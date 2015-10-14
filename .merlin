@@ -1,6 +1,6 @@
-S src/
-S src/wm/
+S src
+S src/wm
 
-B _build/src/
-B _build/src/wm/
+B _build/src
+B _build/src/wm
 
