@@ -23,8 +23,7 @@ let add_xlib_flags () =
 
 
 let add_cocoa_flags () =
-  flag ["c"; "use_lcocoa"; "compile"]
-    (S [A"-ccopt"; A"-framework Foundation -lobjc";]);
+  flag ["c"; "use_lcocoa"; "compile"] (S []);
 
   flag ["c"; "use_lcocoa"; "ocamlmklib"] 
     (S [A"-ccopt"; A"-framework Foundation -lobjc";]);

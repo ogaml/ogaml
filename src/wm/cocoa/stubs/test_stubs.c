@@ -2,7 +2,11 @@
 #include <caml/memory.h>
 #include <caml/alloc.h>
 #include <caml/mlvalues.h> 
-#include <Foundation/NSObjcRuntime.h>
+
+#include <CoreFoundation/CoreFoundation.h>
+
+#include <objc/runtime.h>
+#include <objc/message.h>
 
 CAMLprim value
 caml_cocoa_test(value unit)
