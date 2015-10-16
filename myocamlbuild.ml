@@ -40,7 +40,7 @@ let add_cocoa_flags () =
   flag["link"; "library"; "ocaml"; "native"; "use_libcocoa"]
     (S [A"-cclib"; A"-lcocoa"]);
 
-  dep ["link"; "ocaml"; "use_libcocoa"] ["src/wm/cocoa/cocoa.a"]
+  dep ["link"; "ocaml"; "use_libcocoa"] ["src/wm/cocoa/libcocoa.a"]
 
 
 let _ = dispatch (function
