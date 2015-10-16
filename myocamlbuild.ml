@@ -22,10 +22,30 @@ let add_xlib_flags () =
   dep ["link"; "ocaml"; "use_libxlib"] ["src/wm/xlib/libxlib.a"]
 
 
+let add_cocoa_flags () =
+  flag ["c"; "use_lcocoa"; "compile"]
+    (S [A"-ccopt"; A"-framework Foundation -lobjc";]);
+
+  flag ["c"; "use_lcocoa"; "ocamlmklib"] 
+    (S [A"-ccopt"; A"-framework Foundation -lobjc";]);
+
+  flag ["ocaml"; "use_lcocoa"; "link"; "library"] 
+    (S [A"-cclib"; A"-framework Foundation -lobjc";]);
+
+  ocaml_lib ~extern:true ~dir:"src/wm/cocoa" "cocoa";
+
+  flag["link"; "library"; "ocaml"; "byte"; "use_libcocoa"]
+    (S [A"-dllib"; A"-lcocoa"; A"-cclib"; A"-lcocoa"]);
+
+  flag["link"; "library"; "ocaml"; "native"; "use_libcocoa"]
+    (S [A"-cclib"; A"-lcocoa"]);
+
+  dep ["link"; "ocaml"; "use_libcocoa"] ["src/wm/cocoa/cocoa.a"]
 
 
 let _ = dispatch (function
   | After_rules ->
-    add_xlib_flags ()
+    add_xlib_flags ();
+    add_cocoa_flags ()
   | _ -> ()
   )
