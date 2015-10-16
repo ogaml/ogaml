@@ -1,6 +1,12 @@
 S src
 S src/wm
+S src/wm/xlib
+S src/wm/xlib/stubs
+S src/test
 
 B _build/src
 B _build/src/wm
+B _build/src/wm/xlib
+B _build/src/wm/xlib/stubs
+B _build/src/test
 
