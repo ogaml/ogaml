@@ -1,3 +1,5 @@
+open Cocoa
 
 let () = 
-  Cocoa.test_cocoa ()
+  let ns = NSString.create "Hello binding !" in
+  NSString.print ns
