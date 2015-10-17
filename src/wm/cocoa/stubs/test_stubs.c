@@ -89,6 +89,10 @@ caml_open_window(value unit)
   //                     defer:NO] autorelease];
   // [window setBackgroundColor:[NSColor blueColor]];
   // [window makeKeyAndOrderFront:NSApp];
+  [MyApplication sharedApplication];
+  [NSApp setDelegate: NSApp];
+
+  [NSApp run];
 
   CAMLreturn(Val_unit);
 }

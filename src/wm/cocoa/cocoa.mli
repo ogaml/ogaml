@@ -4,6 +4,8 @@ val init_arp : unit -> unit
 
 val test_cocoa : unit -> unit
 
+val open_window : unit -> unit
+
 module NSString : sig
 
   type t

@@ -1,5 +1,6 @@
 open Cocoa
 
-let () = 
+let () =
   let ns = NSString.create "Hello binding !" in
-  NSString.print ns
+  NSString.print ns ;
+  open_window ()
