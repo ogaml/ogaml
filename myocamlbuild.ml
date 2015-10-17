@@ -48,14 +48,14 @@ let add_gnu_cocoa_flags () =
 
 let add_osx_cocoa_flags () =
   flag ["c"; "use_lcocoa"; "compile"] 
-    (S [A"-ccopt"; A"-x objective-c -lobjc";
+    (S [A"-ccopt"; A"-x objective-c";
         A"-ccopt"; A"-fconstant-string-class=NSConstantString"]);
 
   flag ["c"; "use_lcocoa"; "ocamlmklib"] 
-    (S [A"-ccopt"; A"-framework Foundation -lobjc";]);
+    (S [A"-ccopt"; A"-framework Foundation -framework Cocoa -lobjc";]);
 
   flag ["ocaml"; "use_lcocoa"; "link"; "library"] 
-    (S [A"-cclib"; A"-framework Foundation -lobjc";])
+    (S [A"-cclib"; A"-framework Foundation -framework Cocoa -lobjc";])
 
 
 let add_default_cocoa_flags () =
