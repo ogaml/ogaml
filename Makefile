@@ -24,13 +24,15 @@ xlib-byte:
 	$(OCAMLBUILD) $(XLIB_DIR)/xlib.cma
 
 
-cocoa-nat-test: cocoa-nat
+# Need to clean before compiling, this is a problem with Obj-C...
+cocoa-nat-test: clean cocoa-nat
 	$(OCAMLBUILD) -I $(COCOA_DIR) $(TEST_DIR)/ctest_simple.native
 
-cocoa-byte-test: cocoa-byte
+cocoa-byte-test: clean cocoa-byte
 	$(OCAMLBUILD) -I $(COCOA_DIR) $(TEST_DIR)/ctest_simple.byte
 
-cocoa: cocoa-nat cocoa-byte
+cocoa: clean cocoa-nat cocoa-byte
+
 
 cocoa-nat:
 	$(OCAMLBUILD) $(COCOA_DIR)/cocoa.cmxa

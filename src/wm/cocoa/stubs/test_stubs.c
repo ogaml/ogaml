@@ -1,19 +1,33 @@
-#include <stdio.h>
+#include <caml/custom.h>
+#include <caml/fail.h>
+#include <caml/callback.h>
 #include <caml/memory.h>
 #include <caml/alloc.h>
 #include <caml/mlvalues.h> 
 
-#include <CoreFoundation/CoreFoundation.h>
+#import <Foundation/Foundation.h>
 
-#include <objc/runtime.h>
-#include <objc/message.h>
+static NSAutoreleasePool* arp = nil;
+
+CAMLprim value
+caml_init_arp(value unit)
+{
+  CAMLparam0();
+
+  if(arp == nil) {
+    arp = [[NSAutoreleasePool alloc] init];
+  }
+
+  CAMLreturn(Val_unit);
+}
+
 
 CAMLprim value
 caml_cocoa_test(value unit)
 {
-  void* cls = objc_getClass("NSString");
-  void* obj = objc_msgSend(cls, NSSelectorFromString(CFSTR("alloc")));
-  obj = objc_msgSend(obj, NSSelectorFromString(CFSTR("init")));
-  printf("OK");
-  return Val_unit;
+  CAMLparam0();
+
+  NSLog (@"Binding OK!");
+
+  CAMLreturn(Val_unit);
 }

@@ -1,4 +1,3 @@
 
 let () = 
-  Cocoa.test_cocoa ();
-  print_endline ""
+  Cocoa.test_cocoa ()
