@@ -41,7 +41,7 @@ caml_cocoa_gen_string(value str)
   //Don't know if this pointer will be collected or not...
   char* tmp = String_val(str);
 
-  //Probably not type-safe given that I removed the GC pool
+  //Probably not memory-safe given that I removed the GC pool
   NSString* data = [NSString stringWithFormat:@"%s" , tmp];
 
   CAMLreturn((value) data);
