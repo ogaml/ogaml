@@ -1,3 +1,5 @@
+#define CAML_NAME_SPACE
+
 #include <caml/custom.h>
 #include <caml/fail.h>
 #include <caml/callback.h>
@@ -24,7 +26,7 @@ static NSAutoreleasePool* arp = nil;
   // Indeed we are lucky and allocWithZone ignores its argument, behaving as
   // alloc (wow, much hack)
   // Still no window though
-  NSWindow *window = [[NSWindow allocWithZone:nil] initWithContentRect:NSMakeRect(100, 100, 100, 100)
+  NSWindow *window = [[NSWindow alloc] initWithContentRect:NSMakeRect(100, 100, 100, 100)
                       styleMask:NSTitledWindowMask backing:NSBackingStoreBuffered defer:YES];
 
   // The previous lines use caml_alloc for alloc, hence are not working at
