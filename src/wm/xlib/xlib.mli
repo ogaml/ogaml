@@ -41,3 +41,78 @@ module Atom : sig
   val set_wm_protocols : Display.t -> Window.t -> t list -> unit
 
 end
+
+
+module Event : sig
+
+  type enum = 
+    | KeyPress        
+    | KeyRelease      
+    | ButtonPress     
+    | ButtonRelease   
+    | MotionNotify    
+    | EnterNotify     
+    | LeaveNotify     
+    | FocusIn         
+    | FocusOut        
+    | KeymapNotify    
+    | Expose          
+    | GraphicsExpose  
+    | NoExpose        
+    | VisibilityNotify
+    | CreateNotify    
+    | DestroyNotify   
+    | UnmapNotify     
+    | MapNotify       
+    | MapRequest      
+    | ReparentNotify  
+    | ConfigureNotify 
+    | ConfigureRequest
+    | GravityNotify   
+    | ResizeRequest   
+    | CirculateNotify 
+    | CirculateRequest
+    | PropertyNotify  
+    | SelectionClear  
+    | SelectionRequest
+    | SelectionNotify 
+    | ColormapNotify  
+    | ClientMessage   
+    | MappingNotify   
+    | GenericEvent      
+
+  type mask = 
+    | KeyPressMask            
+    | KeyReleaseMask          
+    | ButtonPressMask         
+    | ButtonReleaseMask       
+    | EnterWindowMask         
+    | LeaveWindowMask         
+    | PointerMotionMask       
+    | PointerMotionHintMask   
+    | Button1MotionMask       
+    | Button2MotionMask       
+    | Button3MotionMask       
+    | Button4MotionMask       
+    | Button5MotionMask       
+    | ButtonMotionMask        
+    | KeymapStateMask         
+    | ExposureMask            
+    | VisibilityChangeMask    
+    | StructureNotifyMask     
+    | ResizeRedirectMask      
+    | SubstructureNotifyMask  
+    | SubstructureRedirectMask
+    | FocusChangeMask         
+    | PropertyChangeMask      
+    | ColormapChangeMask      
+    | OwnerGrabButtonMask  
+    
+  val set_mask : Display.t -> Window.t -> mask list -> unit
+
+  val next : Display.t -> enum option
+
+end
+
+
+

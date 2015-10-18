@@ -9,13 +9,13 @@ COCOA_DIR=src/wm/cocoa
 TEST_DIR=src/test
 
 
-xlib-nat-test: xlib-nat
+xlib-nat-test: clean xlib-nat
 	$(OCAMLBUILD) -I $(XLIB_DIR) $(TEST_DIR)/xtest_simple.native
 
-xlib-byte-test: xlib-byte
+xlib-byte-test: clean xlib-byte
 	$(OCAMLBUILD) -I $(XLIB_DIR) $(TEST_DIR)/xtest_simple.byte
 
-xlib: xlib-nat xlib-byte
+xlib: clean xlib-nat xlib-byte
 
 xlib-nat:
 	$(OCAMLBUILD) $(XLIB_DIR)/xlib.cmxa

@@ -94,3 +94,84 @@ module Atom = struct
     abstract_setwm_protocols disp win arr (Array.length arr)
 
 end
+
+
+(* Event module *)
+module Event = struct
+
+  (* Event enum *)
+  type enum = 
+    | KeyPress        
+    | KeyRelease      
+    | ButtonPress     
+    | ButtonRelease   
+    | MotionNotify    
+    | EnterNotify     
+    | LeaveNotify     
+    | FocusIn         
+    | FocusOut        
+    | KeymapNotify    
+    | Expose          
+    | GraphicsExpose  
+    | NoExpose        
+    | VisibilityNotify
+    | CreateNotify    
+    | DestroyNotify   
+    | UnmapNotify     
+    | MapNotify       
+    | MapRequest      
+    | ReparentNotify  
+    | ConfigureNotify 
+    | ConfigureRequest
+    | GravityNotify   
+    | ResizeRequest   
+    | CirculateNotify 
+    | CirculateRequest
+    | PropertyNotify  
+    | SelectionClear  
+    | SelectionRequest
+    | SelectionNotify 
+    | ColormapNotify  
+    | ClientMessage   
+    | MappingNotify   
+    | GenericEvent    
+
+  (* Event masks enum *)
+  type mask = 
+    | KeyPressMask            
+    | KeyReleaseMask          
+    | ButtonPressMask         
+    | ButtonReleaseMask       
+    | EnterWindowMask         
+    | LeaveWindowMask         
+    | PointerMotionMask       
+    | PointerMotionHintMask   
+    | Button1MotionMask       
+    | Button2MotionMask       
+    | Button3MotionMask       
+    | Button4MotionMask       
+    | Button5MotionMask       
+    | ButtonMotionMask        
+    | KeymapStateMask         
+    | ExposureMask            
+    | VisibilityChangeMask    
+    | StructureNotifyMask     
+    | ResizeRedirectMask      
+    | SubstructureNotifyMask  
+    | SubstructureRedirectMask
+    | FocusChangeMask         
+    | PropertyChangeMask      
+    | ColormapChangeMask      
+    | OwnerGrabButtonMask     
+
+
+  (* Exposed functions *)
+  external set_mask : Display.t -> Window.t -> mask list -> unit 
+    = "caml_xselect_input"
+
+  external next : Display.t -> enum option = "caml_xnext_event"
+
+end
+
+
+

@@ -18,7 +18,12 @@ let () =
     |Some(a) -> Atom.set_wm_protocols d win [a]
   end;
   Window.map d win;
+  Event.set_mask d win [Event.ExposureMask; Event.KeyPressMask; Event.ButtonPressMask];
   Display.flush d;
-  while true do
-    ()
-  done
+  let rec loop () = 
+    match Event.next d with
+    |Some e when e = Event.ClientMessage -> print_endline "Window closed"; ()
+    |Some e when e = Event.KeyPress -> print_endline "Key pressed"; loop ()
+    | _ -> loop()
+  in
+  loop ()

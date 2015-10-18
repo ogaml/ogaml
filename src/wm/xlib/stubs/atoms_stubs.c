@@ -18,7 +18,7 @@ caml_xintern_atom(value disp, value nm, value exists)
   if(tmp == None)
     CAMLreturn(Val_int(0));
   else {
-    Store_field(opt, 0, tmp);
+    Store_field(opt, 0, (value)tmp);
     CAMLreturn(opt);
   }
 }
