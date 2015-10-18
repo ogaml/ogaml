@@ -42,7 +42,8 @@ let lib_flags = "-framework Foundation -framework Cocoa -lobjc"
 
 let add_gnu_cocoa_flags () =
   flag ["c"; "use_lcocoa"; "compile"] 
-    (S [A"-ccopt"; A"-x objective-c";
+    (S [A"-cc"; A"clang";
+        A"-ccopt"; A"-x objective-c";
         A"-ccopt"; A gnustep_flags]);
 
   flag ["c"; "use_lcocoa"; "ocamlmklib"] 
