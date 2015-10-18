@@ -20,8 +20,14 @@ static NSAutoreleasePool* arp = nil;
 
 - (void) applicationDidFinishLaunching: (NSNotification *) note
 {
-    NSWindow *window = [[NSWindow alloc] initWithContentRect:NSMakeRect(100, 100, 100, 100)
-                        styleMask:NSTitledWindowMask backing:NSBackingStoreBuffered defer:YES];
+    // NSWindow *window = [[NSWindow alloc] initWithContentRect:NSMakeRect(100, 100, 100, 100)
+    //                     styleMask:NSTitledWindowMask backing:NSBackingStoreBuffered defer:YES];
+
+    // The previous lines use caml_alloc for alloc, hence are not working at
+    // runtime. Since [NSWindow new] is short for [[NSWindow alloc] init],
+    // the following line works, no runtime error, no window shows, but no error
+    // and the program expects a CTRL+C.
+    NSWindow *window = [NSWindow new];
 
     self.window = window;
 }
