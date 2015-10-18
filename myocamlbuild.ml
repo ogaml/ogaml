@@ -33,17 +33,22 @@ let add_xlib_flags () =
   dep ["link"; "ocaml"; "use_libxlib"] ["src/wm/xlib/libxlib.a"]
 
 
+let gnustep_flags = "-MMD -MP -DGNUSTEP -DGNUSTEP_BASE_LIBRARY=1 -DGNU_GUI_LIBRARY=1 -DGNU_RUNTIME=1 -DGNUSTEP_BASE_LIBRARY=1 -fno-strict-aliasing -fexceptions -fobjc-exceptions -D_NATIVE_OBJC_EXCEPTIONS -pthread -fPIC -Wall -DGSWARN -DGSDIAGNOSE -Wno-import -g -O2 -fgnu-runtime -fconstant-string-class=NSConstantString -I. -I/home/victor/GNUstep/Library/Headers -I/usr/local/include/GNUstep -I/usr/include/GNUstep"
+
+let gnustep_libs = "-rdynamic -shared-libgcc -pthread -fexceptions -fgnu-runtime -L/home/victor/GNUstep/Library/Libraries -L/usr/local/lib -L/usr/lib -lgnustep-gui -lgnustep-base -lobjc -lm"
+
+let lib_flags = "-framework Foundation -framework Cocoa -lobjc"
+
 let add_gnu_cocoa_flags () =
   flag ["c"; "use_lcocoa"; "compile"] 
-    (S [A"-ccopt"; A"-x objective-c -lobjc";
-        A"-ccopt"; A"-I /usr/include/GNUstep/";
-        A"-ccopt"; A"-fconstant-string-class=NSConstantString"]);
+    (S [A"-ccopt"; A"-x objective-c";
+        A"-ccopt"; A gnustep_flags]);
 
   flag ["c"; "use_lcocoa"; "ocamlmklib"] 
-    (S [A"-ccopt"; A"-framework Foundation -lobjc";]);
+    (S [A"-ccopt"; A lib_flags;]);
 
   flag ["ocaml"; "use_lcocoa"; "link"; "library"] 
-    (S [A"-cclib"; A"-lobjc -lgnustep-base";])
+    (S [A"-cclib"; A gnustep_libs])
 
 
 let add_osx_cocoa_flags () =
@@ -52,10 +57,10 @@ let add_osx_cocoa_flags () =
         A"-ccopt"; A"-fconstant-string-class=NSConstantString"]);
 
   flag ["c"; "use_lcocoa"; "ocamlmklib"] 
-    (S [A"-ccopt"; A"-framework Foundation -framework Cocoa -lobjc";]);
+    (S [A"-ccopt"; A lib_flags;]);
 
   flag ["ocaml"; "use_lcocoa"; "link"; "library"] 
-    (S [A"-cclib"; A"-framework Foundation -framework Cocoa -lobjc";])
+    (S [A"-cclib"; A lib_flags;])
 
 
 let add_default_cocoa_flags () =
