@@ -14,3 +14,12 @@ module NSString = struct
   external print : t -> unit = "caml_cocoa_print_string"
 
 end
+
+(* module NSApplication = struct
+
+  type t
+
+  (* Abstract functions *)
+  external abstract_create : string option -> t = "caml_cocoa_create_app"
+
+end *)

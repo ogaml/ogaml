@@ -55,6 +55,25 @@ static NSAutoreleasePool* arp = nil;
     [super stop: self];
 }
 
+// This doesn't appear to change the name
+// +(NSString*)applicationName
+// {
+//     // // First, try localized name
+//     // NSString* appName = [[[NSBundle mainBundle] localizedInfoDictionary] objectForKey:@"CFBundleDisplayName"];
+//     //
+//     // // Then, try non-localized name
+//     // if ((appName == nil) || ([appName length] == 0))
+//     //     appName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+//     //
+//     // // Finally, fallback to the process info
+//     // if ((appName == nil) || ([appName length] == 0))
+//     //     appName = [[NSProcessInfo processInfo] processName];
+//     //
+//     // return appName;
+//
+//     return @"Test";
+// }
+
 @end
 
 
@@ -122,3 +141,12 @@ caml_open_window(value unit)
 
   CAMLreturn(Val_unit);
 }
+
+// CAMLprim value
+// caml_cocoa_create_app(value str)
+// {
+//   CAMLparam1(name);
+//
+//   if(name == Val_int(0))
+//     CAMLreturn( (value) )
+// }

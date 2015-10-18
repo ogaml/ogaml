@@ -15,3 +15,11 @@ module NSString : sig
   val print : t -> unit
 
 end
+
+(* module NSApplication : sig
+
+  type t
+
+  val create : ?name:string -> unit -> t
+
+end *)
