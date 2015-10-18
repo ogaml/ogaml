@@ -41,7 +41,7 @@ module Display = struct
 end
 
 
-(* Module window *)
+(* Window module *)
 module Window = struct
 
   (* Window type *)
@@ -55,17 +55,42 @@ module Window = struct
     Display.t -> t -> (int * int) -> (int * int) -> int -> t
     = "caml_xcreate_simple_window"
 
-  external map_window : Display.t -> t -> unit = "caml_xmap_window"
+  external map : Display.t -> t -> unit = "caml_xmap_window"
 
 
   (* Implementation of abstract functions *)
-  let root_window ?screen display =
+  let root_of ?screen display =
     match screen with
     |None -> abstract_root_window display (Display.default_screen display)
     |Some(s) -> abstract_root_window display s
 
-  let create_simple_window ~display ~parent ~size ~origin ~background = 
+  let create_simple ~display ~parent ~size ~origin ~background = 
     abstract_create_simple_window display parent origin size background
 
+
+end
+
+
+(* Atom module *)
+module Atom = struct
+
+  (* Atom type *)
+  type t
+
+
+  (* Abstract functions *)
+  external abstract_setwm_protocols : 
+    Display.t -> Window.t -> t array -> int -> unit
+    = "caml_xset_wm_protocols"
+
+
+  (* Exposed functions *)
+  external intern : Display.t -> string -> bool -> t option = "caml_xintern_atom"
+
+
+  (* Implementation *)
+  let set_wm_protocols disp win plist = 
+    let arr = Array.of_list plist in
+    abstract_setwm_protocols disp win arr (Array.length arr)
 
 end

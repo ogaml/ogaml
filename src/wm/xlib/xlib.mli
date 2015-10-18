@@ -22,11 +22,22 @@ module Window : sig
 
   type t
 
-  val root_window : ?screen:int -> Display.t -> t
+  val root_of : ?screen:int -> Display.t -> t
 
-  val create_simple_window : display:Display.t -> parent:t -> size:(int * int) -> 
-                             origin:(int * int) -> background:int -> t
+  val create_simple : display:Display.t -> parent:t -> size:(int * int) -> 
+                      origin:(int * int) -> background:int -> t
 
-  val map_window : Display.t -> t -> unit
+  val map : Display.t -> t -> unit
+
+end
+
+
+module Atom : sig
+
+  type t
+
+  val intern : Display.t -> string -> bool -> t option
+
+  val set_wm_protocols : Display.t -> Window.t -> t list -> unit
 
 end
