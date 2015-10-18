@@ -39,6 +39,7 @@ static NSAutoreleasePool* arp = nil;
   [self.window setBackgroundColor:[NSColor blueColor]];
   [self.window makeKeyAndOrderFront:NSApp];
   [self.window center];
+  [self.window makeMainWindow];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
