@@ -13,8 +13,7 @@
 static NSAutoreleasePool* arp = nil;
 
 @interface MyApplication : NSApplication
-
-@property (strong, nonatomic) NSWindow *window;
+@property (strong,retain) NSWindow *window;
 
 @end
 
@@ -22,20 +21,51 @@ static NSAutoreleasePool* arp = nil;
 
 - (void) applicationDidFinishLaunching: (NSNotification *) note
 {
-  // Since alloc isn't recognized, allocWithZone:nil would do the trick
-  // Indeed we are lucky and allocWithZone ignores its argument, behaving as
-  // alloc (wow, much hack)
-  // Still no window though
-  NSWindow *window = [[NSWindow alloc] initWithContentRect:NSMakeRect(100, 100, 100, 100)
+  self.window = [[NSWindow alloc] initWithContentRect:NSMakeRect(100, 100, 100, 100)
                       styleMask:NSTitledWindowMask backing:NSBackingStoreBuffered defer:YES];
 
-  // The previous lines use caml_alloc for alloc, hence are not working at
-  // runtime. Since [NSWindow new] is short for [[NSWindow alloc] init],
-  // the following line works, no runtime error, no window shows, but no error
-  // and the program expects a CTRL+C.
-  // NSWindow *window = [NSWindow new];
+  // [self.window close];
+  //
+  // [super stop: self];
+}
 
-  self.window = window;
+- (void)applicationWillTerminate:(NSNotification *)aNotification {
+    // Insert code here to tear down your application
+    NSLog (@"Leaving the application");
+
+    [self.window close];
+
+    [super stop: self];
+}
+
+@end
+
+// My AppDelegate
+@interface AppDelegate : NSObject <NSApplicationDelegate>
+
+
+@end
+
+@interface AppDelegate ()
+
+@property () IBOutlet NSWindow *window;
+@end
+
+@implementation AppDelegate
+
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    // Insert code here to initialize your application
+    self.window = [[NSWindow alloc] initWithContentRect: NSMakeRect(100, 100, 100, 100)
+                  styleMask: NSTitledWindowMask backing: NSBackingStoreBuffered defer: YES];
+
+    [self.window close];
+
+    // [super stop: self];
+}
+
+- (void)applicationWillTerminate:(NSNotification *)aNotification {
+    // Insert code here to tear down your application
+    NSLog (@"Leaving the application");
 }
 
 @end
@@ -101,10 +131,33 @@ caml_open_window(value unit)
   //                     defer:NO] autorelease];
   // [window setBackgroundColor:[NSColor blueColor]];
   // [window makeKeyAndOrderFront:NSApp];
-  [MyApplication sharedApplication];
-  [NSApp setDelegate: NSApp];
 
-  [NSApp run];
+  // [MyApplication sharedApplication];
+  // [NSApp setDelegate: NSApp];
+  //
+  // [NSApp run];
+
+  // Third way (w/ AppDelegate)
+  // NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+  // [NSApplication sharedApplication];
+  //
+  // AppDelegate *appDelegate = [[AppDelegate alloc] init];
+  // [NSApp setDelegate:appDelegate];
+  // [NSApp run];
+  // [pool release];
+
+  // Fourth way (w/ NSApplication)
+  @autoreleasepool
+  {
+    const ProcessSerialNumber psn = { 0, kCurrentProcess };
+    TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+    SetFrontProcess(&psn);
+
+    [MyApplication sharedApplication];
+    [NSApp setDelegate: NSApp];
+
+    [NSApp run];
+  }
 
   CAMLreturn(Val_unit);
 }
