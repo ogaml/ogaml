@@ -39,6 +39,7 @@ static NSAutoreleasePool* arp = nil;
   [self.window setBackgroundColor:[NSColor blueColor]];
   [self.window makeKeyAndOrderFront:NSApp];
   [self.window center];
+  [self.window makeMainWindow];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
@@ -111,9 +112,10 @@ caml_open_window(value unit)
 {
   CAMLparam0();
 
-  [[MyApplication sharedApplication] activateIgnoringOtherApps:YES];
+  [MyApplication sharedApplication];
   [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
-  [NSApp setDelegate: NSApp];
+  [NSApp activateIgnoringOtherApps:YES];
+  [[NSApplication sharedApplication] setDelegate:NSApp];
 
   [NSApp run];
   [NSApp activateIgnoringOtherApps:YES];
