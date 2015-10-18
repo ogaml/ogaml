@@ -25,8 +25,22 @@ static NSAutoreleasePool* arp = nil;
 
 - (void) applicationDidFinishLaunching: (NSNotification *) note
 {
-  self.window = [[NSWindow alloc] initWithContentRect:NSMakeRect(100, 100, 100, 100)
-                      styleMask:NSTitledWindowMask backing:NSBackingStoreBuffered defer:YES];
+  // self.window = [[NSWindow alloc] initWithContentRect:NSMakeRect(100, 100, 100, 100)
+                      // styleMask:NSTitledWindowMask backing:NSBackingStoreBuffered defer:YES];
+  NSRect frame = NSMakeRect(100, 100, 200, 200);
+  self.window = [[[NSWindow alloc] initWithContentRect:frame
+                // styleMask:NSBorderlessWindowMask
+                styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
+                backing:NSBackingStoreBuffered
+                defer:NO] autorelease];
+  [self.window setBackgroundColor:[NSColor blueColor]];
+  [self.window makeKeyAndOrderFront:NSApp];
+  [self.window center];
+
+  // Apparently I don't have the right to do that...
+  // [self.window makeMainWindow];
+
+  // [self.window display];
 
   // [self.window close];
   //
@@ -37,7 +51,11 @@ static NSAutoreleasePool* arp = nil;
     // Insert code here to tear down your application
     NSLog (@"Leaving the application");
 
-    [self.window close];
+    // I don't know how bad it is not to close the window when quiting but
+    // if you close it before quiting, you get a segfault
+    // if ([self.window screen] != nil) {
+    //   [self.window close];
+    // }
 
     [super stop: self];
 }
@@ -155,7 +173,8 @@ caml_open_window(value unit)
   {
     const ProcessSerialNumber psn = { 0, kCurrentProcess };
     TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-    SetFrontProcess(&psn);
+    // SetFrontProcess(&psn); // This is deperecated
+    // Removing it means the window doesn't get the focus right away
 
     [MyApplication sharedApplication];
     [NSApp setDelegate: NSApp];
