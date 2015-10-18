@@ -31,26 +31,14 @@ static NSAutoreleasePool* arp = nil;
 
 - (void) applicationDidFinishLaunching: (NSNotification *) note
 {
-  // self.window = [[NSWindow alloc] initWithContentRect:NSMakeRect(100, 100, 100, 100)
-                      // styleMask:NSTitledWindowMask backing:NSBackingStoreBuffered defer:YES];
   NSRect frame = NSMakeRect(100, 100, 200, 200);
   self.window = [[[NSWindow alloc] initWithContentRect:frame
-                // styleMask:NSBorderlessWindowMask
                 styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
                 backing:NSBackingStoreBuffered
                 defer:NO] autorelease];
   [self.window setBackgroundColor:[NSColor blueColor]];
   [self.window makeKeyAndOrderFront:NSApp];
   [self.window center];
-
-  // Apparently I don't have the right to do that...
-  // [self.window makeMainWindow];
-
-  // [self.window display];
-
-  // [self.window close];
-  //
-  // [super stop: self];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
@@ -64,37 +52,6 @@ static NSAutoreleasePool* arp = nil;
     // }
 
     [super stop: self];
-}
-
-@end
-
-// My AppDelegate
-@interface AppDelegate : NSObject <NSApplicationDelegate> {
-  NSWindow *_window;
-}
-
-@property (assign) IBOutlet NSWindow *window;
-
-@end
-
-
-@implementation AppDelegate
-
-@synthesize window = _window;
-
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    // Insert code here to initialize your application
-    self.window = [[NSWindow alloc] initWithContentRect: NSMakeRect(100, 100, 100, 100)
-                  styleMask: NSTitledWindowMask backing: NSBackingStoreBuffered defer: YES];
-
-    [self.window close];
-
-    // [super stop: self];
-}
-
-- (void)applicationWillTerminate:(NSNotification *)aNotification {
-    // Insert code here to tear down your application
-    NSLog (@"Leaving the application");
 }
 
 @end
@@ -154,41 +111,12 @@ caml_open_window(value unit)
 {
   CAMLparam0();
 
-  // NSRect frame = NSMakeRect(0, 0, 200, 200);
-  // NSWindow* window  = [[[NSWindow alloc] initWithContentRect:frame
-  //                     styleMask:NSBorderlessWindowMask
-  //                     backing:NSBackingStoreBuffered
-  //                     defer:NO] autorelease];
-  // [window setBackgroundColor:[NSColor blueColor]];
-  // [window makeKeyAndOrderFront:NSApp];
+  [[MyApplication sharedApplication] activateIgnoringOtherApps:YES];
+  [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+  [NSApp setDelegate: NSApp];
 
-  // [MyApplication sharedApplication];
-  // [NSApp setDelegate: NSApp];
-  //
-  // [NSApp run];
-
-  // Third way (w/ AppDelegate)
-  // NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-  // [NSApplication sharedApplication];
-  //
-  // AppDelegate *appDelegate = [[AppDelegate alloc] init];
-  // [NSApp setDelegate:appDelegate];
-  // [NSApp run];
-  // [pool release];
-
-  // Fourth way (w/ NSApplication)
-
-//    Commented out, deprecated w/ Cocoa, doesn't work with GNUStep
-//    const ProcessSerialNumber psn = { 0, kCurrentProcess };
-//    TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-
-    // SetFrontProcess(&psn); // This is deperecated
-    // Removing it means the window doesn't get the focus right away
-
-    [MyApplication sharedApplication];
-    [NSApp setDelegate: NSApp];
-
-    [NSApp run];
+  [NSApp run];
+  [NSApp activateIgnoringOtherApps:YES];
 
   CAMLreturn(Val_unit);
 }
