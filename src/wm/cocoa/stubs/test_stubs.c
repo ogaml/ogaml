@@ -1,5 +1,9 @@
 #define CAML_NAME_SPACE
 
+#ifndef __APPLE__
+#define strong retain
+#endif
+
 #include <caml/custom.h>
 #include <caml/fail.h>
 #include <caml/callback.h>
