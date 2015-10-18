@@ -7,10 +7,12 @@ let () =
   Printf.printf "Screen resolution (px) : %ix%i\n%!" w h;
   Printf.printf "Screen size (mm) : %ix%i\n%!" wmm hmm;
   Printf.printf "Screen definition (ppi) : %f\n%!" ((float_of_int w) *. 25.4 /. (float_of_int wmm));
-  let rwin = Display.root_window d in
-  let win = Display.create_simple_window 
-    ~display:d ~parent:rwin ~size:(800,600) ~origin:(50,50)
+  let rwin = Window.root_window d in
+  let win = Window.create_simple_window 
+    ~display:d ~parent:rwin ~size:(800,600) ~origin:(50,50) ~background:(255 * 256 * 256)
   in
-  Display.map_window d win;
+  Window.map_window d win;
   Display.flush d;
-  Unix.sleep 3
+  while true do
+    ()
+  done

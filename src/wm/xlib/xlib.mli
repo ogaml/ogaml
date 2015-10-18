@@ -3,8 +3,6 @@ module Display : sig
 
   type t
 
-  type window
-
   val create : ?hostname:string -> ?display:int -> ?screen:int -> unit -> t
 
   val screen_count : t -> int
@@ -17,11 +15,18 @@ module Display : sig
 
   val screen_size_mm : ?screen:int -> t -> (int * int)
 
-  val root_window : ?screen:int -> t -> window
+end
 
-  val create_simple_window : display:t -> parent:window -> size:(int * int) -> 
-                             origin:(int * int) -> window
 
-  val map_window : t -> window -> unit
+module Window : sig
+
+  type t
+
+  val root_window : ?screen:int -> Display.t -> t
+
+  val create_simple_window : display:Display.t -> parent:t -> size:(int * int) -> 
+                             origin:(int * int) -> background:int -> t
+
+  val map_window : Display.t -> t -> unit
 
 end
