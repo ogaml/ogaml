@@ -16,12 +16,18 @@
 
 static NSAutoreleasePool* arp = nil;
 
-@interface MyApplication : NSApplication
-@property (strong,retain) NSWindow *window;
+@interface MyApplication : NSApplication {
+  NSWindow* _window;
+}
+
+@property (strong, nonatomic) NSWindow *window;
 
 @end
 
+
 @implementation MyApplication
+
+@synthesize window = _window;
 
 - (void) applicationDidFinishLaunching: (NSNotification *) note
 {
@@ -63,17 +69,18 @@ static NSAutoreleasePool* arp = nil;
 @end
 
 // My AppDelegate
-@interface AppDelegate : NSObject <NSApplicationDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate> {
+  NSWindow *_window;
+}
 
+@property (assign) IBOutlet NSWindow *window;
 
 @end
 
-@interface AppDelegate ()
-
-@property () IBOutlet NSWindow *window;
-@end
 
 @implementation AppDelegate
+
+@synthesize window = _window;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
@@ -91,6 +98,7 @@ static NSAutoreleasePool* arp = nil;
 }
 
 @end
+
 
 CAMLprim value
 caml_init_arp(value unit)
@@ -169,10 +177,11 @@ caml_open_window(value unit)
   // [pool release];
 
   // Fourth way (w/ NSApplication)
-  @autoreleasepool
-  {
-    const ProcessSerialNumber psn = { 0, kCurrentProcess };
-    TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+
+//    Commented out, deprecated w/ Cocoa, doesn't work with GNUStep
+//    const ProcessSerialNumber psn = { 0, kCurrentProcess };
+//    TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+
     // SetFrontProcess(&psn); // This is deperecated
     // Removing it means the window doesn't get the focus right away
 
@@ -180,7 +189,6 @@ caml_open_window(value unit)
     [NSApp setDelegate: NSApp];
 
     [NSApp run];
-  }
 
   CAMLreturn(Val_unit);
 }
