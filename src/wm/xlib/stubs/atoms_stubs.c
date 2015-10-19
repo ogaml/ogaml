@@ -1,8 +1,5 @@
 #include <X11/Xlib.h>
-#include <stdio.h>
-#include <caml/memory.h>
-#include <caml/alloc.h>
-#include <caml/mlvalues.h>
+#include "../../../utils/stubs.h"
 
 
 // INPUT   display, atom name, boolean
@@ -12,15 +9,11 @@ CAMLprim value
 caml_xintern_atom(value disp, value nm, value exists)
 {
   CAMLparam3(disp, nm, exists);
-  CAMLlocal1(opt);
-  opt = caml_alloc(1, 0);
   Atom tmp = XInternAtom((Display*) disp, String_val(nm), Bool_val(exists));
   if(tmp == None)
     CAMLreturn(Val_int(0));
-  else {
-    Store_field(opt, 0, (value)tmp);
-    CAMLreturn(opt);
-  }
+  else
+    CAMLreturn(Val_some((value)tmp));
 }
 
 

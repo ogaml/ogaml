@@ -11,13 +11,23 @@ let sys =
   else if uname = "Darwin" then OSX
   else failwith "Unknown exploitation system"
 
+let utils_dir = "../src/utils"
+
+let xlib_dir = "../src/wm/xlib"
+
+let xlib_stubs_dir = xlib_dir ^ "/stubs"
+
+let add_default_flags () = 
+  flag ["c"; "compile"; "utils"]
+    (S [A"-ccopt"; A("-I"^utils_dir)])
 
 let add_xlib_flags () =
   flag ["c"; "use_x11"; "compile"]
-    (S [A"-ccopt"; A"-I/usr/include/X11";]);
+    (S [A"-ccopt"; A"-I/usr/include/X11";
+        A"-ccopt"; A("-I"^xlib_stubs_dir);]);
 
   flag ["c"; "use_x11"; "ocamlmklib"]
-    (S [A"-lX11";]);
+    (S [A"-lX11"]);
 
   flag ["ocaml"; "use_x11"; "link"; "library"]
     (S [A"-cclib"; A"-lX11";]);
@@ -80,10 +90,12 @@ let add_default_cocoa_flags () =
 
 let _ = dispatch (function
   | After_rules when sys = Linux ->
+    add_default_flags ();
     add_xlib_flags ();
     add_gnu_cocoa_flags ();
     add_default_cocoa_flags ()
   | After_rules when sys = OSX ->
+    add_default_flags ();
     add_xlib_flags ();
     add_osx_cocoa_flags ();
     add_default_cocoa_flags ()

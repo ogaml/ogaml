@@ -1,3 +1,5 @@
+<src/utils/*> : utils
+
 <src/wm/xlib/stubs/*.c> : use_x11
 <src/wm/xlib/libxlib.*> : use_x11
 <src/wm/xlib/xlib.cm{x,}a> : use_x11, use_libxlib

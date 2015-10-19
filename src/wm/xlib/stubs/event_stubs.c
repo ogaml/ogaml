@@ -1,8 +1,5 @@
 #include <X11/Xlib.h>
-#include <stdio.h>
-#include <caml/memory.h>
-#include <caml/alloc.h>
-#include <caml/mlvalues.h>
+#include "../../../utils/stubs.h"
 
 
 // INPUT   display, window, mask list
@@ -39,13 +36,10 @@ CAMLprim value
 caml_xnext_event(value disp)
 {
   CAMLparam1(disp);
-  CAMLlocal1(opt);
-  opt = caml_alloc(1, 0);
+  // NOT SAFE
   XEvent event;
-  if(XCheckIfEvent((Display*) disp, &event, &checkEvent, NULL) == True) {
-    Store_field(opt, 0, (value) &event);
-    CAMLreturn(opt);
-  } 
+  if(XCheckIfEvent((Display*) disp, &event, &checkEvent, NULL) == True) 
+    CAMLreturn(Val_some((value) &event));
   else
     CAMLreturn(Val_int(0));
 }
