@@ -23,3 +23,11 @@ module OGApplication : sig
   val create : unit -> t
 
 end
+
+module OGApplicationDelegate : sig
+
+  type t
+
+  val create : unit -> t
+
+end

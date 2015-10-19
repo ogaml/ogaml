@@ -28,3 +28,16 @@
 -(void)sendEvent:(NSEvent*)anEvent;
 
 @end
+
+
+// Application specific events processing
+/////////////////////////////////////////
+@interface OGApplicationDelegate : NSObject <NSApplicationDelegate>
+
+// Handling of termination notification
+-(NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender;
+
+// Once all windows are closed
+-(BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication*)app;
+
+@end

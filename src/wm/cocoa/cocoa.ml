@@ -26,3 +26,15 @@ module OGApplication = struct
   let create () = abstract_create ()
 
 end
+
+module OGApplicationDelegate = struct
+
+  type t
+
+  (* Abstract functions *)
+  external abstract_create : unit -> t = "caml_cocoa_create_appdgt"
+
+  (* Exposed functions *)
+  let create () = abstract_create ()
+
+end

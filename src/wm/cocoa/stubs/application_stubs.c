@@ -1,6 +1,8 @@
 #import "stubs.h"
 
 
+// OGApplication implementation
+///////////////////////////////
 @implementation OGApplication
 
 +(void)processEvent
@@ -64,10 +66,43 @@
 
 // OGApplication binding
 ////////////////////////
+
 CAMLprim value
 caml_cocoa_create_app(value unit)
 {
   CAMLparam0();
 
   CAMLreturn( (value) [OGApplication new] );
+}
+
+
+// OGApplicationDelegate implementation
+///////////////////////////////////////
+@implementation OGApplicationDelegate
+
+-(NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
+{
+  (void)sender;
+  // TODO Notify closure for all windows
+  // return NSTerminateCancel;
+  return NSTerminateNow;
+}
+
+-(BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication*)app
+{
+  (void)app;
+  return YES;
+}
+
+@end
+
+// OGApplicationDelegate binding
+////////////////////////////////
+
+CAMLprim value
+caml_cocoa_create_appdgt(value unit)
+{
+  CAMLparam0();
+
+  CAMLreturn( (value) [OGApplicationDelegate new] );
 }
