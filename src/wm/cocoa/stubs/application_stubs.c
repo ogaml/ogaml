@@ -1,4 +1,4 @@
-#import "stubs.h"
+#import "cocoa_stubs.h"
 
 
 // OGApplication implementation
