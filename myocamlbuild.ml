@@ -1,6 +1,7 @@
 open Ocamlbuild_plugin
 open Command
 
+(* OS *)
 type sys_type = OSX | Linux
 
 let sys =
@@ -11,40 +12,24 @@ let sys =
   else if uname = "Darwin" then OSX
   else failwith "Unknown exploitation system"
 
-let utils_dir = "../src/utils"
 
-let xlib_dir = "../src/wm/xlib"
+(* Directories *)
+let root_dir   = ".."
 
-let xlib_stubs_dir = xlib_dir ^ "/stubs"
+let utils_dir  = root_dir ^ "/src/utils"
 
+let window_dir = root_dir ^ "/src/wm"
 
-let add_default_flags () = 
-  flag ["c"; "compile"; "utils"]
-    (S [A"-ccopt"; A("-I"^utils_dir)])
+let xlib_dir   = window_dir ^ "/xlib"
 
+let cocoa_dir  = window_dir ^ "/cocoa"
 
-let add_xlib_flags () =
-  flag ["c"; "use_x11"; "compile"]
-    (S [A"-ccopt"; A"-I/usr/include/X11";
-        A"-ccopt"; A("-I"^xlib_stubs_dir);]);
+let stub_dir s = s ^ "/stubs"
 
-  flag ["c"; "use_x11"; "ocamlmklib"]
-    (S [A"-lX11"]);
-
-  flag ["ocaml"; "use_x11"; "link"; "library"]
-    (S [A"-cclib"; A"-lX11";]);
-
-  ocaml_lib ~extern:true ~dir:"src/wm/xlib" "xlib";
-
-  flag["link"; "library"; "ocaml"; "byte"; "use_libxlib"]
-    (S [A"-dllib"; A"-lxlib"; A"-cclib"; A"-lxlib"]);
-
-  flag["link"; "library"; "ocaml"; "native"; "use_libxlib"]
-    (S [A"-cclib"; A"-lxlib"]);
-
-  dep ["link"; "ocaml"; "use_libxlib"] ["src/wm/xlib/libxlib.a"]
+let x11_dir = "/usr/include/X11"
 
 
+(* Constants *)
 let gnustep_flags = "-MMD -MP -DGNUSTEP -DGNUSTEP_BASE_LIBRARY=1 -DGNU_GUI_LIBRARY=1 -DGNU_RUNTIME=1 -DGNUSTEP_BASE_LIBRARY=1 -fno-strict-aliasing -fexceptions -fobjc-exceptions -D_NATIVE_OBJC_EXCEPTIONS -pthread -fPIC -Wall -DGSWARN -DGSDIAGNOSE -Wno-import -g -O2 -fgnu-runtime -fconstant-string-class=NSConstantString -I. -I/home/victor/GNUstep/Library/Headers -I/usr/local/include/GNUstep -I/usr/include/GNUstep"
 
 let gnustep_libs = "-rdynamic -shared-libgcc -pthread -fexceptions -fgnu-runtime -L/home/victor/GNUstep/Library/Libraries -L/usr/local/lib -L/usr/lib -lgnustep-gui -lgnustep-base -lobjc -lm"
@@ -52,45 +37,131 @@ let gnustep_libs = "-rdynamic -shared-libgcc -pthread -fexceptions -fgnu-runtime
 let lib_flags = "-framework Foundation -framework Cocoa -lobjc"
 
 
+(* Utils *)
+type options = 
+  | Compiler of string
+  | Include of string
+  | Clib of string
+  | Dlib of string
+  | Other of string
+  | ObjC
+  | OtherOpt of string
+  | OtherLib of string
+
+let add_flags l opt = 
+  flag l (S (List.flatten (List.map 
+    (function
+      |Compiler s-> [A "-cc"   ; A s]
+      |Include s -> [A "-ccopt"; A ("-I"^s)]
+      |Clib s    -> [A "-cclib"; A ("-l"^s )]
+      |Dlib s    -> [A "-dllib"; A ("-l"^s )]
+      |Other s   -> [A s]
+      |ObjC      -> [A "-ccopt"; A "-x objective-c"]
+      |OtherOpt s-> [A "-ccopt"; A s]
+      |OtherLib s-> [A "-cclib"; A s]
+    )
+    opt
+  )))
+
+
+(* Default flags *)
+let add_default_flags () = 
+  ocaml_lib ~extern:true ~dir:"src/wm" "ogamlWindow";
+
+  add_flags 
+    ["c"; "compile"; "utils"]
+    [Include utils_dir]
+
+
+(* Xlib flags (linux only) *)
+let add_xlib_flags () =
+  add_flags
+    ["c"; "use_x11"; "compile"]
+    [Include x11_dir;
+     Include (stub_dir xlib_dir)];
+
+  add_flags 
+    ["c"; "use_x11"; "ocamlmklib"]
+    [Other "-lX11"];
+
+  add_flags 
+    ["ocaml"; "use_x11"; "link"; "library"]
+    [Clib "X11"];
+
+  ocaml_lib ~extern:true ~dir:"src/wm/xlib" "xlib";
+
+  add_flags
+    ["link"; "library"; "ocaml"; "byte"; "use_libxlib"]
+    [Dlib "xlib"; Clib "xlib"];
+
+  add_flags
+    ["link"; "library"; "ocaml"; "native"; "use_libxlib"]
+    [Clib "xlib"];
+
+  dep ["link"; "ocaml"; "use_libxlib"] ["src/wm/xlib/libxlib.a"]
+
+
+(* Cocoa flags (linux part) *)
 let add_gnu_cocoa_flags () =
-  flag ["c"; "use_lcocoa"; "compile"]
-    (S [A"-cc"; A"clang";
-        A"-ccopt"; A"-x objective-c";
-        A"-ccopt"; A gnustep_flags]);
+  add_flags 
+    ["c"; "use_lcocoa"; "compile"]
+    [Compiler "clang";
+     ObjC;
+     OtherOpt gnustep_flags;
+     Include utils_dir;
+     Include (stub_dir cocoa_dir)];
 
-  flag ["c"; "use_lcocoa"; "ocamlmklib"]
-    (S [A"-ccopt"; A lib_flags;]);
+  add_flags 
+    ["c"; "use_lcocoa"; "ocamlmklib"]
+    [OtherOpt lib_flags];
 
-  flag ["ocaml"; "use_lcocoa"; "link"; "library"]
-    (S [A"-cclib"; A gnustep_libs])
+  add_flags
+    ["ocaml"; "use_lcocoa"; "link"; "library"]
+    [OtherLib gnustep_libs]
 
 
+(* Cocoa flags (osx part) *)
 let add_osx_cocoa_flags () =
-  flag ["c"; "use_lcocoa"; "compile"]
-    (S [A"-ccopt"; A"-x objective-c";
-        A"-ccopt"; A"-fconstant-string-class=NSConstantString";
-        A"-ccopt"; A"-I../src/wm/cocoa/stubs"]);
+  add_flags 
+    ["c"; "use_lcocoa"; "compile"]
+    [ObjC;
+     OtherOpt "-fconstant-string-class=NSConstantString";
+     Include utils_dir;
+     Include (stub_dir cocoa_dir)];
 
-  flag ["c"; "use_lcocoa"; "ocamlmklib"]
-    (S [A"-ccopt"; A lib_flags;]);
+  add_flags 
+    ["c"; "use_lcocoa"; "ocamlmklib"]
+    [OtherOpt lib_flags];
 
-  flag ["ocaml"; "use_lcocoa"; "link"; "library"]
-    (S [A"-cclib"; A lib_flags;])
+  add_flags
+    ["ocaml"; "use_lcocoa"; "link"; "library"]
+    [OtherLib lib_flags]
 
 
+(* Cocoa flags (common part) *)
 let add_default_cocoa_flags () =
   ocaml_lib ~extern:true ~dir:"src/wm/cocoa" "cocoa";
 
-  flag["link"; "library"; "ocaml"; "byte"; "use_libcocoa"]
-    (S [A"-dllib"; A"-lcocoa"; A"-cclib"; A"-lcocoa"]);
+  add_flags
+    ["link"; "library"; "ocaml"; "byte"; "use_libcocoa"]
+    [Dlib "cocoa";
+     Clib "cocoa"];
 
-  flag["link"; "library"; "ocaml"; "native"; "use_libcocoa"]
-    (S [A"-cclib"; A"-lcocoa"]);
+  add_flags
+    ["link"; "library"; "ocaml"; "native"; "use_libcocoa"]
+    [Clib "cocoa"];
 
   dep ["link"; "ocaml"; "use_libcocoa"] ["src/wm/cocoa/libcocoa.a"]
 
 
-let _ = dispatch (function
+(* Main *)
+let () =
+  Ocamlbuild_plugin.dispatch
+    (fun hook ->
+      Ocamlbuild_cppo.dispatcher hook ;
+    )
+
+let () = dispatch (function
   | After_rules when sys = Linux ->
     add_default_flags ();
     add_xlib_flags ();

@@ -3,7 +3,9 @@
 
 #define CAML_NAME_SPACE
 
-#include <stdio.h>
+#include <caml/custom.h>
+#include <caml/fail.h>
+#include <caml/callback.h>
 #include <caml/memory.h>
 #include <caml/alloc.h>
 #include <caml/mlvalues.h>

@@ -3,10 +3,13 @@
 <src/wm/xlib/stubs/*.c> : use_x11
 <src/wm/xlib/libxlib.*> : use_x11
 <src/wm/xlib/xlib.cm{x,}a> : use_x11, use_libxlib
-<src/test/xtest*.{byte,native}> : use_xlib, use_unix
 
 <src/wm/cocoa/stubs/*.c>  : use_lcocoa
 <src/wm/cocoa/libcocoa.*> : use_lcocoa
 <src/wm/cocoa/cocoa.cm{x,}a> : use_lcocoa, use_libcocoa
+
+<src/test/xtest*.{byte,native}> : use_xlib, use_unix
 <src/test/ctest*.{byte,native}> : use_cocoa, use_unix
+
+<src/test/test*.{byte,native}>  : use_ogamlWindow, use_unix
 
