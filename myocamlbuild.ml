@@ -3,7 +3,7 @@ open Command
 
 type sys_type = OSX | Linux
 
-let sys = 
+let sys =
   let ic = Unix.open_process_in "uname" in
   let uname = input_line ic in
   let () = close_in ic in
@@ -16,10 +16,10 @@ let add_xlib_flags () =
   flag ["c"; "use_x11"; "compile"]
     (S [A"-ccopt"; A"-I/usr/include/X11";]);
 
-  flag ["c"; "use_x11"; "ocamlmklib"] 
+  flag ["c"; "use_x11"; "ocamlmklib"]
     (S [A"-lX11";]);
 
-  flag ["ocaml"; "use_x11"; "link"; "library"] 
+  flag ["ocaml"; "use_x11"; "link"; "library"]
     (S [A"-cclib"; A"-lX11";]);
 
   ocaml_lib ~extern:true ~dir:"src/wm/xlib" "xlib";
@@ -41,27 +41,27 @@ let lib_flags = "-framework Foundation -framework Cocoa -lobjc"
 
 
 let add_gnu_cocoa_flags () =
-  flag ["c"; "use_lcocoa"; "compile"] 
+  flag ["c"; "use_lcocoa"; "compile"]
     (S [A"-cc"; A"clang";
         A"-ccopt"; A"-x objective-c";
         A"-ccopt"; A gnustep_flags]);
 
-  flag ["c"; "use_lcocoa"; "ocamlmklib"] 
+  flag ["c"; "use_lcocoa"; "ocamlmklib"]
     (S [A"-ccopt"; A lib_flags;]);
 
-  flag ["ocaml"; "use_lcocoa"; "link"; "library"] 
+  flag ["ocaml"; "use_lcocoa"; "link"; "library"]
     (S [A"-cclib"; A gnustep_libs])
 
 
 let add_osx_cocoa_flags () =
-  flag ["c"; "use_lcocoa"; "compile"] 
+  flag ["c"; "use_lcocoa"; "compile"]
     (S [A"-ccopt"; A"-x objective-c";
         A"-ccopt"; A"-fconstant-string-class=NSConstantString"]);
 
-  flag ["c"; "use_lcocoa"; "ocamlmklib"] 
+  flag ["c"; "use_lcocoa"; "ocamlmklib"]
     (S [A"-ccopt"; A lib_flags;]);
 
-  flag ["ocaml"; "use_lcocoa"; "link"; "library"] 
+  flag ["ocaml"; "use_lcocoa"; "link"; "library"]
     (S [A"-cclib"; A lib_flags;])
 
 
@@ -88,5 +88,3 @@ let _ = dispatch (function
     add_default_cocoa_flags ()
   | _ -> ()
   )
-
-

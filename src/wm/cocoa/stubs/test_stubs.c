@@ -141,12 +141,3 @@ caml_open_window(value unit)
 
   CAMLreturn(Val_unit);
 }
-
-// CAMLprim value
-// caml_cocoa_create_app(value str)
-// {
-//   CAMLparam1(name);
-//
-//   if(name == Val_int(0))
-//     CAMLreturn( (value) )
-// }

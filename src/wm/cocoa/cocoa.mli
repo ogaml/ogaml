@@ -16,10 +16,10 @@ module NSString : sig
 
 end
 
-(* module NSApplication : sig
+module OGApplication : sig
 
   type t
 
-  val create : ?name:string -> unit -> t
+  val create : unit -> t
 
-end *)
+end

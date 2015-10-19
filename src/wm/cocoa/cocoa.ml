@@ -15,11 +15,14 @@ module NSString = struct
 
 end
 
-(* module NSApplication = struct
+module OGApplication = struct
 
   type t
 
   (* Abstract functions *)
-  external abstract_create : string option -> t = "caml_cocoa_create_app"
+  external abstract_create : unit -> t = "caml_cocoa_create_app"
 
-end *)
+  (* Exposed functions *)
+  let create () = abstract_create ()
+
+end

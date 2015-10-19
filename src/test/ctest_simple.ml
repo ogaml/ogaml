@@ -4,4 +4,6 @@ let () =
   init_arp ();
   let ns = NSString.create "Hello binding !" in
   NSString.print ns ;
-  open_window ()
+  let app = OGApplication.create () in (* useless for now *)
+  (* open_window () *) (* we cannot create two applications *)
+  ()
