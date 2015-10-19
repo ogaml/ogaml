@@ -55,7 +55,15 @@ module Window = struct
     Display.t -> t -> (int * int) -> (int * int) -> int -> t
     = "caml_xcreate_simple_window"
 
+  
+  (* Exposed functions *)
   external map : Display.t -> t -> unit = "caml_xmap_window"
+
+  external unmap : Display.t -> t -> unit = "caml_xunmap_window"
+
+  external destroy : Display.t -> t -> unit = "caml_xdestroy_window"
+
+  external size : Display.t -> t -> (int * int) = "caml_size_window"
 
 
   (* Implementation of abstract functions *)
