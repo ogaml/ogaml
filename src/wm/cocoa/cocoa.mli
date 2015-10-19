@@ -44,6 +44,6 @@ module NSWindow : sig
 
   type t
 
-  val create : unit -> t
+  val create : ?frame:NSRect.t -> unit -> t
 
 end

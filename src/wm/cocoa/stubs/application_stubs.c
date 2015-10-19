@@ -112,9 +112,20 @@ caml_cocoa_create_appdgt(value unit)
 ///////////////////////////////////////////////
 
 CAMLprim value
-caml_cocoa_create_window(value unit)
+caml_cocoa_create_window(value frame)
 {
-  CAMLparam0();
-
-  CAMLreturn( (value) [NSWindow new] );
+  CAMLparam1(frame);
+  // This is an option so we check whether it is None of Some
+  if(frame == Val_int(0))
+    CAMLreturn( (value) [NSWindow new] );
+  else
+  {
+    NSRect* rect = (NSRect*) Data_custom_val(frame);
+    NSWindow* window;
+    window = [[[NSWindow alloc] initWithContentRect:(*rect)
+                  styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
+                  backing:NSBackingStoreBuffered
+                  defer:NO] autorelease];
+    CAMLreturn( (value) window );
+  }
 }
