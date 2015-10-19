@@ -143,6 +143,7 @@ caml_cocoa_create_window(value frame)
   {
     [OGApplication sharedApplication]; // ensure NSApp
     NSRect* rect = (NSRect*) Data_custom_val(frame);
+    NSLog(@"x:%f, y:%f, w:%f, h:%f", rect->origin.x, rect->origin.y, rect->size.width, rect->size.height);
     NSWindow* window;
     window = [[[NSWindow alloc] initWithContentRect:(*rect)
                   styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
