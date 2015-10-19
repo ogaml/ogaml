@@ -11,3 +11,5 @@
 <src/test/xtest*.{byte,native}> : use_xlib, use_unix
 <src/test/ctest*.{byte,native}> : use_cocoa, use_unix
 
+<src/test/test*.{byte,native}>  : use_ogamlWindow, use_unix
+

@@ -66,6 +66,8 @@ let add_flags l opt =
 
 (* Default flags *)
 let add_default_flags () = 
+  ocaml_lib ~extern:true ~dir:"src/wm" "ogamlWindow";
+
   add_flags 
     ["c"; "compile"; "utils"]
     [Include utils_dir]
@@ -105,7 +107,9 @@ let add_gnu_cocoa_flags () =
     ["c"; "use_lcocoa"; "compile"]
     [Compiler "clang";
      ObjC;
-     OtherOpt gnustep_flags];
+     OtherOpt gnustep_flags;
+     Include utils_dir;
+     Include (stub_dir cocoa_dir)];
 
   add_flags 
     ["c"; "use_lcocoa"; "ocamlmklib"]
@@ -122,6 +126,7 @@ let add_osx_cocoa_flags () =
     ["c"; "use_lcocoa"; "compile"]
     [ObjC;
      OtherOpt "-fconstant-string-class=NSConstantString";
+     Include utils_dir;
      Include (stub_dir cocoa_dir)];
 
   add_flags 
@@ -150,7 +155,13 @@ let add_default_cocoa_flags () =
 
 
 (* Main *)
-let _ = dispatch (function
+let () =
+  Ocamlbuild_plugin.dispatch
+    (fun hook ->
+      Ocamlbuild_cppo.dispatcher hook ;
+    )
+
+let () = dispatch (function
   | After_rules when sys = Linux ->
     add_default_flags ();
     add_xlib_flags ();

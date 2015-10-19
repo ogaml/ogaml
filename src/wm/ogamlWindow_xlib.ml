@@ -34,6 +34,12 @@ module Window = struct
        closed  = false
       }
     in
+    let atom = Xlib.Atom.intern win.display "WM_DELETE_WINDOW" false in
+    begin 
+      match atom with
+      |None -> assert false
+      |Some(a) -> Xlib.Atom.set_wm_protocols win.display win.window [a]
+    end;
     Xlib.Event.set_mask win.display win.window 
       [Xlib.Event.ExposureMask; 
        Xlib.Event.KeyPressMask; 
@@ -85,3 +91,5 @@ module Window = struct
     end
 
 end
+
+
