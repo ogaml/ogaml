@@ -19,7 +19,11 @@ module NSRect = struct
 
   type t
 
-  external create : int -> int -> int -> int -> t = "caml_cocoa_create_nsrect"
+  external a_create : float -> float -> float -> float -> t = "caml_cocoa_create_nsrect"
+
+  let create x y w h =
+    let f = float_of_int in
+    a_create (f x) (f y) (f w) (f h)
 
 end
 
