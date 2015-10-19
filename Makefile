@@ -1,39 +1,20 @@
-OCAMLBUILD=ocamlbuild -use-ocamlfind -plugin-tag 'package(cppo_ocamlbuild)' -classic-display -j 4
 
-OCAMLBUILD_DIR=$(shell ocamlc -where)/ocamlbuild
+# Directories 
 
-WINDOW_DIR = src/wm
+SRC_DIR = src
 
-XLIB_DIR   = $(WINDOW_DIR)/xlib
+WINDOW_DIR = $(SRC_DIR)/wm
 
-COCOA_DIR  = $(WINDOW_DIR)/cocoa
+XLIB_DIR = $(WINDOW_DIR)/xlib
 
-TEST_DIR   = src/test
+COCOA_DIR = $(WINDOW_DIR)/cocoa
 
+WM_DIRS = $(WINDOW_DIR), $(XLIB_DIR), $(COCOA_DIR), $(XLIB_DIR)/stubs, $(COCOA_DIR)/stubs
 
-window-test: clean
-	$(OCAMLBUILD) -I $(WINDOW_DIR) $(TEST_DIR)/test_window.native
-
-
-libwindow-nat-linux:
-	$(OCAMLBUILD) -I $(XLIB_DIR) $(WINDOW_DIR)/ogamlWindow.cmxa
+DIRS = $(SRC_DIR), $(SRC_DIR)/utils, $(SRC_DIR)/test, $(WM_DIRS)
 
 
-xlib-nat-test: clean xlib-nat
-	$(OCAMLBUILD) -I $(XLIB_DIR) $(TEST_DIR)/xtest_simple.native
 
-xlib-nat:
-	$(OCAMLBUILD) $(XLIB_DIR)/xlib.cmxa
-
-
-cocoa-nat-test: clean cocoa-nat
-	$(OCAMLBUILD) -I $(COCOA_DIR) $(TEST_DIR)/ctest_simple.native
-
-cocoa-nat:
-	$(OCAMLBUILD) $(COCOA_DIR)/cocoa.cmxa
-
-
-clean:
-	$(OCAMLBUILD) -clean
+# Compilation rules
 
 

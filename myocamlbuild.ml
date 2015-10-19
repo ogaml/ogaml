@@ -155,12 +155,6 @@ let add_default_cocoa_flags () =
 
 
 (* Main *)
-let () =
-  Ocamlbuild_plugin.dispatch
-    (fun hook ->
-      Ocamlbuild_cppo.dispatcher hook ;
-    )
-
 let () = dispatch (function
   | After_rules when sys = Linux ->
     add_default_flags ();
