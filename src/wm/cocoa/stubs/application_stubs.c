@@ -106,3 +106,15 @@ caml_cocoa_create_appdgt(value unit)
 
   CAMLreturn( (value) [OGApplicationDelegate new] );
 }
+
+
+// We directly bind NSWindow (for now at least)
+///////////////////////////////////////////////
+
+CAMLprim value
+caml_cocoa_create_window(value unit)
+{
+  CAMLparam0();
+
+  CAMLreturn( (value) [NSWindow new] );
+}

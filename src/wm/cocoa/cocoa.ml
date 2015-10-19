@@ -38,3 +38,15 @@ module OGApplicationDelegate = struct
   let create () = abstract_create ()
 
 end
+
+module NSWindow = struct
+
+  type t
+
+  (* Abstract functions *)
+  external abstract_create : unit -> t = "caml_cocoa_create_window"
+
+  (* Exposed functions *)
+  let create () = abstract_create ()
+
+end

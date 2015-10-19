@@ -31,3 +31,11 @@ module OGApplicationDelegate : sig
   val create : unit -> t
 
 end
+
+module NSWindow : sig
+
+  type t
+
+  val create : unit -> t
+
+end
