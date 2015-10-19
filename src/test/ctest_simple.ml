@@ -7,7 +7,7 @@ let () =
   let app = OGApplication.create () in (* useless for now *)
   (* open_window () *) (* we cannot create two applications *)
   let appdgt = OGApplicationDelegate.create () in
-  let rect = NSRect.create 200 200 200 200 in
-  (* let window = NSWindow.create ~frame:rect () in *)
-  (* For now it appears creating a window creates another app *)
-  ()
+  let rect = NSRect.create 200 200 500 900 in
+  let window = NSWindow.create ~frame:rect () in
+  (* Maybe this is bad because we actually never need the OGApplication.t *)
+  OGApplication.run ()

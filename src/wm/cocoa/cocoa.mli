@@ -30,6 +30,8 @@ module OGApplication : sig
 
   val create : unit -> t
 
+  val run : unit -> unit
+
 end
 
 module OGApplicationDelegate : sig

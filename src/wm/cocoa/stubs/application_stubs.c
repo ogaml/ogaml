@@ -72,7 +72,25 @@ caml_cocoa_create_app(value unit)
 {
   CAMLparam0();
 
-  CAMLreturn( (value) [OGApplication new] );
+  OGApplication* app = [OGApplication sharedApplication];
+  [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+  [NSApp activateIgnoringOtherApps:YES];
+  // Temporary (TODO delegate function)
+  [[NSApplication sharedApplication] setDelegate:NSApp];
+
+  CAMLreturn( (value) app );
+}
+
+CAMLprim value
+caml_cocoa_run_app(value unit)
+{
+  CAMLparam0();
+
+  [OGApplication sharedApplication];
+  [NSApp run];
+  [NSApp activateIgnoringOtherApps:YES];
+
+  CAMLreturn(Val_unit);
 }
 
 
@@ -117,15 +135,23 @@ caml_cocoa_create_window(value frame)
   CAMLparam1(frame);
   // This is an option so we check whether it is None of Some
   if(frame == Val_int(0))
+  {
+    [OGApplication sharedApplication]; // ensure NSApp
     CAMLreturn( (value) [NSWindow new] );
+  }
   else
   {
+    [OGApplication sharedApplication]; // ensure NSApp
     NSRect* rect = (NSRect*) Data_custom_val(frame);
     NSWindow* window;
     window = [[[NSWindow alloc] initWithContentRect:(*rect)
                   styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
                   backing:NSBackingStoreBuffered
                   defer:NO] autorelease];
+    [window setBackgroundColor:[NSColor blueColor]];
+    [window makeKeyAndOrderFront:NSApp];
+    [window center];
+    [window makeMainWindow];
     CAMLreturn( (value) window );
   }
 }
