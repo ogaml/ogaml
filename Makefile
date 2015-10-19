@@ -1,4 +1,4 @@
-OCAMLBUILD=ocamlbuild -use-ocamlfind -plugin-tag 'package(cppo_ocamlbuild)' -classic-display -j 4
+OCAMLBUILD=ocamlbuild -use-ocamlfind -classic-display -j 4
 
 OCAMLBUILD_DIR=$(shell ocamlc -where)/ocamlbuild
 
