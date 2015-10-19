@@ -148,9 +148,9 @@ caml_cocoa_create_window(value frame)
                   styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
                   backing:NSBackingStoreBuffered
                   defer:NO] autorelease];
-    [window setBackgroundColor:[NSColor blueColor]];
+    [window setBackgroundColor:[NSColor greenColor]];
     [window makeKeyAndOrderFront:NSApp];
-    [window center];
+    // [window center];
     [window makeMainWindow];
     CAMLreturn( (value) window );
   }

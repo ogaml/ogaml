@@ -31,12 +31,12 @@ static NSAutoreleasePool* arp = nil;
 
 - (void) applicationDidFinishLaunching: (NSNotification *) note
 {
-  NSRect frame = NSMakeRect(100, 100, 200, 200);
+  NSRect frame = NSMakeRect(100, 100, 500, 200);
   self.window = [[[NSWindow alloc] initWithContentRect:frame
                 styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
                 backing:NSBackingStoreBuffered
                 defer:NO] autorelease];
-  [self.window setBackgroundColor:[NSColor blueColor]];
+  [self.window setBackgroundColor:[NSColor redColor]];
   [self.window makeKeyAndOrderFront:NSApp];
   [self.window center];
   [self.window makeMainWindow];
