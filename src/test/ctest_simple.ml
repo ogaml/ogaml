@@ -7,4 +7,5 @@ let () =
   let app = OGApplication.create () in (* useless for now *)
   (* open_window () *) (* we cannot create two applications *)
   let appdgt = OGApplicationDelegate.create () in
+  let rect = NSRect.create 200 200 200 200 in
   ()

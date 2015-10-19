@@ -16,6 +16,14 @@ module NSString : sig
 
 end
 
+module NSRect : sig
+
+  type t
+
+  val create : int -> int -> int -> int -> t
+
+end
+
 module OGApplication : sig
 
   type t

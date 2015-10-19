@@ -15,6 +15,14 @@ module NSString = struct
 
 end
 
+module NSRect = struct
+
+  type t
+
+  external create : int -> int -> int -> int -> t = "caml_cocoa_create_nsrect"
+
+end
+
 module OGApplication = struct
 
   type t
