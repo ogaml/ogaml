@@ -48,3 +48,42 @@ caml_xmap_window(value disp, value win)
   CAMLreturn(Val_unit);
 }
 
+
+// INPUT   display, window
+// OUTPUT  nothing, unmaps the window
+CAMLprim value
+caml_xunmap_window(value disp, value win)
+{
+  CAMLparam2(disp, win);
+  XUnmapWindow((Display*) disp, (Window) win);
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   display, window
+// OUTPUT  nothing, destroys the window
+CAMLprim value
+caml_xdestroy_window(value disp, value win)
+{
+  CAMLparam2(disp, win);
+  XDestroyWindow((Display*) disp, (Window) win);
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   display, window
+// OUTPUT  width and height of window (in pixels)
+CAMLprim value
+caml_size_window(value disp, value win)
+{
+  CAMLparam2(disp, win);
+  CAMLlocal1(size);
+  size = caml_alloc(2, 0);
+  XWindowAttributes att;
+  XGetWindowAttributes((Display*) disp, (Window) win, &att);
+  Store_field(size, 0, Val_int(att.width));
+  Store_field(size, 1, Val_int(att.height));
+  CAMLreturn(size);
+}
+
+

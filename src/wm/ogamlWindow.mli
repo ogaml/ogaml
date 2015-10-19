@@ -19,7 +19,7 @@ module Window : sig
   (** Creates a window of size width x height *)
   val create : width:int -> height:int -> t
 
-  (** Close a window, but does not free the memory.
+  (** Closes a window, but does not free the memory.
     * This should prevent segfaults when calling functions on this window. *)
   val close : t -> unit
 

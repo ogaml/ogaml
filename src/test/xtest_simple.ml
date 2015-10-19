@@ -20,10 +20,13 @@ let () =
   Window.map d win;
   Event.set_mask d win [Event.ExposureMask; Event.KeyPressMask; Event.ButtonPressMask];
   Display.flush d;
+  let (w,h) = Window.size d win in
+  Printf.printf "Window size : %i %i\n%!" w h;
   let rec loop () = 
     match Event.next d with
     |Some e when Event.type_of e = Event.ClientMessage -> print_endline "Window closed"; ()
     |Some e when Event.type_of e = Event.KeyPress      -> print_endline "Key pressed"; loop ()
     | _ -> loop()
   in
-  loop ()
+  loop ();
+  Window.destroy d win

@@ -25,6 +25,8 @@ caml_xselect_input(value disp, value win, value masks)
 
 
 // Always return true, does not filter events
+// Should definitely consider the window when we
+// are able to create multiple windows on one display
 Bool checkEvent()
 {
   return True;

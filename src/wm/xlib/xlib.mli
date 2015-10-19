@@ -29,6 +29,12 @@ module Window : sig
 
   val map : Display.t -> t -> unit
 
+  val unmap : Display.t -> t -> unit
+
+  val destroy : Display.t -> t -> unit
+
+  val size : Display.t -> t -> (int * int)
+
 end
 
 
