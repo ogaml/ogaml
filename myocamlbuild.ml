@@ -17,9 +17,11 @@ let xlib_dir = "../src/wm/xlib"
 
 let xlib_stubs_dir = xlib_dir ^ "/stubs"
 
+
 let add_default_flags () = 
   flag ["c"; "compile"; "utils"]
     (S [A"-ccopt"; A("-I"^utils_dir)])
+
 
 let add_xlib_flags () =
   flag ["c"; "use_x11"; "compile"]
