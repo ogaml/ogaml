@@ -64,13 +64,14 @@ let add_flags l opt =
   )))
 
 
-(* Flags *)
+(* Default flags *)
 let add_default_flags () = 
   add_flags 
     ["c"; "compile"; "utils"]
     [Include utils_dir]
 
 
+(* Xlib flags (linux only) *)
 let add_xlib_flags () =
   add_flags
     ["c"; "use_x11"; "compile"]
@@ -98,7 +99,7 @@ let add_xlib_flags () =
   dep ["link"; "ocaml"; "use_libxlib"] ["src/wm/xlib/libxlib.a"]
 
 
-
+(* Cocoa flags (linux part) *)
 let add_gnu_cocoa_flags () =
   add_flags 
     ["c"; "use_lcocoa"; "compile"]
@@ -115,6 +116,7 @@ let add_gnu_cocoa_flags () =
     [OtherLib gnustep_libs]
 
 
+(* Cocoa flags (osx part) *)
 let add_osx_cocoa_flags () =
   add_flags 
     ["c"; "use_lcocoa"; "compile"]
@@ -131,6 +133,7 @@ let add_osx_cocoa_flags () =
     [OtherLib lib_flags]
 
 
+(* Cocoa flags (common part) *)
 let add_default_cocoa_flags () =
   ocaml_lib ~extern:true ~dir:"src/wm/cocoa" "cocoa";
 
@@ -146,6 +149,7 @@ let add_default_cocoa_flags () =
   dep ["link"; "ocaml"; "use_libcocoa"] ["src/wm/cocoa/libcocoa.a"]
 
 
+(* Main *)
 let _ = dispatch (function
   | After_rules when sys = Linux ->
     add_default_flags ();
