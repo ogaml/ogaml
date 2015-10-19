@@ -9,7 +9,7 @@ let () =
   Printf.printf "Screen definition (ppi) : %f\n%!" ((float_of_int w) *. 25.4 /. (float_of_int wmm));
   let rwin = Window.root_of d in
   let win = Window.create_simple
-    ~display:d ~parent:rwin ~size:(800,600) ~origin:(50,50) ~background:(255 * 256 * 256)
+    ~display:d ~parent:rwin ~size:(800,600) ~origin:(50,50) ~background:(255 * 256)
   in
   let atom = Atom.intern d "WM_DELETE_WINDOW" false in
   begin 
