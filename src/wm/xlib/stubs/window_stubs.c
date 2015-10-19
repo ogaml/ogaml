@@ -81,8 +81,8 @@ caml_size_window(value disp, value win)
   size = caml_alloc(2, 0);
   XWindowAttributes att;
   XGetWindowAttributes((Display*) disp, (Window) win, &att);
-  Store_field(size, 0, att.width);
-  Store_field(size, 1, att.height);
+  Store_field(size, 0, Val_int(att.width));
+  Store_field(size, 1, Val_int(att.height));
   CAMLreturn(size);
 }
 
