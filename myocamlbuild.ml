@@ -56,7 +56,8 @@ let add_gnu_cocoa_flags () =
 let add_osx_cocoa_flags () =
   flag ["c"; "use_lcocoa"; "compile"]
     (S [A"-ccopt"; A"-x objective-c";
-        A"-ccopt"; A"-fconstant-string-class=NSConstantString"]);
+        A"-ccopt"; A"-fconstant-string-class=NSConstantString";
+        A"-ccopt"; A"-I../src/wm/cocoa/stubs"]);
 
   flag ["c"; "use_lcocoa"; "ocamlmklib"]
     (S [A"-ccopt"; A lib_flags;]);
