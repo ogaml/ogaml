@@ -45,6 +45,8 @@ end
 
 module Event : sig
 
+  type t
+
   type enum = 
     | KeyPress        
     | KeyRelease      
@@ -110,7 +112,9 @@ module Event : sig
     
   val set_mask : Display.t -> Window.t -> mask list -> unit
 
-  val next : Display.t -> enum option
+  val next : Display.t -> t option
+
+  val type_of : t -> enum
 
 end
 

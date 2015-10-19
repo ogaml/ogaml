@@ -99,6 +99,8 @@ end
 (* Event module *)
 module Event = struct
 
+  type t
+
   (* Event enum *)
   type enum = 
     | KeyPress        
@@ -169,7 +171,9 @@ module Event = struct
   external set_mask : Display.t -> Window.t -> mask list -> unit 
     = "caml_xselect_input"
 
-  external next : Display.t -> enum option = "caml_xnext_event"
+  external next : Display.t -> t option = "caml_xnext_event"
+
+  external type_of : t -> enum = "caml_event_type"
 
 end
 

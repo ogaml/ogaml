@@ -22,8 +22,8 @@ let () =
   Display.flush d;
   let rec loop () = 
     match Event.next d with
-    |Some e when e = Event.ClientMessage -> print_endline "Window closed"; ()
-    |Some e when e = Event.KeyPress -> print_endline "Key pressed"; loop ()
+    |Some e when Event.type_of e = Event.ClientMessage -> print_endline "Window closed"; ()
+    |Some e when Event.type_of e = Event.KeyPress      -> print_endline "Key pressed"; loop ()
     | _ -> loop()
   in
   loop ()

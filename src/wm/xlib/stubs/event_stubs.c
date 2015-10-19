@@ -31,8 +31,8 @@ Bool checkEvent()
 }
 
 
-// INPUT   display, event
-// OUTPUT  nothing, updates the event
+// INPUT   display
+// OUTPUT  a pointer on an event (if it exists)
 CAMLprim value
 caml_xnext_event(value disp)
 {
@@ -41,11 +41,22 @@ caml_xnext_event(value disp)
   opt = caml_alloc(1, 0);
   XEvent event;
   if(XCheckIfEvent((Display*) disp, &event, &checkEvent, NULL) == True) {
-    Store_field(opt, 0, Val_int(event.type - 2));
+    Store_field(opt, 0, (value) &event);
     CAMLreturn(opt);
   } 
   else
     CAMLreturn(Val_int(0));
+}
+
+
+// INPUT   a pointer on an event
+// OUTPUT  the type of the event
+CAMLprim value
+caml_event_type(value evt)
+{
+  CAMLparam1(evt);
+  // event types begin at 2...
+  CAMLreturn(Val_int(((XEvent*)evt)->type - 2));
 }
 
 
