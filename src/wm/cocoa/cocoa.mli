@@ -96,4 +96,6 @@ module NSWindow : sig
 
   val make_key_and_order_front : t -> unit
 
+  val center : t -> unit
+
 end

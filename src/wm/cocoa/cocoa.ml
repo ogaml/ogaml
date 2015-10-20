@@ -112,6 +112,8 @@ module NSWindow = struct
   external make_key_and_order_front : t -> unit
     = "caml_cocoa_window_make_key_and_order_front"
 
+  external center : t -> unit = "caml_cocoa_window_center"
+
   (* Exposed functions *)
   let create ~frame ~style_mask ~backing ~defer () =
     abstract_create frame style_mask backing defer

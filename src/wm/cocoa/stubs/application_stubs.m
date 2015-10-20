@@ -191,3 +191,15 @@ caml_cocoa_window_make_key_and_order_front(value mlwindow)
 
   CAMLreturn(Val_unit);
 }
+
+CAMLprim value
+caml_cocoa_window_center(value mlwindow)
+{
+  CAMLparam1(mlwindow);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+
+  [window center];
+
+  CAMLreturn(Val_unit);
+}
