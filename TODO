@@ -20,3 +20,17 @@ Xlib specific:
   ☐ Extract data from key presses
   ☐ Extract data from button presses
   ☐ Extract data from cursor movement
+  ☐ Binding GLX **
+
+Window part:
+  ☐ Add keys enumeration
+  ☐ Add buttons enumeration
+  ☐ Parameterize Keypressed/Keyreleased events with key
+  ☐ Parameterize Button events with position & button
+  ☐ Parameterize Movement events with position
+  ☐ Put shared code directly in ogamlWindow.ml (like the Event module ?)
+  ☐ Window titles
+  ☐ Window attributes abstract type ? May contain title, size, etc @unsure
+  ☐ Real-time state Keyboard and Mouse module * 
+  ☐ Graphical functions display & clear - requires binding GLX for X11 **
+  
