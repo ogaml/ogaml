@@ -1,5 +1,6 @@
 #include <X11/Xlib.h>
 #include "../../../utils/stubs.h"
+#include <memory.h>
 
 
 // INPUT   display, window, mask list
@@ -36,10 +37,13 @@ CAMLprim value
 caml_xnext_event(value disp)
 {
   CAMLparam1(disp);
-  // NOT SAFE
+  CAMLlocal1(evt);
   XEvent event;
-  if(XCheckIfEvent((Display*) disp, &event, &checkEvent, NULL) == True) 
-    CAMLreturn(Val_some((value) &event));
+  if(XCheckIfEvent((Display*) disp, &event, &checkEvent, NULL) == True) {
+    evt = caml_alloc_custom(&empty_custom_opts, sizeof(XEvent), 0, 1);
+    memcpy(Data_custom_val(evt), &event, sizeof(XEvent));
+    CAMLreturn(Val_some(evt));
+  }
   else
     CAMLreturn(Val_int(0));
 }
@@ -52,7 +56,7 @@ caml_event_type(value evt)
 {
   CAMLparam1(evt);
   // event types begin at 2...
-  CAMLreturn(Val_int(((XEvent*)evt)->type - 2));
+  CAMLreturn(Val_int(((XEvent*)Data_custom_val(evt))->type - 2));
 }
 
 

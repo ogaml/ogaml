@@ -1,4 +1,3 @@
-- event_stubs in xlib contains unsafe methods
 - change the implementation of ogamlWindow_xlib to manipulate only one display 
   maybe keep a pointer to the display on C side, and return it whenever ocaml wants one,
   this avoids an ugly reference on ocaml side
