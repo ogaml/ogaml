@@ -31,6 +31,8 @@ OCAMLOPT = ocamlopt
 
 OCAMLMKLIB = ocamlmklib
 
+CLANG = clang
+
 
 
 # Constants
@@ -44,6 +46,10 @@ NATIVEFLAGS =
 BYTEFLAGS =
 
 STUBS_DIR = stubs
+
+OCAML_DIR = $(shell 'ocamlc -where')
+
+CCOMPIL_FLAGS = -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT -fPIC -I '$(OCAML_DIR)'
 
 
 # Commands
