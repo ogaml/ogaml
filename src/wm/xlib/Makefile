@@ -40,7 +40,7 @@ $(CLIB): $(COBJS) $(MLOBJS)
 
 
 %.o:%.c
-	$(OCAMLC) -c -ccopt '$(COPTS)' $< -o $@
+	$(OCAMLC) -c -ccopt '$(COPTS)' $<
 
 
 

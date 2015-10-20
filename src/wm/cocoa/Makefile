@@ -39,10 +39,10 @@ $(CLIB): $(COBJS) $(MLOBJS)
 	$(OCAMLC) -c $< -o $@ -cclib '$(LIBS)'
 
 %.o:%.m
-	$(CLANG) -c $(CCOMPIL_FLAGS) $(COPTS) $< -o $@
+	$(CLANG) -c $(CCOMPIL_FLAGS) $(COPTS) $<
 
 %.o:%.c
-	$(OCAMLC) -c $< -o $@
+	$(OCAMLC) -c $<
 
 
 # Cleaning
