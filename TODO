@@ -1,4 +1,10 @@
 General:
 
+Cocoa specific:
+  ☐ Remove application t type @unsure
+  ☐ Separate functions for all window methods
+  ☐ Make us of Delegate or remove
+  ☐ Add menus to application (+parametrize?)
+
 Xlib specific:
   ☐ match on clientmessage in ogamlWindow_xlib for safety
