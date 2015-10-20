@@ -3,16 +3,16 @@
 #include "stubs.h"
 
 struct custom_operations empty_custom_opts = {
-  identifier: "obj_st handling",
-  finalize:    custom_finalize_default,
-  compare:     custom_compare_default,
-  hash:        custom_hash_default,
-  serialize:   custom_serialize_default,
-  deserialize: custom_deserialize_default
+  .identifier  = "obj_st handling",
+  .finalize    = custom_finalize_default,
+  .compare     = custom_compare_default,
+  .hash        = custom_hash_default,
+  .serialize   = custom_serialize_default,
+  .deserialize = custom_deserialize_default
 };
 
 value Val_some(value v)
-{   
+{
   CAMLparam1(v);
   CAMLlocal1(some);
   some = caml_alloc(1, 0);
