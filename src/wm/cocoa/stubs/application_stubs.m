@@ -330,3 +330,15 @@ caml_cocoa_window_make_main(value mlwindow)
 
   CAMLreturn(Val_unit);
 }
+
+CAMLprim value
+caml_cocoa_window_perform_close(value mlwindow)
+{
+  CAMLparam1(mlwindow);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+
+  [window performClose:nil];
+
+  CAMLreturn(Val_unit);
+}

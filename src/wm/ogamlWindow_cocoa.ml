@@ -46,7 +46,8 @@ module Window = struct
 
     window
 
-  let close win = ()
+  let close win =
+    Cocoa.NSWindow.perform_close win
 
   let destroy win = ()
 

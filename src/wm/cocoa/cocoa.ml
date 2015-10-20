@@ -117,6 +117,8 @@ module NSWindow = struct
 
   external make_main : t -> unit = "caml_cocoa_window_make_main"
 
+  external perform_close : t -> unit = "caml_cocoa_window_perform_close"
+
   (* Exposed functions *)
   let create ~frame ~style_mask ~backing ~defer () =
     abstract_create frame style_mask backing defer

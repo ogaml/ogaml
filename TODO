@@ -33,6 +33,5 @@ Window part:
   ☐ Put shared code directly in ogamlWindow.ml (like the Event module ?)
   ☐ Window titles
   ☐ Window attributes abstract type ? May contain title, size, etc @unsure
-  ☐ Real-time state Keyboard and Mouse module * 
+  ☐ Real-time state Keyboard and Mouse module *
   ☐ Graphical functions display & clear - requires binding GLX for X11 **
-  
