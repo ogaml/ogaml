@@ -24,3 +24,6 @@ setup.log
 
 # vim
 *.swp
+
+# OS X files
+.DS_Store
