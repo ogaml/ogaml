@@ -32,7 +32,7 @@ OCAMLMKLIB = ocamlmklib
 
 # Constants
   # Extensions used for cleaning
-EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so *.native *.out *.byte
+EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so *.native *.out *.byte *.d
 
 INCLUDE_DIRS = 
 

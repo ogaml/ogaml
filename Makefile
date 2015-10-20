@@ -34,6 +34,6 @@ stubs_lib:
 	cd src/wm/$(strip $(OS_WIN_STUBS_DIR)) && make
 
 clean:
-	rm *.out;
+	rm -rf *.out;
 	cd src/wm/ && make clean;
 	cd src/test/ && make clean
