@@ -1,1 +1,4 @@
-- match on clientmessage in ogamlWindow_xlib for safety
+General:
+
+Xlib specific:
+  ☐ match on clientmessage in ogamlWindow_xlib for safety
