@@ -1,5 +1,0 @@
-ogamlWindow_cocoa.cmo : cocoa/cocoa.cmi
-ogamlWindow_cocoa.cmx : cocoa/cocoa.cmx
-ogamlWindow_xlib.cmo :
-ogamlWindow_xlib.cmx :
-ogamlWindow.cmi :

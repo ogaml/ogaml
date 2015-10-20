@@ -24,7 +24,7 @@ LIBS = -lX11
 
 # Compilation
 
-default: depend $(CLIB)
+default: .depend $(CLIB)
 
 $(CLIB): $(COBJS) $(MLOBJS)
 	$(OCAMLMKLIB) -o $(CLIB) $(COBJS2) $(MLOBJS) -ccopt '$(LIBS)'
@@ -52,7 +52,7 @@ clean:
 
 # Dependencies
 
-depend:
+.depend:
 	$(DEPCOMMAND) *.ml *.mli > .depend
 
 include .depend

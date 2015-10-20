@@ -15,7 +15,7 @@ MLLIB = ogamlWindow.cmxa ogamlWindow.cma
 
 # Compilation
 
-default: depend $(MLLIB)
+default: .depend $(MLLIB)
 
 compile_lib:
 	cd $(OS_WIN_STUBS_DIR) && make
@@ -49,7 +49,7 @@ clean:
 
 # Dependencies
 
-depend:
+.depend:
 	$(DEPCOMMAND) *.ml *.mli > .depend
 
 include .depend

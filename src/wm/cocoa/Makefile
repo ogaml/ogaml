@@ -24,7 +24,7 @@ LIBS = -framework Foundation -framework Cocoa -lobjc
 
 # Compilation
 
-default: depend $(CLIB)
+default: .depend $(CLIB)
 
 $(CLIB): $(COBJS) $(MLOBJS)
 	$(OCAMLMKLIB) -o $(CLIB) -v -ccopt '"$(LIBS)"' $(COBJS2) $(MLOBJS)
@@ -53,7 +53,7 @@ clean:
 
 # Dependencies
 
-depend:
+.depend:
 	$(DEPCOMMAND) *.ml *.mli > .depend
 
 include .depend

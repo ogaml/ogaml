@@ -1,3 +1,0 @@
-cocoa.cmo : cocoa.cmi
-cocoa.cmx : cocoa.cmi
-cocoa.cmi :
