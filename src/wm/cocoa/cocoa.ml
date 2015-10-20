@@ -57,11 +57,23 @@ module NSWindow = struct
 
   type t
 
+  type style_mask =
+    | Borderless
+    | Titled
+    | Closable
+    | Miniaturizable
+    | Resizable
+    | TexturedBackground
+    | UnifiedTitleAndToolbar
+    | FullScreen
+    | FullSizeContent
+
   (* Abstract functions *)
-  external abstract_create : NSRect.t -> t = "caml_cocoa_create_window"
+  external abstract_create : NSRect.t -> style_mask list -> t =
+    "caml_cocoa_create_window"
 
   (* Exposed functions *)
-  let create ~frame () =
-    abstract_create frame
+  let create ~frame ~style_mask () =
+    abstract_create frame style_mask
 
 end

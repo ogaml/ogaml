@@ -130,21 +130,31 @@ caml_cocoa_create_appdgt(value unit)
 ///////////////////////////////////////////////
 
 CAMLprim value
-caml_cocoa_create_window(value frame)
+caml_cocoa_create_window(value frame, value styleMask)
 {
-  CAMLparam1(frame);
+  CAMLparam2(frame,styleMask);
+  CAMLlocal2(hd, tl);
 
   NSRect* rect = (NSRect*) Data_custom_val(frame);
-  NSLog(@"x:%f, y:%f, w:%f, h:%f", rect->origin.x, rect->origin.y, rect->size.width, rect->size.height);
+
+  // Getting the flags
+  int mask = 0;
+  tl = styleMask;
+  while(tl != Val_emptylist) {
+    hd = Field(tl,0);
+    tl = Field(tl,1);
+    // We put hd - 1 because Borderless is 0
+    mask |= (1L << (Int_val(hd)-1));
+  }
 
 
   [OGApplication sharedApplication]; // ensure NSApp
 
   NSWindow* window;
   window = [[[NSWindow alloc] initWithContentRect:(*rect)
-                styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
-                backing:NSBackingStoreBuffered
-                defer:NO] autorelease];
+                                        styleMask:mask
+                                          backing:NSBackingStoreBuffered
+                                            defer:NO] autorelease];
   [window setBackgroundColor:[NSColor greenColor]];
   [window makeKeyAndOrderFront:NSApp];
   // [window center];

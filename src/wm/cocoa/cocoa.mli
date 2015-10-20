@@ -46,6 +46,17 @@ module NSWindow : sig
 
   type t
 
-  val create : frame:NSRect.t -> unit -> t
+  type style_mask =
+    | Borderless
+    | Titled
+    | Closable
+    | Miniaturizable
+    | Resizable
+    | TexturedBackground
+    | UnifiedTitleAndToolbar
+    | FullScreen
+    | FullSizeContent
+
+  val create : frame:NSRect.t -> style_mask:style_mask list -> unit -> t
 
 end
