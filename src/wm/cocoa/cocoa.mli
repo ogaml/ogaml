@@ -30,6 +30,8 @@ module OGApplication : sig
 
   val create : unit -> t
 
+  val run : unit -> unit
+
 end
 
 module OGApplicationDelegate : sig
@@ -44,6 +46,25 @@ module NSWindow : sig
 
   type t
 
-  val create : ?frame:NSRect.t -> unit -> t
+  type style_mask =
+    | Borderless
+    | Titled
+    | Closable
+    | Miniaturizable
+    | Resizable
+    | TexturedBackground
+    | UnifiedTitleAndToolbar
+    | FullScreen
+    | FullSizeContent
+
+  type backing_store =
+    | Retained
+    | NonRetained
+    | Buffered
+
+  val create : frame:NSRect.t ->
+               style_mask:style_mask list ->
+               backing:backing_store ->
+               unit -> t
 
 end

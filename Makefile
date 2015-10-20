@@ -1,11 +1,11 @@
 include common_defs.mk
 
 
-# Window constants 
+# Window constants
 
 WINDOW_INCLUDES = -I src/wm -I src/wm/$(strip $(OS_WIN_STUBS_DIR))
 
-WINDOW_CMXA = $(OS_WIN_STUBS).cmxa ogamlWindow.cmxa 
+WINDOW_CMXA = $(OS_WIN_STUBS).cmxa ogamlWindow.cmxa
 
 WINDOW_TEST = src/test/test_window.ml
 
@@ -25,7 +25,7 @@ window_lib:
 	cd src/wm/ && make
 
 window_test: window_lib
-	$(OCAMLOPT) -o $(OUTPUT) $(WINDOW_INCLUDES) $(WINDOW_CMXA) $(WINDOW_TEST) 
+	$(OCAMLOPT) -o $(OUTPUT) $(WINDOW_INCLUDES) $(WINDOW_CMXA) $(WINDOW_TEST)
 
 stubs_test: stubs_lib
 	$(OCAMLOPT) -o $(OUTPUT) $(WINDOW_INCLUDES) $(OS_WIN_STUBS).cmxa $(STUBS_TEST)

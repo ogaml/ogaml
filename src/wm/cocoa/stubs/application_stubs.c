@@ -72,7 +72,25 @@ caml_cocoa_create_app(value unit)
 {
   CAMLparam0();
 
-  CAMLreturn( (value) [OGApplication new] );
+  OGApplication* app = [OGApplication sharedApplication];
+  [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+  [NSApp activateIgnoringOtherApps:YES];
+  // Temporary (TODO delegate function)
+  [[NSApplication sharedApplication] setDelegate:NSApp];
+
+  CAMLreturn( (value) app );
+}
+
+CAMLprim value
+caml_cocoa_run_app(value unit)
+{
+  CAMLparam0();
+
+  [OGApplication sharedApplication];
+  [NSApp run];
+  [NSApp activateIgnoringOtherApps:YES];
+
+  CAMLreturn(Val_unit);
 }
 
 
@@ -112,20 +130,37 @@ caml_cocoa_create_appdgt(value unit)
 ///////////////////////////////////////////////
 
 CAMLprim value
-caml_cocoa_create_window(value frame)
+caml_cocoa_create_window(value frame, value styleMask, value backing)
 {
-  CAMLparam1(frame);
-  // This is an option so we check whether it is None of Some
-  if(frame == Val_int(0))
-    CAMLreturn( (value) [NSWindow new] );
-  else
-  {
-    NSRect* rect = (NSRect*) Data_custom_val(frame);
-    NSWindow* window;
-    window = [[[NSWindow alloc] initWithContentRect:(*rect)
-                  styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
-                  backing:NSBackingStoreBuffered
-                  defer:NO] autorelease];
-    CAMLreturn( (value) window );
+  CAMLparam3(frame,styleMask,backing);
+  CAMLlocal2(hd, tl);
+
+  NSRect* rect = (NSRect*) Data_custom_val(frame);
+
+  // Getting the flags
+  int mask = 0;
+  tl = styleMask;
+  while(tl != Val_emptylist) {
+    hd = Field(tl,0);
+    tl = Field(tl,1);
+    // We put hd - 1 because Borderless is 0
+    mask |= (1L << (Int_val(hd)-1));
   }
+
+
+  [OGApplication sharedApplication]; // ensure NSApp
+
+  NSWindow* window;
+  window = [[[NSWindow alloc] initWithContentRect:(*rect)
+                                        styleMask:mask
+                                          backing:Int_val(backing)
+                                            defer:NO] autorelease];
+
+  // TODO: Put in separate functions the following lines
+  [window setBackgroundColor:[NSColor greenColor]];
+  [window makeKeyAndOrderFront:NSApp];
+  // [window center];
+  [window makeMainWindow];
+
+  CAMLreturn( (value) window );
 }
