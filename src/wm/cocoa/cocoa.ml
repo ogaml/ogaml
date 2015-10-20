@@ -74,11 +74,14 @@ module NSWindow = struct
     | Buffered
 
   (* Abstract functions *)
-  external abstract_create : NSRect.t -> style_mask list -> backing_store -> t =
-    "caml_cocoa_create_window"
+  external abstract_create : NSRect.t ->
+                             style_mask list ->
+                             backing_store ->
+                             bool -> t
+    = "caml_cocoa_create_window"
 
   (* Exposed functions *)
-  let create ~frame ~style_mask ~backing () =
-    abstract_create frame style_mask backing
+  let create ~frame ~style_mask ~backing ~defer () =
+    abstract_create frame style_mask backing defer
 
 end

@@ -130,9 +130,9 @@ caml_cocoa_create_appdgt(value unit)
 ///////////////////////////////////////////////
 
 CAMLprim value
-caml_cocoa_create_window(value frame, value styleMask, value backing)
+caml_cocoa_create_window(value frame, value styleMask, value backing, value defer)
 {
-  CAMLparam3(frame,styleMask,backing);
+  CAMLparam4(frame,styleMask,backing,defer);
   CAMLlocal2(hd, tl);
 
   NSRect* rect = (NSRect*) Data_custom_val(frame);
@@ -147,6 +147,10 @@ caml_cocoa_create_window(value frame, value styleMask, value backing)
     mask |= (1L << (Int_val(hd)-1));
   }
 
+  // Getting the defer boolean
+  BOOL deferb = Bool_val(defer);
+  NSLog(deferb ? @"YES" : @"NO");
+
 
   [OGApplication sharedApplication]; // ensure NSApp
 
@@ -154,7 +158,7 @@ caml_cocoa_create_window(value frame, value styleMask, value backing)
   window = [[[NSWindow alloc] initWithContentRect:(*rect)
                                         styleMask:mask
                                           backing:Int_val(backing)
-                                            defer:NO] autorelease];
+                                            defer:deferb] autorelease];
 
   // TODO: Put in separate functions the following lines
   [window setBackgroundColor:[NSColor greenColor]];

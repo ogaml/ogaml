@@ -65,6 +65,7 @@ module NSWindow : sig
   val create : frame:NSRect.t ->
                style_mask:style_mask list ->
                backing:backing_store ->
+               defer:bool ->
                unit -> t
 
 end
