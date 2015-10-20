@@ -27,7 +27,7 @@ LIBS = -framework Foundation -framework Cocoa -lobjc
 default: depend $(CLIB)
 
 $(CLIB): $(COBJS) $(MLOBJS)
-	$(OCAMLMKLIB) -o $(CLIB) -v -ccopt '-ccopt '$(LIBS)'' $(COBJS2) $(MLOBJS)
+	$(OCAMLMKLIB) -o $(CLIB) -v -ccopt '-ccopt "$(LIBS)"' $(COBJS2) $(MLOBJS)
 
 %.cmi:%.mli
 	$(OCAMLC) -c $< -o $@
