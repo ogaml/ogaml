@@ -130,9 +130,9 @@ caml_cocoa_create_appdgt(value unit)
 ///////////////////////////////////////////////
 
 CAMLprim value
-caml_cocoa_create_window(value frame, value styleMask)
+caml_cocoa_create_window(value frame, value styleMask, value backing)
 {
-  CAMLparam2(frame,styleMask);
+  CAMLparam3(frame,styleMask,backing);
   CAMLlocal2(hd, tl);
 
   NSRect* rect = (NSRect*) Data_custom_val(frame);
@@ -153,11 +153,14 @@ caml_cocoa_create_window(value frame, value styleMask)
   NSWindow* window;
   window = [[[NSWindow alloc] initWithContentRect:(*rect)
                                         styleMask:mask
-                                          backing:NSBackingStoreBuffered
+                                          backing:Int_val(backing)
                                             defer:NO] autorelease];
+
+  // TODO: Put in separate functions the following lines
   [window setBackgroundColor:[NSColor greenColor]];
   [window makeKeyAndOrderFront:NSApp];
   // [window center];
   [window makeMainWindow];
+
   CAMLreturn( (value) window );
 }

@@ -10,7 +10,8 @@ let () =
   let rect = NSRect.create 200 300 400 500 in
   let window = NSWindow.(
     create ~frame:rect
-           ~style_mask:[Titled;Closable;Miniaturizable;Resizable] ()
+           ~style_mask:[Titled;Closable;Miniaturizable;Resizable]
+           ~backing:Buffered ()
   ) in
   (* Maybe this is bad because we actually never need the OGApplication.t *)
   OGApplication.run ()

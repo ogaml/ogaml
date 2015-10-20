@@ -57,6 +57,14 @@ module NSWindow : sig
     | FullScreen
     | FullSizeContent
 
-  val create : frame:NSRect.t -> style_mask:style_mask list -> unit -> t
+  type backing_store =
+    | Retained
+    | NonRetained
+    | Buffered
+
+  val create : frame:NSRect.t ->
+               style_mask:style_mask list ->
+               backing:backing_store ->
+               unit -> t
 
 end

@@ -68,12 +68,17 @@ module NSWindow = struct
     | FullScreen
     | FullSizeContent
 
+  type backing_store =
+    | Retained
+    | NonRetained
+    | Buffered
+
   (* Abstract functions *)
-  external abstract_create : NSRect.t -> style_mask list -> t =
+  external abstract_create : NSRect.t -> style_mask list -> backing_store -> t =
     "caml_cocoa_create_window"
 
   (* Exposed functions *)
-  let create ~frame ~style_mask () =
-    abstract_create frame style_mask
+  let create ~frame ~style_mask ~backing () =
+    abstract_create frame style_mask backing
 
 end
