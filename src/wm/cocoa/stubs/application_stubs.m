@@ -159,11 +159,6 @@ caml_cocoa_create_window(value frame, value styleMask, value backing, value defe
                                           backing:Int_val(backing)
                                             defer:deferb] autorelease];
 
-  // TODO: Put in separate functions the following lines
-  [window makeKeyAndOrderFront:NSApp];
-  // [window center];
-  [window makeMainWindow];
-
   CAMLreturn( (value) window );
 }
 
@@ -176,6 +171,43 @@ caml_cocoa_window_set_bg_color(value mlwindow, value mlcolor)
   NSColor* color = (NSColor*) mlcolor;
 
   [window setBackgroundColor:color];
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_window_make_key_and_order_front(value mlwindow)
+{
+  CAMLparam1(mlwindow);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+
+  [OGApplication sharedApplication]; // ensure NSApp
+  [window makeKeyAndOrderFront:NSApp];
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_window_center(value mlwindow)
+{
+  CAMLparam1(mlwindow);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+
+  [window center];
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_window_make_main(value mlwindow)
+{
+  CAMLparam1(mlwindow);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+
+  [window makeMainWindow];
 
   CAMLreturn(Val_unit);
 }
