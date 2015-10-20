@@ -159,10 +159,6 @@ caml_cocoa_create_window(value frame, value styleMask, value backing, value defe
                                           backing:Int_val(backing)
                                             defer:deferb] autorelease];
 
-  // TODO: Put in separate functions the following lines
-  // [window center];
-  // [window makeMainWindow];
-
   CAMLreturn( (value) window );
 }
 
