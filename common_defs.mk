@@ -1,9 +1,9 @@
 
 # OS-dependant constants
 
-OS_WIN_STUBS = 
-OS_WIN_STUBS_DIR = 
-OS_WIN_STUBS_TEST = 
+OS_WIN_STUBS =
+OS_WIN_STUBS_DIR =
+OS_WIN_STUBS_TEST =
 
 UNAME := $(shell uname)
 
@@ -22,7 +22,7 @@ endif
 
 OCAMLDEP = ocamldep
 
-OCAMLC = ocamlc 
+OCAMLC = ocamlc
 
 OCAMLOPT = ocamlopt
 
@@ -34,11 +34,11 @@ OCAMLMKLIB = ocamlmklib
   # Extensions used for cleaning
 EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so *.native *.out *.byte *.d
 
-INCLUDE_DIRS = 
+INCLUDE_DIRS =
 
-NATIVEFLAGS = 
+NATIVEFLAGS =
 
-BYTEFLAGS = 
+BYTEFLAGS =
 
 STUBS_DIR = stubs
 
@@ -47,12 +47,9 @@ STUBS_DIR = stubs
 
 PPCOMMAND = cppo
 
-DEPCOMMAND = $(OCAMLDEP) -pp "$(PPCOMMAND)" $(INCLUDE_DIRS) 
+DEPCOMMAND = $(OCAMLDEP) -pp "$(PPCOMMAND)" $(INCLUDE_DIRS)
 
 
 # Suffixes
 
-.SUFFIXES: .ml .mli .cmo .cmi .cmx .c .o .a .mllib .clib
-
-
-
+.SUFFIXES: .ml .mli .cmo .cmi .cmx .c .o .a .mllib .clib .m

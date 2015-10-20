@@ -4,8 +4,8 @@ include ../../../common_defs.mk
 
 INCLUDE_DIRS = -I ../../utils/
 
-CSOURCES = $(STUBS_DIR)/utils_stubs.c $(STUBS_DIR)/application_stubs.c\
-	   $(STUBS_DIR)/test_stubs.c ../../utils/stubs.c
+CSOURCES = $(STUBS_DIR)/utils_stubs.m $(STUBS_DIR)/application_stubs.m\
+	   $(STUBS_DIR)/test_stubs.m ../../utils/stubs.c
 
 COBJS = $(CSOURCES:.c=.o)
 
@@ -17,7 +17,7 @@ MLOBJS = $(MLSOURCES:.ml=.cmx)
 
 CLIB = cocoa_stubs
 
-COPTS = -fconstant-string-class=NSConstantString -x objective-c
+COPTS = -fconstant-string-class=NSConstantString
 
 LIBS = -framework Foundation -framework Cocoa -lobjc
 
@@ -40,7 +40,7 @@ $(CLIB): $(COBJS) $(MLOBJS)
 
 
 %.o:%.c
-	$(OCAMLC) -c -ccopt '$(COPTS)' $< -o $@ 
+	$(OCAMLC) -c -ccopt '$(COPTS)' $< -o $@
 
 
 
@@ -56,5 +56,3 @@ depend:
 	$(DEPCOMMAND) *.ml *.mli > .depend
 
 include .depend
-
-
