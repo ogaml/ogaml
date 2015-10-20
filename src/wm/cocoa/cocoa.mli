@@ -100,4 +100,6 @@ module NSWindow : sig
 
   val make_main : t -> unit
 
+  val perform_close : t -> unit
+
 end
