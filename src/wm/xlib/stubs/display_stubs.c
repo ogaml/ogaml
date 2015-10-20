@@ -2,16 +2,24 @@
 #include "../../../utils/stubs.h"
 
 
+Display* current_display = NULL;
+
 // INPUT   string option
 // OUTPUT  display 
 CAMLprim value
 caml_xopen_display(value name)
 {
   CAMLparam1(name);
-  if(name == Val_int(0)) 
-    CAMLreturn( (value) XOpenDisplay(NULL));
-  else
-    CAMLreturn( (value) XOpenDisplay(String_val(Field(name,0))));
+  if(current_display != NULL)
+    CAMLreturn((value)current_display);
+  else if(name == Val_none) {
+    current_display = XOpenDisplay(NULL);
+    CAMLreturn((value)current_display);
+  }
+  else {
+    current_display = XOpenDisplay(String_val(Some_val(name)));
+    CAMLreturn((value)current_display);
+  }
 }
 
 

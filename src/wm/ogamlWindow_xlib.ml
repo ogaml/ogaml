@@ -20,7 +20,7 @@ module Window = struct
   }
 
   let create ~width ~height = 
-    (* For now, every window is top-level and requests a new display *)
+    (* The display is a singleton in C (created only once) *)
     let disp = Xlib.Display.create () in
     let win = 
       {
@@ -68,10 +68,7 @@ module Window = struct
   let poll_event win = 
     if win.closed then None
     else begin 
-      (* Event.next should also consider the window,
-      * but for now we can only create one window 
-      * with one display *)
-      match Xlib.Event.next win.display with
+      match Xlib.Event.next win.display win.window with
       |Some e when Xlib.Event.type_of e = Xlib.Event.ClientMessage -> 
           (* Should match on the type of ClientMessage
           * but there is only one for now *)

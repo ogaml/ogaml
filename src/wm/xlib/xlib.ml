@@ -179,7 +179,7 @@ module Event = struct
   external set_mask : Display.t -> Window.t -> mask list -> unit 
     = "caml_xselect_input"
 
-  external next : Display.t -> t option = "caml_xnext_event"
+  external next : Display.t -> Window.t -> t option = "caml_xnext_event"
 
   external type_of : t -> enum = "caml_event_type"
 
