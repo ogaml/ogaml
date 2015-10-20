@@ -48,21 +48,21 @@ module NSColor : sig
 
 end
 
-module OGApplication : sig
-
-  type t
-
-  val create : unit -> t
-
-  val run : unit -> unit
-
-end
-
 module OGApplicationDelegate : sig
 
   type t
 
   val create : unit -> t
+
+end
+
+module OGApplication : sig
+
+  type t
+
+  val init : OGApplicationDelegate.t -> unit
+
+  val run : unit -> unit
 
 end
 

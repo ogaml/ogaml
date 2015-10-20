@@ -53,20 +53,6 @@ module NSColor = struct
 
 end
 
-module OGApplication = struct
-
-  type t
-
-  (* Abstract functions *)
-  external abstract_create : unit -> t = "caml_cocoa_create_app"
-
-  external run : unit -> unit = "caml_cocoa_run_app"
-
-  (* Exposed functions *)
-  let create () = abstract_create ()
-
-end
-
 module OGApplicationDelegate = struct
 
   type t
@@ -76,6 +62,21 @@ module OGApplicationDelegate = struct
 
   (* Exposed functions *)
   let create () = abstract_create ()
+
+end
+
+module OGApplication = struct
+
+  type t
+
+  (* Abstract functions *)
+  external abstract_init : OGApplicationDelegate.t -> unit
+    = "caml_cocoa_init_app"
+
+  external run : unit -> unit = "caml_cocoa_run_app"
+
+  (* Exposed functions *)
+  let init delegate = abstract_init delegate
 
 end
 
