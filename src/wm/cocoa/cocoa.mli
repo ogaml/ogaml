@@ -98,4 +98,6 @@ module NSWindow : sig
 
   val center : t -> unit
 
+  val make_main : t -> unit
+
 end

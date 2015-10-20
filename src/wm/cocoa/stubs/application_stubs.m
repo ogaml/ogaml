@@ -203,3 +203,15 @@ caml_cocoa_window_center(value mlwindow)
 
   CAMLreturn(Val_unit);
 }
+
+CAMLprim value
+caml_cocoa_window_make_main(value mlwindow)
+{
+  CAMLparam1(mlwindow);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+
+  [window makeMainWindow];
+
+  CAMLreturn(Val_unit);
+}
