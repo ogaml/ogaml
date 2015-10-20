@@ -118,7 +118,7 @@ module Event : sig
     
   val set_mask : Display.t -> Window.t -> mask list -> unit
 
-  val next : Display.t -> t option
+  val next : Display.t -> Window.t -> t option
 
   val type_of : t -> enum
 

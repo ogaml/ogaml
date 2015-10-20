@@ -1,6 +1,1 @@
-- change the implementation of ogamlWindow_xlib to manipulate only one display 
-  maybe keep a pointer to the display on C side, and return it whenever ocaml wants one,
-  this avoids an ugly reference on ocaml side
-- change the test in xlib's event_stubs so that it can handle multiple windows 
-  on the same display
 - match on clientmessage in ogamlWindow_xlib for safety

@@ -22,24 +22,22 @@ caml_xselect_input(value disp, value win, value masks)
 }
 
 
-// Always return true, does not filter events
-// Should definitely consider the window when we
-// are able to create multiple windows on one display
-Bool checkEvent()
+// Tests if an event happens in the right window
+Bool checkEvent(Display* disp, XEvent* evt, XPointer window)
 {
-  return True;
+  return ((XAnyEvent*)evt)->window == (Window)window;
 }
 
 
-// INPUT   display
-// OUTPUT  a pointer on an event (if it exists)
+// INPUT   display, window
+// OUTPUT  a pointer on an event (if it exists) in the current window
 CAMLprim value
-caml_xnext_event(value disp)
+caml_xnext_event(value disp, value win)
 {
   CAMLparam1(disp);
   CAMLlocal1(evt);
   XEvent event;
-  if(XCheckIfEvent((Display*) disp, &event, &checkEvent, NULL) == True) {
+  if(XCheckIfEvent((Display*) disp, &event, &checkEvent, (XPointer)win) == True) {
     evt = caml_alloc_custom(&empty_custom_opts, sizeof(XEvent), 0, 1);
     memcpy(Data_custom_val(evt), &event, sizeof(XEvent));
     CAMLreturn(Val_some(evt));
