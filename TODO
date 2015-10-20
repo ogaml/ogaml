@@ -1,14 +1,21 @@
 General:
 
+Objective-C formatting:
+  ☐ Choose how to align labels
+
 Cocoa specific:
   ☐ Remove application t type @unsure
   ✔ Separate functions for all window methods @done(2015-10-20 20:16) @project(Cocoa specific)
   ☐ Make us of Delegate or remove
-  ☐ Add menus to application (+parametrize?)
+  ✔ Add menus to application @done(2015-10-20 21:34) @project(Cocoa specific)
+  ☐ Add menus without plagiarizing SFML (+parametrize?)
+  ☐ Menus should be clickable on launch @issue
+  ✔ Implement applicationName of OGApplication @unsure @done(2015-10-20 21:14) @project(Cocoa specific)
+  ☐ Close application when all windows are (through delegate probably)
 
 Xlib specific:
   ✔ Match on clientmessage in ogamlWindow_xlib for safety @done(2015-10-20 20:29) @project(Xlib specific)
-  ☐ Avoid re-creating events (should profile before) @unsure 
+  ☐ Avoid re-creating events (should profile before) @unsure
   ☐ Remove unsafe casts of events
   ☐ Extract data from key presses
   ☐ Extract data from button presses
