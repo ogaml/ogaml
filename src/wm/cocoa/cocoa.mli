@@ -1,5 +1,4 @@
 
-(* Buggued function, do not initialize the ARP *)
 val init_arp : unit -> unit
 
 val test_cocoa : unit -> unit
@@ -21,6 +20,31 @@ module NSRect : sig
   type t
 
   val create : int -> int -> int -> int -> t
+
+end
+
+module NSColor : sig
+
+  type t
+
+  (** R G B A are float between 0.0 and 1.0 *)
+  val rgba : float -> float -> float -> float -> t
+
+  val black      : unit -> t
+  val blue       : unit -> t
+  val brown      : unit -> t
+  val clear      : unit -> t
+  val cyan       : unit -> t
+  val dark_gray  : unit -> t
+  val gray       : unit -> t
+  val green      : unit -> t
+  val light_gray : unit -> t
+  val magenta    : unit -> t
+  val orange     : unit -> t
+  val purple     : unit -> t
+  val red        : unit -> t
+  val white      : unit -> t
+  val yellow     : unit -> t
 
 end
 
@@ -67,5 +91,7 @@ module NSWindow : sig
                backing:backing_store ->
                defer:bool ->
                unit -> t
+
+  val set_background_color : t -> NSColor.t -> unit
 
 end

@@ -17,3 +17,45 @@ caml_cocoa_create_nsrect(value x, value y, value w, value h)
 
   CAMLreturn(mlrect);
 }
+
+// NSColor binding
+//////////////////
+
+CAMLprim value
+caml_cocoa_color_rgba(value r, value g, value b, value a)
+{
+  CAMLparam4(r,g,b,a);
+
+  float fr = Double_val(r);
+  float fg = Double_val(g);
+  float fb = Double_val(b);
+  float fa = Double_val(a);
+
+  NSColor* color = [NSColor colorWithRed:fr green:fg blue:fb alpha:fa];
+
+  CAMLreturn( (value) color );
+}
+
+#define def_caml_cocoa_color(c,nsc) CAMLprim value \
+                            caml_cocoa_color_ ## c (value unit) \
+                            { \
+                              CAMLparam0(); \
+                              NSColor* color = [NSColor nsc ## Color]; \
+                              CAMLreturn( (value) color ); \
+                            }
+
+def_caml_cocoa_color(black,black)
+def_caml_cocoa_color(blue,blue)
+def_caml_cocoa_color(brown,brown)
+def_caml_cocoa_color(clear,clear)
+def_caml_cocoa_color(cyan,cyan)
+def_caml_cocoa_color(dark_gray,darkGray)
+def_caml_cocoa_color(gray,gray)
+def_caml_cocoa_color(green,green)
+def_caml_cocoa_color(light_gray,lightGray)
+def_caml_cocoa_color(magenta,magenta)
+def_caml_cocoa_color(orange,orange)
+def_caml_cocoa_color(purple,purple)
+def_caml_cocoa_color(red,red)
+def_caml_cocoa_color(white,white)
+def_caml_cocoa_color(yellow,yellow)

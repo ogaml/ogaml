@@ -149,7 +149,6 @@ caml_cocoa_create_window(value frame, value styleMask, value backing, value defe
 
   // Getting the defer boolean
   BOOL deferb = Bool_val(defer);
-  NSLog(deferb ? @"YES" : @"NO");
 
 
   [OGApplication sharedApplication]; // ensure NSApp
@@ -161,10 +160,22 @@ caml_cocoa_create_window(value frame, value styleMask, value backing, value defe
                                             defer:deferb] autorelease];
 
   // TODO: Put in separate functions the following lines
-  [window setBackgroundColor:[NSColor greenColor]];
   [window makeKeyAndOrderFront:NSApp];
   // [window center];
   [window makeMainWindow];
 
   CAMLreturn( (value) window );
+}
+
+CAMLprim value
+caml_cocoa_window_set_bg_color(value mlwindow, value mlcolor)
+{
+  CAMLparam2(mlwindow, mlcolor);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+  NSColor* color = (NSColor*) mlcolor;
+
+  [window setBackgroundColor:color];
+
+  CAMLreturn(Val_unit);
 }
