@@ -58,10 +58,10 @@ module NSWindow = struct
   type t
 
   (* Abstract functions *)
-  external abstract_create : NSRect.t option -> t = "caml_cocoa_create_window"
+  external abstract_create : NSRect.t -> t = "caml_cocoa_create_window"
 
   (* Exposed functions *)
-  let create ?frame () =
+  let create ~frame () =
     abstract_create frame
 
 end

@@ -133,26 +133,21 @@ CAMLprim value
 caml_cocoa_create_window(value frame)
 {
   CAMLparam1(frame);
-  // This is an option so we check whether it is None of Some
-  if(frame == Val_int(0))
-  {
-    [OGApplication sharedApplication]; // ensure NSApp
-    CAMLreturn( (value) [NSWindow new] );
-  }
-  else
-  {
-    [OGApplication sharedApplication]; // ensure NSApp
-    NSRect* rect = (NSRect*) Data_custom_val(frame);
-    NSLog(@"x:%f, y:%f, w:%f, h:%f", rect->origin.x, rect->origin.y, rect->size.width, rect->size.height);
-    NSWindow* window;
-    window = [[[NSWindow alloc] initWithContentRect:(*rect)
-                  styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
-                  backing:NSBackingStoreBuffered
-                  defer:NO] autorelease];
-    [window setBackgroundColor:[NSColor greenColor]];
-    [window makeKeyAndOrderFront:NSApp];
-    // [window center];
-    [window makeMainWindow];
-    CAMLreturn( (value) window );
-  }
+
+  NSRect* rect = (NSRect*) Data_custom_val(frame);
+  NSLog(@"x:%f, y:%f, w:%f, h:%f", rect->origin.x, rect->origin.y, rect->size.width, rect->size.height);
+
+
+  [OGApplication sharedApplication]; // ensure NSApp
+
+  NSWindow* window;
+  window = [[[NSWindow alloc] initWithContentRect:(*rect)
+                styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
+                backing:NSBackingStoreBuffered
+                defer:NO] autorelease];
+  [window setBackgroundColor:[NSColor greenColor]];
+  [window makeKeyAndOrderFront:NSApp];
+  // [window center];
+  [window makeMainWindow];
+  CAMLreturn( (value) window );
 }
