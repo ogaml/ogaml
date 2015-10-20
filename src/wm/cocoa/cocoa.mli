@@ -94,4 +94,6 @@ module NSWindow : sig
 
   val set_background_color : t -> NSColor.t -> unit
 
+  val make_key_and_order_front : t -> unit
+
 end

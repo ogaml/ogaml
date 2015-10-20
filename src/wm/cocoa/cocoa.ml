@@ -109,6 +109,9 @@ module NSWindow = struct
   external set_background_color : t -> NSColor.t -> unit
     = "caml_cocoa_window_set_bg_color"
 
+  external make_key_and_order_front : t -> unit
+    = "caml_cocoa_window_make_key_and_order_front"
+
   (* Exposed functions *)
   let create ~frame ~style_mask ~backing ~defer () =
     abstract_create frame style_mask backing defer

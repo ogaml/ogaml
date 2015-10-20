@@ -15,5 +15,6 @@ let () =
            ~defer:false ()
   ) in
   NSWindow.set_background_color window (NSColor.magenta ());
+  NSWindow.make_key_and_order_front window;
   (* Maybe this is bad because we actually never need the OGApplication.t *)
   OGApplication.run ()
