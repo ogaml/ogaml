@@ -342,3 +342,18 @@ caml_cocoa_window_perform_close(value mlwindow)
 
   CAMLreturn(Val_unit);
 }
+
+CAMLprim value
+caml_cocoa_window_frame(value mlwindow)
+{
+  CAMLparam1(mlwindow);
+  CAMLlocal1(mlrect);
+  mlrect = caml_alloc_custom(&empty_custom_opts, sizeof(NSRect), 0, 1);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+  NSRect rect = [window frame];
+
+  memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
+
+  CAMLreturn(mlrect);
+}

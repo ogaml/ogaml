@@ -22,6 +22,9 @@ module NSRect = struct
   external a_create : float -> float -> float -> float -> t
     = "caml_cocoa_create_nsrect"
 
+  external get : t -> float * float * float * float
+    = "caml_cocoa_get_nsrect"
+
   let create x y w h =
     let f = float_of_int in
     a_create (f x) (f y) (f w) (f h)
@@ -118,6 +121,8 @@ module NSWindow = struct
   external make_main : t -> unit = "caml_cocoa_window_make_main"
 
   external perform_close : t -> unit = "caml_cocoa_window_perform_close"
+
+  external frame : t -> NSRect.t = "caml_cocoa_window_frame"
 
   (* Exposed functions *)
   let create ~frame ~style_mask ~backing ~defer () =

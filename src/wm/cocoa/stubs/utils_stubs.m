@@ -18,6 +18,23 @@ caml_cocoa_create_nsrect(value x, value y, value w, value h)
   CAMLreturn(mlrect);
 }
 
+CAMLprim value
+caml_cocoa_get_nsrect(value mlrect)
+{
+  CAMLparam1(mlrect);
+  CAMLlocal1(tuple);
+
+  NSRect* rect = (NSRect*) Data_custom_val(mlrect);
+
+  tuple = caml_alloc(4,0);
+  Store_field(tuple,0,rect->origin.x);
+  Store_field(tuple,1,rect->origin.y);
+  Store_field(tuple,2,rect->size.width);
+  Store_field(tuple,3,rect->size.height);
+
+  CAMLreturn(tuple);
+}
+
 // NSColor binding
 //////////////////
 

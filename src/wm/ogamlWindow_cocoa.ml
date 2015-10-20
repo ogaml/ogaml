@@ -51,7 +51,12 @@ module Window = struct
 
   let destroy win = ()
 
-  let size win = 0,0
+  let size win =
+    let i = int_of_float in
+    Cocoa.(
+      let (_,_,w,h) = NSRect.get (Cocoa.NSWindow.frame win)
+      in i w, i h
+    )
 
   let is_open win = true
 

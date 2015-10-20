@@ -21,6 +21,8 @@ module NSRect : sig
 
   val create : int -> int -> int -> int -> t
 
+  val get : t -> float * float * float * float
+
 end
 
 module NSColor : sig
@@ -101,5 +103,7 @@ module NSWindow : sig
   val make_main : t -> unit
 
   val perform_close : t -> unit
+
+  val frame : t -> NSRect.t
 
 end
