@@ -39,7 +39,7 @@ $(CLIB): $(COBJS) $(MLOBJS)
 	$(OCAMLC) -c $< -o $@ -cclib '$(LIBS)'
 
 %.o:%.m
-	$(OCAMLC) -c -ccopt -lobjc '$(COPTS)' $< -o $@
+	$(OCAMLC) -c -ccopt '$(COPTS)' $< -o $@
 
 %.o:%.c
 	$(OCAMLC) -c -ccopt '$(COPTS)' $< -o $@
