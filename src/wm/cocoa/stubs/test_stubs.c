@@ -132,9 +132,9 @@ caml_open_window(value unit)
   CAMLparam0();
 
   [MyApplication sharedApplication];
-  //[NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
-  //[NSApp activateIgnoringOtherApps:YES];
-  //[[NSApplication sharedApplication] setDelegate:NSApp];
+  [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+  [NSApp activateIgnoringOtherApps:YES];
+  [[NSApplication sharedApplication] setDelegate:NSApp];
 
   [NSApp run];
   [NSApp activateIgnoringOtherApps:YES];
