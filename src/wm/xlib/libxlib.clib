@@ -1,5 +1,0 @@
-src/utils/stubs.o
-stubs/display_stubs.o
-stubs/window_stubs.o
-stubs/atoms_stubs.o
-stubs/event_stubs.o

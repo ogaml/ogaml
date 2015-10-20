@@ -1,39 +1,39 @@
-OCAMLBUILD=ocamlbuild -use-ocamlfind -classic-display -j 4
-
-OCAMLBUILD_DIR=$(shell ocamlc -where)/ocamlbuild
-
-WINDOW_DIR = src/wm
-
-XLIB_DIR   = $(WINDOW_DIR)/xlib
-
-COCOA_DIR  = $(WINDOW_DIR)/cocoa
-
-TEST_DIR   = src/test
+include common_defs.mk
 
 
-window-test: clean
-	$(OCAMLBUILD) -I $(WINDOW_DIR) $(TEST_DIR)/test_window.native
+# Window constants
+
+WINDOW_INCLUDES = -I src/wm -I src/wm/$(strip $(OS_WIN_STUBS_DIR))
+
+WINDOW_CMXA = $(OS_WIN_STUBS).cmxa ogamlWindow.cmxa
+
+WINDOW_TEST = src/test/test_window.ml
+
+STUBS_TEST = src/test/$(strip $(OS_WIN_STUBS_TEST)).ml
 
 
-libwindow-nat-linux:
-	$(OCAMLBUILD) -I $(XLIB_DIR) $(WINDOW_DIR)/ogamlWindow.cmxa
+# Constants
+
+OUTPUT = main.out
 
 
-xlib-nat-test: clean xlib-nat
-	$(OCAMLBUILD) -I $(XLIB_DIR) $(TEST_DIR)/xtest_simple.native
+# Compilation
 
-xlib-nat:
-	$(OCAMLBUILD) $(XLIB_DIR)/xlib.cmxa
+default: window_test
 
+window_lib:
+	cd src/wm/ && make
 
-cocoa-nat-test: clean cocoa-nat
-	$(OCAMLBUILD) -I $(COCOA_DIR) $(TEST_DIR)/ctest_simple.native
+window_test: window_lib
+	$(OCAMLOPT) -o $(OUTPUT) $(WINDOW_INCLUDES) $(WINDOW_CMXA) $(WINDOW_TEST)
 
-cocoa-nat:
-	$(OCAMLBUILD) $(COCOA_DIR)/cocoa.cmxa
+stubs_test: stubs_lib
+	$(OCAMLOPT) -o $(OUTPUT) $(WINDOW_INCLUDES) $(OS_WIN_STUBS).cmxa $(STUBS_TEST)
 
+stubs_lib:
+	cd src/wm/$(strip $(OS_WIN_STUBS_DIR)) && make
 
 clean:
-	$(OCAMLBUILD) -clean
-
-
+	rm -rf *.out;
+	cd src/wm/ && make clean;
+	cd src/test/ && make clean

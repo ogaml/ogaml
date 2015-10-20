@@ -1,0 +1,19 @@
+src/main.cmo :
+src/main.cmx :
+src/test/ctest_simple.cmo : src/wm/cocoa/cocoa.cmi
+src/test/ctest_simple.cmx : src/wm/cocoa/cocoa.cmx
+src/test/test_window.cmo : src/wm/ogamlWindow.cmi
+src/test/test_window.cmx : src/wm/ogamlWindow.cmx
+src/test/xtest_simple.cmo : src/wm/xlib/xlib.cmi
+src/test/xtest_simple.cmx : src/wm/xlib/xlib.cmx
+src/wm/ogamlWindow.cmo : src/wm/xlib/xlib.cmi src/wm/ogamlWindow.cmi
+src/wm/ogamlWindow.cmx : src/wm/xlib/xlib.cmx src/wm/ogamlWindow.cmi
+src/wm/ogamlWindow_xlib.cmo : src/wm/xlib/xlib.cmi
+src/wm/ogamlWindow_xlib.cmx : src/wm/xlib/xlib.cmx
+src/wm/xlib/xlib.cmo : src/wm/xlib/xlib.cmi
+src/wm/xlib/xlib.cmx : src/wm/xlib/xlib.cmi
+src/wm/cocoa/cocoa.cmo : src/wm/cocoa/cocoa.cmi
+src/wm/cocoa/cocoa.cmx : src/wm/cocoa/cocoa.cmi
+src/wm/ogamlWindow.cmi :
+src/wm/xlib/xlib.cmi :
+src/wm/cocoa/cocoa.cmi :

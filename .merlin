@@ -6,11 +6,11 @@ S src/wm/cocoa
 S src/wm/cocoa/stubs
 S src/test
 
-B _build/src
-B _build/src/wm
-B _build/src/wm/xlib
-B _build/src/wm/xlib/stubs
-B _build/src/wm/cocoa
-B _build/src/wm/cocoa/stubs
-B _build/src/test
+B src
+B src/wm
+B src/wm/xlib
+B src/wm/xlib/stubs
+B src/wm/cocoa
+B src/wm/cocoa/stubs
+B src/test
 
