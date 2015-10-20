@@ -70,7 +70,7 @@ module Window = struct
     else begin 
       match Xlib.Event.next win.display win.window with
       |Some e -> begin
-        match Xlib.Event.type_of e with
+        match Xlib.Event.data e with
         | Xlib.Event.ClientMessage a -> begin
           match Xlib.Atom.intern win.display "WM_DELETE_WINDOW" true with
           | Some(a') when a = a' -> 

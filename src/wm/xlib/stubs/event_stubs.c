@@ -25,7 +25,7 @@ caml_xselect_input(value disp, value win, value masks)
 // Tests if an event happens in the right window
 Bool checkEvent(Display* disp, XEvent* evt, XPointer window)
 {
-  return ((XAnyEvent*)evt)->window == (Window)window;
+  return evt->xany.window == (Window)window;
 }
 
 
@@ -94,7 +94,7 @@ value extract_event(XEvent* evt)
     // ClientMessage : get the Atom (message_type)
     case ClientMessage: // 33, 1st parametric variant (tag 0)
       result = caml_alloc(1,0);
-      Store_field(result, 0, (value)((XClientMessageEvent*)evt)->data.l[0]);
+      Store_field(result, 0, (value)evt->xclient.data.l[0]);
       break;
 
     case MappingNotify    :
