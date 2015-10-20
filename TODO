@@ -20,7 +20,7 @@ Xlib specific:
   ☐ Extract data from key presses
   ☐ Extract data from button presses
   ☐ Extract data from cursor movement
-  ☐ Binding GLX **
+  ☐ Binding GLX ** (later)
 
 Window part:
   ☐ Add keys enumeration
