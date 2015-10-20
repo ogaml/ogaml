@@ -12,6 +12,8 @@ Cocoa specific:
   ☐ Menus should be clickable on launch @issue
   ✔ Implement applicationName of OGApplication @unsure @done(2015-10-20 21:14) @project(Cocoa specific)
   ✔ Close application when all windows are (through delegate probably) @done(2015-10-20 22:03) @project(Cocoa specific)
+  ☐ Guarantee application is init only once @important
+  ☐ Continue window implementation
 
 Xlib specific:
   ✔ Match on clientmessage in ogamlWindow_xlib for safety @done(2015-10-20 20:29) @project(Xlib specific)
