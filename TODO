@@ -4,14 +4,14 @@ Objective-C formatting:
   ☐ Choose how to align labels
 
 Cocoa specific:
-  ☐ Remove application t type @unsure
+  ✔ Remove application t type @unsure @done(2015-10-20 21:59) @project(Cocoa specific)
   ✔ Separate functions for all window methods @done(2015-10-20 20:16) @project(Cocoa specific)
-  ☐ Make us of Delegate or remove
+  ✔ Make use of Delegate or remove @done(2015-10-20 22:03) @project(Cocoa specific)
   ✔ Add menus to application @done(2015-10-20 21:34) @project(Cocoa specific)
-  ☐ Add menus without plagiarizing SFML (+parametrize?)
+  ☐ Add menus without plagiarizing SFML @option(parametrize)
   ☐ Menus should be clickable on launch @issue
   ✔ Implement applicationName of OGApplication @unsure @done(2015-10-20 21:14) @project(Cocoa specific)
-  ☐ Close application when all windows are (through delegate probably)
+  ✔ Close application when all windows are (through delegate probably) @done(2015-10-20 22:03) @project(Cocoa specific)
 
 Xlib specific:
   ✔ Match on clientmessage in ogamlWindow_xlib for safety @done(2015-10-20 20:29) @project(Xlib specific)

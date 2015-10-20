@@ -183,17 +183,20 @@
 ////////////////////////
 
 CAMLprim value
-caml_cocoa_create_app(value unit)
+caml_cocoa_init_app(value mldelegate)
 {
-  CAMLparam0();
+  CAMLparam1(mldelegate);
 
-  OGApplication* app = [OGApplication sharedApplication];
+  OGApplicationDelegate* delegate = (OGApplicationDelegate*) mldelegate;
+
+  [OGApplication sharedApplication];
   [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
   [NSApp activateIgnoringOtherApps:YES];
-  // Temporary (TODO delegate function)
-  [[NSApplication sharedApplication] setDelegate:NSApp];
 
-  CAMLreturn( (value) app );
+  // [[NSApplication sharedApplication] setDelegate:NSApp];
+  [[NSApplication sharedApplication] setDelegate:delegate];
+
+  CAMLreturn(Val_unit);
 }
 
 CAMLprim value
