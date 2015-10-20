@@ -53,3 +53,4 @@ DEPCOMMAND = $(OCAMLDEP) -pp "$(PPCOMMAND)" $(INCLUDE_DIRS)
 # Suffixes
 
 .SUFFIXES: .ml .mli .cmo .cmi .cmx .c .o .a .mllib .clib .m
+

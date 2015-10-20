@@ -7,7 +7,7 @@ INCLUDE_DIRS = -I ../../utils/
 CSOURCES = $(STUBS_DIR)/utils_stubs.m $(STUBS_DIR)/application_stubs.m\
 	   $(STUBS_DIR)/test_stubs.m ../../utils/stubs.c
 
-COBJS = $(CSOURCES:.c=.o)
+COBJS = $(CSOURCES:.c=.o) $(CSOURCES:.m=.o)
 
 COBJS2 = utils_stubs.o application_stubs.o test_stubs.o stubs.o
 
@@ -38,9 +38,8 @@ $(CLIB): $(COBJS) $(MLOBJS)
 %.cmo:%.ml
 	$(OCAMLC) -c $< -o $@ -cclib '$(LIBS)'
 
-
 %.o:%.m
-	$(OCAMLC) -c -ccopt '$(COPTS)' $< -o $@
+	$(OCAMLC) -c -ccopt -lobjc '$(COPTS)' $< -o $@
 
 %.o:%.c
 	$(OCAMLC) -c -ccopt '$(COPTS)' $< -o $@
