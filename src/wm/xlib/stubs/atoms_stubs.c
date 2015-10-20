@@ -31,3 +31,5 @@ caml_xset_wm_protocols(value disp, value win, value atoms, value size)
   XSetWMProtocols((Display*) disp, (Window) win, tmp, Int_val(size));
   CAMLreturn(Val_unit);
 }
+
+

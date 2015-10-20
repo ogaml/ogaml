@@ -69,22 +69,23 @@ module Window = struct
     if win.closed then None
     else begin 
       match Xlib.Event.next win.display win.window with
-      |Some e when Xlib.Event.type_of e = Xlib.Event.ClientMessage -> 
-          (* Should match on the type of ClientMessage
-          * but there is only one for now *)
-          win.closed <- true;
-          Some Event.Closed
-      |Some e when Xlib.Event.type_of e = Xlib.Event.KeyPress -> 
-          Some Event.KeyPressed
-      |Some e when Xlib.Event.type_of e = Xlib.Event.KeyRelease ->
-          Some Event.KeyReleased
-      |Some e when Xlib.Event.type_of e = Xlib.Event.ButtonPress ->
-          Some Event.ButtonPressed 
-      |Some e when Xlib.Event.type_of e = Xlib.Event.ButtonRelease ->
-          Some Event.ButtonReleased
-      |Some e when Xlib.Event.type_of e = Xlib.Event.MotionNotify ->
-          Some Event.MouseMoved
-      | _ -> None
+      |Some e -> begin
+        match Xlib.Event.type_of e with
+        | Xlib.Event.ClientMessage a -> begin
+          match Xlib.Atom.intern win.display "WM_DELETE_WINDOW" true with
+          | Some(a') when a = a' -> 
+              win.closed <- true;
+              Some Event.Closed
+          | _ -> None
+        end
+        | Xlib.Event.KeyPress      -> Some Event.KeyPressed
+        | Xlib.Event.KeyRelease    -> Some Event.KeyReleased
+        | Xlib.Event.ButtonPress   -> Some Event.ButtonPressed
+        | Xlib.Event.ButtonRelease -> Some Event.ButtonReleased
+        | Xlib.Event.MotionNotify  -> Some Event.MouseMoved
+        | _ -> None
+      end
+      | None -> None
     end
 
 end

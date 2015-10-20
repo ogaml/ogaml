@@ -47,14 +47,79 @@ caml_xnext_event(value disp, value win)
 }
 
 
+// Extract the event out of an XEvent structure
+// Warning : event types begin at 2, and one needs to 
+//           be careful about the parametric variants 
+//           plus there is the Unknown type (0) in Ocaml
+value extract_event(XEvent* evt)
+{
+  CAMLparam0();
+  CAMLlocal1(result);
+  switch(evt->type) {
+
+    case KeyPress         :     
+    case KeyRelease       :
+    case ButtonPress      :
+    case ButtonRelease    :
+    case MotionNotify     :
+    case EnterNotify      :
+    case LeaveNotify      :
+    case FocusIn          :
+    case FocusOut         :
+    case KeymapNotify     :
+    case Expose           :
+    case GraphicsExpose   :
+    case NoExpose         :
+    case VisibilityNotify :
+    case CreateNotify     :
+    case DestroyNotify    :
+    case UnmapNotify      :
+    case MapNotify        :
+    case MapRequest       :
+    case ReparentNotify   :
+    case ConfigureNotify  :
+    case ConfigureRequest :
+    case GravityNotify    :
+    case ResizeRequest    :
+    case CirculateNotify  :
+    case CirculateRequest :
+    case PropertyNotify   :
+    case SelectionClear   :
+    case SelectionRequest :
+    case SelectionNotify  :
+    case ColormapNotify   :
+      result = Val_int(evt->type - 1);
+      break;
+
+    // ClientMessage : get the Atom (message_type)
+    case ClientMessage: // 33, 1st parametric variant (tag 0)
+      result = caml_alloc(1,0);
+      Store_field(result, 0, (value)((XClientMessageEvent*)evt)->data.l[0]);
+      break;
+
+    case MappingNotify    :
+    case GenericEvent     :
+    case LASTEvent        :
+      result = Val_int(evt->type - 2);
+      break;
+    
+    default: 
+      result = Val_int(0);
+      break;
+  }
+  CAMLreturn(result);
+}
+
+
 // INPUT   a pointer on an event
 // OUTPUT  the type of the event
 CAMLprim value
 caml_event_type(value evt)
 {
   CAMLparam1(evt);
-  // event types begin at 2...
-  CAMLreturn(Val_int(((XEvent*)Data_custom_val(evt))->type - 2));
+  CAMLlocal1(result);
+  result = extract_event((XEvent*)Data_custom_val(evt));
+  CAMLreturn(result);
 }
 
 

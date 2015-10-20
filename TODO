@@ -7,4 +7,4 @@ Cocoa specific:
   ☐ Add menus to application (+parametrize?)
 
 Xlib specific:
-  ☐ match on clientmessage in ogamlWindow_xlib for safety
+  ✔ match on clientmessage in ogamlWindow_xlib for safety @done(2015-10-20 20:29) @project(Xlib specific)

@@ -54,6 +54,8 @@ module Event : sig
   type t
 
   type enum = 
+    | ClientMessage of Atom.t
+    | Unknown
     | KeyPress        
     | KeyRelease      
     | ButtonPress     
@@ -85,7 +87,6 @@ module Event : sig
     | SelectionRequest
     | SelectionNotify 
     | ColormapNotify  
-    | ClientMessage   
     | MappingNotify   
     | GenericEvent      
 

@@ -111,6 +111,8 @@ module Event = struct
 
   (* Event enum *)
   type enum = 
+    | ClientMessage of Atom.t
+    | Unknown
     | KeyPress        
     | KeyRelease      
     | ButtonPress     
@@ -142,7 +144,6 @@ module Event = struct
     | SelectionRequest
     | SelectionNotify 
     | ColormapNotify  
-    | ClientMessage   
     | MappingNotify   
     | GenericEvent    
 
