@@ -17,13 +17,13 @@ MLLIB = ogamlWindow.cmxa ogamlWindow.cma
 
 default: depend $(MLLIB)
 
-compile_xlib:
+compile_lib:
 	cd $(OS_WIN_STUBS_DIR) && make
 
-%.cma:%.cmo compile_xlib
+%.cma:%.cmo compile_lib
 	$(OCAMLC) -a -o $@ $(INCLUDE_DIRS) $< -dllib -l$(strip $(OS_WIN_STUBS))
 
-%.cmxa:%.cmx compile_xlib
+%.cmxa:%.cmx compile_lib
 	$(OCAMLOPT) -a -o $@ $(INCLUDE_DIRS) $< -cclib -l$(strip $(OS_WIN_STUBS))
 
 %.cmi:%.mli
