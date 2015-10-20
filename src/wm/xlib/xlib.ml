@@ -182,7 +182,7 @@ module Event = struct
 
   external next : Display.t -> Window.t -> t option = "caml_xnext_event"
 
-  external type_of : t -> enum = "caml_event_type"
+  external data : t -> enum = "caml_event_type"
 
 end
 

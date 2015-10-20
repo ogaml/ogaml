@@ -5,7 +5,7 @@ include common_defs.mk
 
 WINDOW_INCLUDES = -I src/wm -I src/wm/$(strip $(OS_WIN_STUBS_DIR))
 
-WINDOW_CMXA = $(OS_WIN_STUBS).cmxa ogamlWindow.cmxa
+WINDOW_CMXA = $(OS_WIN_STUBS).cmxa ogamlWindow.cmxa unix.cmxa
 
 WINDOW_TEST = src/test/test_window.ml
 

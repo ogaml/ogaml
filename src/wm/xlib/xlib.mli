@@ -121,7 +121,7 @@ module Event : sig
 
   val next : Display.t -> Window.t -> t option
 
-  val type_of : t -> enum
+  val data : t -> enum
 
 end
 
