@@ -8,7 +8,7 @@ Cocoa specific:
 
 Xlib specific:
   ✔ Match on clientmessage in ogamlWindow_xlib for safety @done(2015-10-20 20:29) @project(Xlib specific)
-  ☐ Avoid re-creating events (should profile before) @unsure 
+  ✘ Avoid re-creating events (should profile before) -- takes 4e-7 sec @cancelled(2015-10-20 21:06) @project(Xlib specific)
   ☐ Remove unsafe casts of events
   ☐ Extract data from key presses
   ☐ Extract data from button presses
