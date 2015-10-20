@@ -1,18 +1,21 @@
 
 # OS-dependant constants
 
-OS_WIN_LIB = 
 OS_WIN_STUBS = 
 OS_WIN_STUBS_DIR = 
+OS_WIN_STUBS_TEST = 
 
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Linux)
-  OS_WIN_LIB += -lX11
-  OS_WIN_STUBS += -lxlib_stubs
+  OS_WIN_STUBS += xlib_stubs
   OS_WIN_STUBS_DIR += xlib/
+  OS_WIN_STUBS_TEST += xtest_simple
 endif
 ifeq ($(UNAME), Darwin)
+  OS_WIN_STUBS += cocoa_stubs
+  OS_WIN_STUBS_DIR += cocoa/
+  OS_WIN_STUBS_TEST += ctest_simple
 endif
 
 # Compilers
@@ -28,8 +31,8 @@ OCAMLMKLIB = ocamlmklib
 
 
 # Constants
-
-EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so
+  # Extensions used for cleaning
+EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so *.native *.out *.byte
 
 INCLUDE_DIRS = 
 

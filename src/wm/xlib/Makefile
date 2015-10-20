@@ -13,32 +13,34 @@ COBJS2 = atoms_stubs.o display_stubs.o event_stubs.o window_stubs.o stubs.o
 
 MLSOURCES = xlib.ml xlib.mli
 
-MLOBJS = $(MLSOURCES:.ml=.cmo)
+MLOBJS = $(MLSOURCES:.ml=.cmx)
 
-MLNATOBJS = $(MLSOURCES:.ml=.cmx)
+CLIB = xlib_stubs
 
-CLIB = xlib_stubs.a
+COPTS = 
+
+LIBS = -lX11
 
 
 # Compilation
 
 default: depend $(CLIB)
 
-xlib_stubs.a: $(COBJS) $(MLOBJS)
-	$(OCAMLMKLIB) -o xlib_stubs $(COBJS2) $(MLOBJS) -lX11
+$(CLIB): $(COBJS) $(MLOBJS)
+	$(OCAMLMKLIB) -o $(CLIB) $(COBJS2) $(MLOBJS) -ccopt '$(LIBS)'
 
 %.cmi:%.mli
 	$(OCAMLC) -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLOPT) -c $< -o $@ -cclib -lX11
+	$(OCAMLOPT) -c $< -o $@ -cclib '$(LIBS)'
 
 %.cmo:%.ml
-	$(OCAMLC) -c $< -o $@ -cclib -lX11
+	$(OCAMLC) -c $< -o $@ -cclib '$(LIBS)'
 
 
 %.o:%.c
-	$(OCAMLC) -c $< -o $@
+	$(OCAMLC) -c -ccopt '$(COPTS)' $< -o $@
 
 
 
