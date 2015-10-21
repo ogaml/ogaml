@@ -78,8 +78,8 @@ module Window = struct
               Some Event.Closed
           | _ -> None
         end
-        | Xlib.Event.KeyPress      -> Some Event.KeyPressed
-        | Xlib.Event.KeyRelease    -> Some Event.KeyReleased
+        | Xlib.Event.KeyPress      _ -> Some Event.KeyPressed
+        | Xlib.Event.KeyRelease    _ -> Some Event.KeyReleased
         | Xlib.Event.ButtonPress   _ -> Some Event.ButtonPressed
         | Xlib.Event.ButtonRelease _ -> Some Event.ButtonReleased
         | Xlib.Event.MotionNotify  -> Some Event.MouseMoved

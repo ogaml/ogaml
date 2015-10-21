@@ -116,8 +116,8 @@ module Event = struct
   (* Event enum *)
   type enum = 
     | Unknown
-    | KeyPress        
-    | KeyRelease      
+    | KeyPress      of int * modifiers
+    | KeyRelease    of int * modifiers
     | ButtonPress   of int * position * modifiers
     | ButtonRelease of int * position * modifiers
     | MotionNotify    

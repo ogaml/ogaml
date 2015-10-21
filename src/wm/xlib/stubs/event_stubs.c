@@ -59,12 +59,29 @@ value extract_event(XEvent* evt)
   switch(evt->type) {
 
     case KeyPress         :     
+      result = caml_alloc(2,0);  // 1st param. variant
+      modifiers = caml_alloc(4,0);
+        Store_field(modifiers, 0, Val_bool((evt->xkey.state & ShiftMask) != 0));
+        Store_field(modifiers, 1, Val_bool((evt->xkey.state & ControlMask) != 0));
+        Store_field(modifiers, 2, Val_bool((evt->xkey.state & LockMask) != 0));
+        Store_field(modifiers, 3, Val_bool((evt->xkey.state & global_mod_mask) != 0));
+      Store_field(result, 0, Val_int(evt->xkey.keycode));
+      Store_field(result, 1, modifiers);
+      break;
+
     case KeyRelease       :
-      result = Val_int(evt->type - 1);
+      result = caml_alloc(2,1);  // 2nd param. variant
+      modifiers = caml_alloc(4,0);
+        Store_field(modifiers, 0, Val_bool((evt->xkey.state & ShiftMask) != 0));
+        Store_field(modifiers, 1, Val_bool((evt->xkey.state & ControlMask) != 0));
+        Store_field(modifiers, 2, Val_bool((evt->xkey.state & LockMask) != 0));
+        Store_field(modifiers, 3, Val_bool((evt->xkey.state & global_mod_mask) != 0));
+      Store_field(result, 0, Val_int(evt->xkey.keycode));
+      Store_field(result, 1, modifiers);
       break;
 
     case ButtonPress      :
-      result = caml_alloc(3,0);  // 1st param. variant
+      result = caml_alloc(3,2);  // 3rd param. variant
       position = caml_alloc(2,0);
         Store_field(position, 0, Val_int(evt->xbutton.x));
         Store_field(position, 1, Val_int(evt->xbutton.y));
@@ -79,7 +96,7 @@ value extract_event(XEvent* evt)
       break;
 
     case ButtonRelease    :
-      result = caml_alloc(3,1);  // 2nd param. variant
+      result = caml_alloc(3,3);  // 4th param. variant
       position = caml_alloc(2,0);
         Store_field(position, 0, Val_int(evt->xbutton.x));
         Store_field(position, 1, Val_int(evt->xbutton.y));
@@ -120,19 +137,19 @@ value extract_event(XEvent* evt)
     case SelectionRequest :
     case SelectionNotify  :
     case ColormapNotify   :
-      result = Val_int(evt->type - 3);
+      result = Val_int(evt->type - 5);
       break;
 
     // ClientMessage : get the Atom (message_type)
-    case ClientMessage: // 33, 3rd parametric variant 
-      result = caml_alloc(1,2);
+    case ClientMessage: // 33, 5th parametric variant 
+      result = caml_alloc(1,4);
       Store_field(result, 0, (value)evt->xclient.data.l[0]);
       break;
 
     case MappingNotify    :
     case GenericEvent     :
     case LASTEvent        :
-      result = Val_int(evt->type - 4);
+      result = Val_int(evt->type - 6);
       break;
     
     default: 
