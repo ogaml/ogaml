@@ -24,7 +24,7 @@ Xlib specific:
   ✔ Remove unsafe casts of events @done(2015-10-20 21:10) @project(Xlib specific)
   ✔ Extract data from key presses @done(2015-10-21 16:42) @project(Xlib specific)
   ✔ Extract data from button presses @done(2015-10-21 12:55) @project(Xlib specific)
-  ☐ Extract data from cursor movement
+  ✔ Extract data from cursor movement @done(2015-10-21 16:57) @project(Xlib specific)
   ☐ Binding GLX ** (later)
 
 Window part:

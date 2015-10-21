@@ -18,7 +18,7 @@ let () =
     |Some(a) -> Atom.set_wm_protocols d win [a]
   end;
   Window.map d win;
-  Event.set_mask d win [Event.ExposureMask; Event.KeyPressMask; Event.ButtonPressMask];
+  Event.set_mask d win [Event.ExposureMask; Event.KeyPressMask; Event.ButtonPressMask; Event.PointerMotionMask];
   Display.flush d;
   let (w,h) = Window.size d win in
   Printf.printf "Window size : %i %i\n%!" w h;
@@ -34,6 +34,10 @@ let () =
       | Event.KeyPress (k, m) ->
           Printf.printf "Key %i pressed. Shift : %b, ctrl : %b, lock : %b, mod : %b\n%!"
             k m.Event.shift m.Event.ctrl m.Event.lock m.Event.modif;
+          loop ()
+      | Event.MotionNotify p ->
+          Printf.printf "Mouse moving at %i %i\n%!"
+            p.Event.x p.Event.y;
           loop ()
       | _ -> loop ()
     end

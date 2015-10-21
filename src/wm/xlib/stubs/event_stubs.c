@@ -111,6 +111,13 @@ value extract_event(XEvent* evt)
       break;
 
     case MotionNotify     :
+      result = caml_alloc(1,4); // 5th param. variant
+      position = caml_alloc(2,0);
+        Store_field(position, 0, Val_int(evt->xmotion.x));
+        Store_field(position, 1, Val_int(evt->xmotion.y));
+      Store_field(result, 0, position);
+      break;
+
     case EnterNotify      :
     case LeaveNotify      :
     case FocusIn          :
@@ -137,19 +144,19 @@ value extract_event(XEvent* evt)
     case SelectionRequest :
     case SelectionNotify  :
     case ColormapNotify   :
-      result = Val_int(evt->type - 5);
+      result = Val_int(evt->type - 6);
       break;
 
     // ClientMessage : get the Atom (message_type)
-    case ClientMessage: // 33, 5th parametric variant 
-      result = caml_alloc(1,4);
+    case ClientMessage: // 33, 6th parametric variant 
+      result = caml_alloc(1,5);
       Store_field(result, 0, (value)evt->xclient.data.l[0]);
       break;
 
     case MappingNotify    :
     case GenericEvent     :
     case LASTEvent        :
-      result = Val_int(evt->type - 6);
+      result = Val_int(evt->type - 7);
       break;
     
     default: 

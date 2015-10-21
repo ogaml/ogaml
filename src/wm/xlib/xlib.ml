@@ -120,7 +120,7 @@ module Event = struct
     | KeyRelease    of int * modifiers
     | ButtonPress   of int * position * modifiers
     | ButtonRelease of int * position * modifiers
-    | MotionNotify    
+    | MotionNotify  of position
     | EnterNotify     
     | LeaveNotify     
     | FocusIn         
