@@ -57,4 +57,4 @@ clean:
 
 include .depend
 
-
+.PHONY: .depend

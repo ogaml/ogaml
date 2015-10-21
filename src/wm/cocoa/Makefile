@@ -57,3 +57,5 @@ clean:
 	$(DEPCOMMAND) *.ml *.mli > .depend
 
 include .depend
+
+.PHONY: .depend

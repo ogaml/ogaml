@@ -1,7 +1,0 @@
-
-#ifdef __LINUX__
-  #include "ogamlWindow_xlib.ml"
-#elif defined __OSX__
-  #include "ogamlWindow_cocoa.ml"
-#endif
-

@@ -4,36 +4,47 @@ include ../../common_defs.mk
 
 INCLUDE_DIRS = -I $(OS_WIN_STUBS_DIR)
 
-MLSOURCES = ogamlWindow.ml
+MLSOURCES = event.ml window.ml
 
-MLOBJS = $(MLSOURCES:.ml=.cmo)
+MLOBJS = $(MLSOURCES:.ml=.cmo) 
 
 MLNATOBJS = $(MLSOURCES:.ml=.cmx)
 
-MLLIB = ogamlWindow.cmxa ogamlWindow.cma
+MLLIB = ogamlWindow
+
+PACKNAME = OgamlWindow
+
 
 
 # Compilation
 
-default: .depend $(MLLIB)
+default: .depend compile_window_nat compile_window_byte
 
-compile_lib:
+compile_os_lib:
 	cd $(OS_WIN_STUBS_DIR) && make
 
-%.cma:%.cmo compile_lib
+compile_window_nat: .depend compile_os_lib $(MLNATOBJS)
+	$(OCAMLOPT) -pack -o $(MLLIB).cmx $(MLNATOBJS);
+	$(OCAMLOPT) -a -o $(MLLIB).cmxa $(INCLUDE_DIRS) $(MLLIB).cmx -cclib -l$(strip $(OS_WIN_STUBS))
+
+compile_window_byte: .depend compile_os_lib $(MLOBJS)
+	$(OCAMLC) -pack -o $(MLLIB).cmo $(MLOBJS);
+	$(OCAMLC) -a -o $(MLLIB).cma $(INCLUDE_DIRS) $(MLLIB).cmo -cclib -l$(strip $(OS_WIN_STUBS))
+
+%.cma:%.cmo 
 	$(OCAMLC) -a -o $@ $(INCLUDE_DIRS) $< -dllib -l$(strip $(OS_WIN_STUBS))
 
-%.cmxa:%.cmx compile_lib
+%.cmxa:%.cmx
 	$(OCAMLOPT) -a -o $@ $(INCLUDE_DIRS) $< -cclib -l$(strip $(OS_WIN_STUBS))
 
 %.cmi:%.mli
 	$(OCAMLC) -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLOPT) -c -o $@ $(INCLUDE_DIRS) $< -cclib -l$(strip $(OS_WIN_STUBS))
+	$(OCAMLOPT) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) $< -cclib -l$(strip $(OS_WIN_STUBS))
 
 %.cmo:%.ml
-	$(OCAMLC) -c -o $@ $(INCLUDE_DIRS) $< -dllib -l$(strip $(OS_WIN_STUBS))
+	$(OCAMLC) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) $< -dllib -l$(strip $(OS_WIN_STUBS))
 
 %.ml:%.mlpp %.cmi
 	$(PPCOMMAND) -o $@ $<
@@ -54,4 +65,4 @@ clean:
 
 include .depend
 
-
+.PHONY: .depend
