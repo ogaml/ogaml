@@ -9,7 +9,7 @@ let () =
   Printf.printf "Screen definition (ppi) : %f\n%!" ((float_of_int w) *. 25.4 /. (float_of_int wmm));
   let rwin = Window.root_of d in
   let win = Window.create_simple
-    ~display:d ~parent:rwin ~size:(800,600) ~origin:(50,50) ~background:(255 * 256)
+    ~display:d ~parent:rwin ~size:(800,600) ~origin:(50,50) ~background:(0)
   in
   let atom = Atom.intern d "WM_DELETE_WINDOW" false in
   begin 
@@ -23,10 +23,17 @@ let () =
   let (w,h) = Window.size d win in
   Printf.printf "Window size : %i %i\n%!" w h;
   let rec loop () = 
-    match Event.next d with
-    |Some e when Event.type_of e = Event.ClientMessage -> print_endline "Window closed"; ()
-    |Some e when Event.type_of e = Event.KeyPress      -> print_endline "Key pressed"; loop ()
-    | _ -> loop()
+    match Event.next d win with
+    |Some e -> begin
+      match Event.data e with
+      | Event.ClientMessage _ -> print_endline "Window closed"; ()
+      | Event.ButtonPress (b, p, m) -> 
+          Printf.printf "Button %i pressed at %i,%i. Shift : %b, ctrl : %b\n%!"
+            b p.Event.x p.Event.y m.Event.shift m.Event.ctrl;
+          loop ()
+      | _ -> loop ()
+    end
+    |None -> loop()
   in
   loop ();
   Window.destroy d win

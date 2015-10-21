@@ -46,6 +46,7 @@ caml_xnext_event(value disp, value win)
     CAMLreturn(Val_int(0));
 }
 
+const int global_mod_mask = Mod1Mask | Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask;
 
 // Extract the event out of an XEvent structure
 // Warning : event types begin at 2, and one needs to 
@@ -54,13 +55,44 @@ caml_xnext_event(value disp, value win)
 value extract_event(XEvent* evt)
 {
   CAMLparam0();
-  CAMLlocal1(result);
+  CAMLlocal3(result, position, modifiers);
   switch(evt->type) {
 
     case KeyPress         :     
     case KeyRelease       :
+      result = Val_int(evt->type - 1);
+      break;
+
     case ButtonPress      :
+      result = caml_alloc(3,0);  // 1st param. variant
+      position = caml_alloc(2,0);
+        Store_field(position, 0, Val_int(evt->xbutton.x));
+        Store_field(position, 1, Val_int(evt->xbutton.y));
+      modifiers = caml_alloc(4,0);
+        Store_field(modifiers, 0, Val_bool((evt->xbutton.state & ShiftMask) != 0));
+        Store_field(modifiers, 1, Val_bool((evt->xbutton.state & ControlMask) != 0));
+        Store_field(modifiers, 2, Val_bool((evt->xbutton.state & LockMask) != 0));
+        Store_field(modifiers, 3, Val_bool((evt->xbutton.state & global_mod_mask) != 0));
+      Store_field(result, 0, Val_int(evt->xbutton.button));
+      Store_field(result, 1, position);
+      Store_field(result, 2, modifiers);
+      break;
+
     case ButtonRelease    :
+      result = caml_alloc(3,1);  // 2nd param. variant
+      position = caml_alloc(2,0);
+        Store_field(position, 0, Val_int(evt->xbutton.x));
+        Store_field(position, 1, Val_int(evt->xbutton.y));
+      modifiers = caml_alloc(4,0);
+        Store_field(modifiers, 0, Val_bool((evt->xbutton.state & ShiftMask) != 0));
+        Store_field(modifiers, 1, Val_bool((evt->xbutton.state & ControlMask) != 0));
+        Store_field(modifiers, 2, Val_bool((evt->xbutton.state & LockMask) != 0));
+        Store_field(modifiers, 3, Val_bool((evt->xbutton.state & global_mod_mask) != 0));
+      Store_field(result, 0, Val_int(evt->xbutton.button));
+      Store_field(result, 1, position);
+      Store_field(result, 2, modifiers);
+      break;
+
     case MotionNotify     :
     case EnterNotify      :
     case LeaveNotify      :
@@ -88,19 +120,19 @@ value extract_event(XEvent* evt)
     case SelectionRequest :
     case SelectionNotify  :
     case ColormapNotify   :
-      result = Val_int(evt->type - 1);
+      result = Val_int(evt->type - 3);
       break;
 
     // ClientMessage : get the Atom (message_type)
-    case ClientMessage: // 33, 1st parametric variant (tag 0)
-      result = caml_alloc(1,0);
+    case ClientMessage: // 33, 3rd parametric variant 
+      result = caml_alloc(1,2);
       Store_field(result, 0, (value)evt->xclient.data.l[0]);
       break;
 
     case MappingNotify    :
     case GenericEvent     :
     case LASTEvent        :
-      result = Val_int(evt->type - 2);
+      result = Val_int(evt->type - 4);
       break;
     
     default: 

@@ -109,14 +109,17 @@ module Event = struct
 
   type t
 
+  type modifiers = {shift : bool; ctrl : bool; lock : bool; modif : bool}
+
+  type position = {x : int; y : int}
+
   (* Event enum *)
   type enum = 
-    | ClientMessage of Atom.t
     | Unknown
     | KeyPress        
     | KeyRelease      
-    | ButtonPress     
-    | ButtonRelease   
+    | ButtonPress   of int * position * modifiers
+    | ButtonRelease of int * position * modifiers
     | MotionNotify    
     | EnterNotify     
     | LeaveNotify     
@@ -144,6 +147,7 @@ module Event = struct
     | SelectionRequest
     | SelectionNotify 
     | ColormapNotify  
+    | ClientMessage of Atom.t
     | MappingNotify   
     | GenericEvent    
 
