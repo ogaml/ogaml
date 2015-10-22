@@ -35,10 +35,6 @@ let () =
           Printf.printf "Key %i pressed. Shift : %b, ctrl : %b, lock : %b, mod : %b\n%!"
             k m.Event.shift m.Event.ctrl m.Event.lock m.Event.modif;
           loop ()
-      | Event.MotionNotify p ->
-          Printf.printf "Mouse moving at %i %i\n%!"
-            p.Event.x p.Event.y;
-          loop ()
       | _ -> loop ()
     end
     |None -> loop()

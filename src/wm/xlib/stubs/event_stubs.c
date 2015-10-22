@@ -1,4 +1,5 @@
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #include "../../../utils/stubs.h"
 #include <memory.h>
 
@@ -46,7 +47,19 @@ caml_xnext_event(value disp, value win)
     CAMLreturn(Val_int(0));
 }
 
-const int global_mod_mask = Mod1Mask | Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask;
+
+// Extract the keysym out of an xkey event
+KeySym extract_keysym(XEvent* evt)
+{
+  static XComposeStatus keyboard;
+  char buffer[32];
+  KeySym result;
+  XEvent cpy = *evt;
+    cpy.xkey.state &= (~ShiftMask) & (~ControlMask) & (~LockMask) & (~AnyModifier);
+  XLookupString(&cpy.xkey, buffer, sizeof(buffer), &result, &keyboard);
+  return result;
+}
+
 
 // Extract the event out of an XEvent structure
 // Warning : event types begin at 2, and one needs to 
@@ -64,8 +77,8 @@ value extract_event(XEvent* evt)
         Store_field(modifiers, 0, Val_bool((evt->xkey.state & ShiftMask) != 0));
         Store_field(modifiers, 1, Val_bool((evt->xkey.state & ControlMask) != 0));
         Store_field(modifiers, 2, Val_bool((evt->xkey.state & LockMask) != 0));
-        Store_field(modifiers, 3, Val_bool((evt->xkey.state & global_mod_mask) != 0));
-      Store_field(result, 0, Val_int(evt->xkey.keycode));
+        Store_field(modifiers, 3, Val_bool((evt->xkey.state & AnyModifier) != 0));
+      Store_field(result, 0, Val_int(extract_keysym(evt)));
       Store_field(result, 1, modifiers);
       break;
 
@@ -75,8 +88,8 @@ value extract_event(XEvent* evt)
         Store_field(modifiers, 0, Val_bool((evt->xkey.state & ShiftMask) != 0));
         Store_field(modifiers, 1, Val_bool((evt->xkey.state & ControlMask) != 0));
         Store_field(modifiers, 2, Val_bool((evt->xkey.state & LockMask) != 0));
-        Store_field(modifiers, 3, Val_bool((evt->xkey.state & global_mod_mask) != 0));
-      Store_field(result, 0, Val_int(evt->xkey.keycode));
+        Store_field(modifiers, 3, Val_bool((evt->xkey.state & AnyModifier) != 0));
+      Store_field(result, 0, Val_int(extract_keysym(evt)));
       Store_field(result, 1, modifiers);
       break;
 
@@ -89,7 +102,7 @@ value extract_event(XEvent* evt)
         Store_field(modifiers, 0, Val_bool((evt->xbutton.state & ShiftMask) != 0));
         Store_field(modifiers, 1, Val_bool((evt->xbutton.state & ControlMask) != 0));
         Store_field(modifiers, 2, Val_bool((evt->xbutton.state & LockMask) != 0));
-        Store_field(modifiers, 3, Val_bool((evt->xbutton.state & global_mod_mask) != 0));
+        Store_field(modifiers, 3, Val_bool((evt->xbutton.state & AnyModifier) != 0));
       Store_field(result, 0, Val_int(evt->xbutton.button));
       Store_field(result, 1, position);
       Store_field(result, 2, modifiers);
@@ -104,7 +117,7 @@ value extract_event(XEvent* evt)
         Store_field(modifiers, 0, Val_bool((evt->xbutton.state & ShiftMask) != 0));
         Store_field(modifiers, 1, Val_bool((evt->xbutton.state & ControlMask) != 0));
         Store_field(modifiers, 2, Val_bool((evt->xbutton.state & LockMask) != 0));
-        Store_field(modifiers, 3, Val_bool((evt->xbutton.state & global_mod_mask) != 0));
+        Store_field(modifiers, 3, Val_bool((evt->xbutton.state & AnyModifier) != 0));
       Store_field(result, 0, Val_int(evt->xbutton.button));
       Store_field(result, 1, position);
       Store_field(result, 2, modifiers);
