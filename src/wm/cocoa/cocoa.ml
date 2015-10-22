@@ -56,6 +56,48 @@ module NSColor = struct
 
 end
 
+module NSEvent = struct
+
+  type t
+
+  type event_type =
+    | LeftMouseDown
+    | LeftMouseUp
+    | RightMouseDown
+    | RightMouseUp
+    | MouseMoved
+    | LeftMouseDragged
+    | RightMouseDragged
+    | MouseEntered
+    | MouseExited
+    | KeyDown
+    | KeyUp
+    | FlagsChanged
+    | AppKitDefined
+    | SystemDefined
+    | ApplicationDefined
+    | Periodic
+    | CursorUpdate
+    | ScrollWheel
+    | TabletPoint
+    | TabletProximity
+    | OtherMouseDown
+    | OtherMouseUp
+    | OtherMouseDragged
+    | EventTypeGesture
+    | EventTypeMagnify
+    | EventTypeSwipe
+    | EventTypeRotate
+    | EventTypeBeginGesture
+    | EventTypeEndGesture
+    | EventTypeSmartMagnify
+    | EventTypeQuickLook
+    | EventTypePressure
+
+  external get_type : t -> event_type = "caml_cocoa_event_type"
+
+end
+
 module OGApplicationDelegate = struct
 
   type t

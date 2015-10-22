@@ -1,7 +1,8 @@
 #import "cocoa_stubs.h"
 
 
-// OGApplication implementation (SFML strongly inspired from now)
+////////////////////////////////////////////////////////////////////////////////
+// OGApplication implementation (strongly inspired from SFML for now)
 /////////////////////////////////////////////////////////////////
 @implementation OGApplication
 
@@ -179,6 +180,7 @@
 
 @end
 
+////////////////////////////////////////////////////////////////////////////////
 // OGApplication binding
 ////////////////////////
 
@@ -213,6 +215,7 @@ caml_cocoa_run_app(value unit)
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 // OGApplicationDelegate implementation
 ///////////////////////////////////////
 @implementation OGApplicationDelegate
@@ -233,6 +236,7 @@ caml_cocoa_run_app(value unit)
 
 @end
 
+////////////////////////////////////////////////////////////////////////////////
 // OGApplicationDelegate binding
 ////////////////////////////////
 
@@ -245,6 +249,7 @@ caml_cocoa_create_appdgt(value unit)
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 // We directly bind NSWindow (for now at least)
 ///////////////////////////////////////////////
 
@@ -356,4 +361,22 @@ caml_cocoa_window_frame(value mlwindow)
   memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
 
   CAMLreturn(mlrect);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// BINDING NSEvent
+//////////////////
+// NSEventType is an enum so binding for it is direct
+
+CAMLprim value
+caml_cocoa_event_type(value mlevent)
+{
+  CAMLparam1(mlevent);
+
+  NSEvent* event = (NSEvent*) Data_custom_val(mlevent);
+
+  NSEventType type = [event type];
+
+  // It's an enum so an int
+  CAMLreturn(Val_int(type));
 }

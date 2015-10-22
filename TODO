@@ -2,6 +2,7 @@ General:
 
 Objective-C formatting:
   ☐ Choose how to align labels
+  ☐ Add more comments
 
 Cocoa specific:
   ✔ Remove application t type @unsure @done(2015-10-20 21:59) @project(Cocoa specific)

@@ -50,6 +50,48 @@ module NSColor : sig
 
 end
 
+module NSEvent : sig
+
+  type t
+
+  type event_type =
+    | LeftMouseDown
+    | LeftMouseUp
+    | RightMouseDown
+    | RightMouseUp
+    | MouseMoved
+    | LeftMouseDragged
+    | RightMouseDragged
+    | MouseEntered
+    | MouseExited
+    | KeyDown
+    | KeyUp
+    | FlagsChanged
+    | AppKitDefined
+    | SystemDefined
+    | ApplicationDefined
+    | Periodic
+    | CursorUpdate
+    | ScrollWheel
+    | TabletPoint
+    | TabletProximity
+    | OtherMouseDown
+    | OtherMouseUp
+    | OtherMouseDragged
+    | EventTypeGesture
+    | EventTypeMagnify
+    | EventTypeSwipe
+    | EventTypeRotate
+    | EventTypeBeginGesture
+    | EventTypeEndGesture
+    | EventTypeSmartMagnify
+    | EventTypeQuickLook
+    | EventTypePressure
+
+  val get_type : t -> event_type
+
+end
+
 module OGApplicationDelegate : sig
 
   type t
