@@ -50,6 +50,49 @@ let size win =
 let is_open win = 
   not win.closed
 
+let keysym_to_key = Keycode.(function
+  | 97  -> A    | 98  -> B
+  | 99  -> C    | 100 -> D
+  | 101 -> E    | 102 -> F
+  | 103 -> G    | 104 -> H
+  | 105 -> I    | 106 -> J
+  | 107 -> K    | 108 -> L
+  | 109 -> M    | 110 -> N
+  | 111 -> O    | 112 -> P
+  | 113 -> Q    | 114 -> R
+  | 115 -> S    | 116 -> T
+  | 117 -> U    | 118 -> V
+  | 119 -> W    | 120 -> X
+  | 121 -> Y    | 122 -> Z
+  | 38  -> Num1 | 233 -> Num2
+  | 34  -> Num3 | 39  -> Num4
+  | 40  -> Num5 | 45  -> Num6
+  | 232 -> Num7 | 95  -> Num8
+  | 231 -> Num9 | 224 -> Num0
+  | 65438 -> Numpad0
+  | 65436 -> Numpad1
+  | 65433 -> Numpad2
+  | 65435 -> Numpad3
+  | 65430 -> Numpad4
+  | 65437 -> Numpad5
+  | 65432 -> Numpad6
+  | 65429 -> Numpad7
+  | 65431 -> Numpad8
+  | 65434 -> Numpad9
+  | 65453 -> NumpadMinus
+  | 65450 -> NumpadTimes
+  | 65451 -> NumpadPlus
+  | 65455 -> NumpadDiv
+  | 65454 -> NumpadDot
+  | 65421 -> NumpadReturn
+  | 65307 -> Escape
+  | 65289 -> Tab
+  | 65507 -> LControl
+  | 65505 -> LShift
+  | 65513 -> LAlt
+  | _ -> Unknown
+  )
+
 let poll_event win = 
   if win.closed then None
   else begin 
