@@ -166,6 +166,8 @@ module NSWindow = struct
 
   external frame : t -> NSRect.t = "caml_cocoa_window_frame"
 
+  external next_event : t -> NSEvent.t = "caml_cocoa_window_next_event"
+
   (* Exposed functions *)
   let create ~frame ~style_mask ~backing ~defer () =
     abstract_create frame style_mask backing defer

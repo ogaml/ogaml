@@ -148,4 +148,6 @@ module NSWindow : sig
 
   val frame : t -> NSRect.t
 
+  val next_event : t -> NSEvent.t
+
 end

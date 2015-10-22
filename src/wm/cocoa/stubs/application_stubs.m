@@ -363,11 +363,26 @@ caml_cocoa_window_frame(value mlwindow)
   CAMLreturn(mlrect);
 }
 
+// INPUT  A window to poll (no EventMask for now)
+// OUTPUT An event taken out of the queue
+CAMLprim value
+caml_cocoa_window_next_event(value mlwindow)
+{
+  CAMLparam1(mlwindow);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+  NSEvent* event = [window nextEventMatchingMask:NSAnyEventMask];
+
+  CAMLreturn( (value) event );
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // BINDING NSEvent
 //////////////////
 // NSEventType is an enum so binding for it is direct
 
+// INPUT  a NSEvent
+// OUTPUT the type of the event
 CAMLprim value
 caml_cocoa_event_type(value mlevent)
 {

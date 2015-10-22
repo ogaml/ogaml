@@ -18,6 +18,8 @@ Cocoa specific:
   ☐ See if close shouldn't be used instead of performClose
   ☐ Remove quiting when all window closed
   ☐ Add handling of events (like application quitting)
+  ☐ Add some option to switch between Ctrl and Cmd @question
+  ☐ Add some function to handle keyRepeatDelay and keyRepeatInterval for NSEvent
 
 Xlib specific:
   ✔ Match on clientmessage in ogamlWindow_xlib for safety @done(2015-10-20 20:29) @project(Xlib specific)
