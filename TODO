@@ -20,6 +20,7 @@ Cocoa specific:
   ☐ Add handling of events (like application quitting)
   ☐ Add some option to switch between Ctrl and Cmd @question
   ☐ Add some function to handle keyRepeatDelay and keyRepeatInterval for NSEvent
+  ☐ Handle application creation and running with a boolean
 
 Xlib specific:
   ✔ Match on clientmessage in ogamlWindow_xlib for safety @done(2015-10-20 20:29) @project(Xlib specific)

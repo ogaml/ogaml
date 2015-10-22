@@ -45,5 +45,14 @@ let size win =
 
 let is_open win = true
 
-let poll_event win = None
-
+let poll_event win =
+  let event = Cocoa.NSWindow.next_event win in
+  Cocoa.NSEvent.(
+    match get_type event with
+    | KeyDown       -> Some Event.KeyPressed
+    | KeyUp         -> Some Event.KeyReleased
+    | LeftMouseDown -> Some Event.ButtonPressed
+    | LeftMouseUp   -> Some Event.ButtonReleased
+    | MouseMoved    -> Some Event.MouseMoved
+    | _             -> None
+  )
