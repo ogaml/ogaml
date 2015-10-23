@@ -29,12 +29,12 @@ Xlib specific:
   ✔ Extract data from key presses @done(2015-10-21 16:42) @project(Xlib specific)
   ✔ Extract data from button presses @done(2015-10-21 12:55) @project(Xlib specific)
   ✔ Extract data from cursor movement @done(2015-10-21 16:57) @project(Xlib specific)
-  ☐ Handle different keyboard layouts (and handle keys better) *
+  ✔ Handle different keyboard layouts (and handle keys better) -- current version should be okay for a while @done(2015-10-23 09:46) @project(Xlib specific)
   ☐ Binding GLX ** (later)
 
 Window part:
-  ☐ Add keys enumeration
-  ☐ Add buttons enumeration
+  ✔ Add keys enumeration @done(2015-10-23 09:46) @project(Window part)
+  ✔ Add buttons enumeration @done(2015-10-23 09:50) @project(Window part)
   ☐ Parameterize Keypressed/Keyreleased events with key
   ☐ Parameterize Button events with position & button
   ☐ Parameterize Movement events with position

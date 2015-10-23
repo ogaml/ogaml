@@ -113,11 +113,13 @@ module Event = struct
 
   type position = {x : int; y : int}
 
+  type key = Code of int | Char of char
+
   (* Event enum *)
   type enum = 
     | Unknown
-    | KeyPress      of int * modifiers
-    | KeyRelease    of int * modifiers
+    | KeyPress      of key * modifiers
+    | KeyRelease    of key * modifiers
     | ButtonPress   of int * position * modifiers
     | ButtonRelease of int * position * modifiers
     | MotionNotify  of position
