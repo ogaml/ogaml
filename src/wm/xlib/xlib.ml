@@ -66,19 +66,27 @@ module VisualInfo = struct
 
   (* Abstract functions *)
   external abstract_choose_vinfo : 
-    Display.t -> int -> attribute list -> t = "caml_glx_choose_visual"
+    Display.t -> int -> attribute list -> int -> t = "caml_glx_choose_visual"
 
 
   (* Implementation of abstract functions *)
   let choose display ?screen attl =
+    let att_length = 
+      List.fold_left (fun v e ->
+        match e with
+        |RGBA |Stereo -> v+1
+        | _ -> v+2
+      ) 0 attl
+    in
     match screen with
     |None -> abstract_choose_vinfo 
         display 
         (Display.default_screen display) 
-        attl
+        attl att_length
     |Some(s) -> abstract_choose_vinfo 
         display 
         s attl
+        att_length
 
 
 end
