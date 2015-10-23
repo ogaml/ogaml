@@ -30,6 +30,11 @@ Xlib specific:
   ✔ Extract data from button presses @done(2015-10-21 12:55) @project(Xlib specific)
   ✔ Extract data from cursor movement @done(2015-10-21 16:57) @project(Xlib specific)
   ✔ Handle different keyboard layouts (and handle keys better) -- current version should be okay for a while @done(2015-10-23 09:46) @project(Xlib specific)
+  ☐ Implement caml_glx_choose_visual
+  ☐ Implement caml_glx_create_context
+  ☐ Implement caml_glx_make_current
+  ☐ Implement caml_glx_swap_buffers
+  ☐ Correctly free glx calls when destroying window
   ☐ Binding GLX ** (later)
 
 Window part:
@@ -41,5 +46,6 @@ Window part:
   ✘ Put shared code directly in ogamlWindow.ml (like the Event module ?) -- use packs @cancelled(2015-10-21 17:45) @project(Window part)
   ☐ Window titles
   ☐ Window attributes abstract type ? May contain title, size, etc @unsure
+  ☐ Same for GL context attributes ? @unsure
   ☐ Real-time state Keyboard and Mouse module *
   ☐ Graphical functions display & clear - requires binding GLX for X11 **

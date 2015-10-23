@@ -19,7 +19,7 @@ CLIB = xlib_stubs
 
 COPTS = 
 
-LIBS = -lX11
+LIBS = -cclib -lX11 -cclib -lGL
 
 
 # Compilation
@@ -27,20 +27,20 @@ LIBS = -lX11
 default: .depend $(CLIB)
 
 $(CLIB): $(COBJS) $(MLOBJS)
-	$(OCAMLMKLIB) -o $(CLIB) $(COBJS2) $(MLOBJS) -ccopt '$(LIBS)'
+	$(OCAMLFIND) $(OCAMLMKLIB) -o $(CLIB) $(COBJS2) $(MLOBJS) $(LIBS)
 
 %.cmi:%.mli
-	$(OCAMLC) -c $< -o $@
+	$(OCAMLFIND) $(OCAMLC) -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLOPT) -c $< -o $@ -cclib '$(LIBS)'
+	$(OCAMLFIND) $(OCAMLOPT) -c $< -o $@ $(LIBS)
 
 %.cmo:%.ml
-	$(OCAMLC) -c $< -o $@ -cclib '$(LIBS)'
+	$(OCAMLFIND) $(OCAMLC) -c $< -o $@ $(LIBS)
 
 
 %.o:%.c
-	$(OCAMLC) -c -ccopt '$(COPTS)' $<
+	$(OCAMLFIND) $(OCAMLC) -c -ccopt '$(COPTS)' $<
 
 
 

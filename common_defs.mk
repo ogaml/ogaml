@@ -33,6 +33,8 @@ OCAMLMKLIB = ocamlmklib
 
 CLANG = clang
 
+OCAMLFIND = ocamlfind
+
 
 
 # Constants

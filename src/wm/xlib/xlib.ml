@@ -41,6 +41,60 @@ module Display = struct
 end
 
 
+(* VisualInfo module *)
+module VisualInfo = struct
+
+  type t
+
+  type attribute = 
+    | BufferSize     of int
+    | Level          of int
+    | RGBA           
+    | Stereo         
+    | AuxBuffers     of int
+    | RedSize        of int
+    | GreenSize      of int
+    | BlueSize       of int
+    | AlphaSize      of int
+    | DepthSize      of int
+    | StencilSize    of int
+    | AccumRedSize   of int
+    | AccumBlueSize  of int
+    | AccumAlphaSize of int
+    | AccumGreenSize of int
+
+
+  (* Abstract functions *)
+  external abstract_choose_vinfo : 
+    Display.t -> int -> attribute list -> t = "caml_glx_choose_visual"
+
+
+  (* Implementation of abstract functions *)
+  let choose display ?screen attl =
+    match screen with
+    |None -> abstract_choose_vinfo 
+        display 
+        (Display.default_screen display) 
+        attl
+    |Some(s) -> abstract_choose_vinfo 
+        display 
+        s attl
+
+
+end
+
+
+(* GLContext module *)
+module GLContext = struct
+
+  type t
+
+  (* Exposed functions *)
+  external create : Display.t -> VisualInfo.t -> t = "caml_glx_create_context"
+
+end
+
+
 (* Window module *)
 module Window = struct
 
@@ -57,6 +111,8 @@ module Window = struct
 
   
   (* Exposed functions *)
+  external attach : Display.t -> t -> GLContext.t -> unit = "caml_glx_make_current"
+
   external map : Display.t -> t -> unit = "caml_xmap_window"
 
   external unmap : Display.t -> t -> unit = "caml_xunmap_window"
@@ -64,6 +120,8 @@ module Window = struct
   external destroy : Display.t -> t -> unit = "caml_xdestroy_window"
 
   external size : Display.t -> t -> (int * int) = "caml_size_window"
+
+  external swap : Display.t -> t -> unit = "caml_glx_swap_buffers"
 
 
   (* Implementation of abstract functions *)
