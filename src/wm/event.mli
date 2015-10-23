@@ -1,14 +1,26 @@
-type mouse_event = {x : int; y : int}
+module KeyEvent : sig
 
-type key_event = {key : Keycode.t; shift : bool; control : bool; alt : bool}
+  type t = {key : Keycode.t; shift : bool; control : bool; alt : bool}
 
-type button_event = {button : Button.t; x : int; y : int}
+end
+
+module ButtonEvent : sig
+
+  type t = {button : Button.t; x : int; y : int; shift : bool; control : bool; alt : bool}
+
+end
+
+module MouseEvent : sig
+
+  type t = {x : int; y : int}
+
+end
 
 type t = 
   | Closed
-  | KeyPressed (* of key_event *)
-  | KeyReleased (* of key_event *)
-  | ButtonPressed (* of button_event *)
-  | ButtonReleased (* of button_event *)
-  | MouseMoved (* of mouse_event *)
+  | KeyPressed     (* of KeyEvent.t    *)
+  | KeyReleased    (* of KeyEvent.t    *)
+  | ButtonPressed  (* of ButtonEvent.t *)
+  | ButtonReleased (* of ButtonEvent.t *)
+  | MouseMoved     (* of MouseEvent.t  *)
 
