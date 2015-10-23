@@ -1,8 +1,12 @@
 #include <X11/Xlib.h>
 #include <GL/gl.h>
 #include <GL/glx.h>
+#include <memory.h>
 #include "../../../utils/stubs.h"
 
+
+// INPUT   : a display, a screen number, an attribute list
+// OUTPUT  : a visual info satisfying the attribute list
 CAMLprim value
 caml_glx_choose_visual(value disp, value scr, value attributes, value len)
 {
@@ -58,23 +62,44 @@ caml_glx_choose_visual(value disp, value scr, value attributes, value len)
 }
 
 
+// INPUT   : a display, a visualinfo struct
+// OUTPUT  : creates a context satisfying the visualinfo
 CAMLprim value
-caml_glx_create_context()
+caml_glx_create_context(value disp, value vi)
 {
-  CAMLparam0();
+  CAMLparam2(disp, vi);
+
+  // a GLXContext is already a pointer
+  GLXContext tmp = glXCreateContext(
+      (Display*) disp,
+      (XVisualInfo*) vi,
+      NULL, True);
+
+  CAMLreturn((value)tmp);
+}
+
+
+// INPUT   : a display, a window
+// OUTPUT  : swaps the buffer of the window
+CAMLprim value
+caml_glx_swap_buffers(value disp, value win)
+{
+  CAMLparam2(disp, win);
+  glXSwapBuffers((Display*)disp, (Window)win);
   CAMLreturn(Val_unit);
 }
 
+
+// INPUT   : a display, a window and a GLcontext
+// OUTPUT  : nothing, binds the context to the window
 CAMLprim value
-caml_glx_swap_buffers()
+caml_glx_make_current(value disp, value win, value ctx)
 {
-  CAMLparam0();
+  CAMLparam3(disp, win, ctx);
+  glXMakeCurrent((Display*)disp, (Window)win, (GLXContext)ctx);
   CAMLreturn(Val_unit);
 }
 
-CAMLprim value
-caml_glx_make_current()
-{
-  CAMLparam0();
-  CAMLreturn(Val_unit);
-}
+
+
+
