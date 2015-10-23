@@ -109,7 +109,7 @@ module Event = struct
 
   type t
 
-  type modifiers = {shift : bool; ctrl : bool; lock : bool; modif : bool}
+  type modifiers = {shift : bool; ctrl : bool; lock : bool; alt : bool}
 
   type position = {x : int; y : int}
 

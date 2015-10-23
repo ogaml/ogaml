@@ -89,7 +89,7 @@ value extract_event(XEvent* evt)
         Store_field(modifiers, 0, Val_bool((evt->xkey.state & ShiftMask) != 0));
         Store_field(modifiers, 1, Val_bool((evt->xkey.state & ControlMask) != 0));
         Store_field(modifiers, 2, Val_bool((evt->xkey.state & LockMask) != 0));
-        Store_field(modifiers, 3, Val_bool((evt->xkey.state & AnyModifier) != 0));
+        Store_field(modifiers, 3, Val_bool((evt->xkey.state & Mod1Mask) != 0));
       Store_field(result, 0, extract_keysym(evt));
       Store_field(result, 1, modifiers);
       break;
@@ -100,7 +100,7 @@ value extract_event(XEvent* evt)
         Store_field(modifiers, 0, Val_bool((evt->xkey.state & ShiftMask) != 0));
         Store_field(modifiers, 1, Val_bool((evt->xkey.state & ControlMask) != 0));
         Store_field(modifiers, 2, Val_bool((evt->xkey.state & LockMask) != 0));
-        Store_field(modifiers, 3, Val_bool((evt->xkey.state & AnyModifier) != 0));
+        Store_field(modifiers, 3, Val_bool((evt->xkey.state & Mod1Mask) != 0));
       Store_field(result, 0, extract_keysym(evt));
       Store_field(result, 1, modifiers);
       break;

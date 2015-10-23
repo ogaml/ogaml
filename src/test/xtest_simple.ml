@@ -33,11 +33,11 @@ let () =
           loop ()
       | Event.KeyPress ( Event.Char a , m) ->
           Printf.printf "Key char %c pressed. Shift : %b, ctrl : %b, lock : %b, mod : %b\n%!"
-            a m.Event.shift m.Event.ctrl m.Event.lock m.Event.modif;
+            a m.Event.shift m.Event.ctrl m.Event.lock m.Event.alt;
           loop ()
       | Event.KeyPress ( Event.Code c , m) ->
           Printf.printf "Key code %i pressed. Shift : %b, ctrl : %b, lock : %b, mod : %b\n%!"
-            c m.Event.shift m.Event.ctrl m.Event.lock m.Event.modif;
+            c m.Event.shift m.Event.ctrl m.Event.lock m.Event.alt;
           loop ()
       | _ -> loop ()
     end
