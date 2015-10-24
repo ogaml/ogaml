@@ -55,6 +55,6 @@ Math part:
   ✔ Implement Vector3f @done(2015-10-24 10:07) @project(Math part)
   ✔ Write a Makefile @done(2015-10-24 10:12) @project(Math part)
   ☐ Write tests
-  ☐ Implement Matrix3f
+  ✔ Implement Matrix3f @done(2015-10-24 11:10) @project(Math part)
   ☐ Implement Vector3i
 

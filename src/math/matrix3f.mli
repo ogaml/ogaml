@@ -12,6 +12,9 @@ val zero : unit -> t
 (* Identity matrix *)
 val identity : unit -> t
 
+(* Standard output pretty printer *)
+val print : t -> unit
+
 (* Translation matrix *)
 val translation : Vector3f.t -> t
 
@@ -24,20 +27,14 @@ val rotation : Vector3f.t -> float -> t
 (* Product *)
 val product : t -> t -> t
 
-(* Translate a matrix in place, returns it for composition *)
+(* Return a new, translated matrix *)
 val translate : Vector3f.t -> t -> t
 
-(* Return a new, translated matrix *)
-val translated : Vector3f.t -> t -> t
-
-(* Scale a matrix in place, returns it for composition *)
-val scale : Vector3f.vector3f -> t -> t
-
 (* Return a new, scaled matrix *)
-val scaled : Vector3f.vector3f -> t -> t
+val scale : Vector3f.t -> t -> t
 
 (* Return a new, rotated matrix *)
-val rotated : Vector3f.t -> float -> t -> t
+val rotate : Vector3f.t -> float -> t -> t
 
 (* Vector right-product *)
 val times : t -> Vector3f.t -> Vector3f.t
