@@ -161,9 +161,9 @@ let perspective ~near ~far ~width ~height ~fov =
   let m = zero () in
   set 0 0 m (near /. right);
   set 1 1 m (near /. top);
-  set 2 2 m ((far +. near) /. (near -. far));
+  set 2 2 m ((far +. near) /. (far -. near));
   set 2 3 m (2. *. far *. near /. (near -. far));
-  set 3 2 m (-1.);
+  set 3 2 m (1.);
   m
 
 let iperspective ~near ~far ~width ~height ~fov =

@@ -60,13 +60,11 @@ let () =
   Gl.enable Gl.cull_face_enum;
   Gl.enable Gl.depth_test;
   Gl.cull_face Gl.back;
-  Gl.front_face Gl.ccw;
+  Gl.front_face Gl.cw;
   Gl.clear_color 1.0 1.0 1.0 1.0;
 
   (* Pointer utils *)
   let new_int () = Bigarray.Array1.create Bigarray.int32 Bigarray.c_layout 1 in
-
-(*   let new_string l = Bigarray.Array1.create Bigarray.char Bigarray.c_layout l in *)
 
   let bind_int f = 
     let tab = new_int () in 
@@ -132,12 +130,32 @@ let () =
     |]
   in
 
+  let vertices_axis =
+    Bigarray.Array1.of_array Bigarray.float32 Bigarray.c_layout [|
+     -30.; 0.; 0.;  1.; 0.; 0.;
+      30.; 0.; 0.;  1.; 0.; 0.;
+
+      0.;-30.; 0.;  0.; 1.; 0.;
+      0.; 30.; 0.;  0.; 1.; 0.;
+
+      0.; 0.;-30.;  0.; 0.; 1.;
+      0.; 0.; 30.;  0.; 0.; 1.;
+    |]
+  in
+
   (* VBO creation *)
-  let vbo = bind_int (Gl.gen_buffers 1) in
-  Gl.bind_buffer Gl.array_buffer vbo;
+  let vbo_cube = bind_int (Gl.gen_buffers 1) in
+  Gl.bind_buffer Gl.array_buffer vbo_cube;
   Gl.buffer_data Gl.array_buffer (Gl.bigarray_byte_size vertices)
     (Some vertices) Gl.static_draw;
   Gl.bind_buffer Gl.array_buffer 0;
+
+  let vbo_axis = bind_int (Gl.gen_buffers 1) in
+  Gl.bind_buffer Gl.array_buffer vbo_axis;
+  Gl.buffer_data Gl.array_buffer (Gl.bigarray_byte_size vertices_axis)
+    (Some vertices_axis) Gl.static_draw;
+  Gl.bind_buffer Gl.array_buffer 0;
+
 
   (* Compile GL program *)
   let prog = Gl.create_program () in
@@ -155,9 +173,28 @@ let () =
   let colloc = Gl.get_attrib_location  prog "in_color"  in
 
   (* VAO creation *)
-  let vao = bind_int (Gl.gen_vertex_arrays 1) in
-  Gl.bind_vertex_array vao;
-  Gl.bind_buffer Gl.array_buffer vbo;
+  let vao_cube = bind_int (Gl.gen_vertex_arrays 1) in
+  Gl.bind_vertex_array vao_cube;
+  Gl.bind_buffer Gl.array_buffer vbo_cube;
+  (* Position attribute *)
+  Gl.enable_vertex_attrib_array posloc;
+  Gl.vertex_attrib_pointer posloc 3 
+    Gl.float false
+    24 (`Offset 0);
+  Gl.vertex_attrib_divisor posloc 0;
+  (* Color attribute *)
+  Gl.enable_vertex_attrib_array colloc;
+  Gl.vertex_attrib_pointer colloc 3 
+    Gl.float false
+    24 (`Offset 12);
+  Gl.vertex_attrib_divisor posloc 0;
+  (* Unbinding *)
+  Gl.bind_buffer Gl.array_buffer 0;
+  Gl.bind_vertex_array 0;
+
+  let vao_axis = bind_int (Gl.gen_vertex_arrays 1) in
+  Gl.bind_vertex_array vao_axis;
+  Gl.bind_buffer Gl.array_buffer vbo_axis;
   (* Position attribute *)
   Gl.enable_vertex_attrib_array posloc;
   Gl.vertex_attrib_pointer posloc 3 
@@ -175,30 +212,35 @@ let () =
   Gl.bind_vertex_array 0;
 
   (* Create matrices *)
-(*   let proj = Matrix3f.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.) in *)
-  let proj = Matrix3f.orthographic ~near:(-5.) ~far:(5.) ~left:(-2.) ~right:(2.) ~top:(1.5) ~bottom:(-1.5) in
+  let proj = Matrix3f.perspective ~near:0.1 ~far:100. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.) in
+(*   let proj = Matrix3f.orthographic ~near:(-10.) ~far:(10.) ~left:(-2.) ~right:(2.) ~top:(1.5) ~bottom:(-1.5) in *)
   let view = Matrix3f.look_at 
-    ~from:Vector3f.({x = 1.0; y = 0.; z = 0.}) 
+    ~from:Vector3f.({x = 1.0; y = 1.0; z = 1.0}) 
     ~at:Vector3f.({x = 0.; y = 0.; z = 0.})
     ~up:Vector3f.unit_y
   in
   let vp = Matrix3f.product proj view in
 
-  let rot_vector = Vector3f.({x = 0.8; y = 1.; z = 1.2}) in
   let rot_angle = ref 0. in
 
   (* Display *)
   let display () = 
     Gl.use_program prog;
-
+    (* Compute model matrix *)
+    let t = Unix.gettimeofday () in
+    let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
     let model = Matrix3f.rotation rot_vector !rot_angle in
     let mvp = Matrix3f.product vp model in
-
     rot_angle := !rot_angle +. (abs_float (cos (Unix.gettimeofday ()) /. 10.));
-
+    (* Display the cube *)
     Gl.uniform_matrix4fv mvploc 1 false (Matrix3f.to_bigarray mvp);
-    Gl.bind_vertex_array vao;
+    Gl.bind_vertex_array vao_cube;
     Gl.draw_arrays Gl.triangles 0 36;
+    Gl.bind_vertex_array 0;
+    (* Display the axis *)
+    Gl.uniform_matrix4fv mvploc 1 false (Matrix3f.to_bigarray vp);
+    Gl.bind_vertex_array vao_axis;
+    Gl.draw_arrays Gl.lines 0 6;
     Gl.bind_vertex_array 0;
     Gl.use_program 0;
   in
