@@ -6,19 +6,19 @@
 /////////////////////////////////////////////////////////////////
 @implementation OGApplication
 
-+(void)processEvent
-{
-  [OGApplication sharedApplication]; // ensure NSApp
-  NSEvent* event = nil;
-
-  while ((event = [NSApp nextEventMatchingMask:NSAnyEventMask
-                                     untilDate:[NSDate distantPast]
-                                        inMode:NSDefaultRunLoopMode
-                                       dequeue:YES]))
-  {
-      [NSApp sendEvent:event];
-  }
-}
+// +(void)processEvent
+// {
+//   [OGApplication sharedApplication]; // ensure NSApp
+//   NSEvent* event = nil;
+//
+//   while ((event = [NSApp nextEventMatchingMask:NSAnyEventMask
+//                                      untilDate:[NSDate distantPast]
+//                                         inMode:NSDefaultRunLoopMode
+//                                        dequeue:YES]))
+//   {
+//       [NSApp sendEvent:event];
+//   }
+// }
 
 +(void) setUpMenuBar
 {
@@ -172,11 +172,11 @@
   return appName;
 }
 
--(void)sendEvent:(NSEvent *)anEvent
-{
-    // id firstResponder = [[anEvent window] firstResponder];
-    [super sendEvent:anEvent];
-}
+// -(void)sendEvent:(NSEvent *)anEvent
+// {
+//     // id firstResponder = [[anEvent window] firstResponder];
+//     [super sendEvent:anEvent];
+// }
 
 @end
 
@@ -197,6 +197,10 @@ caml_cocoa_init_app(value mldelegate)
 
   // [[NSApplication sharedApplication] setDelegate:NSApp];
   [[NSApplication sharedApplication] setDelegate:delegate];
+
+  [OGApplication setUpMenuBar];
+
+  [[OGApplication sharedApplication] finishLaunching];
 
   CAMLreturn(Val_unit);
 }
@@ -231,7 +235,7 @@ caml_cocoa_run_app(value unit)
 -(BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication*)app
 {
   (void)app;
-  return YES;
+  return NO;
 }
 
 @end
@@ -282,6 +286,8 @@ caml_cocoa_create_window(value frame, value styleMask, value backing, value defe
                                         styleMask:mask
                                           backing:Int_val(backing)
                                             defer:deferb] autorelease];
+
+  // [window retain];
 
   CAMLreturn( (value) window );
 }
@@ -373,7 +379,35 @@ caml_cocoa_window_next_event(value mlwindow)
   NSWindow* window = (NSWindow*) mlwindow;
   NSEvent* event = [window nextEventMatchingMask:NSAnyEventMask];
 
-  CAMLreturn( (value) event );
+  if(event == nil) CAMLreturn(Val_none);
+  else CAMLreturn( Val_some((value)event) );
+}
+
+CAMLprim value
+caml_cocoa_window_set_for_events(value mlwindow)
+{
+  CAMLparam1(mlwindow);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+
+  // Should we set a delegate?
+  [window setAcceptsMouseMovedEvents:YES];
+  [window setIgnoresMouseEvents:NO];
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
+{
+  CAMLparam2(mlwindow,mlbool);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+  BOOL autodisplay = Bool_val(mlbool);
+
+  [window setAutodisplay:autodisplay];
+
+  CAMLreturn(Val_unit);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

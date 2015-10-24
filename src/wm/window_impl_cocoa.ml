@@ -1,10 +1,19 @@
 type t = Cocoa.NSWindow.t
 
+(* Create the application on first window *)
+let init_app =
+  let launched = ref false in
+  fun () ->
+    if not !launched then begin
+      Cocoa.(
+        (* Create an application and its delegate *)
+        OGApplication.init (OGApplicationDelegate.create ())
+      ) ;
+      launched := true
+    end
+
 let create ~width ~height =
-  (* Create an application and its delegate (should only be done once) *)
-  Cocoa.(
-    OGApplication.init (OGApplicationDelegate.create ())
-  );
+  init_app () ;
 
   (* Rect for setting the size -- offset is ignored we will center *)
   let rect = Cocoa.NSRect.create 0 0 width height in
@@ -20,14 +29,14 @@ let create ~width ~height =
 
   (* Various settings *)
   Cocoa.(
-    NSWindow.set_background_color window (NSColor.magenta ());
+    NSWindow.set_background_color window (NSColor.green ()) ;
     NSWindow.make_key_and_order_front window;
-    NSWindow.center window;
-    NSWindow.make_main window
+    NSWindow.center window ;
+    (* NSWindow.make_main window ; *)
+    (* Set some delegate for the window? *)
+    NSWindow.set_for_events window ;
+    NSWindow.set_autodisplay window true
   );
-
-  (* Now run the application *)
-  Cocoa.OGApplication.run () ;
 
   window
 
@@ -46,13 +55,16 @@ let size win =
 let is_open win = true
 
 let poll_event win =
-  let event = Cocoa.NSWindow.next_event win in
-  Cocoa.NSEvent.(
-    match get_type event with
-    | KeyDown       -> Some Event.KeyPressed
-    | KeyUp         -> Some Event.KeyReleased
-    | LeftMouseDown -> Some Event.ButtonPressed
-    | LeftMouseUp   -> Some Event.ButtonReleased
-    | MouseMoved    -> Some Event.MouseMoved
-    | _             -> None
-  )
+  (* match Cocoa.NSWindow.next_event win with
+  | Some event ->
+      Cocoa.NSEvent.(
+        match get_type event with
+        | KeyDown       -> Some Event.KeyPressed
+        | KeyUp         -> Some Event.KeyReleased
+        | LeftMouseDown -> Some Event.ButtonPressed
+        | LeftMouseUp   -> Some Event.ButtonReleased
+        | MouseMoved    -> Some Event.MouseMoved
+        | _             -> None
+      )
+  | None -> None *)
+  None

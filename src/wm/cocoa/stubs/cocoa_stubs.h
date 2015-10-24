@@ -12,13 +12,13 @@
 @interface OGApplication : NSApplication
 
 // Event processing
-+(void) processEvent;
+// +(void) processEvent;
 
 // Setting the menu bar
 +(void) setUpMenuBar;
 
 // Displatchs events
--(void)sendEvent:(NSEvent*)anEvent;
+// -(void)sendEvent:(NSEvent*)anEvent;
 
 @end
 
