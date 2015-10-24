@@ -16,3 +16,5 @@ B src/wm/cocoa/stubs
 B src/test
 B src/math
 
+PKG tgls
+

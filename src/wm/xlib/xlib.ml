@@ -50,6 +50,7 @@ module VisualInfo = struct
     | BufferSize     of int
     | Level          of int
     | RGBA           
+    | DoubleBuffer
     | Stereo         
     | AuxBuffers     of int
     | RedSize        of int
@@ -74,7 +75,7 @@ module VisualInfo = struct
     let att_length = 
       List.fold_left (fun v e ->
         match e with
-        |RGBA |Stereo -> v+1
+        |RGBA |Stereo |DoubleBuffer -> v+1
         | _ -> v+2
       ) 0 attl
     in

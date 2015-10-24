@@ -24,7 +24,8 @@ caml_glx_choose_visual(value disp, value scr, value attributes, value len)
     if(Is_long(hd)) {
       switch(Int_val(hd)) {
         case 0 : attrs[i] = GLX_RGBA; break;
-        case 1 : attrs[i] = GLX_STEREO; break;
+        case 1 : attrs[i] = GLX_DOUBLEBUFFER; break;
+        case 2 : attrs[i] = GLX_STEREO; break;
         default: caml_failwith("Variant handling bug in glx_choose_visual");
       }
       i++;

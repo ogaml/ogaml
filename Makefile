@@ -3,9 +3,13 @@ include common_defs.mk
 
 # Window constants
 
-WINDOW_INCLUDES = -I src/wm -I src/wm/$(strip $(OS_WIN_STUBS_DIR))
+WINDOW_INCLUDES = -I src/wm -I src/wm/$(strip $(OS_WIN_STUBS_DIR)) -I src/math
 
-WINDOW_CMXA = $(OS_WIN_STUBS).cmxa ogamlWindow.cmxa unix.cmxa
+WINDOW_CMXA = $(OS_WIN_STUBS).cmxa ogamlWindow.cmxa
+
+MATH_CMXA = ogamlMath.cmxa
+
+PACKAGES = -package tgls.tgl4,bigarray,unix
 
 WINDOW_TEST = src/test/test_window.ml
 
@@ -27,11 +31,13 @@ window_lib:
 math_lib:
 	cd src/math/ && make
 
-window_test: window_lib
-	$(OCAMLOPT) -o $(OUTPUT) $(WINDOW_INCLUDES) $(WINDOW_CMXA) $(WINDOW_TEST)
+window_test: window_lib math_lib
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(WINDOW_INCLUDES)\
+	  $(WINDOW_CMXA) $(MATH_CMXA) $(WINDOW_TEST)
 
-stubs_test: stubs_lib
-	$(OCAMLOPT) -o $(OUTPUT) $(WINDOW_INCLUDES) $(OS_WIN_STUBS).cmxa $(STUBS_TEST)
+stubs_test: stubs_lib math_lib
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(WINDOW_INCLUDES)\
+	  $(OS_WIN_STUBS).cmxa $(MATH_CMXA) $(STUBS_TEST)
 
 stubs_lib:
 	cd src/wm/$(strip $(OS_WIN_STUBS_DIR)) && make
