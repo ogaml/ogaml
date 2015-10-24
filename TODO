@@ -58,6 +58,7 @@ Math part:
   ✔ Implement Matrix3f @done(2015-10-24 11:10) @project(Math part)
   ☐ Implement Vector3i
   ✔ Add more complex functions to matrix3f (look_at, clipping, etc...) @done(2015-10-24 11:55) @project(Math part)
+  ☐ Debug matrices... Really
   ☐ Implement Quaternions
 
 

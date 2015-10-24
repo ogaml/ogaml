@@ -116,18 +116,18 @@ let times m v =
 
 let look_at ~from ~at ~up = 
   let open Vector3f in
-  let dir = sub from at in
-  let right = normalize (cross up dir) in
-  let up = normalize (cross dir right) in
+  let dir = direction from at in
+  let right = normalize (cross dir up) in
+  let up = cross dir right in
   let m = identity () in
   set 0 0 m (right.x);
-  set 1 0 m (right.y);
-  set 2 0 m (right.z);
-  set 0 1 m (up.x);
+  set 0 1 m (right.y);
+  set 0 2 m (right.z);
+  set 1 0 m (up.x);
   set 1 1 m (up.y);
-  set 2 1 m (up.z);
-  set 0 2 m (dir.x);
-  set 1 2 m (dir.y);
+  set 1 2 m (up.z);
+  set 2 0 m (dir.x);
+  set 2 1 m (dir.y);
   set 2 2 m (dir.z);
   set 0 3 m (-. (dot from right));
   set 1 3 m (-. (dot from up ));
