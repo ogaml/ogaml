@@ -49,3 +49,12 @@ Window part:
   ☐ Same for GL context attributes ? @unsure
   ☐ Real-time state Keyboard and Mouse module *
   ☐ Graphical functions display & clear - requires binding GLX for X11 **
+
+Math part:
+  ☐ Fix a notation convention
+  ✔ Implement Vector3f @done(2015-10-24 10:07) @project(Math part)
+  ✔ Write a Makefile @done(2015-10-24 10:12) @project(Math part)
+  ☐ Write tests
+  ☐ Implement Matrix3f
+  ☐ Implement Vector3i
+
