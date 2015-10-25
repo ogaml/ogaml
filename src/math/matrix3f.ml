@@ -117,8 +117,9 @@ let times m v =
 let look_at ~from ~at ~up = 
   let open Vector3f in
   let dir = direction from at in
+  let up = normalize up in
   let right = normalize (cross dir up) in
-  let up = cross dir right in
+  let up = cross right dir in
   let m = identity () in
   set 0 0 m (right.x);
   set 0 1 m (right.y);
@@ -126,12 +127,12 @@ let look_at ~from ~at ~up =
   set 1 0 m (up.x);
   set 1 1 m (up.y);
   set 1 2 m (up.z);
-  set 2 0 m (dir.x);
-  set 2 1 m (dir.y);
-  set 2 2 m (dir.z);
-  set 0 3 m (-. (dot from right));
-  set 1 3 m (-. (dot from up ));
-  set 2 3 m (-. (dot from dir));
+  set 2 0 m (-. dir.x);
+  set 2 1 m (-. dir.y);
+  set 2 2 m (-. dir.z);
+  set 0 3 m (dot from right);
+  set 1 3 m (dot from up );
+  set 2 3 m (dot from dir);
   m
 
 let orthographic ~right ~left ~near ~far ~top ~bottom =
@@ -139,9 +140,9 @@ let orthographic ~right ~left ~near ~far ~top ~bottom =
   set 0 0 m (2. /. (right -. left));
   set 1 1 m (2. /. (top -. bottom));
   set 2 2 m (2. /. (near -. far));
-  set 0 3 m ((right +. left) /. (right -. left));
-  set 1 3 m ((top +. bottom) /. (top -. bottom));
-  set 2 3 m ((far +. near) /. (far -. near));
+  set 0 3 m ((right +. left) /. (left -. right));
+  set 1 3 m ((top +. bottom) /. (bottom -. top));
+  set 2 3 m ((far +. near) /. (near -. far));
   m
 
 let iorthographic ~right ~left ~near ~far ~top ~bottom =
@@ -162,8 +163,8 @@ let perspective ~near ~far ~width ~height ~fov =
   set 0 0 m (near /. right);
   set 1 1 m (near /. top);
   set 2 2 m ((far +. near) /. (near -. far));
-  set 2 3 m (2. *. far *. near /. (far -. near));
-  set 3 2 m (1.);
+  set 2 3 m (2. *. far *. near /. (near -. far));
+  set 3 2 m (-1.);
   m
 
 let iperspective ~near ~far ~width ~height ~fov =

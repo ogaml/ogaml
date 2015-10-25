@@ -57,10 +57,10 @@ let () =
   let vi = VisualInfo.choose d [VisualInfo.RGBA; VisualInfo.DepthSize 24; VisualInfo.DoubleBuffer] in
   let ctx = GLContext.create d vi in
   Window.attach d win ctx;
-  Gl.enable Gl.cull_face_enum;
   Gl.enable Gl.depth_test;
-  Gl.cull_face Gl.back;
-  Gl.front_face Gl.cw;
+(*   Gl.cull_face Gl.back; *)
+(*   Gl.front_face Gl.cw; *)
+(*   Gl.polygon_mode (Gl.front_and_back Gl.line); *)
   Gl.clear_color 1.0 1.0 1.0 1.0;
 
   (* Pointer utils *)
@@ -132,13 +132,13 @@ let () =
 
   let vertices_axis =
     Bigarray.Array1.of_array Bigarray.float32 Bigarray.c_layout [|
-     -30.; 0.; 0.;  1.; 0.; 0.;
+      0. ; 0.; 0.;  1.; 0.; 0.;
       30.; 0.; 0.;  1.; 0.; 0.;
 
-      0.;-30.; 0.;  0.; 1.; 0.;
+      0.; 0. ; 0.;  0.; 1.; 0.;
       0.; 30.; 0.;  0.; 1.; 0.;
 
-      0.; 0.;-30.;  0.; 0.; 1.;
+      0.; 0.; 0. ;  0.; 0.; 1.;
       0.; 0.; 30.;  0.; 0.; 1.;
     |]
   in
@@ -212,10 +212,10 @@ let () =
   Gl.bind_vertex_array 0;
 
   (* Create matrices *)
-  let proj = Matrix3f.perspective ~near:0.1 ~far:100. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.) in
-(*   let proj = Matrix3f.orthographic ~near:(-10.) ~far:(10.) ~left:(-2.) ~right:(2.) ~top:(1.5) ~bottom:(-1.5) in *)
+  let proj = Matrix3f.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.) in
+(*   let proj = Matrix3f.orthographic ~near:(-20.) ~far:(20.) ~left:(-2.) ~right:(2.) ~top:(1.5) ~bottom:(-1.5) in *)
   let view = Matrix3f.look_at 
-    ~from:Vector3f.({x = 1.0; y = 1.0; z = 1.0}) 
+    ~from:Vector3f.({x = 1.; y = 0.6; z = 1.4}) 
     ~at:Vector3f.({x = 0.; y = 0.; z = 0.})
     ~up:Vector3f.unit_y
   in
@@ -223,9 +223,11 @@ let () =
 
   let rot_angle = ref 0. in
 
+
   (* Display *)
   let display () = 
     Gl.use_program prog;
+
     (* Compute model matrix *)
     let t = Unix.gettimeofday () in
     let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
