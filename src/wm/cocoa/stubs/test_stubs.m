@@ -89,9 +89,9 @@ caml_open_window(value unit)
   // Window
   NSRect frame = NSMakeRect(0,0,500,400);
   NSWindow* window = [[NSWindow alloc] initWithContentRect:frame
-                                        styleMask:NSTitledWindowMask|NSClosableWindowMask
-                                          backing:NSBackingStoreBuffered
-                                            defer:NO];
+                                       styleMask:NSTitledWindowMask|NSClosableWindowMask
+                                       backing:NSBackingStoreBuffered
+                                       defer:NO];
 
   // Window Delegate
   OGWindowController* wc = [[OGWindowController alloc] init];

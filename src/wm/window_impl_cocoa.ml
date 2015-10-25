@@ -1,4 +1,4 @@
-type t = Cocoa.NSWindow.t
+type t = Cocoa.OGWindowController.t
 
 (* Create the application on first window *)
 let init_app =
@@ -40,23 +40,28 @@ let create ~width ~height =
     NSWindow.set_autodisplay window true
   );
 
-  window
+  (* Creating the delegate which we will return *)
+  Cocoa.OGWindowController.init_with_window window
 
 let close win =
-  Cocoa.NSWindow.perform_close win
+  (* Cocoa.NSWindow.perform_close win *)
+  ()
 
 let destroy win = ()
 
 let size win =
-  let i = int_of_float in
+  (* let i = int_of_float in
   Cocoa.(
     let (_,_,w,h) = NSRect.get (Cocoa.NSWindow.frame win)
     in i w, i h
-  )
+  ) *)
+  0,0
 
 let is_open win = true
 
 let poll_event win =
+  (* TODO Make real use of it *)
+  Cocoa.OGWindowController.process_event win ;
   (* match Cocoa.NSWindow.next_event win with
   | Some event ->
       Cocoa.NSEvent.(

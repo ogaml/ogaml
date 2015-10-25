@@ -3,22 +3,22 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // OGApplication implementation (strongly inspired from SFML for now)
-/////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 @implementation OGApplication
 
-// +(void)processEvent
-// {
-//   [OGApplication sharedApplication]; // ensure NSApp
-//   NSEvent* event = nil;
-//
-//   while ((event = [NSApp nextEventMatchingMask:NSAnyEventMask
-//                                      untilDate:[NSDate distantPast]
-//                                         inMode:NSDefaultRunLoopMode
-//                                        dequeue:YES]))
-//   {
-//       [NSApp sendEvent:event];
-//   }
-// }
++(void)processEvent
+{
+  [OGApplication sharedApplication]; // ensure NSApp
+  NSEvent* event = nil;
+
+  while ((event = [NSApp nextEventMatchingMask:NSAnyEventMask
+                                     untilDate:[NSDate distantPast]
+                                        inMode:NSDefaultRunLoopMode
+                                       dequeue:YES]))
+  {
+      [NSApp sendEvent:event];
+  }
+}
 
 +(void) setUpMenuBar
 {
@@ -172,17 +172,17 @@
   return appName;
 }
 
-// -(void)sendEvent:(NSEvent *)anEvent
-// {
-//     // id firstResponder = [[anEvent window] firstResponder];
-//     [super sendEvent:anEvent];
-// }
+-(void)sendEvent:(NSEvent *)anEvent
+{
+    // id firstResponder = [[anEvent window] firstResponder];
+    [super sendEvent:anEvent];
+}
 
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
 // OGApplication binding
-////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 CAMLprim value
 caml_cocoa_init_app(value mldelegate)
@@ -221,7 +221,7 @@ caml_cocoa_run_app(value unit)
 
 ////////////////////////////////////////////////////////////////////////////////
 // OGApplicationDelegate implementation
-///////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 @implementation OGApplicationDelegate
 
 -(NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
@@ -242,7 +242,7 @@ caml_cocoa_run_app(value unit)
 
 ////////////////////////////////////////////////////////////////////////////////
 // OGApplicationDelegate binding
-////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 CAMLprim value
 caml_cocoa_create_appdgt(value unit)
@@ -255,7 +255,7 @@ caml_cocoa_create_appdgt(value unit)
 
 ////////////////////////////////////////////////////////////////////////////////
 // We directly bind NSWindow (for now at least)
-///////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 CAMLprim value
 caml_cocoa_create_window(value frame, value styleMask, value backing, value defer)
@@ -435,7 +435,40 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
   return self;
 }
 
+-(void)processEvent
+{
+  [OGApplication processEvent];
+}
+
 @end
+
+////////////////////////////////////////////////////////////////////////////////
+// BINDING OGWindowController
+////////////////////////////////////////////////////////////////////////////////
+CAMLprim value
+caml_cocoa_window_controller_init_with_window(value mlwindow)
+{
+  CAMLparam1(mlwindow);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+
+  OGWindowController* wc = [[OGWindowController alloc] init];
+  [wc initWithWindow:window];
+
+  CAMLreturn( (value) wc );
+}
+
+CAMLprim value
+caml_cocoa_window_controller_process_event(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  [controller processEvent];
+
+  CAMLreturn(Val_unit);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // BINDING NSEvent

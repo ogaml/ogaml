@@ -157,3 +157,13 @@ module NSWindow : sig
   val set_autodisplay : t -> bool -> unit
 
 end
+
+module OGWindowController : sig
+
+  type t
+
+  val init_with_window : NSWindow.t -> t
+
+  val process_event : t -> unit
+
+end
