@@ -31,9 +31,13 @@ let () =
           Printf.printf "Button %i pressed at %i,%i. Shift : %b, ctrl : %b\n%!"
             b p.Event.x p.Event.y m.Event.shift m.Event.ctrl;
           loop ()
-      | Event.KeyPress (k, m) ->
-          Printf.printf "Key %i pressed. Shift : %b, ctrl : %b, lock : %b, mod : %b\n%!"
-            k m.Event.shift m.Event.ctrl m.Event.lock m.Event.modif;
+      | Event.KeyPress ( Event.Char a , m) ->
+          Printf.printf "Key char %c pressed. Shift : %b, ctrl : %b, lock : %b, mod : %b\n%!"
+            a m.Event.shift m.Event.ctrl m.Event.lock m.Event.alt;
+          loop ()
+      | Event.KeyPress ( Event.Code c , m) ->
+          Printf.printf "Key code %i pressed. Shift : %b, ctrl : %b, lock : %b, mod : %b\n%!"
+            c m.Event.shift m.Event.ctrl m.Event.lock m.Event.alt;
           loop ()
       | _ -> loop ()
     end

@@ -24,6 +24,9 @@ default: window_test
 window_lib:
 	cd src/wm/ && make
 
+math_lib:
+	cd src/math/ && make
+
 window_test: window_lib
 	$(OCAMLOPT) -o $(OUTPUT) $(WINDOW_INCLUDES) $(WINDOW_CMXA) $(WINDOW_TEST)
 
@@ -36,4 +39,5 @@ stubs_lib:
 clean:
 	rm -rf *.out;
 	cd src/wm/ && make clean;
-	cd src/test/ && make clean
+	cd src/test/ && make clean;
+	cd src/math/ && make clean

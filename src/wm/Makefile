@@ -6,7 +6,7 @@ INCLUDE_DIRS = -I $(OS_WIN_STUBS_DIR)
 
 MLSOURCES = window.ml
 
-MLINTERFACES = keycode.mli event.mli
+MLINTERFACES = button.mli keycode.mli event.mli
 
 MLOBJS = $(MLSOURCES:.ml=.cmo) 
 

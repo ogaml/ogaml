@@ -41,6 +41,68 @@ module Display = struct
 end
 
 
+(* VisualInfo module *)
+module VisualInfo = struct
+
+  type t
+
+  type attribute = 
+    | BufferSize     of int
+    | Level          of int
+    | RGBA           
+    | Stereo         
+    | AuxBuffers     of int
+    | RedSize        of int
+    | GreenSize      of int
+    | BlueSize       of int
+    | AlphaSize      of int
+    | DepthSize      of int
+    | StencilSize    of int
+    | AccumRedSize   of int
+    | AccumBlueSize  of int
+    | AccumAlphaSize of int
+    | AccumGreenSize of int
+
+
+  (* Abstract functions *)
+  external abstract_choose_vinfo : 
+    Display.t -> int -> attribute list -> int -> t = "caml_glx_choose_visual"
+
+
+  (* Implementation of abstract functions *)
+  let choose display ?screen attl =
+    let att_length = 
+      List.fold_left (fun v e ->
+        match e with
+        |RGBA |Stereo -> v+1
+        | _ -> v+2
+      ) 0 attl
+    in
+    match screen with
+    |None -> abstract_choose_vinfo 
+        display 
+        (Display.default_screen display) 
+        attl att_length
+    |Some(s) -> abstract_choose_vinfo 
+        display 
+        s attl
+        att_length
+
+
+end
+
+
+(* GLContext module *)
+module GLContext = struct
+
+  type t
+
+  (* Exposed functions *)
+  external create : Display.t -> VisualInfo.t -> t = "caml_glx_create_context"
+
+end
+
+
 (* Window module *)
 module Window = struct
 
@@ -57,6 +119,8 @@ module Window = struct
 
   
   (* Exposed functions *)
+  external attach : Display.t -> t -> GLContext.t -> unit = "caml_glx_make_current"
+
   external map : Display.t -> t -> unit = "caml_xmap_window"
 
   external unmap : Display.t -> t -> unit = "caml_xunmap_window"
@@ -64,6 +128,8 @@ module Window = struct
   external destroy : Display.t -> t -> unit = "caml_xdestroy_window"
 
   external size : Display.t -> t -> (int * int) = "caml_size_window"
+
+  external swap : Display.t -> t -> unit = "caml_glx_swap_buffers"
 
 
   (* Implementation of abstract functions *)
@@ -109,15 +175,17 @@ module Event = struct
 
   type t
 
-  type modifiers = {shift : bool; ctrl : bool; lock : bool; modif : bool}
+  type modifiers = {shift : bool; ctrl : bool; lock : bool; alt : bool}
 
   type position = {x : int; y : int}
+
+  type key = Code of int | Char of char
 
   (* Event enum *)
   type enum = 
     | Unknown
-    | KeyPress      of int * modifiers
-    | KeyRelease    of int * modifiers
+    | KeyPress      of key * modifiers
+    | KeyRelease    of key * modifiers
     | ButtonPress   of int * position * modifiers
     | ButtonRelease of int * position * modifiers
     | MotionNotify  of position

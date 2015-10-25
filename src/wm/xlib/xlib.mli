@@ -18,9 +18,46 @@ module Display : sig
 end
 
 
+module VisualInfo : sig
+
+  type t
+
+  type attribute = 
+    | BufferSize     of int
+    | Level          of int
+    | RGBA           
+    | Stereo         
+    | AuxBuffers     of int
+    | RedSize        of int
+    | GreenSize      of int
+    | BlueSize       of int
+    | AlphaSize      of int
+    | DepthSize      of int
+    | StencilSize    of int
+    | AccumRedSize   of int
+    | AccumBlueSize  of int
+    | AccumAlphaSize of int
+    | AccumGreenSize of int
+
+  val choose : Display.t -> ?screen:int -> attribute list -> t
+
+end
+
+
+module GLContext : sig
+
+  type t
+
+  val create : Display.t -> VisualInfo.t -> t
+
+end
+
+
 module Window : sig
 
   type t
+
+  val attach : Display.t -> t -> GLContext.t -> unit
 
   val root_of : ?screen:int -> Display.t -> t
 
@@ -34,6 +71,8 @@ module Window : sig
   val destroy : Display.t -> t -> unit
 
   val size : Display.t -> t -> (int * int)
+
+  val swap : Display.t -> t -> unit
 
 end
 
@@ -53,14 +92,16 @@ module Event : sig
 
   type t
 
-  type modifiers = {shift : bool; ctrl : bool; lock : bool; modif : bool}
+  type modifiers = {shift : bool; ctrl : bool; lock : bool; alt : bool}
 
   type position = {x : int; y : int}
 
+  type key = Code of int | Char of char
+
   type enum = 
     | Unknown
-    | KeyPress      of int * modifiers
-    | KeyRelease    of int * modifiers
+    | KeyPress      of key * modifiers
+    | KeyRelease    of key * modifiers
     | ButtonPress   of int * position * modifiers
     | ButtonRelease of int * position * modifiers
     | MotionNotify  of position

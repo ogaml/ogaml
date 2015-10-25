@@ -5,6 +5,7 @@ S src/wm/xlib/stubs
 S src/wm/cocoa
 S src/wm/cocoa/stubs
 S src/test
+S src/math
 
 B src
 B src/wm
@@ -13,4 +14,5 @@ B src/wm/xlib/stubs
 B src/wm/cocoa
 B src/wm/cocoa/stubs
 B src/test
+B src/math
 

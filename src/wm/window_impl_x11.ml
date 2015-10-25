@@ -51,47 +51,55 @@ let is_open win =
   not win.closed
 
 let keysym_to_key = Keycode.(function
-  | 97  -> A    | 98  -> B
-  | 99  -> C    | 100 -> D
-  | 101 -> E    | 102 -> F
-  | 103 -> G    | 104 -> H
-  | 105 -> I    | 106 -> J
-  | 107 -> K    | 108 -> L
-  | 109 -> M    | 110 -> N
-  | 111 -> O    | 112 -> P
-  | 113 -> Q    | 114 -> R
-  | 115 -> S    | 116 -> T
-  | 117 -> U    | 118 -> V
-  | 119 -> W    | 120 -> X
-  | 121 -> Y    | 122 -> Z
-  | 38  -> Num1 | 233 -> Num2
-  | 34  -> Num3 | 39  -> Num4
-  | 40  -> Num5 | 45  -> Num6
-  | 232 -> Num7 | 95  -> Num8
-  | 231 -> Num9 | 224 -> Num0
-  | 65438 -> Numpad0
-  | 65436 -> Numpad1
-  | 65433 -> Numpad2
-  | 65435 -> Numpad3
-  | 65430 -> Numpad4
-  | 65437 -> Numpad5
-  | 65432 -> Numpad6
-  | 65429 -> Numpad7
-  | 65431 -> Numpad8
-  | 65434 -> Numpad9
-  | 65453 -> NumpadMinus
-  | 65450 -> NumpadTimes
-  | 65451 -> NumpadPlus
-  | 65455 -> NumpadDiv
-  | 65454 -> NumpadDot
-  | 65421 -> NumpadReturn
-  | 65307 -> Escape
-  | 65289 -> Tab
-  | 65507 -> LControl
-  | 65505 -> LShift
-  | 65513 -> LAlt
-  | _ -> Unknown
-  )
+  | Xlib.Event.Code i -> begin
+    match i with
+    |10 -> Num1        |11 -> Num2 
+    |12 -> Num3        |13 -> Num4 
+    |14 -> Num5        |15 -> Num6
+    |16 -> Num7        |17 -> Num8 
+    |18 -> Num9        |19 -> Num0
+    |87 -> Numpad1     |88 -> Numpad2 
+    |89 -> Numpad3     |83 -> Numpad4 
+    |84 -> Numpad5     |85 -> Numpad6
+    |79 -> Numpad7     |80 -> Numpad8 
+    |81 -> Numpad9     |90 -> Numpad0 
+    |82 -> NumpadMinus |63  -> NumpadTimes
+    |86 -> NumpadPlus  |106 -> NumpadDiv
+    |91 -> NumpadDot   |104 -> NumpadReturn
+    |9   -> Escape     |23 -> Tab
+    |37  -> LControl   |50 -> LShift
+    |64  -> LAlt       |65 -> Space
+    |105 -> RControl   |62 -> RShift
+    |108 -> RAlt       |36 -> Return
+    |111 -> Up         |113 -> Left
+    |116 -> Down       |114 -> Right
+    |67 -> F1          |68 -> F2
+    |69 -> F3          |70 -> F4
+    |71 -> F5          |72 -> F6
+    |73 -> F7          |74 -> F8
+    |75 -> F9          |76 -> F10
+    |95 -> F11         |96 -> F12
+    |22  -> Delete     | _ -> Unknown
+  end
+  | Xlib.Event.Char c -> begin
+    match c with
+    |'a' -> A |'b' -> B |'c' -> C
+    |'d' -> D |'e' -> E |'f' -> F
+    |'g' -> G |'h' -> H |'i' -> I
+    |'j' -> J |'k' -> K |'l' -> L
+    |'m' -> M |'n' -> N |'o' -> O
+    |'p' -> P |'q' -> Q |'r' -> R
+    |'s' -> S |'t' -> T |'u' -> U
+    |'v' -> V |'w' -> W |'x' -> X
+    |'y' -> Y |'z' -> Z 
+    | _  -> Unknown
+  end)
+
+let value_to_button = Button.(function
+  |1 -> Left
+  |2 -> Middle
+  |3 -> Right
+  |_ -> Unknown)
 
 let poll_event win = 
   if win.closed then None
@@ -106,11 +114,43 @@ let poll_event win =
             Some Event.Closed
         | _ -> None
       end
-      | Xlib.Event.KeyPress      _ -> Some Event.KeyPressed
-      | Xlib.Event.KeyRelease    _ -> Some Event.KeyReleased
-      | Xlib.Event.ButtonPress   _ -> Some Event.ButtonPressed
-      | Xlib.Event.ButtonRelease _ -> Some Event.ButtonReleased
-      | Xlib.Event.MotionNotify  _ -> Some Event.MouseMoved
+      | Xlib.Event.KeyPress      (key,modif) -> Some Event.KeyPressed
+(*          Some Event.(KeyPressed {
+              KeyEvent.key = keysym_to_key key; 
+              KeyEvent.shift = modif.Xlib.Event.shift || modif.Xlib.Event.lock;
+              KeyEvent.control = modif.Xlib.Event.ctrl;
+              KeyEvent.alt = modif.Xlib.Event.alt
+          })*)
+      | Xlib.Event.KeyRelease    (key,modif) -> Some Event.KeyReleased
+(*          Some Event.(KeyReleased {
+              KeyEvent.key = keysym_to_key key; 
+              KeyEvent.shift = modif.Xlib.Event.shift || modif.Xlib.Event.lock;
+              KeyEvent.control = modif.Xlib.Event.ctrl;
+              KeyEvent.alt = modif.Xlib.Event.alt
+          })*)
+      | Xlib.Event.ButtonPress   (but,pos,modif) -> Some Event.ButtonPressed
+(*          Some Event.(ButtonPressed {
+              ButtonEvent.button = value_to_button but;
+              ButtonEvent.x = pos.Xlib.Event.x;
+              ButtonEvent.y = pos.Xlib.Event.y;
+              ButtonEvent.shift = modif.Xlib.Event.shift || modif.Xlib.Event.lock;
+              ButtonEvent.control = modif.Xlib.Event.ctrl;
+              ButtonEvent.alt = modif.Xlib.Event.alt
+          })*)
+      | Xlib.Event.ButtonRelease (but,pos,modif) -> Some Event.ButtonReleased
+(*          Some Event.(ButtonReleased {
+              ButtonEvent.button = value_to_button but;
+              ButtonEvent.x = pos.Xlib.Event.x;
+              ButtonEvent.y = pos.Xlib.Event.y;
+              ButtonEvent.shift = modif.Xlib.Event.shift || modif.Xlib.Event.lock;
+              ButtonEvent.control = modif.Xlib.Event.ctrl;
+              ButtonEvent.alt = modif.Xlib.Event.alt
+          })*)
+      | Xlib.Event.MotionNotify  pos -> Some Event.MouseMoved
+(*          Some Event.(MouseMoved {
+              MouseEvent.x = pos.Xlib.Event.x;
+              MouseEvent.y = pos.Xlib.Event.y
+          })*)
       | _ -> None
     end
     | None -> None
