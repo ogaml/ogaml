@@ -413,6 +413,31 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// IMPLEMENTING OGWindowController
+// Our own version of a Window Controller (it isn't a NSWindowController)
+////////////////////////////////////////////////////////////////////////////////
+@implementation OGWindowController
+
+-(id)initWithWindow:(NSWindow*)window
+{
+  m_window = [window retain];
+
+  // Register for event.
+  [m_window setDelegate:self];
+  [m_window setAcceptsMouseMovedEvents:YES];
+  [m_window setIgnoresMouseEvents:NO];
+
+  // And some other things...
+  [m_window center];
+  [m_window setAutodisplay:YES];
+  [m_window setReleasedWhenClosed:NO]; // We own the class, not AppKit
+
+  return self;
+}
+
+@end
+
+////////////////////////////////////////////////////////////////////////////////
 // BINDING NSEvent
 //////////////////
 // NSEventType is an enum so binding for it is direct

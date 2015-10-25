@@ -34,3 +34,15 @@
 -(BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication*)app;
 
 @end
+
+
+// Handler of a window
+//////////////////////
+@interface OGWindowController : NSResponder <NSWindowDelegate>
+{
+  NSWindow* m_window;
+}
+
+-(id)initWithWindow:(NSWindow*)window;
+
+@end
