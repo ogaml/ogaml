@@ -7,7 +7,9 @@ let init_app =
     if not !launched then begin
       Cocoa.(
         (* Create an application and its delegate *)
-        OGApplication.init (OGApplicationDelegate.create ())
+        OGApplication.init (OGApplicationDelegate.create ()) ;
+        (* Creating an AutoReleasePool *)
+        init_arp ()
       ) ;
       launched := true
     end

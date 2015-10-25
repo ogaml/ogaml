@@ -391,6 +391,8 @@ caml_cocoa_window_set_for_events(value mlwindow)
   NSWindow* window = (NSWindow*) mlwindow;
 
   // Should we set a delegate?
+  // [OGApplication sharedApplication]; // ensure NSApp
+  // [window setDelegate:NSApp];
   [window setAcceptsMouseMovedEvents:YES];
   [window setIgnoresMouseEvents:NO];
 
