@@ -32,7 +32,7 @@ let create ~width ~height =
   (* Various settings *)
   Cocoa.(
     NSWindow.set_background_color window (NSColor.green ()) ;
-    (* NSWindow.make_key_and_order_front window; *)
+    NSWindow.make_key_and_order_front window;
     NSWindow.center window ;
     (* NSWindow.make_main window ; *)
     (* Set some delegate for the window? *)
