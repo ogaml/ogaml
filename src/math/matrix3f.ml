@@ -150,9 +150,9 @@ let iorthographic ~right ~left ~near ~far ~top ~bottom =
   set 0 0 m ((right -. left) /. 2.);
   set 1 1 m ((top -. bottom) /. 2.);
   set 2 2 m ((near -. far) /. 2.);
-  set 0 3 m (-. (right +. left) /. 2.);
-  set 1 3 m (-. (top +. bottom) /. 2.);
-  set 2 3 m ((far +. near) /. 2.);
+  set 0 3 m ((right +. left) /. 2.);
+  set 1 3 m ((top +. bottom) /. 2.);
+  set 2 3 m (-.(far +. near) /. 2.);
   m
 
 let perspective ~near ~far ~width ~height ~fov =
