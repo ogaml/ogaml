@@ -58,8 +58,8 @@ let () =
   let ctx = GLContext.create d vi in
   Window.attach d win ctx;
   Gl.enable Gl.depth_test;
-(*   Gl.cull_face Gl.back; *)
-(*   Gl.front_face Gl.cw; *)
+  Gl.cull_face Gl.back;
+  Gl.front_face Gl.cw;
 (*   Gl.polygon_mode (Gl.front_and_back Gl.line); *)
   Gl.clear_color 1.0 1.0 1.0 1.0;
 
