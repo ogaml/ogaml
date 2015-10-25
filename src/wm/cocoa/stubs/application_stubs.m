@@ -424,12 +424,14 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
 
   // Register for event.
   [m_window setDelegate:self];
-  [m_window setAcceptsMouseMovedEvents:YES];
-  [m_window setIgnoresMouseEvents:NO];
+  // Not twice
+  // [m_window setAcceptsMouseMovedEvents:YES];
+  // [m_window setIgnoresMouseEvents:NO];
 
   // And some other things...
-  [m_window center];
-  [m_window setAutodisplay:YES];
+  // Not twice
+  // [m_window center];
+  // [m_window setAutodisplay:YES];
   [m_window setReleasedWhenClosed:NO]; // We own the class, not AppKit
 
   return self;
