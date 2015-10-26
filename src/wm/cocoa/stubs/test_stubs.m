@@ -27,6 +27,13 @@ caml_init_arp(value unit)
     arp = [[NSAutoreleasePool alloc] init];
   }
 
+  ProcessSerialNumber psn;
+  if (!GetCurrentProcess(&psn)) 
+  {
+      TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+      SetFrontProcess(&psn);
+  }
+
   CAMLreturn(Val_unit);
 }
 
