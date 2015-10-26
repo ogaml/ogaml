@@ -64,14 +64,14 @@ Math part:
   ✔ Add more complex functions to matrix3f (look_at, clipping, etc...) @done(2015-10-24 11:55) @project(Math part)
   ✔ Debug matrices... Really @done(2015-10-25 09:17) @project(Math part)
   ✔ Recode inverse matrices after debugging @done(2015-10-25 09:20) @project(Math part)
-  ☐ Matrices exceptions (and centralized exceptions)
+  ☐ Matrices exceptions 
   ☐ Implement Quaternions
   ✔ Implement polygons @done(2015-10-26 16:33) @project(Math part)
 
 GL part:
   ☐ Let the user choose the usage of a vbo when setting data
   ☐ Bind face culling, front_face
-  ☐ Bind gl_enable and options
+  ✔ Bind gl_enable and options @done(2015-10-26 19:35) @project(GL part)
   ☐ Bind clear_color
   ✔ Bind shaders @done(2015-10-26 16:01) @project(GL part)
   ☐ Bind programs & locations
