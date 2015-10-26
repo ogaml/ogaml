@@ -172,6 +172,12 @@
   return appName;
 }
 
+-(void)bringAllToFront:(id)sender
+{
+    (void)sender;
+    [[NSApp windows] makeObjectsPerformSelector:@selector(orderFrontRegardless)];
+}
+
 -(void)sendEvent:(NSEvent *)anEvent
 {
     // id firstResponder = [[anEvent window] firstResponder];
