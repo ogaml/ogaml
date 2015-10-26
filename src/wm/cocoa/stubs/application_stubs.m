@@ -426,6 +426,9 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
 
 -(id)initWithWindow:(NSWindow*)window
 {
+  // Inits the event queue
+  m_events = [NSMutableArray new];
+
   m_window = [window retain];
 
   [m_window setDelegate:self];
@@ -481,6 +484,7 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
 {
   if ([m_events count] == 0) return nil;
   NSEvent* event = [m_events objectAtIndex:0];
+  NSLog(@"Some event should be here.");
   if (event != nil)
   {
     [[event retain] autorelease];
@@ -592,7 +596,7 @@ caml_cocoa_window_controller_pop_event(value mlcontroller)
   NSEvent* event = [controller popEvent];
 
   if(event == nil) CAMLreturn(Val_none);
-  else CAMLreturn( Val_some((value)event) );
+  else CAMLreturn(Val_some((value)event));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
