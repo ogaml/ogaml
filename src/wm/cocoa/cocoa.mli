@@ -170,4 +170,6 @@ module OGWindowController : sig
 
   val close_window : t -> unit
 
+  val is_window_open : t -> bool
+
 end

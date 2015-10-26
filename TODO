@@ -16,7 +16,7 @@ Cocoa specific:
   ✔ Guarantee application is init only once @important @done(2015-10-26 01:43) @project(Cocoa specific)
   ✔ Continue window implementation @done(2015-10-26 01:43) @project(Cocoa specific)
   ✘ See if close shouldn't be used instead of performClose @cancelled(2015-10-26 01:43) @project(Cocoa specific)
-  ☐ Remove quiting when all window closed
+  ✔ Remove quiting when all window closed @done(2015-10-26 01:46) @project(Cocoa specific)
   ☐ Add handling of events (like application quitting)
   ☐ Add some option to switch between Ctrl and Cmd @question
   ☐ Add some function to handle keyRepeatDelay and keyRepeatInterval for NSEvent

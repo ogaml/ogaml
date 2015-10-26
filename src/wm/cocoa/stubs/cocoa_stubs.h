@@ -41,6 +41,7 @@
 @interface OGWindowController : NSResponder <NSWindowDelegate>
 {
   NSWindow* m_window;
+  BOOL m_windowIsOpen; // Luckily it is NO by default
 }
 
 -(id)initWithWindow:(NSWindow*)window;
@@ -48,5 +49,7 @@
 -(NSRect)frame;
 
 -(void)closeWindow;
+
+-(BOOL)isWindowOpen;
 
 @end

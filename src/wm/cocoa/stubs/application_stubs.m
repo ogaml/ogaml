@@ -422,19 +422,18 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
 {
   m_window = [window retain];
 
-  // Register for event.
   [m_window setDelegate:self];
-  // Not twice
-  // [m_window setAcceptsMouseMovedEvents:YES];
-  // [m_window setIgnoresMouseEvents:NO];
 
-  // And some other things...
-  // Not twice
-  // [m_window center];
-  // [m_window setAutodisplay:YES];
-  [m_window setReleasedWhenClosed:NO]; // We own the class, not AppKit
+  [m_window setReleasedWhenClosed:NO]; // We can destroy it ourselves
+
+  m_windowIsOpen = true;
 
   return self;
+}
+
+-(void)windowWillClose:(NSNotification *)notification
+{
+  m_windowIsOpen = false;
 }
 
 -(void)processEvent
@@ -451,6 +450,11 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
 {
   [m_window close];
   [m_window setDelegate:nil];
+}
+
+-(BOOL)isWindowOpen
+{
+  return m_windowIsOpen;
 }
 
 @end
@@ -508,6 +512,18 @@ caml_cocoa_window_controller_close(value mlcontroller)
   [controller closeWindow];
 
   CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_controller_is_window_open(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  BOOL b = [controller isWindowOpen];
+
+  CAMLreturn(Val_bool(b));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

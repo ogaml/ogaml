@@ -55,7 +55,8 @@ let size win =
     in i w, i h
   )
 
-let is_open win = true
+let is_open win =
+  Cocoa.OGWindowController.is_window_open win
 
 let poll_event win =
   (* TODO Make real use of it *)
