@@ -7,6 +7,12 @@
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 
+// Custom OpenGLView that handles events
+////////////////////////////////////////
+@interface OGOpenGLView : NSOpenGLView
+
+@end
+
 // Event processing and menu bar (strongly inspired from SFML)
 //////////////////////////////////////////////////////////////
 @interface OGApplication : NSApplication
@@ -43,6 +49,7 @@
   NSWindow* m_window;
   BOOL m_windowIsOpen; // Luckily it is NO by default
   NSMutableArray* m_events;
+  OGOpenGLView* m_view;
 }
 
 -(id)initWithWindow:(NSWindow*)window;

@@ -438,6 +438,12 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
 
   m_windowIsOpen = true;
 
+  // Setting the openGL view
+  m_view = [[OGOpenGLView alloc] initWithFrame:[[m_window contentView] frame]
+                                 pixelFormat:[OGOpenGLView defaultPixelFormat]];
+
+  [m_window setContentView:m_view];
+
   return self;
 }
 
