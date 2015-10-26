@@ -44,8 +44,7 @@ let create ~width ~height =
   Cocoa.OGWindowController.init_with_window window
 
 let close win =
-  (* Cocoa.NSWindow.perform_close win *)
-  ()
+  Cocoa.OGWindowController.close_window win
 
 let destroy win = ()
 

@@ -47,4 +47,6 @@
 
 -(NSRect)frame;
 
+-(void)closeWindow;
+
 @end

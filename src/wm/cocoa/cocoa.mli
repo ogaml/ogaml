@@ -168,4 +168,6 @@ module OGWindowController : sig
 
   val frame : t -> NSRect.t
 
+  val close_window : t -> unit
+
 end

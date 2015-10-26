@@ -191,4 +191,6 @@ module OGWindowController = struct
 
   external frame : t -> NSRect.t = "caml_cocoa_controller_frame"
 
+  external close_window : t -> unit = "caml_cocoa_window_controller_close"
+
 end

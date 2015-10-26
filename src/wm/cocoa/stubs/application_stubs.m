@@ -447,6 +447,12 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
   return [m_window frame];
 }
 
+-(void)closeWindow
+{
+  [m_window close];
+  [m_window setDelegate:nil];
+}
+
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -490,6 +496,18 @@ caml_cocoa_controller_frame(value mlcontroller)
   memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
 
   CAMLreturn(mlrect);
+}
+
+CAMLprim value
+caml_cocoa_window_controller_close(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  [controller closeWindow];
+
+  CAMLreturn(Val_unit);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
