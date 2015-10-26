@@ -484,7 +484,6 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
 {
   if ([m_events count] == 0) return nil;
   NSEvent* event = [m_events objectAtIndex:0];
-  NSLog(@"Some event should be here.");
   if (event != nil)
   {
     [[event retain] autorelease];
@@ -495,13 +494,11 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
 
 -(void)keyDown:(NSEvent *)event
 {
-  NSLog(@"key down");
   [self pushEvent:event];
 }
 
 -(void)mouseDown:(NSEvent *)event
 {
-  NSLog(@"mouse down");
   [self pushEvent:event];
 }
 
@@ -616,5 +613,5 @@ caml_cocoa_event_type(value mlevent)
   NSEventType type = [event type];
 
   // It's an enum so an int
-  CAMLreturn(Val_int(type));
+  CAMLreturn(Val_int(type-1));
 }
