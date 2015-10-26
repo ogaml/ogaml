@@ -1,17 +1,10 @@
 
-module FragmentShader : sig
+exception GLSL_error of Error.t * string
 
-  type t
+type t
 
-  val create : [< `File of string | `String of string] -> t
+type kind = Fragment | Vertex
 
-end
+val create : [< `File of string | `String of string] -> kind -> t
 
 
-module VertexShader : sig
-
-  type t
-
-  val create : [< `File of string | `String of string] -> t
-
-end

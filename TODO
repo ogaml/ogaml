@@ -38,6 +38,9 @@ Xlib specific:
   ☐ Correctly free glx calls when destroying window
   ☐ Binding GLX ** (later)
 
+General:
+  ☐ Make a log system ? @unsure
+
 Window part:
   ✔ Add keys enumeration @done(2015-10-23 09:46) @project(Window part)
   ✔ Add buttons enumeration @done(2015-10-23 09:50) @project(Window part)
@@ -73,3 +76,5 @@ GL part:
   ☐ Bind shaders
   ☐ Bind programs & locations
   ☐ Bind VAOs & attributes
+
+

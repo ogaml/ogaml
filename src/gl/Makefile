@@ -10,7 +10,7 @@ COBJS = $(CSOURCES:.c=.o)
 
 COBJS2 = buffers_stubs.o stubs.o
 
-MLSOURCES = buffers.ml buffers.mli shader.ml shader.mli
+MLSOURCES = buffer.ml buffer.mli shader.ml shader.mli error.ml error.mli
 
 MLINTERFACES =
 
@@ -32,23 +32,23 @@ default: .depend $(MLLIB)
 
 
 $(MLLIB): $(COBJS) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) 
-	$(OCAMLFIND) $(OCAMLMKLIB) -o $(MLLIB) $(COBJS2) $(MLCMIS) $(MLOBJS) $(LIBS);
-	$(OCAMLFIND) $(OCAMLMKLIB) -o $(MLLIB) $(COBJS2) $(MLCMIS) $(MLNATOBJS) $(LIBS)
+	$(OCAMLMKLIB) -o $(MLLIB) $(COBJS2) $(MLCMIS) $(MLOBJS) $(LIBS);
+	$(OCAMLMKLIB) -o $(MLLIB) $(COBJS2) $(MLCMIS) $(MLNATOBJS) $(LIBS)
 
 %.cma:%.cmo 
-	$(OCAMLFIND) $(OCAMLC) -a -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLC) -a -o $@ $(INCLUDE_DIRS) $<
 
 %.cmxa:%.cmx
-	$(OCAMLFIND) $(OCAMLOPT) -a -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLOPT) -a -o $@ $(INCLUDE_DIRS) $<
 
 %.cmi:%.mli
-	$(OCAMLFIND) $(OCAMLC) -c $< -o $@
+	$(OCAMLC) -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLFIND) $(OCAMLOPT) -c -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLOPT) -c -o $@ $(INCLUDE_DIRS) $<
 
 %.cmo:%.ml
-	$(OCAMLFIND) $(OCAMLC) -c -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLC) -c -o $@ $(INCLUDE_DIRS) $<
 
 %.ml:%.mlpp %.cmi
 	$(PPCOMMAND) -o $@ $<

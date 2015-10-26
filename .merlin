@@ -6,6 +6,8 @@ S src/wm/cocoa
 S src/wm/cocoa/stubs
 S src/test
 S src/math
+S src/gl
+S src/gl/stubs
 
 B src
 B src/wm
@@ -15,6 +17,8 @@ B src/wm/cocoa
 B src/wm/cocoa/stubs
 B src/test
 B src/math
+B src/gl
+B src/gl/stubs
 
 PKG tgls
 
