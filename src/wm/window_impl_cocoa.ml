@@ -46,7 +46,8 @@ let create ~width ~height =
 let close win =
   Cocoa.OGWindowController.close_window win
 
-let destroy win = ()
+let destroy win =
+  Cocoa.OGWindowController.release_window win
 
 let size win =
   let i = int_of_float in

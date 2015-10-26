@@ -172,4 +172,6 @@ module OGWindowController : sig
 
   val is_window_open : t -> bool
 
+  val release_window : t -> unit
+
 end

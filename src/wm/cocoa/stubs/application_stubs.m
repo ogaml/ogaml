@@ -452,6 +452,14 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
   [m_window setDelegate:nil];
 }
 
+-(void)releaseWindow
+{
+  if([self isWindowOpen]) [self closeWindow];
+  if(m_window == nil) return;
+  [m_window release];
+  m_window = nil;
+}
+
 -(BOOL)isWindowOpen
 {
   return m_windowIsOpen;
@@ -524,6 +532,18 @@ caml_cocoa_controller_is_window_open(value mlcontroller)
   BOOL b = [controller isWindowOpen];
 
   CAMLreturn(Val_bool(b));
+}
+
+CAMLprim value
+caml_cocoa_window_controller_release_window(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  [controller releaseWindow];
+
+  CAMLreturn(Val_unit);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

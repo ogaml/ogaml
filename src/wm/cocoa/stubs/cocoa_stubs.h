@@ -52,4 +52,6 @@
 
 -(BOOL)isWindowOpen;
 
+-(void)releaseWindow;
+
 @end

@@ -195,4 +195,7 @@ module OGWindowController = struct
 
   external is_window_open : t -> bool = "caml_cocoa_controller_is_window_open"
 
+  external release_window : t -> unit
+    = "caml_cocoa_window_controller_release_window"
+
 end
