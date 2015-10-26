@@ -139,4 +139,57 @@ caml_gl_disable_list(value list)
 }
 
 
+// INPUT   a face 
+// OUTPUT  nothing, sets the face culling
+CAMLprim value
+caml_gl_cull_face(value face)
+{
+  CAMLparam1(face);
+  switch(Int_val(face))
+  {
+    case 0: glCullFace(GL_BACK); break;
+    case 1: glCullFace(GL_FRONT); break;
+    case 2: glCullFace(GL_FRONT_AND_BACK); break;
+    default: caml_failwith("caml variant error gl_cull_face");
+  }
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   an orientation
+// OUTPUT  nothing, sets the front face orientation
+CAMLprim value
+caml_gl_front_face(value orient)
+{
+  CAMLparam1(orient);
+  switch(Int_val(orient))
+  {
+    case 0: glFrontFace(GL_CW); break;
+    case 1: glFrontFace(GL_CCW); break;
+    default: caml_failwith("caml variant error gl_front_face");
+  }
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   three values r g b in [0;1]
+// OUTPUT  nothing, sets the clear color
+CAMLprim value
+caml_gl_clear_color(value r, value g, value b)
+{
+  CAMLparam3(r,g,b);
+  glClearColor(Double_val(r), Double_val(g), Double_val(b), 1.0);
+  CAMLreturn(Val_unit);
+}
+
+
+// temp
+CAMLprim value
+caml_gl_clear(value unit)
+{
+  CAMLparam0();
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  CAMLreturn(Val_unit);
+}
+
 

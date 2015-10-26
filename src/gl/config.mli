@@ -67,8 +67,25 @@ type capability =
   | VertexProgramPointSize
   | VertexProgramTwoSide
 
+type face = 
+  | Back
+  | Front
+  | Both
+
+type orientation =
+  | CW
+  | CCW
+
 val enable : capability list -> unit
 
 val disable : capability list -> unit
 
+val set_culling : face -> unit
+
+val set_front : orientation -> unit
+
+val set_color : float -> float -> float -> unit
+
+(* temp *)
+val clear : unit -> unit
 

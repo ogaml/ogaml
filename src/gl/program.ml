@@ -25,6 +25,8 @@ external abstract_attrib_location : program -> string -> attribute
 
 external abstract_use : program option -> unit = "caml_gl_use_program"
 
+external abstract_link : program -> unit = "caml_gl_link_program"
+
 
 let create () = 
   let p = abstract_create () in
@@ -36,6 +38,9 @@ let create () =
 
 let attach s p = 
   abstract_attach s p.prog; p
+
+let link p = 
+  abstract_link p.prog
 
 let add_uniform s p = 
   let loc = abstract_uniform_location p.prog s in
@@ -77,7 +82,7 @@ let attribute p s =
 
 let build ~shaders ~uniforms ~attributes =
   let p = create () in
-  List.iter (fun s -> attach s p |> ignore) shaders;
+  List.iter (fun s -> attach s p |> ignore) shaders; link p;
   List.iter (fun s -> add_uniform   s p |> ignore) uniforms;
   List.iter (fun s -> add_attribute s p |> ignore) attributes;
   p

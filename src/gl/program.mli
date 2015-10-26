@@ -16,6 +16,8 @@ val build :
 
 val attach : Shader.t -> t -> t
 
+val link : t -> unit
+
 val add_uniform : string -> t -> t
 
 val add_attribute : string -> t -> t

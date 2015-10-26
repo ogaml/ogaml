@@ -70,11 +70,13 @@ Math part:
 
 GL part:
   ☐ Let the user choose the usage of a vbo when setting data
-  ☐ Bind face culling, front_face
+  ✔ Bind face culling, front_face @done(2015-10-26 21:31) @project(GL part)
   ✔ Bind gl_enable and options @done(2015-10-26 19:35) @project(GL part)
-  ☐ Bind clear_color
+  ✔ Bind clear_color @done(2015-10-26 21:31) @project(GL part)
   ✔ Bind shaders @done(2015-10-26 16:01) @project(GL part)
   ✔ Bind programs & locations @done(2015-10-26 21:15) @project(GL part)
+  ☐ Bind polygon mode
   ☐ Bind VAOs & attributes
+  ☐ Bind uniform setting
 
 

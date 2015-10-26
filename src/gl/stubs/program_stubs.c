@@ -3,8 +3,8 @@
 #include "../../utils/stubs.h"
 
 
-// INPUT   : nothing
-// OUTPUT  : a new gl program
+// INPUT   nothing
+// OUTPUT  a new gl program
 CAMLprim value
 caml_gl_create_program(value unit)
 {
@@ -13,8 +13,8 @@ caml_gl_create_program(value unit)
 }
 
 
-// INPUT   : a program and a shader
-// OUTPUT  : nothing, attaches the shader
+// INPUT   a program and a shader
+// OUTPUT  nothing, attaches the shader
 CAMLprim value
 caml_gl_attach_shader(value sh, value prog)
 {
@@ -24,8 +24,8 @@ caml_gl_attach_shader(value sh, value prog)
 }
 
 
-// INPUT   : a program and an attribute name
-// OUTPUT  : returns the location of the attribute
+// INPUT   a program and an attribute name
+// OUTPUT  returns the location of the attribute
 CAMLprim value
 caml_gl_attrib_location(value prog, value str)
 {
@@ -34,8 +34,8 @@ caml_gl_attrib_location(value prog, value str)
 }
 
 
-// INPUT   : a program and a uniform name
-// OUTPUT  : returns the location of the uniform
+// INPUT   a program and a uniform name
+// OUTPUT  returns the location of the uniform
 CAMLprim value
 caml_gl_uniform_location(value prog, value str)
 {
@@ -44,8 +44,19 @@ caml_gl_uniform_location(value prog, value str)
 }
 
 
-// INPUT   : a program option
-// OUTPUT  : nothing, uses the program (if provided)
+// INPUT   a program
+// OUTPUT  nothing, links the program
+CAMLprim value
+caml_gl_link_program(value prog)
+{
+  CAMLparam1(prog);
+  glLinkProgram((GLuint)prog);
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   a program option
+// OUTPUT  nothing, uses the program (if provided)
 CAMLprim value
 caml_gl_use_program(value prog)
 {

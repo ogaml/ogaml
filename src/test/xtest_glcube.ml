@@ -80,10 +80,10 @@ let () =
   Window.attach d win ctx;
 
   Config.enable [Config.DepthTest];
-  Gl.cull_face Gl.back;
-  Gl.front_face Gl.cw;
+  Config.set_culling Config.Back;
+  Config.set_front Config.CW;
+  Config.set_color 1.0 1.0 1.0;
 (*   Gl.polygon_mode (Gl.front_and_back Gl.line); *)
-  Gl.clear_color 1.0 1.0 1.0 1.0;
 
   (* Pointer utils *)
   let new_int () = Bigarray.Array1.create Bigarray.int32 Bigarray.c_layout 1 in
@@ -282,7 +282,7 @@ let () =
 
   (* Main loop *)
   let rec loop () = 
-    Gl.clear (Gl.color_buffer_bit lor Gl.depth_buffer_bit);
+    Config.clear ();
     display ();
     Window.swap d win;
     if event_loop () then ()
