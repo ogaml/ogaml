@@ -611,7 +611,7 @@ caml_cocoa_event_type(value mlevent)
 {
   CAMLparam1(mlevent);
 
-  NSEvent* event = (NSEvent*) Data_custom_val(mlevent);
+  NSEvent* event = (NSEvent*) mlevent;
 
   NSEventType type = [event type];
 
