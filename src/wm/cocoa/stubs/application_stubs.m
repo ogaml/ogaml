@@ -198,13 +198,7 @@ caml_cocoa_init_app(value mldelegate)
   OGApplicationDelegate* delegate = (OGApplicationDelegate*) mldelegate;
 
   [OGApplication sharedApplication];
-  [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
-  [NSApp activateIgnoringOtherApps:YES];
-
-  // [[NSApplication sharedApplication] setDelegate:NSApp];
   [[NSApplication sharedApplication] setDelegate:delegate];
-
-  [OGApplication setUpMenuBar];
 
   [[OGApplication sharedApplication] finishLaunching];
 
@@ -242,6 +236,21 @@ caml_cocoa_run_app(value unit)
 {
   (void)app;
   return NO;
+}
+
+-(void)applicationWillFinishLaunching:(NSNotification *)aNotification
+{
+  [OGApplication sharedApplication];
+  [OGApplication setUpMenuBar];
+  [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+}
+
+-(void)applicationDidFinishLaunching:(NSNotification *)notification
+{
+  [OGApplication sharedApplication];
+
+  // [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+  [NSApp activateIgnoringOtherApps:YES];
 }
 
 @end
