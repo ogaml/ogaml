@@ -13,14 +13,15 @@ Cocoa specific:
   ☐ Menus should be clickable on launch @issue
   ✔ Implement applicationName of OGApplication @unsure @done(2015-10-20 21:14) @project(Cocoa specific)
   ✔ Close application when all windows are (through delegate probably) @done(2015-10-20 22:03) @project(Cocoa specific)
-  ☐ Guarantee application is init only once @important
-  ☐ Continue window implementation
-  ☐ See if close shouldn't be used instead of performClose
-  ☐ Remove quiting when all window closed
+  ✔ Guarantee application is init only once @important @done(2015-10-26 01:43) @project(Cocoa specific)
+  ✔ Continue window implementation @done(2015-10-26 01:43) @project(Cocoa specific)
+  ✘ See if close shouldn't be used instead of performClose @cancelled(2015-10-26 01:43) @project(Cocoa specific)
+  ✔ Remove quiting when all window closed @done(2015-10-26 01:46) @project(Cocoa specific)
   ☐ Add handling of events (like application quitting)
   ☐ Add some option to switch between Ctrl and Cmd @question
   ☐ Add some function to handle keyRepeatDelay and keyRepeatInterval for NSEvent
-  ☐ Handle application creation and running with a boolean
+  ✔ Handle application creation and running with a boolean @done(2015-10-26 01:43) @project(Cocoa specific)
+  ✔ Implement window destroy properly @done(2015-10-26 02:04) @project(Cocoa specific)
 
 Xlib specific:
   ✔ Match on clientmessage in ogamlWindow_xlib for safety @done(2015-10-20 20:29) @project(Xlib specific)
@@ -59,5 +60,3 @@ Math part:
   ☐ Implement Vector3i
   ✔ Add more complex functions to matrix3f (look_at, clipping, etc...) @done(2015-10-24 11:55) @project(Math part)
   ☐ Implement Quaternions
-
-

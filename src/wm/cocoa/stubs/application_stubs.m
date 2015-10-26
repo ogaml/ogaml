@@ -3,7 +3,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // OGApplication implementation (strongly inspired from SFML for now)
-/////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 @implementation OGApplication
 
 +(void)processEvent
@@ -172,6 +172,12 @@
   return appName;
 }
 
+-(void)bringAllToFront:(id)sender
+{
+    (void)sender;
+    [[NSApp windows] makeObjectsPerformSelector:@selector(orderFrontRegardless)];
+}
+
 -(void)sendEvent:(NSEvent *)anEvent
 {
     // id firstResponder = [[anEvent window] firstResponder];
@@ -182,7 +188,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // OGApplication binding
-////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 CAMLprim value
 caml_cocoa_init_app(value mldelegate)
@@ -197,6 +203,10 @@ caml_cocoa_init_app(value mldelegate)
 
   // [[NSApplication sharedApplication] setDelegate:NSApp];
   [[NSApplication sharedApplication] setDelegate:delegate];
+
+  [OGApplication setUpMenuBar];
+
+  [[OGApplication sharedApplication] finishLaunching];
 
   CAMLreturn(Val_unit);
 }
@@ -217,7 +227,7 @@ caml_cocoa_run_app(value unit)
 
 ////////////////////////////////////////////////////////////////////////////////
 // OGApplicationDelegate implementation
-///////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 @implementation OGApplicationDelegate
 
 -(NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
@@ -231,14 +241,14 @@ caml_cocoa_run_app(value unit)
 -(BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication*)app
 {
   (void)app;
-  return YES;
+  return NO;
 }
 
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
 // OGApplicationDelegate binding
-////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 CAMLprim value
 caml_cocoa_create_appdgt(value unit)
@@ -251,7 +261,7 @@ caml_cocoa_create_appdgt(value unit)
 
 ////////////////////////////////////////////////////////////////////////////////
 // We directly bind NSWindow (for now at least)
-///////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 CAMLprim value
 caml_cocoa_create_window(value frame, value styleMask, value backing, value defer)
@@ -282,6 +292,8 @@ caml_cocoa_create_window(value frame, value styleMask, value backing, value defe
                                         styleMask:mask
                                           backing:Int_val(backing)
                                             defer:deferb] autorelease];
+
+  // [window retain];
 
   CAMLreturn( (value) window );
 }
@@ -373,7 +385,206 @@ caml_cocoa_window_next_event(value mlwindow)
   NSWindow* window = (NSWindow*) mlwindow;
   NSEvent* event = [window nextEventMatchingMask:NSAnyEventMask];
 
-  CAMLreturn( (value) event );
+  if(event == nil) CAMLreturn(Val_none);
+  else CAMLreturn( Val_some((value)event) );
+}
+
+CAMLprim value
+caml_cocoa_window_set_for_events(value mlwindow)
+{
+  CAMLparam1(mlwindow);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+
+  // Should we set a delegate?
+  // [OGApplication sharedApplication]; // ensure NSApp
+  // [window setDelegate:NSApp];
+  [window setAcceptsMouseMovedEvents:YES];
+  [window setIgnoresMouseEvents:NO];
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
+{
+  CAMLparam2(mlwindow,mlbool);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+  BOOL autodisplay = Bool_val(mlbool);
+
+  [window setAutodisplay:autodisplay];
+
+  CAMLreturn(Val_unit);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// IMPLEMENTING OGWindowController
+// Our own version of a Window Controller (it isn't a NSWindowController)
+////////////////////////////////////////////////////////////////////////////////
+@implementation OGWindowController
+
+-(id)initWithWindow:(NSWindow*)window
+{
+  m_window = [window retain];
+
+  [m_window setDelegate:self];
+
+  [m_window setReleasedWhenClosed:NO]; // We can destroy it ourselves
+
+  m_windowIsOpen = true;
+
+  return self;
+}
+
+-(void)windowWillClose:(NSNotification *)notification
+{
+  m_windowIsOpen = false;
+}
+
+-(void)processEvent
+{
+  [OGApplication processEvent];
+}
+
+-(NSRect)frame
+{
+  return [m_window frame];
+}
+
+-(void)closeWindow
+{
+  [m_window close];
+  [m_window setDelegate:nil];
+}
+
+-(void)releaseWindow
+{
+  if([self isWindowOpen]) [self closeWindow];
+  if(m_window == nil) return;
+  [m_window release];
+  m_window = nil;
+}
+
+-(BOOL)isWindowOpen
+{
+  return m_windowIsOpen;
+}
+
+-(void)pushEvent:(NSEvent *)event
+{
+  [m_events addObject:event];
+}
+
+-(NSEvent *)popEvent
+{
+  if ([m_events count] == 0) return nil;
+  NSEvent* event = [m_events objectAtIndex:0];
+  if (event != nil)
+  {
+    [[event retain] autorelease];
+    [m_events removeObjectAtIndex:0];
+  }
+  return event;
+}
+
+-(void)keyDown:(NSEvent *)event
+{
+  [self pushEvent:event];
+}
+
+@end
+
+////////////////////////////////////////////////////////////////////////////////
+// BINDING OGWindowController
+////////////////////////////////////////////////////////////////////////////////
+CAMLprim value
+caml_cocoa_window_controller_init_with_window(value mlwindow)
+{
+  CAMLparam1(mlwindow);
+
+  NSWindow* window = (NSWindow*) mlwindow;
+
+  OGWindowController* wc = [[OGWindowController alloc] init];
+  [wc initWithWindow:window];
+
+  CAMLreturn( (value) wc );
+}
+
+CAMLprim value
+caml_cocoa_window_controller_process_event(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  [controller processEvent];
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_controller_frame(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+  CAMLlocal1(mlrect);
+  mlrect = caml_alloc_custom(&empty_custom_opts, sizeof(NSRect), 0, 1);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+  NSRect rect = [controller frame];
+
+  memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
+
+  CAMLreturn(mlrect);
+}
+
+CAMLprim value
+caml_cocoa_window_controller_close(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  [controller closeWindow];
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_controller_is_window_open(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  BOOL b = [controller isWindowOpen];
+
+  CAMLreturn(Val_bool(b));
+}
+
+CAMLprim value
+caml_cocoa_window_controller_release_window(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  [controller releaseWindow];
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_window_controller_pop_event(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  NSEvent* event = [controller popEvent];
+
+  if(event == nil) CAMLreturn(Val_none);
+  else CAMLreturn( Val_some((value)event) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
