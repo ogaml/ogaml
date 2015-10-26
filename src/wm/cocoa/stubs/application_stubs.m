@@ -465,6 +465,28 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
   return m_windowIsOpen;
 }
 
+-(void)pushEvent:(NSEvent *)event
+{
+  [m_events addObject:event];
+}
+
+-(NSEvent *)popEvent
+{
+  if ([m_events count] == 0) return nil;
+  NSEvent* event = [m_events objectAtIndex:0];
+  if (event != nil)
+  {
+    [[event retain] autorelease];
+    [m_events removeObjectAtIndex:0];
+  }
+  return event;
+}
+
+-(void)keyDown:(NSEvent *)event
+{
+  [self pushEvent:event];
+}
+
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -544,6 +566,19 @@ caml_cocoa_window_controller_release_window(value mlcontroller)
   [controller releaseWindow];
 
   CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_window_controller_pop_event(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  NSEvent* event = [controller popEvent];
+
+  if(event == nil) CAMLreturn(Val_none);
+  else CAMLreturn( Val_some((value)event) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

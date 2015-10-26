@@ -60,9 +60,8 @@ let is_open win =
   Cocoa.OGWindowController.is_window_open win
 
 let poll_event win =
-  (* TODO Make real use of it *)
   Cocoa.OGWindowController.process_event win ;
-  (* match Cocoa.NSWindow.next_event win with
+  match Cocoa.OGWindowController.pop_event win with
   | Some event ->
       Cocoa.NSEvent.(
         match get_type event with
@@ -73,5 +72,4 @@ let poll_event win =
         | MouseMoved    -> Some Event.MouseMoved
         | _             -> None
       )
-  | None -> None *)
-  None
+  | None -> None

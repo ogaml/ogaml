@@ -174,4 +174,6 @@ module OGWindowController : sig
 
   val release_window : t -> unit
 
+  val pop_event : t -> NSEvent.t option
+
 end

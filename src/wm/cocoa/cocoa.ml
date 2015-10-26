@@ -198,4 +198,7 @@ module OGWindowController = struct
   external release_window : t -> unit
     = "caml_cocoa_window_controller_release_window"
 
+  external pop_event : t -> NSEvent.t option
+    = "caml_cocoa_window_controller_pop_event"
+
 end

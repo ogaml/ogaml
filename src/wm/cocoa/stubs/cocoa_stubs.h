@@ -42,6 +42,7 @@
 {
   NSWindow* m_window;
   BOOL m_windowIsOpen; // Luckily it is NO by default
+  NSMutableArray* m_events;
 }
 
 -(id)initWithWindow:(NSWindow*)window;
@@ -53,5 +54,7 @@
 -(BOOL)isWindowOpen;
 
 -(void)releaseWindow;
+
+-(NSEvent *)popEvent;
 
 @end
