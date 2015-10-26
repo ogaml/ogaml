@@ -4,6 +4,7 @@ Objective-C formatting:
   ☐ Choose how to align labels
   ☐ Add more comments
   ☐ Add nil tests to catch initialization problems
+  ☐ Move init_arp in cocoa/utils_stubs
 
 Cocoa specific:
   ✔ Remove application t type @unsure @done(2015-10-20 21:59) @project(Cocoa specific)

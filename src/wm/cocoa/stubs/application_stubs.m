@@ -482,6 +482,7 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
   if([self isWindowOpen]) [self closeWindow];
   if(m_window == nil) return;
   [m_window release];
+  [m_view release];
   m_window = nil;
 }
 
