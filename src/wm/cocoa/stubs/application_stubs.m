@@ -429,6 +429,7 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
   m_window = [window retain];
 
   [m_window setDelegate:self];
+  [m_window makeFirstResponder:self];
 
   [m_window setReleasedWhenClosed:NO]; // We can destroy it ourselves
 
@@ -490,6 +491,13 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
 
 -(void)keyDown:(NSEvent *)event
 {
+  NSLog(@"key down");
+  [self pushEvent:event];
+}
+
+-(void)mouseDown:(NSEvent *)event
+{
+  NSLog(@"mouse down");
   [self pushEvent:event];
 }
 

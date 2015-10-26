@@ -63,6 +63,7 @@ let poll_event win =
   Cocoa.OGWindowController.process_event win ;
   match Cocoa.OGWindowController.pop_event win with
   | Some event ->
+      print_endline "Non None event";
       Cocoa.NSEvent.(
         match get_type event with
         | KeyDown       -> Some Event.KeyPressed
