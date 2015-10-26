@@ -166,10 +166,39 @@ module NSWindow = struct
 
   external frame : t -> NSRect.t = "caml_cocoa_window_frame"
 
-  external next_event : t -> NSEvent.t = "caml_cocoa_window_next_event"
+  external next_event : t -> NSEvent.t option = "caml_cocoa_window_next_event"
+
+  external set_for_events : t -> unit = "caml_cocoa_window_set_for_events"
+
+  external set_autodisplay : t -> bool -> unit
+    = "caml_cocoa_window_set_autodisplay"
 
   (* Exposed functions *)
   let create ~frame ~style_mask ~backing ~defer () =
     abstract_create frame style_mask backing defer
+
+end
+
+module OGWindowController = struct
+
+  type t
+
+  external init_with_window : NSWindow.t -> t
+    = "caml_cocoa_window_controller_init_with_window"
+
+  external process_event : t -> unit
+    = "caml_cocoa_window_controller_process_event"
+
+  external frame : t -> NSRect.t = "caml_cocoa_controller_frame"
+
+  external close_window : t -> unit = "caml_cocoa_window_controller_close"
+
+  external is_window_open : t -> bool = "caml_cocoa_controller_is_window_open"
+
+  external release_window : t -> unit
+    = "caml_cocoa_window_controller_release_window"
+
+  external pop_event : t -> NSEvent.t option
+    = "caml_cocoa_window_controller_pop_event"
 
 end

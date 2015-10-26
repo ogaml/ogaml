@@ -1,10 +1,21 @@
-type t = Cocoa.NSWindow.t
+type t = Cocoa.OGWindowController.t
+
+(* Create the application on first window *)
+let init_app =
+  let launched = ref false in
+  fun () ->
+    if not !launched then begin
+      Cocoa.(
+        (* Create an application and its delegate *)
+        OGApplication.init (OGApplicationDelegate.create ()) ;
+        (* Creating an AutoReleasePool *)
+        init_arp ()
+      ) ;
+      launched := true
+    end
 
 let create ~width ~height =
-  (* Create an application and its delegate (should only be done once) *)
-  Cocoa.(
-    OGApplication.init (OGApplicationDelegate.create ())
-  );
+  init_app () ;
 
   (* Rect for setting the size -- offset is ignored we will center *)
   let rect = Cocoa.NSRect.create 0 0 width height in
@@ -20,39 +31,45 @@ let create ~width ~height =
 
   (* Various settings *)
   Cocoa.(
-    NSWindow.set_background_color window (NSColor.magenta ());
+    NSWindow.set_background_color window (NSColor.green ()) ;
     NSWindow.make_key_and_order_front window;
-    NSWindow.center window;
-    NSWindow.make_main window
+    NSWindow.center window ;
+    (* NSWindow.make_main window ; *)
+    (* Set some delegate for the window? *)
+    NSWindow.set_for_events window ;
+    NSWindow.set_autodisplay window true
   );
 
-  (* Now run the application *)
-  Cocoa.OGApplication.run () ;
-
-  window
+  (* Creating the delegate which we will return *)
+  Cocoa.OGWindowController.init_with_window window
 
 let close win =
-  Cocoa.NSWindow.perform_close win
+  Cocoa.OGWindowController.close_window win
 
-let destroy win = ()
+let destroy win =
+  Cocoa.OGWindowController.release_window win
 
 let size win =
   let i = int_of_float in
   Cocoa.(
-    let (_,_,w,h) = NSRect.get (Cocoa.NSWindow.frame win)
+    let (_,_,w,h) = NSRect.get (Cocoa.OGWindowController.frame win)
     in i w, i h
   )
 
-let is_open win = true
+let is_open win =
+  Cocoa.OGWindowController.is_window_open win
 
 let poll_event win =
-  let event = Cocoa.NSWindow.next_event win in
-  Cocoa.NSEvent.(
-    match get_type event with
-    | KeyDown       -> Some Event.KeyPressed
-    | KeyUp         -> Some Event.KeyReleased
-    | LeftMouseDown -> Some Event.ButtonPressed
-    | LeftMouseUp   -> Some Event.ButtonReleased
-    | MouseMoved    -> Some Event.MouseMoved
-    | _             -> None
-  )
+  Cocoa.OGWindowController.process_event win ;
+  match Cocoa.OGWindowController.pop_event win with
+  | Some event ->
+      Cocoa.NSEvent.(
+        match get_type event with
+        | KeyDown       -> Some Event.KeyPressed
+        | KeyUp         -> Some Event.KeyReleased
+        | LeftMouseDown -> Some Event.ButtonPressed
+        | LeftMouseUp   -> Some Event.ButtonReleased
+        | MouseMoved    -> Some Event.MouseMoved
+        | _             -> None
+      )
+  | None -> None

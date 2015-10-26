@@ -106,6 +106,8 @@ module OGApplication : sig
 
   val init : OGApplicationDelegate.t -> unit
 
+  (** This runs the application, letting it handle the main loop by itself.
+    * It might be best not to use it to handle things in ocaml directly. *)
   val run : unit -> unit
 
 end
@@ -148,6 +150,30 @@ module NSWindow : sig
 
   val frame : t -> NSRect.t
 
-  val next_event : t -> NSEvent.t
+  val next_event : t -> NSEvent.t option
+
+  val set_for_events : t -> unit
+
+  val set_autodisplay : t -> bool -> unit
+
+end
+
+module OGWindowController : sig
+
+  type t
+
+  val init_with_window : NSWindow.t -> t
+
+  val process_event : t -> unit
+
+  val frame : t -> NSRect.t
+
+  val close_window : t -> unit
+
+  val is_window_open : t -> bool
+
+  val release_window : t -> unit
+
+  val pop_event : t -> NSEvent.t option
 
 end
