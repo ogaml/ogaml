@@ -4,6 +4,10 @@ module Data = struct
 
   type ('a, 'b) t = ('a, 'b, c_layout) Array1.t
 
+  type ft = (float, float32_elt) t
+
+  type it = (int32, int32_elt) t
+
   let create n k = Array1.create k c_layout n 
 
   let create_float n = create n Float32 
@@ -56,8 +60,11 @@ module VBO = struct
     abstract_set d (Data.size d);
     bind None
 
-end
+  let build d = 
+    let buf = create () in
+    set buf d; buf
 
+end
 
 
 

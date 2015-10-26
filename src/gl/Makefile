@@ -6,15 +6,15 @@ INCLUDE_DIRS = -I ../utils/
 
 CSOURCES = $(STUBS_DIR)/buffers_stubs.c $(STUBS_DIR)/shader_stubs.c\
 	   $(STUBS_DIR)/error_stubs.c $(STUBS_DIR)/config_stubs.c\
-	   $(STUBS_DIR)/program_stubs.c\
+	   $(STUBS_DIR)/program_stubs.c $(STUBS_DIR)/uniform_stubs.c\
 	   ../utils/stubs.c
 
 COBJS = $(CSOURCES:.c=.o)
 
 COBJS2 = buffers_stubs.o shader_stubs.o error_stubs.o config_stubs.o\
-	 program_stubs.o stubs.o
+	 program_stubs.o stubs.o uniform_stubs.o
 
-MLSOURCES = config.ml error.ml program.ml buffers.ml shader.ml
+MLSOURCES = config.ml error.ml program.ml buffers.ml uniform.ml shader.ml 
 
 MLINTERFACES =
 

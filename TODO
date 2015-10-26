@@ -78,5 +78,7 @@ GL part:
   ☐ Bind polygon mode
   ☐ Bind VAOs & attributes
   ☐ Bind uniform setting
+  ☐ Merge Math and GL modules, or make GL depend on Math (for uniform setting)
+  ☐ Better support for uint uniforms and array uniforms
 
 
