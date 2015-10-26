@@ -1,6 +1,7 @@
 open Xlib
 open Tgl4
 open OgamlMath
+open OgamlGL
 
 let vertex = "
     #version 130
@@ -57,7 +58,8 @@ let () =
   let vi = VisualInfo.choose d [VisualInfo.RGBA; VisualInfo.DepthSize 24; VisualInfo.DoubleBuffer] in
   let ctx = GLContext.create d vi in
   Window.attach d win ctx;
-  Gl.enable Gl.depth_test;
+
+  Config.enable [Config.DepthTest];
   Gl.cull_face Gl.back;
   Gl.front_face Gl.cw;
 (*   Gl.polygon_mode (Gl.front_and_back Gl.line); *)

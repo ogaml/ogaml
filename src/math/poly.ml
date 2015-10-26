@@ -1,4 +1,6 @@
 
+type t = float array
+
 let cube corner size = 
   let open Vector3f in
   let fdl, ful, fur, fdr, 
@@ -59,3 +61,15 @@ let cube_n corner size =
     (cube corner size);
     (convert_array norm_array)
   ]
+
+let axis start length = 
+  let a = start in
+  let b = start +. length in
+  [|
+    a ; 0.; 0.;
+    b ; 0.; 0.;
+    0.; a ; 0.;
+    0.; b ; 0.;
+    0.; 0.; a ;
+    0.; 0.; b 
+  |]

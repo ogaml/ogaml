@@ -5,13 +5,14 @@ include ../../common_defs.mk
 INCLUDE_DIRS = -I ../utils/
 
 CSOURCES = $(STUBS_DIR)/buffers_stubs.c $(STUBS_DIR)/shader_stubs.c\
-	   $(STUBS_DIR)/error_stubs.c ../utils/stubs.c
+	   $(STUBS_DIR)/error_stubs.c $(STUBS_DIR)/config_stubs.c\
+	   ../utils/stubs.c
 
 COBJS = $(CSOURCES:.c=.o)
 
-COBJS2 = buffers_stubs.o shader_stubs.o error_stubs.o stubs.o
+COBJS2 = buffers_stubs.o shader_stubs.o error_stubs.o config_stubs.o stubs.o
 
-MLSOURCES = buffer.ml shader.ml error.ml
+MLSOURCES = config.ml error.ml glBuffer.ml shader.ml
 
 MLINTERFACES =
 
@@ -23,6 +24,8 @@ MLCMIS = $(MLINTERFACES:.mli=.cmi)
 
 MLLIB = ogamlGL
 
+PACKNAME = OgamlGL
+
 LIBS = -cclib -lX11 -cclib -lGL
 
 
@@ -33,23 +36,25 @@ default: .depend $(MLLIB)
 
 
 $(MLLIB): $(COBJS) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) 
-	$(OCAMLMKLIB) -o $(MLLIB) $(COBJS2) $(MLCMIS) $(MLOBJS) $(LIBS);
-	$(OCAMLMKLIB) -o $(MLLIB) $(COBJS2) $(MLCMIS) $(MLNATOBJS) $(LIBS)
+	$(OCAMLFIND) $(OCAMLC) -pack -o $(MLLIB).cmo $(MLCMIS) $(MLOBJS);
+	$(OCAMLFIND) $(OCAMLOPT) -pack -o $(MLLIB).cmx $(MLCMIS) $(MLNATOBJS);
+	$(OCAMLFIND) $(OCAMLMKLIB) -o $(MLLIB) $(COBJS2) $(MLLIB).cmo $(LIBS);
+	$(OCAMLFIND) $(OCAMLMKLIB) -o $(MLLIB) $(COBJS2) $(MLLIB).cmx $(MLNATOBJS) $(LIBS)
 
 %.cma:%.cmo 
-	$(OCAMLC) -a -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLFIND) $(OCAMLC) -a -o $@ $(INCLUDE_DIRS) $<
 
 %.cmxa:%.cmx
-	$(OCAMLOPT) -a -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLFIND) $(OCAMLOPT) -a -o $@ $(INCLUDE_DIRS) $<
 
 %.cmi:%.mli
-	$(OCAMLC) -c $< -o $@
+	$(OCAMLFIND) $(OCAMLC) -for-pack $(PACKNAME) -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLOPT) -c -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLFIND) $(OCAMLOPT) -for-pack $(PACKNAME) -c -o $@ $(INCLUDE_DIRS) $<
 
 %.cmo:%.ml
-	$(OCAMLC) -c -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLFIND) $(OCAMLC) -for-pack $(PACKNAME) -c -o $@ $(INCLUDE_DIRS) $<
 
 %.ml:%.mlpp %.cmi
 	$(PPCOMMAND) -o $@ $<
