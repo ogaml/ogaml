@@ -81,4 +81,11 @@ let endpoint u v t =
   prop t v
   |> add u
 
-
+let convert_array t = 
+  let n = Array.length t in
+  let new_array = Array.make (n*3) 0. in
+  for i = 0 to n-1 do
+    new_array.(3*i+0) <- t.(i).x;
+    new_array.(3*i+1) <- t.(i).y;
+    new_array.(3*i+2) <- t.(i).z;
+  done; new_array

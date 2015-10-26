@@ -8,7 +8,9 @@ module Data = struct
 
   let create_float n = create n Float32 
 
-  let create_int n = create n Int32
+  let of_array k a = Array1.of_array k c_layout a
+
+  let of_float_array a = Array1.of_array Float32 c_layout a
 
   let size : type a b. (a, b, c_layout) Array1.t -> int = 
     fun t -> 

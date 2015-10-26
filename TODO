@@ -66,7 +66,7 @@ Math part:
   ✔ Recode inverse matrices after debugging @done(2015-10-25 09:20) @project(Math part)
   ☐ Matrices exceptions (and centralized exceptions)
   ☐ Implement Quaternions
-  ☐ Implement polygons
+  ✔ Implement polygons @done(2015-10-26 16:33) @project(Math part)
 
 GL part:
   ☐ Let the user choose the usage of a vbo when setting data

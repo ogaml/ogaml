@@ -8,7 +8,9 @@ module Data : sig
 
   val create_float : int -> (float, float32_elt) t
 
-  val create_int : int -> (int32, int32_elt) t
+  val of_array : ('a, 'b) kind -> 'a array -> ('a, 'b) t
+
+  val of_float_array : float array -> (float, float32_elt) t
 
   val size : ('a, 'b) t -> int
 

@@ -12,7 +12,7 @@ COBJS = $(CSOURCES:.c=.o)
 
 COBJS2 = atoms_stubs.o display_stubs.o event_stubs.o window_stubs.o glx_stubs.o stubs.o
 
-MLSOURCES = xlib.ml xlib.mli
+MLSOURCES = xlib.ml
 
 MLOBJS = $(MLSOURCES:.ml=.cmx)
 
