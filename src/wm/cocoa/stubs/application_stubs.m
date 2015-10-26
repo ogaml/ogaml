@@ -442,6 +442,11 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
   [OGApplication processEvent];
 }
 
+-(NSRect)frame
+{
+  return [m_window frame];
+}
+
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -470,6 +475,21 @@ caml_cocoa_window_controller_process_event(value mlcontroller)
   [controller processEvent];
 
   CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_controller_frame(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+  CAMLlocal1(mlrect);
+  mlrect = caml_alloc_custom(&empty_custom_opts, sizeof(NSRect), 0, 1);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+  NSRect rect = [controller frame];
+
+  memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
+
+  CAMLreturn(mlrect);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

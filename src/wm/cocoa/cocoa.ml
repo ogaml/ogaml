@@ -189,4 +189,6 @@ module OGWindowController = struct
   external process_event : t -> unit
     = "caml_cocoa_window_controller_process_event"
 
+  external frame : t -> NSRect.t = "caml_cocoa_controller_frame"
+
 end

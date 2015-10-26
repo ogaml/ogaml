@@ -12,7 +12,7 @@
 @interface OGApplication : NSApplication
 
 // Event processing
-// +(void) processEvent;
++(void) processEvent;
 
 // Setting the menu bar
 +(void) setUpMenuBar;
@@ -44,5 +44,7 @@
 }
 
 -(id)initWithWindow:(NSWindow*)window;
+
+-(NSRect)frame;
 
 @end

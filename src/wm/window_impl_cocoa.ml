@@ -50,12 +50,11 @@ let close win =
 let destroy win = ()
 
 let size win =
-  (* let i = int_of_float in
+  let i = int_of_float in
   Cocoa.(
-    let (_,_,w,h) = NSRect.get (Cocoa.NSWindow.frame win)
+    let (_,_,w,h) = NSRect.get (Cocoa.OGWindowController.frame win)
     in i w, i h
-  ) *)
-  0,0
+  )
 
 let is_open win = true
 

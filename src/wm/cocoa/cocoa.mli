@@ -166,4 +166,6 @@ module OGWindowController : sig
 
   val process_event : t -> unit
 
+  val frame : t -> NSRect.t
+
 end
