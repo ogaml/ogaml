@@ -13,6 +13,10 @@ module Data = struct
   let size : type a b. (a, b, c_layout) Array1.t -> int = 
     fun t -> 
     let n = Array1.dim t in
+    let s = 
+      if max_int / 2 <= 1000000000 then 4
+      else 8
+    in
     match Array1.kind t with
     | Float32       -> n * 4
     | Float64       -> n * 8
@@ -22,8 +26,8 @@ module Data = struct
     | Int16_unsigned-> n * 2
     | Int32         -> n * 4
     | Int64         -> n * 8
-    | Int           -> n * 4
-    | Nativeint     -> n * 4
+    | Int           -> n * s
+    | Nativeint     -> n * s
     | Complex32     -> n * 4
     | Complex64     -> n * 8
     | Char          -> n
@@ -51,6 +55,7 @@ module VBO = struct
     bind None
 
 end
+
 
 
 

@@ -62,6 +62,17 @@ Math part:
   ✔ Recode inverse matrices after debugging @done(2015-10-25 09:20) @project(Math part)
   ☐ Matrices exceptions (and centralized exceptions)
   ☐ Implement Quaternions
+  ☐ Implement polygons
 
 GL part:
   ☐ Let the user choose the usage of a vbo when setting data
+  ☐ Bind face culling, front_face
+  ☐ Bind gl_enable and options
+  ☐ Bind clear_color
+  ☐ Bind shaders
+  ☐ Bind programs & locations
+  ☐ Bind VAOs & attributes
+
+
+
+

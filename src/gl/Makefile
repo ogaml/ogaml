@@ -10,7 +10,7 @@ COBJS = $(CSOURCES:.c=.o)
 
 COBJS2 = buffers_stubs.o stubs.o
 
-MLSOURCES = buffers.ml
+MLSOURCES = buffers.ml buffers.mli shader.ml shader.mli
 
 MLINTERFACES =
 
@@ -31,7 +31,7 @@ LIBS = -cclib -lX11 -cclib -lGL
 default: .depend $(MLLIB)
 
 
-$(MLLIB): $(COBJS) $(MLOBJS) $(MLNATOBJS) $(MLCMIS)
+$(MLLIB): $(COBJS) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) 
 	$(OCAMLFIND) $(OCAMLMKLIB) -o $(MLLIB) $(COBJS2) $(MLCMIS) $(MLOBJS) $(LIBS);
 	$(OCAMLFIND) $(OCAMLMKLIB) -o $(MLLIB) $(COBJS2) $(MLCMIS) $(MLNATOBJS) $(LIBS)
 
