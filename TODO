@@ -73,7 +73,7 @@ GL part:
   ☐ Bind face culling, front_face
   ☐ Bind gl_enable and options
   ☐ Bind clear_color
-  ☐ Bind shaders
+  ✔ Bind shaders @done(2015-10-26 16:01) @project(GL part)
   ☐ Bind programs & locations
   ☐ Bind VAOs & attributes
 

@@ -4,11 +4,12 @@ include ../../common_defs.mk
 
 INCLUDE_DIRS = -I ../utils/
 
-CSOURCES = $(STUBS_DIR)/buffers_stubs.c ../utils/stubs.c
+CSOURCES = $(STUBS_DIR)/buffers_stubs.c $(STUBS_DIR)/shader_stubs.c\
+	   $(STUBS_DIR)/error_stubs.c ../utils/stubs.c
 
 COBJS = $(CSOURCES:.c=.o)
 
-COBJS2 = buffers_stubs.o stubs.o
+COBJS2 = buffers_stubs.o shader_stubs.o error_stubs.o stubs.o
 
 MLSOURCES = buffer.ml buffer.mli shader.ml shader.mli error.ml error.mli
 
