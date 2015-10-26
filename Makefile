@@ -31,6 +31,9 @@ window_lib:
 math_lib:
 	cd src/math/ && make
 
+gl_lib:
+	cd src/gl/ && make
+
 window_test: window_lib math_lib
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(WINDOW_INCLUDES)\
 	  $(WINDOW_CMXA) $(MATH_CMXA) $(WINDOW_TEST)
@@ -46,4 +49,5 @@ clean:
 	rm -rf *.out;
 	cd src/wm/ && make clean;
 	cd src/test/ && make clean;
-	cd src/math/ && make clean
+	cd src/math/ && make clean;
+	cd src/gl/ && make clean

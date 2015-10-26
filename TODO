@@ -63,4 +63,5 @@ Math part:
   ☐ Matrices exceptions (and centralized exceptions)
   ☐ Implement Quaternions
 
-
+GL part:
+  ☐ Let the user choose the usage of a vbo when setting data
