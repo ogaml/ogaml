@@ -87,5 +87,6 @@ GL part:
   ☐ Make a pervasives modules or something to hold clear, types, etc...
   ☐ Find a way to strongly type VAOs/VBOs ? @unsure
   ☐ Reorganize VAOs
+  ☐ Fix Error.get always returning None
 
 

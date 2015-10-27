@@ -12,7 +12,7 @@ ifeq ($(UNAME), Linux)
   OS_NAME = LINUX
   OS_WIN_STUBS = xlib_stubs
   OS_WIN_STUBS_DIR = xlib/
-  OS_WIN_STUBS_TEST = xtest_glcube_v2
+  OS_WIN_STUBS_TEST = xtest_glcube
 endif
 ifeq ($(UNAME), Darwin)
   OS_NAME = OSX

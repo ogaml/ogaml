@@ -1,40 +1,44 @@
 type t = {
   display : Xlib.Display.t;
   window  : Xlib.Window.t;
+  context : Xlib.GLContext.t;
   mutable closed : bool
 }
 
 let create ~width ~height = 
   (* The display is a singleton in C (created only once) *)
-  let disp = Xlib.Display.create () in
-  let win = 
-    {
-      display = disp;
-      window  = Xlib.Window.create_simple
-          ~display:disp
-          ~parent:(Xlib.Window.root_of disp)
+  let display = Xlib.Display.create () in
+  let window  = 
+      Xlib.Window.create_simple
+          ~display:display
+          ~parent:(Xlib.Window.root_of display)
           ~size:(width,height) 
           ~origin:(50,50) 
           ~background:0;
-      closed  = false
-    }
   in
-  let atom = Xlib.Atom.intern win.display "WM_DELETE_WINDOW" false in
+  let atom = Xlib.Atom.intern display "WM_DELETE_WINDOW" false in
   begin 
     match atom with
     |None -> assert false
-    |Some(a) -> Xlib.Atom.set_wm_protocols win.display win.window [a]
+    |Some(a) -> Xlib.Atom.set_wm_protocols display window [a]
   end;
-  Xlib.Event.set_mask win.display win.window 
+  Xlib.Event.set_mask display window 
     [Xlib.Event.ExposureMask; 
       Xlib.Event.KeyPressMask; 
       Xlib.Event.KeyReleaseMask; 
       Xlib.Event.ButtonPressMask;
       Xlib.Event.ButtonReleaseMask;
       Xlib.Event.PointerMotionMask];
-  Xlib.Window.map win.display win.window;
-  Xlib.Display.flush win.display;
-  win
+  Xlib.Window.map display window;
+  Xlib.Display.flush display;
+  let vi = Xlib.VisualInfo.choose display
+    [Xlib.VisualInfo.RGBA; 
+     Xlib.VisualInfo.DepthSize 24; 
+     Xlib.VisualInfo.DoubleBuffer] 
+  in
+  let context = Xlib.GLContext.create display vi in
+  Xlib.Window.attach display window context;
+  {display; window; context; closed = false}
 
 let close win =
   Xlib.Window.unmap win.display win.window;
@@ -156,4 +160,5 @@ let poll_event win =
     | None -> None
   end
 
-
+let display win = 
+  Xlib.Window.swap win.display win.window

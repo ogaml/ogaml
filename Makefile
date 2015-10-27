@@ -13,7 +13,7 @@ GL_CMXA = ogamlGL.cmxa
 
 PACKAGES = -package bigarray,unix
 
-WINDOW_TEST = src/test/test_window.ml
+WINDOW_TEST = src/test/test_glcube.ml
 
 STUBS_TEST = src/test/$(strip $(OS_WIN_STUBS_TEST)).ml
 
@@ -38,7 +38,7 @@ gl_lib:
 
 window_test: window_lib math_lib gl_lib
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(WINDOW_INCLUDES)\
-	  $(WINDOW_CMXA) $(MATH_CMXA) $(WINDOW_TEST)
+	  $(WINDOW_CMXA) $(MATH_CMXA) $(GL_CMXA) $(WINDOW_TEST)
 
 stubs_test: stubs_lib math_lib gl_lib
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(WINDOW_INCLUDES)\

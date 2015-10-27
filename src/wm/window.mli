@@ -19,3 +19,6 @@ val is_open : t -> bool
 (** Return the event at the top of the stack, if it exists *)
 val poll_event : t -> Event.t option
 
+(** Display the window after the GL calls *)
+val display : t -> unit
+

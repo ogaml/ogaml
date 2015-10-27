@@ -57,8 +57,8 @@ caml_gl_shader_infolog(value id)
   CAMLlocal1(res);
 
   GLsizei maxl = 1024;
-  GLsizei len[1];
-  GLchar  log[1024];
+  GLsizei len[1] = {0};
+  GLchar  log[1024] = "";
   glGetShaderInfoLog((GLuint)id, maxl, len, log);
 
   res = caml_alloc(2, 0);
