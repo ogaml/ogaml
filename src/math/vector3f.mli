@@ -42,3 +42,5 @@ val direction : t -> t -> t
 
 (* Returns the point u + tv *)
 val endpoint : t -> t -> float -> t
+
+val convert_array : t array -> float array

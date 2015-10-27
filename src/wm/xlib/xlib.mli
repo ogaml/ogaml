@@ -26,6 +26,7 @@ module VisualInfo : sig
     | BufferSize     of int
     | Level          of int
     | RGBA           
+    | DoubleBuffer
     | Stereo         
     | AuxBuffers     of int
     | RedSize        of int

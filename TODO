@@ -40,6 +40,9 @@ Xlib specific:
   ☐ Correctly free glx calls when destroying window
   ☐ Binding GLX ** (later)
 
+General:
+  ☐ Make a log system ? @unsure
+
 Window part:
   ✔ Add keys enumeration @done(2015-10-23 09:46) @project(Window part)
   ✔ Add buttons enumeration @done(2015-10-23 09:50) @project(Window part)
@@ -61,4 +64,28 @@ Math part:
   ✔ Implement Matrix3f @done(2015-10-24 11:10) @project(Math part)
   ☐ Implement Vector3i
   ✔ Add more complex functions to matrix3f (look_at, clipping, etc...) @done(2015-10-24 11:55) @project(Math part)
+  ✔ Debug matrices... Really @done(2015-10-25 09:17) @project(Math part)
+  ✔ Recode inverse matrices after debugging @done(2015-10-25 09:20) @project(Math part)
+  ☐ Matrices exceptions 
   ☐ Implement Quaternions
+  ✔ Implement polygons @done(2015-10-26 16:33) @project(Math part)
+  ☐ Parameterize Poly.axis with vector3f 
+
+GL part:
+  ☐ Let the user choose the usage of a vbo when setting data
+  ✔ Bind face culling, front_face @done(2015-10-26 21:31) @project(GL part)
+  ✔ Bind gl_enable and options @done(2015-10-26 19:35) @project(GL part)
+  ✔ Bind clear_color @done(2015-10-26 21:31) @project(GL part)
+  ✔ Bind shaders @done(2015-10-26 16:01) @project(GL part)
+  ✔ Bind programs & locations @done(2015-10-26 21:15) @project(GL part)
+  ☐ Bind polygon mode
+  ✔ Bind VAOs & attributes @done(2015-10-27 10:57) @project(GL part)
+  ✔ Bind uniform setting @done(2015-10-26 23:08) @project(GL part)
+  ✔ Reabstract types in buffers and program after debugging @done(2015-10-27 12:20) @project(GL part)
+  ☐ Merge Math and GL modules, or make GL depend on Math (for uniform setting)
+  ☐ Better support for uint uniforms and array uniforms
+  ☐ Make a pervasives modules or something to hold clear, types, etc...
+  ☐ Find a way to strongly type VAOs/VBOs ? @unsure
+  ☐ Reorganize VAOs
+
+
