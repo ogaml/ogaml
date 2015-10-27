@@ -3,8 +3,6 @@ type capability =
     | Blend
     | ColorLogicOp
     | CullFace
-    | DebugOutput
-    | DebugOutputSynchronous
     | DepthClamp
     | DepthTest
     | Dither
@@ -16,7 +14,6 @@ type capability =
     | PolygonOffsetPoint
     | PolygonSmooth
     | PrimitiveRestart
-    | PrimitiveRestartFixedIndex
     | RasterizerDiscard
     | SampleAlphaToCoverage
     | SampleAlphaToOne
