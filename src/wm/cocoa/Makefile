@@ -4,12 +4,13 @@ include ../../../common_defs.mk
 
 INCLUDE_DIRS = -I ../../utils/
 
-CSOURCES = $(STUBS_DIR)/utils_stubs.m $(STUBS_DIR)/application_stubs.m\
+CSOURCES = $(STUBS_DIR)/utils_stubs.m $(STUBS_DIR)/opengl_stubs.m\
+	   $(STUBS_DIR)/application_stubs.m\
 	   $(STUBS_DIR)/test_stubs.m ../../utils/stubs.c
 
 COBJS = $(CSOURCES:.c=.o) $(CSOURCES:.m=.o)
 
-COBJS2 = utils_stubs.o application_stubs.o test_stubs.o stubs.o
+COBJS2 = utils_stubs.o opengl_stubs.o application_stubs.o test_stubs.o stubs.o
 
 MLSOURCES = cocoa.ml cocoa.mli
 

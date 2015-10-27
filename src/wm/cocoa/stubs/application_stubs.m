@@ -198,13 +198,7 @@ caml_cocoa_init_app(value mldelegate)
   OGApplicationDelegate* delegate = (OGApplicationDelegate*) mldelegate;
 
   [OGApplication sharedApplication];
-  [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
-  [NSApp activateIgnoringOtherApps:YES];
-
-  // [[NSApplication sharedApplication] setDelegate:NSApp];
   [[NSApplication sharedApplication] setDelegate:delegate];
-
-  [OGApplication setUpMenuBar];
 
   [[OGApplication sharedApplication] finishLaunching];
 
@@ -242,6 +236,21 @@ caml_cocoa_run_app(value unit)
 {
   (void)app;
   return NO;
+}
+
+-(void)applicationWillFinishLaunching:(NSNotification *)aNotification
+{
+  [OGApplication sharedApplication];
+  [OGApplication setUpMenuBar];
+  [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+}
+
+-(void)applicationDidFinishLaunching:(NSNotification *)notification
+{
+  [OGApplication sharedApplication];
+
+  // [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+  [NSApp activateIgnoringOtherApps:YES];
 }
 
 @end
@@ -426,13 +435,23 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
 
 -(id)initWithWindow:(NSWindow*)window
 {
+  // Inits the event queue
+  m_events = [NSMutableArray new];
+
   m_window = [window retain];
 
   [m_window setDelegate:self];
+  [m_window makeFirstResponder:self];
 
   [m_window setReleasedWhenClosed:NO]; // We can destroy it ourselves
 
   m_windowIsOpen = true;
+
+  // Setting the openGL view
+  m_view = [[OGOpenGLView alloc] initWithFrame:[[m_window contentView] frame]
+                                 pixelFormat:[OGOpenGLView defaultPixelFormat]];
+
+  [m_window setContentView:m_view];
 
   return self;
 }
@@ -463,6 +482,7 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
   if([self isWindowOpen]) [self closeWindow];
   if(m_window == nil) return;
   [m_window release];
+  [m_view release];
   m_window = nil;
 }
 
@@ -489,6 +509,11 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
 }
 
 -(void)keyDown:(NSEvent *)event
+{
+  [self pushEvent:event];
+}
+
+-(void)mouseDown:(NSEvent *)event
 {
   [self pushEvent:event];
 }
@@ -584,7 +609,7 @@ caml_cocoa_window_controller_pop_event(value mlcontroller)
   NSEvent* event = [controller popEvent];
 
   if(event == nil) CAMLreturn(Val_none);
-  else CAMLreturn( Val_some((value)event) );
+  else CAMLreturn(Val_some((value)event));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -599,10 +624,10 @@ caml_cocoa_event_type(value mlevent)
 {
   CAMLparam1(mlevent);
 
-  NSEvent* event = (NSEvent*) Data_custom_val(mlevent);
+  NSEvent* event = (NSEvent*) mlevent;
 
   NSEventType type = [event type];
 
   // It's an enum so an int
-  CAMLreturn(Val_int(type));
+  CAMLreturn(Val_int(type-1));
 }

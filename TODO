@@ -3,6 +3,8 @@ General:
 Objective-C formatting:
   ☐ Choose how to align labels
   ☐ Add more comments
+  ☐ Add nil tests to catch initialization problems
+  ☐ Move init_arp in cocoa/utils_stubs
 
 Cocoa specific:
   ✔ Remove application t type @unsure @done(2015-10-20 21:59) @project(Cocoa specific)
@@ -10,14 +12,14 @@ Cocoa specific:
   ✔ Make use of Delegate or remove @done(2015-10-20 22:03) @project(Cocoa specific)
   ✔ Add menus to application @done(2015-10-20 21:34) @project(Cocoa specific)
   ☐ Add menus without plagiarizing SFML @option(parametrize)
-  ☐ Menus should be clickable on launch @issue
+  ✔ Menus should be clickable on launch @issue @done(2015-10-26 22:19) @project(Cocoa specific)
   ✔ Implement applicationName of OGApplication @unsure @done(2015-10-20 21:14) @project(Cocoa specific)
   ✔ Close application when all windows are (through delegate probably) @done(2015-10-20 22:03) @project(Cocoa specific)
   ✔ Guarantee application is init only once @important @done(2015-10-26 01:43) @project(Cocoa specific)
   ✔ Continue window implementation @done(2015-10-26 01:43) @project(Cocoa specific)
   ✘ See if close shouldn't be used instead of performClose @cancelled(2015-10-26 01:43) @project(Cocoa specific)
   ✔ Remove quiting when all window closed @done(2015-10-26 01:46) @project(Cocoa specific)
-  ☐ Add handling of events (like application quitting)
+  ✔ Add handling of events (like application quitting) @done(2015-10-26 22:19) @project(Cocoa specific)
   ☐ Add some option to switch between Ctrl and Cmd @question
   ☐ Add some function to handle keyRepeatDelay and keyRepeatInterval for NSEvent
   ✔ Handle application creation and running with a boolean @done(2015-10-26 01:43) @project(Cocoa specific)
