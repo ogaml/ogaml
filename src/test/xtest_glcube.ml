@@ -1,5 +1,4 @@
 open Xlib
-open Tgl4
 open OgamlMath
 open OgamlGL
 
@@ -19,26 +18,6 @@ let vertex = "
         gl_Position = MVPMatrix * vec4(position, 1.0);
 
         out_color = in_color;
-
-    }
-  "
-
-let vertex_cube = "
-    #version 130
-
-    uniform mat4 MVPMatrix;
-
-    in vec3 position;
-
-    in vec3 normal;
-
-    out vec3 out_color;
-
-    void main() {
-
-        gl_Position = MVPMatrix * vec4(position, 1.0);
-
-        out_color = (normal + vec3(1.0, 1.0, 1.0))/2.0;
 
     }
   "
@@ -85,158 +64,126 @@ let () =
   Config.set_color 1.0 1.0 1.0;
 (*   Gl.polygon_mode (Gl.front_and_back Gl.line); *)
 
-  (* Pointer utils *)
-  let new_int () = Bigarray.Array1.create Bigarray.int32 Bigarray.c_layout 1 in
-
-  let bind_int f = 
-    let tab = new_int () in 
-    f tab; Int32.to_int tab.{0}
+  (* Polygons *)
+  let cube = 
+    let vertices = 
+      Poly.cube 
+        Vector3f.({x = -0.5; y = -0.5; z = -0.5})
+        Vector3f.({x = 1.; y = 1.; z = 1.})
+    in
+    let colors = 
+      [| 
+         1.0; 0.0; 0.0;
+         1.0; 0.0; 0.0;
+         1.0; 0.0; 0.0;
+         1.0; 0.0; 0.0;
+         1.0; 0.0; 0.0;
+         1.0; 0.0; 0.0;
+         0.0; 1.0; 0.0;
+         0.0; 1.0; 0.0;
+         0.0; 1.0; 0.0;
+         0.0; 1.0; 0.0;
+         0.0; 1.0; 0.0;
+         0.0; 1.0; 0.0;
+         0.0; 0.0; 1.0;
+         0.0; 0.0; 1.0;
+         0.0; 0.0; 1.0;
+         0.0; 0.0; 1.0;
+         0.0; 0.0; 1.0;
+         0.0; 0.0; 1.0;
+         1.0; 1.0; 0.0;
+         1.0; 1.0; 0.0;
+         1.0; 1.0; 0.0;
+         1.0; 1.0; 0.0;
+         1.0; 1.0; 0.0;
+         1.0; 1.0; 0.0;
+         0.0; 1.0; 1.0;
+         0.0; 1.0; 1.0;
+         0.0; 1.0; 1.0;
+         0.0; 1.0; 1.0;
+         0.0; 1.0; 1.0;
+         0.0; 1.0; 1.0;
+         1.0; 0.0; 1.0;
+         1.0; 0.0; 1.0;
+         1.0; 0.0; 1.0;
+         1.0; 0.0; 1.0;
+         1.0; 0.0; 1.0;
+         1.0; 0.0; 1.0;
+      |]
+    in
+    Array.concat [vertices; colors]
   in
 
-  (* Vertices *)
-  let vertices =
-    Bigarray.Array1.of_array Bigarray.float32 Bigarray.c_layout [|
-      (* Bottom *)
-      -0.5; -0.5; -0.5;  1.0; 0.0; 0.0;
-      -0.5; -0.5;  0.5;  1.0; 0.0; 0.0;
-       0.5; -0.5; -0.5;  1.0; 0.0; 0.0;
-               
-       0.5; -0.5; -0.5;  1.0; 0.0; 0.0;
-      -0.5; -0.5;  0.5;  1.0; 0.0; 0.0;
-       0.5; -0.5;  0.5;  1.0; 0.0; 0.0;
-                
-      (* Up *)  
-      -0.5;  0.5; -0.5;  0.0; 1.0; 1.0;
-       0.5;  0.5; -0.5;  0.0; 1.0; 1.0;
-      -0.5;  0.5;  0.5;  0.0; 1.0; 1.0;
-                 
-      -0.5;  0.5;  0.5;  0.0; 1.0; 1.0;
-       0.5;  0.5; -0.5;  0.0; 1.0; 1.0;
-       0.5;  0.5;  0.5;  0.0; 1.0; 1.0;
-                  
-      (* Right *)
-       0.5; -0.5; -0.5;  1.0; 0.0; 1.0;
-       0.5; -0.5;  0.5;  1.0; 0.0; 1.0;
-       0.5;  0.5; -0.5;  1.0; 0.0; 1.0;
-                   
-       0.5;  0.5; -0.5;  1.0; 0.0; 1.0;
-       0.5; -0.5;  0.5;  1.0; 0.0; 1.0;
-       0.5;  0.5;  0.5;  1.0; 0.0; 1.0;
-                    
-      (* Left *)
-      -0.5; -0.5; -0.5;  1.0; 1.0; 0.0;
-      -0.5;  0.5; -0.5;  1.0; 1.0; 0.0;
-      -0.5; -0.5;  0.5;  1.0; 1.0; 0.0;
-                     
-      -0.5; -0.5;  0.5;  1.0; 1.0; 0.0;
-      -0.5;  0.5; -0.5;  1.0; 1.0; 0.0;
-      -0.5;  0.5;  0.5;  1.0; 1.0; 0.0;
-                
-      (* Front *)
-      -0.5; -0.5;  0.5;  0.0; 1.0; 0.0;
-      -0.5;  0.5;  0.5;  0.0; 1.0; 0.0;
-       0.5; -0.5;  0.5;  0.0; 1.0; 0.0;
-                      
-       0.5; -0.5;  0.5;  0.0; 1.0; 0.0;
-      -0.5;  0.5;  0.5;  0.0; 1.0; 0.0;
-       0.5;  0.5;  0.5;  0.0; 1.0; 0.0;
-                 
-      (* Back *) 
-      -0.5; -0.5; -0.5;  0.0; 0.0; 1.0;
-       0.5; -0.5; -0.5;  0.0; 0.0; 1.0;
-      -0.5;  0.5; -0.5;  0.0; 0.0; 1.0;
-                  
-      -0.5;  0.5; -0.5;  0.0; 0.0; 1.0;
-       0.5; -0.5; -0.5;  0.0; 0.0; 1.0;
-       0.5;  0.5; -0.5;  0.0; 0.0; 1.0;
-    |]
-  in
-
-  let vertices_axis =
-    Bigarray.Array1.of_array Bigarray.float32 Bigarray.c_layout [|
-      0. ; 0.; 0.;  
-      30.; 0.; 0.;  
-
-      0.; 0. ; 0.;  
-      0.; 30.; 0.;  
-
-      0.; 0.; 0. ;  
-      0.; 0.; 30.;  
-
-      1.; 0.; 0.;
-      1.; 0.; 0.;
-                  
-      0.; 1.; 0.;
-      0.; 1.; 0.;
-                  
-      0.; 0.; 1.;
-      0.; 0.; 1.;     
-    |]
+  let axis = 
+    let vertices = Poly.axis 0. 30. in
+    let colors = 
+      [|
+        1.0; 0.0; 0.0;
+        1.0; 0.0; 0.0;
+        0.0; 1.0; 0.0;
+        0.0; 1.0; 0.0;
+        0.0; 0.0; 1.0;
+        0.0; 0.0; 1.0
+      |]
+    in
+    Array.concat [vertices; colors]
   in
 
   (* VBO creation *)
-  let vbo_cube = bind_int (Gl.gen_buffers 1) in
-  Gl.bind_buffer Gl.array_buffer vbo_cube;
-  Gl.buffer_data Gl.array_buffer (Gl.bigarray_byte_size vertices)
-    (Some vertices) Gl.static_draw;
-  Gl.bind_buffer Gl.array_buffer 0;
-
-  let vbo_axis = bind_int (Gl.gen_buffers 1) in
-  Gl.bind_buffer Gl.array_buffer vbo_axis;
-  Gl.buffer_data Gl.array_buffer (Gl.bigarray_byte_size vertices_axis)
-    (Some vertices_axis) Gl.static_draw;
-  Gl.bind_buffer Gl.array_buffer 0;
-
+  let vbo_cube = Buffers.VBO.build (Buffers.Data.of_float_array cube) in
+  let vbo_axis = Buffers.VBO.build (Buffers.Data.of_float_array axis) in
 
   (* Compile GL program *)
-  let prog = Gl.create_program () in
-  let vert = Gl.create_shader Gl.vertex_shader in
-             Gl.shader_source vert vertex;
-             Gl.compile_shader vert;
-  let frag = Gl.create_shader Gl.fragment_shader in
-             Gl.shader_source frag fragment;
-             Gl.compile_shader frag;
-  Gl.attach_shader prog vert;
-  Gl.attach_shader prog frag;
-  Gl.link_program prog;
-  let mvploc = Gl.get_uniform_location prog "MVPMatrix" in
-  let posloc = Gl.get_attrib_location  prog "position"  in
-  let colloc = Gl.get_attrib_location  prog "in_color"  in
+  let vertex_shader   = Shader.create (`String vertex)   Shader.Vertex   in
+  let fragment_shader = Shader.create (`String fragment) Shader.Fragment in
+  let program = Program.build 
+    ~shaders:[vertex_shader; fragment_shader]
+    ~attributes:["position"; "in_color"]
+    ~uniforms:["MVPMatrix"]
+  in
 
   (* VAO creation *)
-  let vao_cube = bind_int (Gl.gen_vertex_arrays 1) in
-  Gl.bind_vertex_array vao_cube;
-  Gl.bind_buffer Gl.array_buffer vbo_cube;
+  let open Buffers in
+  let vao_cube = VAO.create () in
+  VAO.bind (Some vao_cube);
+  VBO.bind (Some vbo_cube);
   (* Position attribute *)
-  Gl.enable_vertex_attrib_array posloc;
-  Gl.vertex_attrib_pointer posloc 3 
-    Gl.float false
-    24 (`Offset 0);
-  (* Color attribute *)
-  Gl.enable_vertex_attrib_array colloc;
-  Gl.vertex_attrib_pointer colloc 3 
-    Gl.float false
-    24 (`Offset 12);
-  (* Unbinding *)
-  Gl.bind_buffer Gl.array_buffer 0;
-  Gl.bind_vertex_array 0;
+  VAO.enable_attrib (Program.attribute program "position");
+  VAO.set_attrib
+    ~attribute:(Program.attribute program "position")
+    ~size:3
+    ~kind:VAO.Float
+    ~offset:0 ();
+  (* color attribute *)
+  VAO.enable_attrib (Program.attribute program "in_color");
+  VAO.set_attrib
+    ~attribute:(Program.attribute program "in_color")
+    ~size:3
+    ~kind:VAO.Float
+    ~offset:(36 * 12) ();
+  VBO.bind None;
+  VAO.bind None;
 
-  let vao_axis = bind_int (Gl.gen_vertex_arrays 1) in
-  Gl.bind_vertex_array vao_axis;
-  Gl.bind_buffer Gl.array_buffer vbo_axis;
+  let vao_axis = VAO.create () in
+  VAO.bind (Some vao_axis);
+  VBO.bind (Some vbo_axis);
   (* Position attribute *)
-  Gl.enable_vertex_attrib_array posloc;
-  Gl.vertex_attrib_pointer posloc 3 
-    Gl.float false
-    0 (`Offset 0);
-  (* Color attribute *)
-  Gl.enable_vertex_attrib_array colloc;
-  Gl.vertex_attrib_pointer colloc 3 
-    Gl.float false
-    0 (`Offset (4 * 18));
-  (* Unbinding *)
-  Gl.bind_buffer Gl.array_buffer 0;
-  Gl.bind_vertex_array 0;
+  VAO.enable_attrib (Program.attribute program "position");
+  VAO.set_attrib
+    ~attribute:(Program.attribute program "position")
+    ~size:3
+    ~kind:VAO.Float
+    ~offset:0 ();
+  (* color attribute *)
+  VAO.enable_attrib (Program.attribute program "in_color");
+  VAO.set_attrib
+    ~attribute:(Program.attribute program "in_color")
+    ~size:3
+    ~kind:VAO.Float
+    ~offset:(18 * 4) ();
+
+  VAO.bind None; 
+  VBO.bind None;
 
   (* Create matrices *)
   let proj = Matrix3f.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.) in
@@ -253,7 +200,7 @@ let () =
 
   (* Display *)
   let display () = 
-    Gl.use_program prog;
+    Program.use (Some program);
 
     (* Compute model matrix *)
     let t = Unix.gettimeofday () in
@@ -261,17 +208,18 @@ let () =
     let model = Matrix3f.rotation rot_vector !rot_angle in
     let mvp = Matrix3f.product vp model in
     rot_angle := !rot_angle +. (abs_float (cos (Unix.gettimeofday ()) /. 10.));
+
     (* Display the cube *)
-    Gl.uniform_matrix4fv mvploc 1 false (Matrix3f.to_bigarray mvp);
-    Gl.bind_vertex_array vao_cube;
-    Gl.draw_arrays Gl.triangles 0 36;
-    Gl.bind_vertex_array 0;
+    Uniform.set (Uniform.Matrix4 (Matrix3f.to_bigarray mvp)) 
+                (Program.uniform program "MVPMatrix");
+    VAO.bind_draw vao_cube VAO.Triangles 0 36;
+    
     (* Display the axis *)
-    Gl.uniform_matrix4fv mvploc 1 false (Matrix3f.to_bigarray vp);
-    Gl.bind_vertex_array vao_axis;
-    Gl.draw_arrays Gl.lines 0 6;
-    Gl.bind_vertex_array 0;
-    Gl.use_program 0;
+    Uniform.set (Uniform.Matrix4 (Matrix3f.to_bigarray vp)) 
+                (Program.uniform program "MVPMatrix");
+    VAO.bind_draw vao_axis VAO.Lines 0 6;
+
+    Program.use None;
   in
 
   (* Event loop *)

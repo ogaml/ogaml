@@ -20,5 +20,3 @@ B src/math
 B src/gl
 B src/gl/stubs
 
-PKG tgls
-
