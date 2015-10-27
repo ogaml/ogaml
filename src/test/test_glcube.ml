@@ -25,7 +25,7 @@ let cube =
     for j = 0 to 5 do
       colors.(i*18+j*3+0) <- float_of_int (i/3);
       colors.(i*18+j*3+1) <- float_of_int ((i+1) mod 2);
-      colors.(i*18+j*3+2) <- float_of_int ((i mod 5) mod 2);
+      colors.(i*18+j*3+2) <- float_of_int (((max i 1) mod 5) mod 2); 
     done;
   done;
   Array.concat [vertices; colors]
