@@ -28,9 +28,16 @@ MLLIB = ogamlGL
 
 PACKNAME = OgamlGL
 
-COPTS = -Wno-int-to-void-pointer-cast
+COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast
 
-LIBS = -framework openGL
+LIBS = 
+
+ifeq ($(OS_NAME), LINUX)
+  LIBS = -lGL
+endif
+ifeq ($(OS_NAME), OSX)
+  LIBS = -framework openGL
+endif
 
 
 
