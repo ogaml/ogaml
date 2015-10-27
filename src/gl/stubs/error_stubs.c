@@ -51,13 +51,15 @@ caml_gl_get_error(value unit)
       res = Val_some(Val_int(4));
       break;
 
-    case GL_STACK_UNDERFLOW :
-      res = Val_some(Val_int(5));
-      break;
+    #ifndef __APPLE__
+      case GL_STACK_UNDERFLOW :
+        res = Val_some(Val_int(5));
+        break;
 
-    case GL_STACK_OVERFLOW :
-      res = Val_some(Val_int(6));
-      break;
+      case GL_STACK_OVERFLOW :
+        res = Val_some(Val_int(6));
+        break;
+    #endif
 
     default:
       res = Val_none;
