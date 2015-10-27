@@ -16,6 +16,8 @@
 #include <caml/bigarray.h>
 #include "../../utils/stubs.h"
 
+#include <stdio.h>
+
 
 // INPUT   : nothing
 // OUTPUT  : an error, if there is one on the stack
