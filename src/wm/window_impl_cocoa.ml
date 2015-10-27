@@ -73,3 +73,5 @@ let poll_event win =
         | _             -> None
       )
   | None -> None
+
+let display win = ()
