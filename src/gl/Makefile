@@ -18,7 +18,7 @@ MLSOURCES = config.ml error.ml shader.ml program.ml buffers.ml uniform.ml
 
 MLINTERFACES =
 
-MLOBJS = $(MLSOURCES:.ml=.cmo) 
+MLOBJS = $(MLSOURCES:.ml=.cmo)
 
 MLNATOBJS = $(MLSOURCES:.ml=.cmx)
 
@@ -28,7 +28,7 @@ MLLIB = ogamlGL
 
 PACKNAME = OgamlGL
 
-LIBS = -cclib -lX11 -cclib -lGL
+LIBS = -framework openGL
 
 
 
@@ -37,13 +37,13 @@ LIBS = -cclib -lX11 -cclib -lGL
 default: .depend $(MLLIB)
 
 
-$(MLLIB): $(COBJS) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) 
+$(MLLIB): $(COBJS) $(MLCMIS) $(MLOBJS) $(MLNATOBJS)
 	$(OCAMLFIND) $(OCAMLC) -pack -o $(MLLIB).cmo $(MLCMIS) $(MLOBJS);
 	$(OCAMLFIND) $(OCAMLOPT) -pack -o $(MLLIB).cmx $(MLCMIS) $(MLNATOBJS);
 	$(OCAMLFIND) $(OCAMLMKLIB) -o $(MLLIB) $(COBJS2) $(MLLIB).cmo $(LIBS);
 	$(OCAMLFIND) $(OCAMLMKLIB) -o $(MLLIB) $(COBJS2) $(MLLIB).cmx $(MLNATOBJS) $(LIBS)
 
-%.cma:%.cmo 
+%.cma:%.cmo
 	$(OCAMLFIND) $(OCAMLC) -a -o $@ $(INCLUDE_DIRS) $<
 
 %.cmxa:%.cmx
@@ -81,4 +81,3 @@ clean:
 include .depend
 
 .PHONY: .depend
-
