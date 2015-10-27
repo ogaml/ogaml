@@ -38,5 +38,56 @@ module VBO : sig
 end
 
 
+module VAO : sig
+
+  type t
+
+  type types =
+    | Byte
+    | UByte
+    | Short
+    | UShort
+    | Int
+    | UInt
+    | Float
+    | Double
+
+  type shape = 
+    | Points
+    | LineStrip
+    | LineLoop
+    | Lines
+    | LineStripAdjacency
+    | LinesAdjacency
+    | TriangleStrip
+    | TriangleFan
+    | Triangles
+    | TriangleStripAdjacency
+    | TrianglesAdjacency
+    | Patches
+
+  val create : unit -> t
+
+  val bind : t option -> unit
+
+  val delete : t -> unit
+
+  val enable_attrib : Program.attribute -> unit
+
+  val set_attrib : 
+      ?normalize:bool ->
+      ?integer  :bool ->
+      ?stride   :int  ->
+      ?divisor  :int  ->
+      attribute:Program.attribute ->
+      size :int   ->
+      kind :types ->
+      offset:int  -> unit -> unit
+
+  val draw : shape -> int -> int -> unit
+
+  val bind_draw : t -> shape -> int -> int -> unit
+
+end 
 
 

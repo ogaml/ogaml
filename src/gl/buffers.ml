@@ -43,7 +43,7 @@ end
 
 module VBO = struct
 
-  type t
+  type t = int
 
   (* Abstract functions *)
   external abstract_set : ('a, 'b) Data.t -> int -> unit = "caml_gl_buffer_data"
@@ -66,5 +66,74 @@ module VBO = struct
 
 end
 
+
+module VAO = struct
+
+  type t = int
+
+  type types =
+    | Byte
+    | UByte
+    | Short
+    | UShort
+    | Int
+    | UInt
+    | Float
+    | Double
+
+  type shape = 
+    | Points
+    | LineStrip
+    | LineLoop
+    | Lines
+    | LineStripAdjacency
+    | LinesAdjacency
+    | TriangleStrip
+    | TriangleFan
+    | Triangles
+    | TriangleStripAdjacency
+    | TrianglesAdjacency
+    | Patches
+
+  (* Abstract functions *)
+  external attrib_pointer 
+    : Program.attribute -> int -> types -> bool -> (int * int) -> unit 
+    = "caml_gl_vertex_attrib_pointer"
+
+  external attrib_i_pointer 
+    : Program.attribute -> int -> types -> (int * int) -> unit 
+    = "caml_gl_vertex_attrib_ipointer"
+
+  external attrib_divisor
+    : Program.attribute -> int -> unit
+    = "caml_gl_vertex_attrib_divisor"
+
+
+  (* Exposed functions *)
+  external create : unit -> t = "caml_gl_gen_vertex_array"
+
+  external bind : t option -> unit = "caml_gl_bind_vertex_array"
+
+  external delete : t -> unit = "caml_gl_delete_vertex_array"
+
+  external enable_attrib : Program.attribute -> unit = "caml_gl_enable_vaa"
+
+  external draw : shape -> int -> int -> unit = "caml_gl_draw_arrays"
+
+  let set_attrib ?normalize:(normalize = false) ?integer:(integer = false)
+    ?stride:(stride = 0) ?divisor:(divisor = 0) ~attribute
+    ~size ~kind ~offset () =
+    if integer && kind <> Float && kind <> Double then 
+      attrib_i_pointer attribute size kind (stride,offset)
+    else 
+      attrib_pointer attribute size kind normalize (stride,offset);
+    attrib_divisor attribute divisor
+
+  let bind_draw t s b e = 
+    bind (Some t);
+    draw s b e;
+    bind None
+
+end 
 
 

@@ -11,7 +11,7 @@ MATH_CMXA = ogamlMath.cmxa
 
 GL_CMXA = ogamlGL.cmxa
 
-PACKAGES = -package tgls.tgl4,bigarray,unix
+PACKAGES = -package bigarray,unix
 
 WINDOW_TEST = src/test/test_window.ml
 

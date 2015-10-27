@@ -154,14 +154,23 @@ let () =
 
   let vertices_axis =
     Bigarray.Array1.of_array Bigarray.float32 Bigarray.c_layout [|
-      0. ; 0.; 0.;  1.; 0.; 0.;
-      30.; 0.; 0.;  1.; 0.; 0.;
+      0. ; 0.; 0.;  
+      30.; 0.; 0.;  
 
-      0.; 0. ; 0.;  0.; 1.; 0.;
-      0.; 30.; 0.;  0.; 1.; 0.;
+      0.; 0. ; 0.;  
+      0.; 30.; 0.;  
 
-      0.; 0.; 0. ;  0.; 0.; 1.;
-      0.; 0.; 30.;  0.; 0.; 1.;
+      0.; 0.; 0. ;  
+      0.; 0.; 30.;  
+
+      1.; 0.; 0.;
+      1.; 0.; 0.;
+                  
+      0.; 1.; 0.;
+      0.; 1.; 0.;
+                  
+      0.; 0.; 1.;
+      0.; 0.; 1.;     
     |]
   in
 
@@ -203,13 +212,11 @@ let () =
   Gl.vertex_attrib_pointer posloc 3 
     Gl.float false
     24 (`Offset 0);
-  Gl.vertex_attrib_divisor posloc 0;
   (* Color attribute *)
   Gl.enable_vertex_attrib_array colloc;
   Gl.vertex_attrib_pointer colloc 3 
     Gl.float false
     24 (`Offset 12);
-  Gl.vertex_attrib_divisor posloc 0;
   (* Unbinding *)
   Gl.bind_buffer Gl.array_buffer 0;
   Gl.bind_vertex_array 0;
@@ -221,14 +228,12 @@ let () =
   Gl.enable_vertex_attrib_array posloc;
   Gl.vertex_attrib_pointer posloc 3 
     Gl.float false
-    24 (`Offset 0);
-  Gl.vertex_attrib_divisor posloc 0;
+    0 (`Offset 0);
   (* Color attribute *)
   Gl.enable_vertex_attrib_array colloc;
   Gl.vertex_attrib_pointer colloc 3 
     Gl.float false
-    24 (`Offset 12);
-  Gl.vertex_attrib_divisor posloc 0;
+    0 (`Offset (4 * 18));
   (* Unbinding *)
   Gl.bind_buffer Gl.array_buffer 0;
   Gl.bind_vertex_array 0;

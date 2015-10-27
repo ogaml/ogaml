@@ -30,7 +30,7 @@ CAMLprim value
 caml_gl_attrib_location(value prog, value str)
 {
   CAMLparam2(prog, str);
-  CAMLreturn(Int_val(glGetAttribLocation((GLuint)prog,String_val(str))));
+  CAMLreturn(Val_int(glGetAttribLocation((GLuint)prog,String_val(str))));
 }
 
 
@@ -40,7 +40,7 @@ CAMLprim value
 caml_gl_uniform_location(value prog, value str)
 {
   CAMLparam2(prog, str);
-  CAMLreturn(Int_val(glGetUniformLocation((GLuint)prog,String_val(str))));
+  CAMLreturn(Val_int(glGetUniformLocation((GLuint)prog,String_val(str))));
 }
 
 

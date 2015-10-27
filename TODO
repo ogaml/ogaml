@@ -67,6 +67,7 @@ Math part:
   ☐ Matrices exceptions 
   ☐ Implement Quaternions
   ✔ Implement polygons @done(2015-10-26 16:33) @project(Math part)
+  ☐ Parameterize Poly.axis with vector3f 
 
 GL part:
   ☐ Let the user choose the usage of a vbo when setting data
@@ -76,9 +77,13 @@ GL part:
   ✔ Bind shaders @done(2015-10-26 16:01) @project(GL part)
   ✔ Bind programs & locations @done(2015-10-26 21:15) @project(GL part)
   ☐ Bind polygon mode
-  ☐ Bind VAOs & attributes
-  ☐ Bind uniform setting
+  ✔ Bind VAOs & attributes @done(2015-10-27 10:57) @project(GL part)
+  ✔ Bind uniform setting @done(2015-10-26 23:08) @project(GL part)
+  ✔ Reabstract types in buffers and program after debugging @done(2015-10-27 12:20) @project(GL part)
   ☐ Merge Math and GL modules, or make GL depend on Math (for uniform setting)
   ☐ Better support for uint uniforms and array uniforms
+  ☐ Make a pervasives modules or something to hold clear, types, etc...
+  ☐ Find a way to strongly type VAOs/VBOs ? @unsure
+  ☐ Reorganize VAOs
 
 
