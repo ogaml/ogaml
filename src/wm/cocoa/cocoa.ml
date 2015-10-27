@@ -201,4 +201,6 @@ module OGWindowController = struct
   external pop_event : t -> NSEvent.t option
     = "caml_cocoa_window_controller_pop_event"
 
+  external flush_context : t -> unit = "caml_cocoa_controller_flush_glctx"
+
 end

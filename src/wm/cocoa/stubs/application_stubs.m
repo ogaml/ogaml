@@ -20,7 +20,7 @@
   }
 }
 
-+(void) setUpMenuBar
++(void)setUpMenuBar
 {
   [OGApplication sharedApplication]; // ensure NSApp
 
@@ -448,8 +448,18 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
   m_windowIsOpen = true;
 
   // Setting the openGL view
-  m_view = [[OGOpenGLView alloc] initWithFrame:[[m_window contentView] frame]
-                                 pixelFormat:[OGOpenGLView defaultPixelFormat]];
+  NSOpenGLPixelFormatAttribute pixelFormatAttributes[] =
+  {
+    NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
+    NSOpenGLPFAColorSize    , 24                           ,
+    NSOpenGLPFAAlphaSize    , 8                            ,
+    NSOpenGLPFADoubleBuffer ,
+    NSOpenGLPFAAccelerated  ,
+    0
+  };
+  NSOpenGLPixelFormat *pixelFormat = [[[NSOpenGLPixelFormat alloc] initWithAttributes:pixelFormatAttributes] autorelease];
+  m_view = [[[OGOpenGLView alloc] initWithFrame:[[m_window contentView] bounds]
+                                    pixelFormat:pixelFormat] autorelease];
 
   [m_window setContentView:m_view];
 
@@ -516,6 +526,12 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
 -(void)mouseDown:(NSEvent *)event
 {
   [self pushEvent:event];
+}
+
+-(void)flushGLContext
+{
+  [[m_view openGLContext] makeCurrentContext];
+  [[m_view openGLContext] flushBuffer];
 }
 
 @end
@@ -610,6 +626,18 @@ caml_cocoa_window_controller_pop_event(value mlcontroller)
 
   if(event == nil) CAMLreturn(Val_none);
   else CAMLreturn(Val_some((value)event));
+}
+
+CAMLprim value
+caml_cocoa_controller_flush_glctx(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  [controller flushGLContext];
+
+  CAMLreturn(Val_unit);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

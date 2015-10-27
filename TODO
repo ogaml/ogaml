@@ -24,6 +24,7 @@ Cocoa specific:
   ☐ Add some function to handle keyRepeatDelay and keyRepeatInterval for NSEvent
   ✔ Handle application creation and running with a boolean @done(2015-10-26 01:43) @project(Cocoa specific)
   ✔ Implement window destroy properly @done(2015-10-26 02:04) @project(Cocoa specific)
+  ☐ Add window closed event
 
 Xlib specific:
   ✔ Match on clientmessage in ogamlWindow_xlib for safety @done(2015-10-20 20:29) @project(Xlib specific)
@@ -66,10 +67,10 @@ Math part:
   ✔ Add more complex functions to matrix3f (look_at, clipping, etc...) @done(2015-10-24 11:55) @project(Math part)
   ✔ Debug matrices... Really @done(2015-10-25 09:17) @project(Math part)
   ✔ Recode inverse matrices after debugging @done(2015-10-25 09:20) @project(Math part)
-  ☐ Matrices exceptions 
+  ☐ Matrices exceptions
   ☐ Implement Quaternions
   ✔ Implement polygons @done(2015-10-26 16:33) @project(Math part)
-  ☐ Parameterize Poly.axis with vector3f 
+  ☐ Parameterize Poly.axis with vector3f
 
 GL part:
   ☐ Let the user choose the usage of a vbo when setting data
@@ -88,5 +89,3 @@ GL part:
   ☐ Find a way to strongly type VAOs/VBOs ? @unsure
   ☐ Reorganize VAOs
   ☐ Fix shader compilation not returning an error when failing (use glGetShaderiv with GL_COMPILE_STATUS)
-
-

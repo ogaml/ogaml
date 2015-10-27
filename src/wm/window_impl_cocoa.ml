@@ -74,4 +74,5 @@ let poll_event win =
       )
   | None -> None
 
-let display win = ()
+let display win =
+  Cocoa.OGWindowController.flush_context win
