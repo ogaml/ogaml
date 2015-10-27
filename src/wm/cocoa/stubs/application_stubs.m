@@ -20,7 +20,7 @@
   }
 }
 
-+(void) setUpMenuBar
++(void)setUpMenuBar
 {
   [OGApplication sharedApplication]; // ensure NSApp
 
@@ -518,6 +518,11 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
   [self pushEvent:event];
 }
 
+-(void)flushGLContext
+{
+  [[m_view openGLContext] flushBuffer];
+}
+
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -610,6 +615,18 @@ caml_cocoa_window_controller_pop_event(value mlcontroller)
 
   if(event == nil) CAMLreturn(Val_none);
   else CAMLreturn(Val_some((value)event));
+}
+
+CAMLprim value
+caml_cocoa_controller_flush_glctx(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  [controller flushGLContext];
+
+  CAMLreturn(Val_unit);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

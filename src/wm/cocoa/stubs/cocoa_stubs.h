@@ -64,4 +64,6 @@
 
 -(NSEvent *)popEvent;
 
+-(void)flushGLContext;
+
 @end

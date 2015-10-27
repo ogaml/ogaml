@@ -176,4 +176,6 @@ module OGWindowController : sig
 
   val pop_event : t -> NSEvent.t option
 
+  val flush_context : t -> unit
+
 end
