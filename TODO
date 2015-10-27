@@ -88,4 +88,4 @@ GL part:
   ☐ Make a pervasives modules or something to hold clear, types, etc...
   ☐ Find a way to strongly type VAOs/VBOs ? @unsure
   ☐ Reorganize VAOs
-  ☐ Fix Error.get always returning None
+  ☐ Fix shader compilation not returning an error when failing (use glGetShaderiv with GL_COMPILE_STATUS)
