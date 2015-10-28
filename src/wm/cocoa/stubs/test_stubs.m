@@ -81,7 +81,9 @@ caml_open_window(value unit)
 
   // This should only be done once, but this is only for testing purposes
   [OGApplication sharedApplication];
-  [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+  #ifdef __OSX__
+    [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+  #endif
   [NSApp activateIgnoringOtherApps:YES];
 
   [[NSApplication sharedApplication] setDelegate:[OGApplicationDelegate new]];

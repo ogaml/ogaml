@@ -242,7 +242,9 @@ caml_cocoa_run_app(value unit)
 {
   [OGApplication sharedApplication];
   [OGApplication setUpMenuBar];
-  [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+  #ifdef __OSX__
+    [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+  #endif
 }
 
 -(void)applicationDidFinishLaunching:(NSNotification *)notification
@@ -450,7 +452,9 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
   // Setting the openGL view
   NSOpenGLPixelFormatAttribute pixelFormatAttributes[] =
   {
-    NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
+    #ifdef __OSX__
+      NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
+    #endif
     NSOpenGLPFAColorSize    , 24                           ,
     NSOpenGLPFAAlphaSize    , 8                            ,
     NSOpenGLPFADoubleBuffer ,
