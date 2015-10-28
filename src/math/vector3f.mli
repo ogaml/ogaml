@@ -36,6 +36,8 @@ val min : t -> float
 
 val normalize : t -> t
 
+val print : t -> string
+
 (* Returns the normalized direction vector from point1 to point 2 
  * Equivalent to normalize @ sub *)
 val direction : t -> t -> t
@@ -44,3 +46,5 @@ val direction : t -> t -> t
 val endpoint : t -> t -> float -> t
 
 val convert_array : t array -> float array
+
+val triangle_normal : t -> t -> t -> t

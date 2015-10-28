@@ -26,15 +26,15 @@ let identity () =
   done; m
 
 let print m = 
+  let s = ref "" in
   for i = 0 to 3 do
-    print_string "|";
+    s := Printf.sprintf "%s|" !s;
     for j = 0 to 2 do
-      print_float (get i j m);
-      print_string "; ";
+      s := Printf.sprintf "%s%f; " !s (get i j m) ;
     done;
-    print_float (get i 3 m);
-    print_endline "|";
-  done
+    s := Printf.sprintf "%s%f|\n" !s (get i 3 m);
+  done;
+  !s
 
 let translation v = 
   let open Vector3f in

@@ -71,7 +71,10 @@ let min v =
   min (min v.x v.y) v.z
 
 let angle u v =
-  atan2 (dot u v) (norm (cross u v))
+  atan2 (norm (cross u v)) (dot u v)
+
+let print u = 
+  Printf.sprintf "(x = %f; y = %f; z = %f)" u.x u.y u.z
 
 let direction u v = 
   sub v u
@@ -89,3 +92,7 @@ let convert_array t =
     new_array.(3*i+1) <- t.(i).y;
     new_array.(3*i+2) <- t.(i).z;
   done; new_array
+
+let triangle_normal a b c = 
+  let u,v = sub b a, sub c a in
+  normalize (cross u v)

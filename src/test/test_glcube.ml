@@ -12,22 +12,35 @@ let () =
   Config.set_front Config.CW;
   Config.set_color 1.0 1.0 1.0
 
+let initial_time = ref 0.
+
+let frame_count = ref 0
+
+
+
 
 (* Polygons *)
 let cube = 
-  let vertices = 
+  (*let vertices = 
     Poly.cube 
       Vector3f.({x = -0.5; y = -0.5; z = -0.5})
       Vector3f.({x = 1.; y = 1.; z = 1.})
+  in*)
+  let vertices = 
+    Poly.sphere 0.5 10
   in
-  let colors = Array.make (36*3) 0. in
+  let colors = Array.make (Array.length vertices) 1.0 in
+  for i = 0 to (Array.length vertices - 1) do
+    colors.(i) <- Random.float 1.0;
+  done;
+  (*let colors = Array.make (36*3) 0. in
   for i = 0 to 5 do
     for j = 0 to 5 do
       colors.(i*18+j*3+0) <- float_of_int (i/3);
       colors.(i*18+j*3+1) <- float_of_int ((i+1) mod 2);
       colors.(i*18+j*3+2) <- float_of_int (((max i 1) mod 5) mod 2); 
     done;
-  done;
+  done;*)
   Array.concat [vertices; colors]
 
 let axis = 
@@ -80,7 +93,7 @@ let () =
     ~attribute:(Program.attribute program "in_color")
     ~size:3
     ~kind:VAO.Float
-    ~offset:(36 * 12) ();
+    ~offset:((Array.length cube / 6) * 12) ();
   VBO.bind None;
   VAO.bind None
 
@@ -134,7 +147,7 @@ let display () =
   (* Display the cube *)
   Uniform.set (Uniform.Matrix4 (Matrix3f.to_bigarray mvp)) 
               (Program.uniform program "MVPMatrix");
-  VAO.bind_draw vao_cube VAO.Triangles 0 36;
+  VAO.bind_draw vao_cube VAO.Triangles 0 (Array.length cube / 6);
   (* Display the axis *)
   Uniform.set (Uniform.Matrix4 (Matrix3f.to_bigarray vp)) 
               (Program.uniform program "MVPMatrix");
@@ -148,8 +161,7 @@ let rec event_loop () =
   |Some e -> begin
     match e with
     |Event.Closed ->
-      Window.close win;
-      print_endline "window closed"
+      Window.close win
     |Event.KeyPressed ->
       print_endline "key pressed"
     |Event.ButtonPressed ->
@@ -166,13 +178,17 @@ let rec main_loop () =
     display ();
     Window.display win;
     event_loop ();
+    incr frame_count;
     main_loop ()
   end
 
 
 (* Start *)
 let () =
+  Printf.printf "Rendering %i vertices\n%!" (Array.length cube / 2);
+  initial_time := Unix.gettimeofday ();
   main_loop ();
+  Printf.printf "Avg FPS : %f\n%!" (float_of_int (!frame_count) /. (Unix.gettimeofday () -. !initial_time));
   Window.destroy win
 
 

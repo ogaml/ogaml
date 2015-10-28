@@ -12,8 +12,8 @@ val zero : unit -> t
 (* Identity matrix *)
 val identity : unit -> t
 
-(* Standard output pretty printer *)
-val print : t -> unit
+(* Pretty-printer to string *)
+val print : t -> string
 
 (* Translation matrix *)
 val translation : Vector3f.t -> t
