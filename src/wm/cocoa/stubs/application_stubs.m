@@ -461,7 +461,7 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
     NSOpenGLPFAAccelerated  ,
     0
   };
-  NSOpenGLPixelFormat *pixelFormat = [[[NSOpenGLPixelFormat alloc] initWithAttributes:&pixelFormatAttributes] autorelease];
+  NSOpenGLPixelFormat *pixelFormat = [[[NSOpenGLPixelFormat alloc] initWithAttributes:pixelFormatAttributes] autorelease];
   m_view = [[[OGOpenGLView alloc] initWithFrame:[[m_window contentView] bounds]
                                     pixelFormat:pixelFormat] autorelease];
 
