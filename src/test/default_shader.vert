@@ -1,12 +1,12 @@
-#version 130
+#version 120
 
 uniform mat4 MVPMatrix;
 
-in vec3 position;
+attribute vec3 position;
 
-in vec3 in_color;
+attribute vec3 in_color;
 
-out vec3 out_color;
+varying vec3 out_color;
 
 void main() {
 
