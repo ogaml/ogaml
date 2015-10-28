@@ -50,6 +50,7 @@
   BOOL m_windowIsOpen; // Luckily it is NO by default
   NSMutableArray* m_events;
   OGOpenGLView* m_view;
+  NSOpenGLContext* m_context;
 }
 
 -(id)initWithWindow:(NSWindow*)window;

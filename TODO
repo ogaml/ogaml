@@ -75,6 +75,7 @@ Math part:
 
 GL part:
   ☐ Let the user choose the usage of a vbo when setting data
+  ☐ Implement glGetString in config for debug
   ✔ Bind face culling, front_face @done(2015-10-26 21:31) @project(GL part)
   ✔ Bind gl_enable and options @done(2015-10-26 19:35) @project(GL part)
   ✔ Bind clear_color @done(2015-10-26 21:31) @project(GL part)
