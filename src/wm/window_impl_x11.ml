@@ -45,6 +45,8 @@ let close win =
   win.closed <- true
 
 let destroy win = 
+  Xlib.Window.detach win.display win.window;
+  Xlib.GLContext.destroy win.display win.context;
   Xlib.Window.destroy win.display win.window;
   win.closed <- true
 

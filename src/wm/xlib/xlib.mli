@@ -51,6 +51,8 @@ module GLContext : sig
 
   val create : Display.t -> VisualInfo.t -> t
 
+  val destroy : Display.t -> t -> unit
+
 end
 
 
@@ -59,6 +61,8 @@ module Window : sig
   type t
 
   val attach : Display.t -> t -> GLContext.t -> unit
+
+  val detach : Display.t -> t -> unit
 
   val root_of : ?screen:int -> Display.t -> t
 

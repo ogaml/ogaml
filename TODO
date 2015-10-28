@@ -39,8 +39,8 @@ Xlib specific:
   ✔ Implement caml_glx_create_context @done(2015-10-23 23:24) @project(Xlib specific)
   ✔ Implement caml_glx_make_current @done(2015-10-23 23:24) @project(Xlib specific)
   ✔ Implement caml_glx_swap_buffers @done(2015-10-23 23:24) @project(Xlib specific)
-  ☐ Correctly free glx calls when destroying window
-  ☐ Binding GLX ** (later)
+  ✔ Correctly free glx calls when destroying window @done(2015-10-28 09:43) @project(Xlib specific)
+  ✔ Binding GLX ** (later) @done(2015-10-28 09:43) @project(Xlib specific)
 
 General:
   ☐ Make a log system ? @unsure
@@ -84,9 +84,12 @@ GL part:
   ✔ Bind VAOs & attributes @done(2015-10-27 10:57) @project(GL part)
   ✔ Bind uniform setting @done(2015-10-26 23:08) @project(GL part)
   ✔ Reabstract types in buffers and program after debugging @done(2015-10-27 12:20) @project(GL part)
-  ☐ Merge Math and GL modules, or make GL depend on Math (for uniform setting)
+  ✘ Merge Math and GL modules, or make GL depend on Math (for uniform setting) -- would remove generality of matrix uniforms @cancelled(2015-10-28 09:36) @project(GL part)
   ☐ Better support for uint uniforms and array uniforms
   ☐ Make a pervasives modules or something to hold clear, types, etc...
   ☐ Find a way to strongly type VAOs/VBOs ? @unsure
   ☐ Reorganize VAOs
   ☐ Fix shader compilation not returning an error when failing (use glGetShaderiv with GL_COMPILE_STATUS)
+
+
+

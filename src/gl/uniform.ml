@@ -100,15 +100,15 @@ let set v loc =
   | UInt2 (i1,i2)       -> abstract_uniform2ui loc i1 i2
   | UInt3 (i1,i2,i3)    -> abstract_uniform3ui loc i1 i2 i3
   | UInt4 (i1,i2,i3,i4) -> abstract_uniform4ui loc i1 i2 i3 i4
-  | Matrix2   d -> abstract_uniformmat2 loc d
-  | Matrix3   d -> abstract_uniformmat3 loc d
-  | Matrix4   d -> abstract_uniformmat4 loc d
-  | Matrix2x3 d -> abstract_uniformmat23 loc d
-  | Matrix3x2 d -> abstract_uniformmat32 loc d
-  | Matrix2x4 d -> abstract_uniformmat24 loc d
-  | Matrix4x2 d -> abstract_uniformmat42 loc d
-  | Matrix3x4 d -> abstract_uniformmat34 loc d
-  | Matrix4x3 d -> abstract_uniformmat43 loc d
+  | Matrix2   d         -> abstract_uniformmat2 loc d
+  | Matrix3   d         -> abstract_uniformmat3 loc d
+  | Matrix4   d         -> abstract_uniformmat4 loc d
+  | Matrix2x3 d         -> abstract_uniformmat23 loc d
+  | Matrix3x2 d         -> abstract_uniformmat32 loc d
+  | Matrix2x4 d         -> abstract_uniformmat24 loc d
+  | Matrix4x2 d         -> abstract_uniformmat42 loc d
+  | Matrix3x4 d         -> abstract_uniformmat34 loc d
+  | Matrix4x3 d         -> abstract_uniformmat43 loc d
 
 
 

@@ -101,6 +101,8 @@ module GLContext = struct
   (* Exposed functions *)
   external create : Display.t -> VisualInfo.t -> t = "caml_glx_create_context"
 
+  external destroy : Display.t -> t -> unit = "caml_glx_destroy_context"
+
 end
 
 
@@ -118,9 +120,11 @@ module Window = struct
     Display.t -> t -> (int * int) -> (int * int) -> int -> t
     = "caml_xcreate_simple_window"
 
-  
+
   (* Exposed functions *)
   external attach : Display.t -> t -> GLContext.t -> unit = "caml_glx_make_current"
+
+  external detach : Display.t -> t -> unit = "caml_glx_remove_current"
 
   external map : Display.t -> t -> unit = "caml_xmap_window"
 

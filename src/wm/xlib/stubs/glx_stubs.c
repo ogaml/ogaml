@@ -102,5 +102,26 @@ caml_glx_make_current(value disp, value win, value ctx)
 }
 
 
+// INPUT   : a display, a window 
+// OUTPUT  : nothing, removes the current context of the window
+CAMLprim value
+caml_glx_remove_current(value disp, value win)
+{
+  CAMLparam2(disp, win);
+  glXMakeCurrent((Display*)disp, (Window)win, NULL);
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   : a display, a context
+// OUTPUT  : nothing, frees the context
+CAMLprim value
+caml_glx_destroy_context(value disp, value ctx)
+{
+  CAMLparam2(disp, ctx);
+  glXDestroyContext((Display*)disp, (GLXContext)ctx);
+  CAMLreturn(Val_unit);
+}
+
 
 

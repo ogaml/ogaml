@@ -461,10 +461,7 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
   m_view = [[[OGOpenGLView alloc] initWithFrame:[[m_window contentView] bounds]
                                     pixelFormat:pixelFormat] autorelease];
 
-  // [m_window setContentView:m_view];
-  [[m_window contentView] addSubview:m_view];
-
-  [[m_view openGLContext] makeCurrentContext];
+  [m_window setContentView:m_view];
 
   return self;
 }
@@ -533,6 +530,7 @@ caml_cocoa_window_set_autodisplay(value mlwindow, value mlbool)
 
 -(void)flushGLContext
 {
+  [[m_view openGLContext] makeCurrentContext];
   [[m_view openGLContext] flushBuffer];
 }
 
