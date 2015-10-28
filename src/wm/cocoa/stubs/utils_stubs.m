@@ -1,5 +1,21 @@
 #import "cocoa_stubs.h"
 
+// AutoReleasePool binding
+//////////////////////////
+static NSAutoreleasePool* arp = nil;
+
+CAMLprim value
+caml_init_arp(value unit)
+{
+  CAMLparam0();
+
+  if(arp == nil) {
+    arp = [[NSAutoreleasePool alloc] init];
+  }
+
+  CAMLreturn(Val_unit);
+}
+
 // NSRect binding
 /////////////////
 

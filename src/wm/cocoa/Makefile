@@ -10,13 +10,13 @@ CSOURCES = $(STUBS_DIR)/utils_stubs.m $(STUBS_DIR)/opengl_stubs.m\
 		 $(STUBS_DIR)/window_stubs.m\
 		 $(STUBS_DIR)/window_controller_stubs.m\
 		 $(STUBS_DIR)/event_stubs.m\
-	   $(STUBS_DIR)/test_stubs.m ../../utils/stubs.c
+	   ../../utils/stubs.c
 
 COBJS = $(CSOURCES:.c=.o) $(CSOURCES:.m=.o)
 
 COBJS2 = utils_stubs.o opengl_stubs.o application_stubs.o\
  	       application_delegate_stubs.o window_stubs.o window_controller_stubs.o\
-				 event_stubs.o test_stubs.o stubs.o
+				 event_stubs.o stubs.o
 
 MLSOURCES = cocoa.ml cocoa.mli
 
