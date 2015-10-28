@@ -18,9 +18,15 @@ MLOBJS = $(MLSOURCES:.ml=.cmx)
 
 CLIB = cocoa_stubs
 
-COPTS = -fconstant-string-class=NSConstantString
+ifeq ($(OS_NAME), LINUX)
+  COPTS = -MMD -MP -DGNUSTEP -DGNUSTEP_BASE_LIBRARY=1 -DGNU_GUI_LIBRARY=1 -DGNU_RUNTIME=1 -DGNUSTEP_BASE_LIBRARY=1 -fno-strict-aliasing -fexceptions -fobjc-exceptions -D_NATIVE_OBJC_EXCEPTIONS -pthread -fPIC -Wall -DGSWARN -DGSDIAGNOSE -Wno-import -g -O2 -fgnu-runtime -fconstant-string-class=NSConstantString -I. -I/home/victor/GNUstep/Library/Headers -I/usr/local/include/GNUstep -I/usr/include/GNUstep
+  LIBS  = -rdynamic -shared-libgcc -pthread -fexceptions -fgnu-runtime -L/home/victor/GNUstep/Library/Libraries -L/usr/local/lib -L/usr/lib -lgnustep-gui -lgnustep-base -lobjc -lm
+endif
+ifeq ($(OS_NAME), OSX)
+  COPTS = -fconstant-string-class=NSConstantString
+  LIBS = -framework Foundation -framework Cocoa -lobjc
+endif
 
-LIBS = -framework Foundation -framework Cocoa -lobjc
 
 
 # Compilation
