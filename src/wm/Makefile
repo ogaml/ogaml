@@ -35,20 +35,14 @@ compile_window_byte: .depend compile_os_lib $(MLCMIS) $(MLOBJS)
 	$(OCAMLC) -pack -o $(MLLIB).cmo $(MLCMIS) $(MLOBJS);
 	$(OCAMLC) -a -o $(MLLIB).cma $(INCLUDE_DIRS) $(MLLIB).cmo -cclib -l$(strip $(OS_WIN_STUBS))
 
-%.cma:%.cmo 
-	$(OCAMLC) -a -o $@ $(INCLUDE_DIRS) $< -dllib -l$(strip $(OS_WIN_STUBS))
-
-%.cmxa:%.cmx
-	$(OCAMLOPT) -a -o $@ $(INCLUDE_DIRS) $< -cclib -l$(strip $(OS_WIN_STUBS))
-
 %.cmi:%.mli
 	$(OCAMLC) -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLOPT) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) $< -cclib -l$(strip $(OS_WIN_STUBS))
+	$(OCAMLOPT) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) $<
 
 %.cmo:%.ml
-	$(OCAMLC) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) $< -dllib -l$(strip $(OS_WIN_STUBS))
+	$(OCAMLC) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) $<
 
 %.ml:%.mlpp %.cmi
 	$(PPCOMMAND) -o $@ $<

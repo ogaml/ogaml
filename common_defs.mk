@@ -20,7 +20,7 @@ ifeq ($(UNAME), Linux)
     OS_WIN_STUBS_TEST = ctest_simple
   else 
     PP_DEFINE = __LINUX__
-    OS_WIN_STUBS = xlib_stubs
+    OS_WIN_STUBS = xlib
     OS_WIN_STUBS_DIR = xlib/
     OS_WIN_STUBS_TEST = xtest_glcube
   endif

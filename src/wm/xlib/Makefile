@@ -16,7 +16,7 @@ MLSOURCES = xlib.ml
 
 MLOBJS = $(MLSOURCES:.ml=.cmx)
 
-CLIB = xlib_stubs
+CLIB = xlib
 
 COPTS = 
 

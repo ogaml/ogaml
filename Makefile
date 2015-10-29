@@ -15,7 +15,7 @@ WINDOW_FILES = src/wm/*.a src/wm/*.cmx src/wm/*.cmi src/wm/*.mli src/wm/*.cma sr
 
 WMLIB_FILES = src/wm/$(strip $(OS_WIN_STUBS_DIR))*.a   src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmx\
 	      src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmi src/wm/$(strip $(OS_WIN_STUBS_DIR))*.mli\
-	      src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmxa #src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmxa\
+	      src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmxa #src/wm/$(strip $(OS_WIN_STUBS_DIR))*.so\
 	      #src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmo
 
 PACKAGES = -package bigarray,unix
