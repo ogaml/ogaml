@@ -1,17 +1,17 @@
-#version 120
+#version 130
 
 uniform mat4 MVPMatrix;
 
-attribute vec3 position;
+in vec3 position;
 
-attribute vec3 in_color;
+in vec3 in_color;
 
-varying vec3 out_color;
+out vec3 out_color;
 
 void main() {
 
     gl_Position = MVPMatrix * vec4(position, 1.0);
 
-    out_color = in_color;
+    out_color = in_color;//(vec3(1.0, 1.0, 1.0) + in_color) / 2.0;
 
 }

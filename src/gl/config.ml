@@ -1,29 +1,29 @@
 type capability = 
-    | ClipDistance of int
-    | Blend
-    | ColorLogicOp
-    | CullFace
-    | DepthClamp
-    | DepthTest
-    | Dither
-    | FramebufferSRGB
-    | LineSmooth
-    | Multisample
-    | PolygonOffsetFill
-    | PolygonOffsetLine
-    | PolygonOffsetPoint
-    | PolygonSmooth
-    | PrimitiveRestart
-    | RasterizerDiscard
-    | SampleAlphaToCoverage
-    | SampleAlphaToOne
-    | SampleCoverage
-    | SampleShading
-    | SampleMask
-    | ScissorTest
-    | StencilTest
-    | TextureCubeMapSeamless
-    | ProgramPointSize
+  | ClipDistance of int
+  | Blend
+  | ColorLogicOp
+  | CullFace
+  | DepthClamp
+  | DepthTest
+  | Dither
+  | FramebufferSRGB
+  | LineSmooth
+  | Multisample
+  | PolygonOffsetFill
+  | PolygonOffsetLine
+  | PolygonOffsetPoint
+  | PolygonSmooth
+  | PrimitiveRestart
+  | RasterizerDiscard
+  | SampleAlphaToCoverage
+  | SampleAlphaToOne
+  | SampleCoverage
+  | SampleShading
+  | SampleMask
+  | ScissorTest
+  | StencilTest
+  | TextureCubeMapSeamless
+  | ProgramPointSize
 
 type face = 
   | Back
@@ -40,9 +40,13 @@ external disable : capability list -> unit = "caml_gl_disable_list"
 
 external set_culling : face -> unit = "caml_gl_cull_face"
 
-external set_front : orientation -> unit = "caml_gl_front_face"
+external set_front_face : orientation -> unit = "caml_gl_front_face"
 
-external set_color : float -> float -> float -> unit = "caml_gl_clear_color"
+external set_clear_color : float -> float -> float -> unit = "caml_gl_clear_color"
 
 external clear : unit -> unit = "caml_gl_clear"
+
+external version : unit -> string = "caml_gl_version"
+
+external glsl_version : unit -> string = "caml_glsl_version"
 

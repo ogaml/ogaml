@@ -3,8 +3,8 @@ type t = float array
 
 let cube corner size = 
   let open Vector3f in
-  let fdl, ful, fur, fdr, 
-      bdl, bul, bur, bdr 
+  let bdl, bul, bur, bdr, 
+      fdl, ful, fur, fdr 
       =
       corner,
       add corner {x = 0.; y = size.y; z = 0.},

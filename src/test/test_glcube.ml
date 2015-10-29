@@ -7,10 +7,12 @@ open OgamlGL.Buffers
 let win = Window.create ~width:800 ~height:600
 
 let () = 
+  Printf.printf "OpenGL version : %s\n%!" (Config.version ());
+  Printf.printf "OpenGL Shading Language (GLSL) version : %s\n%!" (Config.glsl_version ());
   Config.enable [Config.DepthTest; Config.CullFace];
   Config.set_culling Config.Back;
-  Config.set_front Config.CW;
-  Config.set_color 1.0 1.0 1.0
+  Config.set_front_face Config.CW;
+  Config.set_clear_color 1.0 1.0 1.0
 
 let initial_time = ref 0.
 
@@ -21,28 +23,20 @@ let frame_count = ref 0
 
 (* Polygons *)
 let cube = 
-  (*let vertices = 
+  let vertices = 
     Poly.cube 
       Vector3f.({x = -0.5; y = -0.5; z = -0.5})
       Vector3f.({x = 1.; y = 1.; z = 1.})
-  in*)
-  let vertices = 
-    Poly.sphere_n 0.5 10
   in
-  (*let colors = Array.make (Array.length vertices) 1.0 in
-  for i = 0 to (Array.length vertices - 1) do
-    colors.(i) <- Random.float 1.0;
-  done;*)
-  (*let colors = Array.make (36*3) 0. in
+  let colors = Array.make (36*3) 0. in
   for i = 0 to 5 do
     for j = 0 to 5 do
       colors.(i*18+j*3+0) <- float_of_int (i/3);
       colors.(i*18+j*3+1) <- float_of_int ((i+1) mod 2);
       colors.(i*18+j*3+2) <- float_of_int (((max i 1) mod 5) mod 2); 
     done;
-  done;*)
-(*   Array.concat [vertices; colors] *)
-  vertices
+  done;
+  Array.concat [vertices; colors]
 
 let axis = 
   let vertices = Poly.axis 0. 30. in

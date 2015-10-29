@@ -154,6 +154,26 @@ caml_gl_clear_color(value r, value g, value b)
 }
 
 
+// INPUT   nothing
+// OUTPUT  the current GL version
+CAMLprim value
+caml_gl_version(value unit)
+{
+  CAMLparam0();
+  CAMLreturn(caml_copy_string(glGetString(GL_VERSION)));
+}
+
+
+// INPUT   nothing
+// OUTPUT  the current GLSL version
+CAMLprim value
+caml_glsl_version(value unit)
+{
+  CAMLparam0();
+  CAMLreturn(caml_copy_string(glGetString(GL_SHADING_LANGUAGE_VERSION)));
+}
+
+
 // temp
 CAMLprim value
 caml_gl_clear(value unit)
