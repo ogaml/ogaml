@@ -7,7 +7,7 @@ open OgamlGL.Buffers
 let win = Window.create ~width:800 ~height:600
 
 let () = 
-  Config.enable [Config.DepthTest];
+  Config.enable [Config.DepthTest; Config.CullFace];
   Config.set_culling Config.Back;
   Config.set_front Config.CW;
   Config.set_color 1.0 1.0 1.0
@@ -27,12 +27,12 @@ let cube =
       Vector3f.({x = 1.; y = 1.; z = 1.})
   in*)
   let vertices = 
-    Poly.sphere 0.5 10
+    Poly.sphere_n 0.5 10
   in
-  let colors = Array.make (Array.length vertices) 1.0 in
+  (*let colors = Array.make (Array.length vertices) 1.0 in
   for i = 0 to (Array.length vertices - 1) do
     colors.(i) <- Random.float 1.0;
-  done;
+  done;*)
   (*let colors = Array.make (36*3) 0. in
   for i = 0 to 5 do
     for j = 0 to 5 do
@@ -41,7 +41,8 @@ let cube =
       colors.(i*18+j*3+2) <- float_of_int (((max i 1) mod 5) mod 2); 
     done;
   done;*)
-  Array.concat [vertices; colors]
+(*   Array.concat [vertices; colors] *)
+  vertices
 
 let axis = 
   let vertices = Poly.axis 0. 30. in

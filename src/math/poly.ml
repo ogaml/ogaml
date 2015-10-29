@@ -117,7 +117,7 @@ let sphere radius precision =
       {r = radius; t = (fi +. 1.) *. unit_angle; p = fj         *. unit_angle} |> to_cartesian,
       {r = radius; t = fi         *. unit_angle; p = (fj +. 1.) *. unit_angle} |> to_cartesian
     ) in
-    sphere.(ii + jj) <- p1; sphere.(ii + jj + 1) <- p2; sphere.(ii + jj + 2) <- p3;
+    sphere.(ii + jj) <- p3; sphere.(ii + jj + 1) <- p2; sphere.(ii + jj + 2) <- p1;
 
     (* south pole *)
     let jj = 12 * precision + 3 in

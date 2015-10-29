@@ -32,7 +32,10 @@
 {
   [OGApplication sharedApplication];
 
-  // [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+  #ifdef __OSX__
+    [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+  #endif
+
   [NSApp activateIgnoringOtherApps:YES];
 }
 
