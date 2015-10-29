@@ -56,19 +56,19 @@ Window part:
   ☐ Window attributes abstract type ? May contain title, size, etc @unsure
   ☐ Same for GL context attributes ? @unsure
   ☐ Real-time state Keyboard and Mouse module *
-  ☐ Graphical functions display & clear - requires binding GLX for X11 **
+  ✔ Graphical functions display & clear - requires binding GLX for X11 ** @done(2015-10-29 18:33) @project(Window part)
 
 Math part:
-  ☐ Fix a notation convention
+  ✔ Fix a notation convention @done(2015-10-29 18:32) @project(Math part)
   ✔ Implement Vector3f @done(2015-10-24 10:07) @project(Math part)
   ✔ Write a Makefile @done(2015-10-24 10:12) @project(Math part)
-  ☐ Write tests
+  ✔ Write tests @done(2015-10-29 18:32) @project(Math part)
   ✔ Implement Matrix3f @done(2015-10-24 11:10) @project(Math part)
   ☐ Implement Vector3i
   ✔ Add more complex functions to matrix3f (look_at, clipping, etc...) @done(2015-10-24 11:55) @project(Math part)
   ✔ Debug matrices... Really @done(2015-10-25 09:17) @project(Math part)
   ✔ Recode inverse matrices after debugging @done(2015-10-25 09:20) @project(Math part)
-  ☐ Matrices exceptions
+  ☐ Matrices and vector exceptions
   ☐ Implement Quaternions
   ✔ Implement polygons @done(2015-10-26 16:33) @project(Math part)
   ☐ Parameterize Poly.axis with vector3f

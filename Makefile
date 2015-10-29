@@ -3,13 +3,20 @@ include common_defs.mk
 
 # Window constants
 
-WINDOW_INCLUDES = -I src/wm -I src/wm/$(strip $(OS_WIN_STUBS_DIR)) -I src/math -I src/gl
+INCLUDES = -I src/wm -I src/wm/$(strip $(OS_WIN_STUBS_DIR)) -I src/math -I src/gl
 
-WINDOW_CMXA = $(OS_WIN_STUBS).cmxa ogamlWindow.cmxa
+MODULES = $(OS_WIN_STUBS).cmxa ogamlWindow.cmxa ogamlMath.cmxa ogamlGL.cmxa
 
-MATH_CMXA = ogamlMath.cmxa
+GL_FILES = src/gl/*.a src/gl/*.cmx src/gl/*.cmi src/gl/*.mli src/gl/*.cma src/gl/*.cmxa src/gl/*.cmo
 
-GL_CMXA = ogamlGL.cmxa
+MATH_FILES = src/math/*.a src/math/*.cmx src/math/*.cmi src/math/*.mli src/math/*.cma src/math/*.cmxa src/math/*.cmo
+
+WINDOW_FILES = src/wm/*.a src/wm/*.cmx src/wm/*.cmi src/wm/*.mli src/wm/*.cma src/wm/*.cmxa src/wm/*.cmo
+
+WMLIB_FILES = src/wm/$(strip $(OS_WIN_STUBS_DIR))*.a   src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmx\
+	      src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmi src/wm/$(strip $(OS_WIN_STUBS_DIR))*.mli\
+	      src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmxa #src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmxa\
+	      #src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmo
 
 PACKAGES = -package bigarray,unix
 
@@ -39,19 +46,25 @@ gl_lib:
 	cd src/gl/ && make
 
 window_test: window_lib math_lib gl_lib
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(WINDOW_INCLUDES)\
-	  $(WINDOW_CMXA) $(MATH_CMXA) $(GL_CMXA) $(WINDOW_TEST)
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(INCLUDES)\
+	  $(MODULES) $(WINDOW_TEST)
 
 math_test: math_lib
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(WINDOW_INCLUDES)\
-	  $(MATH_CMXA) $(MATH_TEST)
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(INCLUDES)\
+	  $(MODULES) $(MATH_TEST)
 
 stubs_test: stubs_lib math_lib gl_lib
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(WINDOW_INCLUDES)\
-	  $(OS_WIN_STUBS).cmxa $(MATH_CMXA) $(GL_CMXA) $(STUBS_TEST)
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(INCLUDES)\
+	  $(MODULES) $(STUBS_TEST)
 
 stubs_lib:
 	cd src/wm/$(strip $(OS_WIN_STUBS_DIR)) && make
+
+install:
+	$(OCAMLFIND) install ogaml META $(GL_FILES) $(MATH_FILES) $(WINDOW_FILES) $(WMLIB_FILES)
+
+uninstall:
+	$(OCAMLFIND) remove "ogaml"
 
 clean:
 	rm -rf *.out;

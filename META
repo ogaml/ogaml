@@ -1,0 +1,24 @@
+name = "ogaml"
+version = "0.01a"
+description = "ocaml multimedia library"
+
+package "window" (
+  requires = "bigarray,unix"
+  archive(byte) = "ogamlWindow.cma"
+  archive(toploop) = "ogamlWindow.cma"
+  archive(native) = "ogamlWindow.cmxa"
+)
+
+package "gl" (
+  requires = "bigarray,unix"
+  archive(byte) = "ogamlGL.cma"
+  archive(toploop) = "ogamlGL.cma"
+  archive(native) = "ogamlGL.cmxa"
+)
+
+package "math" (
+  requires = "bigarray,unix"
+  archive(byte) = "ogamlMath.cma"
+  archive(toploop) = "ogamlMath.cma"
+  archive(native) = "ogamlMath.cmxa"
+)
