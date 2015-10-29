@@ -7,20 +7,15 @@
 CAMLprim value
 caml_cocoa_init_pixelformat_with_attributes(value mlattributes)
 {
-  CAMLparam1(mlattributes); // Ignored for now
+  CAMLparam1(mlattributes);
+  int i, len;
+  len = Wosize_val(mlattributes);
+  NSOpenGLPixelFormatAttribute attributes[len];
 
-  NSOpenGLPixelFormatAttribute attributes[] =
+  for (i=0; i < len; i++)
   {
-    #ifdef __APPLE__
-      NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
-    #endif
-    NSOpenGLPFAColorSize    , 24                           ,
-    NSOpenGLPFAAlphaSize    , 8                            ,
-    NSOpenGLPFADepthSize    , 24                           ,
-    NSOpenGLPFADoubleBuffer ,
-    NSOpenGLPFAAccelerated  ,
-    0
-  };
+    attributes[i] = Int_val(Field(mlattributes, i));
+  }
 
   id format = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
 

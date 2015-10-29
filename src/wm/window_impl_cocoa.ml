@@ -44,7 +44,17 @@ let create ~width ~height =
   let win_ctrl = Cocoa.OGWindowController.init_with_window window in
 
   (* But first we create and apply a new openGL context *)
-  let pixel_format = Cocoa.NSOpenGLPixelFormat.init_with_attributes [] in
+  let attr = Cocoa.NSOpenGLPixelFormat.([
+    #ifdef __OSX__
+    NSOpenGLPFAOpenGLProfile NSOpenGLProfileVersion3_2Core;
+    #endif
+    NSOpenGLPFAColorSize 24 ;
+    NSOpenGLPFAAlphaSize 8  ;
+    NSOpenGLPFADepthSize 24 ;
+    NSOpenGLPFADoubleBuffer ;
+    NSOpenGLPFAAccelerated
+  ]) in
+  let pixel_format = Cocoa.NSOpenGLPixelFormat.init_with_attributes attr in
   let context = Cocoa.NSOpenGLContext.init_with_format pixel_format in
   Cocoa.OGWindowController.set_context win_ctrl context ;
 

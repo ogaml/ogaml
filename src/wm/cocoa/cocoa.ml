@@ -88,8 +88,106 @@ module NSOpenGLPixelFormat = struct
 
   type t
 
-  external init_with_attributes : int list -> t
+  type profile =
+    | NSOpenGLProfileVersionLegacy
+    | NSOpenGLProfileVersion3_2Core
+
+  type attribute =
+    | NSOpenGLPFAAllRenderers
+    | NSOpenGLPFADoubleBuffer
+    | NSOpenGLPFATripleBuffer
+    | NSOpenGLPFAStereo
+    | NSOpenGLPFAAuxBuffers         of int
+    | NSOpenGLPFAColorSize          of int
+    | NSOpenGLPFAAlphaSize          of int
+    | NSOpenGLPFADepthSize          of int
+    | NSOpenGLPFAStencilSize        of int
+    | NSOpenGLPFAAccumSize          of int
+    | NSOpenGLPFAMinimumPolicy
+    | NSOpenGLPFAMaximumPolicy
+    | NSOpenGLPFAOffScreen
+    | NSOpenGLPFAFullScreen
+    | NSOpenGLPFASampleBuffers      of int
+    | NSOpenGLPFASamples            of int
+    | NSOpenGLPFAAuxDepthStencil
+    | NSOpenGLPFAColorFloat
+    | NSOpenGLPFAMultisample
+    | NSOpenGLPFASupersample
+    | NSOpenGLPFASampleAlpha
+    | NSOpenGLPFARendererID         of int
+    | NSOpenGLPFASingleRenderer
+    | NSOpenGLPFANoRecovery
+    | NSOpenGLPFAAccelerated
+    | NSOpenGLPFAClosestPolicy
+    | NSOpenGLPFARobust
+    | NSOpenGLPFABackingStore
+    | NSOpenGLPFAMPSafe
+    | NSOpenGLPFAWindow
+    | NSOpenGLPFAMultiScreen
+    | NSOpenGLPFACompliant
+    | NSOpenGLPFAScreenMask         of int (* TODO int is for mask, go list *)
+    | NSOpenGLPFAPixelBuffer
+    | NSOpenGLPFARemotePixelBuffer
+    | NSOpenGLPFAAllowOfflineRenderers
+    | NSOpenGLPFAAcceleratedCompute
+    | NSOpenGLPFAOpenGLProfile      of profile
+    | NSOpenGLPFAVirtualScreenCount of int
+
+  external abstract_init_with_attributes : int array -> t
     = "caml_cocoa_init_pixelformat_with_attributes"
+
+  let init_with_attributes attributes =
+    let profile_to_int = function
+      | NSOpenGLProfileVersionLegacy  -> 0x1000
+      | NSOpenGLProfileVersion3_2Core -> 0x3200
+    in
+    let to_ints = function
+      | NSOpenGLPFAAllRenderers          -> [1]
+      | NSOpenGLPFADoubleBuffer          -> [5]
+      | NSOpenGLPFATripleBuffer          -> [3]
+      | NSOpenGLPFAStereo                -> [6]
+      | NSOpenGLPFAAuxBuffers i          -> [7;i]
+      | NSOpenGLPFAColorSize i           -> [8;i]
+      | NSOpenGLPFAAlphaSize i           -> [11;i]
+      | NSOpenGLPFADepthSize i           -> [12;i]
+      | NSOpenGLPFAStencilSize i         -> [13;i]
+      | NSOpenGLPFAAccumSize i           -> [14;i]
+      | NSOpenGLPFAMinimumPolicy         -> [51]
+      | NSOpenGLPFAMaximumPolicy         -> [52]
+      | NSOpenGLPFAOffScreen             -> [53]
+      | NSOpenGLPFAFullScreen            -> [54]
+      | NSOpenGLPFASampleBuffers i       -> [55;i]
+      | NSOpenGLPFASamples i             -> [56;i]
+      | NSOpenGLPFAAuxDepthStencil       -> [57]
+      | NSOpenGLPFAColorFloat            -> [58]
+      | NSOpenGLPFAMultisample           -> [59]
+      | NSOpenGLPFASupersample           -> [60]
+      | NSOpenGLPFASampleAlpha           -> [61]
+      | NSOpenGLPFARendererID i          -> [70;i]
+      | NSOpenGLPFASingleRenderer        -> [71]
+      | NSOpenGLPFANoRecovery            -> [72]
+      | NSOpenGLPFAAccelerated           -> [73]
+      | NSOpenGLPFAClosestPolicy         -> [74]
+      | NSOpenGLPFARobust                -> [75]
+      | NSOpenGLPFABackingStore          -> [76]
+      | NSOpenGLPFAMPSafe                -> [78]
+      | NSOpenGLPFAWindow                -> [80]
+      | NSOpenGLPFAMultiScreen           -> [81]
+      | NSOpenGLPFACompliant             -> [83]
+      | NSOpenGLPFAScreenMask i          -> [84;i]
+      | NSOpenGLPFAPixelBuffer           -> [90]
+      | NSOpenGLPFARemotePixelBuffer     -> [91]
+      | NSOpenGLPFAAllowOfflineRenderers -> [96]
+      | NSOpenGLPFAAcceleratedCompute    -> [97]
+      | NSOpenGLPFAOpenGLProfile p       -> [99;profile_to_int p]
+      | NSOpenGLPFAVirtualScreenCount i  -> [128;i]
+    in
+    let rec map0 f = function
+      | e :: r -> (f e) :: (map0 f r)
+      | []     -> [[0]]
+    in
+    let arg = Array.of_list (List.flatten (map0 to_ints attributes)) in
+    abstract_init_with_attributes arg
 
 end
 

@@ -82,8 +82,53 @@ module NSOpenGLPixelFormat : sig
 
   type t
 
+  type profile =
+    | NSOpenGLProfileVersionLegacy
+    | NSOpenGLProfileVersion3_2Core
+
+  type attribute =
+    | NSOpenGLPFAAllRenderers
+    | NSOpenGLPFADoubleBuffer
+    | NSOpenGLPFATripleBuffer
+    | NSOpenGLPFAStereo
+    | NSOpenGLPFAAuxBuffers         of int
+    | NSOpenGLPFAColorSize          of int
+    | NSOpenGLPFAAlphaSize          of int
+    | NSOpenGLPFADepthSize          of int
+    | NSOpenGLPFAStencilSize        of int
+    | NSOpenGLPFAAccumSize          of int
+    | NSOpenGLPFAMinimumPolicy
+    | NSOpenGLPFAMaximumPolicy
+    | NSOpenGLPFAOffScreen
+    | NSOpenGLPFAFullScreen
+    | NSOpenGLPFASampleBuffers      of int
+    | NSOpenGLPFASamples            of int
+    | NSOpenGLPFAAuxDepthStencil
+    | NSOpenGLPFAColorFloat
+    | NSOpenGLPFAMultisample
+    | NSOpenGLPFASupersample
+    | NSOpenGLPFASampleAlpha
+    | NSOpenGLPFARendererID         of int
+    | NSOpenGLPFASingleRenderer
+    | NSOpenGLPFANoRecovery
+    | NSOpenGLPFAAccelerated
+    | NSOpenGLPFAClosestPolicy
+    | NSOpenGLPFARobust
+    | NSOpenGLPFABackingStore
+    | NSOpenGLPFAMPSafe
+    | NSOpenGLPFAWindow
+    | NSOpenGLPFAMultiScreen
+    | NSOpenGLPFACompliant
+    | NSOpenGLPFAScreenMask         of int (* TODO int is for mask, go list *)
+    | NSOpenGLPFAPixelBuffer
+    | NSOpenGLPFARemotePixelBuffer
+    | NSOpenGLPFAAllowOfflineRenderers
+    | NSOpenGLPFAAcceleratedCompute
+    | NSOpenGLPFAOpenGLProfile      of profile
+    | NSOpenGLPFAVirtualScreenCount of int
+
   (* TODO Change int *)
-  val init_with_attributes : int list -> t
+  val init_with_attributes : attribute list -> t
 
 end
 
