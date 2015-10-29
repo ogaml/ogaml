@@ -28,9 +28,9 @@ MLLIB = ogamlGL
 
 PACKNAME = OgamlGL
 
-COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast
+COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast -Wno-pointer-sign
 
-LIBS = 
+LIBS =
 
 ifeq ($(OS_NAME), LINUX)
   LIBS = -lGL
