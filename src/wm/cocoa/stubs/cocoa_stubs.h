@@ -2,11 +2,11 @@
 
 #ifndef __APPLE__
 #define strong retain
-#import <OpenGL/OpenGL.h>
 #endif
 
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
+
 
 // Custom OpenGLView that handles events
 ////////////////////////////////////////

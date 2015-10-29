@@ -9,7 +9,7 @@ PP_DEFINE =
 
 UNAME := $(shell uname)
 
-COMPATIBILITY_MODE = True
+COMPATIBILITY_MODE = False
 
 ifeq ($(UNAME), Linux)
   OS_NAME = LINUX
