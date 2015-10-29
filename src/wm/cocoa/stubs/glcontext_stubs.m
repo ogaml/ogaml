@@ -16,6 +16,7 @@ caml_cocoa_init_pixelformat_with_attributes(value mlattributes)
     #endif
     NSOpenGLPFAColorSize    , 24                           ,
     NSOpenGLPFAAlphaSize    , 8                            ,
+    NSOpenGLPFADepthSize    , 24                           ,
     NSOpenGLPFADoubleBuffer ,
     NSOpenGLPFAAccelerated  ,
     0
