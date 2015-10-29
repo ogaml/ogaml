@@ -82,3 +82,22 @@ caml_gl_shader_infolog(value id)
 }
 
 
+// INPUT   a shader id
+// OUTPUT  true iff the shader compiled successfully 
+CAMLprim value
+caml_gl_shader_compiled(value id)
+{
+  CAMLparam1(id);
+  CAMLlocal1(ret);
+
+  GLint res;
+  glGetShaderiv((GLuint)id, GL_COMPILE_STATUS, &res);
+
+  if(res == GL_FALSE)
+    ret = Val_false;
+  else
+    ret = Val_true;
+
+  CAMLreturn(ret);
+}
+

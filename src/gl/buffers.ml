@@ -1,5 +1,12 @@
 open Bigarray
 
+
+external abstract_clear : bool -> bool -> bool -> unit = "caml_gl_clear"
+
+let clear ~color ~depth ~stencil =
+  abstract_clear color depth stencil
+
+
 module Data = struct
 
   type ('a, 'b) t = ('a, 'b, c_layout) Array1.t
@@ -43,7 +50,7 @@ end
 
 module VBO = struct
 
-  type t = int
+  type t
 
   (* Abstract functions *)
   external abstract_set : ('a, 'b) Data.t -> int -> unit = "caml_gl_buffer_data"
@@ -69,7 +76,7 @@ end
 
 module VAO = struct
 
-  type t = int
+  type t
 
   type types =
     | Byte
@@ -128,11 +135,6 @@ module VAO = struct
     else 
       attrib_pointer attribute size kind normalize (stride,offset);
     attrib_divisor attribute divisor
-
-  let bind_draw t s b e = 
-    bind (Some t);
-    draw s b e;
-    bind None
 
 end 
 

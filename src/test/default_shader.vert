@@ -1,5 +1,3 @@
-#version 150
-
 uniform mat4 MVPMatrix;
 
 in vec3 position;

@@ -62,8 +62,6 @@ module Window : sig
 
   val attach : Display.t -> t -> GLContext.t -> unit
 
-  val detach : Display.t -> t -> unit
-
   val root_of : ?screen:int -> Display.t -> t
 
   val create_simple : display:Display.t -> parent:t -> size:(int * int) -> 

@@ -1,5 +1,5 @@
 
-exception GLSL_error of Error.t * string
+exception GLSL_error of string
 
 type t
 
@@ -18,12 +18,21 @@ external abstract_source : string -> t -> unit = "caml_gl_source_shader"
 
 external abstract_compile : t -> unit = "caml_gl_compile_shader"
 
-let abstract_debug sh = 
+external abstract_compiled : t -> bool = "caml_gl_shader_compiled"
+
+let abstract_debug sh k arg = 
   let s,l = abstract_log sh in
   let s   = String.sub s 0 l in
-  match Error.get () with
-  | None -> if s <> "" then print_endline s
-  | Some e -> raise (GLSL_error (e,s))
+  if abstract_compiled sh && s <> "" then print_endline s
+  else if not (abstract_compiled sh) then begin
+    let shader_name = 
+      match (k,arg) with
+      |Fragment, `String _ -> "fragment shader"
+      |Vertex  , `String _ -> "vertex shader"
+      | _      , `File   s -> s
+    in
+    raise (GLSL_error (Printf.sprintf "Error compiling %s : %s" shader_name s))
+  end
 
 let abstract_read_file filename =
   let chan = open_in filename in
@@ -34,8 +43,23 @@ let abstract_read_file filename =
 
 
 (* Exposed functions *)
+let recommended_version () = 
+  let s = Config.glsl_version () in
+  let pt1 = String.index s '.' in
+  let sp = 
+    try String.index s ' ' 
+    with Not_found -> String.length s
+  in
+  let pt2 = 
+    try String.index_from s (pt1+1) '.' 
+    with Not_found -> sp
+  in
+  let major = String.sub s 0 pt1 in
+  let minor = String.sub s (pt1+1) (min sp pt2 - pt1 - 1) in
+  int_of_string (major ^ minor)
 
-let create arg k = 
+
+let create ?version arg k = 
   let sh = 
     match k with
     |Fragment -> abstract_create_fragment ()
@@ -46,9 +70,14 @@ let create arg k =
     |`File s   -> abstract_read_file s
     |`String s -> s
   in
-  abstract_source src sh;
+  let src_app = 
+    match version with
+    |None -> src
+    |Some v -> Printf.sprintf "#version %i\n\n%s" v src
+  in
+  abstract_source src_app sh;
   abstract_compile sh;
-  abstract_debug sh;
+  abstract_debug sh k arg;
   sh
 
 

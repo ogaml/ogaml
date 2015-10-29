@@ -124,8 +124,6 @@ module Window = struct
   (* Exposed functions *)
   external attach : Display.t -> t -> GLContext.t -> unit = "caml_glx_make_current"
 
-  external detach : Display.t -> t -> unit = "caml_glx_remove_current"
-
   external map : Display.t -> t -> unit = "caml_xmap_window"
 
   external unmap : Display.t -> t -> unit = "caml_xunmap_window"

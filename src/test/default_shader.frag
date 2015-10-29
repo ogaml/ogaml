@@ -1,5 +1,3 @@
-#version 150
-
 in vec3 out_color;
 
 out vec4 frag_color;

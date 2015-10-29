@@ -228,3 +228,23 @@ caml_gl_draw_arrays(value sh, value start, value end)
 
   CAMLreturn(Val_unit);
 }
+
+
+// INPUT   3 boolean : color bit, depth bit, stencil bit
+// OUTPUT  clear the corresponding bits
+CAMLprim value
+caml_gl_clear(value c, value d, value s)
+{
+  CAMLparam3(c,d,s);
+
+  GLbitfield tmp = 0;
+  if(Bool_val(c)) tmp |= GL_COLOR_BUFFER_BIT;
+  if(Bool_val(d)) tmp |= GL_DEPTH_BUFFER_BIT;
+  if(Bool_val(s)) tmp |= GL_STENCIL_BUFFER_BIT;
+  glClear(tmp);
+
+  CAMLreturn(Val_unit);
+}
+
+
+

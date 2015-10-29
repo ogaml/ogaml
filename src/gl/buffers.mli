@@ -1,5 +1,9 @@
 open Bigarray
 
+
+val clear : color:bool -> depth:bool -> stencil:bool -> unit
+
+
 module Data : sig
 
   type ('a, 'b) t = ('a, 'b, c_layout) Array1.t
@@ -85,8 +89,6 @@ module VAO : sig
       offset:int  -> unit -> unit
 
   val draw : shape -> int -> int -> unit
-
-  val bind_draw : t -> shape -> int -> int -> unit
 
 end 
 

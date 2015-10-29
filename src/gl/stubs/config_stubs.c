@@ -160,7 +160,7 @@ CAMLprim value
 caml_gl_version(value unit)
 {
   CAMLparam0();
-  CAMLreturn(caml_copy_string(glGetString(GL_VERSION)));
+  CAMLreturn(caml_copy_string((char*)glGetString(GL_VERSION)));
 }
 
 
@@ -170,16 +170,48 @@ CAMLprim value
 caml_glsl_version(value unit)
 {
   CAMLparam0();
-  CAMLreturn(caml_copy_string(glGetString(GL_SHADING_LANGUAGE_VERSION)));
+  CAMLreturn(caml_copy_string((char*)glGetString(GL_SHADING_LANGUAGE_VERSION)));
 }
 
 
-// temp
+// INPUT   a face and a polygon mode
+// OUTPUT  nothing, changes the polygon mode
 CAMLprim value
-caml_gl_clear(value unit)
+caml_gl_polygon_mode(value face, value mode)
 {
-  CAMLparam0();
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  CAMLparam1(mode);
+  GLenum glface;
+
+  switch(Int_val(face))
+  {
+    case 0:
+      glface = GL_BACK;
+      break;
+    case 1:
+      glface = GL_FRONT;
+      break;
+    case 2:
+      glface = GL_FRONT_AND_BACK;
+      break;
+    default:
+      caml_failwith("caml variant error : set_polygon_mode");
+  }
+
+  switch(Int_val(mode))
+  {
+    case 0:
+      glPolygonMode(glface, GL_POINT);
+      break;
+    case 1:
+      glPolygonMode(glface, GL_LINE);
+      break;
+    case 2:
+      glPolygonMode(glface, GL_FILL);
+      break;
+    default:
+      caml_failwith("caml variant error : set_polygon_mode");
+  }
+
   CAMLreturn(Val_unit);
 }
 

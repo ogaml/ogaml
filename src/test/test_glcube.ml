@@ -59,9 +59,15 @@ let vbo_cube = VBO.build (Data.of_float_array cube)
 let vbo_axis = VBO.build (Data.of_float_array axis)
 
 (* Compile GL program *)
-let vertex_shader   = Shader.create (`File "src/test/default_shader.vert")   Shader.Vertex  
+let vertex_shader   = Shader.create 
+  ~version:(Shader.recommended_version ()) 
+  (`File "src/test/default_shader.vert") 
+  Shader.Vertex  
 
-let fragment_shader = Shader.create (`File "src/test/default_shader.frag") Shader.Fragment
+let fragment_shader = Shader.create 
+  ~version:(Shader.recommended_version ())
+  (`File "src/test/default_shader.frag") 
+  Shader.Fragment
 
 let program = Program.build 
   ~shaders:[vertex_shader; fragment_shader]
@@ -142,11 +148,14 @@ let display () =
   (* Display the cube *)
   Uniform.set (Uniform.Matrix4 (Matrix3f.to_bigarray mvp)) 
               (Program.uniform program "MVPMatrix");
-  VAO.bind_draw vao_cube VAO.Triangles 0 (Array.length cube / 6);
+  VAO.bind (Some vao_cube);
+  VAO.draw VAO.Triangles 0 (Array.length cube / 6);
   (* Display the axis *)
   Uniform.set (Uniform.Matrix4 (Matrix3f.to_bigarray vp)) 
               (Program.uniform program "MVPMatrix");
-  VAO.bind_draw vao_axis VAO.Lines 0 6;
+  VAO.bind (Some vao_axis);
+  VAO.draw VAO.Lines 0 6;
+  VAO.bind None;
   Program.use None
 
 
@@ -169,7 +178,7 @@ let rec event_loop () =
 (* Main loop *)
 let rec main_loop () =
   if Window.is_open win then begin
-    Config.clear ();
+    Buffers.clear ~color:true ~depth:true ~stencil:false;
     display ();
     Window.display win;
     event_loop ();

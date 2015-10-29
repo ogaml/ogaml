@@ -75,22 +75,23 @@ Math part:
 
 GL part:
   ☐ Let the user choose the usage of a vbo when setting data
-  ☐ Implement glGetString in config for debug
+  ✔ Implement glGetString in config for debug @done(2015-10-29 13:21) @project(GL part)
   ✔ Bind face culling, front_face @done(2015-10-26 21:31) @project(GL part)
   ✔ Bind gl_enable and options @done(2015-10-26 19:35) @project(GL part)
   ✔ Bind clear_color @done(2015-10-26 21:31) @project(GL part)
   ✔ Bind shaders @done(2015-10-26 16:01) @project(GL part)
   ✔ Bind programs & locations @done(2015-10-26 21:15) @project(GL part)
-  ☐ Bind polygon mode
+  ✔ Bind polygon mode @done(2015-10-29 14:54) @project(GL part)
   ✔ Bind VAOs & attributes @done(2015-10-27 10:57) @project(GL part)
   ✔ Bind uniform setting @done(2015-10-26 23:08) @project(GL part)
   ✔ Reabstract types in buffers and program after debugging @done(2015-10-27 12:20) @project(GL part)
   ✘ Merge Math and GL modules, or make GL depend on Math (for uniform setting) -- would remove generality of matrix uniforms @cancelled(2015-10-28 09:36) @project(GL part)
   ☐ Better support for uint uniforms and array uniforms
-  ☐ Make a pervasives modules or something to hold clear, types, etc...
-  ☐ Find a way to strongly type VAOs/VBOs ? @unsure
-  ☐ Reorganize VAOs
-  ☐ Fix shader compilation not returning an error when failing (use glGetShaderiv with GL_COMPILE_STATUS)
+  ✘ Make a pervasives modules or something to hold clear, types, etc... -- moved in buffers @cancelled(2015-10-29 15:04) @project(GL part)
+  ✘ Find a way to strongly type VAOs/VBOs ? -- probably way too difficult @cancelled(2015-10-29 15:05) @project(GL part)
+  ✔ Reorganize VAOs @done(2015-10-29 15:06) @project(GL part)
+  ✔ Fix shader compilation not returning an error when failing (use glGetShaderiv with GL_COMPILE_STATUS) @done(2015-10-29 15:59) @project(GL part)
+  ✔ Add version option when compiling shaders @done(2015-10-29 15:44) @project(GL part)
 
 
 
