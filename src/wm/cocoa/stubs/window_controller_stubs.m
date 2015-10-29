@@ -21,23 +21,9 @@
   m_windowIsOpen = true;
 
   // Setting the openGL view
-  NSOpenGLPixelFormatAttribute pixelFormatAttributes[] =
-  {
-    #ifdef __OSX__
-      NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
-    #endif
-    NSOpenGLPFAColorSize    , 24                           ,
-    NSOpenGLPFAAlphaSize    , 8                            ,
-    NSOpenGLPFADoubleBuffer ,
-    NSOpenGLPFAAccelerated  ,
-    0
-  };
-  NSOpenGLPixelFormat *pixelFormat = [[[NSOpenGLPixelFormat alloc] initWithAttributes:pixelFormatAttributes] autorelease];
   m_view = [[[OGOpenGLView alloc] initWithFrame:[[m_window contentView] bounds]
-                                    pixelFormat:pixelFormat] autorelease];
-
+                                    pixelFormat:[OGOpenGLView defaultPixelFormat]] autorelease];
   [m_window setContentView:m_view];
-  [[m_view openGLContext] makeCurrentContext];
 
   return self;
 }
@@ -102,6 +88,14 @@
 -(void)mouseDown:(NSEvent *)event
 {
   [self pushEvent:event];
+}
+
+-(void)setGLContext:(NSOpenGLContext*)context
+{
+  [m_view setOpenGLContext:context];
+  [context setView:m_view];
+  // We test it down here
+  [context makeCurrentContext];
 }
 
 -(void)flushGLContext
@@ -201,6 +195,19 @@ caml_cocoa_window_controller_pop_event(value mlcontroller)
 
   if(event == nil) CAMLreturn(Val_none);
   else CAMLreturn(Val_some((value)event));
+}
+
+CAMLprim value
+caml_cocoa_controller_set_glctx(value mlcontroller, value mlctx)
+{
+  CAMLparam2(mlcontroller,mlctx);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+  NSOpenGLContext* context = (NSOpenGLContext*) mlctx;
+
+  [controller setGLContext:context];
+
+  CAMLreturn(Val_unit);
 }
 
 CAMLprim value

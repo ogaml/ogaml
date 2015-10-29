@@ -65,6 +65,8 @@
 
 -(NSEvent *)popEvent;
 
+-(void)setGLContext:(NSOpenGLContext*)context;
+
 -(void)flushGLContext;
 
 @end

@@ -78,6 +78,23 @@ module NSEvent : sig
 
 end
 
+module NSOpenGLPixelFormat : sig
+
+  type t
+
+  (* TODO Change int *)
+  val init_with_attributes : int list -> t
+
+end
+
+module NSOpenGLContext : sig
+
+  type t
+
+  val init_with_format : NSOpenGLPixelFormat.t -> t
+
+end
+
 module OGApplicationDelegate : sig
 
   type t
@@ -161,6 +178,8 @@ module OGWindowController : sig
   val release_window : t -> unit
 
   val pop_event : t -> NSEvent.t option
+
+  val set_context : t -> NSOpenGLContext.t -> unit
 
   val flush_context : t -> unit
 

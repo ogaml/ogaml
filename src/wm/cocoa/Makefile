@@ -4,7 +4,9 @@ include ../../../common_defs.mk
 
 INCLUDE_DIRS = -I ../../utils/
 
-CSOURCES = $(STUBS_DIR)/utils_stubs.m $(STUBS_DIR)/opengl_stubs.m\
+CSOURCES = $(STUBS_DIR)/utils_stubs.m\
+	   $(STUBS_DIR)/glcontext_stubs.m\
+	   $(STUBS_DIR)/opengl_stubs.m\
 	   $(STUBS_DIR)/application_stubs.m\
 		 $(STUBS_DIR)/application_delegate_stubs.m\
 		 $(STUBS_DIR)/window_stubs.m\
@@ -14,7 +16,7 @@ CSOURCES = $(STUBS_DIR)/utils_stubs.m $(STUBS_DIR)/opengl_stubs.m\
 
 COBJS = $(CSOURCES:.c=.o) $(CSOURCES:.m=.o)
 
-COBJS2 = utils_stubs.o opengl_stubs.o application_stubs.o\
+COBJS2 = utils_stubs.o glcontext_stubs.o opengl_stubs.o application_stubs.o\
  	       application_delegate_stubs.o window_stubs.o window_controller_stubs.o\
 				 event_stubs.o stubs.o
 

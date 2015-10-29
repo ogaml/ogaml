@@ -84,6 +84,24 @@ module NSEvent = struct
 
 end
 
+module NSOpenGLPixelFormat = struct
+
+  type t
+
+  external init_with_attributes : int list -> t
+    = "caml_cocoa_init_pixelformat_with_attributes"
+
+end
+
+module NSOpenGLContext = struct
+
+  type t
+
+  external init_with_format : NSOpenGLPixelFormat.t -> t
+    = "caml_cocoa_init_context_with_format"
+
+end
+
 module OGApplicationDelegate = struct
 
   type t
@@ -186,6 +204,9 @@ module OGWindowController = struct
 
   external pop_event : t -> NSEvent.t option
     = "caml_cocoa_window_controller_pop_event"
+
+  external set_context : t -> NSOpenGLContext.t -> unit
+    = "caml_cocoa_controller_set_glctx"
 
   external flush_context : t -> unit = "caml_cocoa_controller_flush_glctx"
 

@@ -41,7 +41,15 @@ let create ~width ~height =
   );
 
   (* Creating the delegate which we will return *)
-  Cocoa.OGWindowController.init_with_window window
+  let win_ctrl = Cocoa.OGWindowController.init_with_window window in
+
+  (* But first we create and apply a new openGL context *)
+  let pixel_format = Cocoa.NSOpenGLPixelFormat.init_with_attributes [] in
+  let context = Cocoa.NSOpenGLContext.init_with_format pixel_format in
+  Cocoa.OGWindowController.set_context win_ctrl context ;
+
+  (* Finally returning the window controller *)
+  win_ctrl
 
 let close win =
   Cocoa.OGWindowController.close_window win
