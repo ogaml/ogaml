@@ -8,13 +8,10 @@
 
 -(id)initWithWindow:(NSWindow*)window
 {
-  // Inits the event queue
-  m_events = [NSMutableArray new];
-
   m_window = [window retain];
 
   [m_window setDelegate:self];
-  [m_window makeFirstResponder:self];
+  // [m_window makeFirstResponder:self];
 
   [m_window setReleasedWhenClosed:NO]; // We can destroy it ourselves
 
@@ -24,6 +21,7 @@
   m_view = [[[OGOpenGLView alloc] initWithFrame:[[m_window contentView] bounds]
                                     pixelFormat:[OGOpenGLView defaultPixelFormat]] autorelease];
   [m_window setContentView:m_view];
+  [m_window makeFirstResponder:m_view];
 
   return self;
 }
@@ -63,31 +61,9 @@
   return m_windowIsOpen;
 }
 
--(void)pushEvent:(NSEvent *)event
-{
-  [m_events addObject:event];
-}
-
 -(NSEvent *)popEvent
 {
-  if ([m_events count] == 0) return nil;
-  NSEvent* event = [m_events objectAtIndex:0];
-  if (event != nil)
-  {
-    [[event retain] autorelease];
-    [m_events removeObjectAtIndex:0];
-  }
-  return event;
-}
-
--(void)keyDown:(NSEvent *)event
-{
-  [self pushEvent:event];
-}
-
--(void)mouseDown:(NSEvent *)event
-{
-  [self pushEvent:event];
+  return [m_view popEvent];
 }
 
 -(void)setGLContext:(NSOpenGLContext*)context

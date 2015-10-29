@@ -11,6 +11,13 @@
 // Custom OpenGLView that handles events
 ////////////////////////////////////////
 @interface OGOpenGLView : NSOpenGLView
+{
+  NSMutableArray* m_events;
+}
+
+-(void)pushEvent:(NSEvent *)event;
+
+-(NSEvent *)popEvent;
 
 @end
 
@@ -49,7 +56,6 @@
 {
   NSWindow* m_window;
   BOOL m_windowIsOpen; // Luckily it is NO by default
-  NSMutableArray* m_events;
   OGOpenGLView* m_view;
   NSOpenGLContext* m_context;
 }
