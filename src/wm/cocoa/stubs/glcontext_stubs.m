@@ -11,7 +11,7 @@ caml_cocoa_init_pixelformat_with_attributes(value mlattributes)
 
   NSOpenGLPixelFormatAttribute attributes[] =
   {
-    #ifdef __OSX__
+    #ifdef __APPLE__
       NSOpenGLPFAOpenGLProfile, kCGLOGLPVersion_3_2_Core,
     #endif
     NSOpenGLPFAColorSize    , 24                           ,

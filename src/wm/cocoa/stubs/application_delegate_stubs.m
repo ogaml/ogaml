@@ -23,7 +23,7 @@
 {
   [OGApplication sharedApplication];
   [OGApplication setUpMenuBar];
-  #ifdef __OSX__
+  #ifdef __APPLE__
     [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
   #endif
 }
@@ -32,7 +32,7 @@
 {
   [OGApplication sharedApplication];
 
-  #ifdef __OSX__
+  #ifdef __APPLE__
     [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
   #endif
 
