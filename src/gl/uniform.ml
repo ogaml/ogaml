@@ -20,6 +20,7 @@ type t =
   | Matrix4x2 of Buffers.Data.ft
   | Matrix3x4 of Buffers.Data.ft
   | Matrix4x3 of Buffers.Data.ft
+  | Matrix3D  of OgamlMath.Matrix3D.t
 
 
 external abstract_uniform1f : 
@@ -109,6 +110,7 @@ let set v loc =
   | Matrix4x2 d         -> abstract_uniformmat42 loc d
   | Matrix3x4 d         -> abstract_uniformmat34 loc d
   | Matrix4x3 d         -> abstract_uniformmat43 loc d
+  | Matrix3D  m         -> abstract_uniformmat4 loc (OgamlMath.Matrix3D.to_bigarray m)
 
 
 

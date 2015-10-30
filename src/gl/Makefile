@@ -2,7 +2,7 @@ include ../../common_defs.mk
 
 # Override
 
-INCLUDE_DIRS = -I ../utils/
+INCLUDE_DIRS = -I ../utils/ -I ../math/
 
 CSOURCES = $(STUBS_DIR)/buffers_stubs.c $(STUBS_DIR)/shader_stubs.c\
 	   $(STUBS_DIR)/error_stubs.c $(STUBS_DIR)/config_stubs.c\
@@ -59,10 +59,10 @@ $(MLLIB): $(COBJS) $(MLCMIS) $(MLOBJS) $(MLNATOBJS)
 	$(OCAMLFIND) $(OCAMLOPT) -a -o $@ $(INCLUDE_DIRS) $<
 
 %.cmi:%.mli
-	$(OCAMLFIND) $(OCAMLC) -for-pack $(PACKNAME) -c $< -o $@
+	$(OCAMLFIND) $(OCAMLC) -for-pack $(PACKNAME) $(INCLUDE_DIRS) ../math/ogamlMath.cma -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLFIND) $(OCAMLOPT) -for-pack $(PACKNAME) -c -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLFIND) $(OCAMLOPT) -for-pack $(PACKNAME) $(INCLUDE_DIRS) ../math/ogamlMath.cmxa -c $< -o $@ 
 
 %.cmo:%.ml
 	$(OCAMLFIND) $(OCAMLC) -for-pack $(PACKNAME) -c -o $@ $(INCLUDE_DIRS) $<

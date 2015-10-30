@@ -20,6 +20,7 @@ type t =
   | Matrix4x2 of Buffers.Data.ft
   | Matrix3x4 of Buffers.Data.ft
   | Matrix4x3 of Buffers.Data.ft
+  | Matrix3D  of OgamlMath.Matrix3D.t
 
 val set : t -> Program.uniform -> unit
 

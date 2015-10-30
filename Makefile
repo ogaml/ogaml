@@ -42,7 +42,7 @@ window_lib:
 math_lib:
 	cd src/math/ && make
 
-gl_lib:
+gl_lib: math_lib
 	cd src/gl/ && make
 
 window_test: window_lib math_lib gl_lib

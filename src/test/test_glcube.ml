@@ -123,15 +123,15 @@ let () =
 
 
 (* Create matrices *)
-let proj = Matrix3f.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
-(* let proj = Matrix3f.orthographic ~near:(-20.) ~far:(20.) ~left:(-2.) ~right:(2.) ~top:(1.5) ~bottom:(-1.5) *)
+let proj = Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
+(* let proj = Matrix3D.orthographic ~near:(-20.) ~far:(20.) ~left:(-2.) ~right:(2.) ~top:(1.5) ~bottom:(-1.5) *)
 
-let view = Matrix3f.look_at 
+let view = Matrix3D.look_at 
   ~from:Vector3f.({x = 1.; y = 0.6; z = 1.4}) 
   ~at:Vector3f.({x = 0.; y = 0.; z = 0.})
   ~up:Vector3f.unit_y
   
-let vp = Matrix3f.product proj view
+let vp = Matrix3D.product proj view
 
 let rot_angle = ref 0. 
 
@@ -142,16 +142,16 @@ let display () =
   (* Compute model matrix *)
   let t = Unix.gettimeofday () in
   let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
-  let model = Matrix3f.rotation rot_vector !rot_angle in
-  let mvp = Matrix3f.product vp model in
+  let model = Matrix3D.rotation rot_vector !rot_angle in
+  let mvp = Matrix3D.product vp model in
   rot_angle := !rot_angle +. (abs_float (cos (Unix.gettimeofday ()) /. 10.));
   (* Display the cube *)
-  Uniform.set (Uniform.Matrix4 (Matrix3f.to_bigarray mvp)) 
+  Uniform.set (Uniform.Matrix3D mvp) 
               (Program.uniform program "MVPMatrix");
   VAO.bind (Some vao_cube);
   VAO.draw VAO.Triangles 0 (Array.length cube / 6);
   (* Display the axis *)
-  Uniform.set (Uniform.Matrix4 (Matrix3f.to_bigarray vp)) 
+  Uniform.set (Uniform.Matrix3D vp) 
               (Program.uniform program "MVPMatrix");
   VAO.bind (Some vao_axis);
   VAO.draw VAO.Lines 0 6;

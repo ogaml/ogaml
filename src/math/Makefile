@@ -4,7 +4,7 @@ include ../../common_defs.mk
 
 INCLUDE_DIRS = 
 
-MLSOURCES = constants.ml vector3i.ml vector3f.ml vector3fs.ml matrix3f.ml poly.ml
+MLSOURCES = constants.ml vector3i.ml vector3f.ml vector3fs.ml matrix3D.ml poly.ml
 
 MLINTERFACES =
 

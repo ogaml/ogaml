@@ -8,7 +8,6 @@ let get i j m = m.{i + j*4} (* column major order *)
 
 let set i j m v = m.{i + j*4} <- v
 
-
 let to_bigarray m = m
 
 let zero () = 
