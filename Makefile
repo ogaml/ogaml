@@ -5,7 +5,7 @@ include common_defs.mk
 
 INCLUDES = -I src/wm -I src/wm/$(strip $(OS_WIN_STUBS_DIR)) -I src/math -I src/gl
 
-MODULES = $(OS_WIN_STUBS).cmxa ogamlWindow.cmxa ogamlMath.cmxa ogamlGL.cmxa
+MODULES = $(OS_WIN_STUBS).cmxa ogamlMath.cmxa ogamlGL.cmxa ogamlWindow.cmxa
 
 GL_FILES = src/gl/*.a src/gl/*.cmx src/gl/*.cmi src/gl/*.mli src/gl/*.cma src/gl/*.cmxa src/gl/*.cmo
 
@@ -36,7 +36,7 @@ OUTPUT = main.out
 
 default: window_test
 
-window_lib:
+window_lib: gl_lib
 	cd src/wm/ && make
 
 math_lib:

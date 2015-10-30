@@ -2,7 +2,7 @@ include ../../common_defs.mk
 
 # Override
 
-INCLUDE_DIRS = -I $(OS_WIN_STUBS_DIR)
+INCLUDE_DIRS = -I $(OS_WIN_STUBS_DIR) -I ../gl/
 
 MLSOURCES = window.ml
 
@@ -39,10 +39,10 @@ compile_window_byte: .depend compile_os_lib $(MLCMIS) $(MLOBJS)
 	$(OCAMLC) -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLOPT) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLOPT) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) ../gl/OgamlGL.cmxa $<
 
 %.cmo:%.ml
-	$(OCAMLC) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLC) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) ../gl/OgamlGl.cma $<
 
 %.ml:%.mlpp %.cmi
 	$(PPCOMMAND) -o $@ $<

@@ -22,3 +22,5 @@ val poll_event : t -> Event.t option
 (** Display the window after the GL calls *)
 val display : t -> unit
 
+(** Clears the window *)
+val clear : t -> color:bool -> depth:bool -> stencil:bool -> unit

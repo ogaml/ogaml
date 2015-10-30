@@ -178,7 +178,7 @@ let rec event_loop () =
 (* Main loop *)
 let rec main_loop () =
   if Window.is_open win then begin
-    Buffers.clear ~color:true ~depth:true ~stencil:false;
+    Window.clear win ~color:true ~depth:true ~stencil:false;
     display ();
     Window.display win;
     event_loop ();

@@ -65,7 +65,7 @@ $(MLLIB): $(COBJS) $(MLCMIS) $(MLOBJS) $(MLNATOBJS)
 	$(OCAMLFIND) $(OCAMLOPT) -for-pack $(PACKNAME) $(INCLUDE_DIRS) ../math/ogamlMath.cmxa -c $< -o $@ 
 
 %.cmo:%.ml
-	$(OCAMLFIND) $(OCAMLC) -for-pack $(PACKNAME) -c -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLFIND) $(OCAMLC) -for-pack $(PACKNAME) $(INCLUDE_DIRS) ../math/ogamlMath.cma -c $< -o $@ 
 
 %.ml:%.mlpp %.cmi
 	$(PPCOMMAND) -o $@ $<
