@@ -4,7 +4,7 @@ Objective-C formatting:
   ☐ Choose how to align labels
   ☐ Add more comments
   ☐ Add nil tests to catch initialization problems
-  ☐ Move init_arp in cocoa/utils_stubs
+  ✔ Move init_arp in cocoa/utils_stubs @done(2015-10-31 00:30) @project(Objective-C formatting)
 
 Cocoa specific:
   ✔ Remove application t type @unsure @done(2015-10-20 21:59) @project(Cocoa specific)
@@ -24,7 +24,7 @@ Cocoa specific:
   ☐ Add some function to handle keyRepeatDelay and keyRepeatInterval for NSEvent
   ✔ Handle application creation and running with a boolean @done(2015-10-26 01:43) @project(Cocoa specific)
   ✔ Implement window destroy properly @done(2015-10-26 02:04) @project(Cocoa specific)
-  ☐ Add window closed event
+  ✔ Add window closed event @done(2015-10-31 00:30) @project(Cocoa specific)
   ☐ Update the view (and probably other things) when resizing
 
 Xlib specific:
@@ -43,7 +43,7 @@ Xlib specific:
   ✔ Binding GLX ** (later) @done(2015-10-28 09:43) @project(Xlib specific)
 
 General:
-  ☐ Make a log system ? @unsure
+  ☐ Make a log system ? @unsure @comment(Théo: It might be redundant if the user uses dolog for instance, but it also occured to me we could provide one)
 
 Window part:
   ✔ Add keys enumeration @done(2015-10-23 09:46) @project(Window part)
@@ -94,6 +94,3 @@ GL part:
   ✔ Reorganize VAOs @done(2015-10-29 15:06) @project(GL part)
   ✔ Fix shader compilation not returning an error when failing (use glGetShaderiv with GL_COMPILE_STATUS) @done(2015-10-29 15:59) @project(GL part)
   ✔ Add version option when compiling shaders @done(2015-10-29 15:44) @project(GL part)
-
-
-

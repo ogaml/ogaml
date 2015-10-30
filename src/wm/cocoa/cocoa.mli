@@ -78,6 +78,18 @@ module NSEvent : sig
 
 end
 
+module OGEvent : sig
+
+  type t
+
+  type content =
+    | CocoaEvent of NSEvent.t
+    | CloseWindow
+
+  val get_content : t -> content
+
+end
+
 module NSOpenGLPixelFormat : sig
 
   type t
@@ -194,6 +206,8 @@ module NSWindow : sig
 
   val make_main : t -> unit
 
+  val close : t -> unit
+
   val perform_close : t -> unit
 
   val frame : t -> NSRect.t
@@ -222,7 +236,7 @@ module OGWindowController : sig
 
   val release_window : t -> unit
 
-  val pop_event : t -> NSEvent.t option
+  val pop_event : t -> OGEvent.t option
 
   val set_context : t -> NSOpenGLContext.t -> unit
 

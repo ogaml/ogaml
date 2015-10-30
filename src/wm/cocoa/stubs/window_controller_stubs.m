@@ -26,6 +26,16 @@
   return self;
 }
 
+-(BOOL)windowShouldClose:(id)sender
+{
+  (void)sender;
+
+  // We cancel close and treat it as an event instead
+  OGEvent* ogevent = [[OGEvent alloc] initWithCloseWindow];
+  [m_view pushEvent:ogevent];
+  return NO;
+}
+
 -(void)windowWillClose:(NSNotification *)notification
 {
   m_windowIsOpen = false;
@@ -61,7 +71,7 @@
   return m_windowIsOpen;
 }
 
--(NSEvent *)popEvent
+-(OGEvent *)popEvent
 {
   return [m_view popEvent];
 }
@@ -167,7 +177,7 @@ caml_cocoa_window_controller_pop_event(value mlcontroller)
 
   OGWindowController* controller = (OGWindowController*) mlcontroller;
 
-  NSEvent* event = [controller popEvent];
+  OGEvent* event = [controller popEvent];
 
   if(event == nil) CAMLreturn(Val_none);
   else CAMLreturn(Val_some((value)event));

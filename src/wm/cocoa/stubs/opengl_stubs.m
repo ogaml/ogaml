@@ -16,23 +16,25 @@
 
 -(void)keyDown:(NSEvent *)event
 {
-  [self pushEvent:event];
+  OGEvent* ogevent = [[OGEvent alloc] initWithNSEvent:event];
+  [self pushEvent:ogevent];
 }
 
 -(void)mouseDown:(NSEvent *)event
 {
-  [self pushEvent:event];
+  OGEvent* ogevent = [[OGEvent alloc] initWithNSEvent:event];
+  [self pushEvent:ogevent];
 }
 
--(void)pushEvent:(NSEvent *)event
+-(void)pushEvent:(OGEvent *)event
 {
   [m_events addObject:event];
 }
 
--(NSEvent *)popEvent
+-(OGEvent *)popEvent
 {
   if ([m_events count] == 0) return nil;
-  NSEvent* event = [m_events objectAtIndex:0];
+  OGEvent* event = [m_events objectAtIndex:0];
   if (event != nil)
   {
     [[event retain] autorelease];

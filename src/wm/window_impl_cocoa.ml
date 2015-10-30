@@ -80,15 +80,20 @@ let is_open win =
 let poll_event win =
   Cocoa.OGWindowController.process_event win ;
   match Cocoa.OGWindowController.pop_event win with
-  | Some event ->
-      Cocoa.NSEvent.(
-        match get_type event with
-        | KeyDown       -> Some Event.KeyPressed
-        | KeyUp         -> Some Event.KeyReleased
-        | LeftMouseDown -> Some Event.ButtonPressed
-        | LeftMouseUp   -> Some Event.ButtonReleased
-        | MouseMoved    -> Some Event.MouseMoved
-        | _             -> None
+  | Some ogevent ->
+      Cocoa.(
+        match OGEvent.get_content ogevent with
+        | OGEvent.CocoaEvent event ->
+            NSEvent.(
+              match get_type event with
+              | KeyDown       -> Some Event.KeyPressed
+              | KeyUp         -> Some Event.KeyReleased
+              | LeftMouseDown -> Some Event.ButtonPressed
+              | LeftMouseUp   -> Some Event.ButtonReleased
+              | MouseMoved    -> Some Event.MouseMoved
+              | _             -> None
+            )
+        | OGEvent.CloseWindow -> Some Event.Closed
       )
   | None -> None
 

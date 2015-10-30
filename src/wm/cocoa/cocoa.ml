@@ -84,6 +84,18 @@ module NSEvent = struct
 
 end
 
+module OGEvent = struct
+
+  type t
+
+  type content =
+    | CocoaEvent of NSEvent.t
+    | CloseWindow
+
+  external get_content : t -> content = "caml_ogevent_get_content"
+
+end
+
 module NSOpenGLPixelFormat = struct
 
   type t
@@ -264,6 +276,8 @@ module NSWindow = struct
 
   external make_main : t -> unit = "caml_cocoa_window_make_main"
 
+  external close : t -> unit = "caml_cocoa_window_close"
+
   external perform_close : t -> unit = "caml_cocoa_window_perform_close"
 
   external frame : t -> NSRect.t = "caml_cocoa_window_frame"
@@ -300,7 +314,7 @@ module OGWindowController = struct
   external release_window : t -> unit
     = "caml_cocoa_window_controller_release_window"
 
-  external pop_event : t -> NSEvent.t option
+  external pop_event : t -> OGEvent.t option
     = "caml_cocoa_window_controller_pop_event"
 
   external set_context : t -> NSOpenGLContext.t -> unit

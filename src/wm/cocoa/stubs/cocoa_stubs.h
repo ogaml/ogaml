@@ -8,6 +8,36 @@
 #import <Cocoa/Cocoa.h>
 
 
+// Our own event object to add windowClosed
+typedef enum
+{
+  OGCocoaEvent,
+  OGCloseWindowEvent
+} OGEventType;
+
+typedef union
+{
+  NSEvent*  nsevent;
+  // void closeWindow; // We might want to have something more here later
+} OGEventContent;
+
+@interface OGEvent : NSObject
+{
+  OGEventType m_type;
+  OGEventContent m_content;
+}
+
+- (instancetype)initWithNSEvent:(NSEvent*)nsevent;
+
+- (instancetype)initWithCloseWindow;
+
+- (OGEventType)type;
+
+- (OGEventContent)content;
+
+@end
+
+
 // Custom OpenGLView that handles events
 ////////////////////////////////////////
 @interface OGOpenGLView : NSOpenGLView
@@ -15,9 +45,9 @@
   NSMutableArray* m_events;
 }
 
--(void)pushEvent:(NSEvent *)event;
+-(void)pushEvent:(OGEvent *)event;
 
--(NSEvent *)popEvent;
+-(OGEvent *)popEvent;
 
 @end
 
@@ -70,7 +100,7 @@
 
 -(void)releaseWindow;
 
--(NSEvent *)popEvent;
+-(OGEvent *)popEvent;
 
 -(void)setGLContext:(NSOpenGLContext*)context;
 
