@@ -72,6 +72,7 @@ Math part:
   ☐ Implement Quaternions
   ✔ Implement polygons @done(2015-10-26 16:33) @project(Math part)
   ☐ Parameterize Poly.axis with vector3f
+  ☐ Rename matrix3f in matrix3D @unsure
 
 GL part:
   ☐ Let the user choose the usage of a vbo when setting data
@@ -86,6 +87,7 @@ GL part:
   ✔ Bind uniform setting @done(2015-10-26 23:08) @project(GL part)
   ✔ Reabstract types in buffers and program after debugging @done(2015-10-27 12:20) @project(GL part)
   ✘ Merge Math and GL modules, or make GL depend on Math (for uniform setting) -- would remove generality of matrix uniforms @cancelled(2015-10-28 09:36) @project(GL part)
+  ☐ Add a Matrix3D uniform and remove the conversion matrix -> bigarray @unsure
   ☐ Better support for uint uniforms and array uniforms
   ✘ Make a pervasives modules or something to hold clear, types, etc... -- moved in buffers @cancelled(2015-10-29 15:04) @project(GL part)
   ✘ Find a way to strongly type VAOs/VBOs ? -- probably way too difficult @cancelled(2015-10-29 15:05) @project(GL part)
