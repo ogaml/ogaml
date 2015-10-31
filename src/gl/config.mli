@@ -49,7 +49,7 @@ type polygon =
 
 val set_polygon_mode : face -> polygon -> unit
 
-val set_clear_color : float -> float -> float -> unit
+val set_clear_color : Color.t -> unit
 
 val version : unit -> string
 

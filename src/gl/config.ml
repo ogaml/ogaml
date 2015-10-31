@@ -39,6 +39,8 @@ type polygon =
   | Line
   | Fill
 
+external abstract_set_clear_color : float -> float -> float -> unit = "caml_gl_clear_color"
+
 external enable  : capability list -> unit = "caml_gl_enable_list"
 
 external disable : capability list -> unit = "caml_gl_disable_list"
@@ -49,10 +51,12 @@ external set_front_face : orientation -> unit = "caml_gl_front_face"
 
 external set_polygon_mode : face -> polygon -> unit = "caml_gl_polygon_mode"
 
-external set_clear_color : float -> float -> float -> unit = "caml_gl_clear_color"
-
 external version : unit -> string = "caml_gl_version"
 
 external glsl_version : unit -> string = "caml_glsl_version"
+
+let set_clear_color c = Color.(
+  let c = rgb c in
+  RGB.(abstract_set_clear_color c.r c.g c.b))
 
 

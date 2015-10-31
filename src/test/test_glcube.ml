@@ -12,7 +12,7 @@ let () =
   Config.enable [Config.DepthTest; Config.CullFace];
   Config.set_culling Config.Back;
   Config.set_front_face Config.CW;
-  Config.set_clear_color 1.0 1.0 1.0
+  Config.set_clear_color (`RGB Color.RGB.white)
 
 let initial_time = ref 0.
 

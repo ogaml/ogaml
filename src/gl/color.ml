@@ -51,6 +51,10 @@ module HSV = struct
 
 end
 
+
+type t = [`HSV of HSV.t | `RGB of RGB.t]
+
+
 let rgb_to_hsv color = 
   let open RGB in
   let cmax = max (max color.r color.g) color.b in
@@ -91,4 +95,14 @@ let hsv_to_rgb color =
    RGB.g = clamp (g'+.m) 0. 1.; 
    RGB.b = clamp (b'+.m) 0. 1.;
    RGB.a = color.a}
+
+let hsv = function
+  |`HSV c -> c
+  |`RGB c -> rgb_to_hsv c
+
+let rgb = function
+  |`HSV c -> hsv_to_rgb c
+  |`RGB c -> c
+
+
 

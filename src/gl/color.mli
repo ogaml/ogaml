@@ -49,8 +49,15 @@ module HSV : sig
 end
 
 
+type t = [`HSV of HSV.t | `RGB of RGB.t]
+
+
 val rgb_to_hsv : RGB.t -> HSV.t
 
 val hsv_to_rgb : HSV.t -> RGB.t
+
+val hsv : t -> HSV.t
+
+val rgb : t -> RGB.t
 
 
