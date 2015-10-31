@@ -42,6 +42,9 @@ val rotate : Vector3f.t -> float -> t -> t
 (* Vector right-product *)
 val times : t -> Vector3f.t -> Vector3f.t
 
+(* Rotation matrix from a quaternion *)
+val from_quaternion : Quaternion.t -> t
+
 (* Look-At view matrix *)
 val look_at : from:Vector3f.t -> at:Vector3f.t -> up:Vector3f.t -> t
 

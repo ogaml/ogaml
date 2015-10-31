@@ -131,9 +131,13 @@ let view = Matrix3D.look_at
   ~at:Vector3f.({x = 0.; y = 0.; z = 0.})
   ~up:Vector3f.unit_y
 
-let vp = Matrix3D.product proj view
+let position = Vector3f.({x = 1.; y = 0.6; z = 1.4})
 
 let rot_angle = ref 0.
+
+let view_theta = ref 0.
+
+let view_phi = ref 0.
 
 
 (* Display *)
@@ -141,8 +145,18 @@ let display () =
   Program.use (Some program);
   (* Compute model matrix *)
   let t = Unix.gettimeofday () in
+  let view = 
+    Matrix3D.translation (Vector3f.prop (-1.) position)
+    |> Matrix3D.product 
+      (Matrix3D.from_quaternion
+        (Quaternion.times 
+          (Quaternion.rotation Vector3f.unit_y !view_theta)
+          (Quaternion.rotation Vector3f.unit_x !view_phi)
+        ))
+  in
   let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
   let model = Matrix3D.rotation rot_vector !rot_angle in
+  let vp = Matrix3D.product proj view in
   let mvp = Matrix3D.product vp model in
   rot_angle := !rot_angle +. (abs_float (cos (Unix.gettimeofday ()) /. 10.));
   (* Display the cube *)
@@ -166,8 +180,14 @@ let rec event_loop () =
     match e with
     |Event.Closed ->
       Window.close win
-    |Event.KeyPressed _ ->
-      print_endline "key pressed"
+    |Event.KeyPressed k -> Keycode.(
+      match k.Event.KeyEvent.key with
+      | Right |D -> view_theta := !view_theta -. 0.1;
+      | Left  |Q -> view_theta := !view_theta +. 0.1;
+      | Up    |Z -> view_phi := !view_phi +. 0.1;
+      | Down  |S -> view_phi := !view_phi -. 0.1;
+      | _ -> ()
+    )
     |Event.ButtonPressed ->
       print_endline "button pressed"
     | _ -> ()
