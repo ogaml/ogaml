@@ -190,6 +190,11 @@ let make_mouse_event button event win =
     alt = alt
   })
 
+let mouse_loc win =
+  let (x,y) = Cocoa.OGWindowController.mouse_location win in
+  let i = int_of_float in
+  Event.MouseEvent.({ x = i x ; y = i y })
+
 let poll_event win =
   Cocoa.OGWindowController.process_event win ;
   match Cocoa.OGWindowController.pop_event win with
@@ -219,7 +224,7 @@ let poll_event win =
               | OtherMouseUp   -> Some (Event.ButtonReleased (
                   make_mouse_event Button.Middle event win
                 ))
-              | MouseMoved     -> Some Event.MouseMoved
+              | MouseMoved     -> Some (Event.MouseMoved (mouse_loc win))
               | _              -> None
             )
         | OGEvent.CloseWindow -> Some Event.Closed
