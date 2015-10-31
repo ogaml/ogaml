@@ -16,6 +16,36 @@ caml_init_arp(value unit)
   CAMLreturn(Val_unit);
 }
 
+// NSString binding
+///////////////////
+
+CAMLprim value
+caml_cocoa_gen_string(value str)
+{
+  CAMLparam1(str);
+
+  char* tmp = String_val(str);
+
+  NSString* data = [NSString stringWithFormat:@"%s" , tmp];
+
+  CAMLreturn((value) data);
+}
+
+
+CAMLprim value
+caml_cocoa_get_string(value mlstr)
+{
+  CAMLparam1(mlstr);
+  CAMLlocal1(mlc);
+
+  NSString* str = (NSString*) mlstr;
+  char* c = (char*)[str UTF8String];
+
+  mlc = caml_copy_string(c);
+
+  CAMLreturn(mlc);
+}
+
 // NSRect binding
 /////////////////
 

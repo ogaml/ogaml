@@ -6,7 +6,7 @@ open OgamlGL.Buffers
 
 let win = Window.create ~width:800 ~height:600
 
-let () = 
+let () =
   Printf.printf "OpenGL version : %s\n%!" (Config.version ());
   Printf.printf "OpenGL Shading Language (GLSL) version : %s\n%!" (Config.glsl_version ());
   Config.enable [Config.DepthTest; Config.CullFace];
@@ -22,9 +22,9 @@ let frame_count = ref 0
 
 
 (* Polygons *)
-let cube = 
-  let vertices = 
-    Poly.cube 
+let cube =
+  let vertices =
+    Poly.cube
       Vector3f.({x = -0.5; y = -0.5; z = -0.5})
       Vector3f.({x = 1.; y = 1.; z = 1.})
   in
@@ -33,14 +33,14 @@ let cube =
     for j = 0 to 5 do
       colors.(i*18+j*3+0) <- float_of_int (i/3);
       colors.(i*18+j*3+1) <- float_of_int ((i+1) mod 2);
-      colors.(i*18+j*3+2) <- float_of_int (((max i 1) mod 5) mod 2); 
+      colors.(i*18+j*3+2) <- float_of_int (((max i 1) mod 5) mod 2);
     done;
   done;
   Array.concat [vertices; colors]
 
-let axis = 
+let axis =
   let vertices = Poly.axis 0. 30. in
-  let colors = 
+  let colors =
     [|
       1.0; 0.0; 0.0;
       1.0; 0.0; 0.0;
@@ -59,17 +59,17 @@ let vbo_cube = VBO.build (Data.of_float_array cube)
 let vbo_axis = VBO.build (Data.of_float_array axis)
 
 (* Compile GL program *)
-let vertex_shader   = Shader.create 
-  ~version:(Shader.recommended_version ()) 
-  (`File "src/test/default_shader.vert") 
-  Shader.Vertex  
-
-let fragment_shader = Shader.create 
+let vertex_shader   = Shader.create
   ~version:(Shader.recommended_version ())
-  (`File "src/test/default_shader.frag") 
+  (`File "src/test/default_shader.vert")
+  Shader.Vertex
+
+let fragment_shader = Shader.create
+  ~version:(Shader.recommended_version ())
+  (`File "src/test/default_shader.frag")
   Shader.Fragment
 
-let program = Program.build 
+let program = Program.build
   ~shaders:[vertex_shader; fragment_shader]
   ~attributes:["position"; "in_color"]
   ~uniforms:["MVPMatrix"]
@@ -78,7 +78,7 @@ let program = Program.build
 (* VAO creation *)
 let vao_cube = VAO.create ()
 
-let () = 
+let () =
   VAO.bind (Some vao_cube);
   VBO.bind (Some vbo_cube);
   (* Position attribute *)
@@ -99,9 +99,9 @@ let () =
   VAO.bind None
 
 
-let vao_axis = VAO.create () 
+let vao_axis = VAO.create ()
 
-let () = 
+let () =
   VAO.bind (Some vao_axis);
   VBO.bind (Some vbo_axis);
   (* Position attribute *)
@@ -118,7 +118,7 @@ let () =
     ~size:3
     ~kind:VAO.Float
     ~offset:(18 * 4) ();
-  VAO.bind None; 
+  VAO.bind None;
   VBO.bind None
 
 
@@ -126,18 +126,18 @@ let () =
 let proj = Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
 (* let proj = Matrix3D.orthographic ~near:(-20.) ~far:(20.) ~left:(-2.) ~right:(2.) ~top:(1.5) ~bottom:(-1.5) *)
 
-let view = Matrix3D.look_at 
-  ~from:Vector3f.({x = 1.; y = 0.6; z = 1.4}) 
+let view = Matrix3D.look_at
+  ~from:Vector3f.({x = 1.; y = 0.6; z = 1.4})
   ~at:Vector3f.({x = 0.; y = 0.; z = 0.})
   ~up:Vector3f.unit_y
-  
+
 let vp = Matrix3D.product proj view
 
-let rot_angle = ref 0. 
+let rot_angle = ref 0.
 
 
 (* Display *)
-let display () = 
+let display () =
   Program.use (Some program);
   (* Compute model matrix *)
   let t = Unix.gettimeofday () in
@@ -146,12 +146,12 @@ let display () =
   let mvp = Matrix3D.product vp model in
   rot_angle := !rot_angle +. (abs_float (cos (Unix.gettimeofday ()) /. 10.));
   (* Display the cube *)
-  Uniform.set (Uniform.Matrix3D mvp) 
+  Uniform.set (Uniform.Matrix3D mvp)
               (Program.uniform program "MVPMatrix");
   VAO.bind (Some vao_cube);
   VAO.draw VAO.Triangles 0 (Array.length cube / 6);
   (* Display the axis *)
-  Uniform.set (Uniform.Matrix3D vp) 
+  Uniform.set (Uniform.Matrix3D vp)
               (Program.uniform program "MVPMatrix");
   VAO.bind (Some vao_axis);
   VAO.draw VAO.Lines 0 6;
@@ -166,7 +166,7 @@ let rec event_loop () =
     match e with
     |Event.Closed ->
       Window.close win
-    |Event.KeyPressed ->
+    |Event.KeyPressed _ ->
       print_endline "key pressed"
     |Event.ButtonPressed ->
       print_endline "button pressed"
@@ -194,5 +194,3 @@ let () =
   main_loop ();
   Printf.printf "Avg FPS : %f\n%!" (float_of_int (!frame_count) /. (Unix.gettimeofday () -. !initial_time));
   Window.destroy win
-
-

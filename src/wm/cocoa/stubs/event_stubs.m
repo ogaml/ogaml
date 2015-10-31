@@ -20,6 +20,104 @@ caml_cocoa_event_type(value mlevent)
   CAMLreturn(Val_int(type-1));
 }
 
+CAMLprim value
+caml_cocoa_event_modifier_flags(value mlevent)
+{
+  CAMLparam1(mlevent);
+  CAMLlocal2(li, cons);
+  li = Val_emptylist;
+
+  NSEvent* event = (NSEvent*) mlevent;
+
+  NSEventModifierFlags mask = [event modifierFlags];
+
+  if(mask & NSAlphaShiftKeyMask)
+  {
+    cons = caml_alloc(2, 0);
+    Store_field(cons, 0, 0); // 0 for NSAlphaShiftKeyMask is the first
+    Store_field(cons, 1, li);
+    li = cons;
+  }
+  if(mask & NSShiftKeyMask)
+  {
+    cons = caml_alloc(2, 0);
+    Store_field(cons, 0, 1);
+    Store_field(cons, 1, li);
+    li = cons;
+  }
+  if(mask & NSControlKeyMask)
+  {
+    cons = caml_alloc(2, 0);
+    Store_field(cons, 0, 2);
+    Store_field(cons, 1, li);
+    li = cons;
+  }
+  if(mask & NSAlternateKeyMask)
+  {
+    cons = caml_alloc(2, 0);
+    Store_field(cons, 0, 2);
+    Store_field(cons, 1, li);
+    li = cons;
+  }
+  if(mask & NSCommandKeyMask)
+  {
+    cons = caml_alloc(2, 0);
+    Store_field(cons, 0, 2);
+    Store_field(cons, 1, li);
+    li = cons;
+  }
+  if(mask & NSNumericPadKeyMask)
+  {
+    cons = caml_alloc(2, 0);
+    Store_field(cons, 0, 2);
+    Store_field(cons, 1, li);
+    li = cons;
+  }
+  if(mask & NSHelpKeyMask)
+  {
+    cons = caml_alloc(2, 0);
+    Store_field(cons, 0, 2);
+    Store_field(cons, 1, li);
+    li = cons;
+  }
+  if(mask & NSFunctionKeyMask)
+  {
+    cons = caml_alloc(2, 0);
+    Store_field(cons, 0, 2);
+    Store_field(cons, 1, li);
+    li = cons;
+  }
+  if(mask & NSDeviceIndependentModifierFlagsMask)
+  {
+    cons = caml_alloc(2, 0);
+    Store_field(cons, 0, 2);
+    Store_field(cons, 1, li);
+    li = cons;
+  }
+
+  CAMLreturn(li);
+}
+
+CAMLprim value
+caml_cocoa_event_characters(value mlevent)
+{
+  CAMLparam1(mlevent);
+
+  NSEvent* event = (NSEvent*) mlevent;
+
+  CAMLreturn((value)[event characters]);
+}
+
+CAMLprim value
+caml_cocoa_event_key_code(value mlevent)
+{
+  CAMLparam1(mlevent);
+
+  NSEvent* event = (NSEvent*) mlevent;
+
+  CAMLreturn(Int_val([event keyCode]));
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // OGEvent implementation

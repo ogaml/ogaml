@@ -1,6 +1,16 @@
 
 val init_arp : unit -> unit
 
+module NSString : sig
+
+  type t
+
+  val create : string -> t
+
+  val get : t -> string
+
+end
+
 module NSRect : sig
 
   type t
@@ -74,7 +84,26 @@ module NSEvent : sig
     | EventTypeQuickLook
     | EventTypePressure
 
+  type modifier_flag =
+    | NSAlphaShiftKeyMask
+    | NSShiftKeyMask
+    | NSControlKeyMask
+    | NSAlternateKeyMask
+    | NSCommandKeyMask
+    | NSNumericPadKeyMask
+    | NSHelpKeyMask
+    | NSFunctionKeyMask
+    | NSDeviceIndependentModifierFlagsMask
+
   val get_type : t -> event_type
+
+  (* Key event information *)
+
+  val modifier_flags : t -> modifier_flag list
+
+  val character : t -> NSString.t
+
+  val key_code : t -> int
 
 end
 
@@ -139,7 +168,6 @@ module NSOpenGLPixelFormat : sig
     | NSOpenGLPFAOpenGLProfile      of profile
     | NSOpenGLPFAVirtualScreenCount of int
 
-  (* TODO Change int *)
   val init_with_attributes : attribute list -> t
 
 end

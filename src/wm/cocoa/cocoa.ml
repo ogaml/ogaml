@@ -1,6 +1,16 @@
 
 external init_arp : unit -> unit = "caml_init_arp"
 
+module NSString = struct
+
+  type t
+
+  external create : string -> t = "caml_cocoa_gen_string"
+
+  external get : t -> string = "caml_cocoa_get_string"
+
+end
+
 module NSRect = struct
 
   type t
@@ -80,7 +90,25 @@ module NSEvent = struct
     | EventTypeQuickLook
     | EventTypePressure
 
+  type modifier_flag =
+    | NSAlphaShiftKeyMask
+    | NSShiftKeyMask
+    | NSControlKeyMask
+    | NSAlternateKeyMask
+    | NSCommandKeyMask
+    | NSNumericPadKeyMask
+    | NSHelpKeyMask
+    | NSFunctionKeyMask
+    | NSDeviceIndependentModifierFlagsMask
+
   external get_type : t -> event_type = "caml_cocoa_event_type"
+
+  external modifier_flags : t -> modifier_flag list
+    = "caml_cocoa_event_modifier_flags"
+
+  external character : t -> NSString.t = "caml_cocoa_event_characters"
+
+  external key_code : t -> int = "caml_cocoa_event_key_code"
 
 end
 

@@ -77,6 +77,102 @@ let size win =
 let is_open win =
   Cocoa.OGWindowController.is_window_open win
 
+let get_key_event event =
+  let keycode = Keycode.(
+    match Cocoa.NSString.get (Cocoa.NSEvent.character event) with
+    | "a" | "A" -> A
+    | "b" | "B" -> B
+    | "c" | "C" -> C
+    | "d" | "D" -> D
+    | "e" | "E" -> E
+    | "f" | "F" -> F
+    | "g" | "G" -> G
+    | "h" | "H" -> H
+    | "i" | "I" -> I
+    | "j" | "J" -> J
+    | "k" | "K" -> K
+    | "l" | "L" -> L
+    | "m" | "M" -> M
+    | "n" | "N" -> N
+    | "o" | "O" -> O
+    | "p" | "P" -> P
+    | "q" | "Q" -> Q
+    | "r" | "R" -> R
+    | "s" | "S" -> S
+    | "t" | "T" -> T
+    | "u" | "U" -> U
+    | "v" | "V" -> V
+    | "w" | "W" -> W
+    | "x" | "X" -> X
+    | "y" | "Y" -> Y
+    | "z" | "Z" -> Z
+    | _ -> begin
+        match Cocoa.NSEvent.key_code event with
+        | 18  -> Num1
+        | 19  -> Num2
+        | 20  -> Num3
+        | 21  -> Num4
+        | 23  -> Num5
+        | 22  -> Num6
+        | 26  -> Num7
+        | 28  -> Num8
+        | 25  -> Num9
+        | 29  -> Num0
+        | 83  -> Numpad1
+        | 84  -> Numpad2
+        | 85  -> Numpad3
+        | 86  -> Numpad4
+        | 87  -> Numpad5
+        | 88  -> Numpad6
+        | 89  -> Numpad7
+        | 91  -> Numpad8
+        | 92  -> Numpad9
+        | 82  -> Numpad0
+        | 78  -> NumpadMinus
+        | 67  -> NumpadTimes
+        | 69  -> NumpadPlus
+        | 75  -> NumpadDiv
+        | 65  -> NumpadDot
+        | 76  -> NumpadReturn
+        | 53  -> Escape
+        | 48  -> Tab
+        | 55  -> LControl
+        (* | 59  -> LControl -- here actual ctrl *)
+        | 56  -> LShift
+        | 58  -> LAlt
+        | 49  -> Space
+        (* | 55  -> RControl -- oh... *)
+        | 36  -> Return
+        | 117 -> Delete
+        | 126 -> Up
+        | 123 -> Left
+        | 125 -> Down
+        | 124 -> Right
+        | 122 -> F1
+        | 120 -> F2
+        | 99  -> F3
+        | 118 -> F4
+        | 96  -> F5
+        | 97  -> F6
+        | 98  -> F7
+        | 100 -> F8
+        | 101 -> F9
+        | 109 -> F10
+        | 103 -> F11
+        | 111 -> F12
+        | _   -> Unknown
+    end
+  ) in
+  let modifiers = Cocoa.NSEvent.modifier_flags event in
+  let (shift,control,alt) = Cocoa.NSEvent.(
+    List.mem NSShiftKeyMask     modifiers,
+    List.mem NSCommandKeyMask   modifiers,
+    List.mem NSAlternateKeyMask modifiers
+  ) in
+  Event.KeyEvent.({
+    key = keycode ; shift = shift ; control = control ; alt = alt
+  })
+
 let poll_event win =
   Cocoa.OGWindowController.process_event win ;
   match Cocoa.OGWindowController.pop_event win with
@@ -86,8 +182,8 @@ let poll_event win =
         | OGEvent.CocoaEvent event ->
             NSEvent.(
               match get_type event with
-              | KeyDown       -> Some Event.KeyPressed
-              | KeyUp         -> Some Event.KeyReleased
+              | KeyDown       -> Some (Event.KeyPressed (get_key_event event))
+              | KeyUp         -> Some (Event.KeyReleased (get_key_event event))
               | LeftMouseDown -> Some Event.ButtonPressed
               | LeftMouseUp   -> Some Event.ButtonReleased
               | MouseMoved    -> Some Event.MouseMoved

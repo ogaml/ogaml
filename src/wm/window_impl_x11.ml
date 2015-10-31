@@ -5,36 +5,36 @@ type t = {
   mutable closed : bool
 }
 
-let create ~width ~height = 
+let create ~width ~height =
   (* The display is a singleton in C (created only once) *)
   let display = Xlib.Display.create () in
-  let window  = 
+  let window  =
       Xlib.Window.create_simple
           ~display:display
           ~parent:(Xlib.Window.root_of display)
-          ~size:(width,height) 
-          ~origin:(50,50) 
+          ~size:(width,height)
+          ~origin:(50,50)
           ~background:0;
   in
   let atom = Xlib.Atom.intern display "WM_DELETE_WINDOW" false in
-  begin 
+  begin
     match atom with
     |None -> assert false
     |Some(a) -> Xlib.Atom.set_wm_protocols display window [a]
   end;
-  Xlib.Event.set_mask display window 
-    [Xlib.Event.ExposureMask; 
-      Xlib.Event.KeyPressMask; 
-      Xlib.Event.KeyReleaseMask; 
+  Xlib.Event.set_mask display window
+    [Xlib.Event.ExposureMask;
+      Xlib.Event.KeyPressMask;
+      Xlib.Event.KeyReleaseMask;
       Xlib.Event.ButtonPressMask;
       Xlib.Event.ButtonReleaseMask;
       Xlib.Event.PointerMotionMask];
   Xlib.Window.map display window;
   Xlib.Display.flush display;
   let vi = Xlib.VisualInfo.choose display
-    [Xlib.VisualInfo.RGBA; 
-     Xlib.VisualInfo.DepthSize 24; 
-     Xlib.VisualInfo.DoubleBuffer] 
+    [Xlib.VisualInfo.RGBA;
+     Xlib.VisualInfo.DepthSize 24;
+     Xlib.VisualInfo.DoubleBuffer]
   in
   let context = Xlib.GLContext.create display vi in
   Xlib.Window.attach display window context;
@@ -44,29 +44,29 @@ let close win =
   Xlib.Window.unmap win.display win.window;
   win.closed <- true
 
-let destroy win = 
+let destroy win =
   Xlib.Window.destroy win.display win.window;
   win.closed <- true
 
-let size win = 
+let size win =
   Xlib.Window.size win.display win.window
 
-let is_open win = 
+let is_open win =
   not win.closed
 
 let keysym_to_key = Keycode.(function
   | Xlib.Event.Code i -> begin
     match i with
-    |10 -> Num1        |11 -> Num2 
-    |12 -> Num3        |13 -> Num4 
+    |10 -> Num1        |11 -> Num2
+    |12 -> Num3        |13 -> Num4
     |14 -> Num5        |15 -> Num6
-    |16 -> Num7        |17 -> Num8 
+    |16 -> Num7        |17 -> Num8
     |18 -> Num9        |19 -> Num0
-    |87 -> Numpad1     |88 -> Numpad2 
-    |89 -> Numpad3     |83 -> Numpad4 
+    |87 -> Numpad1     |88 -> Numpad2
+    |89 -> Numpad3     |83 -> Numpad4
     |84 -> Numpad5     |85 -> Numpad6
-    |79 -> Numpad7     |80 -> Numpad8 
-    |81 -> Numpad9     |90 -> Numpad0 
+    |79 -> Numpad7     |80 -> Numpad8
+    |81 -> Numpad9     |90 -> Numpad0
     |82 -> NumpadMinus |63  -> NumpadTimes
     |86 -> NumpadPlus  |106 -> NumpadDiv
     |91 -> NumpadDot   |104 -> NumpadReturn
@@ -95,7 +95,7 @@ let keysym_to_key = Keycode.(function
     |'p' -> P |'q' -> Q |'r' -> R
     |'s' -> S |'t' -> T |'u' -> U
     |'v' -> V |'w' -> W |'x' -> X
-    |'y' -> Y |'z' -> Z 
+    |'y' -> Y |'z' -> Z
     | _  -> Unknown
   end)
 
@@ -105,33 +105,33 @@ let value_to_button = Button.(function
   |3 -> Right
   |_ -> Unknown)
 
-let poll_event win = 
+let poll_event win =
   if win.closed then None
-  else begin 
+  else begin
     match Xlib.Event.next win.display win.window with
     |Some e -> begin
       match Xlib.Event.data e with
       | Xlib.Event.ClientMessage a -> begin
         match Xlib.Atom.intern win.display "WM_DELETE_WINDOW" true with
-        | Some(a') when a = a' -> 
+        | Some(a') when a = a' ->
             win.closed <- true;
             Some Event.Closed
         | _ -> None
       end
-      | Xlib.Event.KeyPress      (key,modif) -> Some Event.KeyPressed
-(*          Some Event.(KeyPressed {
-              KeyEvent.key = keysym_to_key key; 
+      | Xlib.Event.KeyPress      (key,modif) ->
+         Some Event.(KeyPressed {
+              KeyEvent.key = keysym_to_key key;
               KeyEvent.shift = modif.Xlib.Event.shift || modif.Xlib.Event.lock;
               KeyEvent.control = modif.Xlib.Event.ctrl;
               KeyEvent.alt = modif.Xlib.Event.alt
-          })*)
-      | Xlib.Event.KeyRelease    (key,modif) -> Some Event.KeyReleased
-(*          Some Event.(KeyReleased {
-              KeyEvent.key = keysym_to_key key; 
+          })
+      | Xlib.Event.KeyRelease    (key,modif) ->
+         Some Event.(KeyReleased {
+              KeyEvent.key = keysym_to_key key;
               KeyEvent.shift = modif.Xlib.Event.shift || modif.Xlib.Event.lock;
               KeyEvent.control = modif.Xlib.Event.ctrl;
               KeyEvent.alt = modif.Xlib.Event.alt
-          })*)
+          })
       | Xlib.Event.ButtonPress   (but,pos,modif) -> Some Event.ButtonPressed
 (*          Some Event.(ButtonPressed {
               ButtonEvent.button = value_to_button but;
@@ -160,5 +160,5 @@ let poll_event win =
     | None -> None
   end
 
-let display win = 
+let display win =
   Xlib.Window.swap win.display win.window
