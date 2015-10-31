@@ -26,6 +26,7 @@ Cocoa specific:
   ✔ Implement window destroy properly @done(2015-10-26 02:04) @project(Cocoa specific)
   ✔ Add window closed event @done(2015-10-31 00:30) @project(Cocoa specific)
   ☐ Update the view (and probably other things) when resizing
+  ☐ Handle left/right modifiers for keycodes
 
 Xlib specific:
   ✔ Match on clientmessage in ogamlWindow_xlib for safety @done(2015-10-20 20:29) @project(Xlib specific)
