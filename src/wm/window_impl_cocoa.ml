@@ -35,7 +35,6 @@ let create ~width ~height =
     NSWindow.make_key_and_order_front window;
     NSWindow.center window ;
     (* NSWindow.make_main window ; *)
-    (* Set some delegate for the window? *)
     NSWindow.set_for_events window ;
     NSWindow.set_autodisplay window true
   );
@@ -173,6 +172,24 @@ let get_key_event event =
     key = keycode ; shift = shift ; control = control ; alt = alt
   })
 
+let make_mouse_event button event win =
+  let (x,y) = Cocoa.OGWindowController.mouse_location win in
+  let modifiers = Cocoa.NSEvent.modifier_flags event in
+  let (shift,control,alt) = Cocoa.NSEvent.(
+    List.mem NSShiftKeyMask     modifiers,
+    List.mem NSCommandKeyMask   modifiers,
+    List.mem NSAlternateKeyMask modifiers
+  ) in
+  let i = int_of_float in
+  Event.ButtonEvent.({
+    button = button ;
+    x = i x ;
+    y = i y ;
+    shift = shift ;
+    control = control ;
+    alt = alt
+  })
+
 let poll_event win =
   Cocoa.OGWindowController.process_event win ;
   match Cocoa.OGWindowController.pop_event win with
@@ -182,12 +199,28 @@ let poll_event win =
         | OGEvent.CocoaEvent event ->
             NSEvent.(
               match get_type event with
-              | KeyDown       -> Some (Event.KeyPressed (get_key_event event))
-              | KeyUp         -> Some (Event.KeyReleased (get_key_event event))
-              | LeftMouseDown -> Some Event.ButtonPressed
-              | LeftMouseUp   -> Some Event.ButtonReleased
-              | MouseMoved    -> Some Event.MouseMoved
-              | _             -> None
+              | KeyDown        -> Some (Event.KeyPressed (get_key_event event))
+              | KeyUp          -> Some (Event.KeyReleased (get_key_event event))
+              | LeftMouseDown  -> Some (Event.ButtonPressed (
+                  make_mouse_event Button.Left event win
+                ))
+              | RightMouseDown -> Some (Event.ButtonPressed (
+                  make_mouse_event Button.Right event win
+                ))
+              | OtherMouseDown -> Some (Event.ButtonPressed (
+                  make_mouse_event Button.Middle event win
+                ))
+              | LeftMouseUp    -> Some (Event.ButtonReleased (
+                  make_mouse_event Button.Left event win
+                ))
+              | RightMouseUp   -> Some (Event.ButtonReleased (
+                  make_mouse_event Button.Right event win
+                ))
+              | OtherMouseUp   -> Some (Event.ButtonReleased (
+                  make_mouse_event Button.Middle event win
+                ))
+              | MouseMoved     -> Some Event.MouseMoved
+              | _              -> None
             )
         | OGEvent.CloseWindow -> Some Event.Closed
       )

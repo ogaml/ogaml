@@ -20,6 +20,6 @@ type t =
   | Closed
   | KeyPressed     of KeyEvent.t
   | KeyReleased    of KeyEvent.t
-  | ButtonPressed  (* of ButtonEvent.t *)
-  | ButtonReleased (* of ButtonEvent.t *)
+  | ButtonPressed  of ButtonEvent.t
+  | ButtonReleased of ButtonEvent.t
   | MouseMoved     (* of MouseEvent.t  *)

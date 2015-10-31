@@ -118,6 +118,23 @@ caml_cocoa_event_key_code(value mlevent)
   CAMLreturn(Int_val([event keyCode]));
 }
 
+CAMLprim value
+caml_cocoa_mouse_location(value mlevent)
+{
+  CAMLparam1(mlevent);
+  CAMLlocal1(pair);
+
+  // NSEvent* event = (NSEvent*) mlevent;
+
+  NSPoint loc = [NSEvent mouseLocation];
+
+  pair = caml_alloc(2,0);
+  Store_field(pair,0,caml_copy_double(loc.x));
+  Store_field(pair,1,caml_copy_double(loc.y));
+
+  CAMLreturn(pair);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // OGEvent implementation

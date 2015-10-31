@@ -89,6 +89,11 @@
   [[m_view openGLContext] flushBuffer];
 }
 
+-(NSPoint)mouseLocation
+{
+  return [m_window mouseLocationOutsideOfEventStream];
+}
+
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -206,4 +211,21 @@ caml_cocoa_controller_flush_glctx(value mlcontroller)
   [controller flushGLContext];
 
   CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_controller_mouse_location(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+  CAMLlocal1(pair);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  NSPoint loc = [controller mouseLocation];
+
+  pair = caml_alloc(2,0);
+  Store_field(pair,0,caml_copy_double(loc.x));
+  Store_field(pair,1,caml_copy_double(loc.y));
+
+  CAMLreturn(pair);
 }

@@ -110,6 +110,8 @@ module NSEvent = struct
 
   external key_code : t -> int = "caml_cocoa_event_key_code"
 
+  external mouse_location : t -> float * float = "caml_cocoa_mouse_location"
+
 end
 
 module OGEvent = struct
@@ -349,5 +351,8 @@ module OGWindowController = struct
     = "caml_cocoa_controller_set_glctx"
 
   external flush_context : t -> unit = "caml_cocoa_controller_flush_glctx"
+
+  external mouse_location : t -> float * float
+    = "caml_cocoa_controller_mouse_location"
 
 end

@@ -105,6 +105,10 @@ module NSEvent : sig
 
   val key_code : t -> int
 
+  (* Mouse event information *)
+
+  val mouse_location : t -> float * float
+
 end
 
 module OGEvent : sig
@@ -269,5 +273,7 @@ module OGWindowController : sig
   val set_context : t -> NSOpenGLContext.t -> unit
 
   val flush_context : t -> unit
+
+  val mouse_location : t -> float * float
 
 end

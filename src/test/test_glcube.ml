@@ -168,7 +168,7 @@ let rec event_loop () =
       Window.close win
     |Event.KeyPressed _ ->
       print_endline "key pressed"
-    |Event.ButtonPressed ->
+    |Event.ButtonPressed _ ->
       print_endline "button pressed"
     | _ -> ()
   end; event_loop ()
