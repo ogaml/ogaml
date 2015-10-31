@@ -113,6 +113,19 @@ let times m v =
     z = v.x *. m.{2} +. v.y *. m.{6} +. v.z *. m.{10} +. m.{12}
   }
 
+let from_quaternion q = 
+  let mat = zero () in Quaternion.(
+  set 0 0 mat (1. -. 2. *. q.j *. q.j -. 2. *. q.k *. q.k);
+  set 1 0 mat (2. *. q.i *. q.j -. 2. *. q.r *. q.k);
+  set 2 0 mat (2. *. q.i *. q.k +. 2. *. q.r *. q.j);
+  set 0 1 mat (2. *. q.i *. q.j +. 2. *. q.r *. q.k);
+  set 1 1 mat (1. -. 2. *. q.i *. q.i -. 2. *. q.k *. q.k);
+  set 2 1 mat (2. *. q.j *. q.k -. 2. *. q.r *. q.i);
+  set 0 2 mat (2. *. q.i *. q.k -. 2. *. q.r *. q.j);
+  set 1 2 mat (2. *. q.j *. q.k +. 2. *. q.r *. q.i);
+  set 2 2 mat (1. -. 2. *. q.i *. q.i -. 2. *. q.j *. q.j);
+  set 3 3 mat 1.; mat)
+
 let look_at ~from ~at ~up = 
   let open Vector3f in
   let dir = direction from at in
