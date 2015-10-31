@@ -73,10 +73,10 @@ caml_cocoa_get_nsrect(value mlrect)
   NSRect* rect = (NSRect*) Data_custom_val(mlrect);
 
   tuple = caml_alloc(4,0);
-  Store_field(tuple,0,rect->origin.x);
-  Store_field(tuple,1,rect->origin.y);
-  Store_field(tuple,2,rect->size.width);
-  Store_field(tuple,3,rect->size.height);
+  Store_field(tuple,0,caml_copy_double(rect->origin.x));
+  Store_field(tuple,1,caml_copy_double(rect->origin.y));
+  Store_field(tuple,2,caml_copy_double(rect->size.width));
+  Store_field(tuple,3,caml_copy_double(rect->size.height));
 
   CAMLreturn(tuple);
 }
