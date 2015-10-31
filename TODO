@@ -69,7 +69,7 @@ Math part:
   ✔ Debug matrices... Really @done(2015-10-25 09:17) @project(Math part)
   ✔ Recode inverse matrices after debugging @done(2015-10-25 09:20) @project(Math part)
   ☐ Matrices and vector exceptions
-  ☐ Implement Quaternions
+  ✔ Implement Quaternions @done(2015-11-01 00:03) @project(Math part)
   ✔ Implement polygons @done(2015-10-26 16:33) @project(Math part)
   ☐ Parameterize Poly.axis with vector3f
   ✔ Rename matrix3f in matrix3D @done(2015-10-30 10:08) @project(Math part)

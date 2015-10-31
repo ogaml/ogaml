@@ -132,7 +132,7 @@ let poll_event win =
               KeyEvent.control = modif.Xlib.Event.ctrl;
               KeyEvent.alt = modif.Xlib.Event.alt
           })
-      | Xlib.Event.ButtonPress   (but,pos,modif) -> Some Event.ButtonPressed
+      | Xlib.Event.ButtonPress   (but,pos,modif) ->
           Some Event.(ButtonPressed {
               ButtonEvent.button = value_to_button but;
               ButtonEvent.x = pos.Xlib.Event.x;
@@ -141,7 +141,7 @@ let poll_event win =
               ButtonEvent.control = modif.Xlib.Event.ctrl;
               ButtonEvent.alt = modif.Xlib.Event.alt
           })
-      | Xlib.Event.ButtonRelease (but,pos,modif) -> Some Event.ButtonReleased
+      | Xlib.Event.ButtonRelease (but,pos,modif) ->
          Some Event.(ButtonReleased {
               ButtonEvent.button = value_to_button but;
               ButtonEvent.x = pos.Xlib.Event.x;
@@ -150,7 +150,7 @@ let poll_event win =
               ButtonEvent.control = modif.Xlib.Event.ctrl;
               ButtonEvent.alt = modif.Xlib.Event.alt
           })
-      | Xlib.Event.MotionNotify  pos -> Some Event.MouseMoved
+      | Xlib.Event.MotionNotify  pos -> 
          Some Event.(MouseMoved {
               MouseEvent.x = pos.Xlib.Event.x;
               MouseEvent.y = pos.Xlib.Event.y
