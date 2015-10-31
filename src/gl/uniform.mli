@@ -21,6 +21,10 @@ type t =
   | Matrix3x4 of Buffers.Data.ft
   | Matrix4x3 of Buffers.Data.ft
   | Matrix3D  of OgamlMath.Matrix3D.t
+  | Vector3f  of OgamlMath.Vector3f.t
+  | Vector3i  of OgamlMath.Vector3i.t
+  | Color     of Color.RGB.t
+
 
 val set : t -> Program.uniform -> unit
 

@@ -14,7 +14,7 @@ COBJS = $(CSOURCES:.c=.o)
 COBJS2 = buffers_stubs.o shader_stubs.o error_stubs.o config_stubs.o\
 	 program_stubs.o stubs.o uniform_stubs.o
 
-MLSOURCES = config.ml error.ml shader.ml program.ml buffers.ml uniform.ml
+MLSOURCES = config.ml error.ml shader.ml program.ml buffers.ml color.ml uniform.ml
 
 MLINTERFACES =
 

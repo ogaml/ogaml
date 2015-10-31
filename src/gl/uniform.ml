@@ -21,6 +21,9 @@ type t =
   | Matrix3x4 of Buffers.Data.ft
   | Matrix4x3 of Buffers.Data.ft
   | Matrix3D  of OgamlMath.Matrix3D.t
+  | Vector3f  of OgamlMath.Vector3f.t
+  | Vector3i  of OgamlMath.Vector3i.t
+  | Color     of Color.RGB.t
 
 
 external abstract_uniform1f : 
@@ -111,6 +114,6 @@ let set v loc =
   | Matrix3x4 d         -> abstract_uniformmat34 loc d
   | Matrix4x3 d         -> abstract_uniformmat43 loc d
   | Matrix3D  m         -> abstract_uniformmat4 loc (OgamlMath.Matrix3D.to_bigarray m)
-
-
-
+  | Vector3f  v         -> OgamlMath.Vector3f.(abstract_uniform3f loc v.x v.y v.z)
+  | Vector3i  v         -> OgamlMath.Vector3i.(abstract_uniform3i loc v.x v.y v.z)
+  | Color     c         -> Color.RGB.(abstract_uniform4f loc c.r c.g c.b c.a)
