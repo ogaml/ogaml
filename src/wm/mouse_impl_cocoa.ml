@@ -18,4 +18,11 @@ let set_relative_position win (x,y) =
   let f = float_of_int in
   Cocoa.Mouse.warp ((f x) +. dx) ((f y) +. dy)
 
-let is_pressed button = true
+let is_pressed button =
+  let pressed_buttons = Cocoa.NSEvent.pressed_mouse_buttons () in
+  let conv = Cocoa.NSEvent.(function
+    | ButtonLeft  -> Button.Left
+    | ButtonRight -> Button.Right
+    | ButtonOther -> Button.Middle
+  ) in
+  List.mem button (List.map conv pressed_buttons)

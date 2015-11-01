@@ -28,6 +28,7 @@ Cocoa specific:
   ☐ Update the view (and probably other things) when resizing
   ☐ Handle left/right modifiers for keycodes
   ☐ Discuss the possibility to dissociate mouse and cursor to get delta events @source(https://developer.apple.com/library/mac/documentation/GraphicsImaging/Reference/Quartz_Services_Ref/#//apple_ref/c/func/CGAssociateMouseAndMouseCursorPosition)
+  ☐ Differentiate between Middle and Other for mouse
 
 Xlib specific:
   ✔ Match on clientmessage in ogamlWindow_xlib for safety @done(2015-10-20 20:29) @project(Xlib specific)

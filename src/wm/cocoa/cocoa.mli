@@ -101,6 +101,11 @@ module NSEvent : sig
     | NSFunctionKeyMask
     | NSDeviceIndependentModifierFlagsMask
 
+  type mouse_button =
+    | ButtonLeft
+    | ButtonRight
+    | ButtonOther
+
   val get_type : t -> event_type
 
   (* Key event information *)
@@ -114,6 +119,8 @@ module NSEvent : sig
   (* Mouse event information *)
 
   val mouse_location : unit -> float * float
+
+  val pressed_mouse_buttons : unit -> mouse_button list
 
 end
 

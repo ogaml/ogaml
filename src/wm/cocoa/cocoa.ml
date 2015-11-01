@@ -107,6 +107,11 @@ module NSEvent = struct
     | NSFunctionKeyMask
     | NSDeviceIndependentModifierFlagsMask
 
+  type mouse_button =
+    | ButtonLeft
+    | ButtonRight
+    | ButtonOther
+
   external get_type : t -> event_type = "caml_cocoa_event_type"
 
   external modifier_flags : t -> modifier_flag list
@@ -117,6 +122,9 @@ module NSEvent = struct
   external key_code : t -> int = "caml_cocoa_event_key_code"
 
   external mouse_location : unit -> float * float = "caml_cocoa_mouse_location"
+
+  external pressed_mouse_buttons : unit -> mouse_button list
+    = "caml_cocoa_event_pressed_mouse_buttons"
 
 end
 

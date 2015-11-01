@@ -133,6 +133,46 @@ caml_cocoa_mouse_location(value unit)
   CAMLreturn(pair);
 }
 
+CAMLprim value
+caml_cocoa_event_pressed_mouse_buttons(value unit)
+{
+  CAMLparam0();
+  CAMLlocal2(li,cons);
+  li = Val_emptylist;
+
+  NSUInteger mask = [NSEvent pressedMouseButtons];
+
+  if(mask & (1 << 0)) // Left Button is pressed
+  {
+    cons = caml_alloc(2, 0);
+    Store_field(cons, 0, 0); // Left Button
+    Store_field(cons, 1, li);
+    li = cons;
+
+    mask -= (1 << 0);
+  }
+
+  if(mask & (1 << 1)) // Right Button is pressed
+  {
+    cons = caml_alloc(2, 0);
+    Store_field(cons, 0, 1); // Right Button
+    Store_field(cons, 1, li);
+    li = cons;
+
+    mask -= (1 << 1);
+  }
+
+  if(mask != 0) // Some other bit is on
+  {
+    cons = caml_alloc(2, 0);
+    Store_field(cons, 0, 2); // Other Button
+    Store_field(cons, 1, li);
+    li = cons;
+  }
+
+  CAMLreturn(li);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // OGEvent implementation
