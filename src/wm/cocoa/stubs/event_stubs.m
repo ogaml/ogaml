@@ -119,12 +119,10 @@ caml_cocoa_event_key_code(value mlevent)
 }
 
 CAMLprim value
-caml_cocoa_mouse_location(value mlevent)
+caml_cocoa_mouse_location(value unit)
 {
-  CAMLparam1(mlevent);
+  CAMLparam0();
   CAMLlocal1(pair);
-
-  // NSEvent* event = (NSEvent*) mlevent;
 
   NSPoint loc = [NSEvent mouseLocation];
 

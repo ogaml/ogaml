@@ -110,7 +110,7 @@ module NSEvent = struct
 
   external key_code : t -> int = "caml_cocoa_event_key_code"
 
-  external mouse_location : t -> float * float = "caml_cocoa_mouse_location"
+  external mouse_location : unit -> float * float = "caml_cocoa_mouse_location"
 
 end
 

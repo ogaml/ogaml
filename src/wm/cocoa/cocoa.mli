@@ -107,7 +107,7 @@ module NSEvent : sig
 
   (* Mouse event information *)
 
-  val mouse_location : t -> float * float
+  val mouse_location : unit -> float * float
 
 end
 
