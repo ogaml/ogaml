@@ -8,14 +8,6 @@ NAT_DEPS = ogamlGL.cmxa
 
 BYT_DEPS = $(NAT_DEPS:.cmxa=.cma)
 
-MLSOURCES = window.ml mouse.ml
-
-MLINTERFACES = button.mli keycode.mli event.mli
-
-MLOBJS = $(MLSOURCES:.ml=.cmo) 
-
-MLNATOBJS = $(MLSOURCES:.ml=.cmx)
-
 MLCMIS = $(MLINTERFACES:.mli=.cmi)
 
 MLLIB = ogamlWindow

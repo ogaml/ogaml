@@ -6,11 +6,13 @@ INCLUDE_DIRS = -I ../../utils/
 
 CSOURCES = $(STUBS_DIR)/atoms_stubs.c $(STUBS_DIR)/display_stubs.c\
 	   $(STUBS_DIR)/event_stubs.c $(STUBS_DIR)/window_stubs.c\
+	   $(STUBS_DIR)/mouse_stubs.c\
 	   $(STUBS_DIR)/glx_stubs.c ../../utils/stubs.c
 
 COBJS = $(CSOURCES:.c=.o)
 
-COBJS2 = atoms_stubs.o display_stubs.o event_stubs.o window_stubs.o glx_stubs.o stubs.o
+COBJS2 = atoms_stubs.o display_stubs.o event_stubs.o window_stubs.o\
+	 glx_stubs.o stubs.o mouse_stubs.o
 
 MLSOURCES = xlib.ml
 

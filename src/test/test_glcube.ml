@@ -131,7 +131,7 @@ let view = Matrix3D.look_at
   ~at:Vector3f.({x = 0.; y = 0.; z = 0.})
   ~up:Vector3f.unit_y
 
-let position = Vector3f.({x = 1.; y = 0.6; z = 1.4})
+let position = ref Vector3f.({x = 1.; y = 0.6; z = 1.4})
 
 let rot_angle = ref 0.
 
@@ -146,7 +146,7 @@ let display () =
   (* Compute model matrix *)
   let t = Unix.gettimeofday () in
   let view =
-    Matrix3D.translation (Vector3f.prop (-1.) position)
+    Matrix3D.translation (Vector3f.prop (-1.) !position)
     |> Matrix3D.product
       (Matrix3D.from_quaternion
         (Quaternion.times
@@ -173,6 +173,23 @@ let display () =
   Program.use None
 
 
+(* Camera *)
+let centerx, centery = 
+  let (x,y) = Window.size win in
+  (x / 2, y / 2)
+
+let () = 
+  Mouse.set_relative_position win (centerx, centery)
+
+let rec update_camera () = 
+  let x,y = Mouse.relative_position win in
+  let dx, dy = x - centerx, y - centery in
+  let lim = Constants.pi /. 2. -. 0.1 in
+  view_theta := !view_theta -. 0.005 *. (float_of_int dx);
+  view_phi   := !view_phi   -. 0.005 *. (float_of_int dy);
+  view_phi   := min (max !view_phi (-.lim)) lim;
+  Mouse.set_relative_position win (centerx, centery)
+
 (* Event loop *)
 let rec event_loop () =
   match Window.poll_event win with
@@ -182,14 +199,34 @@ let rec event_loop () =
       Window.close win
     |Event.KeyPressed k -> Keycode.(
       match k.Event.KeyEvent.key with
-      | Right |D -> view_theta := !view_theta -. 0.1;
-      | Left  |Q -> view_theta := !view_theta +. 0.1;
-      | Up    |Z -> view_phi := !view_phi +. 0.1;
-      | Down  |S -> view_phi := !view_phi -. 0.1;
+      | Escape -> Window.close win
+      | Q when k.Event.KeyEvent.control -> Window.close win
+      | Z | Up -> 
+          position := Vector3f.(add 
+            !position 
+            {x = -. 0.15 *. (sin !view_theta); 
+             y = 0.; 
+             z = -. 0.15 *. (cos !view_theta)})
+      | S | Down -> 
+          position := Vector3f.(add 
+            !position 
+            {x = 0.15 *. (sin !view_theta); 
+             y = 0.; 
+             z = 0.15 *. (cos !view_theta)})
+      | Q | Left -> 
+          position := Vector3f.(add 
+            !position 
+            {x = -. 0.15 *. (cos !view_theta); 
+             y = 0.; 
+             z = 0.15 *. (sin !view_theta)})
+      | D | Right -> 
+          position := Vector3f.(add 
+            !position 
+            {x = 0.15 *. (cos !view_theta); 
+             y = 0.; 
+             z = -. 0.15 *. (sin !view_theta)})
       | _ -> ()
     )
-    |Event.ButtonPressed _ ->
-      print_endline "button pressed"
     | _ -> ()
   end; event_loop ()
   |None -> ()
@@ -201,6 +238,7 @@ let rec main_loop () =
     Window.clear win ~color:true ~depth:true ~stencil:false;
     display ();
     Window.display win;
+    update_camera ();
     event_loop ();
     incr frame_count;
     main_loop ()

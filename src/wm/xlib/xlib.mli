@@ -174,4 +174,15 @@ module Event : sig
 end
 
 
+module Mouse : sig
+
+  val warp : Display.t -> Window.t -> int -> int -> unit
+
+  val position : Display.t -> Window.t -> (int * int)
+
+  val button_down : Display.t -> Window.t -> int -> bool
+
+end
+
+
 

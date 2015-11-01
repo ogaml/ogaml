@@ -262,4 +262,15 @@ module Event = struct
 end
 
 
+module Mouse = struct
 
+  external warp : Display.t -> Window.t -> int -> int -> unit 
+    = "caml_xwarp_pointer"
+
+  external position : Display.t -> Window.t -> int * int
+    = "caml_xquery_pointer_position"
+
+  external button_down : Display.t -> Window.t -> int -> bool
+    = "caml_xquery_button_down"
+
+end
