@@ -1,0 +1,31 @@
+module Button = struct
+  #include "button.mli"
+end
+
+module Keycode = struct
+  #include "keycode.mli"
+end
+
+module Event = struct
+  #include "event.ml"
+end
+
+module Window = struct
+  #ifdef __LINUX__
+    #include "window_impl_x11.ml"
+  #elif defined __OSX__
+    #include "window_impl_cocoa.ml"
+  #endif
+
+  let clear win ~color ~depth ~stencil = 
+    OgamlGL.Buffers.clear ~color ~depth ~stencil
+end
+
+module Mouse = struct
+  #ifdef __LINUX__
+    #include "mouse_impl_x11.ml"
+  #elif defined __OSX__
+    #include "mouse_impl_cocoa.ml"
+  #endif
+end
+

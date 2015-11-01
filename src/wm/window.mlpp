@@ -1,9 +1,0 @@
-
-#ifdef __LINUX__
-  #include "window_impl_x11.ml"
-#elif defined __OSX__
-  #include "window_impl_cocoa.ml"
-#endif
-
-let clear win ~color ~depth ~stencil = 
-  OgamlGL.Buffers.clear ~color ~depth ~stencil

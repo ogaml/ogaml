@@ -4,7 +4,11 @@ include ../../common_defs.mk
 
 INCLUDE_DIRS = -I $(OS_WIN_STUBS_DIR) -I ../gl/
 
-MLSOURCES = window.ml
+NAT_DEPS = ogamlGL.cmxa
+
+BYT_DEPS = $(NAT_DEPS:.cmxa=.cma)
+
+MLSOURCES = window.ml mouse.ml
 
 MLINTERFACES = button.mli keycode.mli event.mli
 
@@ -16,8 +20,10 @@ MLCMIS = $(MLINTERFACES:.mli=.cmi)
 
 MLLIB = ogamlWindow
 
-PACKNAME = OgamlWindow
 
+# Do not remove the cmi generated from the mlipp file !
+
+.PRECIOUS: %.cmi
 
 
 # Compilation
@@ -27,22 +33,23 @@ default: .depend compile_window_nat compile_window_byte
 compile_os_lib:
 	cd $(OS_WIN_STUBS_DIR) && make
 
-compile_window_nat: .depend compile_os_lib $(MLCMIS) $(MLNATOBJS)
-	$(OCAMLOPT) -pack -o $(MLLIB).cmx $(MLCMIS) $(MLNATOBJS);
-	$(OCAMLOPT) -a -o $(MLLIB).cmxa $(INCLUDE_DIRS) $(MLLIB).cmx -cclib -l$(strip $(OS_WIN_STUBS))
+compile_window_nat: .depend compile_os_lib $(MLLIB).cmx
+	$(OCAMLOPT) -a -o $(MLLIB).cmxa $(MLLIB).cmx -cclib -l$(strip $(OS_WIN_STUBS))
 
-compile_window_byte: .depend compile_os_lib $(MLCMIS) $(MLOBJS)
-	$(OCAMLC) -pack -o $(MLLIB).cmo $(MLCMIS) $(MLOBJS);
-	$(OCAMLC) -a -o $(MLLIB).cma $(INCLUDE_DIRS) $(MLLIB).cmo -cclib -l$(strip $(OS_WIN_STUBS))
+compile_window_byte: .depend compile_os_lib $(MLLIB).cmo
+	$(OCAMLC) -a -o $(MLLIB).cma $(MLLIB).cmo -cclib -l$(strip $(OS_WIN_STUBS))
 
 %.cmi:%.mli
 	$(OCAMLC) -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLOPT) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) ../gl/OgamlGL.cmxa $<
+	$(OCAMLOPT) -c -o $@ $(INCLUDE_DIRS) $(NAT_DEPS) $<
 
 %.cmo:%.ml
-	$(OCAMLC) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) ../gl/OgamlGl.cma $<
+	$(OCAMLC) -c -o $@ $(INCLUDE_DIRS) $(BYT_DEPS) $<
+
+%.mli:%.mlipp 
+	$(PPCOMMAND) -o $@ $<
 
 %.ml:%.mlpp %.cmi
 	$(PPCOMMAND) -o $@ $<
