@@ -8,8 +8,14 @@ let relative_position win =
   let i = int_of_float in
   i x , i y
 
-let set_position (x,y) = ()
+let set_position (x,y) =
+  let f = float_of_int in
+  Cocoa.Mouse.warp (f x) (f y)
 
-let set_relative_position win (x,y) = ()
+let set_relative_position win (x,y) =
+  let frame = Cocoa.OGWindowController.frame win in
+  let (dx, dy, _, _) = Cocoa.NSRect.get frame in
+  let f = float_of_int in
+  Cocoa.Mouse.warp ((f x) +. dx) ((f y) +. dy)
 
 let is_pressed button = true

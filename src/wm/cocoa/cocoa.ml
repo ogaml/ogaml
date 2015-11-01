@@ -52,6 +52,12 @@ module NSColor = struct
 
 end
 
+module Mouse = struct
+
+  external warp : float -> float -> unit = "caml_cg_warp_mouse_cursor_position"
+
+end
+
 module NSEvent = struct
 
   type t

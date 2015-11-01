@@ -46,6 +46,12 @@ module NSColor : sig
 
 end
 
+module Mouse : sig
+
+  val warp : float -> float -> unit
+
+end
+
 module NSEvent : sig
 
   type t
