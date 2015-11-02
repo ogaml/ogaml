@@ -100,7 +100,12 @@ GL part:
   ✔ Reorganize VAOs @done(2015-10-29 15:06) @project(GL part)
   ✔ Fix shader compilation not returning an error when failing (use glGetShaderiv with GL_COMPILE_STATUS) @done(2015-10-29 15:59) @project(GL part)
   ✔ Add version option when compiling shaders @done(2015-10-29 15:44) @project(GL part)
+  ✔ Implement BMP @done(2015-11-02 18:44) @project(GL part)
+  ☐ Implement PNG
+  ☐ Implement JPG
   ☐ Implement Image
   ☐ Implement Texture
+  ☐ Organize image parsing
+  ☐ Better support for all formats (for example 24,32 bit bmps)
   ☐ Add other kinds of textures
   ☐ Let the user choose the active texture when binding

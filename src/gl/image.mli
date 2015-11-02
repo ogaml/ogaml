@@ -9,5 +9,5 @@ val set : t -> int -> int -> Color.t -> unit
 
 val get : t -> int -> int -> Color.RGB.t
 
-val data : t -> float array 
+val data : t -> Bytes.t
 

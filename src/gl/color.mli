@@ -21,6 +21,8 @@ module RGB : sig
 
   val transparent : t
 
+  val clamp : t -> t
+
 end
 
 
@@ -46,6 +48,8 @@ module HSV : sig
 
   val transparent : t
 
+  val clamp : t -> t
+
 end
 
 
@@ -60,4 +64,4 @@ val hsv : t -> HSV.t
 
 val rgb : t -> RGB.t
 
-
+val clamp : t -> t

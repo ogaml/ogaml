@@ -23,6 +23,13 @@ module RGB = struct
 
   let transparent = {r = 0.; g = 0.; b = 0.; a = 0.}
 
+  let clamp c = {
+    r = clamp c.r 0. 1.;
+    g = clamp c.g 0. 1.;
+    b = clamp c.b 0. 1.;
+    a = clamp c.a 0. 1.
+  }
+
 end
 
 let rad60 = 60. *. OgamlMath.Constants.pi /. 180.
@@ -49,6 +56,13 @@ module HSV = struct
 
   let transparent = {h = 0.; s = 0.; v = 0.; a = 0.}
 
+  let clamp c = {
+    h = clamp c.h 0. (2. *. OgamlMath.Constants.pi);
+    s = clamp c.s 0. 1.;
+    v = clamp c.v 0. 1.;
+    a = clamp c.a 0. 1.
+  }
+
 end
 
 
@@ -72,10 +86,11 @@ let rgb_to_hsv color =
     if cmax = 0. then 0.
     else d /. cmax
   in
-  {HSV.h = clamp h 0. (2. *. OgamlMath.Constants.pi);
-   HSV.s = clamp s 0. 1.;
-   HSV.v = clamp cmax 0. 1.;
-   HSV.a = color.a}
+  HSV.clamp
+    {HSV.h = h;
+     HSV.s = s;
+     HSV.v = cmax;
+     HSV.a = color.a}
 
 let hsv_to_rgb color = 
   let open HSV in 
@@ -91,18 +106,21 @@ let hsv_to_rgb color =
     else if h < 5. *. rad60 then (x,0.,c)
     else (c,0.,x)
   in
-  {RGB.r = clamp (r'+.m) 0. 1.; 
-   RGB.g = clamp (g'+.m) 0. 1.; 
-   RGB.b = clamp (b'+.m) 0. 1.;
-   RGB.a = color.a}
+  RGB.clamp
+    {RGB.r = (r'+.m);
+     RGB.g = (g'+.m);
+     RGB.b = (b'+.m);
+     RGB.a = color.a}
 
 let hsv = function
-  |`HSV c -> c
+  |`HSV c -> HSV.clamp c
   |`RGB c -> rgb_to_hsv c
 
 let rgb = function
   |`HSV c -> hsv_to_rgb c
-  |`RGB c -> c
+  |`RGB c -> RGB.clamp c
 
-
+let clamp = function
+  |`HSV c -> `HSV (HSV.clamp c)
+  |`RGB c -> `RGB (RGB.clamp c)
 
