@@ -174,6 +174,8 @@ let display () =
 
 
 (* Camera *)
+let begin_log = Unix.gettimeofday ()
+
 let centerx, centery = 
   let (x,y) = Window.size win in
   (x / 2, y / 2)
@@ -188,6 +190,9 @@ let rec update_camera () =
   view_theta := !view_theta -. 0.005 *. (float_of_int dx);
   view_phi   := !view_phi   -. 0.005 *. (float_of_int dy);
   view_phi   := min (max !view_phi (-.lim)) lim;
+  if (Unix.gettimeofday () -. begin_log >= 1. && Unix.gettimeofday () -. begin_log <= 1.1) then
+    Printf.printf "Deltas : %i,%i\nAngles : %f,%f\nLimit : %f\nPosition : %i,%i\n%!"
+      dx dy !view_theta !view_phi lim centerx centery;
   Mouse.set_relative_position win (centerx, centery)
 
 (* Event loop *)
