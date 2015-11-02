@@ -16,7 +16,27 @@ caml_cg_warp_mouse_cursor_position(value mlx, value mly)
     .y = Double_val(mly)
   };
 
-  CGWarpMouseCursorPosition(newCursorPosition);
+  // First solution
+  // CGWarpMouseCursorPosition(newCursorPosition);
+
+  // Second solution fro StackOverflow
+  // CGEventSourceRef source =
+  //   CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
+  // CGEventRef mouse = CGEventCreateMouseEvent(NULL,
+  //                                            kCGEventMouseMoved,
+  //                                            newCursorPosition,
+  //                                            0);
+  // CGEventPost(kCGHIDEventTap, mouse);
+  // CFRelease(mouse);
+  // CFRelease(source);
+
+  // SFML solution
+  CGEventRef event = CGEventCreateMouseEvent(NULL,
+                                             kCGEventMouseMoved,
+                                             newCursorPosition,
+                                             0);
+  CGEventPost(kCGHIDEventTap, event);
+  CFRelease(event);
 
   CAMLreturn(Val_unit);
 }
