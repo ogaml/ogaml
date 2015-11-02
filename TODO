@@ -29,7 +29,8 @@ Cocoa specific:
   ☐ Handle left/right modifiers for keycodes
   ☐ Discuss the possibility to dissociate mouse and cursor to get delta events @source(https://developer.apple.com/library/mac/documentation/GraphicsImaging/Reference/Quartz_Services_Ref/#//apple_ref/c/func/CGAssociateMouseAndMouseCursorPosition)
   ☐ Differentiate between Middle and Other for mouse
-  ☐ Every size might have been specified in points for Cocoa, use scale whenever necessary @important @review @comment(At least for the events, but it might also be wrong in window size definition)
+  ✔ Every size might have been specified in points for Cocoa, use scale whenever necessary @important @review @comment(At least for the events, but it might also be wrong in window size definition) @done(2015-11-02 16:35) @project(Cocoa specific)
+  ☐ Check if window size is in points instead of pixels
 
 Xlib specific:
   ✔ Match on clientmessage in ogamlWindow_xlib for safety @done(2015-10-20 20:29) @project(Xlib specific)

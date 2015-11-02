@@ -173,7 +173,7 @@ let get_key_event event =
   })
 
 let make_mouse_event button event win =
-  let (x,y) = Cocoa.OGWindowController.mouse_location win in
+  let (x,y) = Cocoa.OGWindowController.proper_relative_mouse_location win in
   let modifiers = Cocoa.NSEvent.modifier_flags event in
   let (shift,control,alt) = Cocoa.NSEvent.(
     List.mem NSShiftKeyMask     modifiers,
@@ -191,7 +191,7 @@ let make_mouse_event button event win =
   })
 
 let mouse_loc win =
-  let (x,y) = Cocoa.OGWindowController.mouse_location win in
+  let (x,y) = Cocoa.OGWindowController.proper_relative_mouse_location win in
   let i = int_of_float in
   Event.MouseEvent.({ x = i x ; y = i y })
 
