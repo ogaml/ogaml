@@ -83,7 +83,10 @@ Math part:
   ✔ Rename matrix3f in matrix3D @done(2015-10-30 10:08) @project(Math part)
 
 GL part:
+  ✔ Implement indexing (high priority !!) @done(2015-11-02 21:38) @project(GL part)
+  ☐ Implement OBJ loading
   ☐ Let the user choose the usage of a vbo when setting data
+  ☐ Same for element buffers
   ✔ Implement glGetString in config for debug @done(2015-10-29 13:21) @project(GL part)
   ✔ Bind face culling, front_face @done(2015-10-26 21:31) @project(GL part)
   ✔ Bind gl_enable and options @done(2015-10-26 19:35) @project(GL part)
@@ -109,5 +112,7 @@ GL part:
   ✔ Implement Texture @done(2015-11-02 20:07) @project(GL part)
   ☐ Organize image parsing
   ☐ Better support for all formats (for example 24,32 bit bmps)
-  ☐ Add other kinds of textures
+  ☐ Add other kinds of textures @unsure
   ✔ Let the user choose the active texture when binding @done(2015-11-02 20:07) @project(GL part)
+
+

@@ -74,6 +74,32 @@ module VBO = struct
 end
 
 
+module EBO = struct
+
+  type t
+
+  (* Abstract functions *)
+  external abstract_set : ('a, 'b) Data.t -> int -> unit = "caml_gl_element_buffer_data"
+
+  (* Exposed functions *)
+  external create : unit -> t = "caml_gl_gen_buffers"
+
+  external bind : t option -> unit = "caml_gl_bind_element_buffer"
+  
+  external delete : t -> unit = "caml_gl_delete_buffer"
+
+  let set t d = 
+    bind (Some t);
+    abstract_set d (Data.size d);
+    bind None
+
+  let build d = 
+    let buf = create () in
+    set buf d; buf
+
+end
+
+
 module VAO = struct
 
   type t

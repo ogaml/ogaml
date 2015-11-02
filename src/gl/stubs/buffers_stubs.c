@@ -69,6 +69,32 @@ caml_gl_buffer_data(value data, value len)
 }
 
 
+// INPUT   : an element buffer name
+// OUTPUT  : nothing, binds the buffer
+CAMLprim value
+caml_gl_bind_element_buffer(value buf)
+{
+  CAMLparam1(buf);
+  if(buf == Val_none)
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  else
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (GLuint)Int_val(Some_val(buf)));
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   : some data, the length of the data in bytes
+// OUTPUT  : nothing, updates the bound element buffer with the data
+CAMLprim value
+caml_gl_element_buffer_data(value data, value len)
+{
+  CAMLparam2(data, len);
+  const GLvoid* c_dat = Caml_ba_data_val(data);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, Int_val(len), c_dat, GL_STATIC_DRAW);
+  CAMLreturn(Val_unit);
+}
+
+
 // INPUT   : nothing
 // OUTPUT  : a vertex array name
 CAMLprim value

@@ -42,6 +42,23 @@ module VBO : sig
 end
 
 
+module EBO : sig
+
+  type t
+
+  val create : unit -> t
+
+  val build : ('a, 'b) Data.t -> t
+
+  val bind : t option -> unit
+
+  val delete : t -> unit
+
+  val set : t -> ('a, 'b) Data.t -> unit
+
+end
+
+
 module VAO : sig
 
   type t
