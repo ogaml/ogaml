@@ -6,6 +6,10 @@
 
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
+#import <CoreGraphics/CoreGraphics.h>
+
+// A function to move the cursor
+void warpCursor(NSPoint loc);
 
 
 // Our own event object to add windowClosed

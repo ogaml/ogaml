@@ -128,15 +128,7 @@
   p.y = screenHeight - p.y;
 
   // No we set the cursor to p
-  CGPoint newCursorPosition = CGPointMake(p.x / scale,
-                                          p.y / scale);
-
-  CGEventRef event = CGEventCreateMouseEvent(NULL,
-                                             kCGEventMouseMoved,
-                                             newCursorPosition,
-                                             0);
-  CGEventPost(kCGHIDEventTap, event);
-  CFRelease(event);
+  warpCursor(p);
 }
 
 @end

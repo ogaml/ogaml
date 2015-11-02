@@ -23,7 +23,7 @@ caml_cg_warp_mouse_cursor_position(value mlx, value mly)
   // CGWarpMouseCursorPosition(newCursorPosition);
   // CGAssociateMouseAndMouseCursorPosition(1);
 
-  // Second solution fro StackOverflow
+  // Second solution from StackOverflow
   // CGEventSourceRef source =
   //   CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
   // CGEventRef mouse = CGEventCreateMouseEvent(NULL,
