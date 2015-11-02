@@ -99,6 +99,46 @@
   return [m_window mouseLocationOutsideOfEventStream];
 }
 
+-(NSPoint)properRelativeMouseLocation
+{
+  NSPoint rawloc = [m_window mouseLocationOutsideOfEventStream];
+  NSPoint loc = [m_view convertPoint:rawloc fromView:nil];
+  int scale = [[m_window screen] backingScaleFactor];
+
+  return NSMakePoint(loc.x * scale, loc.y * scale);
+}
+
+-(void)setProperRelativeMouseLocationTo:(NSPoint)loc
+{
+  int scale = [[m_window screen] backingScaleFactor];
+  NSPoint p = NSMakePoint(loc.x / scale, loc.y / scale);
+
+  // Now we get global coordinates (Thanks SFML)
+  p.y = [m_view frame].size.height - p.y;
+
+  p = [m_view convertPoint:p toView:m_view];
+  p = [m_view convertPoint:p toView:nil];
+
+  NSRect rect = NSZeroRect;
+  rect.origin = p;
+  rect = [m_window convertRectToScreen:rect];
+  p = rect.origin;
+
+  const float screenHeight = [[[m_view window] screen] frame].size.height;
+  p.y = screenHeight - p.y;
+
+  // No we set the cursor to p
+  CGPoint newCursorPosition = CGPointMake(p.x / scale,
+                                          p.y / scale);
+
+  CGEventRef event = CGEventCreateMouseEvent(NULL,
+                                             kCGEventMouseMoved,
+                                             newCursorPosition,
+                                             0);
+  CGEventPost(kCGHIDEventTap, event);
+  CFRelease(event);
+}
+
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -248,4 +288,34 @@ caml_cocoa_controller_mouse_location(value mlcontroller)
   Store_field(pair,1,caml_copy_double(loc.y));
 
   CAMLreturn(pair);
+}
+
+CAMLprim value
+caml_cocoa_proper_relative_mouse_location(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+  CAMLlocal1(pair);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  NSPoint loc = [controller properRelativeMouseLocation];
+
+  pair = caml_alloc(2,0);
+  Store_field(pair,0,caml_copy_double(loc.x));
+  Store_field(pair,1,caml_copy_double(loc.y));
+
+  CAMLreturn(pair);
+}
+
+CAMLprim value
+caml_cocoa_set_proper_relative_mouse_location(value mlcontroller, value mlx, value mly)
+{
+  CAMLparam3(mlcontroller,mlx,mly);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+  NSPoint loc = NSMakePoint(Double_val(mlx),Double_val(mly));
+
+  [controller setProperRelativeMouseLocationTo:loc];
+
+  CAMLreturn(Val_unit);
 }

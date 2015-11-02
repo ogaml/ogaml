@@ -11,13 +11,17 @@ caml_cg_warp_mouse_cursor_position(value mlx, value mly)
 {
   CAMLparam2(mlx,mly);
 
-  CGPoint newCursorPosition = {
-    .x = Double_val(mlx),
-    .y = Double_val(mly)
-  };
+  int scale = [[NSScreen mainScreen] backingScaleFactor];
+  CGPoint newCursorPosition = CGPointMake(Double_val(mlx) / scale,
+                                          Double_val(mly) / scale);
 
   // First solution
+  // CGEventSourceRef evsrc =
+  //   CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
+  // CGEventSourceSetLocalEventsSuppressionInterval(evsrc, 0.0);
+  // CGAssociateMouseAndMouseCursorPosition(0);
   // CGWarpMouseCursorPosition(newCursorPosition);
+  // CGAssociateMouseAndMouseCursorPosition(1);
 
   // Second solution fro StackOverflow
   // CGEventSourceRef source =

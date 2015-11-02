@@ -1,6 +1,8 @@
 
 external init_arp : unit -> unit = "caml_init_arp"
 
+external screen_size : unit -> float * float = "caml_cocoa_display_size"
+
 module NSString = struct
 
   type t
@@ -122,6 +124,9 @@ module NSEvent = struct
   external key_code : t -> int = "caml_cocoa_event_key_code"
 
   external mouse_location : unit -> float * float = "caml_cocoa_mouse_location"
+
+  external proper_mouse_location : unit -> float * float
+    = "caml_cocoa_proper_mouse_location"
 
   external pressed_mouse_buttons : unit -> mouse_button list
     = "caml_cocoa_event_pressed_mouse_buttons"
@@ -370,5 +375,11 @@ module OGWindowController = struct
 
   external mouse_location : t -> float * float
     = "caml_cocoa_controller_mouse_location"
+
+  external proper_relative_mouse_location : t -> float * float
+    = "caml_cocoa_proper_relative_mouse_location"
+
+  external set_proper_relative_mouse_location : t -> float -> float -> unit
+    = "caml_cocoa_set_proper_relative_mouse_location"
 
 end

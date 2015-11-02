@@ -1,6 +1,8 @@
 
 val init_arp : unit -> unit
 
+val screen_size : unit -> float * float
+
 module NSString : sig
 
   type t
@@ -119,6 +121,8 @@ module NSEvent : sig
   (* Mouse event information *)
 
   val mouse_location : unit -> float * float
+
+  val proper_mouse_location : unit -> float * float
 
   val pressed_mouse_buttons : unit -> mouse_button list
 
@@ -290,5 +294,9 @@ module OGWindowController : sig
   val flush_context : t -> unit
 
   val mouse_location : t -> float * float
+
+  val proper_relative_mouse_location : t -> float * float
+
+  val set_proper_relative_mouse_location : t -> float -> float -> unit
 
 end

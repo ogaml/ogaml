@@ -108,4 +108,10 @@ typedef union
 
 -(void)flushGLContext;
 
+-(NSPoint)mouseLocation;
+
+-(NSPoint)properRelativeMouseLocation;
+
+-(void)setProperRelativeMouseLocationTo:(NSPoint)loc;
+
 @end

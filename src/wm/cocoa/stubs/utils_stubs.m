@@ -16,6 +16,25 @@ caml_init_arp(value unit)
   CAMLreturn(Val_unit);
 }
 
+// Display information
+//////////////////////
+CAMLprim value
+caml_cocoa_display_size(value unit)
+{
+  CAMLparam0();
+  CAMLlocal1(tuple);
+
+  CGDirectDisplayID displayID = CGMainDisplayID();
+  size_t screenWidth = CGDisplayPixelsWide(displayID);
+  size_t screenHeight = CGDisplayPixelsHigh(displayID);
+
+  tuple = caml_alloc(2,0);
+  Store_field(tuple,0,caml_copy_double(screenWidth));
+  Store_field(tuple,1,caml_copy_double(screenHeight));
+
+  CAMLreturn(tuple);
+}
+
 // NSString binding
 ///////////////////
 

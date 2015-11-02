@@ -255,5 +255,9 @@ let () =
   Printf.printf "Rendering %i vertices\n%!" (Array.length cube / 2);
   initial_time := Unix.gettimeofday ();
   main_loop ();
-  Printf.printf "Avg FPS : %f\n%!" (float_of_int (!frame_count) /. (Unix.gettimeofday () -. !initial_time));
+  Printf.printf "Avg FPS: %f\n%!" (float_of_int (!frame_count) /. (Unix.gettimeofday () -. !initial_time));
+  let (wx,wy) = Window.size win in
+  Printf.printf "Window.size: %d,%d\n%!" wx wy ;
+  let (mx,my) = Mouse.relative_position win in
+  Printf.printf "Mouse.relative_position: %d,%d\n%!" mx my ;
   Window.destroy win

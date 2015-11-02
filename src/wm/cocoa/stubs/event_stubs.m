@@ -134,6 +134,28 @@ caml_cocoa_mouse_location(value unit)
 }
 
 CAMLprim value
+caml_cocoa_proper_mouse_location(value unit)
+{
+  CAMLparam0();
+  CAMLlocal1(pair);
+
+  NSPoint loc = [NSEvent mouseLocation];
+
+  // Reversing y
+  CGDirectDisplayID displayID = CGMainDisplayID();
+  size_t screenHeight = CGDisplayPixelsHigh(displayID);
+  loc.y = screenHeight - loc.y;
+
+  int scale = [[NSScreen mainScreen] backingScaleFactor];
+
+  pair = caml_alloc(2,0);
+  Store_field(pair,0,caml_copy_double(loc.x * scale));
+  Store_field(pair,1,caml_copy_double(loc.y * scale));
+
+  CAMLreturn(pair);
+}
+
+CAMLprim value
 caml_cocoa_event_pressed_mouse_buttons(value unit)
 {
   CAMLparam0();
