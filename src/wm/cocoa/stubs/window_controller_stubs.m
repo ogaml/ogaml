@@ -105,6 +105,9 @@
   NSPoint loc = [m_view convertPoint:rawloc fromView:nil];
   int scale = [[m_window screen] backingScaleFactor];
 
+  float h = [m_view frame].size.height;
+  loc.y = h - loc.y;
+
   return NSMakePoint(loc.x * scale, loc.y * scale);
 }
 
