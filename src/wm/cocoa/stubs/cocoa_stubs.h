@@ -94,6 +94,8 @@ typedef union
 
 -(NSRect)frame;
 
+-(NSRect)contentFrame;
+
 -(void)closeWindow;
 
 -(BOOL)isWindowOpen;

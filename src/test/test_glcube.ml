@@ -176,14 +176,14 @@ let display () =
 (* Camera *)
 let begin_log = Unix.gettimeofday ()
 
-let centerx, centery = 
+let centerx, centery =
   let (x,y) = Window.size win in
   (x / 2, y / 2)
 
-let () = 
+let () =
   Mouse.set_relative_position win (centerx, centery)
 
-let rec update_camera () = 
+let rec update_camera () =
   let x,y = Mouse.relative_position win in
   let dx, dy = x - centerx, y - centery in
   let lim = Constants.pi /. 2. -. 0.1 in
@@ -206,29 +206,29 @@ let rec event_loop () =
       match k.Event.KeyEvent.key with
       | Escape -> Window.close win
       | Q when k.Event.KeyEvent.control -> Window.close win
-      | Z | Up -> 
-          position := Vector3f.(add 
-            !position 
-            {x = -. 0.15 *. (sin !view_theta); 
-             y = 0.; 
+      | Z | Up ->
+          position := Vector3f.(add
+            !position
+            {x = -. 0.15 *. (sin !view_theta);
+             y = 0.;
              z = -. 0.15 *. (cos !view_theta)})
-      | S | Down -> 
-          position := Vector3f.(add 
-            !position 
-            {x = 0.15 *. (sin !view_theta); 
-             y = 0.; 
+      | S | Down ->
+          position := Vector3f.(add
+            !position
+            {x = 0.15 *. (sin !view_theta);
+             y = 0.;
              z = 0.15 *. (cos !view_theta)})
-      | Q | Left -> 
-          position := Vector3f.(add 
-            !position 
-            {x = -. 0.15 *. (cos !view_theta); 
-             y = 0.; 
+      | Q | Left ->
+          position := Vector3f.(add
+            !position
+            {x = -. 0.15 *. (cos !view_theta);
+             y = 0.;
              z = 0.15 *. (sin !view_theta)})
-      | D | Right -> 
-          position := Vector3f.(add 
-            !position 
-            {x = 0.15 *. (cos !view_theta); 
-             y = 0.; 
+      | D | Right ->
+          position := Vector3f.(add
+            !position
+            {x = 0.15 *. (cos !view_theta);
+             y = 0.;
              z = -. 0.15 *. (sin !view_theta)})
       | _ -> ()
     )

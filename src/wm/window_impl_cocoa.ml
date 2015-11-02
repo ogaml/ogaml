@@ -69,7 +69,7 @@ let destroy win =
 let size win =
   let i = int_of_float in
   Cocoa.(
-    let (_,_,w,h) = NSRect.get (Cocoa.OGWindowController.frame win)
+    let (_,_,w,h) = NSRect.get (Cocoa.OGWindowController.content_frame win)
     in i w, i h
   )
 

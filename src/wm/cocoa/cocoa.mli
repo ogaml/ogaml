@@ -275,6 +275,8 @@ module OGWindowController : sig
 
   val frame : t -> NSRect.t
 
+  val content_frame : t -> NSRect.t
+
   val close_window : t -> unit
 
   val is_window_open : t -> bool

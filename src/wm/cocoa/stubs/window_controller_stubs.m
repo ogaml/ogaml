@@ -51,6 +51,11 @@
   return [m_window frame];
 }
 
+-(NSRect)contentFrame
+{
+  return [[m_window contentView] frame];
+}
+
 -(void)closeWindow
 {
   [m_window close];
@@ -133,6 +138,21 @@ caml_cocoa_controller_frame(value mlcontroller)
 
   OGWindowController* controller = (OGWindowController*) mlcontroller;
   NSRect rect = [controller frame];
+
+  memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
+
+  CAMLreturn(mlrect);
+}
+
+CAMLprim value
+caml_cocoa_controller_content_frame(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+  CAMLlocal1(mlrect);
+  mlrect = caml_alloc_custom(&empty_custom_opts, sizeof(NSRect), 0, 1);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+  NSRect rect = [controller contentFrame];
 
   memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
 
