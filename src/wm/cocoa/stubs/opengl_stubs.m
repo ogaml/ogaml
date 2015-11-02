@@ -16,11 +16,53 @@
 
 -(void)keyDown:(NSEvent *)event
 {
-  OGEvent* ogevent = [[OGEvent alloc] initWithNSEvent:event];
-  [self pushEvent:ogevent];
+  [self pushNSEvent:event];
+}
+
+-(void)keyUp:(NSEvent *)event
+{
+  [self pushNSEvent:event];
 }
 
 -(void)mouseDown:(NSEvent *)event
+{
+  [self pushNSEvent:event];
+}
+
+-(void)mouseUp:(NSEvent *)event
+{
+  [self pushNSEvent:event];
+}
+
+-(void)mouseMoved:(NSEvent *)event
+{
+  [self pushNSEvent:event];
+}
+
+-(void)rightMouseDown:(NSEvent *)event
+{
+  [self pushNSEvent:event];
+}
+
+-(void)rightMouseUp:(NSEvent *)event
+{
+  [self pushNSEvent:event];
+}
+
+-(void)otherMouseDown:(NSEvent *)event
+{
+  [self pushNSEvent:event];
+}
+
+-(void)otherMouseUp:(NSEvent *)event
+{
+  [self pushNSEvent:event];
+}
+
+// TODO
+// -(void)flagsChanged:(NSEvent*)event
+
+-(void)pushNSEvent:(NSEvent *)event
 {
   OGEvent* ogevent = [[OGEvent alloc] initWithNSEvent:event];
   [self pushEvent:ogevent];
