@@ -30,15 +30,13 @@ let ext filename =
 let parse_bmp str = 
   let data_pos = 
     let tmp = input_32bit_le str 10 in
-    if tmp = 0 then 54 else 0
+    if tmp = 0 then 54 else tmp
   in
   let width  = input_32bit_le str 18 in
   let height = input_32bit_le str 22 in
   let bpp  = input_16bit_le str 28 in
-  let size = 
-    let tmp = input_32bit_le str 34 in
-    if tmp = 0 then width * height * (bpp / 8) else tmp
-  in
+  let size = width * height * (bpp / 8) in
+  Printf.printf "%i %i %i %i %i %i\n%!" data_pos width height size bpp (String.length str);
   let data = Bytes.make size '\000' in
   for i = 0 to size - 1 do
     match i mod 4 with

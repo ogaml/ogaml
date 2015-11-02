@@ -104,8 +104,8 @@ GL part:
   ☐ Implement PNG
   ☐ Implement JPG
   ☐ Implement Image
-  ☐ Implement Texture
+  ✔ Implement Texture @done(2015-11-02 20:07) @project(GL part)
   ☐ Organize image parsing
   ☐ Better support for all formats (for example 24,32 bit bmps)
   ☐ Add other kinds of textures
-  ☐ Let the user choose the active texture when binding
+  ✔ Let the user choose the active texture when binding @done(2015-11-02 20:07) @project(GL part)

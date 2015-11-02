@@ -24,11 +24,12 @@ let frame_count = ref 0
 (* Polygons *)
 let cube =
   let vertices =
-    Poly.cube
+    Poly.cube_n
       Vector3f.({x = -0.5; y = -0.5; z = -0.5})
       Vector3f.({x = 1.; y = 1.; z = 1.})
   in
-  let colors = Array.make (36*3) 0. in
+  vertices
+  (*let colors = Array.make (36*3) 0. in
   for i = 0 to 5 do
     for j = 0 to 5 do
       colors.(i*18+j*3+0) <- float_of_int (i/3);
@@ -36,7 +37,8 @@ let cube =
       colors.(i*18+j*3+2) <- float_of_int (((max i 1) mod 5) mod 2);
     done;
   done;
-  Array.concat [vertices; colors]
+  Array.concat [vertices; colors]*)
+
 
 let axis =
   let vertices = Poly.axis 0. 30. in
@@ -53,12 +55,20 @@ let axis =
   Array.concat [vertices; colors]
 
 
+(* Load the cube texture *)
+let mario_texture = Texture.create (`File "src/test/mario-block.bmp")
+
+let david_texture = Texture.create (`File "src/test/david-block.bmp")
+
+let ubermode = ref false
+
+
 (* VBO creation *)
 let vbo_cube = VBO.build (Data.of_float_array cube)
 
 let vbo_axis = VBO.build (Data.of_float_array axis)
 
-(* Compile GL program *)
+(* Compile default GL program *)
 let vertex_shader   = Shader.create
   ~version:(Shader.recommended_version ())
   (`File "src/test/default_shader.vert")
@@ -69,10 +79,28 @@ let fragment_shader = Shader.create
   (`File "src/test/default_shader.frag")
   Shader.Fragment
 
-let program = Program.build
+let default_program = Program.build
   ~shaders:[vertex_shader; fragment_shader]
   ~attributes:["position"; "in_color"]
   ~uniforms:["MVPMatrix"]
+
+
+(* Compile texture GL program *)
+let vertex_shader   = Shader.create
+  ~version:(Shader.recommended_version ())
+  (`File "src/test/texture_shader.vert")
+  Shader.Vertex
+
+let fragment_shader = Shader.create
+  ~version:(Shader.recommended_version ())
+  (`File "src/test/texture_shader.frag")
+  Shader.Fragment
+
+let texture_program = Program.build
+  ~shaders:[vertex_shader; fragment_shader]
+  ~attributes:["position"; "normal"]
+  ~uniforms:["MVPMatrix"; "MyTex"]
+
 
 
 (* VAO creation *)
@@ -82,16 +110,16 @@ let () =
   VAO.bind (Some vao_cube);
   VBO.bind (Some vbo_cube);
   (* Position attribute *)
-  VAO.enable_attrib (Program.attribute program "position");
+  VAO.enable_attrib (Program.attribute texture_program "position");
   VAO.set_attrib
-    ~attribute:(Program.attribute program "position")
+    ~attribute:(Program.attribute texture_program "position")
     ~size:3
     ~kind:VAO.Float
     ~offset:0 ();
-  (* color attribute *)
-  VAO.enable_attrib (Program.attribute program "in_color");
+  (* Normal attribute *)
+  VAO.enable_attrib (Program.attribute texture_program "normal");
   VAO.set_attrib
-    ~attribute:(Program.attribute program "in_color")
+    ~attribute:(Program.attribute texture_program "normal")
     ~size:3
     ~kind:VAO.Float
     ~offset:((Array.length cube / 6) * 12) ();
@@ -105,16 +133,16 @@ let () =
   VAO.bind (Some vao_axis);
   VBO.bind (Some vbo_axis);
   (* Position attribute *)
-  VAO.enable_attrib (Program.attribute program "position");
+  VAO.enable_attrib (Program.attribute default_program "position");
   VAO.set_attrib
-    ~attribute:(Program.attribute program "position")
+    ~attribute:(Program.attribute default_program "position")
     ~size:3
     ~kind:VAO.Float
     ~offset:0 ();
   (* color attribute *)
-  VAO.enable_attrib (Program.attribute program "in_color");
+  VAO.enable_attrib (Program.attribute default_program "in_color");
   VAO.set_attrib
-    ~attribute:(Program.attribute program "in_color")
+    ~attribute:(Program.attribute default_program "in_color")
     ~size:3
     ~kind:VAO.Float
     ~offset:(18 * 4) ();
@@ -142,7 +170,6 @@ let view_phi = ref 0.
 
 (* Display *)
 let display () =
-  Program.use (Some program);
   (* Compute model matrix *)
   let t = Unix.gettimeofday () in
   let view =
@@ -160,13 +187,22 @@ let display () =
   let mvp = Matrix3D.product vp model in
   rot_angle := !rot_angle +. (abs_float (cos (Unix.gettimeofday ()) /. 10.));
   (* Display the cube *)
+  Program.use (Some texture_program);
   Uniform.set (Uniform.Matrix3D mvp)
-              (Program.uniform program "MVPMatrix");
+              (Program.uniform texture_program "MVPMatrix");
+  Texture.activate 0;
+  if !ubermode then 
+    Texture.bind (Some david_texture)
+  else 
+    Texture.bind (Some mario_texture);
+  Uniform.set (Uniform.Int1 0)
+              (Program.uniform texture_program "MyTex");
   VAO.bind (Some vao_cube);
   VAO.draw VAO.Triangles 0 (Array.length cube / 6);
   (* Display the axis *)
+  Program.use (Some default_program);
   Uniform.set (Uniform.Matrix3D vp)
-              (Program.uniform program "MVPMatrix");
+              (Program.uniform default_program "MVPMatrix");
   VAO.bind (Some vao_axis);
   VAO.draw VAO.Lines 0 6;
   VAO.bind None;
@@ -201,6 +237,7 @@ let rec event_loop () =
       match k.Event.KeyEvent.key with
       | Escape -> Window.close win
       | Q when k.Event.KeyEvent.control -> Window.close win
+      | U -> ubermode := not !ubermode
       | Z | Up ->
           position := Vector3f.(add
             !position
