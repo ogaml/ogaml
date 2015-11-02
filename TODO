@@ -27,6 +27,7 @@ Cocoa specific:
   ✔ Add window closed event @done(2015-10-31 00:30) @project(Cocoa specific)
   ☐ Update the view (and probably other things) when resizing
   ☐ Handle left/right modifiers for keycodes
+  ☐ Apparently modifiers do not raise keyDown at all so we have to deal with it
   ☐ Discuss the possibility to dissociate mouse and cursor to get delta events @source(https://developer.apple.com/library/mac/documentation/GraphicsImaging/Reference/Quartz_Services_Ref/#//apple_ref/c/func/CGAssociateMouseAndMouseCursorPosition)
   ☐ Differentiate between Middle and Other for mouse
   ✔ Every size might have been specified in points for Cocoa, use scale whenever necessary @important @review @comment(At least for the events, but it might also be wrong in window size definition) @done(2015-11-02 16:35) @project(Cocoa specific)
