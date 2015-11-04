@@ -19,13 +19,13 @@ module Texture : sig
   val create : unit -> t
 
   (** Activates a texture binding point *)
-  val active : int -> unit
+  val activate : int -> unit
 
   (** Binds a texture to the current point with a given format *)
-  val bind : Enum.TextureTarget.t -> t -> unit
+  val bind : Enum.TextureTarget.t -> t option -> unit
 
-  (** Associates a 2D image with the currently bound texture *)
-  val image2D : Enum.TextureTarget.t -> Enum.PixelFormat.t -> (int * int) 
+  (** Associates an image with the currently bound texture *)
+  val image : Enum.TextureTarget.t -> Enum.PixelFormat.t -> (int * int) 
     -> Enum.TextureFormat.t -> Bytes.t -> unit
 
   (** Sets the value of a parameter of the currently bound texture2D *)

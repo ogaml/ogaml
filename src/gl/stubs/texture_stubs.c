@@ -17,48 +17,149 @@
 #include "../../utils/stubs.h"
 
 
-// INPUT   some pixel data, width, height
-// OUTPUT  a texture 
-CAMLprim value
-caml_gl_create_texture(value data, value width, value height)
+#define MLvar_Minify  (254173077)
+
+#define MLvar_Magnify (-1011094397)
+
+
+GLenum Target_val(value target)
 {
-  CAMLparam3(data, width, height);
+  switch(target)
+  {
+    case 0:
+      return GL_TEXTURE_1D;
+
+    case 1:
+      return GL_TEXTURE_2D;
+
+    case 2:
+      return GL_TEXTURE_3D;
+
+    default:
+      caml_failwith("Caml variant error in Target_val(1)");
+  }
+}
+
+
+GLenum Magnify_val(value mag)
+{
+  switch(mag)
+  {
+    case 0:
+      return GL_NEAREST;
+
+    case 1:
+      return GL_LINEAR;
+
+    default:
+      caml_failwith("Caml variant error in Magnify_val(1)");
+  }
+}
+
+
+GLenum Minify_val(value min)
+{
+  switch(min)
+  {
+    case 0:
+      return GL_NEAREST;
+
+    case 1:
+      return GL_LINEAR;
+
+    case 2:
+      return GL_NEAREST_MIPMAP_NEAREST;
+
+    case 3:
+      return GL_LINEAR_MIPMAP_NEAREST;
+
+    default:
+      caml_failwith("Caml variant error in Minify_val(1)");
+  }
+}
+
+
+GLenum TextureFormat_val(value fmt)
+{
+  switch(fmt)
+  {
+    case 0:
+      return GL_RGB;
+
+    case 1:
+      return GL_RGBA;
+
+    case 2:
+      return GL_DEPTH_COMPONENT;
+
+    case 3:
+      return GL_DEPTH_STENCIL;
+
+    default:
+      caml_failwith("Caml variant error in TextureFormat_val(1)");
+  }
+}
+
+
+GLenum PixelFormat_val(value fmt)
+{
+  switch(fmt)
+  {
+    case 0:
+      return GL_R;
+
+    case 1:
+      return GL_RG;
+
+    case 2:
+      return GL_RGB;
+
+    case 3:
+      return GL_BGR;
+
+    case 4:
+      return GL_RGBA;
+
+    case 5:
+      return GL_BGRA;
+
+    case 6:
+      return GL_DEPTH_COMPONENT;
+
+    case 7:
+      return GL_DEPTH_STENCIL;
+
+    default:
+      caml_failwith("Caml variant error in TextureFormat_val(1)");
+  }
+}
+
+
+// INPUT   nothing
+// OUTPUT  a fresh texture id
+CAMLprim value
+caml_create_texture(value unit)
+{
+  CAMLparam0();
 
   GLuint textureID;
   glGenTextures(1, &textureID);
-  
-  glBindTexture(GL_TEXTURE_2D, textureID);
-  
-  glTexImage2D(GL_TEXTURE_2D, 
-                           0, 
-                     GL_RGBA, 
-              Int_val(width), 
-             Int_val(height), 
-                           0, 
-                     GL_RGBA, 
-            GL_UNSIGNED_BYTE, 
-            String_val(data));
-  
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-  glBindTexture(GL_TEXTURE_2D, 0);
 
   CAMLreturn((value)textureID);
 }
 
 
-// INPUT   a texture id option
+// INPUT   a binding point and a texture id option
 // OUTPUT  nothing, binds the texture
 CAMLprim value
-caml_gl_bind_texture(value opt)
+caml_bind_texture(value point, value tex_opt)
 {
-  CAMLparam1(opt);
+  CAMLparam2(point, tex_opt);
 
-  if(opt == Val_none)
-    glBindTexture(GL_TEXTURE_2D, 0);
+  if(tex_opt == Val_none)
+    glBindTexture(Target_val(point), 0);
   else
-    glBindTexture(GL_TEXTURE_2D, (GLuint)Some_val(opt));
+    glBindTexture(Target_val(point), (GLuint)Some_val(tex_opt));
 
   CAMLreturn(Val_unit);
 }
@@ -67,7 +168,7 @@ caml_gl_bind_texture(value opt)
 // INPUT   an int (texture location)
 // OUTPUT  nothing, activates the texture location
 CAMLprim value
-caml_gl_active_texture(value loc)
+caml_activate_texture(value loc)
 {
   CAMLparam1(loc);
 
@@ -77,10 +178,49 @@ caml_gl_active_texture(value loc)
 }
 
 
+// INPUT   a texture target, a pixel format, a size, a texture format, some data
+// OUTPUT  nothing, binds an image to the current texture2D
+CAMLprim value
+caml_tex_image_2D(value target, value fmt, value size, value tfmt, value data)
+{
+  CAMLparam5(target, fmt, size, tfmt, data);
+
+  glTexImage2D(Target_val(target), 
+               0, 
+               TextureFormat_val(tfmt),
+               Int_val(Field(size,0)),
+               Int_val(Field(size,1)),
+               0, 
+               PixelFormat_val(fmt),
+               GL_UNSIGNED_BYTE,
+               String_val(data));
+
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   a variant containing the min/mag filter
+// OUTPUT  nothing, sets the texture2D parameter
+CAMLprim value
+caml_tex_parameter_2D(value loc)
+{
+  CAMLparam1(loc);
+
+  if(loc == MLvar_Magnify)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, Magnify_val(Field(loc,0)));
+  else if(loc == MLvar_Minify)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Minify_val(Field(loc,0)));
+  else 
+    caml_failwith("Caml polymorphic variant error in tex_parameter_2D(1)");
+
+  CAMLreturn(Val_unit);
+}
+
+
 // INPUT   a texture ID
 // OUTPUT  nothing, deletes the texture
 CAMLprim value
-caml_gl_delete_texture(value id)
+caml_destroy_texture(value id)
 {
   CAMLparam1(id);
 

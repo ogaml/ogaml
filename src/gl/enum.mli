@@ -56,9 +56,8 @@ module TextureFormat : sig
   type t = 
     | RGB
     | RGBA
-    | Depth16
-    | Depth24
-    | Depth32
+    | Depth
+    | DepthStencil
 
 end
 

@@ -49,11 +49,11 @@ val texture_unit : t -> int
 (** Sets the currently active texture unit *)
 val set_texture_unit : t -> int -> unit
 
-(** Returns the texture currently bound to a texture unit *)
-val bound_texture : t -> int -> Internal.Texture.t option
+(** Returns the texture currently bound to a texture unit and a target *)
+val bound_texture : t -> int -> Enum.TextureTarget.t -> Internal.Texture.t option
 
-(** Sets the currently bound texture to a texture unit *)
-val set_bound_texture : t -> int -> Internal.Texture.t option -> unit
+(** Sets the currently bound texture to a texture unit and a target *)
+val set_bound_texture : t -> int -> Enum.TextureTarget.t -> Internal.Texture.t option -> unit
 
 
 
