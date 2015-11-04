@@ -29,6 +29,7 @@ val enable : capability list -> unit
 
 val disable : capability list -> unit
 
+
 type face = 
   | Back
   | Front
@@ -36,11 +37,13 @@ type face =
 
 val set_culling : face -> unit
 
+
 type orientation =
   | CW
   | CCW
 
 val set_front_face : orientation -> unit
+
 
 type polygon = 
   | Point
@@ -48,6 +51,7 @@ type polygon =
   | Fill
 
 val set_polygon_mode : face -> polygon -> unit
+
 
 val set_clear_color : Color.t -> unit
 

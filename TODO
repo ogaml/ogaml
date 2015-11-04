@@ -66,14 +66,21 @@ Window part:
   ✔ Real-time state Mouse module @done(2015-11-01 23:59) @project(Window part)
   ✔ Graphical functions display & clear - requires binding GLX for X11 ** @done(2015-10-29 18:33) @project(Window part)
 
-Refactoring Math & GL:
-  ☐ Polys should return vector arrays
-  ☐ Store max_size and actual_size in VBO structure
-  ☐ VBO add functions (add_vector3f, add_int, etc...) and vector3fdata ?
-  ☐ Parametrize VBO creation with max_size
-  ☐ Last 3 : same for EBOs
-  ☐ Parametrize VAO creation with EBO and VBO (optional)
-  ☐ Store bound program and VAO
+New GL Implementation :
+  ☐ Base
+    ☐ Implement State
+    ☐ Implement Internal.Texture
+    ☐ Implement Texture
+    ☐ Implement Internal.Shader
+    ☐ Implement Shader
+    ☐ Implement Internal.Program
+    ☐ Implement Program
+    ☐ Implement Internal.VBO
+    ☐ Implement VBO
+    ☐ Implement Internal.VAO
+    ☐ Implement VAO
+    ☐ Clean Enum according to what can be hidden in Internal
+    ☐ Rework cube test
 
 Math part:
   ✔ Fix a notation convention @done(2015-10-29 18:32) @project(Math part)
@@ -82,10 +89,11 @@ Math part:
   ✔ Write tests @done(2015-10-29 18:32) @project(Math part)
   ✔ Implement Matrix3f @done(2015-10-24 11:10) @project(Math part)
   ☐ Implement Vector3i
+  ☐ Implement Vector2i and Vector2f
   ✔ Add more complex functions to matrix3f (look_at, clipping, etc...) @done(2015-10-24 11:55) @project(Math part)
   ✔ Debug matrices... Really @done(2015-10-25 09:17) @project(Math part)
   ✔ Recode inverse matrices after debugging @done(2015-10-25 09:20) @project(Math part)
-  ☐ Matrices and vector exceptions
+  ☐ Matrices, quaternions and vector exceptions
   ✔ Implement Quaternions @done(2015-11-01 00:03) @project(Math part)
   ✔ Implement polygons @done(2015-10-26 16:33) @project(Math part)
   ☐ Parameterize Poly.axis with vector3f
@@ -93,9 +101,10 @@ Math part:
 
 GL part:
   ✔ Implement indexing (high priority !!) @done(2015-11-02 21:38) @project(GL part)
-  ☐ Implement OBJ loading
-  ☐ Let the user choose the usage of a vbo when setting data
-  ☐ Same for element buffers
+  ☐ Implement OBJ loading in Model
+  ☐ Implement model creation - modification in Model
+  ☐ Move Polys to GL and output models rather than float arrays
+  ☐ VertexArray module ? @unsure
   ✔ Implement glGetString in config for debug @done(2015-10-29 13:21) @project(GL part)
   ✔ Bind face culling, front_face @done(2015-10-26 21:31) @project(GL part)
   ✔ Bind gl_enable and options @done(2015-10-26 19:35) @project(GL part)
