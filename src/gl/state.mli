@@ -7,6 +7,8 @@
   * NOTE : this module is mostly intended for internal use only
 **)
 
+(** GL state exceptions *)
+exception Invalid_texture_unit of int
 
 (** Type of the GL state *)
 type t
@@ -38,6 +40,9 @@ val polygon_mode : t -> Enum.PolygonMode.t
 (** Sets the current polygon drawing mode *)
 val set_polygon_mode : t -> Enum.PolygonMode.t -> unit
 
+(** Returns the number of texture units available *)
+val textures : t -> int
+
 (** Returns the currently active texture unit *)
 val texture_unit : t -> int
 
@@ -45,10 +50,10 @@ val texture_unit : t -> int
 val set_texture_unit : t -> int -> unit
 
 (** Returns the texture currently bound to a texture unit *)
-val bound_texture : t -> int -> Internal.Texture.t
+val bound_texture : t -> int -> Internal.Texture.t option
 
 (** Sets the currently bound texture to a texture unit *)
-val set_bound_texture : t -> int -> Internal.Texture.t -> unit
+val set_bound_texture : t -> int -> Internal.Texture.t option -> unit
 
 
 

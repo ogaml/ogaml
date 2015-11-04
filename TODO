@@ -68,7 +68,7 @@ Window part:
 
 New GL Implementation :
   ☐ Base
-    ☐ Implement State
+    ✔ Implement State @done(2015-11-04 15:10) @project(New GL Implementation)
     ☐ Implement Internal.Texture
     ☐ Implement Texture
     ☐ Implement Internal.Shader
@@ -80,6 +80,7 @@ New GL Implementation :
     ☐ Implement Internal.VAO
     ☐ Implement VAO
     ☐ Clean Enum according to what can be hidden in Internal
+    ☐ Hide State.t in Window
     ☐ Rework cube test
 
 Math part:
