@@ -55,7 +55,11 @@ val bound_texture : t -> int -> Enum.TextureTarget.t -> Internal.Texture.t optio
 (** Sets the currently bound texture to a texture unit and a target *)
 val set_bound_texture : t -> int -> Enum.TextureTarget.t -> Internal.Texture.t option -> unit
 
+(** Returns the currently linked program *)
+val linked_program : t -> Internal.Program.t option
 
+(** Sets the currently linked program *)
+val set_linked_program : t -> Internal.Program.t option -> unit
 
 
 

@@ -9,7 +9,8 @@ type t = {
   mutable culling_mode  : Enum.CullingMode.t;
   mutable polygon_mode  : Enum.PolygonMode.t;
   mutable texture_unit  : int;
-  mutable bound_texture : (Internal.Texture.t option) array array
+  mutable bound_texture : (Internal.Texture.t option) array array;
+  mutable linked_program : Internal.Program.t option;
 }
 
 external ext_gl_version : unit -> string = "caml_gl_version"
@@ -40,6 +41,7 @@ let create () =
     polygon_mode = Enum.PolygonMode.DrawFill;
     texture_unit = 0;
     bound_texture = Array.make_matrix textures 3 None;
+    linked_program = None;
   }
 
 let version s = 
@@ -87,5 +89,11 @@ let set_bound_texture s i targ t =
   if i >= s.textures then
     raise (Invalid_texture_unit i);
   s.bound_texture.(i).(Obj.magic targ) <- t
+
+let linked_program s = 
+  s.linked_program
+
+let set_linked_program s p =
+  s.linked_program <- p
 
 

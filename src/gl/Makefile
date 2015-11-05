@@ -16,7 +16,7 @@ COBJS2 = buffers_stubs.o shader_stubs.o error_stubs.o config_stubs.o\
 	 program_stubs.o stubs.o uniform_stubs.o state_stubs.o\
 	 texture_stubs.o
 
-MLSOURCES = color.ml config.ml error.ml shader.ml program.ml buffers.ml image.ml internal.ml state.ml texture.ml uniform.ml
+MLSOURCES = color.ml config.ml error.ml internal.ml state.ml program.ml buffers.ml image.ml texture.ml uniform.ml
 
 MLINTERFACES = enum.mli
 

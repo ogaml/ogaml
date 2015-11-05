@@ -74,11 +74,9 @@ New GL Implementation :
     ✔ Implement Internal.Shader @done(2015-11-05 10:44) @project(New GL Implementation)
     ✘ Implement Shader -- Hidden in program @cancelled(2015-11-05 10:45) @project(New GL Implementation)
     ✔ Implement Internal.Program @done(2015-11-05 13:09) @project(New GL Implementation)
-    ☐ Implement Program
+    ✔ Implement Program @done(2015-11-05 20:06) @project(New GL Implementation)
     ☐ Implement Internal.VBO
-    ☐ Implement VBO
     ☐ Implement Internal.VAO
-    ☐ Implement VAO
     ☐ Clean Enum according to what can be hidden in Internal
     ☐ Hide State.t in Window
     ☐ Rework cube test

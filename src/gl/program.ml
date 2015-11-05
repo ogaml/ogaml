@@ -1,93 +1,139 @@
 
-exception Program_error of string
+exception Compilation_error of string
 
-type program
+exception Linking_error of string
 
-type attribute = int
-
-type uniform = int
-
-type t = {
-  prog  : program;
-  unifs : (string, uniform) Hashtbl.t;
-  attrs : (string, attribute) Hashtbl.t
-}
-
-external abstract_create : unit -> program = "caml_gl_create_program"
-
-external abstract_attach : Shader.t -> program -> unit = "caml_gl_attach_shader"
-
-external abstract_uniform_location : program -> string -> uniform
-  = "caml_gl_uniform_location"
-
-external abstract_attrib_location : program -> string -> attribute
-  = "caml_gl_attrib_location"
-
-external abstract_use : program option -> unit = "caml_gl_use_program"
-
-external abstract_link : program -> unit = "caml_gl_link_program"
+exception Invalid_version of string
 
 
-let create () = 
-  let p = abstract_create () in
+module Uniform = struct
+
+  type t = {name : string; kind : Enum.GlslType.t; location : int}
+
+  let name u = u.name
+
+  let kind u = u.kind
+
+  let location u = u.location
+
+end
+
+
+module Attribute = struct
+
+  type t = {name : string; kind : Enum.GlslType.t; location : int}
+
+  let name a = a.name
+
+  let kind a = a.kind
+
+  let location a = a.location
+
+end
+
+
+type t = { 
+           program    : Internal.Program.t; 
+           vertex     : Internal.Shader.t;
+           fragment   : Internal.Shader.t;
+           uniforms   : Uniform.t   list;
+           attributes : Attribute.t list
+         }
+
+let from_source state ~vertex_source ~fragment_source =
+  let program = Internal.Program.create () in
+  let vshader = Internal.Shader.create Enum.ShaderType.Vertex   in
+  let fshader = Internal.Shader.create Enum.ShaderType.Fragment in
+  Internal.Shader.source vshader vertex_source;
+  Internal.Shader.source fshader fragment_source;
+  Internal.Shader.compile vshader;
+  Internal.Shader.compile fshader;
+  if Internal.Shader.status vshader = false then begin
+    let log = Internal.Shader.log vshader in
+    let msg = Printf.sprintf "Error while compiling vertex shader : %s" log in
+    raise (Compilation_error msg)
+  end;
+  if Internal.Shader.status fshader = false then begin
+    let log = Internal.Shader.log fshader in
+    let msg = Printf.sprintf "Error while compiling vertex shader : %s" log in
+    raise (Compilation_error msg)
+  end;
+  Internal.Program.attach program vshader;
+  Internal.Program.attach program fshader;
+  Internal.Program.link program;
+  if Internal.Program.status program = false then begin
+    let log = Internal.Program.log program in
+    let msg = Printf.sprintf "Error while linking GLSL program : %s" log in
+    raise (Linking_error msg)
+  end;
+  let rec uniforms = function
+    |0 -> []
+    |n -> begin
+      let name = Internal.Program.uname program n in
+      let kind = Internal.Program.utype program n in
+      let location = Internal.Program.uloc program name in
+      {
+        Uniform.name = name; 
+        Uniform.kind = kind; 
+        Uniform.location = location
+      } :: (uniforms (n-1))
+    end
+  in
+  let rec attributes = function
+    |0 -> []
+    |n -> begin
+      let name = Internal.Program.aname program n in
+      let kind = Internal.Program.atype program n in
+      let location = Internal.Program.aloc program name in
+      {
+        Attribute.name = name; 
+        Attribute.kind = kind; 
+        Attribute.location = location
+      } :: (attributes (n-1))
+    end
+  in
   {
-   prog  = p; 
-   unifs = Hashtbl.create 13;
-   attrs = Hashtbl.create 13
+    program;
+    vertex   = vshader;
+    fragment = fshader;
+    uniforms = uniforms (Internal.Program.ucount program);
+    attributes = attributes (Internal.Program.acount program);
   }
+ 
 
-let attach s p = 
-  abstract_attach s p.prog; p
+let from_source_list state ~vertex_source ~fragment_source =
+  let list_vshader = 
+    List.sort (fun (v,_) (v',_) -> - (compare v v')) vertex_source
+  in
+  let list_fshader = 
+    List.sort (fun (v,_) (v',_) -> - (compare v v')) fragment_source
+  in
+  let best_vshader = 
+    List.find (fun (v,_) -> State.is_glsl_version_supported state v) list_vshader
+    |> snd
+  in
+  let best_fshader = 
+    List.find (fun (v,_) -> State.is_glsl_version_supported state v) list_fshader
+    |> snd
+  in
+  from_source state ~vertex_source:best_vshader ~fragment_source:best_fshader
 
-let link p = 
-  abstract_link p.prog
 
-let add_uniform s p = 
-  let loc = abstract_uniform_location p.prog s in
-  if loc = -1 then
-    raise 
-      (Program_error 
-        (Printf.sprintf "Cannot bind uniform %s" s)
-      )
-  else Hashtbl.add p.unifs s loc;
-  p
+let use state prog = 
+  match prog with
+  |None when State.linked_program state <> None -> begin
+    State.set_linked_program state None;
+    Internal.Program.use None
+  end
+  |Some(p) when State.linked_program state <> Some p.program -> begin
+    State.set_linked_program state (Some p.program);
+    Internal.Program.use (Some p.program);
+  end
+  | _ -> ()
 
-let add_attribute s p = 
-  let loc = abstract_attrib_location p.prog s in
-  if loc = -1 then
-    raise 
-      (Program_error 
-        (Printf.sprintf "Cannot bind attribute %s" s)
-      )
-  else Hashtbl.add p.attrs s loc;
-  p
 
-let uniform p s = 
-  try 
-    Hashtbl.find p.unifs s
-  with
-    Not_found -> raise 
-        (Program_error
-          (Printf.sprintf "Uniform %s not found. Did you bind it before ?" s)
-        )
+let iter_uniforms prog f = List.iter f prog.uniforms
 
-let attribute p s = 
-  try 
-    Hashtbl.find p.attrs s
-  with
-    Not_found -> raise 
-        (Program_error
-          (Printf.sprintf "Attribute %s not found. Did you bind it before ?" s)
-        )
+let iter_attributes prog f = List.iter f prog.attributes
 
-let build ~shaders ~uniforms ~attributes =
-  let p = create () in
-  List.iter (fun s -> attach s p |> ignore) shaders; link p;
-  List.iter (fun s -> add_uniform   s p |> ignore) uniforms;
-  List.iter (fun s -> add_attribute s p |> ignore) attributes;
-  p
 
-let use p = 
-  match p with
-  |None -> abstract_use None
-  |Some p' -> abstract_use (Some p'.prog)

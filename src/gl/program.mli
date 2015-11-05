@@ -1,30 +1,77 @@
+(** This module provides an high-level, type-safe and optimized 
+  * way to manipulate programs (groups of GLSL shaders).
+**)
 
-exception Program_error of string
+(** Thrown when GLSL compilation failed *)
+exception Compilation_error of string
 
+(** Thrown when the program linking failed *)
+exception Linking_error of string
+
+(** Thrown when no valid shader has been provided *)
+exception Invalid_version of string
+
+
+(** This module provides a low-level access to uniforms *)
+module Uniform : sig 
+
+  (** Type of a uniform *)
+  type t
+
+  (** Returns the name of a uniform *)
+  val name : t -> string
+
+  (** Returns the type of a uniform *)
+  val kind : t -> Enum.GlslType.t
+
+  (** Returns the location of a uniform.
+    * This is a low-level value and should only be
+    * used internally *)
+  val location : t -> int
+
+end
+
+
+(** This module provides a low-level access to attributes *)
+module Attribute : sig 
+
+  (** Type of an attribute *)
+  type t
+
+  (** Returns the name of an attribute *)
+  val name : t -> string
+
+  (** Returns the type of an attribute *)
+  val kind : t -> Enum.GlslType.t
+
+  (** Returns the location of an attribute.
+    * This is a low-level value and should only be
+    * used internally *)
+  val location : t -> int
+
+end
+
+
+(** The type of GL programs *)
 type t
 
-type attribute
+(** Creates a program from two shader sources. *)
+val from_source : State.t -> vertex_source:string -> fragment_source:string -> t
 
-type uniform
+(** Creates a program from a list of shader sources
+  * and version numbers. Choses the best source for 
+  * the current hardware. *)
+val from_source_list : State.t -> vertex_source:(int * string) list 
+                               -> fragment_source:(int * string) list -> t
 
-val create : unit -> t
+(** Activates the program for use in the next rendering 
+  * pass. Used internally by Ogaml, usually not needed. *)
+val use : State.t -> t option -> unit
 
-val build : 
-  shaders    : Shader.t list ->
-  uniforms   : string list   ->
-  attributes : string list   -> t
+(** Iterates on the uniforms of a program *)
+val iter_uniforms : t -> (Uniform.t -> unit) -> unit
 
-val attach : Shader.t -> t -> t
+(** Iterates on the attributes of a program *)
+val iter_attributes : t -> (Attribute.t -> unit) -> unit
 
-val link : t -> unit
-
-val add_uniform : string -> t -> t
-
-val add_attribute : string -> t -> t
-
-val uniform   : t -> string -> uniform
-
-val attribute : t -> string -> attribute
-
-val use : t option -> unit
 
