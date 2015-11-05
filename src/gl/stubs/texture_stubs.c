@@ -106,7 +106,7 @@ GLenum PixelFormat_val(value fmt)
   switch(Int_val(fmt))
   {
     case 0:
-      return GL_R;
+      return GL_RED;
 
     case 1:
       return GL_RG;
@@ -185,12 +185,12 @@ caml_tex_image_2D(value target, value fmt, value size, value tfmt, value data)
 {
   CAMLparam5(target, fmt, size, tfmt, data);
 
-  glTexImage2D(Target_val(target), 
-               0, 
+  glTexImage2D(Target_val(target),
+               0,
                TextureFormat_val(tfmt),
                Int_val(Field(size,0)),
                Int_val(Field(size,1)),
-               0, 
+               0,
                PixelFormat_val(fmt),
                GL_UNSIGNED_BYTE,
                String_val(data));
@@ -210,7 +210,7 @@ caml_tex_parameter_2D(value loc)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, Magnify_val(Field(loc, 1)));
   else if(Field(loc, 0) == MLvar_Minify)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Minify_val(Field(loc, 1)));
-  else 
+  else
     caml_failwith("Caml polymorphic variant error in tex_parameter_2D(1)");
 
   CAMLreturn(Val_unit);
@@ -229,4 +229,3 @@ caml_destroy_texture(value id)
 
   CAMLreturn(Val_unit);
 }
-
