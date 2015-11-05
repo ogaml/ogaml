@@ -44,6 +44,6 @@ caml_max_textures(value unit)
 {
   CAMLparam0();
   int res;
-  glGetIntegerv(GL_MAX_TEXTURE_UNITS, &res);
+  glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &res);
   CAMLreturn(Val_int(res));
 }
