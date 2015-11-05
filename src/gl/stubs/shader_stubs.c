@@ -46,7 +46,7 @@ caml_create_shader(value type)
 // INPUT   a shader id, a source
 // OUTPUT  nothing, changes the source code of the shader
 CAMLprim value
-caml_source_shader(value src, value id)
+caml_source_shader(value id, value src)
 {
   CAMLparam2(src, id);
   

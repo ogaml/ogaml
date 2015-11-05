@@ -18,7 +18,8 @@ module Window = struct
   #endif
 
   let clear win ~color ~depth ~stencil = 
-    OgamlGL.Buffers.clear ~color ~depth ~stencil
+    (* OgamlGL.Buffers.clear ~color ~depth ~stencil *)
+    ()
 end
 
 module Mouse = struct

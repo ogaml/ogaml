@@ -4,7 +4,6 @@
 OS_NAME = 
 OS_WIN_STUBS =
 OS_WIN_STUBS_DIR =
-OS_WIN_STUBS_TEST =
 PP_DEFINE = 
 
 UNAME := $(shell uname)
@@ -17,12 +16,10 @@ ifeq ($(UNAME), Linux)
     PP_DEFINE = __OSX__
     OS_WIN_STUBS = cocoa_stubs
     OS_WIN_STUBS_DIR = cocoa/
-    OS_WIN_STUBS_TEST = ctest_simple
   else 
     PP_DEFINE = __LINUX__
     OS_WIN_STUBS = xlib
     OS_WIN_STUBS_DIR = xlib/
-    OS_WIN_STUBS_TEST = xtest_glcube
   endif
 endif
 ifeq ($(UNAME), Darwin)
@@ -30,7 +27,6 @@ ifeq ($(UNAME), Darwin)
   OS_NAME = OSX
   OS_WIN_STUBS = cocoa_stubs
   OS_WIN_STUBS_DIR = cocoa/
-  OS_WIN_STUBS_TEST = ctest_simple
 endif
 
 # Compilers

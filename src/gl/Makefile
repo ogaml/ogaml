@@ -4,19 +4,16 @@ include ../../common_defs.mk
 
 INCLUDE_DIRS = -I ../utils/ -I ../math/
 
-CSOURCES = $(STUBS_DIR)/buffers_stubs.c $(STUBS_DIR)/shader_stubs.c\
-	   $(STUBS_DIR)/error_stubs.c $(STUBS_DIR)/config_stubs.c\
-	   $(STUBS_DIR)/program_stubs.c $(STUBS_DIR)/uniform_stubs.c\
+CSOURCES = $(STUBS_DIR)/shader_stubs.c $(STUBS_DIR)/program_stubs.c\
 	   $(STUBS_DIR)/state_stubs.c $(STUBS_DIR)/texture_stubs.c\
 	   ../utils/stubs.c
 
 COBJS = $(CSOURCES:.c=.o)
 
-COBJS2 = buffers_stubs.o shader_stubs.o error_stubs.o config_stubs.o\
-	 program_stubs.o stubs.o uniform_stubs.o state_stubs.o\
+COBJS2 = shader_stubs.o program_stubs.o stubs.o state_stubs.o\
 	 texture_stubs.o
 
-MLSOURCES = color.ml config.ml error.ml internal.ml state.ml program.ml buffers.ml image.ml texture.ml uniform.ml
+MLSOURCES = color.ml internal.ml state.ml program.ml image.ml texture.ml 
 
 MLINTERFACES = enum.mli
 

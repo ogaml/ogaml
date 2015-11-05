@@ -69,8 +69,8 @@ let from_source state ~vertex_source ~fragment_source =
   let rec uniforms = function
     |0 -> []
     |n -> begin
-      let name = Internal.Program.uname program n in
-      let kind = Internal.Program.utype program n in
+      let name = Internal.Program.uname program (n - 1) in
+      let kind = Internal.Program.utype program (n - 1) in
       let location = Internal.Program.uloc program name in
       {
         Uniform.name = name; 
@@ -82,8 +82,8 @@ let from_source state ~vertex_source ~fragment_source =
   let rec attributes = function
     |0 -> []
     |n -> begin
-      let name = Internal.Program.aname program n in
-      let kind = Internal.Program.atype program n in
+      let name = Internal.Program.aname program (n - 1) in
+      let kind = Internal.Program.atype program (n - 1) in
       let location = Internal.Program.aloc program name in
       {
         Attribute.name = name; 

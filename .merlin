@@ -8,6 +8,7 @@ S src/test
 S src/math
 S src/gl
 S src/gl/stubs
+S tests
 
 B src
 B src/wm
@@ -19,4 +20,5 @@ B src/test
 B src/math
 B src/gl
 B src/gl/stubs
+B tests
 

@@ -16,7 +16,7 @@
 #include "../../utils/stubs.h"
 
 
-GLenum Val_type(value type)
+int Val_type(GLenum type)
 {
   switch(type)
   {
@@ -245,7 +245,7 @@ caml_uniform_type(value id, value index)
 
   glGetActiveUniform((GLuint)id, Int_val(index), 0, &tmp_len, &tmp_size, &tmp_type, &tmp_name);
 
-  CAMLreturn(Val_type(tmp_type));
+  CAMLreturn(Val_int(Val_type(tmp_type)));
 }
 
 
@@ -264,6 +264,6 @@ caml_attribute_type(value id, value index)
 
   glGetActiveAttrib((GLuint)id, Int_val(index), 0, &tmp_len, &tmp_size, &tmp_type, &tmp_name);
 
-  CAMLreturn(Val_type(tmp_type));
+  CAMLreturn(Val_int(Val_type(tmp_type)));
 }
 

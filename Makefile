@@ -20,12 +20,6 @@ WMLIB_FILES = src/wm/$(strip $(OS_WIN_STUBS_DIR))*.a   src/wm/$(strip $(OS_WIN_S
 
 PACKAGES = -package bigarray,unix
 
-WINDOW_TEST = src/test/test_glcube.ml
-
-MATH_TEST = src/test/math_test.ml
-
-STUBS_TEST = src/test/$(strip $(OS_WIN_STUBS_TEST)).ml
-
 
 # Constants
 
@@ -34,7 +28,7 @@ OUTPUT = main.out
 
 # Compilation
 
-default: window_test
+default: stubs_lib math_lib gl_lib window_lib
 
 window_lib: gl_lib
 	cd src/wm/ && make
@@ -45,20 +39,11 @@ math_lib:
 gl_lib: math_lib
 	cd src/gl/ && make
 
-window_test: window_lib math_lib gl_lib
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(INCLUDES)\
-	  $(MODULES) $(WINDOW_TEST)
-
-math_test: math_lib
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(INCLUDES)\
-	  $(MODULES) $(MATH_TEST)
-
-stubs_test: stubs_lib math_lib gl_lib
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(INCLUDES)\
-	  $(MODULES) $(STUBS_TEST)
-
 stubs_lib:
 	cd src/wm/$(strip $(OS_WIN_STUBS_DIR)) && make
+
+tests: stubs_lib math_lib gl_lib window_lib
+	$(OCAMLFIND) ocamlopt -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/programs.ml -o main.out
 
 install:
 	$(OCAMLFIND) install ogaml META $(GL_FILES) $(MATH_FILES) $(WINDOW_FILES) $(WMLIB_FILES)
@@ -71,4 +56,5 @@ clean:
 	cd src/wm/ && make clean;
 	cd src/test/ && make clean;
 	cd src/math/ && make clean;
-	cd src/gl/ && make clean
+	cd src/gl/ && make clean;
+	cd tests/ && make clean

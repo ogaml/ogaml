@@ -80,6 +80,9 @@ New GL Implementation :
     ☐ Clean Enum according to what can be hidden in Internal
     ☐ Hide State.t in Window
     ☐ Rework cube test
+    ☐ Reimplement Window.clear
+    ☐ Add error for shader creation
+    ☐ Add error for program creation
 
 Math part:
   ✔ Fix a notation convention @done(2015-10-29 18:32) @project(Math part)

@@ -23,7 +23,7 @@ CAMLprim value
 caml_gl_version(value unit)
 {
   CAMLparam0();
-  CAMLreturn(caml_copy_string((char*)glGetString(GL_VERSION)));
+  CAMLreturn(caml_copy_string(glGetString(GL_VERSION)));
 }
 
 
@@ -33,7 +33,7 @@ CAMLprim value
 caml_glsl_version(value unit)
 {
   CAMLparam0();
-  CAMLreturn(caml_copy_string((char*)glGetString(GL_SHADING_LANGUAGE_VERSION)));
+  CAMLreturn(caml_copy_string(glGetString(GL_SHADING_LANGUAGE_VERSION)));
 }
 
 
