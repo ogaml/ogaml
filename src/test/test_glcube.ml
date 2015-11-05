@@ -191,9 +191,9 @@ let display () =
   Uniform.set (Uniform.Matrix3D mvp)
               (Program.uniform texture_program "MVPMatrix");
   Texture.activate 0;
-  if !ubermode then 
+  if !ubermode then
     Texture.bind (Some david_texture)
-  else 
+  else
     Texture.bind (Some mario_texture);
   Uniform.set (Uniform.Int1 0)
               (Program.uniform texture_program "MyTex");

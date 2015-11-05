@@ -17,7 +17,7 @@ module Window = struct
     #include "window_impl_cocoa.ml"
   #endif
 
-  let clear win ~color ~depth ~stencil = 
+  let clear win ~color ~depth ~stencil =
     OgamlGL.Buffers.clear ~color ~depth ~stencil
 end
 
@@ -29,3 +29,10 @@ module Mouse = struct
   #endif
 end
 
+module Keyboard = struct
+  #ifdef __LINUX__
+    #include "keyboard_impl_x11.ml"
+  #elif defined __OSX__
+    #include "keyboard_impl_cocoa.ml"
+  #endif
+end
