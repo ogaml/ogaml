@@ -70,7 +70,7 @@ New GL Implementation :
   ☐ Base
     ✔ Implement State @done(2015-11-04 15:10) @project(New GL Implementation)
     ✔ Implement Internal.Texture @done(2015-11-05 00:25) @project(New GL Implementation)
-    ☐ Implement Texture
+    ✔ Implement Texture @done(2015-11-05 01:22) @project(New GL Implementation)
     ☐ Implement Internal.Shader
     ☐ Implement Shader
     ☐ Implement Internal.Program

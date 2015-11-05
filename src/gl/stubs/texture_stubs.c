@@ -24,7 +24,7 @@
 
 GLenum Target_val(value target)
 {
-  switch(target)
+  switch(Int_val(target))
   {
     case 0:
       return GL_TEXTURE_1D;
@@ -43,7 +43,7 @@ GLenum Target_val(value target)
 
 GLenum Magnify_val(value mag)
 {
-  switch(mag)
+  switch(Int_val(mag))
   {
     case 0:
       return GL_NEAREST;
@@ -59,7 +59,7 @@ GLenum Magnify_val(value mag)
 
 GLenum Minify_val(value min)
 {
-  switch(min)
+  switch(Int_val(min))
   {
     case 0:
       return GL_NEAREST;
@@ -81,7 +81,7 @@ GLenum Minify_val(value min)
 
 GLenum TextureFormat_val(value fmt)
 {
-  switch(fmt)
+  switch(Int_val(fmt))
   {
     case 0:
       return GL_RGB;
@@ -103,7 +103,7 @@ GLenum TextureFormat_val(value fmt)
 
 GLenum PixelFormat_val(value fmt)
 {
-  switch(fmt)
+  switch(Int_val(fmt))
   {
     case 0:
       return GL_R;
@@ -206,10 +206,10 @@ caml_tex_parameter_2D(value loc)
 {
   CAMLparam1(loc);
 
-  if(loc == MLvar_Magnify)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, Magnify_val(Field(loc,0)));
-  else if(loc == MLvar_Minify)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Minify_val(Field(loc,0)));
+  if(Field(loc, 0) == MLvar_Magnify)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, Magnify_val(Field(loc, 1)));
+  else if(Field(loc, 0) == MLvar_Minify)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Minify_val(Field(loc, 1)));
   else 
     caml_failwith("Caml polymorphic variant error in tex_parameter_2D(1)");
 

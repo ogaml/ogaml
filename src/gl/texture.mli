@@ -1,11 +1,13 @@
 
-type t
 
-val create : [`File of string | `Image of Image.t ] -> t
+module Texture2D : sig
 
-val activate : int -> unit
+  type t
 
-val bind : t option -> unit
+  val create : State.t -> [< `File of string | `Image of Image.t ] -> t
 
-val delete : t -> unit
+  val bind : State.t -> t option -> unit
 
+  val size : t -> (int * int)
+
+end

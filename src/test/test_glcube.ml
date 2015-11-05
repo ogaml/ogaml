@@ -6,6 +6,8 @@ open OgamlGL.Buffers
 
 let win = Window.create ~width:800 ~height:600
 
+let state = State.create ()
+
 let () =
   Printf.printf "OpenGL version : %s\n%!" (Config.version ());
   Printf.printf "OpenGL Shading Language (GLSL) version : %s\n%!" (Config.glsl_version ());
@@ -56,9 +58,9 @@ let axis =
 
 
 (* Load the cube texture *)
-let mario_texture = Texture.create (`File "src/test/mario-block.bmp")
+let mario_texture = Texture.Texture2D.create state (`File "src/test/mario-block.bmp")
 
-let david_texture = Texture.create (`File "src/test/david-block.bmp")
+let david_texture = Texture.Texture2D.create state (`File "src/test/david-block.bmp")
 
 let ubermode = ref false
 
@@ -190,11 +192,10 @@ let display () =
   Program.use (Some texture_program);
   Uniform.set (Uniform.Matrix3D mvp)
               (Program.uniform texture_program "MVPMatrix");
-  Texture.activate 0;
   if !ubermode then 
-    Texture.bind (Some david_texture)
+    Texture.Texture2D.bind state (Some david_texture)
   else 
-    Texture.bind (Some mario_texture);
+    Texture.Texture2D.bind state (Some mario_texture);
   Uniform.set (Uniform.Int1 0)
               (Program.uniform texture_program "MyTex");
   VAO.bind (Some vao_cube);

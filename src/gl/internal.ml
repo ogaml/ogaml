@@ -12,9 +12,9 @@ module Texture = struct
   (* Exposed functions *)
   external create : unit -> t = "caml_create_texture"
 
-  external activate : int -> t = "caml_activate_texture"
+  external activate : int -> unit = "caml_activate_texture"
 
-  external bind : Enum.TextureTarget.t -> t -> unit = "caml_bind_texture"
+  external bind : Enum.TextureTarget.t -> t option -> unit = "caml_bind_texture"
 
   external parameter2D : 
     [`Magnify of Enum.MagnifyFilter.t |`Minify  of Enum.MinifyFilter.t] 
