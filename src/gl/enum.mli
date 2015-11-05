@@ -23,6 +23,40 @@ module PolygonMode : sig
 end
 
 
+(** Shader types enumeration *)
+module ShaderType : sig
+
+  type t = 
+    | Fragment
+    | Vertex
+
+end
+
+
+(** GLSL types enumeration *)
+module GlslType : sig
+
+  type t =
+    | Float
+    | Float2
+    | Float3
+    | Float4
+    | Float2x2
+    | Float2x3
+    | Float2x4
+    | Float3x2
+    | Float3x3
+    | Float3x4
+    | Float4x2
+    | Float4x3
+    | Float4x4
+    | Sampler1D
+    | Sampler2D
+    | Sampler3D
+
+end
+
+
 (** Texture targets enumeration *)
 module TextureTarget : sig
 

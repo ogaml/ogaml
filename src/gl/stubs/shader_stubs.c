@@ -17,87 +17,99 @@
 #include "../../utils/stubs.h"
 
 
-// INPUT   : nothing
-// OUTPUT  : a fragment shader id
-CAMLprim value
-caml_gl_create_fragment_shader(value unit)
+GLenum Shader_val(value type)
 {
-  CAMLparam0();
-  CAMLreturn((value) glCreateShader(GL_FRAGMENT_SHADER));
+  switch(Int_val(type))
+  {
+    case 0:
+      return GL_FRAGMENT_SHADER;
+
+    case 1:
+      return GL_VERTEX_SHADER;
+
+    default:
+      caml_failwith("Caml variant error in Shader_val(1)");
+  }
 }
 
 
-// INPUT   : nothing
-// OUTPUT  : a vertex shader id
+// INPUT   a shader type
+// OUTPUT  a new shader id
 CAMLprim value
-caml_gl_create_vertex_shader(value unit)
+caml_create_shader(value type)
 {
-  CAMLparam0();
-  CAMLreturn((value) glCreateShader(GL_VERTEX_SHADER));
+  CAMLparam1(type);
+  CAMLreturn((value) glCreateShader(Shader_val(type)));
 }
 
 
-// INPUT   : a shader id, a source
-// OUTPUT  : nothing, changes the source code of the shader
+// INPUT   a shader id, a source
+// OUTPUT  nothing, changes the source code of the shader
 CAMLprim value
-caml_gl_source_shader(value src, value id)
+caml_source_shader(value src, value id)
 {
   CAMLparam2(src, id);
+  
   const GLchar* tmp_src = String_val(src);
   const GLint tmp_len  = -1;
   glShaderSource((GLuint)id, 1, &tmp_src, &tmp_len);
+
   CAMLreturn(Val_unit);
 }
 
 
-// INPUT   : a shader id
-// OUTPUT  : nothing, compiles the shader
+// INPUT   a shader id
+// OUTPUT  nothing, compiles the shader
 CAMLprim value
-caml_gl_compile_shader(value id)
+caml_compile_shader(value id)
 {
   CAMLparam1(id);
+
   glCompileShader((GLuint)id);
+
   CAMLreturn(Val_unit);
 }
 
 
-// INPUT   : a shader id
-// OUTPUT  : the log of the shader and the size of the log
+// INPUT   a shader id
+// OUTPUT  true iff the shader successfully compiled
 CAMLprim value
-caml_gl_shader_infolog(value id)
+caml_shader_status(value id)
+{
+  CAMLparam1(id);
+  
+  GLint tmp;
+  glGetShaderiv((GLuint)id, GL_COMPILE_STATUS, &tmp);
+
+  if(tmp == GL_FALSE) 
+    CAMLreturn(Val_false);
+  else
+    CAMLreturn(Val_true);
+}
+
+
+// INPUT   : a shader id
+// OUTPUT  : the log of the shader
+CAMLprim value
+caml_shader_log(value id)
 {
   CAMLparam1(id);
   CAMLlocal1(res);
 
-  GLsizei maxl = 1024;
+  GLint tmp;
+  glGetShaderiv((GLuint)id, GL_INFO_LOG_LENGTH, &tmp);
+
+  GLsizei maxl = tmp;
   GLsizei len[1] = {0};
-  GLchar  log[1024] = "";
+  GLchar* log = malloc(tmp * sizeof(GLchar));
   glGetShaderInfoLog((GLuint)id, maxl, len, log);
 
-  res = caml_alloc(2, 0);
-  Store_field(res, 0, caml_copy_string(log));
-  Store_field(res, 1, Val_int(len[0]));
+  res = caml_copy_string(log);
+
+  free(log);
 
   CAMLreturn(res);
 }
 
 
-// INPUT   a shader id
-// OUTPUT  true iff the shader compiled successfully 
-CAMLprim value
-caml_gl_shader_compiled(value id)
-{
-  CAMLparam1(id);
-  CAMLlocal1(ret);
-
-  GLint res;
-  glGetShaderiv((GLuint)id, GL_COMPILE_STATUS, &res);
-
-  if(res == GL_FALSE)
-    ret = Val_false;
-  else
-    ret = Val_true;
-
-  CAMLreturn(ret);
-}
 

@@ -106,7 +106,7 @@ GLenum PixelFormat_val(value fmt)
   switch(Int_val(fmt))
   {
     case 0:
-      return GL_R;
+      return GL_RED;
 
     case 1:
       return GL_RG;

@@ -37,3 +37,80 @@ module Texture : sig
 
 end
 
+
+(** Represents an openGL shader *)
+module Shader : sig
+
+  (** Abstract shader type *)
+  type t
+
+  (** Creates an empty shader *)
+  val create : Enum.ShaderType.t -> t
+
+  (** Adds a source to a shader *)
+  val source : t -> string -> unit
+
+  (** Compiles a shader *)
+  val compile : t -> unit
+
+  (** Returns the compilation status of a shader *)
+  val status : t -> bool
+
+  (** Returns the information log about the compilation *)
+  val log : t -> string
+
+end
+
+
+(** Represents an openGL program *)
+module Program : sig
+
+  (** Abstract program type *)
+  type t
+
+  (** Creates an empty program *)
+  val create : unit -> t
+
+  (** Attaches a shader to a program *)
+  val attach : t -> Shader.t -> unit
+
+  (** Links the program *)
+  val link : t -> unit
+
+  (** Returns the location of a uniform *)
+  val uloc : t -> string -> int
+
+  (** Returns the location of an attribute *)
+  val aloc : t -> string -> int
+
+  (** Returns the name of a uniform from its index *)
+  val uname : t -> int -> string
+
+  (** Returns the name of an attribute from its index *)
+  val aname : t -> int -> string
+
+  (** Returns the type of a uniform from its index *)
+  val utype : t -> int -> Enum.GlslType.t
+
+  (** Returns the type of an attribute from its index *)
+  val atype : t -> int -> Enum.GlslType.t
+
+  (** Returns the number of uniforms *)
+  val ucount : t -> int
+
+  (** Returns the number of attributes *)
+  val acount : t -> int
+
+  (** Uses the program *)
+  val use : t option -> unit
+
+  (** Returns true iff the linking was successful *)
+  val status : t -> bool
+
+  (** Returns the log of the program *)
+  val log : t -> string
+
+end
+
+
+

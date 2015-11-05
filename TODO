@@ -71,9 +71,9 @@ New GL Implementation :
     ✔ Implement State @done(2015-11-04 15:10) @project(New GL Implementation)
     ✔ Implement Internal.Texture @done(2015-11-05 00:25) @project(New GL Implementation)
     ✔ Implement Texture @done(2015-11-05 01:22) @project(New GL Implementation)
-    ☐ Implement Internal.Shader
-    ☐ Implement Shader
-    ☐ Implement Internal.Program
+    ✔ Implement Internal.Shader @done(2015-11-05 10:44) @project(New GL Implementation)
+    ✘ Implement Shader -- Hidden in program @cancelled(2015-11-05 10:45) @project(New GL Implementation)
+    ✔ Implement Internal.Program @done(2015-11-05 13:09) @project(New GL Implementation)
     ☐ Implement Program
     ☐ Implement Internal.VBO
     ☐ Implement VBO
