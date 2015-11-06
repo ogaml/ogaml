@@ -76,6 +76,9 @@ let size win =
 let is_open win =
   Cocoa.OGWindowController.is_window_open win
 
+let has_focus win =
+  true
+
 let get_key_event event =
   let keycode = Keycode.(
     match Cocoa.NSString.get (Cocoa.NSEvent.character event) with

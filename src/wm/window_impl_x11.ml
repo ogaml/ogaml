@@ -54,6 +54,9 @@ let size win =
 let is_open win =
   not win.closed
 
+let has_focus win =
+  true
+
 let keysym_to_key = Keycode.(function
   | Xlib.Event.Code i -> begin
     match i with
@@ -150,7 +153,7 @@ let poll_event win =
               ButtonEvent.control = modif.Xlib.Event.ctrl;
               ButtonEvent.alt = modif.Xlib.Event.alt
           })
-      | Xlib.Event.MotionNotify  pos -> 
+      | Xlib.Event.MotionNotify  pos ->
          Some Event.(MouseMoved {
               MouseEvent.x = pos.Xlib.Event.x;
               MouseEvent.y = pos.Xlib.Event.y

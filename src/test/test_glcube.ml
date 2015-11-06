@@ -238,7 +238,7 @@ let rec event_loop () =
       | Escape -> Window.close win
       | Q when k.Event.KeyEvent.control -> Window.close win
       | U -> ubermode := not !ubermode
-      | Z | Up ->
+      (* | Z | Up ->
           position := Vector3f.(add
             !position
             {x = -. 0.15 *. (sin !view_theta);
@@ -261,13 +261,42 @@ let rec event_loop () =
             !position
             {x = 0.15 *. (cos !view_theta);
              y = 0.;
-             z = -. 0.15 *. (sin !view_theta)})
+             z = -. 0.15 *. (sin !view_theta)}) *)
       | _ -> ()
     )
     | _ -> ()
   end; event_loop ()
   |None -> ()
 
+
+(* Handle keys directly by polling the keyboard *)
+let handle_keys () =
+  Keyboard.(Keycode.(
+    if is_pressed Z || is_pressed Up then
+      position := Vector3f.(add
+        !position
+        {x = -. 0.15 *. (sin !view_theta);
+         y = 0.;
+         z = -. 0.15 *. (cos !view_theta)}) ;
+    if is_pressed S || is_pressed Down then
+      position := Vector3f.(add
+        !position
+        {x = 0.15 *. (sin !view_theta);
+         y = 0.;
+         z = 0.15 *. (cos !view_theta)}) ;
+    if is_pressed Q || is_pressed Left then
+      position := Vector3f.(add
+        !position
+        {x = -. 0.15 *. (cos !view_theta);
+         y = 0.;
+         z = 0.15 *. (sin !view_theta)}) ;
+    if is_pressed D || is_pressed Right then
+      position := Vector3f.(add
+        !position
+        {x = 0.15 *. (cos !view_theta);
+         y = 0.;
+         z = -. 0.15 *. (sin !view_theta)})
+  ))
 
 (* Main loop *)
 let rec main_loop () =
@@ -276,8 +305,7 @@ let rec main_loop () =
     display ();
     Window.display win;
     update_camera ();
-    if Keyboard.is_pressed Keycode.A then Printf.printf "yAy!\n%!";
-    if Keyboard.is_pressed Keycode.Num1 then Printf.printf "y1y!\n%!";
+    if Window.has_focus win then handle_keys () ;
     event_loop ();
     incr frame_count;
     main_loop ()
