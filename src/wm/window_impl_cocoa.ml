@@ -77,7 +77,7 @@ let is_open win =
   Cocoa.OGWindowController.is_window_open win
 
 let has_focus win =
-  true
+  Cocoa.OGWindowController.has_focus win
 
 let get_key_event event =
   let keycode = Keycode.(

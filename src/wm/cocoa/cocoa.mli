@@ -307,4 +307,6 @@ module OGWindowController : sig
 
   val set_proper_relative_mouse_location : t -> float -> float -> unit
 
+  val has_focus : t -> bool
+
 end

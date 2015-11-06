@@ -390,4 +390,6 @@ module OGWindowController = struct
   external set_proper_relative_mouse_location : t -> float -> float -> unit
     = "caml_cocoa_set_proper_relative_mouse_location"
 
+  external has_focus : t -> bool = "caml_cocoa_controller_has_focus"
+
 end

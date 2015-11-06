@@ -134,6 +134,11 @@
   warpCursor(p);
 }
 
+-(BOOL)hasFocus
+{
+  return [m_window isKeyWindow];
+}
+
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -313,4 +318,16 @@ caml_cocoa_set_proper_relative_mouse_location(value mlcontroller, value mlx, val
   [controller setProperRelativeMouseLocationTo:loc];
 
   CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_controller_has_focus(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  BOOL res = [controller hasFocus];
+
+  CAMLreturn(Val_bool(res));
 }

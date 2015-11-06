@@ -304,7 +304,7 @@ let rec main_loop () =
     Window.clear win ~color:true ~depth:true ~stencil:false;
     display ();
     Window.display win;
-    update_camera ();
+    if Window.has_focus win then update_camera () ;
     if Window.has_focus win then handle_keys () ;
     event_loop ();
     incr frame_count;
