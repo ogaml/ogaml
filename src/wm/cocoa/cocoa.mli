@@ -54,6 +54,14 @@ module Mouse : sig
 
 end
 
+module Keyboard : sig
+
+  val is_keycode_pressed : int -> bool
+
+  val is_char_pressed : char -> bool
+
+end
+
 module NSEvent : sig
 
   type t

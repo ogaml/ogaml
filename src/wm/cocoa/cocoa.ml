@@ -60,6 +60,14 @@ module Mouse = struct
 
 end
 
+module Keyboard = struct
+
+  external is_keycode_pressed : int -> bool = "caml_cg_is_key_pressed"
+
+  external is_char_pressed : char -> bool = "caml_cg_is_char_pressed"
+
+end
+
 module NSEvent = struct
 
   type t

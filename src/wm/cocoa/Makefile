@@ -32,7 +32,7 @@ ifeq ($(OS_NAME), LINUX)
 endif
 ifeq ($(OS_NAME), OSX)
   COPTS = -fconstant-string-class=NSConstantString
-  LIBS = -framework Foundation -framework Cocoa -lobjc
+  LIBS = -framework Foundation -framework Cocoa -framework Carbon -lobjc
 endif
 
 

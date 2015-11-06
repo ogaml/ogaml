@@ -83,6 +83,104 @@ caml_cg_warp_mouse_cursor_position(value mlx, value mly)
   CAMLreturn(Val_unit);
 }
 
+// Keyboard information
+///////////////////////
+
+// The two following functions come from StackOverflow
+CFStringRef createStringForKey(CGKeyCode keyCode)
+{
+  TISInputSourceRef currentKeyboard = TISCopyCurrentKeyboardInputSource();
+  CFDataRef layoutData =
+    TISGetInputSourceProperty(currentKeyboard,
+                              kTISPropertyUnicodeKeyLayoutData);
+  const UCKeyboardLayout *keyboardLayout =
+    (const UCKeyboardLayout *)CFDataGetBytePtr(layoutData);
+
+  UInt32 keysDown = 0;
+  UniChar chars[4];
+  UniCharCount realLength;
+
+  UCKeyTranslate(keyboardLayout,
+                 keyCode,
+                 kUCKeyActionDisplay,
+                 0,
+                 LMGetKbdType(),
+                 kUCKeyTranslateNoDeadKeysBit,
+                 &keysDown,
+                 sizeof(chars) / sizeof(chars[0]),
+                 &realLength,
+                 chars);
+  CFRelease(currentKeyboard);
+
+  return CFStringCreateWithCharacters(kCFAllocatorDefault, chars, 1);
+}
+
+CGKeyCode keyCodeForChar(const char c)
+{
+  static CFMutableDictionaryRef charToCodeDict = NULL;
+  CGKeyCode code;
+  UniChar character = c;
+  CFStringRef charStr = NULL;
+
+  /* Generate table of keycodes and characters. */
+  if (charToCodeDict == NULL) {
+    size_t i;
+    charToCodeDict = CFDictionaryCreateMutable(kCFAllocatorDefault,
+                                               128,
+                                               &kCFCopyStringDictionaryKeyCallBacks,
+                                               NULL);
+    if (charToCodeDict == NULL) return UINT16_MAX;
+
+    /* Loop through every keycode (0 - 127) to find its current mapping. */
+    for (i = 0; i < 128; ++i) {
+      CFStringRef string = createStringForKey((CGKeyCode)i);
+      if (string != NULL) {
+        CFDictionaryAddValue(charToCodeDict, string, (const void *)i);
+        CFRelease(string);
+      }
+    }
+  }
+
+  charStr = CFStringCreateWithCharacters(kCFAllocatorDefault, &character, 1);
+
+  /* Our values may be NULL (0), so we need to use this function. */
+  if (!CFDictionaryGetValueIfPresent(charToCodeDict, charStr,
+                                     (const void **)&code)) {
+    code = UINT16_MAX;
+  }
+
+  CFRelease(charStr);
+  return code;
+}
+
+// Check if a keycode is pressed
+BOOL isKeyPressed(CGKeyCode key)
+{
+  return CGEventSourceKeyState(kCGEventSourceStateHIDSystemState,key);
+}
+
+CAMLprim value
+caml_cg_is_key_pressed(value mlkeycode)
+{
+  CAMLparam1(mlkeycode);
+
+  BOOL res = isKeyPressed(Int_val(mlkeycode));
+
+  CAMLreturn(Val_bool(res));
+}
+
+CAMLprim value
+caml_cg_is_char_pressed(value mlchar)
+{
+  CAMLparam1(mlchar);
+
+  char c = Int_val(mlchar);
+
+  BOOL res = isKeyPressed(keyCodeForChar(c));
+
+  CAMLreturn(Val_bool(res));
+}
+
 // NSString binding
 ///////////////////
 
