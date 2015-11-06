@@ -7,7 +7,7 @@ let opengl_state =
   State.create ()
 
 let test_program1 () = 
-  let prog = Program.from_source_list opengl_state
+  let prog = Program.from_source_list
     ~vertex_source:[
       (130, "#version 130
               

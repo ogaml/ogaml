@@ -73,6 +73,24 @@ caml_gl_clear(value c, value d, value s)
 }
 
 
+// INPUT   four values r g b a
+// OUTPUT  nothing, sets the clear color
+CAMLprim value
+caml_clear_color(value r, value g, value b, value a)
+{
+  CAMLparam4(r,g,b,a);
+
+  glClearColor(
+    Double_val(r),
+    Double_val(g),
+    Double_val(b),
+    Double_val(a)
+  );
+
+  CAMLreturn(Val_unit);
+}
+
+
 int culling = 0;
 
 // INPUT   a culling mode

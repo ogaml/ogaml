@@ -84,9 +84,10 @@ New GL Implementation :
     ✔ Update State @done(2015-11-06 18:08) @project(New GL Implementation)
     ✔ Hide State.t in Window @done(2015-11-06 19:56) @project(New GL Implementation)
     ✔ Implement window draw and clear functions @done(2015-11-06 22:18) @project(New GL Implementation)
-    ☐ Rework cube test
+    ✔ Rework cube test @done(2015-11-06 23:31) @project(New GL Implementation)
     ☐ Add error for shader creation
     ☐ Add error for program creation
+    ☐ Better program creation (auto versioning)
     ☐ Hide uniform & attribute locations ?
     ☐ Move Uniform externals to Internal and remove all Field(data,0) in uniform bindings
     ✔ Hide Data.t ? & more data conversions @done(2015-11-06 17:57) @project(New GL Implementation)

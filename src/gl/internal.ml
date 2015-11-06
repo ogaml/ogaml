@@ -76,9 +76,20 @@ module Pervasives = struct
 
   external clear : bool -> bool -> bool -> unit = "caml_gl_clear"
 
+  external color : float -> float -> float -> float -> unit = "caml_clear_color"
+
   external culling : Enum.CullingMode.t -> unit = "caml_culling_mode"
 
   external polygon : Enum.PolygonMode.t -> unit = "caml_polygon_mode"
+
+  external glsl_version : unit -> string = "caml_glsl_version"
+
+  let glsl_supported v = 
+    let glsl = 
+      let str = glsl_version () in
+      Scanf.sscanf str "%i.%i" (fun a b -> a * 100 + (if b < 10 then b * 10 else b))
+    in
+    v <= glsl
 
 end
 

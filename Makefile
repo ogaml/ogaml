@@ -28,7 +28,7 @@ OUTPUT = main.out
 
 # Compilation
 
-default: stubs_lib math_lib gl_lib window_lib
+default: example
 
 window_lib: gl_lib
 	cd src/wm/ && make
@@ -41,6 +41,9 @@ gl_lib: math_lib
 
 stubs_lib:
 	cd src/wm/$(strip $(OS_WIN_STUBS_DIR)) && make
+
+example: stubs_lib math_lib gl_lib window_lib
+	$(OCAMLFIND) ocamlopt -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) examples/cube.ml -o main.out
 
 tests: stubs_lib math_lib gl_lib window_lib
 	$(OCAMLFIND) ocamlopt -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/programs.ml -o main.out && ./main.out &&\

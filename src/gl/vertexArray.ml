@@ -96,22 +96,22 @@ module Source = struct
 
   let (<<) src v = add src v
 
-  let attribs src = 
-    let rec build_list_opt = function
-      |[] -> []
-      |(_, None)   ::t -> build_list_opt t
-      |(n, Some s) :: t -> (n, s) :: (build_list_opt t)
-    in
-    build_list_opt [Position, src.position;
-                    Normal  , src.normal;
-                    Texcoord, src.texcoord;
-                    Color   , src.color]
-
   let size_of_attrib = function
     |Position -> 3
     |Color    -> 4
     |Normal   -> 3
     |Texcoord -> 2
+
+  let attribs src = 
+    let rec build_list_opt i = function
+      |[] -> []
+      |(_, None)   :: t -> build_list_opt i t
+      |(n, Some s) :: t -> (n, s, i) :: (build_list_opt (size_of_attrib n + i) t)
+    in
+    build_list_opt 0 [Position, src.position;
+                      Texcoord, src.texcoord;
+                      Normal  , src.normal;
+                      Color   , src.color]
 
   let type_of_attrib = function
     |Position -> Enum.GlslType.Float3
@@ -119,13 +119,9 @@ module Source = struct
     |Normal   -> Enum.GlslType.Float3
     |Texcoord -> Enum.GlslType.Float2
 
-  let offset_of_attrib = function
-    |Position -> 0
-    |Texcoord -> 3
-    |Normal   -> 5
-    |Color    -> 8
+  let stride src = 
+    List.fold_left (fun v (t,_,_) -> v + size_of_attrib t) 0 (attribs src)
 
-  let stride = 12
 
 end
 
@@ -138,7 +134,8 @@ type _ t = {
   vao     : Internal.VAO.t;
   size    : int;
   length  : int;
-  attribs : (Source.attrib * string) list;
+  attribs : (Source.attrib * string * int) list;
+  stride  : int;
   mutable bound  : Program.t option
 }
 
@@ -154,6 +151,7 @@ let dynamic src =
    size = Internal.Data.length data;
    length = Internal.Data.length data; 
    attribs = Source.attribs src;
+   stride = Source.stride src;
    bound = None
   }
 
@@ -169,6 +167,7 @@ let static src =
    size = Internal.Data.length data;
    length = Internal.Data.length data; 
    attribs = Source.attribs src;
+   stride = Source.stride src;
    bound = None
   }
 
@@ -185,6 +184,7 @@ let rebuild t src =
    size   = max (Internal.Data.length data) (t.size);
    length = Internal.Data.length data;
    attribs = Source.attribs src;
+   stride = Source.stride src;
    bound  = t.bound
   }
 
@@ -201,16 +201,16 @@ let bind state t prog =
         raise (Missing_attribute 
           (Printf.sprintf "Attribute %s not provided in vertex source" s)
         )
-      | (e,h)::t when h = s -> (e,t)
+      | (e,h,off)::t when h = s -> (e,off,t)
       | h::t -> 
-        let (e,l) = find_remove s t in 
-        (e,h::l)
+        let (e,off,l) = find_remove s t in 
+        (e,off,h::l)
     in
     Program.iter_attributes prog 
       (fun att ->
-        let (t, l) = find_remove (Program.Attribute.name att) !attribs in
+        let (typ,offset,l) = find_remove (Program.Attribute.name att) !attribs in
         attribs := l;
-        if Source.type_of_attrib t <> Program.Attribute.kind att then
+        if Source.type_of_attrib typ <> Program.Attribute.kind att then
           raise (Invalid_attribute
             (Printf.sprintf "Attribute %s has invalid type"
               (Program.Attribute.name att)
@@ -218,15 +218,15 @@ let bind state t prog =
         Internal.VAO.enable_attrib (Program.Attribute.location att);
         Internal.VAO.attrib_float 
           (Program.Attribute.location att)
-          (Source.size_of_attrib t)
+          (Source.size_of_attrib typ)
           (Enum.GlFloatType.Float)
-          (Source.offset_of_attrib t * 4)
-          (Source.stride * 4)
+          (offset   * 4)
+          (t.stride * 4)
       );
     if !attribs <> [] then
       raise (Invalid_attribute
         (Printf.sprintf "Attribute %s not required by program" 
-          (List.hd !attribs |> snd)
+          (let (_,s,_) = List.hd !attribs in s)
         ))
   end
   else begin

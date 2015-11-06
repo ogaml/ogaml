@@ -46,11 +46,17 @@ module Pervasives : sig
   (** Clears the current display buffer *)
   val clear : bool -> bool -> bool -> unit
 
+  (** Sets the clear color *)
+  val color : float -> float -> float -> float -> unit
+
   (** Sets the current culling mode *)
   val culling : Enum.CullingMode.t -> unit
 
   (** Sets the current polygon mode *)
   val polygon : Enum.PolygonMode.t -> unit
+
+  (** Returns true iff the given glsl version is supported *)
+  val glsl_supported : int -> bool
 
 end
 

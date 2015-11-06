@@ -147,7 +147,7 @@ CAMLprim value
 caml_gl_uniform_mat4(value loc, value dat)
 {
   CAMLparam2(loc,dat);
-  glUniformMatrix4fv((GLuint)Int_val(loc), 1, GL_FALSE, (GLfloat*)Caml_ba_data_val(dat));
+  glUniformMatrix4fv((GLuint)Int_val(loc), 1, GL_FALSE, (GLfloat*)Caml_ba_data_val(Field(dat,0)));
   CAMLreturn(Val_unit);
 }
 

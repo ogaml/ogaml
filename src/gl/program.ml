@@ -40,7 +40,7 @@ type t = {
            attributes : Attribute.t list
          }
 
-let from_source state ~vertex_source ~fragment_source =
+let from_source ~vertex_source ~fragment_source =
   let program = Internal.Program.create () in
   let vshader = Internal.Shader.create Enum.ShaderType.Vertex   in
   let fshader = Internal.Shader.create Enum.ShaderType.Fragment in
@@ -101,22 +101,24 @@ let from_source state ~vertex_source ~fragment_source =
   }
  
 
-let from_source_list state ~vertex_source ~fragment_source =
+let from_source_list ~vertex_source ~fragment_source =
   let list_vshader = 
     List.sort (fun (v,_) (v',_) -> - (compare v v')) vertex_source
   in
   let list_fshader = 
     List.sort (fun (v,_) (v',_) -> - (compare v v')) fragment_source
   in
-  let best_vshader = 
-    List.find (fun (v,_) -> State.is_glsl_version_supported state v) list_vshader
-    |> snd
-  in
-  let best_fshader = 
-    List.find (fun (v,_) -> State.is_glsl_version_supported state v) list_fshader
-    |> snd
-  in
-  from_source state ~vertex_source:best_vshader ~fragment_source:best_fshader
+  try 
+    let best_vshader = 
+      List.find (fun (v,_) -> Internal.Pervasives.glsl_supported v) list_vshader
+      |> snd
+    in
+    let best_fshader = 
+      List.find (fun (v,_) -> Internal.Pervasives.glsl_supported v) list_fshader
+      |> snd
+    in
+    from_source ~vertex_source:best_vshader ~fragment_source:best_fshader
+  with Not_found -> raise (Invalid_version "No supported GLSL version provided")
 
 
 let use state prog = 
