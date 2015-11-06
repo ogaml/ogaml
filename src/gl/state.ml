@@ -11,6 +11,8 @@ type t = {
   mutable texture_unit  : int;
   mutable bound_texture : (Internal.Texture.t option) array array;
   mutable linked_program : Internal.Program.t option;
+  mutable bound_vbo : Internal.VBO.t option;
+  mutable bound_vao : Internal.VAO.t option;
 }
 
 external ext_gl_version : unit -> string = "caml_gl_version"
@@ -42,6 +44,8 @@ let create () =
     texture_unit = 0;
     bound_texture = Array.make_matrix textures 3 None;
     linked_program = None;
+    bound_vbo = None;
+    bound_vao = None
   }
 
 let version s = 
@@ -96,4 +100,14 @@ let linked_program s =
 let set_linked_program s p =
   s.linked_program <- p
 
+let bound_vbo s = 
+  s.bound_vbo
 
+let set_bound_vbo s v = 
+  s.bound_vbo <- v
+
+let bound_vao s = 
+  s.bound_vao
+
+let set_bound_vao s v = 
+  s.bound_vao <- v

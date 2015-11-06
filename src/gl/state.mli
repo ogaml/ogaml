@@ -61,6 +61,17 @@ val linked_program : t -> Internal.Program.t option
 (** Sets the currently linked program *)
 val set_linked_program : t -> Internal.Program.t option -> unit
 
+(** Returns the currently bound VBO *)
+val bound_vbo : t -> Internal.VBO.t option
+
+(** Sets the currently bound VBO *)
+val set_bound_vbo : t -> Internal.VBO.t option -> unit
+
+(** Returns the currently bound VAO *)
+val bound_vao : t -> Internal.VAO.t option
+
+(** Sets the currently bound VAO *)
+val set_bound_vao : t -> Internal.VAO.t option -> unit
 
 
 

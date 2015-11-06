@@ -77,17 +77,20 @@ New GL Implementation :
     ✔ Implement Program @done(2015-11-05 20:06) @project(New GL Implementation)
     ✔ Implement Internal.VBO @done(2015-11-06 10:07) @project(New GL Implementation)
     ✔ Implement Internal.VAO @done(2015-11-06 10:07) @project(New GL Implementation)
-    ☐ Implement Uniform
+    ✔ Implement Uniform @done(2015-11-06 11:04) @project(New GL Implementation)
     ✔ Implement DrawParameter @done(2015-11-06 10:33) @project(New GL Implementation)
-    ☐ Implement VertexArray
+    ✔ Implement VertexArray @done(2015-11-06 19:02) @project(New GL Implementation)
+    ✔ Update State @done(2015-11-06 18:08) @project(New GL Implementation)
     ☐ Hide State.t in Window
     ☐ Implement window draw and clear functions
-    ☐ Clean Enum according to what can be hidden in Internal
     ☐ Rework cube test
     ☐ Add error for shader creation
     ☐ Add error for program creation
-    ☐ Hide Data.t ? & more data conversions
     ☐ Hide uniform & attribute locations ?
+    ☐ Move Uniform externals to Internal !!
+    ✔ Hide Data.t ? & more data conversions @done(2015-11-06 17:57) @project(New GL Implementation)
+    ☐ Safe destroy function for VertexArrays
+    ☐ Clean Enum according to what can be hidden in Internal
 
 Math part:
   ✔ Fix a notation convention @done(2015-10-29 18:32) @project(Math part)
@@ -111,7 +114,6 @@ GL part:
   ☐ Implement OBJ loading in Model
   ☐ Implement model creation - modification in Model
   ☐ Move Polys to GL and output models rather than float arrays
-  ☐ VertexArray module ? @unsure
   ✔ Implement glGetString in config for debug @done(2015-10-29 13:21) @project(GL part)
   ✔ Bind face culling, front_face @done(2015-10-26 21:31) @project(GL part)
   ✔ Bind gl_enable and options @done(2015-10-26 19:35) @project(GL part)

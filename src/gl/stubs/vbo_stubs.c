@@ -82,7 +82,7 @@ caml_vbo_data(value len, value opt, value mode)
   if(opt == Val_none)
     glBufferData(GL_ARRAY_BUFFER, Int_val(len), NULL, VBOKind_val(mode));
   else {
-    const GLvoid* c_dat = Caml_ba_data_val(Some_val(opt));
+    const GLvoid* c_dat = Caml_ba_data_val(Field(Some_val(opt),0));
     glBufferData(GL_ARRAY_BUFFER, Int_val(len), c_dat, VBOKind_val(mode));
   }
   CAMLreturn(Val_unit);
@@ -95,6 +95,7 @@ CAMLprim value
 caml_vbo_subdata(value off, value len, value data)
 {
   CAMLparam3(off, len, data);
-  const GLvoid* c_dat = Caml_ba_data_val(data);
+  const GLvoid* c_dat = Caml_ba_data_val(Field(data,0));
   glBufferSubData(GL_ARRAY_BUFFER, Int_val(off), Int_val(len), c_dat);
+  CAMLreturn(Val_unit);
 }

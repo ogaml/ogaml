@@ -14,10 +14,28 @@
 module Data : sig
 
   (** Type of data *)
-  type ('a, 'b) t = ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t
+  type t  
 
-  (** Gets data from a float array *)
-  val of_float_array : float array -> (float, Bigarray.float32_elt) t
+  (** Creates some data, the integer must be the expected size *)
+  val create : int -> t
+
+  (** Adds a vector3f to the data *)
+  val add_3f : t -> OgamlMath.Vector3f.t -> unit
+
+  (** Adds a color to the data *)
+  val add_color : t -> Color.t -> unit
+
+  (** Adds two floats to the data *)
+  val add_2f : t -> float * float -> unit
+
+  (** Returns the data associated to a matrix TEMPORARY *)
+  val of_matrix : OgamlMath.Matrix3D.t -> t
+
+  (** Returns the length of some data*)
+  val length : t -> int
+
+  (** Returns the data at position i (debug only) *)
+  val get : t -> int -> float
 
 end
 
@@ -139,10 +157,10 @@ module VBO : sig
   val bind : t option -> unit
 
   (** Sets the data of the currently bound VBO *)
-  val data : int -> ('a, 'b) Data.t option -> Enum.VBOKind.t -> unit
+  val data : int -> Data.t option -> Enum.VBOKind.t -> unit
 
   (** Sets some subset of the data of the currently bound VBO *)
-  val subdata : int -> int -> ('a, 'b) Data.t -> unit
+  val subdata : int -> int -> Data.t -> unit
 
   (** Destroys a VBO *)
   val destroy : t -> unit

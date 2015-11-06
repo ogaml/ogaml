@@ -1,30 +1,28 @@
-type t = 
-  | Float1    of float
-  | Float2    of float * float
-  | Float3    of float * float * float
-  | Float4    of float * float * float * float
-  | Int1      of int
-  | Int2      of int * int
-  | Int3      of int * int * int
-  | Int4      of int * int * int * int
-  | UInt1     of int
-  | UInt2     of int * int
-  | UInt3     of int * int * int
-  | UInt4     of int * int * int * int
-  | Matrix2   of Buffers.Data.ft
-  | Matrix3   of Buffers.Data.ft
-  | Matrix4   of Buffers.Data.ft
-  | Matrix2x3 of Buffers.Data.ft
-  | Matrix3x2 of Buffers.Data.ft
-  | Matrix2x4 of Buffers.Data.ft
-  | Matrix4x2 of Buffers.Data.ft
-  | Matrix3x4 of Buffers.Data.ft
-  | Matrix4x3 of Buffers.Data.ft
-  | Matrix3D  of OgamlMath.Matrix3D.t
-  | Vector3f  of OgamlMath.Vector3f.t
-  | Vector3i  of OgamlMath.Vector3i.t
-  | Color     of Color.RGB.t
+(** This module provides a way to easily construct
+  * a list of uniforms to be passed to a program
+  * when drawing 
+**)
 
+(** Raised when trying to bind a non-provided uniform *)
+exception Unknown_uniform of string
 
-val set : t -> Program.uniform -> unit
+(** Raised when trying to bind a uniform with the wrong type *)
+exception Invalid_uniform of string
 
+(** Type of a set of uniforms *)
+type t
+
+(** An empty uniform set *)
+val empty : t
+
+(** Adds a vector3f to a uniform structure *)
+val vector3f : string -> OgamlMath.Vector3f.t -> t -> t
+
+(** Adds a matrix3D to a uniform structure *)
+val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> t
+
+(** Adds a color to a uniform structure *)
+val color : string -> Color.t -> t -> t
+
+(** Binds a value to a program uniform *)
+val bind : t -> Program.Uniform.t -> unit

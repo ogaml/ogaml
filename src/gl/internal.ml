@@ -1,10 +1,73 @@
 
 module Data = struct
 
-  type ('a, 'b) t = ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t
+  type batype = (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t
 
-  let of_float_array a = 
-    Bigarray.Array1.of_array Bigarray.float32 Bigarray.c_layout a
+  type t = {
+    mutable data   : batype;
+    mutable size   : int;
+    mutable length : int
+  }
+
+  let create i = 
+    let arr = 
+      Bigarray.Array1.create 
+        Bigarray.float32 
+        Bigarray.c_layout
+        (max i 1)
+    in
+    {data = arr; size = (max i 1); length = 0}
+
+  let double t = 
+    let arr = 
+      Bigarray.Array1.create
+        Bigarray.float32
+        Bigarray.c_layout
+        (t.size * 2)
+    in
+    Bigarray.Array1.sub arr 0 t.size 
+    |> Bigarray.Array1.blit t.data;
+    t.size <- t.size * 2;
+    t.data <- arr
+
+  let rec alloc t i = 
+    let space = t.size - t.length in
+    if space < i then begin
+      double t;
+      alloc t i
+    end
+
+  let add_3f t vec = 
+    alloc t 3;
+    t.data.{t.length+0} <- vec.OgamlMath.Vector3f.x;
+    t.data.{t.length+1} <- vec.OgamlMath.Vector3f.y;
+    t.data.{t.length+2} <- vec.OgamlMath.Vector3f.z;
+    t.length <- t.length+3
+
+  let add_color t col = 
+    alloc t 4;
+    let c = Color.rgb col in
+    t.data.{t.length+0} <- c.Color.RGB.r;
+    t.data.{t.length+1} <- c.Color.RGB.g;
+    t.data.{t.length+2} <- c.Color.RGB.b;
+    t.data.{t.length+3} <- c.Color.RGB.a;
+    t.length <- t.length+4
+
+  let add_2f t (a,b) = 
+    alloc t 2;
+    t.data.{t.length+0} <- a;
+    t.data.{t.length+1} <- b;
+    t.length <- t.length+2
+
+  let of_matrix m = {
+    data = OgamlMath.Matrix3D.to_bigarray m;
+    size = 16;
+    length = 16
+  }
+
+  let length t = t.length
+
+  let get t i = t.data.{i}
 
 end
 
@@ -101,9 +164,9 @@ module VBO = struct
 
   external bind : t option -> unit = "caml_bind_vbo"
 
-  external data : int -> ('a, 'b) Data.t option -> Enum.VBOKind.t -> unit = "caml_vbo_data"
+  external data : int -> Data.t option -> Enum.VBOKind.t -> unit = "caml_vbo_data"
 
-  external subdata : int -> int -> ('a, 'b) Data.t -> unit = "caml_vbo_subdata"
+  external subdata : int -> int -> Data.t -> unit = "caml_vbo_subdata"
 
   external destroy : t -> unit = "caml_destroy_buffer"
 
