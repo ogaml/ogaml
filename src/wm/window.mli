@@ -1,3 +1,7 @@
+exception Missing_uniform of string
+
+exception Invalid_uniform of string
+
 type t
 
 (** Creates a window of size width x height *)
@@ -21,6 +25,14 @@ val poll_event : t -> Event.t option
 
 (** Display the window after the GL calls *)
 val display : t -> unit
+
+(** Draws a vertex array *)
+val draw : 
+  window     : t -> 
+  vertices   : 'a OgamlGL.VertexArray.t -> 
+  program    : OgamlGL.Program.t -> 
+  uniform    : OgamlGL.Uniform.t ->
+  parameters : OgamlGL.DrawParameter.t -> unit
 
 (** Clears the window *)
 val clear : t -> color:bool -> depth:bool -> stencil:bool -> unit

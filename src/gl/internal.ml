@@ -72,6 +72,17 @@ module Data = struct
 end
 
 
+module Pervasives = struct
+
+  external clear : bool -> bool -> bool -> unit = "caml_gl_clear"
+
+  external culling : Enum.CullingMode.t -> unit = "caml_culling_mode"
+
+  external polygon : Enum.PolygonMode.t -> unit = "caml_polygon_mode"
+
+end
+
+
 module Texture = struct
 
   type t
@@ -194,6 +205,7 @@ module VAO = struct
   external draw : Enum.DrawMode.t -> int -> int -> unit = "caml_draw_arrays"
 
 end
+
 
 
 

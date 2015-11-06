@@ -26,3 +26,4 @@ val color : string -> Color.t -> t -> t
 
 (** Binds a value to a program uniform *)
 val bind : t -> Program.Uniform.t -> unit
+

@@ -114,4 +114,5 @@ let bind map u =
       )
   | _ -> raise (Invalid_uniform (Printf.sprintf "Uniform %s has wrong type" name))
 
+let names t = List.map (fun (a,b) -> a) (UniformMap.bindings t)
 

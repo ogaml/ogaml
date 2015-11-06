@@ -28,9 +28,11 @@ let test_program1 () =
 
              uniform float param2;
 
+             in vec2 param3;
+
              void main () {
 
-                gl_Position = vec4(param1.x, param1.y, param2, 0.);
+                gl_Position = vec4(param1.x, param1.y, param2, param3.x);
 
              }")
     ]
@@ -55,25 +57,18 @@ let test_program1 () =
              }")
     ]
   in
-  let string_of_type = function
-    | Enum.GlslType.Float -> "float"
-    | Enum.GlslType.Float2 -> "vec2"
-    | Enum.GlslType.Float4 -> "vec4"
-    | _ -> assert false
-  in
   Program.iter_attributes prog (fun att ->
-    Printf.printf "\tProgram attribute : %s, type : %s, location : %i\n%!"
-      (Program.Attribute.name att) 
-      (string_of_type (Program.Attribute.kind att))
-      (Program.Attribute.location att)
+    assert ((Program.Attribute.name att) = "param3");
+    assert ((Program.Attribute.kind att) = Enum.GlslType.Float2);
   );
   Program.iter_uniforms prog (fun att ->
-    Printf.printf "\tProgram uniform : %s, type : %s, location : %i\n%!"
-      (Program.Uniform.name att) 
-      (string_of_type (Program.Uniform.kind att))
-      (Program.Uniform.location att)
+    let n = Program.Uniform.name att in
+    let k = Program.Uniform.kind att in
+    assert ((n = "param1" && k = Enum.GlslType.Float2) ||
+            (n = "param2" && k = Enum.GlslType.Float));
   )
 
 let () = 
   Printf.printf "Beginning program tests...\n%!";
-  test_program1 ()
+  test_program1 ();
+  Printf.printf "\tTest 1 passed\n%!";

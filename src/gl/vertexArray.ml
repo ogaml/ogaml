@@ -235,5 +235,9 @@ let bind state t prog =
     State.set_bound_vbo state (Some t.buffer);
   end
 
+let draw state t prog = 
+  bind state t prog;
+  Internal.VAO.draw Enum.DrawMode.Triangles 0 (t.length * 4)
+
 let length t = t.length
 

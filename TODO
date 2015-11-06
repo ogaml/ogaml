@@ -59,6 +59,7 @@ Window part:
   ✔ Parameterize Button events with position & button @commented_out @done(2015-10-31 23:58) @project(Window part)
   ✔ Parameterize Movement events with position @commented_out @done(2015-10-31 23:58) @project(Window part)
   ✘ Put shared code directly in ogamlWindow.ml (like the Event module ?) -- use packs @cancelled(2015-10-21 17:45) @project(Window part)
+  ☐ Maybe merge window_impl and mouse_impl... it would probably be cleaner
   ☐ Window titles
   ☐ Window attributes abstract type ? May contain title, size, etc @unsure
   ☐ Same for GL context attributes ? @unsure
@@ -81,13 +82,13 @@ New GL Implementation :
     ✔ Implement DrawParameter @done(2015-11-06 10:33) @project(New GL Implementation)
     ✔ Implement VertexArray @done(2015-11-06 19:02) @project(New GL Implementation)
     ✔ Update State @done(2015-11-06 18:08) @project(New GL Implementation)
-    ☐ Hide State.t in Window
-    ☐ Implement window draw and clear functions
+    ✔ Hide State.t in Window @done(2015-11-06 19:56) @project(New GL Implementation)
+    ✔ Implement window draw and clear functions @done(2015-11-06 22:18) @project(New GL Implementation)
     ☐ Rework cube test
     ☐ Add error for shader creation
     ☐ Add error for program creation
     ☐ Hide uniform & attribute locations ?
-    ☐ Move Uniform externals to Internal !!
+    ☐ Move Uniform externals to Internal and remove all Field(data,0) in uniform bindings
     ✔ Hide Data.t ? & more data conversions @done(2015-11-06 17:57) @project(New GL Implementation)
     ☐ Safe destroy function for VertexArrays
     ☐ Clean Enum according to what can be hidden in Internal

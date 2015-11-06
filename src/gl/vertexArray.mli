@@ -45,8 +45,7 @@ val dynamic : Source.t -> dynamic t
 
 val rebuild : dynamic t -> Source.t -> dynamic t
 
-val bind : State.t -> 'a t -> Program.t -> unit
+val draw : State.t -> 'a t -> Program.t -> unit
 
 val length : 'a t -> int
-
 

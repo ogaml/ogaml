@@ -40,6 +40,21 @@ module Data : sig
 end
 
 
+(** Default openGL functions functions *)
+module Pervasives : sig
+
+  (** Clears the current display buffer *)
+  val clear : bool -> bool -> bool -> unit
+
+  (** Sets the current culling mode *)
+  val culling : Enum.CullingMode.t -> unit
+
+  (** Sets the current polygon mode *)
+  val polygon : Enum.PolygonMode.t -> unit
+
+end
+
+
 (** Represents an openGL texture *)
 module Texture : sig
 
@@ -196,7 +211,5 @@ module VAO : sig
   val draw : Enum.DrawMode.t -> int -> int -> unit
 
 end
-
-
 
 

@@ -7,7 +7,6 @@ module CullingMode : sig
     | CullNone
     | CullClockwise
     | CullCounterClockwise
-    | CullAll
 
 end
 

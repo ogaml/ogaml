@@ -4,14 +4,14 @@ let position () =
   Xlib.Mouse.position d (Xlib.Window.root_of d)
 
 let relative_position win = 
-  Xlib.Mouse.position win.Window.display win.Window.window
+  Xlib.Mouse.position win.InternalWindow.display win.InternalWindow.window
 
 let set_position (x,y) = 
   let d = Xlib.Display.create () in
   Xlib.Mouse.warp d (Xlib.Window.root_of d) x y
 
 let set_relative_position win (x,y) = 
-  Xlib.Mouse.warp win.Window.display win.Window.window x y
+  Xlib.Mouse.warp win.InternalWindow.display win.InternalWindow.window x y
 
 let is_pressed button = 
   let d = Xlib.Display.create () in

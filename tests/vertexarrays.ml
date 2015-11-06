@@ -113,7 +113,7 @@ let test_vao6 () =
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
   let vao = VertexArray.dynamic vsource in
-  VertexArray.bind opengl_state vao prog
+  VertexArray.draw opengl_state vao prog
 
 let test_vao7 () = 
   let vsource = VertexArray.(Source.(
@@ -124,7 +124,7 @@ let test_vao7 () =
   )) in
   let vao = VertexArray.dynamic vsource in
   try 
-    VertexArray.bind opengl_state vao prog;
+    VertexArray.draw opengl_state vao prog;
     assert false
   with
     VertexArray.Missing_attribute _ -> ()
@@ -139,7 +139,7 @@ let test_vao8 () =
   )) in
   let vao = VertexArray.dynamic vsource in
   try 
-    VertexArray.bind opengl_state vao prog;
+    VertexArray.draw opengl_state vao prog;
     assert false
   with
     VertexArray.Invalid_attribute _ -> ()
@@ -147,13 +147,21 @@ let test_vao8 () =
 let () = 
   Printf.printf "Beginning vertex array tests...\n%!";
   test_vao1 ();
+  Printf.printf "\tTest 1 passed\n%!";
   test_vao2 ();
+  Printf.printf "\tTest 2 passed\n%!";
   test_vao3 ();
+  Printf.printf "\tTest 3 passed\n%!";
   test_vao4 ();
+  Printf.printf "\tTest 4 passed\n%!";
   test_vao5 ();
+  Printf.printf "\tTest 5 passed\n%!";
   test_vao6 ();
+  Printf.printf "\tTest 6 passed\n%!";
   test_vao7 ();
-  test_vao8 ()
+  Printf.printf "\tTest 7 passed\n%!";
+  test_vao8 ();
+  Printf.printf "\tTest 8 passed\n%!";
 
 
 
