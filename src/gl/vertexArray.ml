@@ -41,19 +41,27 @@ module Source = struct
     data     : Internal.Data.t;
   }
 
-  let empty ?position ?normal ?texcoord ?color ~size = {
-    position;
-    texcoord;
-    normal;
-    color;
-    data = Internal.Data.create size
-  }
+  let empty ?position ?normal ?texcoord ?color ~size () = 
+    let sizep = if position <> None then 3 else 0 in
+    let sizen = if normal   <> None then 3 else 0 in
+    let sizet = if texcoord <> None then 2 else 0 in
+    let sizec = if color    <> None then 4 else 0 in
+    let size  = size * (sizep + sizen + sizet + sizec) in
+    {
+      position;
+      texcoord;
+      normal;
+      color;
+      data = Internal.Data.create size
+    }
 
   let add src v = 
     begin 
       match v.Vertex.position with
       |None when src.position <> None -> 
         raise (Invalid_vertex "Missing vertex position")
+      |Some _ when src.position = None ->
+        raise (Invalid_vertex "Vertex position not required by source")
       |Some vec -> Internal.Data.add_3f src.data vec
       | _ -> ()
     end;
@@ -61,6 +69,8 @@ module Source = struct
       match v.Vertex.texcoord with
       |None when src.texcoord <> None -> 
         raise (Invalid_vertex "Missing texture coordinate")
+      |Some _ when src.texcoord = None ->
+        raise (Invalid_vertex "Texture coordinate not required by source")
       |Some vec -> Internal.Data.add_2f src.data vec
       | _ -> ()
     end;
@@ -68,6 +78,8 @@ module Source = struct
       match v.Vertex.normal with
       |None when src.normal <> None -> 
         raise (Invalid_vertex "Missing vertex normal")
+      |Some _ when src.normal = None ->
+        raise (Invalid_vertex "Vertex normal not required by source")
       |Some vec -> Internal.Data.add_3f src.data vec
       | _ -> ()
     end;
@@ -75,6 +87,8 @@ module Source = struct
       match v.Vertex.color with
       |None when src.color <> None -> 
         raise (Invalid_vertex "Missing vertex color")
+      |Some _ when src.color = None ->
+        raise (Invalid_vertex "Vertex color not required by source")
       |Some vec -> Internal.Data.add_color src.data vec
       | _ -> ()
     end;

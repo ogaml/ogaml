@@ -62,17 +62,18 @@ let test_program1 () =
     | _ -> assert false
   in
   Program.iter_attributes prog (fun att ->
-    Printf.printf "Program attribute : %s, type : %s, location : %i\n%!"
+    Printf.printf "\tProgram attribute : %s, type : %s, location : %i\n%!"
       (Program.Attribute.name att) 
       (string_of_type (Program.Attribute.kind att))
       (Program.Attribute.location att)
   );
   Program.iter_uniforms prog (fun att ->
-    Printf.printf "Program uniform : %s, type : %s, location : %i\n%!"
+    Printf.printf "\tProgram uniform : %s, type : %s, location : %i\n%!"
       (Program.Uniform.name att) 
       (string_of_type (Program.Uniform.kind att))
       (Program.Uniform.location att)
   )
 
 let () = 
+  Printf.printf "Beginning program tests...\n%!";
   test_program1 ()

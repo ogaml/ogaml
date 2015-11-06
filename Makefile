@@ -43,7 +43,9 @@ stubs_lib:
 	cd src/wm/$(strip $(OS_WIN_STUBS_DIR)) && make
 
 tests: stubs_lib math_lib gl_lib window_lib
-	$(OCAMLFIND) ocamlopt -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/programs.ml -o main.out
+	$(OCAMLFIND) ocamlopt -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/programs.ml -o main.out && ./main.out &&\
+	$(OCAMLFIND) ocamlopt -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/vertexarrays.ml -o main.out && ./main.out &&\
+	echo "Tests passed !"
 
 install:
 	$(OCAMLFIND) install ogaml META $(GL_FILES) $(MATH_FILES) $(WINDOW_FILES) $(WMLIB_FILES)
@@ -58,3 +60,4 @@ clean:
 	cd src/math/ && make clean;
 	cd src/gl/ && make clean;
 	cd tests/ && make clean
+

@@ -1,0 +1,164 @@
+open OgamlGL
+open OgamlMath
+
+let context = 
+  OgamlWindow.Window.create ~width:100 ~height:100
+
+let opengl_state = 
+  State.create ()
+
+let prog = Program.from_source_list opengl_state
+    ~vertex_source:[
+      (130, "#version 130
+              
+             in vec3 pos;
+
+             void main () {
+
+                gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);
+
+             }");
+      (150, "#version 150
+              
+             in vec3 pos;
+
+             void main () {
+
+                gl_Position = vec4(pos.x, pos.y, pos.z, 1.0); 
+
+             }")
+    ]
+    ~fragment_source:[
+      (130, "#version 130
+
+             out vec4 color;
+      
+             void main () {
+
+               color = vec4(1.0, 1.0, 1.0, 1.0);
+
+             }");
+      (150, "#version 150
+
+             out vec4 color;
+      
+             void main () {
+
+               color = vec4(1.0, 1.0, 1.0, 1.0);
+
+             }")
+    ]
+
+let test_vao1 () =
+  let vsource = VertexArray.(Source.(
+    empty ~position:"pos" ~size:4 ()
+    << Vertex.create ~position:Vector3f.unit_z ()
+    << Vertex.create ~position:Vector3f.unit_y ()
+    << Vertex.create ~position:Vector3f.unit_x ()
+  )) in
+  let vao = VertexArray.dynamic vsource in
+  assert (VertexArray.length vao = 9)
+
+let test_vao2 () = 
+  let vsource = VertexArray.(Source.(
+    empty ~position:"pos" ~size:4 ()
+    << Vertex.create ~position:Vector3f.unit_z ()
+    << Vertex.create ~position:Vector3f.unit_y ()
+    << Vertex.create ~position:Vector3f.unit_x ()
+    << Vertex.create ~position:Vector3f.unit_x ()
+    << Vertex.create ~position:Vector3f.unit_x ()
+    << Vertex.create ~position:Vector3f.unit_x ()
+  )) in
+  let vao = VertexArray.dynamic vsource in
+  assert (VertexArray.length vao = 18)
+
+let test_vao3 () = 
+  try
+    let vsource = VertexArray.(Source.(
+      empty ~position:"pos" ~color:"col" ~size:4 ()
+      << Vertex.create ~position:Vector3f.unit_z ()
+    )) in
+    ignore vsource;
+    assert false
+  with
+    |VertexArray.Invalid_vertex _ -> ()
+
+let test_vao4 () = 
+  try
+    let vsource = VertexArray.(Source.(
+      empty ~position:"pos" ~size:4 ()
+      << Vertex.create ~position:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
+    )) in
+    ignore vsource;
+    assert false
+  with
+    |VertexArray.Invalid_vertex _ -> ()
+
+let test_vao5 () = 
+  let vsource = VertexArray.(Source.(
+    empty ~position:"pos" ~color:"col" ~texcoord:"uv" ~normal:"normal" ~size:4 ()
+    << Vertex.create ~position:Vector3f.unit_z ~texcoord:(1.,1.) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
+    << Vertex.create ~position:Vector3f.unit_y ~texcoord:(1.,1.) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
+    << Vertex.create ~position:Vector3f.unit_x ~texcoord:(1.,1.) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
+    << Vertex.create ~position:Vector3f.unit_x ~texcoord:(1.,1.) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
+  )) in
+  let vao = VertexArray.dynamic vsource in
+  assert (VertexArray.length vao = 48)
+
+let test_vao6 () = 
+  let vsource = VertexArray.(Source.(
+    empty ~position:"pos" ~size:4 ()
+    << Vertex.create ~position:Vector3f.unit_z ()
+    << Vertex.create ~position:Vector3f.unit_y ()
+    << Vertex.create ~position:Vector3f.unit_x ()
+  )) in
+  let vao = VertexArray.dynamic vsource in
+  VertexArray.bind opengl_state vao prog
+
+let test_vao7 () = 
+  let vsource = VertexArray.(Source.(
+    empty ~position:"foo" ~size:4 ()
+    << Vertex.create ~position:Vector3f.unit_z ()
+    << Vertex.create ~position:Vector3f.unit_y ()
+    << Vertex.create ~position:Vector3f.unit_x ()
+  )) in
+  let vao = VertexArray.dynamic vsource in
+  try 
+    VertexArray.bind opengl_state vao prog;
+    assert false
+  with
+    VertexArray.Missing_attribute _ -> ()
+
+
+let test_vao8 () = 
+  let vsource = VertexArray.(Source.(
+    empty ~position:"pos" ~color:"foo" ~size:4 ()
+    << Vertex.create ~position:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
+    << Vertex.create ~position:Vector3f.unit_y ~color:(`RGB Color.RGB.white) ()
+    << Vertex.create ~position:Vector3f.unit_x ~color:(`RGB Color.RGB.white) ()
+  )) in
+  let vao = VertexArray.dynamic vsource in
+  try 
+    VertexArray.bind opengl_state vao prog;
+    assert false
+  with
+    VertexArray.Invalid_attribute _ -> ()
+
+let () = 
+  Printf.printf "Beginning vertex array tests...\n%!";
+  test_vao1 ();
+  test_vao2 ();
+  test_vao3 ();
+  test_vao4 ();
+  test_vao5 ();
+  test_vao6 ();
+  test_vao7 ();
+  test_vao8 ()
+
+
+
+
+
+
+
+

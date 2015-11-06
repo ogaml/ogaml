@@ -25,7 +25,7 @@ module Source : sig
               ?normal  :string -> 
               ?texcoord:string ->
               ?color   :string ->
-              size:int -> t
+              size:int -> unit -> t
 
   val add : t -> Vertex.t -> t
 
