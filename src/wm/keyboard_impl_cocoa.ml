@@ -87,8 +87,29 @@ let is_pressed key =
   | `Keycode c -> Cocoa.Keyboard.is_keycode_pressed c
   | `Unknown   -> false
 
-let is_shift_down () = false
+let is_shift_down () =
+  let modifiers = Cocoa.NSEvent.modifier_flags () in
+  let (shift,_,_) = Cocoa.NSEvent.(
+    List.mem NSShiftKeyMask     modifiers,
+    List.mem NSCommandKeyMask   modifiers,
+    List.mem NSAlternateKeyMask modifiers
+  ) in
+  shift
 
-let is_ctrl_down () = false
+let is_ctrl_down () =
+  let modifiers = Cocoa.NSEvent.modifier_flags () in
+  let (_,control,_) = Cocoa.NSEvent.(
+    List.mem NSShiftKeyMask     modifiers,
+    List.mem NSCommandKeyMask   modifiers,
+    List.mem NSAlternateKeyMask modifiers
+  ) in
+  control
 
-let is_alt_down () = false
+let is_alt_down () =
+  let modifiers = Cocoa.NSEvent.modifier_flags () in
+  let (_,_,alt) = Cocoa.NSEvent.(
+    List.mem NSShiftKeyMask     modifiers,
+    List.mem NSCommandKeyMask   modifiers,
+    List.mem NSAlternateKeyMask modifiers
+  ) in
+  alt

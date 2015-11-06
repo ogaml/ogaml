@@ -162,7 +162,7 @@ let get_key_event event =
         | _   -> Unknown
     end
   ) in
-  let modifiers = Cocoa.NSEvent.modifier_flags event in
+  let modifiers = Cocoa.NSEvent.modifier_flags () in
   let (shift,control,alt) = Cocoa.NSEvent.(
     List.mem NSShiftKeyMask     modifiers,
     List.mem NSCommandKeyMask   modifiers,
@@ -174,7 +174,7 @@ let get_key_event event =
 
 let make_mouse_event button event win =
   let (x,y) = Cocoa.OGWindowController.proper_relative_mouse_location win in
-  let modifiers = Cocoa.NSEvent.modifier_flags event in
+  let modifiers = Cocoa.NSEvent.modifier_flags () in
   let (shift,control,alt) = Cocoa.NSEvent.(
     List.mem NSShiftKeyMask     modifiers,
     List.mem NSCommandKeyMask   modifiers,

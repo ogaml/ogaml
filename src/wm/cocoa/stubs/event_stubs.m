@@ -21,15 +21,13 @@ caml_cocoa_event_type(value mlevent)
 }
 
 CAMLprim value
-caml_cocoa_event_modifier_flags(value mlevent)
+caml_cocoa_event_modifier_flags(value unit)
 {
-  CAMLparam1(mlevent);
+  CAMLparam0();
   CAMLlocal2(li, cons);
   li = Val_emptylist;
 
-  NSEvent* event = (NSEvent*) mlevent;
-
-  NSEventModifierFlags mask = [event modifierFlags];
+  NSEventModifierFlags mask = [NSEvent modifierFlags];
 
   if(mask & NSAlphaShiftKeyMask)
   {

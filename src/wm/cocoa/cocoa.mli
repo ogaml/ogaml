@@ -120,7 +120,7 @@ module NSEvent : sig
 
   (* Key event information *)
 
-  val modifier_flags : t -> modifier_flag list
+  val modifier_flags : unit -> modifier_flag list
 
   val character : t -> NSString.t
 

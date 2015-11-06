@@ -124,7 +124,7 @@ module NSEvent = struct
 
   external get_type : t -> event_type = "caml_cocoa_event_type"
 
-  external modifier_flags : t -> modifier_flag list
+  external modifier_flags : unit -> modifier_flag list
     = "caml_cocoa_event_modifier_flags"
 
   external character : t -> NSString.t = "caml_cocoa_event_characters"
