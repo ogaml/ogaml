@@ -75,14 +75,19 @@ New GL Implementation :
     ✘ Implement Shader -- Hidden in program @cancelled(2015-11-05 10:45) @project(New GL Implementation)
     ✔ Implement Internal.Program @done(2015-11-05 13:09) @project(New GL Implementation)
     ✔ Implement Program @done(2015-11-05 20:06) @project(New GL Implementation)
-    ☐ Implement Internal.VBO
-    ☐ Implement Internal.VAO
-    ☐ Clean Enum according to what can be hidden in Internal
+    ✔ Implement Internal.VBO @done(2015-11-06 10:07) @project(New GL Implementation)
+    ✔ Implement Internal.VAO @done(2015-11-06 10:07) @project(New GL Implementation)
+    ☐ Implement Uniform
+    ☐ Implement DrawParameter
+    ☐ Implement VertexArray
     ☐ Hide State.t in Window
+    ☐ Implement window draw and clear functions
+    ☐ Clean Enum according to what can be hidden in Internal
     ☐ Rework cube test
-    ☐ Reimplement Window.clear
     ☐ Add error for shader creation
     ☐ Add error for program creation
+    ☐ Hide Data.t ? & more data conversions
+    ☐ Hide uniform & attribute locations ?
 
 Math part:
   ✔ Fix a notation convention @done(2015-10-29 18:32) @project(Math part)

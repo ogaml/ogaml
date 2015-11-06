@@ -1,4 +1,14 @@
 
+module Data = struct
+
+  type ('a, 'b) t = ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t
+
+  let of_float_array a = 
+    Bigarray.Array1.of_array Bigarray.float32 Bigarray.c_layout a
+
+end
+
+
 module Texture = struct
 
   type t
@@ -81,5 +91,47 @@ module Program = struct
   external log : t -> string = "caml_program_log"
 
 end
+
+
+module VBO = struct
+
+  type t
+
+  external create : unit -> t = "caml_create_buffer"
+
+  external bind : t option -> unit = "caml_bind_vbo"
+
+  external data : int -> ('a, 'b) Data.t option -> Enum.VBOKind.t -> unit = "caml_vbo_data"
+
+  external subdata : int -> int -> ('a, 'b) Data.t -> unit = "caml_vbo_subdata"
+
+  external destroy : t -> unit = "caml_destroy_buffer"
+
+end
+
+
+module VAO = struct
+
+  type t
+
+  external create : unit -> t = "caml_create_vao"
+
+  external bind : t option -> unit = "caml_bind_vao"
+
+  external destroy : t -> unit = "caml_destroy_vao"
+
+  external enable_attrib : int -> unit = "caml_enable_attrib"
+
+  external attrib_float : 
+    int -> int -> Enum.GlFloatType.t -> int -> int -> unit = "caml_attrib_float"
+
+  external attrib_int : 
+    int -> int -> Enum.GlIntType.t -> int -> int -> unit = "caml_attrib_int"
+
+  external draw : Enum.DrawMode.t -> int -> int -> unit = "caml_draw_arrays"
+
+end
+
+
 
 

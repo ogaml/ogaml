@@ -118,3 +118,53 @@ module MagnifyFilter : sig
 end
 
 
+(** VBO kinds enumeration *)
+module VBOKind : sig
+
+  type t = 
+    | StaticDraw
+    | DynamicDraw
+
+end
+
+
+(** GL float types *)
+module GlFloatType : sig
+
+  type t = 
+    | Byte
+    | UByte
+    | Short
+    | UShort
+    | Int
+    | UInt
+    | Float
+    | Double
+
+end
+
+
+(** GL int types *)
+module GlIntType : sig
+
+  type t  =
+    | Byte
+    | UByte
+    | Short
+    | UShort
+    | Int
+    | UInt
+
+end
+
+
+(** GL draw modes enum *)
+module DrawMode : sig
+
+  type t =
+    | TriangleStrip
+    | TriangleFan
+    | Triangles
+
+end
+

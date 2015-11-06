@@ -6,12 +6,13 @@ INCLUDE_DIRS = -I ../utils/ -I ../math/
 
 CSOURCES = $(STUBS_DIR)/shader_stubs.c $(STUBS_DIR)/program_stubs.c\
 	   $(STUBS_DIR)/state_stubs.c $(STUBS_DIR)/texture_stubs.c\
+	   $(STUBS_DIR)/vao_stubs.c $(STUBS_DIR)/vbo_stubs.c\
 	   ../utils/stubs.c
 
 COBJS = $(CSOURCES:.c=.o)
 
 COBJS2 = shader_stubs.o program_stubs.o stubs.o state_stubs.o\
-	 texture_stubs.o
+	 texture_stubs.o vao_stubs.o vbo_stubs.o
 
 MLSOURCES = color.ml internal.ml state.ml program.ml image.ml texture.ml 
 

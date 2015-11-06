@@ -9,6 +9,19 @@
   * NOTE : For internal use only, may cause bugs 
 **)
 
+
+(** Represents openGL data internally *)
+module Data : sig
+
+  (** Type of data *)
+  type ('a, 'b) t = ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t
+
+  (** Gets data from a float array *)
+  val of_float_array : float array -> (float, Bigarray.float32_elt) t
+
+end
+
+
 (** Represents an openGL texture *)
 module Texture : sig
 
@@ -111,5 +124,61 @@ module Program : sig
   val log : t -> string
 
 end
+
+
+(** Represents an openGL buffer *)
+module VBO : sig
+
+  (** Type of a VBO *)
+  type t
+
+  (** Creates a VBO *)
+  val create : unit -> t
+
+  (** Binds a VBO for modification/drawing *)
+  val bind : t option -> unit
+
+  (** Sets the data of the currently bound VBO *)
+  val data : int -> ('a, 'b) Data.t option -> Enum.VBOKind.t -> unit
+
+  (** Sets some subset of the data of the currently bound VBO *)
+  val subdata : int -> int -> ('a, 'b) Data.t -> unit
+
+  (** Destroys a VBO *)
+  val destroy : t -> unit
+
+end
+
+
+(** Represents an openGL vertex array *)
+module VAO : sig
+
+  (** Type of a VAO *)
+  type t
+
+  (** Creates a VAO *)
+  val create : unit -> t
+
+  (** Binds a VAO *)
+  val bind : t option -> unit
+
+  (** Destroys a VAO *)
+  val destroy : t -> unit
+
+  (** Enables an attribute for use *)
+  val enable_attrib : int -> unit
+
+  (** Binds a floating point attribute to an offset and a type in a VBO *)
+  val attrib_float : int -> int -> Enum.GlFloatType.t -> int -> int -> unit
+
+  (** Binds an integer attribute to an offset and a type in a VBO *)
+  val attrib_int : int -> int -> Enum.GlIntType.t -> int -> int -> unit
+
+  (** Draws the currently bound VAO *)
+  val draw : Enum.DrawMode.t -> int -> int -> unit
+
+end
+
+
 
 
