@@ -276,6 +276,8 @@ let rec main_loop () =
     display ();
     Window.display win;
     update_camera ();
+    if Keyboard.is_pressed Keycode.A then Printf.printf "yAy!\n%!";
+    if Keyboard.is_pressed Keycode.Num1 then Printf.printf "y1y!\n%!";
     event_loop ();
     incr frame_count;
     main_loop ()
