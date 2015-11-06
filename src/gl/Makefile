@@ -14,7 +14,7 @@ COBJS = $(CSOURCES:.c=.o)
 COBJS2 = shader_stubs.o program_stubs.o stubs.o state_stubs.o\
 	 texture_stubs.o vao_stubs.o vbo_stubs.o
 
-MLSOURCES = color.ml internal.ml state.ml program.ml image.ml texture.ml 
+MLSOURCES = color.ml internal.ml drawParameter.ml state.ml program.ml image.ml texture.ml 
 
 MLINTERFACES = enum.mli
 

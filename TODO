@@ -78,7 +78,7 @@ New GL Implementation :
     ✔ Implement Internal.VBO @done(2015-11-06 10:07) @project(New GL Implementation)
     ✔ Implement Internal.VAO @done(2015-11-06 10:07) @project(New GL Implementation)
     ☐ Implement Uniform
-    ☐ Implement DrawParameter
+    ✔ Implement DrawParameter @done(2015-11-06 10:33) @project(New GL Implementation)
     ☐ Implement VertexArray
     ☐ Hide State.t in Window
     ☐ Implement window draw and clear functions
