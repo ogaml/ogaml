@@ -5,14 +5,14 @@ include ../../common_defs.mk
 INCLUDE_DIRS = -I ../utils/ -I ../math/
 
 CSOURCES = $(STUBS_DIR)/shader_stubs.c $(STUBS_DIR)/program_stubs.c\
-	   $(STUBS_DIR)/state_stubs.c $(STUBS_DIR)/texture_stubs.c\
+	   $(STUBS_DIR)/texture_stubs.c\
 	   $(STUBS_DIR)/vao_stubs.c $(STUBS_DIR)/vbo_stubs.c\
 	   $(STUBS_DIR)/uniform_stubs.c $(STUBS_DIR)/render_stubs.c\
 	   ../utils/stubs.c
 
 COBJS = $(CSOURCES:.c=.o)
 
-COBJS2 = shader_stubs.o program_stubs.o stubs.o state_stubs.o\
+COBJS2 = shader_stubs.o program_stubs.o stubs.o\
 	 texture_stubs.o vao_stubs.o vbo_stubs.o uniform_stubs.o\
 	 render_stubs.o
 

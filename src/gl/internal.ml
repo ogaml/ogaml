@@ -84,12 +84,9 @@ module Pervasives = struct
 
   external glsl_version : unit -> string = "caml_glsl_version"
 
-  let glsl_supported v = 
-    let glsl = 
-      let str = glsl_version () in
-      Scanf.sscanf str "%i.%i" (fun a b -> a * 100 + (if b < 10 then b * 10 else b))
-    in
-    v <= glsl
+  external gl_version : unit -> string = "caml_gl_version"
+
+  external max_textures : unit -> int = "caml_max_textures"
 
 end
 

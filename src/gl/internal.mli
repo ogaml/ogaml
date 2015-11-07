@@ -55,8 +55,14 @@ module Pervasives : sig
   (** Sets the current polygon mode *)
   val polygon : Enum.PolygonMode.t -> unit
 
-  (** Returns true iff the given glsl version is supported *)
-  val glsl_supported : int -> bool
+  (** Returns the current glsl version *)
+  val glsl_version : unit -> string
+
+  (** Returns the current gl version *)
+  val gl_version : unit -> string
+
+  (** Returns the maximal number of textures *)
+  val max_textures : unit -> int
 
 end
 

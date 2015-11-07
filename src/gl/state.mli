@@ -4,7 +4,7 @@
   * Note that setters do not change the value stored
   * by the internal GL state and should not be used alone.
   *
-  * NOTE : this module is mostly intended for internal use only
+  * NOTE : this module is mostly intended for internal use
 **)
 
 (** GL state exceptions *)

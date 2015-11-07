@@ -129,5 +129,35 @@ caml_polygon_mode(value mode)
 }
 
 
+// INPUT   nothing
+// OUTPUT  the current GL version
+CAMLprim value
+caml_gl_version(value unit)
+{
+  CAMLparam0();
+  CAMLreturn(caml_copy_string(glGetString(GL_VERSION)));
+}
+
+
+// INPUT   nothing
+// OUTPUT  the current GLSL version
+CAMLprim value
+caml_glsl_version(value unit)
+{
+  CAMLparam0();
+  CAMLreturn(caml_copy_string(glGetString(GL_SHADING_LANGUAGE_VERSION)));
+}
+
+
+// INPUT   nothing
+// OUTPUT  the maximal number of textures
+CAMLprim value
+caml_max_textures(value unit)
+{
+  CAMLparam0();
+  int res;
+  glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &res);
+  CAMLreturn(Val_int(res));
+}
 
 

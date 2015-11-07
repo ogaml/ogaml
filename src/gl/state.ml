@@ -15,25 +15,19 @@ type t = {
   mutable bound_vao : Internal.VAO.t option;
 }
 
-external ext_gl_version : unit -> string = "caml_gl_version"
-
-external ext_glsl_version : unit -> string = "caml_glsl_version"
-
-external ext_max_textures : unit -> int = "caml_max_textures"
-
 let create () =
   let convert v = 
     if v < 10 then v*10 else v
   in
   let major, minor = 
-    let str = ext_gl_version () in
+    let str = Internal.Pervasives.gl_version () in
     Scanf.sscanf str "%i.%i" (fun a b -> (a, convert b))
   in
   let glsl = 
-    let str = ext_glsl_version () in
+    let str = Internal.Pervasives.glsl_version () in
     Scanf.sscanf str "%i.%i" (fun a b -> a * 100 + (convert b))
   in
-  let textures = ext_max_textures () in
+  let textures = Internal.Pervasives.max_textures () in
   {
     major   ;
     minor   ;

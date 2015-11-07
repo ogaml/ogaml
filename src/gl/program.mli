@@ -61,8 +61,8 @@ val from_source : vertex_source:string -> fragment_source:string -> t
 (** Creates a program from a list of shader sources
   * and version numbers. Choses the best source for 
   * the current hardware. *)
-val from_source_list : vertex_source:(int * string) list 
-                       -> fragment_source:(int * string) list -> t
+(* val from_source_list : vertex_source:(int * string) list  *)
+(*                        -> fragment_source:(int * string) list -> t *)
 
 (** Activates the program for use in the next rendering 
   * pass. Used internally by Ogaml, usually not needed. *)
