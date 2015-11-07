@@ -48,7 +48,7 @@ compile_math_byte: .depend $(MLCMIS) $(MLOBJS)
 # Cleaning
 
 clean:
-	rm -rf $(EXTENSIONS)
+	rm -rf $(CLEAN_EXTENSIONS)
 
 
 # Dependencies

@@ -30,7 +30,7 @@ ifeq ($(UNAME), Darwin)
   OS_NAME = OSX
   OS_WIN_LIB = cocoa 
   GLOBAL_OBJCOPTS = -fconstant-string-class=NSConstantString
-  GLOBAL_CLIBS = -framework Foundation -framework Cocoa -framework Carbon -lobjc
+  GLOBAL_CLIBS = -framework Foundation -framework Cocoa -framework Carbon -lobjc -framework openGL
 endif
 
 
