@@ -23,6 +23,7 @@ Cocoa specific:
   ☐ Add some option to switch between Ctrl and Cmd @question
   ☐ Add some function to handle keyRepeatDelay and keyRepeatInterval for NSEvent
   ☐ Consider converting every event to OGEvent before pushing (instead of having both NSEvent and OGEvent) @unsure
+  ☐ Key events should be converted to OGEvent to save the modifier flags of the time it is raised and not handled
   ✔ Handle application creation and running with a boolean @done(2015-10-26 01:43) @project(Cocoa specific)
   ✔ Implement window destroy properly @done(2015-10-26 02:04) @project(Cocoa specific)
   ✔ Add window closed event @done(2015-10-31 00:30) @project(Cocoa specific)
@@ -33,6 +34,7 @@ Cocoa specific:
   ☐ Differentiate between Middle and Other for mouse
   ✔ Every size might have been specified in points for Cocoa, use scale whenever necessary @important @review @comment(At least for the events, but it might also be wrong in window size definition) @done(2015-11-02 16:35) @project(Cocoa specific)
   ☐ Check if window size is in points instead of pixels
+  ☐ Window doesn't resign being key on mission control
 
 Xlib specific:
   ✔ Match on clientmessage in ogamlWindow_xlib for safety @done(2015-10-20 20:29) @project(Xlib specific)

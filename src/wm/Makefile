@@ -32,7 +32,7 @@ compile_window_byte: .depend compile_os_lib $(MLLIB).cmo
 	$(OCAMLC) -a -o $(MLLIB).cma $(MLLIB).cmo -cclib -l$(strip $(OS_WIN_STUBS))
 
 %.cmi:%.mli
-	$(OCAMLC) -c $< -o $@
+	$(OCAMLC) -c -o $@ $(INCLUDE_DIRS) $(BYT_DEPS) $<
 
 %.cmx:%.ml
 	$(OCAMLOPT) -c -o $@ $(INCLUDE_DIRS) $(NAT_DEPS) $<

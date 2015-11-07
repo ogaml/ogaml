@@ -60,6 +60,14 @@ module Mouse = struct
 
 end
 
+module Keyboard = struct
+
+  external is_keycode_pressed : int -> bool = "caml_cg_is_key_pressed"
+
+  external is_char_pressed : char -> bool = "caml_cg_is_char_pressed"
+
+end
+
 module NSEvent = struct
 
   type t
@@ -116,7 +124,7 @@ module NSEvent = struct
 
   external get_type : t -> event_type = "caml_cocoa_event_type"
 
-  external modifier_flags : t -> modifier_flag list
+  external modifier_flags : unit -> modifier_flag list
     = "caml_cocoa_event_modifier_flags"
 
   external character : t -> NSString.t = "caml_cocoa_event_characters"
@@ -381,5 +389,7 @@ module OGWindowController = struct
 
   external set_proper_relative_mouse_location : t -> float -> float -> unit
     = "caml_cocoa_set_proper_relative_mouse_location"
+
+  external has_focus : t -> bool = "caml_cocoa_controller_has_focus"
 
 end

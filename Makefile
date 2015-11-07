@@ -28,7 +28,7 @@ OUTPUT = main.out
 
 # Compilation
 
-default: example
+default: stubs_lib math_lib gl_lib window_lib
 
 window_lib: gl_lib
 	cd src/wm/ && make

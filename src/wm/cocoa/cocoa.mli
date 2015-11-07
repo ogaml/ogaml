@@ -54,6 +54,14 @@ module Mouse : sig
 
 end
 
+module Keyboard : sig
+
+  val is_keycode_pressed : int -> bool
+
+  val is_char_pressed : char -> bool
+
+end
+
 module NSEvent : sig
 
   type t
@@ -112,7 +120,7 @@ module NSEvent : sig
 
   (* Key event information *)
 
-  val modifier_flags : t -> modifier_flag list
+  val modifier_flags : unit -> modifier_flag list
 
   val character : t -> NSString.t
 
@@ -298,5 +306,7 @@ module OGWindowController : sig
   val proper_relative_mouse_location : t -> float * float
 
   val set_proper_relative_mouse_location : t -> float -> float -> unit
+
+  val has_focus : t -> bool
 
 end

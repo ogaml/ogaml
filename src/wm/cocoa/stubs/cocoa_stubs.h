@@ -7,6 +7,8 @@
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 #import <CoreGraphics/CoreGraphics.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include <Carbon/Carbon.h>
 
 // A function to move the cursor
 void warpCursor(NSPoint loc);

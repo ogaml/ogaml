@@ -20,6 +20,11 @@ val size : t -> (int * int)
 (** Return true iff the window is open *)
 val is_open : t -> bool
 
+(** Return true iff the window has the focus.
+  * This should prove useful when one wants to access the mouse or keyboard
+  * directly. *)
+val has_focus : t -> bool
+
 (** Return the event at the top of the stack, if it exists *)
 val poll_event : t -> Event.t option
 

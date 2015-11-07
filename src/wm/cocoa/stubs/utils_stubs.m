@@ -83,6 +83,107 @@ caml_cg_warp_mouse_cursor_position(value mlx, value mly)
   CAMLreturn(Val_unit);
 }
 
+// Keyboard information
+///////////////////////
+
+// This function is strongly inspired from StackOverflow
+// http://stackoverflow.com/questions/8263618/convert-virtual-key-code-to-unicode-string
+NSString* keyCodeToString(CGKeyCode keyCode)
+{
+  TISInputSourceRef currentKeyboard = TISCopyCurrentKeyboardInputSource();
+  CFDataRef uchr =
+    (CFDataRef)TISGetInputSourceProperty(currentKeyboard,
+                                         kTISPropertyUnicodeKeyLayoutData);
+  const UCKeyboardLayout *keyboardLayout =
+    (const UCKeyboardLayout*)CFDataGetBytePtr(uchr);
+
+  if(keyboardLayout)
+  {
+    UInt32 deadKeyState = 0;
+    UniCharCount maxStringLength = 255;
+    UniCharCount actualStringLength = 0;
+    UniChar unicodeString[maxStringLength];
+
+    OSStatus status = UCKeyTranslate(keyboardLayout,
+                                     keyCode, kUCKeyActionDown, 0,
+                                     LMGetKbdType(), 0,
+                                     &deadKeyState,
+                                     maxStringLength,
+                                     &actualStringLength, unicodeString);
+
+    if (actualStringLength == 0 && deadKeyState)
+    {
+      status = UCKeyTranslate(keyboardLayout,
+                                       kVK_Space, kUCKeyActionDown, 0,
+                                       LMGetKbdType(), 0,
+                                       &deadKeyState,
+                                       maxStringLength,
+                                       &actualStringLength, unicodeString);
+    }
+    if(actualStringLength > 0 && status == noErr)
+      return [[NSString stringWithCharacters:unicodeString
+                        length:(NSUInteger)actualStringLength] lowercaseString];
+  }
+
+  return nil;
+}
+
+NSNumber* charToKeyCode(const char c)
+{
+  static NSMutableDictionary* dict = nil;
+
+  if (dict == nil)
+  {
+    dict = [NSMutableDictionary dictionary];
+
+    // For every keyCode
+    size_t i;
+    for (i = 0; i < 128; ++i)
+    {
+      NSString* str = keyCodeToString((CGKeyCode)i);
+      if(str != nil && ![str isEqualToString:@""])
+      {
+        [dict setObject:[NSNumber numberWithInt:i] forKey:str];
+      }
+    }
+  }
+
+  NSString * keyChar = [NSString stringWithFormat:@"%c" , c];
+
+  return [dict objectForKey:keyChar];
+}
+
+// Check if a keycode is pressed
+BOOL isKeyPressed(CGKeyCode key)
+{
+  return CGEventSourceKeyState(kCGEventSourceStateHIDSystemState,key);
+}
+
+CAMLprim value
+caml_cg_is_key_pressed(value mlkeycode)
+{
+  CAMLparam1(mlkeycode);
+
+  BOOL res = isKeyPressed(Int_val(mlkeycode));
+
+  CAMLreturn(Val_bool(res));
+}
+
+CAMLprim value
+caml_cg_is_char_pressed(value mlchar)
+{
+  CAMLparam1(mlchar);
+
+  char c = Int_val(mlchar);
+
+  NSNumber* keycode = charToKeyCode(c);
+
+  BOOL res =
+    (keycode == nil) ? false : isKeyPressed((CGKeyCode)[keycode intValue]);
+
+  CAMLreturn(Val_bool(res));
+}
+
 // NSString binding
 ///////////////////
 
