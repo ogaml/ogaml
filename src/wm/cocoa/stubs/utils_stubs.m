@@ -86,71 +86,71 @@ caml_cg_warp_mouse_cursor_position(value mlx, value mly)
 // Keyboard information
 ///////////////////////
 
-// The two following functions come from StackOverflow
-CFStringRef createStringForKey(CGKeyCode keyCode)
+// This function is strongly inspired from StackOverflow
+// http://stackoverflow.com/questions/8263618/convert-virtual-key-code-to-unicode-string
+NSString* keyCodeToString(CGKeyCode keyCode)
 {
   TISInputSourceRef currentKeyboard = TISCopyCurrentKeyboardInputSource();
-  CFDataRef layoutData =
-    TISGetInputSourceProperty(currentKeyboard,
-                              kTISPropertyUnicodeKeyLayoutData);
+  CFDataRef uchr =
+    (CFDataRef)TISGetInputSourceProperty(currentKeyboard,
+                                         kTISPropertyUnicodeKeyLayoutData);
   const UCKeyboardLayout *keyboardLayout =
-    (const UCKeyboardLayout *)CFDataGetBytePtr(layoutData);
+    (const UCKeyboardLayout*)CFDataGetBytePtr(uchr);
 
-  UInt32 keysDown = 0;
-  UniChar chars[4];
-  UniCharCount realLength;
+  if(keyboardLayout)
+  {
+    UInt32 deadKeyState = 0;
+    UniCharCount maxStringLength = 255;
+    UniCharCount actualStringLength = 0;
+    UniChar unicodeString[maxStringLength];
 
-  UCKeyTranslate(keyboardLayout,
-                 keyCode,
-                 kUCKeyActionDisplay,
-                 0,
-                 LMGetKbdType(),
-                 kUCKeyTranslateNoDeadKeysBit,
-                 &keysDown,
-                 sizeof(chars) / sizeof(chars[0]),
-                 &realLength,
-                 chars);
-  CFRelease(currentKeyboard);
+    OSStatus status = UCKeyTranslate(keyboardLayout,
+                                     keyCode, kUCKeyActionDown, 0,
+                                     LMGetKbdType(), 0,
+                                     &deadKeyState,
+                                     maxStringLength,
+                                     &actualStringLength, unicodeString);
 
-  return CFStringCreateWithCharacters(kCFAllocatorDefault, chars, 1);
+    if (actualStringLength == 0 && deadKeyState)
+    {
+      status = UCKeyTranslate(keyboardLayout,
+                                       kVK_Space, kUCKeyActionDown, 0,
+                                       LMGetKbdType(), 0,
+                                       &deadKeyState,
+                                       maxStringLength,
+                                       &actualStringLength, unicodeString);
+    }
+    if(actualStringLength > 0 && status == noErr)
+      return [[NSString stringWithCharacters:unicodeString
+                        length:(NSUInteger)actualStringLength] lowercaseString];
+  }
+
+  return nil;
 }
 
-CGKeyCode keyCodeForChar(const char c)
+NSNumber* charToKeyCode(const char c)
 {
-  static CFMutableDictionaryRef charToCodeDict = NULL;
-  CGKeyCode code;
-  UniChar character = c;
-  CFStringRef charStr = NULL;
+  static NSMutableDictionary* dict = nil;
 
-  /* Generate table of keycodes and characters. */
-  if (charToCodeDict == NULL) {
+  if (dict == nil)
+  {
+    dict = [NSMutableDictionary dictionary];
+
+    // For every keyCode
     size_t i;
-    charToCodeDict = CFDictionaryCreateMutable(kCFAllocatorDefault,
-                                               128,
-                                               &kCFCopyStringDictionaryKeyCallBacks,
-                                               NULL);
-    if (charToCodeDict == NULL) return UINT16_MAX;
-
-    /* Loop through every keycode (0 - 127) to find its current mapping. */
-    for (i = 0; i < 128; ++i) {
-      CFStringRef string = createStringForKey((CGKeyCode)i);
-      if (string != NULL) {
-        CFDictionaryAddValue(charToCodeDict, string, (const void *)i);
-        CFRelease(string);
+    for (i = 0; i < 128; ++i)
+    {
+      NSString* str = keyCodeToString((CGKeyCode)i);
+      if(str != nil && ![str isEqualToString:@""])
+      {
+        [dict setObject:[NSNumber numberWithInt:i] forKey:str];
       }
     }
   }
 
-  charStr = CFStringCreateWithCharacters(kCFAllocatorDefault, &character, 1);
+  NSString * keyChar = [NSString stringWithFormat:@"%c" , c];
 
-  /* Our values may be NULL (0), so we need to use this function. */
-  if (!CFDictionaryGetValueIfPresent(charToCodeDict, charStr,
-                                     (const void **)&code)) {
-    code = UINT16_MAX;
-  }
-
-  CFRelease(charStr);
-  return code;
+  return [dict objectForKey:keyChar];
 }
 
 // Check if a keycode is pressed
@@ -176,7 +176,10 @@ caml_cg_is_char_pressed(value mlchar)
 
   char c = Int_val(mlchar);
 
-  BOOL res = isKeyPressed(keyCodeForChar(c));
+  NSNumber* keycode = charToKeyCode(c);
+
+  BOOL res =
+    (keycode == nil) ? false : isKeyPressed((CGKeyCode)[keycode intValue]);
 
   CAMLreturn(Val_bool(res));
 }
