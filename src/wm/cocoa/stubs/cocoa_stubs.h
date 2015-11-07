@@ -18,13 +18,22 @@ void warpCursor(NSPoint loc);
 typedef enum
 {
   OGCocoaEvent,
-  OGCloseWindowEvent
+  OGCloseWindowEvent,
+  OGKeyDown,
+  OGKeyUp
 } OGEventType;
+
+typedef struct
+{
+  unsigned short       keyCode;
+  NSString *           characters;
+  NSEventModifierFlags modifierFlags;
+} OGKeyInfo;
 
 typedef union
 {
   NSEvent*  nsevent;
-  // void closeWindow; // We might want to have something more here later
+  OGKeyInfo keyInformation;
 } OGEventContent;
 
 @interface OGEvent : NSObject
@@ -36,6 +45,14 @@ typedef union
 - (instancetype)initWithNSEvent:(NSEvent*)nsevent;
 
 - (instancetype)initWithCloseWindow;
+
+- (instancetype)initWithKeyUp:(unsigned short)keyCode
+                   characters:(NSString *)characters
+                modifierFlags:(NSEventModifierFlags)modifierFlags;
+
+- (instancetype)initWithKeyDown:(unsigned short)keyCode
+                     characters:(NSString *)characters
+                  modifierFlags:(NSEventModifierFlags)modifierFlags;
 
 - (OGEventType)type;
 

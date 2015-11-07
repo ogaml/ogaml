@@ -23,7 +23,7 @@ Cocoa specific:
   ☐ Add some option to switch between Ctrl and Cmd @question
   ☐ Add some function to handle keyRepeatDelay and keyRepeatInterval for NSEvent
   ☐ Consider converting every event to OGEvent before pushing (instead of having both NSEvent and OGEvent) @unsure
-  ☐ Key events should be converted to OGEvent to save the modifier flags of the time it is raised and not handled
+  ✔ Key events should be converted to OGEvent to save the modifier flags of the time it is raised and not handled @done(2015-11-07 19:26) @project(Cocoa specific)
   ✔ Handle application creation and running with a boolean @done(2015-10-26 01:43) @project(Cocoa specific)
   ✔ Implement window destroy properly @done(2015-10-26 02:04) @project(Cocoa specific)
   ✔ Add window closed event @done(2015-10-31 00:30) @project(Cocoa specific)

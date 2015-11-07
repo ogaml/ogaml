@@ -21,12 +21,18 @@
 
 -(void)keyUp:(NSEvent *)event
 {
-  [self pushNSEvent:event];
+  OGEvent* ogevent = [[OGEvent alloc] initWithKeyUp:[event keyCode]
+                                         characters:[event characters]
+                                      modifierFlags:[NSEvent modifierFlags]];
+  [self pushEvent:ogevent];
 }
 
 -(void)mouseDown:(NSEvent *)event
 {
-  [self pushNSEvent:event];
+  OGEvent* ogevent = [[OGEvent alloc] initWithKeyDown:[event keyCode]
+                                           characters:[event characters]
+                                        modifierFlags:[NSEvent modifierFlags]];
+  [self pushEvent:ogevent];
 }
 
 -(void)mouseUp:(NSEvent *)event

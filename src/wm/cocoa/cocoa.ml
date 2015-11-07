@@ -145,9 +145,17 @@ module OGEvent = struct
 
   type t
 
+  type key_info = {
+    keycode : int ;
+    characters : NSString.t ;
+    modifier_flags : NSEvent.modifier_flag list
+  }
+
   type content =
-    | CocoaEvent of NSEvent.t
+    | CocoaEvent  of NSEvent.t
     | CloseWindow
+    | KeyUp       of key_info
+    | KeyDown     of key_info
 
   external get_content : t -> content = "caml_ogevent_get_content"
 

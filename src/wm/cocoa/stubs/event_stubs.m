@@ -20,14 +20,11 @@ caml_cocoa_event_type(value mlevent)
   CAMLreturn(Val_int(type-1));
 }
 
-CAMLprim value
-caml_cocoa_event_modifier_flags(value unit)
+value extract_modifier_flags(NSEventModifierFlags mask)
 {
   CAMLparam0();
   CAMLlocal2(li, cons);
   li = Val_emptylist;
-
-  NSEventModifierFlags mask = [NSEvent modifierFlags];
 
   if(mask & NSAlphaShiftKeyMask)
   {
@@ -92,6 +89,20 @@ caml_cocoa_event_modifier_flags(value unit)
     Store_field(cons, 1, li);
     li = cons;
   }
+
+  CAMLreturn(li);
+}
+
+
+CAMLprim value
+caml_cocoa_event_modifier_flags(value unit)
+{
+  CAMLparam0();
+  CAMLlocal1(li);
+
+  NSEventModifierFlags mask = [NSEvent modifierFlags];
+
+  li = extract_modifier_flags(mask);
 
   CAMLreturn(li);
 }
@@ -202,8 +213,6 @@ caml_cocoa_event_pressed_mouse_buttons(value unit)
 - (instancetype)initWithNSEvent:(NSEvent*)nsevent
 {
   m_type = OGCocoaEvent;
-  // m_content = {'$'};
-  // m_content = {.nsevent = nsevent};
   m_content.nsevent = nsevent;
 
   return self;
@@ -212,6 +221,36 @@ caml_cocoa_event_pressed_mouse_buttons(value unit)
 - (instancetype)initWithCloseWindow
 {
   m_type = OGCloseWindowEvent;
+
+  return self;
+}
+
+- (instancetype)initWithKeyUp:(unsigned short)keyCode
+                   characters:(NSString *)characters
+                modifierFlags:(NSEventModifierFlags)modifierFlags
+{
+  m_type = OGKeyUp;
+  OGKeyInfo info = {
+    .keyCode       = keyCode,
+    .characters    = characters,
+    .modifierFlags = modifierFlags
+  };
+ m_content.keyInformation = info;
+
+  return self;
+}
+
+- (instancetype)initWithKeyDown:(unsigned short)keyCode
+                     characters:(NSString *)characters
+                  modifierFlags:(NSEventModifierFlags)modifierFlags
+{
+  m_type = OGKeyDown;
+  OGKeyInfo info = {
+    .keyCode       = keyCode,
+    .characters    = characters,
+    .modifierFlags = modifierFlags
+  };
+ m_content.keyInformation = info;
 
   return self;
 }
@@ -236,21 +275,45 @@ CAMLprim value
 caml_ogevent_get_content(value mlogevent)
 {
   CAMLparam1(mlogevent);
-  CAMLlocal1(result);
+  CAMLlocal3(result,key_info,li);
 
   OGEvent* ogevent = (OGEvent*) mlogevent;
 
   OGEventType type = [ogevent type];
 
+  OGKeyInfo info;
+
   switch(type)
   {
     case OGCocoaEvent:
-      result = caml_alloc(1,0);
+      result = caml_alloc(1,0); // 1st variant
       Store_field(result, 0, (value) [ogevent content].nsevent);
       break;
 
     case OGCloseWindowEvent:
       result = Val_int(0);
+      break;
+
+    case OGKeyUp:
+      info = [ogevent content].keyInformation;
+      result = caml_alloc(1,1); // 2nd variant
+      key_info = caml_alloc(3,0); // 3 values, 0 for tuple (no tag)
+        Store_field(key_info, 0, Val_int(info.keyCode));
+        Store_field(key_info, 1, (value) info.characters);
+        li = extract_modifier_flags(info.modifierFlags);
+        Store_field(key_info, 2, li);
+      Store_field(result, 0, key_info);
+      break;
+
+    case OGKeyDown:
+      info = [ogevent content].keyInformation;
+      result = caml_alloc(1,2); // 3rd variant
+      key_info = caml_alloc(3,0); // 3 values, 0 for tuple (no tag)
+        Store_field(key_info, 0, Val_int(info.keyCode));
+        Store_field(key_info, 1, (value) info.characters);
+        li = extract_modifier_flags(info.modifierFlags);
+        Store_field(key_info, 2, li);
+      Store_field(result, 0, key_info);
       break;
   };
 

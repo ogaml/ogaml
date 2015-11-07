@@ -79,9 +79,9 @@ let is_open win =
 let has_focus win =
   Cocoa.OGWindowController.has_focus win
 
-let get_key_event event =
+let get_key_event key_info =
   let keycode = Keycode.(
-    match Cocoa.NSString.get (Cocoa.NSEvent.character event) with
+    match Cocoa.NSString.get Cocoa.OGEvent.(key_info.characters) with
     | "a" | "A" -> A
     | "b" | "B" -> B
     | "c" | "C" -> C
@@ -109,7 +109,7 @@ let get_key_event event =
     | "y" | "Y" -> Y
     | "z" | "Z" -> Z
     | _ -> begin
-        match Cocoa.NSEvent.key_code event with
+        match key_info.keycode with
         | 18  -> Num1
         | 19  -> Num2
         | 20  -> Num3
@@ -165,7 +165,7 @@ let get_key_event event =
         | _   -> Unknown
     end
   ) in
-  let modifiers = Cocoa.NSEvent.modifier_flags () in
+  let modifiers = key_info.modifier_flags in
   let (shift,control,alt) = Cocoa.NSEvent.(
     List.mem NSShiftKeyMask     modifiers,
     List.mem NSCommandKeyMask   modifiers,
@@ -207,8 +207,6 @@ let poll_event win =
         | OGEvent.CocoaEvent event ->
             NSEvent.(
               match get_type event with
-              | KeyDown        -> Some (Event.KeyPressed (get_key_event event))
-              | KeyUp          -> Some (Event.KeyReleased (get_key_event event))
               | LeftMouseDown  -> Some (Event.ButtonPressed (
                   make_mouse_event Button.Left event win
                 ))
@@ -230,7 +228,9 @@ let poll_event win =
               | MouseMoved     -> Some (Event.MouseMoved (mouse_loc win))
               | _              -> None
             )
-        | OGEvent.CloseWindow -> Some Event.Closed
+        | OGEvent.CloseWindow  -> Some Event.Closed
+        | OGEvent.KeyUp   info -> Some (Event.KeyPressed  (get_key_event info))
+        | OGEvent.KeyDown info -> Some (Event.KeyReleased (get_key_event info))
       )
   | None -> None
 
