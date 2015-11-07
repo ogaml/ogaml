@@ -47,6 +47,8 @@ module Window = struct
 
   let is_open win = InternalWindow.is_open win.internal
 
+  let has_focus win = InternalWindow.has_focus win.internal
+
   let size    win = InternalWindow.size    win.internal
 
   let poll_event win = InternalWindow.poll_event win.internal
