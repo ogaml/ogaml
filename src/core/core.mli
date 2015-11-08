@@ -8,7 +8,7 @@ module Window : sig
   val create : width:int -> height:int -> t
 
   (** Closes a window, but does not free the memory.
-  * This should prevent segfaults when calling functions on this window. *)
+    * This should prevent segfaults when calling functions on this window. *)
   val close : t -> unit
 
   (** Free the window and the memory *)
@@ -21,8 +21,8 @@ module Window : sig
   val is_open : t -> bool
 
   (** Return true iff the window has the focus.
-  * This should prove useful when one wants to access the mouse or keyboard
-  * directly. *)
+    * This should prove useful when one wants to access the mouse or keyboard
+    * directly. *)
   val has_focus : t -> bool
 
   (** Return the event at the top of the stack, if it exists *)
@@ -62,5 +62,3 @@ module Mouse : sig
   val is_pressed : Button.t -> bool
 
 end
-
-

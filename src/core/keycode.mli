@@ -1,6 +1,6 @@
-type t = 
-  | Unknown 
-  | A 
+type t =
+  | Unknown
+  | A
   | B
   | C
   | D
@@ -79,7 +79,3 @@ type t =
   | F10
   | F11
   | F12
-
-
-
-

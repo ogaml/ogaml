@@ -82,7 +82,7 @@ module Window = struct
   let has_focus win =
     Cocoa.OGWindowController.has_focus win
 
-  let get_key_event key_info =
+  let mk_key_event key_info =
     let keycode = Keycode.(
       match Cocoa.NSString.get Cocoa.OGEvent.(key_info.characters) with
       | "a" | "A" -> A
@@ -232,8 +232,8 @@ module Window = struct
                 | _              -> None
               )
           | OGEvent.CloseWindow  -> Some Event.Closed
-          | OGEvent.KeyUp   info -> Some (Event.KeyPressed  (get_key_event info))
-          | OGEvent.KeyDown info -> Some (Event.KeyReleased (get_key_event info))
+          | OGEvent.KeyUp   info -> Some (Event.KeyPressed  (mk_key_event info))
+          | OGEvent.KeyDown info -> Some (Event.KeyReleased (mk_key_event info))
         )
     | None -> None
 
