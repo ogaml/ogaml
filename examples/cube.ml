@@ -11,20 +11,20 @@ let frame_count  = ref 0
 
 let cube_source = VertexArray.(Source.(
     empty ~position:"in_position" ~color:"in_color" ~size:6 ()
-    << Vertex.create ~position:Vector3f.({x = -0.5; y = -0.5; z = 0.5}) 
+    << Vertex.create ~position:Vector3f.({x = -0.5; y = -0.5; z = 0.5})
                      ~color:(`RGB Color.RGB.red) ()
-    << Vertex.create ~position:Vector3f.({x = -0.5; y =  0.5; z = 0.5}) 
+    << Vertex.create ~position:Vector3f.({x = -0.5; y =  0.5; z = 0.5})
                      ~color:(`RGB Color.RGB.red) ()
-    << Vertex.create ~position:Vector3f.({x =  0.5; y =  0.5; z = 0.5}) 
+    << Vertex.create ~position:Vector3f.({x =  0.5; y =  0.5; z = 0.5})
                      ~color:(`RGB Color.RGB.red) ()
-    << Vertex.create ~position:Vector3f.({x = -0.5; y = -0.5; z = 0.5}) 
+    << Vertex.create ~position:Vector3f.({x = -0.5; y = -0.5; z = 0.5})
                      ~color:(`RGB Color.RGB.red) ()
-    << Vertex.create ~position:Vector3f.({x =  0.5; y =  0.5; z = 0.5}) 
+    << Vertex.create ~position:Vector3f.({x =  0.5; y =  0.5; z = 0.5})
                      ~color:(`RGB Color.RGB.red) ()
-    << Vertex.create ~position:Vector3f.({x =  0.5; y = -0.5; z = 0.5}) 
+    << Vertex.create ~position:Vector3f.({x =  0.5; y = -0.5; z = 0.5})
                      ~color:(`RGB Color.RGB.red) ()
 
-  )) 
+  ))
 
 let buffer = VertexArray.static cube_source
 
@@ -32,7 +32,7 @@ let program = Program.from_source_list
   (Window.state window)
   ~vertex_source:[
     (130, "#version 130
-    
+
            uniform mat4 MVPMatrix;
 
            in vec3 in_position;
@@ -49,7 +49,7 @@ let program = Program.from_source_list
 
            }");
     (150, "#version 150
-    
+
            uniform mat4 MVPMatrix;
 
            in vec3 in_position;
@@ -118,14 +118,14 @@ let display () =
   let vp = Matrix3D.product proj view in
   let mvp = Matrix3D.product vp model in
   rot_angle := !rot_angle +. (abs_float (cos (Unix.gettimeofday ()) /. 10.));
-  let uniform = 
-    Uniform.empty 
-    |> Uniform.matrix3D "MVPMatrix" mvp 
+  let uniform =
+    Uniform.empty
+    |> Uniform.matrix3D "MVPMatrix" mvp
   in
-  let parameters = 
+  let parameters =
     DrawParameter.make ()
   in
-  Window.draw ~window ~vertices:buffer ~uniform ~program ~parameters 
+  Window.draw ~window ~vertices:buffer ~uniform ~program ~parameters
 
 
 (* Camera *)
@@ -145,6 +145,35 @@ let rec update_camera () =
   view_phi   := min (max !view_phi (-.lim)) lim;
   Mouse.set_relative_position window (centerx, centery)
 
+(* Handle keys directly by polling the keyboard *)
+let handle_keys () =
+  OgamlCore.Keycode.(Keyboard.(
+    if is_pressed Z || is_pressed Up then
+      position := Vector3f.(add
+        !position
+        {x = -. 0.15 *. (sin !view_theta);
+         y = 0.;
+         z = -. 0.15 *. (cos !view_theta)}) ;
+    if is_pressed S || is_pressed Down then
+      position := Vector3f.(add
+        !position
+        {x = 0.15 *. (sin !view_theta);
+         y = 0.;
+         z = 0.15 *. (cos !view_theta)}) ;
+    if is_pressed Q || is_pressed Left then
+      position := Vector3f.(add
+        !position
+        {x = -. 0.15 *. (cos !view_theta);
+         y = 0.;
+         z = 0.15 *. (sin !view_theta)}) ;
+    if is_pressed D || is_pressed Right then
+      position := Vector3f.(add
+        !position
+        {x = 0.15 *. (cos !view_theta);
+         y = 0.;
+         z = -. 0.15 *. (sin !view_theta)})
+  ))
+
 
 (* Event loop *)
 let rec event_loop () =
@@ -158,30 +187,6 @@ let rec event_loop () =
       match k.Event.KeyEvent.key with
       | Escape -> Window.close window
       | Q when k.Event.KeyEvent.control -> Window.close window
-      | Z | Up ->
-          position := Vector3f.(add
-            !position
-            {x = -. 0.15 *. (sin !view_theta);
-             y = 0.;
-             z = -. 0.15 *. (cos !view_theta)})
-      | S | Down ->
-          position := Vector3f.(add
-            !position
-            {x = 0.15 *. (sin !view_theta);
-             y = 0.;
-             z = 0.15 *. (cos !view_theta)})
-      | Q | Left ->
-          position := Vector3f.(add
-            !position
-            {x = -. 0.15 *. (cos !view_theta);
-             y = 0.;
-             z = 0.15 *. (sin !view_theta)})
-      | D | Right ->
-          position := Vector3f.(add
-            !position
-            {x = 0.15 *. (cos !view_theta);
-             y = 0.;
-             z = -. 0.15 *. (sin !view_theta)})
       | _ -> ()
     )
     | _ -> ()
@@ -195,7 +200,11 @@ let rec main_loop () =
     Window.clear window ~color:true ~depth:true ~stencil:false;
     display ();
     Window.display window;
-    update_camera ();
+    (* We only capture the mouse and listen to the keyboard when focused *)
+    if Window.has_focus window then (
+      update_camera () ;
+      handle_keys ()
+    ) ;
     event_loop ();
     incr frame_count;
     main_loop ()
