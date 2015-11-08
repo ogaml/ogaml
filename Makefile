@@ -34,8 +34,8 @@ core_lib:
 graphics_lib: core_lib math_lib
 	cd src/graphics/ && make
 
-example: math_lib core_lib graphics_lib
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) examples/cube.ml -o main.out
+examples: 
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/cube.ml -o main.out
 
 tests: math_lib core_lib graphics_lib
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/programs.ml -o main.out && ./main.out &&\
@@ -56,3 +56,4 @@ clean:
 	cd tests/ && make clean;
 	cd examples/ && make clean
 
+.PHONY: install uninstall examples
