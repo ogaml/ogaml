@@ -1,24 +1,18 @@
 S src
-S src/wm
-S src/wm/xlib
-S src/wm/xlib/stubs
-S src/wm/cocoa
-S src/wm/cocoa/stubs
-S src/test
+S src/core
+S src/core/xlib
+S src/core/cocoa
 S src/math
-S src/gl
-S src/gl/stubs
+S src/graphics
 S tests
+S examples
 
 B src
-B src/wm
-B src/wm/xlib
-B src/wm/xlib/stubs
-B src/wm/cocoa
-B src/wm/cocoa/stubs
-B src/test
+B src/core
+B src/core/xlib
+B src/core/cocoa
 B src/math
-B src/gl
-B src/gl/stubs
+B src/graphics
 B tests
+B examples
 

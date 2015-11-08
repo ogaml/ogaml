@@ -23,3 +23,4 @@ type t =
   | ButtonPressed  of ButtonEvent.t
   | ButtonReleased of ButtonEvent.t
   | MouseMoved     of MouseEvent.t
+

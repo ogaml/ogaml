@@ -2,7 +2,7 @@ include ../../common_defs.mk
 
 # Override
 
-INCLUDE_DIRS = -I ../utils/ -I ../math/
+INCLUDE_DIRS = -I ../utils/ -I ../math/ -I ../core/
 
 GRAPHICS_STUBS = shader_stubs.c program_stubs.c texture_stubs.c\
 	         vao_stubs.c vbo_stubs.c uniform_stubs.c\
@@ -17,8 +17,9 @@ STUBS_TARGET = $(STUBS_SRC:.c=.o)
 
 STUBS_OBJS = $(GRAPHICS_STUBS:.c=.o) $(UTILS_STUBS:.c=.o)
 
-MLSOURCES = color.ml internal.ml drawParameter.ml state.ml\
-	    image.ml texture.ml program.ml vertexArray.ml uniform.ml 
+MLSOURCES = color.ml internal.ml state.ml drawParameter.ml\
+	    image.ml texture.ml program.ml vertexArray.ml uniform.ml window.ml\
+	    mouse.ml keyboard.ml
 
 MLINTERFACES = enum.mli
 
@@ -49,13 +50,13 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS)
 	$(OCAMLFIND) $(OCAMLOPT) -a -o $@ $(INCLUDE_DIRS) $<
 
 %.cmi:%.mli
-	$(OCAMLFIND) $(OCAMLC) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../math/ogamlMath.cma -c $< -o $@
+	$(OCAMLFIND) $(OCAMLC) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../core/ogamlCore.cma ../math/ogamlMath.cma -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLFIND) $(OCAMLOPT) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../math/ogamlMath.cmxa -c $< -o $@ 
+	$(OCAMLFIND) $(OCAMLOPT) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../core/ogamlCore.cmxa ../math/ogamlMath.cmxa -c $< -o $@ 
 
 %.cmo:%.ml
-	$(OCAMLFIND) $(OCAMLC) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../math/ogamlMath.cma -c $< -o $@ 
+	$(OCAMLFIND) $(OCAMLC) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../core/ogamlCore.cma ../math/ogamlMath.cma -c $< -o $@ 
 
 %.ml:%.mlpp %.cmi
 	$(PPCOMMAND) -o $@ $<

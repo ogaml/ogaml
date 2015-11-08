@@ -5,7 +5,7 @@ include common_defs.mk
 
 INCLUDES = -I src/core -I src/math -I src/graphics
 
-MODULES = ogamlCore.cmxa ogamlGraphics.cmxa ogamlMath.cmxa
+MODULES = ogamlMath.cmxa ogamlCore.cmxa ogamlGraphics.cmxa
 
 PACKAGES = -package bigarray,unix
 
@@ -23,10 +23,10 @@ core_lib:
 graphics_lib: core_lib math_lib
 	cd src/graphics/ && make
 
-example: math_lib core_lib
+example: math_lib core_lib graphics_lib
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) examples/cube.ml -o main.out
 
-tests: math_lib core_lib 
+tests: math_lib core_lib graphics_lib
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/programs.ml -o main.out && ./main.out &&\
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/vertexarrays.ml -o main.out && ./main.out &&\
 	echo "Tests passed !"

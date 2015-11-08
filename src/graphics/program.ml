@@ -101,7 +101,7 @@ let from_source ~vertex_source ~fragment_source =
   }
  
 
-(*let from_source_list ~vertex_source ~fragment_source =
+let from_source_list st ~vertex_source ~fragment_source =
   let list_vshader = 
     List.sort (fun (v,_) (v',_) -> - (compare v v')) vertex_source
   in
@@ -110,16 +110,16 @@ let from_source ~vertex_source ~fragment_source =
   in
   try 
     let best_vshader = 
-      List.find (fun (v,_) -> Internal.Pervasives.glsl_supported v) list_vshader
+      List.find (fun (v,_) -> State.is_glsl_version_supported st v) list_vshader
       |> snd
     in
     let best_fshader = 
-      List.find (fun (v,_) -> Internal.Pervasives.glsl_supported v) list_fshader
+      List.find (fun (v,_) -> State.is_glsl_version_supported st v) list_fshader
       |> snd
     in
     from_source ~vertex_source:best_vshader ~fragment_source:best_fshader
   with Not_found -> raise (Invalid_version "No supported GLSL version provided")
-*)
+
 
 let use state prog = 
   match prog with

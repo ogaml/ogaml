@@ -1,5 +1,0 @@
-#ifdef __LINUX__
-  #include "internal_impl_x11.ml"
-#elif defined __OSX__
-  #include "internal_impl_cocoa.ml"
-#endif

@@ -1,13 +1,12 @@
-open OgamlGL
+open OgamlGraphics
 open OgamlMath
 
-let context = 
-  OgamlWindow.Window.create ~width:100 ~height:100
+let window = Window.create ~width:100 ~height:100
 
-let opengl_state = 
-  State.create ()
+let state = Window.state window
 
 let prog = Program.from_source_list 
+    state
     ~vertex_source:[
       (130, "#version 130
               
@@ -113,7 +112,7 @@ let test_vao6 () =
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
   let vao = VertexArray.dynamic vsource in
-  VertexArray.draw opengl_state vao prog
+  VertexArray.draw state vao prog
 
 let test_vao7 () = 
   let vsource = VertexArray.(Source.(
@@ -124,7 +123,7 @@ let test_vao7 () =
   )) in
   let vao = VertexArray.dynamic vsource in
   try 
-    VertexArray.draw opengl_state vao prog;
+    VertexArray.draw state vao prog;
     assert false
   with
     VertexArray.Missing_attribute _ -> ()
@@ -139,7 +138,7 @@ let test_vao8 () =
   )) in
   let vao = VertexArray.dynamic vsource in
   try 
-    VertexArray.draw opengl_state vao prog;
+    VertexArray.draw state vao prog;
     assert false
   with
     VertexArray.Invalid_attribute _ -> ()

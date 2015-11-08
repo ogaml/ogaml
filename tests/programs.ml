@@ -1,13 +1,12 @@
-open OgamlGL
+open OgamlGraphics
 
-let context = 
-  OgamlWindow.Window.create ~width:100 ~height:100
+let window = Window.create ~width:100 ~height:100
 
-let opengl_state = 
-  State.create ()
+let state = Window.state window
 
 let test_program1 () = 
   let prog = Program.from_source_list
+    state
     ~vertex_source:[
       (130, "#version 130
               

@@ -28,7 +28,7 @@ endif
 ifeq ($(UNAME), Darwin)
   PP_DEFINE = __OSX__
   OS_NAME = OSX
-  OS_WIN_LIB = cocoa 
+  OS_WIN_LIB = cocoa
   GLOBAL_OBJCOPTS = -fconstant-string-class=NSConstantString
   GLOBAL_CLIBS = -framework Foundation -framework Cocoa -framework Carbon -lobjc -framework openGL
 endif

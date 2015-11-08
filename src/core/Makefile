@@ -21,26 +21,27 @@ ifeq ($(OS_WIN_LIB), x11)
   OS_WIN_STUBS = $(XLIB_STUBS)
 endif
 
-STUBS_SOURCES = $(addprefix $(OS_WIN_LIB)/$(STUBS_DIR)/, $(OS_WIN_STUBS)) \
-		$(addprefix ../utils/, $(UTILS_STUBS))
+STUBS_SOURCES = $(addprefix $(OS_WIN_LIB)/$(STUBS_DIR)/, $(OS_WIN_STUBS)) 
+	    
+UTILS_SOURCES  =$(addprefix ../utils/, $(UTILS_STUBS))
 
 STUBS_TARGETS = 
 
 STUBS_OBJECTS = 
 
 ifeq ($(OS_WIN_LIB), cocoa)
-  STUBS_TARGETS = $(STUBS_SOURCES:.m=.o)
+  STUBS_TARGETS = $(STUBS_SOURCES:.m=.o) $(UTILS_SOURCES:.c=.o)
   STUBS_OBJECTS = $(OS_WIN_STUBS:.m=.o) $(UTILS_STUBS:.c=.o)
 endif
 ifeq ($(OS_WIN_LIB), x11)
-  STUBS_TARGETS = $(STUBS_SOURCES:.c=.o)
+  STUBS_TARGETS = $(STUBS_SOURCES:.c=.o) $(UTILS_SOURCES:.c=.o)
   STUBS_OBJECTS = $(OS_WIN_STUBS:.c=.o) $(UTILS_STUBS:.c=.o)
 endif
 
 
 # ML constants
 
-ML_SOURCES = internal.ml 
+ML_SOURCES = core.ml 
 
 ML_INTERFACES = button.mli keycode.mli event.mli
 
@@ -48,15 +49,17 @@ ML_OBJ = $(ML_SOURCES:.ml=.cmo)
 
 ML_NAT = $(ML_SOURCES:.ml=.cmx)
 
+ML_CMIS = $(ML_INTERFACES:.mli=.cmi)
+
 
 
 # Compilation
 
 default: .depend core_lib
 
-core_lib: ml_stubs $(STUBS_TARGETS) $(ML_OBJ) $(ML_NAT)
-	$(OCAMLFIND) $(OCAMLOPT) -pack -o ogamlCore.cmx $(OS_WIN_LIB)/$(OS_WIN_LIB).cmx $(ML_NAT);
-	$(OCAMLFIND) $(OCAMLC) -pack -o ogamlCore.cmo $(OS_WIN_LIB)/$(OS_WIN_LIB).cmo $(ML_OBJ);
+core_lib: ml_stubs $(STUBS_TARGETS) $(ML_CMIS) $(ML_OBJ) $(ML_NAT)
+	$(OCAMLFIND) $(OCAMLOPT) -pack -o ogamlCore.cmx $(OS_WIN_LIB)/$(OS_WIN_LIB).cmx $(ML_CMIS) $(ML_NAT);
+	$(OCAMLFIND) $(OCAMLC) -pack -o ogamlCore.cmo $(OS_WIN_LIB)/$(OS_WIN_LIB).cmo $(ML_CMIS) $(ML_OBJ);
 	$(OCAMLFIND) $(OCAMLMKLIB) -o ogamlCore ogamlCore.cmx ogamlCore.cmo\
 	  $(STUBS_OBJECTS) -ccopt '"$(GLOBAL_CLIBS)"'
 

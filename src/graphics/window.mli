@@ -26,7 +26,7 @@ val is_open : t -> bool
 val has_focus : t -> bool
 
 (** Return the event at the top of the stack, if it exists *)
-val poll_event : t -> Event.t option
+val poll_event : t -> OgamlCore.Event.t option
 
 (** Display the window after the GL calls *)
 val display : t -> unit
@@ -34,10 +34,17 @@ val display : t -> unit
 (** Draws a vertex array *)
 val draw : 
   window     : t -> 
-  vertices   : 'a OgamlGL.VertexArray.t -> 
-  program    : OgamlGL.Program.t -> 
-  uniform    : OgamlGL.Uniform.t ->
-  parameters : OgamlGL.DrawParameter.t -> unit
+  vertices   : 'a VertexArray.t -> 
+  program    : Program.t -> 
+  uniform    : Uniform.t ->
+  parameters : DrawParameter.t -> unit
 
 (** Clears the window *)
 val clear : t -> color:bool -> depth:bool -> stencil:bool -> unit
+
+(** Returns the internal GL state of the window *)
+val state : t -> State.t
+
+(** Returns the internal window of this window, should only be used internally *)
+val internal : t -> OgamlCore.Core.Window.t
+

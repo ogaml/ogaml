@@ -1,6 +1,5 @@
+open OgamlGraphics
 open OgamlMath
-open OgamlWindow
-open OgamlGL
 
 let window = Window.create ~width:800 ~height:600
 
@@ -30,6 +29,7 @@ let cube_source = VertexArray.(Source.(
 let buffer = VertexArray.static cube_source
 
 let program = Program.from_source_list
+  (Window.state window)
   ~vertex_source:[
     (130, "#version 130
     
@@ -148,6 +148,7 @@ let rec update_camera () =
 
 (* Event loop *)
 let rec event_loop () =
+  let open OgamlCore in
   match Window.poll_event window with
   |Some e -> begin
     match e with
