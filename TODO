@@ -61,12 +61,40 @@ Window part:
   ✔ Parameterize Button events with position & button @commented_out @done(2015-10-31 23:58) @project(Window part)
   ✔ Parameterize Movement events with position @commented_out @done(2015-10-31 23:58) @project(Window part)
   ✘ Put shared code directly in ogamlWindow.ml (like the Event module ?) -- use packs @cancelled(2015-10-21 17:45) @project(Window part)
+  ☐ Maybe merge window_impl and mouse_impl... it would probably be cleaner
   ☐ Window titles
   ☐ Window attributes abstract type ? May contain title, size, etc @unsure
   ☐ Same for GL context attributes ? @unsure
   ☐ Real-time state Keyboard module
   ✔ Real-time state Mouse module @done(2015-11-01 23:59) @project(Window part)
   ✔ Graphical functions display & clear - requires binding GLX for X11 ** @done(2015-10-29 18:33) @project(Window part)
+
+New GL Implementation :
+  ☐ Base
+    ✔ Implement State @done(2015-11-04 15:10) @project(New GL Implementation)
+    ✔ Implement Internal.Texture @done(2015-11-05 00:25) @project(New GL Implementation)
+    ✔ Implement Texture @done(2015-11-05 01:22) @project(New GL Implementation)
+    ✔ Implement Internal.Shader @done(2015-11-05 10:44) @project(New GL Implementation)
+    ✘ Implement Shader -- Hidden in program @cancelled(2015-11-05 10:45) @project(New GL Implementation)
+    ✔ Implement Internal.Program @done(2015-11-05 13:09) @project(New GL Implementation)
+    ✔ Implement Program @done(2015-11-05 20:06) @project(New GL Implementation)
+    ✔ Implement Internal.VBO @done(2015-11-06 10:07) @project(New GL Implementation)
+    ✔ Implement Internal.VAO @done(2015-11-06 10:07) @project(New GL Implementation)
+    ✔ Implement Uniform @done(2015-11-06 11:04) @project(New GL Implementation)
+    ✔ Implement DrawParameter @done(2015-11-06 10:33) @project(New GL Implementation)
+    ✔ Implement VertexArray @done(2015-11-06 19:02) @project(New GL Implementation)
+    ✔ Update State @done(2015-11-06 18:08) @project(New GL Implementation)
+    ✔ Hide State.t in Window @done(2015-11-06 19:56) @project(New GL Implementation)
+    ✔ Implement window draw and clear functions @done(2015-11-06 22:18) @project(New GL Implementation)
+    ✔ Rework cube test @done(2015-11-06 23:31) @project(New GL Implementation)
+    ☐ Add error for shader creation
+    ☐ Add error for program creation
+    ☐ Better program creation (auto versioning)
+    ☐ Hide uniform & attribute locations ?
+    ☐ Move Uniform externals to Internal and remove all Field(data,0) in uniform bindings
+    ✔ Hide Data.t ? & more data conversions @done(2015-11-06 17:57) @project(New GL Implementation)
+    ☐ Safe destroy function for VertexArrays
+    ☐ Clean Enum according to what can be hidden in Internal
 
 Math part:
   ✔ Fix a notation convention @done(2015-10-29 18:32) @project(Math part)
@@ -75,17 +103,21 @@ Math part:
   ✔ Write tests @done(2015-10-29 18:32) @project(Math part)
   ✔ Implement Matrix3f @done(2015-10-24 11:10) @project(Math part)
   ☐ Implement Vector3i
+  ☐ Implement Vector2i and Vector2f
   ✔ Add more complex functions to matrix3f (look_at, clipping, etc...) @done(2015-10-24 11:55) @project(Math part)
   ✔ Debug matrices... Really @done(2015-10-25 09:17) @project(Math part)
   ✔ Recode inverse matrices after debugging @done(2015-10-25 09:20) @project(Math part)
-  ☐ Matrices and vector exceptions
+  ☐ Matrices, quaternions and vector exceptions
   ✔ Implement Quaternions @done(2015-11-01 00:03) @project(Math part)
   ✔ Implement polygons @done(2015-10-26 16:33) @project(Math part)
   ☐ Parameterize Poly.axis with vector3f
   ✔ Rename matrix3f in matrix3D @done(2015-10-30 10:08) @project(Math part)
 
 GL part:
-  ☐ Let the user choose the usage of a vbo when setting data
+  ✔ Implement indexing (high priority !!) @done(2015-11-02 21:38) @project(GL part)
+  ☐ Implement OBJ loading in Model
+  ☐ Implement model creation - modification in Model
+  ☐ Move Polys to GL and output models rather than float arrays
   ✔ Implement glGetString in config for debug @done(2015-10-29 13:21) @project(GL part)
   ✔ Bind face culling, front_face @done(2015-10-26 21:31) @project(GL part)
   ✔ Bind gl_enable and options @done(2015-10-26 19:35) @project(GL part)
@@ -111,5 +143,7 @@ GL part:
   ✔ Implement Texture @done(2015-11-02 20:07) @project(GL part)
   ☐ Organize image parsing
   ☐ Better support for all formats (for example 24,32 bit bmps)
-  ☐ Add other kinds of textures
+  ☐ Add other kinds of textures @unsure
   ✔ Let the user choose the active texture when binding @done(2015-11-02 20:07) @project(GL part)
+
+

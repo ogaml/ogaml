@@ -3,72 +3,38 @@ include common_defs.mk
 
 # Window constants
 
-INCLUDES = -I src/wm -I src/wm/$(strip $(OS_WIN_STUBS_DIR)) -I src/math -I src/gl
+INCLUDES = -I src/core -I src/math -I src/graphics
 
-MODULES = $(OS_WIN_STUBS).cmxa ogamlMath.cmxa ogamlGL.cmxa ogamlWindow.cmxa
-
-GL_FILES = src/gl/*.a src/gl/*.cmx src/gl/*.cmi src/gl/*.mli src/gl/*.cma src/gl/*.cmxa src/gl/*.cmo
-
-MATH_FILES = src/math/*.a src/math/*.cmx src/math/*.cmi src/math/*.mli src/math/*.cma src/math/*.cmxa src/math/*.cmo
-
-WINDOW_FILES = src/wm/*.a src/wm/*.cmx src/wm/*.cmi src/wm/*.mli src/wm/*.cma src/wm/*.cmxa src/wm/*.cmo
-
-WMLIB_FILES = src/wm/$(strip $(OS_WIN_STUBS_DIR))*.a   src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmx\
-	      src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmi src/wm/$(strip $(OS_WIN_STUBS_DIR))*.mli\
-	      src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmxa #src/wm/$(strip $(OS_WIN_STUBS_DIR))*.so\
-	      #src/wm/$(strip $(OS_WIN_STUBS_DIR))*.cmo
+MODULES = ogamlMath.cmxa ogamlCore.cmxa ogamlGraphics.cmxa
 
 PACKAGES = -package bigarray,unix
-
-WINDOW_TEST = src/test/test_glcube.ml
-
-MATH_TEST = src/test/math_test.ml
-
-STUBS_TEST = src/test/$(strip $(OS_WIN_STUBS_TEST)).ml
-
-
-# Constants
-
-OUTPUT = main.out
 
 
 # Compilation
 
-default: window_test
-
-window_lib: gl_lib
-	cd src/wm/ && make
+default: math_lib core_lib graphics_lib
 
 math_lib:
 	cd src/math/ && make
 
-gl_lib: math_lib
-	cd src/gl/ && make
+core_lib: 
+	cd src/core/ && make
 
-window_test: window_lib math_lib gl_lib
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(INCLUDES)\
-	  $(MODULES) $(WINDOW_TEST)
+graphics_lib: core_lib math_lib
+	cd src/graphics/ && make
 
-math_test: math_lib
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(INCLUDES)\
-	  $(MODULES) $(MATH_TEST)
+example: math_lib core_lib graphics_lib
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) examples/cube.ml -o main.out
 
-stubs_test: stubs_lib math_lib gl_lib
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -o $(OUTPUT) $(PACKAGES) $(INCLUDES)\
-	  $(MODULES) $(STUBS_TEST)
-
-stubs_lib:
-	cd src/wm/$(strip $(OS_WIN_STUBS_DIR)) && make
-
-install:
-	$(OCAMLFIND) install ogaml META $(GL_FILES) $(MATH_FILES) $(WINDOW_FILES) $(WMLIB_FILES)
-
-uninstall:
-	$(OCAMLFIND) remove "ogaml"
+tests: math_lib core_lib graphics_lib
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/programs.ml -o main.out && ./main.out &&\
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/vertexarrays.ml -o main.out && ./main.out &&\
+	echo "Tests passed !"
 
 clean:
 	rm -rf *.out;
-	cd src/wm/ && make clean;
-	cd src/test/ && make clean;
+	cd src/core/ && make clean;
 	cd src/math/ && make clean;
-	cd src/gl/ && make clean
+	cd src/graphics/ && make clean;
+	cd tests/ && make clean
+
