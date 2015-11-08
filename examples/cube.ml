@@ -21,6 +21,7 @@ let cube_source =
   let src = VertexArray.Source.empty 
     ~position:"in_position" 
     ~color:"in_color" 
+    ~normal:"in_normal"
     ~size:36 () 
   in
   Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
@@ -35,6 +36,10 @@ let default_program =
     ~vertex_source:(`File "examples/default_shader.vert")
     ~fragment_source:(`File "examples/default_shader.frag")
 
+let normal_program =
+  Program.from_source_pp (Window.state window)
+    ~vertex_source:(`File "examples/normals_shader.vert")
+    ~fragment_source:(`File "examples/normals_shader.frag")
 
 (* Display computations *)
 let proj = Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
@@ -54,8 +59,9 @@ let display () =
   let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
   let model = Matrix3D.rotation rot_vector !rot_angle in
   let vp = Matrix3D.product proj view in
+  let mv = Matrix3D.product view model in
   let mvp = Matrix3D.product vp model in
-  rot_angle := !rot_angle +. (abs_float (cos (Unix.gettimeofday ()) /. 10.));
+  rot_angle := !rot_angle +. (abs_float (cos t /. 10.)) /. 3.;
   let parameters =
     DrawParameter.(make 
       ~depth_test:true 
@@ -64,8 +70,10 @@ let display () =
   let uniform =
     Uniform.empty
     |> Uniform.matrix3D "MVPMatrix" mvp
+    |> Uniform.matrix3D "MVMatrix" mv
+    |> Uniform.matrix3D "VMatrix" view
   in
-  Window.draw ~window ~vertices:cube ~uniform ~program:default_program ~parameters;
+  Window.draw ~window ~vertices:cube ~uniform ~program:normal_program ~parameters;
   let uniform =
     Uniform.empty
     |> Uniform.matrix3D "MVPMatrix" vp

@@ -1,4 +1,6 @@
-uniform mat4 VPMatrix;
+uniform mat4 MVMatrix;
+
+uniform mat4 VMatrix;
 
 in vec4 out_color;
 
@@ -6,16 +8,16 @@ in vec3 out_normal;
 
 out vec4 frag_color;
 
-vec3 LightDir = vec3(-4., -5., -3.);
-vec3 AmbientIntensity = vec3(0.20, 0.20, 0.20);
-float SunIntensity = 1.5;
+vec3 LightDir = vec3(-4., -2., -3.);
+vec3 AmbientIntensity = vec3(0.30, 0.30, 0.30);
+float SunIntensity = 1.6;
 float MaxIntensity = 1.0;
 float Gamma = 1.2;
 
 void main() {
 
-  vec4 NormalCameraSpace = normalize(VPMatrix * vec4(out_normal,0.));
-  vec4 LightCameraSpace  = normalize(VPMatrix * vec4(-LightDir,0.));
+  vec4 NormalCameraSpace = normalize(MVMatrix * vec4(out_normal,0.));
+  vec4 LightCameraSpace  = normalize(VMatrix * vec4(-LightDir,0.));
 
   float CosIncidence = dot(NormalCameraSpace.xyz, LightCameraSpace.xyz);
 	CosIncidence = CosIncidence < 0.001 ? 0.0 : CosIncidence;
