@@ -112,7 +112,7 @@ module Window = struct
       | "y" | "Y" -> Y
       | "z" | "Z" -> Z
       | _ -> begin
-          match key_info.keycode with
+          match Cocoa.OGEvent.(key_info.keycode) with
           | 18  -> Num1
           | 19  -> Num2
           | 20  -> Num3
@@ -168,7 +168,7 @@ module Window = struct
           | _   -> Unknown
       end
     ) in
-    let modifiers = key_info.modifier_flags in
+    let modifiers = Cocoa.OGEvent.(key_info.modifier_flags) in
     let (shift,control,alt) = Cocoa.NSEvent.(
       List.mem NSShiftKeyMask     modifiers,
       List.mem NSCommandKeyMask   modifiers,
