@@ -40,7 +40,7 @@ module Source = struct
     texcoord : string option;
     normal   : string option;
     color    : string option;
-    data     : Internal.Data.t;
+    data     : GL.Data.t;
   }
 
   let empty ?position ?normal ?texcoord ?color ~size () = 
@@ -54,7 +54,7 @@ module Source = struct
       texcoord;
       normal;
       color;
-      data = Internal.Data.create size
+      data = GL.Data.create size
     }
 
   let requires_position s = s.position <> None
@@ -72,7 +72,7 @@ module Source = struct
         raise (Invalid_vertex "Missing vertex position")
       |Some _ when src.position = None ->
         raise (Invalid_vertex "Vertex position not required by source")
-      |Some vec -> Internal.Data.add_3f src.data vec
+      |Some vec -> GL.Data.add_3f src.data vec
       | _ -> ()
     end;
     begin 
@@ -81,7 +81,7 @@ module Source = struct
         raise (Invalid_vertex "Missing texture coordinate")
       |Some _ when src.texcoord = None ->
         raise (Invalid_vertex "Texture coordinate not required by source")
-      |Some vec -> Internal.Data.add_2f src.data vec
+      |Some vec -> GL.Data.add_2f src.data vec
       | _ -> ()
     end;
     begin 
@@ -90,7 +90,7 @@ module Source = struct
         raise (Invalid_vertex "Missing vertex normal")
       |Some _ when src.normal = None ->
         raise (Invalid_vertex "Vertex normal not required by source")
-      |Some vec -> Internal.Data.add_3f src.data vec
+      |Some vec -> GL.Data.add_3f src.data vec
       | _ -> ()
     end;
     begin 
@@ -99,7 +99,7 @@ module Source = struct
         raise (Invalid_vertex "Missing vertex color")
       |Some _ when src.color = None ->
         raise (Invalid_vertex "Vertex color not required by source")
-      |Some vec -> Internal.Data.add_color src.data vec
+      |Some vec -> GL.Data.add_color src.data vec
       | _ -> ()
     end;
     src
@@ -124,10 +124,10 @@ module Source = struct
                       Color   , src.color]
 
   let type_of_attrib = function
-    |Position -> Enum.GlslType.Float3
-    |Color    -> Enum.GlslType.Float4
-    |Normal   -> Enum.GlslType.Float3
-    |Texcoord -> Enum.GlslType.Float2
+    |Position -> GL.Types.GlslType.Float3
+    |Color    -> GL.Types.GlslType.Float4
+    |Normal   -> GL.Types.GlslType.Float3
+    |Texcoord -> GL.Types.GlslType.Float2
 
   let stride src = 
     List.fold_left (fun v (t,_,_) -> v + size_of_attrib t) 0 (attribs src)
@@ -140,28 +140,28 @@ type static = unit
 type dynamic = unit
 
 type _ t = {
-  buffer  : Internal.VBO.t;
-  vao     : Internal.VAO.t;
+  buffer  : GL.VBO.t;
+  vao     : GL.VAO.t;
   size    : int;
   length  : int;
   attribs : (Source.attrib * string * int) list;
   stride  : int;
-  mode    : Enum.DrawMode.t;
+  mode    : DrawMode.t;
   mutable bound : Program.t option;
   mutable valid : bool
 }
 
 let dynamic src mode = 
-  let vao    = Internal.VAO.create () in
-  let buffer = Internal.VBO.create () in
+  let vao    = GL.VAO.create () in
+  let buffer = GL.VBO.create () in
   let data = src.Source.data in
-  Internal.VBO.bind (Some buffer);
-  Internal.VBO.data (Internal.Data.length data * 4) (Some data) (Enum.VBOKind.DynamicDraw);
-  Internal.VBO.bind None;
+  GL.VBO.bind (Some buffer);
+  GL.VBO.data (GL.Data.length data * 4) (Some data) (GL.Types.VBOKind.DynamicDraw);
+  GL.VBO.bind None;
   {
    buffer; vao; 
-   size = Internal.Data.length data;
-   length = Internal.Data.length data; 
+   size = GL.Data.length data;
+   length = GL.Data.length data; 
    attribs = Source.attribs src;
    stride = Source.stride src;
    mode;  
@@ -170,16 +170,16 @@ let dynamic src mode =
   }
 
 let static src mode = 
-  let vao    = Internal.VAO.create () in
-  let buffer = Internal.VBO.create () in
+  let vao    = GL.VAO.create () in
+  let buffer = GL.VBO.create () in
   let data = src.Source.data in
-  Internal.VBO.bind (Some buffer);
-  Internal.VBO.data (Internal.Data.length data * 4) (Some data) (Enum.VBOKind.StaticDraw);
-  Internal.VBO.bind None;
+  GL.VBO.bind (Some buffer);
+  GL.VBO.data (GL.Data.length data * 4) (Some data) (GL.Types.VBOKind.StaticDraw);
+  GL.VBO.bind None;
   {
    buffer; vao; 
-   size = Internal.Data.length data;
-   length = Internal.Data.length data; 
+   size = GL.Data.length data;
+   length = GL.Data.length data; 
    attribs = Source.attribs src;
    stride = Source.stride src;
    mode;
@@ -191,16 +191,16 @@ let rebuild t src mode =
   if not t.valid then
     raise (Invalid_buffer "Cannot rebuild buffer, it may have been destroyed");
   let data = src.Source.data in
-  Internal.VBO.bind (Some t.buffer);
-  if t.size < Internal.Data.length data then
-    Internal.VBO.data (Internal.Data.length data * 4) None (Enum.VBOKind.DynamicDraw);
-  Internal.VBO.subdata 0 (Internal.Data.length data * 4) data;
-  Internal.VBO.bind None;
+  GL.VBO.bind (Some t.buffer);
+  if t.size < GL.Data.length data then
+    GL.VBO.data (GL.Data.length data * 4) None (GL.Types.VBOKind.DynamicDraw);
+  GL.VBO.subdata 0 (GL.Data.length data * 4) data;
+  GL.VBO.bind None;
   {
    buffer = t.buffer;
    vao    = t.vao;
-   size   = max (Internal.Data.length data) (t.size);
-   length = Internal.Data.length data;
+   size   = max (GL.Data.length data) (t.size);
+   length = GL.Data.length data;
    attribs = Source.attribs src;
    stride = Source.stride src;
    mode;
@@ -213,10 +213,10 @@ let bind state t prog =
     raise (Invalid_buffer "Cannot bind buffer, it may have been destroyed");
   if t.bound <> Some prog then begin
     t.bound <- Some prog;
-    Internal.VAO.bind (Some t.vao);
-    State.set_bound_vao state (Some t.vao);
-    Internal.VBO.bind (Some t.buffer);
-    State.set_bound_vbo state (Some t.buffer);
+    GL.VAO.bind (Some t.vao);
+    State.LL.set_bound_vao state (Some t.vao);
+    GL.VBO.bind (Some t.buffer);
+    State.LL.set_bound_vbo state (Some t.buffer);
     let attribs = ref t.attribs in
     let rec find_remove s = function
       | [] -> 
@@ -228,7 +228,7 @@ let bind state t prog =
         let (e,off,l) = find_remove s t in 
         (e,off,h::l)
     in
-    Program.iter_attributes prog 
+    Program.LL.iter_attributes prog 
       (fun att ->
         let (typ,offset,l) = find_remove (Program.Attribute.name att) !attribs in
         attribs := l;
@@ -237,11 +237,11 @@ let bind state t prog =
             (Printf.sprintf "Attribute %s has invalid type"
               (Program.Attribute.name att)
             ));
-        Internal.VAO.enable_attrib (Program.Attribute.location att);
-        Internal.VAO.attrib_float 
+        GL.VAO.enable_attrib (Program.Attribute.location att);
+        GL.VAO.attrib_float 
           (Program.Attribute.location att)
           (Source.size_of_attrib typ)
-          (Enum.GlFloatType.Float)
+          (GL.Types.GlFloatType.Float)
           (offset   * 4)
           (t.stride * 4)
       );
@@ -251,25 +251,27 @@ let bind state t prog =
           (let (_,s,_) = List.hd !attribs in s)
         ))
   end
-  else if State.bound_vao state <> (Some t.vao) then begin
-    Internal.VAO.bind (Some t.vao);
-    State.set_bound_vao state (Some t.vao);
-    State.set_bound_vbo state (Some t.buffer);
+  else if State.LL.bound_vao state <> (Some t.vao) then begin
+    GL.VAO.bind (Some t.vao);
+    State.LL.set_bound_vao state (Some t.vao);
+    State.LL.set_bound_vbo state (Some t.buffer);
   end
-
-let draw state t prog = 
-  if not t.valid then
-    raise (Invalid_buffer "Cannot draw buffer, it may have been destroyed");
-  bind state t prog;
-  Internal.VAO.draw t.mode 0 (t.length * 4)
 
 let length t = t.length
 
 let destroy t =
   if not t.valid then
     raise (Invalid_buffer "Cannot destroy buffer : already destroyed");
-  Internal.VAO.destroy t.vao;
-  Internal.VBO.destroy t.buffer;
+  GL.VAO.destroy t.vao;
+  GL.VBO.destroy t.buffer;
   t.valid <- false
 
+module LL = struct
 
+  let draw state t prog = 
+    if not t.valid then
+      raise (Invalid_buffer "Cannot draw buffer, it may have been destroyed");
+    bind state t prog;
+    GL.VAO.draw t.mode 0 (t.length * 4)
+
+end

@@ -24,6 +24,10 @@ val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> t
 (** Adds a color to a uniform structure *)
 val color : string -> Color.t -> t -> t
 
-(** Binds a value to a program uniform *)
-val bind : t -> Program.Uniform.t -> unit
 
+module LL : sig
+
+  (** Binds a value to a program uniform *)
+  val bind : t -> Program.Uniform.t -> unit
+
+end

@@ -22,12 +22,12 @@ module Uniform : sig
   val name : t -> string
 
   (** Returns the type of a uniform *)
-  val kind : t -> Enum.GlslType.t
+  val kind : t -> GL.Types.GlslType.t
 
   (** Returns the location of a uniform.
     * This is a low-level value and should only be
     * used internally *)
-  val location : t -> Internal.Program.u_location
+  val location : t -> GL.Program.u_location
 
 end
 
@@ -42,12 +42,12 @@ module Attribute : sig
   val name : t -> string
 
   (** Returns the type of an attribute *)
-  val kind : t -> Enum.GlslType.t
+  val kind : t -> GL.Types.GlslType.t
 
   (** Returns the location of an attribute.
     * This is a low-level value and should only be
     * used internally *)
-  val location : t -> Internal.Program.a_location
+  val location : t -> GL.Program.a_location
 
 end
 
@@ -75,14 +75,17 @@ val from_source_pp : State.t
                      -> vertex_source:src
                      -> fragment_source:src -> t
 
-(** Activates the program for use in the next rendering 
-  * pass. Used internally by Ogaml, usually not needed. *)
-val use : State.t -> t option -> unit
+module LL : sig
 
-(** Iterates on the uniforms of a program *)
-val iter_uniforms : t -> (Uniform.t -> unit) -> unit
+  (** Activates the program for use in the next rendering 
+    * pass. Used internally by Ogaml, usually not needed. *)
+  val use : State.t -> t option -> unit
 
-(** Iterates on the attributes of a program *)
-val iter_attributes : t -> (Attribute.t -> unit) -> unit
+  (** Iterates on the uniforms of a program *)
+  val iter_uniforms : t -> (Uniform.t -> unit) -> unit
 
+  (** Iterates on the attributes of a program *)
+  val iter_attributes : t -> (Attribute.t -> unit) -> unit
+
+end
 

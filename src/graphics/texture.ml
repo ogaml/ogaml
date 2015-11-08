@@ -4,38 +4,41 @@ module Texture2D = struct
 
 
   type t = {
-    internal  : Internal.Texture.t;
+    internal  : GL.Texture.t;
     width     : int;
     height    : int;
   }
 
+  module LL = struct
 
-  let bind st tex = 
-    let bound_tex = 
-      State.bound_texture 
-        st (State.texture_unit st) 
-        Enum.TextureTarget.Texture2D 
-    in
-    match tex with
-    |None when bound_tex <> None -> begin
-      State.set_bound_texture
-        st (State.texture_unit st)
-        Enum.TextureTarget.Texture2D
-        None;
-      Internal.Texture.bind 
-        Enum.TextureTarget.Texture2D
-        None
-    end
-    |Some(t) when bound_tex <> Some t.internal -> begin
-      State.set_bound_texture
-        st (State.texture_unit st)
-        Enum.TextureTarget.Texture2D
-        (Some t.internal);
-      Internal.Texture.bind 
-        Enum.TextureTarget.Texture2D
-        (Some t.internal)
-    end
-    | _ -> ()
+    let bind st tex = 
+      let bound_tex = 
+        State.LL.bound_texture 
+          st (State.LL.texture_unit st) 
+          GL.Types.TextureTarget.Texture2D 
+      in
+      match tex with
+      |None when bound_tex <> None -> begin
+        State.LL.set_bound_texture
+          st (State.LL.texture_unit st)
+          GL.Types.TextureTarget.Texture2D
+          None;
+        GL.Texture.bind 
+          GL.Types.TextureTarget.Texture2D
+          None
+      end
+      |Some(t) when bound_tex <> Some t.internal -> begin
+        State.LL.set_bound_texture
+          st (State.LL.texture_unit st)
+          GL.Types.TextureTarget.Texture2D
+          (Some t.internal);
+        GL.Texture.bind 
+          GL.Types.TextureTarget.Texture2D
+          (Some t.internal)
+      end
+      | _ -> ()
+
+  end
 
 
   let create st src = 
@@ -51,22 +54,22 @@ module Texture2D = struct
         x, y, Image.data img
     in
     (* Create the internal texture *)
-    let internal = Internal.Texture.create () in
+    let internal = GL.Texture.create () in
     let tex = {internal; width; height} in
     (* Bind the texture *)
-    bind st (Some tex);
+    LL.bind st (Some tex);
     (* Load the corresponding image *)
-    Internal.Texture.image
-      Enum.TextureTarget.Texture2D
-      Enum.PixelFormat.RGBA
+    GL.Texture.image
+      GL.Types.TextureTarget.Texture2D
+      GL.Types.PixelFormat.RGBA
       (width, height)
-      Enum.TextureFormat.RGBA
+      GL.Types.TextureFormat.RGBA
       data;
     (* Set the parameters *)
-    Internal.Texture.parameter2D 
-      (`Magnify Enum.MagnifyFilter.Nearest);
-    Internal.Texture.parameter2D
-      (`Minify  Enum.MinifyFilter.Nearest);
+    GL.Texture.parameter2D 
+      (`Magnify GL.Types.MagnifyFilter.Nearest);
+    GL.Texture.parameter2D
+      (`Minify  GL.Types.MinifyFilter.Nearest);
     (* Return the texture *)
     tex
 
@@ -75,4 +78,5 @@ module Texture2D = struct
     (tex.width, tex.height)
 
 
+  
 end

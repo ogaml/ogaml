@@ -8,7 +8,7 @@ exception Invalid_version of string
 
 module Uniform = struct
 
-  type t = {name : string; kind : Enum.GlslType.t; location : Internal.Program.u_location}
+  type t = {name : string; kind : GL.Types.GlslType.t; location : GL.Program.u_location}
 
   let name u = u.name
 
@@ -21,7 +21,7 @@ end
 
 module Attribute = struct
 
-  type t = {name : string; kind : Enum.GlslType.t; location : Internal.Program.a_location}
+  type t = {name : string; kind : GL.Types.GlslType.t; location : GL.Program.a_location}
 
   let name a = a.name
 
@@ -33,9 +33,9 @@ end
 
 
 type t = { 
-           program    : Internal.Program.t; 
-           vertex     : Internal.Shader.t;
-           fragment   : Internal.Shader.t;
+           program    : GL.Program.t; 
+           vertex     : GL.Shader.t;
+           fragment   : GL.Shader.t;
            uniforms   : Uniform.t   list;
            attributes : Attribute.t list
          }
@@ -56,41 +56,41 @@ let to_source = function
 let from_source ~vertex_source ~fragment_source =
   let vertex_source   = to_source vertex_source   in
   let fragment_source = to_source fragment_source in
-  let program = Internal.Program.create () in
-  let vshader = Internal.Shader.create Enum.ShaderType.Vertex   in
-  let fshader = Internal.Shader.create Enum.ShaderType.Fragment in
-  if not (Internal.Shader.valid vshader) ||
-     not (Internal.Shader.valid fshader) ||
-     not (Internal.Program.valid program) then
+  let program = GL.Program.create () in
+  let vshader = GL.Shader.create GL.Types.ShaderType.Vertex   in
+  let fshader = GL.Shader.create GL.Types.ShaderType.Fragment in
+  if not (GL.Shader.valid vshader) ||
+     not (GL.Shader.valid fshader) ||
+     not (GL.Program.valid program) then
     raise (Compilation_error "Failed to create a GLSL program , the GL context may not be initialized");
-  Internal.Shader.source vshader vertex_source;
-  Internal.Shader.source fshader fragment_source;
-  Internal.Shader.compile vshader;
-  Internal.Shader.compile fshader;
-  if Internal.Shader.status vshader = false then begin
-    let log = Internal.Shader.log vshader in
+  GL.Shader.source vshader vertex_source;
+  GL.Shader.source fshader fragment_source;
+  GL.Shader.compile vshader;
+  GL.Shader.compile fshader;
+  if GL.Shader.status vshader = false then begin
+    let log = GL.Shader.log vshader in
     let msg = Printf.sprintf "Error while compiling vertex shader : %s" log in
     raise (Compilation_error msg)
   end;
-  if Internal.Shader.status fshader = false then begin
-    let log = Internal.Shader.log fshader in
+  if GL.Shader.status fshader = false then begin
+    let log = GL.Shader.log fshader in
     let msg = Printf.sprintf "Error while compiling fragment shader : %s" log in
     raise (Compilation_error msg)
   end;
-  Internal.Program.attach program vshader;
-  Internal.Program.attach program fshader;
-  Internal.Program.link program;
-  if Internal.Program.status program = false then begin
-    let log = Internal.Program.log program in
+  GL.Program.attach program vshader;
+  GL.Program.attach program fshader;
+  GL.Program.link program;
+  if GL.Program.status program = false then begin
+    let log = GL.Program.log program in
     let msg = Printf.sprintf "Error while linking GLSL program : %s" log in
     raise (Linking_error msg)
   end;
   let rec uniforms = function
     |0 -> []
     |n -> begin
-      let name = Internal.Program.uname program (n - 1) in
-      let kind = Internal.Program.utype program (n - 1) in
-      let location = Internal.Program.uloc program name in
+      let name = GL.Program.uname program (n - 1) in
+      let kind = GL.Program.utype program (n - 1) in
+      let location = GL.Program.uloc program name in
       {
         Uniform.name = name; 
         Uniform.kind = kind; 
@@ -101,9 +101,9 @@ let from_source ~vertex_source ~fragment_source =
   let rec attributes = function
     |0 -> []
     |n -> begin
-      let name = Internal.Program.aname program (n - 1) in
-      let kind = Internal.Program.atype program (n - 1) in
-      let location = Internal.Program.aloc program name in
+      let name = GL.Program.aname program (n - 1) in
+      let kind = GL.Program.atype program (n - 1) in
+      let location = GL.Program.aloc program name in
       {
         Attribute.name = name; 
         Attribute.kind = kind; 
@@ -115,8 +115,8 @@ let from_source ~vertex_source ~fragment_source =
     program;
     vertex   = vshader;
     fragment = fshader;
-    uniforms = uniforms (Internal.Program.ucount program);
-    attributes = attributes (Internal.Program.acount program);
+    uniforms = uniforms (GL.Program.ucount program);
+    attributes = attributes (GL.Program.acount program);
   }
  
 
@@ -151,21 +151,23 @@ let from_source_pp st ~vertex_source ~fragment_source =
     ~fragment_source:(`String fsource)
 
 
-let use state prog = 
-  match prog with
-  |None when State.linked_program state <> None -> begin
-    State.set_linked_program state None;
-    Internal.Program.use None
-  end
-  |Some(p) when State.linked_program state <> Some p.program -> begin
-    State.set_linked_program state (Some p.program);
-    Internal.Program.use (Some p.program);
-  end
-  | _ -> ()
+module LL = struct
+
+  let use state prog = 
+    match prog with
+    |None when State.LL.linked_program state <> None -> begin
+      State.LL.set_linked_program state None;
+      GL.Program.use None
+    end
+    |Some(p) when State.LL.linked_program state <> Some p.program -> begin
+      State.LL.set_linked_program state (Some p.program);
+      GL.Program.use (Some p.program);
+    end
+    | _ -> ()
 
 
-let iter_uniforms prog f = List.iter f prog.uniforms
+  let iter_uniforms prog f = List.iter f prog.uniforms
 
-let iter_attributes prog f = List.iter f prog.attributes
+  let iter_attributes prog f = List.iter f prog.attributes
 
-
+end

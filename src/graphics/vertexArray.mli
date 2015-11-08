@@ -49,14 +49,20 @@ type dynamic
 
 type 'a t 
 
-val static : Source.t -> Enum.DrawMode.t -> static t
+val static : Source.t -> DrawMode.t -> static t
 
-val dynamic : Source.t -> Enum.DrawMode.t -> dynamic t
+val dynamic : Source.t -> DrawMode.t -> dynamic t
 
-val rebuild : dynamic t -> Source.t -> Enum.DrawMode.t -> dynamic t
-
-val draw : State.t -> 'a t -> Program.t -> unit
+val rebuild : dynamic t -> Source.t -> DrawMode.t -> dynamic t
 
 val length : 'a t -> int
 
 val destroy : 'a t -> unit
+
+
+module LL : sig
+
+  val draw : State.t -> 'a t -> Program.t -> unit
+
+end
+
