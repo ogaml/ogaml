@@ -43,6 +43,15 @@ caml_create_shader(value type)
 }
 
 
+// INPUT   a shader
+// OUTPUT  true iff it is valid
+CAMLprim value
+caml_valid_shader(value shader)
+{
+  CAMLparam1(shader);
+  CAMLreturn(Val_bool((GLuint)shader != 0));
+}
+
 // INPUT   a shader id, a source
 // OUTPUT  nothing, changes the source code of the shader
 CAMLprim value

@@ -50,10 +50,10 @@ module Pervasives : sig
   val color : float -> float -> float -> float -> unit
 
   (** Sets the current culling mode *)
-  val culling : Enum.CullingMode.t -> unit
+  val culling : DrawParameter.CullingMode.t -> unit
 
   (** Sets the current polygon mode *)
-  val polygon : Enum.PolygonMode.t -> unit
+  val polygon : DrawParameter.PolygonMode.t -> unit
 
   (** Returns the current glsl version *)
   val glsl_version : unit -> string
@@ -105,6 +105,9 @@ module Shader : sig
   (** Creates an empty shader *)
   val create : Enum.ShaderType.t -> t
 
+  (** Returns true iff the shader is valid *)
+  val valid : t -> bool
+
   (** Adds a source to a shader *)
   val source : t -> string -> unit
 
@@ -126,8 +129,17 @@ module Program : sig
   (** Abstract program type *)
   type t
 
+  (** Abstract uniform location *)
+  type u_location
+
+  (** Abstract attribute location *)
+  type a_location
+
   (** Creates an empty program *)
   val create : unit -> t
+
+  (** Returns true iff the program is valid *)
+  val valid : t -> bool
 
   (** Attaches a shader to a program *)
   val attach : t -> Shader.t -> unit
@@ -136,10 +148,10 @@ module Program : sig
   val link : t -> unit
 
   (** Returns the location of a uniform *)
-  val uloc : t -> string -> int
+  val uloc : t -> string -> u_location
 
   (** Returns the location of an attribute *)
-  val aloc : t -> string -> int
+  val aloc : t -> string -> a_location
 
   (** Returns the name of a uniform from its index *)
   val uname : t -> int -> string
@@ -211,16 +223,64 @@ module VAO : sig
   val destroy : t -> unit
 
   (** Enables an attribute for use *)
-  val enable_attrib : int -> unit
+  val enable_attrib : Program.a_location -> unit
 
   (** Binds a floating point attribute to an offset and a type in a VBO *)
-  val attrib_float : int -> int -> Enum.GlFloatType.t -> int -> int -> unit
+  val attrib_float : Program.a_location -> int -> Enum.GlFloatType.t -> int -> int -> unit
 
   (** Binds an integer attribute to an offset and a type in a VBO *)
-  val attrib_int : int -> int -> Enum.GlIntType.t -> int -> int -> unit
+  val attrib_int : Program.a_location -> int -> Enum.GlIntType.t -> int -> int -> unit
 
   (** Draws the currently bound VAO *)
   val draw : Enum.DrawMode.t -> int -> int -> unit
+
+end
+
+
+(** Uniform bindings *)
+module Uniform : sig
+
+  val float1 : Program.u_location -> float -> unit
+
+  val float2 : Program.u_location -> float -> float -> unit
+
+  val float3 : Program.u_location -> float -> float -> float -> unit
+
+  val float4 : Program.u_location -> float -> float -> float -> float ->unit
+
+  val int1 : Program.u_location -> int -> unit
+
+  val int2 : Program.u_location -> int -> int -> unit
+
+  val int3 : Program.u_location -> int -> int -> int -> unit
+
+  val int4 : Program.u_location -> int -> int -> int -> int ->unit
+
+  val uint1 : Program.u_location -> int -> unit
+
+  val uint2 : Program.u_location -> int -> int -> unit
+
+  val uint3 : Program.u_location -> int -> int -> int -> unit
+
+  val uint4 : Program.u_location -> int -> int -> int -> int ->unit
+
+  val mat2  : Program.u_location -> Data.t -> unit
+
+  val mat23 : Program.u_location -> Data.t -> unit
+
+  val mat24 : Program.u_location -> Data.t -> unit
+
+  val mat32 : Program.u_location -> Data.t -> unit
+
+  val mat3  : Program.u_location -> Data.t -> unit
+
+  val mat34 : Program.u_location -> Data.t -> unit
+
+  val mat42 : Program.u_location -> Data.t -> unit
+
+  val mat43 : Program.u_location -> Data.t -> unit
+
+  val mat4  : Program.u_location -> Data.t -> unit
 
 end
 

@@ -1,11 +1,31 @@
 
+(** Backface culling enumeration *)
+module CullingMode = struct
+
+  type t = 
+    | CullNone
+    | CullClockwise
+    | CullCounterClockwise
+
+end
+
+(** Polygon drawing mode enumeration *)
+module PolygonMode = struct
+
+  type t = 
+    | DrawVertices
+    | DrawLines
+    | DrawFill
+
+end
+
 type t = {
-  culling : Enum.CullingMode.t;
-  polygon : Enum.PolygonMode.t
+  culling : CullingMode.t;
+  polygon : PolygonMode.t
 }
 
-let make ?culling:(culling = Enum.CullingMode.CullNone)
-         ?polygon:(polygon = Enum.PolygonMode.DrawFill) 
+let make ?culling:(culling = CullingMode.CullNone)
+         ?polygon:(polygon = PolygonMode.DrawFill) 
          () = 
   { culling; polygon }
 

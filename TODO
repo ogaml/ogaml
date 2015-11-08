@@ -61,7 +61,7 @@ Window part:
   ✔ Parameterize Button events with position & button @commented_out @done(2015-10-31 23:58) @project(Window part)
   ✔ Parameterize Movement events with position @commented_out @done(2015-10-31 23:58) @project(Window part)
   ✘ Put shared code directly in ogamlWindow.ml (like the Event module ?) -- use packs @cancelled(2015-10-21 17:45) @project(Window part)
-  ☐ Maybe merge window_impl and mouse_impl... it would probably be cleaner
+  ✔ Maybe merge window_impl and mouse_impl... it would probably be cleaner @done(2015-11-08 12:42) @project(Window part)
   ☐ Window titles
   ☐ Window attributes abstract type ? May contain title, size, etc @unsure
   ☐ Same for GL context attributes ? @unsure
@@ -70,7 +70,7 @@ Window part:
   ✔ Graphical functions display & clear - requires binding GLX for X11 ** @done(2015-10-29 18:33) @project(Window part)
 
 New GL Implementation :
-  ☐ Base
+  ✔ Base @done(2015-11-08 13:59) @project(New GL Implementation)
     ✔ Implement State @done(2015-11-04 15:10) @project(New GL Implementation)
     ✔ Implement Internal.Texture @done(2015-11-05 00:25) @project(New GL Implementation)
     ✔ Implement Texture @done(2015-11-05 01:22) @project(New GL Implementation)
@@ -87,14 +87,15 @@ New GL Implementation :
     ✔ Hide State.t in Window @done(2015-11-06 19:56) @project(New GL Implementation)
     ✔ Implement window draw and clear functions @done(2015-11-06 22:18) @project(New GL Implementation)
     ✔ Rework cube test @done(2015-11-06 23:31) @project(New GL Implementation)
-    ☐ Add error for shader creation
-    ☐ Add error for program creation
-    ☐ Better program creation (auto versioning)
-    ☐ Hide uniform & attribute locations ?
-    ☐ Move Uniform externals to Internal and remove all Field(data,0) in uniform bindings
+    ✔ Add error for shader creation @done(2015-11-08 13:20) @project(New GL Implementation)
+    ✔ Add error for program creation @done(2015-11-08 13:20) @project(New GL Implementation)
+    ✔ Better program creation (auto versioning) @done(2015-11-08 12:50) @project(New GL Implementation)
+    ✔ Hide uniform & attribute locations ? @done(2015-11-08 13:26) @project(New GL Implementation)
+    ✔ Move Uniform externals to Internal and remove all Field(data,0) in uniform bindings @done(2015-11-08 13:40) @project(New GL Implementation)
     ✔ Hide Data.t ? & more data conversions @done(2015-11-06 17:57) @project(New GL Implementation)
-    ☐ Safe destroy function for VertexArrays
-    ☐ Clean Enum according to what can be hidden in Internal
+    ✔ Safe destroy function for VertexArrays @done(2015-11-08 13:45) @project(New GL Implementation)
+    ✔ Clean Enum according to what can be hidden in Internal @done(2015-11-08 13:59) @project(New GL Implementation)
+  ☐ Hide core functions in low-level submodules (like Program.LL.bind)
 
 Math part:
   ✔ Fix a notation convention @done(2015-10-29 18:32) @project(Math part)

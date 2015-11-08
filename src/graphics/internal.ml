@@ -78,9 +78,9 @@ module Pervasives = struct
 
   external color : float -> float -> float -> float -> unit = "caml_clear_color"
 
-  external culling : Enum.CullingMode.t -> unit = "caml_culling_mode"
+  external culling : DrawParameter.CullingMode.t -> unit = "caml_culling_mode"
 
-  external polygon : Enum.PolygonMode.t -> unit = "caml_polygon_mode"
+  external polygon : DrawParameter.PolygonMode.t -> unit = "caml_polygon_mode"
 
   external glsl_version : unit -> string = "caml_glsl_version"
 
@@ -129,6 +129,8 @@ module Shader = struct
 
   external create : Enum.ShaderType.t -> t = "caml_create_shader"
 
+  external valid : t -> bool = "caml_valid_shader"
+
   external source : t -> string -> unit = "caml_source_shader"
 
   external compile : t -> unit = "caml_compile_shader"
@@ -144,7 +146,13 @@ module Program = struct
 
   type t
 
+  type u_location = int
+
+  type a_location = int
+
   external create : unit -> t = "caml_create_program"
+
+  external valid : t -> bool = "caml_valid_program"
 
   external attach : t -> Shader.t -> unit = "caml_attach_shader"
 
@@ -215,6 +223,69 @@ module VAO = struct
 end
 
 
+module Uniform = struct
+
+  external float1 : int -> float -> unit = "caml_uniform1f"
+
+  external float2 : int -> float -> float -> unit = "caml_uniform2f"
+
+  external float3 : int -> float -> float -> float -> unit = "caml_uniform3f"
+
+  external float4 : int -> float -> float -> float -> float -> unit = "caml_uniform4f"
+
+  external int1 : int -> int -> unit = "caml_uniform1i"
+
+  external int2 : int -> int -> int -> unit = "caml_uniform2i"
+
+  external int3 : int -> int -> int -> int -> unit = "caml_uniform3i"
+
+  external int4 : int -> int -> int -> int -> int -> unit = "caml_uniform4i"
+
+  external uint1 : int -> int -> unit = "caml_uniform1ui"
+
+  external uint2 : int -> int -> int -> unit = "caml_uniform2ui"
+
+  external uint3 : int -> int -> int -> int -> unit = "caml_uniform3ui"
+
+  external uint4 : int -> int -> int -> int -> int -> unit = "caml_uniform4ui"
+
+  external abst_mat2 : int -> Data.batype -> unit = "caml_uniform_mat2"
+
+  external abst_mat3 : int -> Data.batype -> unit = "caml_uniform_mat3"
+
+  external abst_mat4 : int -> Data.batype -> unit = "caml_uniform_mat4"
+
+  external abst_mat23 : int -> Data.batype -> unit = "caml_uniform_mat23"
+
+  external abst_mat32 : int -> Data.batype -> unit = "caml_uniform_mat32"
+
+  external abst_mat24 : int -> Data.batype -> unit = "caml_uniform_mat24"
+
+  external abst_mat42 : int -> Data.batype -> unit = "caml_uniform_mat42"
+
+  external abst_mat34 : int -> Data.batype -> unit = "caml_uniform_mat34"
+
+  external abst_mat43 : int -> Data.batype -> unit = "caml_uniform_mat43"
+
+  let mat2  i m = abst_mat2  i m.Data.data
+
+  let mat3  i m = abst_mat3  i m.Data.data
+
+  let mat4  i m = abst_mat4  i m.Data.data
+
+  let mat23 i m = abst_mat23 i m.Data.data
+
+  let mat32 i m = abst_mat32 i m.Data.data
+
+  let mat24 i m = abst_mat24 i m.Data.data
+
+  let mat42 i m = abst_mat42 i m.Data.data
+
+  let mat34 i m = abst_mat34 i m.Data.data
+
+  let mat43 i m = abst_mat43 i m.Data.data
+
+end
 
 
 

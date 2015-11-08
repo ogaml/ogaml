@@ -8,7 +8,7 @@ exception Invalid_version of string
 
 module Uniform = struct
 
-  type t = {name : string; kind : Enum.GlslType.t; location : int}
+  type t = {name : string; kind : Enum.GlslType.t; location : Internal.Program.u_location}
 
   let name u = u.name
 
@@ -21,7 +21,7 @@ end
 
 module Attribute = struct
 
-  type t = {name : string; kind : Enum.GlslType.t; location : int}
+  type t = {name : string; kind : Enum.GlslType.t; location : Internal.Program.a_location}
 
   let name a = a.name
 
@@ -40,10 +40,29 @@ type t = {
            attributes : Attribute.t list
          }
 
+type src = [`File of string | `String of string]
+
+let read_file filename =
+  let chan = open_in filename in
+  let len = in_channel_length chan in
+  let str = Bytes.create len in
+  really_input chan str 0 len;
+  close_in chan; str
+
+let to_source = function
+  | `File   s -> read_file s
+  | `String s -> s
+
 let from_source ~vertex_source ~fragment_source =
+  let vertex_source   = to_source vertex_source   in
+  let fragment_source = to_source fragment_source in
   let program = Internal.Program.create () in
   let vshader = Internal.Shader.create Enum.ShaderType.Vertex   in
   let fshader = Internal.Shader.create Enum.ShaderType.Fragment in
+  if not (Internal.Shader.valid vshader) ||
+     not (Internal.Shader.valid fshader) ||
+     not (Internal.Program.valid program) then
+    raise (Compilation_error "Failed to create a GLSL program , the GL context may not be initialized");
   Internal.Shader.source vshader vertex_source;
   Internal.Shader.source fshader fragment_source;
   Internal.Shader.compile vshader;
@@ -119,6 +138,17 @@ let from_source_list st ~vertex_source ~fragment_source =
     in
     from_source ~vertex_source:best_vshader ~fragment_source:best_fshader
   with Not_found -> raise (Invalid_version "No supported GLSL version provided")
+
+
+let from_source_pp st ~vertex_source ~fragment_source =
+  let vertex_source   = to_source vertex_source   in
+  let fragment_source = to_source fragment_source in
+  let version = State.glsl_version st in
+  let vsource = Printf.sprintf "#version %i\n\n%s" version vertex_source in
+  let fsource = Printf.sprintf "#version %i\n\n%s" version fragment_source in
+  from_source 
+    ~vertex_source:(`String vsource)
+    ~fragment_source:(`String fsource)
 
 
 let use state prog = 

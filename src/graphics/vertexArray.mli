@@ -1,4 +1,6 @@
 
+exception Invalid_buffer of string
+
 exception Invalid_vertex of string
 
 exception Invalid_attribute of string
@@ -49,3 +51,4 @@ val draw : State.t -> 'a t -> Program.t -> unit
 
 val length : 'a t -> int
 
+val destroy : 'a t -> unit

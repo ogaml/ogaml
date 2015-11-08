@@ -29,16 +29,16 @@ val glsl_version : t -> int
 val is_glsl_version_supported : t -> int -> bool
 
 (** Returns the current culling mode *)
-val culling_mode : t -> Enum.CullingMode.t
+val culling_mode : t -> DrawParameter.CullingMode.t
 
 (** Sets the current culling mode *)
-val set_culling_mode : t -> Enum.CullingMode.t -> unit
+val set_culling_mode : t -> DrawParameter.CullingMode.t -> unit
 
 (** Returns the current polygon drawing mode *)
-val polygon_mode : t -> Enum.PolygonMode.t
+val polygon_mode : t -> DrawParameter.PolygonMode.t
 
 (** Sets the current polygon drawing mode *)
-val set_polygon_mode : t -> Enum.PolygonMode.t -> unit
+val set_polygon_mode : t -> DrawParameter.PolygonMode.t -> unit
 
 (** Returns the number of texture units available *)
 val textures : t -> int

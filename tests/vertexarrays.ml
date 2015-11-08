@@ -1,52 +1,31 @@
 open OgamlGraphics
 open OgamlMath
 
+let () =
+  Printf.printf "Beginning vertex array tests...\n%!"
+
 let window = Window.create ~width:100 ~height:100
 
 let state = Window.state window
 
-let prog = Program.from_source_list 
+let prog = Program.from_source_pp
     state
-    ~vertex_source:[
-      (130, "#version 130
-              
-             in vec3 pos;
+    ~vertex_source:
+      (`String "in vec3 pos;
 
              void main () {
 
                 gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);
 
-             }");
-      (150, "#version 150
-              
-             in vec3 pos;
-
-             void main () {
-
-                gl_Position = vec4(pos.x, pos.y, pos.z, 1.0); 
-
              }")
-    ]
-    ~fragment_source:[
-      (130, "#version 130
-
-             out vec4 color;
-      
-             void main () {
-
-               color = vec4(1.0, 1.0, 1.0, 1.0);
-
-             }");
-      (150, "#version 150
-
-             out vec4 color;
+    ~fragment_source:
+      (`String "out vec4 color;
       
              void main () {
 
                color = vec4(1.0, 1.0, 1.0, 1.0);
 
              }")
-    ]
 
 let test_vao1 () =
   let vsource = VertexArray.(Source.(
@@ -144,7 +123,6 @@ let test_vao8 () =
     VertexArray.Invalid_attribute _ -> ()
 
 let () = 
-  Printf.printf "Beginning vertex array tests...\n%!";
   test_vao1 ();
   Printf.printf "\tTest 1 passed\n%!";
   test_vao2 ();

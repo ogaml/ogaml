@@ -5,15 +5,35 @@
 (** Type of a set of draw parameters *)
 type t
 
+(** Backface culling enumeration *)
+module CullingMode : sig
+
+  type t = 
+    | CullNone
+    | CullClockwise
+    | CullCounterClockwise
+
+end
+
+(** Polygon drawing mode enumeration *)
+module PolygonMode : sig
+
+  type t = 
+    | DrawVertices
+    | DrawLines
+    | DrawFill
+
+end
+
 (** Creates a set *)
-val make : ?culling:Enum.CullingMode.t -> 
-           ?polygon:Enum.PolygonMode.t ->
+val make : ?culling:CullingMode.t -> 
+           ?polygon:PolygonMode.t ->
            unit -> t
 
 (** Returns the value of the culling parameter *)
-val culling : t -> Enum.CullingMode.t
+val culling : t -> CullingMode.t
 
 (** Returns the value of the polygon parameter *)
-val polygon : t -> Enum.PolygonMode.t
+val polygon : t -> PolygonMode.t
 
 

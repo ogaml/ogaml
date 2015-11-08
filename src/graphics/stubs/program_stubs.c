@@ -51,6 +51,16 @@ caml_create_program(value unit)
 }
 
 
+// INPUT   a program
+// OUTPUT  true iff it is valid
+CAMLprim value
+caml_valid_program(value prog)
+{
+  CAMLparam1(prog);
+  CAMLreturn(Val_bool((GLuint)prog != 0));
+}
+
+
 // INPUT   a program and a shader
 // OUTPUT  nothing, attaches the shader
 CAMLprim value

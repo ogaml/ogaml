@@ -5,6 +5,8 @@ exception Invalid_attribute of string
 
 exception Missing_attribute of string
 
+exception Invalid_buffer of string
+
 
 module Vertex = struct
 
@@ -136,7 +138,8 @@ type _ t = {
   length  : int;
   attribs : (Source.attrib * string * int) list;
   stride  : int;
-  mutable bound  : Program.t option
+  mutable bound : Program.t option;
+  mutable valid : bool
 }
 
 let dynamic src = 
@@ -152,7 +155,8 @@ let dynamic src =
    length = Internal.Data.length data; 
    attribs = Source.attribs src;
    stride = Source.stride src;
-   bound = None
+   bound = None;
+   valid = true
   }
 
 let static src = 
@@ -168,10 +172,13 @@ let static src =
    length = Internal.Data.length data; 
    attribs = Source.attribs src;
    stride = Source.stride src;
-   bound = None
+   bound = None;
+   valid = true
   }
 
 let rebuild t src = 
+  if not t.valid then
+    raise (Invalid_buffer "Cannot rebuild buffer, it may have been destroyed");
   let data = src.Source.data in
   Internal.VBO.bind (Some t.buffer);
   if t.size < Internal.Data.length data then
@@ -185,10 +192,13 @@ let rebuild t src =
    length = Internal.Data.length data;
    attribs = Source.attribs src;
    stride = Source.stride src;
-   bound  = t.bound
+   bound  = t.bound;
+   valid  = true
   }
 
 let bind state t prog = 
+  if not t.valid then
+    raise (Invalid_buffer "Cannot bind buffer, it may have been destroyed");
   if t.bound <> Some prog then begin
     t.bound <- Some prog;
     Internal.VAO.bind (Some t.vao);
@@ -236,8 +246,18 @@ let bind state t prog =
   end
 
 let draw state t prog = 
+  if not t.valid then
+    raise (Invalid_buffer "Cannot draw buffer, it may have been destroyed");
   bind state t prog;
   Internal.VAO.draw Enum.DrawMode.Triangles 0 (t.length * 4)
 
 let length t = t.length
+
+let destroy t =
+  if not t.valid then
+    raise (Invalid_buffer "Cannot destroy buffer : already destroyed");
+  Internal.VAO.destroy t.vao;
+  Internal.VBO.destroy t.buffer;
+  t.valid <- false
+
 

@@ -6,8 +6,8 @@ type t = {
   minor : int;
   glsl  : int;
   textures : int;
-  mutable culling_mode  : Enum.CullingMode.t;
-  mutable polygon_mode  : Enum.PolygonMode.t;
+  mutable culling_mode  : DrawParameter.CullingMode.t;
+  mutable polygon_mode  : DrawParameter.PolygonMode.t;
   mutable texture_unit  : int;
   mutable bound_texture : (Internal.Texture.t option) array array;
   mutable linked_program : Internal.Program.t option;
@@ -33,8 +33,8 @@ let create () =
     minor   ;
     glsl    ;
     textures;
-    culling_mode = Enum.CullingMode.CullNone;
-    polygon_mode = Enum.PolygonMode.DrawFill;
+    culling_mode = DrawParameter.CullingMode.CullNone;
+    polygon_mode = DrawParameter.PolygonMode.DrawFill;
     texture_unit = 0;
     bound_texture = Array.make_matrix textures 3 None;
     linked_program = None;

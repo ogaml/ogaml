@@ -1,25 +1,4 @@
-(** This module defines all GL enumerations *)
-
-(** Backface culling enumeration *)
-module CullingMode : sig
-
-  type t = 
-    | CullNone
-    | CullClockwise
-    | CullCounterClockwise
-
-end
-
-
-(** Polygon drawing mode enumeration *)
-module PolygonMode : sig
-
-  type t = 
-    | DrawVertices
-    | DrawLines
-    | DrawFill
-
-end
+(** This module defines internal GL enumerations *)
 
 
 (** Shader types enumeration *)

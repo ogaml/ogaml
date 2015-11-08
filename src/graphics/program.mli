@@ -27,7 +27,7 @@ module Uniform : sig
   (** Returns the location of a uniform.
     * This is a low-level value and should only be
     * used internally *)
-  val location : t -> int
+  val location : t -> Internal.Program.u_location
 
 end
 
@@ -47,7 +47,7 @@ module Attribute : sig
   (** Returns the location of an attribute.
     * This is a low-level value and should only be
     * used internally *)
-  val location : t -> int
+  val location : t -> Internal.Program.a_location
 
 end
 
@@ -55,15 +55,25 @@ end
 (** The type of GL programs *)
 type t
 
+(** Type of a source *)
+type src = [`File of string | `String of string]
+
 (** Creates a program from two shader sources. *)
-val from_source : vertex_source:string -> fragment_source:string -> t
+val from_source : vertex_source:src -> fragment_source:src -> t
 
 (** Creates a program from a list of shader sources
   * and version numbers. Choses the best source for 
   * the current hardware. *)
 val from_source_list : State.t 
-                       -> vertex_source:(int * string) list  
-                       -> fragment_source:(int * string) list -> t 
+                       -> vertex_source:(int * src) list  
+                       -> fragment_source:(int * src) list -> t 
+
+(** Creates a program from a source by prepending 
+  * #version v where v is the best GLSL version supported
+  * by the given context. *)
+val from_source_pp : State.t 
+                     -> vertex_source:src
+                     -> fragment_source:src -> t
 
 (** Activates the program for use in the next rendering 
   * pass. Used internally by Ogaml, usually not needed. *)

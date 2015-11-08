@@ -28,66 +28,10 @@ let cube_source = VertexArray.(Source.(
 
 let buffer = VertexArray.static cube_source
 
-let program = Program.from_source_list
-  (Window.state window)
-  ~vertex_source:[
-    (130, "#version 130
-    
-           uniform mat4 MVPMatrix;
-
-           in vec3 in_position;
-
-           in vec4 in_color;
-
-           out vec4 out_color;
-
-           void main() {
-
-              gl_Position = MVPMatrix * vec4(in_position, 1.0);
-
-              out_color = in_color;
-
-           }");
-    (150, "#version 150
-    
-           uniform mat4 MVPMatrix;
-
-           in vec3 in_position;
-
-           in vec4 in_color;
-
-           out vec4 out_color;
-
-           void main() {
-
-              gl_Position = MVPMatrix * vec4(in_position, 1.0);
-
-              out_color = in_color;
-
-           }")]
-  ~fragment_source:[
-    (130, "#version 130
-
-           in vec4 out_color;
-
-           out vec4 frag_color;
-
-           void main() {
-
-              frag_color = out_color;
-
-           }");
-    (150, "#version 150
-
-           in vec4 out_color;
-
-           out vec4 frag_color;
-
-           void main() {
-
-              frag_color = out_color;
-
-           }")]
+let program = 
+  Program.from_source_pp (Window.state window)
+    ~vertex_source:(`File "examples/default_shader.vert")
+    ~fragment_source:(`File "examples/default_shader.frag")
 
 
 (* Display computations *)
