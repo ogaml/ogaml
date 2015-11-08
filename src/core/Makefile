@@ -5,42 +5,32 @@ include ../../common_defs.mk
 
 COCOA_STUBS = application_delegate_stubs.m event_stubs.m glcontext_stubs.m\
 	      utils_stubs.m window_stubs.m application_stubs.m opengl_stubs.m\
-	      window_controller_stubs.m 
+	      window_controller_stubs.m
 
 XLIB_STUBS = atoms_stubs.c display_stubs.c event_stubs.c glx_stubs.c\
-	     mouse_stubs.c window_stubs.c 
+	     mouse_stubs.c window_stubs.c
 
-UTILS_STUBS = stubs.c
+STUBS_SOURCES = $(addprefix $(OS_WIN_LIB)/$(STUBS_DIR)/, $(OS_WIN_STUBS))
 
-OS_WIN_STUBS =
+UTILS_SOURCES  =$(addprefix ../utils/, $(UTILS_STUBS))
 
-ifeq ($(OS_WIN_LIB), cocoa)
-  OS_WIN_STUBS = $(COCOA_STUBS)
-endif
-ifeq ($(OS_WIN_LIB), x11)
-  OS_WIN_STUBS = $(XLIB_STUBS)
-endif
+STUBS_TARGETS =
 
-STUBS_SOURCES = $(addprefix $(OS_WIN_LIB)/$(STUBS_DIR)/, $(OS_WIN_STUBS)) \
-		$(addprefix ../utils/, $(UTILS_STUBS))
-
-STUBS_TARGETS = 
-
-STUBS_OBJECTS = 
+STUBS_OBJECTS =
 
 ifeq ($(OS_WIN_LIB), cocoa)
-  STUBS_TARGETS = $(STUBS_SOURCES:.m=.o)
-  STUBS_OBJECTS = $(OS_WIN_STUBS:.m=.o) $(UTILS_STUBS:.c=.o)
+ STUBS_TARGETS = $(STUBS_SOURCES:.m=.o) $(UTILS_SOURCES:.c=.o)
+ STUBS_OBJECTS = $(OS_WIN_STUBS:.m=.o) $(UTILS_STUBS:.c=.o)
 endif
 ifeq ($(OS_WIN_LIB), x11)
-  STUBS_TARGETS = $(STUBS_SOURCES:.c=.o)
-  STUBS_OBJECTS = $(OS_WIN_STUBS:.c=.o) $(UTILS_STUBS:.c=.o)
+ STUBS_TARGETS = $(STUBS_SOURCES:.c=.o) $(UTILS_SOURCES:.c=.o)
+ STUBS_OBJECTS = $(OS_WIN_STUBS:.c=.o) $(UTILS_STUBS:.c=.o)
 endif
 
 
 # ML constants
 
-ML_SOURCES = internal.ml 
+ML_SOURCES = internal.ml
 
 ML_INTERFACES = button.mli keycode.mli event.mli
 
@@ -60,7 +50,7 @@ core_lib: ml_stubs $(STUBS_TARGETS) $(ML_OBJ) $(ML_NAT)
 	$(OCAMLFIND) $(OCAMLMKLIB) -o ogamlCore ogamlCore.cmx ogamlCore.cmo\
 	  $(STUBS_OBJECTS) -ccopt '"$(GLOBAL_CLIBS)"'
 
-ml_stubs: 
+ml_stubs:
 	cd $(OS_WIN_LIB) && make
 
 %.cmi:%.mli
@@ -97,4 +87,3 @@ clean:
 include .depend
 
 .PHONY: .depend
-
