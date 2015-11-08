@@ -44,8 +44,8 @@ let translation v =
   m
 
 let scaling v = 
-  let open Vector3f in
   let m = zero () in
+  let open Vector3f in
   set 0 0 m v.x;
   set 1 1 m v.y;
   set 2 2 m v.z;

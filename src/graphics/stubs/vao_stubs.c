@@ -92,6 +92,9 @@ GLenum Drawmode_val(value mode)
     case 2:
       return GL_TRIANGLES;
 
+    case 3:
+      return GL_LINES;
+
     default:
       failwith("Caml variant error in Drawmode_val(1)");
   }

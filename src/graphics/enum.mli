@@ -1,6 +1,17 @@
 (** This module defines internal GL enumerations *)
 
 
+(** GL draw modes enum *)
+module DrawMode : sig
+
+  type t =
+    | TriangleStrip
+    | TriangleFan
+    | Triangles
+    | Lines
+
+end
+
 (** Shader types enumeration *)
 module ShaderType : sig
 
@@ -135,14 +146,4 @@ module GlIntType : sig
 
 end
 
-
-(** GL draw modes enum *)
-module DrawMode : sig
-
-  type t =
-    | TriangleStrip
-    | TriangleFan
-    | Triangles
-
-end
 

@@ -111,14 +111,14 @@ Math part:
   ☐ Matrices, quaternions and vector exceptions
   ✔ Implement Quaternions @done(2015-11-01 00:03) @project(Math part)
   ✔ Implement polygons @done(2015-10-26 16:33) @project(Math part)
-  ☐ Parameterize Poly.axis with vector3f
+  ✔ Parameterize Poly.axis with vector3f @done(2015-11-08 15:45) @project(Math part)
   ✔ Rename matrix3f in matrix3D @done(2015-10-30 10:08) @project(Math part)
 
 GL part:
   ✔ Implement indexing (high priority !!) @done(2015-11-02 21:38) @project(GL part)
   ☐ Implement OBJ loading in Model
   ☐ Implement model creation - modification in Model
-  ☐ Move Polys to GL and output models rather than float arrays
+  ✔ Move Polys to GL and output models rather than float arrays @done(2015-11-08 15:45) @project(GL part)
   ✔ Implement glGetString in config for debug @done(2015-10-29 13:21) @project(GL part)
   ✔ Bind face culling, front_face @done(2015-10-26 21:31) @project(GL part)
   ✔ Bind gl_enable and options @done(2015-10-26 19:35) @project(GL part)
@@ -131,7 +131,7 @@ GL part:
   ✔ Reabstract types in buffers and program after debugging @done(2015-10-27 12:20) @project(GL part)
   ✘ Merge Math and GL modules, or make GL depend on Math (for uniform setting) -- would remove generality of matrix uniforms @cancelled(2015-10-28 09:36) @project(GL part)
   ✔ Add a Matrix3D uniform and remove the conversion matrix -> bigarray @unsure @done(2015-10-30 10:43) @project(GL part)
-  ☐ Better support for uint uniforms and array uniforms
+  ✘ Better support for uint uniforms and array uniforms @cancelled(2015-11-08 15:45) @project(GL part)
   ✘ Make a pervasives modules or something to hold clear, types, etc... -- moved in buffers @cancelled(2015-10-29 15:04) @project(GL part)
   ✘ Find a way to strongly type VAOs/VBOs ? -- probably way too difficult @cancelled(2015-10-29 15:05) @project(GL part)
   ✔ Reorganize VAOs @done(2015-10-29 15:06) @project(GL part)

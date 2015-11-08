@@ -55,6 +55,9 @@ module Pervasives : sig
   (** Sets the current polygon mode *)
   val polygon : DrawParameter.PolygonMode.t -> unit
 
+  (** Sets the current value of depth testing *)
+  val depthtest : bool -> unit
+
   (** Returns the current glsl version *)
   val glsl_version : unit -> string
 

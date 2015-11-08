@@ -8,6 +8,7 @@ type t = {
   textures : int;
   mutable culling_mode  : DrawParameter.CullingMode.t;
   mutable polygon_mode  : DrawParameter.PolygonMode.t;
+  mutable depth_test    : bool;
   mutable texture_unit  : int;
   mutable bound_texture : (Internal.Texture.t option) array array;
   mutable linked_program : Internal.Program.t option;
@@ -35,6 +36,7 @@ let create () =
     textures;
     culling_mode = DrawParameter.CullingMode.CullNone;
     polygon_mode = DrawParameter.PolygonMode.DrawFill;
+    depth_test   = false;
     texture_unit = 0;
     bound_texture = Array.make_matrix textures 3 None;
     linked_program = None;
@@ -68,6 +70,12 @@ let polygon_mode s =
 
 let set_polygon_mode s m =
   s.polygon_mode <- m
+
+let depth_test s = 
+  s.depth_test
+
+let set_depth_test s v = 
+  s.depth_test <- v
 
 let textures s = 
   s.textures

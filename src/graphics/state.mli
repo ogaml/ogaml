@@ -40,6 +40,12 @@ val polygon_mode : t -> DrawParameter.PolygonMode.t
 (** Sets the current polygon drawing mode *)
 val set_polygon_mode : t -> DrawParameter.PolygonMode.t -> unit
 
+(** Returns if depth testing is currently activated or not *)
+val depth_test : t -> bool
+
+(** Sets the current value of depth testing *)
+val set_depth_test : t -> bool -> unit
+
 (** Returns the number of texture units available *)
 val textures : t -> int
 

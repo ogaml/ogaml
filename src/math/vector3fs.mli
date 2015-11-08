@@ -2,6 +2,8 @@
 
 type t = {r : float; t : float; p : float}
 
+val zero : t
+
 val unit_x : t
 
 val unit_y : t

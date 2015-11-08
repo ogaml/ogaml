@@ -9,24 +9,25 @@ let initial_time = ref 0.
 
 let frame_count  = ref 0
 
-let cube_source = VertexArray.(Source.(
-    empty ~position:"in_position" ~color:"in_color" ~size:6 ()
-    << Vertex.create ~position:Vector3f.({x = -0.5; y = -0.5; z = 0.5})
-                     ~color:(`RGB Color.RGB.red) ()
-    << Vertex.create ~position:Vector3f.({x = -0.5; y =  0.5; z = 0.5})
-                     ~color:(`RGB Color.RGB.red) ()
-    << Vertex.create ~position:Vector3f.({x =  0.5; y =  0.5; z = 0.5})
-                     ~color:(`RGB Color.RGB.red) ()
-    << Vertex.create ~position:Vector3f.({x = -0.5; y = -0.5; z = 0.5})
-                     ~color:(`RGB Color.RGB.red) ()
-    << Vertex.create ~position:Vector3f.({x =  0.5; y =  0.5; z = 0.5})
-                     ~color:(`RGB Color.RGB.red) ()
-    << Vertex.create ~position:Vector3f.({x =  0.5; y = -0.5; z = 0.5})
-                     ~color:(`RGB Color.RGB.red) ()
+let axis_source = 
+  let src = VertexArray.Source.empty
+    ~position:"in_position"
+    ~color:"in_color"
+    ~size:6 ()
+  in
+  Poly.axis src Vector3f.({x = -1.; y = -1.; z = -1.}) Vector3f.({x = 5.; y = 5.; z = 5.})
 
-  ))
+let cube_source = 
+  let src = VertexArray.Source.empty 
+    ~position:"in_position" 
+    ~color:"in_color" 
+    ~size:36 () 
+  in
+  Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
 
-let buffer = VertexArray.static cube_source
+let axis = VertexArray.static axis_source Enum.DrawMode.Lines
+
+let cube = VertexArray.static cube_source Enum.DrawMode.Triangles
 
 let program = 
   Program.from_source_pp (Window.state window)
@@ -66,9 +67,16 @@ let display () =
     |> Uniform.matrix3D "MVPMatrix" mvp
   in
   let parameters =
-    DrawParameter.make ()
+    DrawParameter.(make 
+      ~depth_test:true 
+      ~culling:CullingMode.CullCounterClockwise ())
   in
-  Window.draw ~window ~vertices:buffer ~uniform ~program ~parameters
+  Window.draw ~window ~vertices:cube ~uniform ~program ~parameters;
+  let uniform =
+    Uniform.empty
+    |> Uniform.matrix3D "MVPMatrix" vp
+  in
+  Window.draw ~window ~vertices:axis ~uniform ~program ~parameters
 
 
 (* Camera *)
@@ -156,7 +164,7 @@ let rec main_loop () =
 
 (* Start *)
 let () =
-  Printf.printf "Rendering %i vertices\n%!" (VertexArray.length buffer / 7);
+  Printf.printf "Rendering %i vertices\n%!" (VertexArray.length cube / 7);
   initial_time := Unix.gettimeofday ();
   main_loop ();
   Printf.printf "Avg FPS: %f\n%!" (float_of_int (!frame_count) /. (Unix.gettimeofday () -. !initial_time));

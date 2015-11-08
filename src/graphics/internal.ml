@@ -82,6 +82,8 @@ module Pervasives = struct
 
   external polygon : DrawParameter.PolygonMode.t -> unit = "caml_polygon_mode"
 
+  external depthtest : bool -> unit = "caml_depth_test"
+
   external glsl_version : unit -> string = "caml_glsl_version"
 
   external gl_version : unit -> string = "caml_gl_version"

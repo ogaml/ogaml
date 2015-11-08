@@ -28,6 +28,7 @@ end
 (** Creates a set *)
 val make : ?culling:CullingMode.t -> 
            ?polygon:PolygonMode.t ->
+           ?depth_test:bool ->
            unit -> t
 
 (** Returns the value of the culling parameter *)
@@ -36,4 +37,6 @@ val culling : t -> CullingMode.t
 (** Returns the value of the polygon parameter *)
 val polygon : t -> PolygonMode.t
 
+(** Returns the value of the depth test parameter *)
+val depth_test : t -> bool
 

@@ -91,8 +91,6 @@ caml_clear_color(value r, value g, value b, value a)
 }
 
 
-int culling = 0;
-
 // INPUT   a culling mode
 // OUTPUT  nothing, sets the culling mode
 CAMLprim value
@@ -100,17 +98,14 @@ caml_culling_mode(value mode)
 {
   CAMLparam1(mode);
 
-  if(culling == 0) 
-  {
-    glEnable(GL_BACK);
-    culling = 1;
-  }
   GLenum val = Cull_val(mode);
   if(val != -1)
   {
     glEnable(GL_CULL_FACE);
     glFrontFace(val);
   }
+  else
+    glDisable(GL_CULL_FACE);
 
   CAMLreturn(Val_unit);
 }
@@ -124,6 +119,22 @@ caml_polygon_mode(value mode)
   CAMLparam1(mode);
 
   glPolygonMode(GL_FRONT_AND_BACK, Polygon_val(mode));
+
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   a boolean
+// OUTPUT  nothing, sets the current value of depth testing
+CAMLprim value
+caml_depth_test(value b)
+{
+  CAMLparam1(b);
+
+  if(Bool_val(b))
+    glEnable(GL_DEPTH_TEST);
+  else
+    glDisable(GL_DEPTH_TEST);
 
   CAMLreturn(Val_unit);
 }

@@ -38,6 +38,11 @@ let draw ~window ~vertices ~program ~uniform ~parameters =
     State.set_polygon_mode window.state poly_mode;
     Internal.Pervasives.polygon poly_mode
   end;
+  let depth_testing = DrawParameter.depth_test parameters in
+  if State.depth_test window.state <> depth_testing then begin
+    State.set_depth_test window.state depth_testing;
+    Internal.Pervasives.depthtest depth_testing
+  end;
   Program.use window.state (Some program);
   Program.iter_uniforms program (fun unif -> Uniform.bind uniform unif);
   VertexArray.draw window.state vertices program

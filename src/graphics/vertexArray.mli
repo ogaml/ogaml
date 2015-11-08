@@ -29,6 +29,14 @@ module Source : sig
               ?color   :string ->
               size:int -> unit -> t
 
+  val requires_position : t -> bool
+
+  val requires_normal   : t -> bool
+
+  val requires_uv : t -> bool
+
+  val requires_color : t -> bool
+
   val add : t -> Vertex.t -> t
 
   val (<<) : t -> Vertex.t -> t
@@ -41,11 +49,11 @@ type dynamic
 
 type 'a t 
 
-val static : Source.t -> static t
+val static : Source.t -> Enum.DrawMode.t -> static t
 
-val dynamic : Source.t -> dynamic t
+val dynamic : Source.t -> Enum.DrawMode.t -> dynamic t
 
-val rebuild : dynamic t -> Source.t -> dynamic t
+val rebuild : dynamic t -> Source.t -> Enum.DrawMode.t -> dynamic t
 
 val draw : State.t -> 'a t -> Program.t -> unit
 

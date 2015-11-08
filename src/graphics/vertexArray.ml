@@ -57,6 +57,14 @@ module Source = struct
       data = Internal.Data.create size
     }
 
+  let requires_position s = s.position <> None
+
+  let requires_normal s = s.normal <> None
+
+  let requires_uv s = s.texcoord <> None
+
+  let requires_color s = s.color <> None
+
   let add src v = 
     begin 
       match v.Vertex.position with
@@ -138,11 +146,12 @@ type _ t = {
   length  : int;
   attribs : (Source.attrib * string * int) list;
   stride  : int;
+  mode    : Enum.DrawMode.t;
   mutable bound : Program.t option;
   mutable valid : bool
 }
 
-let dynamic src = 
+let dynamic src mode = 
   let vao    = Internal.VAO.create () in
   let buffer = Internal.VBO.create () in
   let data = src.Source.data in
@@ -155,11 +164,12 @@ let dynamic src =
    length = Internal.Data.length data; 
    attribs = Source.attribs src;
    stride = Source.stride src;
+   mode;  
    bound = None;
    valid = true
   }
 
-let static src = 
+let static src mode = 
   let vao    = Internal.VAO.create () in
   let buffer = Internal.VBO.create () in
   let data = src.Source.data in
@@ -172,11 +182,12 @@ let static src =
    length = Internal.Data.length data; 
    attribs = Source.attribs src;
    stride = Source.stride src;
+   mode;
    bound = None;
    valid = true
   }
 
-let rebuild t src = 
+let rebuild t src mode =
   if not t.valid then
     raise (Invalid_buffer "Cannot rebuild buffer, it may have been destroyed");
   let data = src.Source.data in
@@ -192,6 +203,7 @@ let rebuild t src =
    length = Internal.Data.length data;
    attribs = Source.attribs src;
    stride = Source.stride src;
+   mode;
    bound  = t.bound;
    valid  = true
   }
@@ -249,7 +261,7 @@ let draw state t prog =
   if not t.valid then
     raise (Invalid_buffer "Cannot draw buffer, it may have been destroyed");
   bind state t prog;
-  Internal.VAO.draw Enum.DrawMode.Triangles 0 (t.length * 4)
+  Internal.VAO.draw t.mode 0 (t.length * 4)
 
 let length t = t.length
 

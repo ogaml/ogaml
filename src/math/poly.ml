@@ -15,7 +15,7 @@ let cube corner size =
       add corner {x = size.x; y = size.y; z = size.z},
       add corner {x = size.x; y = 0.; z = size.z}
   in
-  [|
+  [
     fdl; ful; fur;
     fdl; fur; fdr;
 
@@ -33,8 +33,7 @@ let cube corner size =
 
     bdl; bul; ful;
     bdl; ful; fdl;
-  |]
-  |> convert_array
+  ]
    
 
 let cube_n corner size = 

@@ -1,6 +1,8 @@
 
 type t = {r : float; t : float; p : float}
 
+let zero = {r = 0.; t = 0.; p = 0.}
+
 let unit_x = 
   {
    r = 1.0;
