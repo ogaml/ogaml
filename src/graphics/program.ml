@@ -74,7 +74,7 @@ let from_source ~vertex_source ~fragment_source =
   end;
   if Internal.Shader.status fshader = false then begin
     let log = Internal.Shader.log fshader in
-    let msg = Printf.sprintf "Error while compiling vertex shader : %s" log in
+    let msg = Printf.sprintf "Error while compiling fragment shader : %s" log in
     raise (Compilation_error msg)
   end;
   Internal.Program.attach program vshader;

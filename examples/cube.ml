@@ -25,14 +25,16 @@ let cube_source =
   in
   Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
 
+
 let axis = VertexArray.static axis_source Enum.DrawMode.Lines
 
 let cube = VertexArray.static cube_source Enum.DrawMode.Triangles
 
-let program = 
+let default_program = 
   Program.from_source_pp (Window.state window)
     ~vertex_source:(`File "examples/default_shader.vert")
     ~fragment_source:(`File "examples/default_shader.frag")
+
 
 (* Display computations *)
 let proj = Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
@@ -48,35 +50,27 @@ let view_phi = ref 0.
 let display () =
   (* Compute model matrix *)
   let t = Unix.gettimeofday () in
-  let view =
-    Matrix3D.translation (Vector3f.prop (-1.) !position)
-    |> Matrix3D.product
-      (Matrix3D.from_quaternion
-        (Quaternion.times
-          (Quaternion.rotation Vector3f.unit_y !view_theta)
-          (Quaternion.rotation Vector3f.unit_x !view_phi)
-        ))
-  in
+  let view = Matrix3D.look_at_eulerian ~from:!position ~theta:!view_theta ~phi:!view_phi in
   let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
   let model = Matrix3D.rotation rot_vector !rot_angle in
   let vp = Matrix3D.product proj view in
   let mvp = Matrix3D.product vp model in
   rot_angle := !rot_angle +. (abs_float (cos (Unix.gettimeofday ()) /. 10.));
-  let uniform =
-    Uniform.empty
-    |> Uniform.matrix3D "MVPMatrix" mvp
-  in
   let parameters =
     DrawParameter.(make 
       ~depth_test:true 
       ~culling:CullingMode.CullCounterClockwise ())
   in
-  Window.draw ~window ~vertices:cube ~uniform ~program ~parameters;
+  let uniform =
+    Uniform.empty
+    |> Uniform.matrix3D "MVPMatrix" mvp
+  in
+  Window.draw ~window ~vertices:cube ~uniform ~program:default_program ~parameters;
   let uniform =
     Uniform.empty
     |> Uniform.matrix3D "MVPMatrix" vp
   in
-  Window.draw ~window ~vertices:axis ~uniform ~program ~parameters
+  Window.draw ~window ~vertices:axis ~uniform ~program:default_program ~parameters
 
 
 (* Camera *)
@@ -169,3 +163,5 @@ let () =
   main_loop ();
   Printf.printf "Avg FPS: %f\n%!" (float_of_int (!frame_count) /. (Unix.gettimeofday () -. !initial_time));
   Window.destroy window
+
+

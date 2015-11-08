@@ -251,7 +251,7 @@ let bind state t prog =
           (let (_,s,_) = List.hd !attribs in s)
         ))
   end
-  else begin
+  else if State.bound_vao state <> (Some t.vao) then begin
     Internal.VAO.bind (Some t.vao);
     State.set_bound_vao state (Some t.vao);
     State.set_bound_vbo state (Some t.buffer);

@@ -48,6 +48,9 @@ val from_quaternion : Quaternion.t -> t
 (* Look-At view matrix *)
 val look_at : from:Vector3f.t -> at:Vector3f.t -> up:Vector3f.t -> t
 
+(* Look_At view matrix from angles *)
+val look_at_eulerian : from:Vector3f.t -> theta:float -> phi:float -> t
+
 (* Orthographic projection matrix *)
 val orthographic : right:float -> left:float -> near:float -> far:float ->
     top:float -> bottom:float -> t

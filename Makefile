@@ -7,7 +7,7 @@ INCLUDES = -I src/core -I src/math -I src/graphics
 
 MODULES = ogamlMath.cmxa ogamlCore.cmxa ogamlGraphics.cmxa
 
-PACKAGES = -package bigarray,unix
+PACKAGES = -package bigarray,unix,str
 
 
 # Compilation

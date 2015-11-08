@@ -147,6 +147,15 @@ let look_at ~from ~at ~up =
   set 2 3 m (dot from dir);
   m
 
+let look_at_eulerian ~from ~theta ~phi =
+  translation (Vector3f.prop (-1.) from)
+  |> product
+    (from_quaternion
+      (Quaternion.times
+        (Quaternion.rotation Vector3f.unit_y theta)
+        (Quaternion.rotation Vector3f.unit_x phi)
+      ))
+
 let orthographic ~right ~left ~near ~far ~top ~bottom =
   let m = identity () in
   set 0 0 m (2. /. (right -. left));
