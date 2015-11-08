@@ -10,39 +10,11 @@ type t = {
   mutable polygon_mode  : DrawParameter.PolygonMode.t;
   mutable depth_test    : bool;
   mutable texture_unit  : int;
-  mutable bound_texture : (Internal.Texture.t option) array array;
-  mutable linked_program : Internal.Program.t option;
-  mutable bound_vbo : Internal.VBO.t option;
-  mutable bound_vao : Internal.VAO.t option;
+  mutable bound_texture : (GL.Texture.t option) array array;
+  mutable linked_program : GL.Program.t option;
+  mutable bound_vbo : GL.VBO.t option;
+  mutable bound_vao : GL.VAO.t option;
 }
-
-let create () =
-  let convert v = 
-    if v < 10 then v*10 else v
-  in
-  let major, minor = 
-    let str = Internal.Pervasives.gl_version () in
-    Scanf.sscanf str "%i.%i" (fun a b -> (a, convert b))
-  in
-  let glsl = 
-    let str = Internal.Pervasives.glsl_version () in
-    Scanf.sscanf str "%i.%i" (fun a b -> a * 100 + (convert b))
-  in
-  let textures = Internal.Pervasives.max_textures () in
-  {
-    major   ;
-    minor   ;
-    glsl    ;
-    textures;
-    culling_mode = DrawParameter.CullingMode.CullNone;
-    polygon_mode = DrawParameter.PolygonMode.DrawFill;
-    depth_test   = false;
-    texture_unit = 0;
-    bound_texture = Array.make_matrix textures 3 None;
-    linked_program = None;
-    bound_vbo = None;
-    bound_vao = None
-  }
 
 let version s = 
   (s.major, s.minor)
@@ -62,54 +34,88 @@ let is_glsl_version_supported s v =
 let culling_mode s =
   s.culling_mode
 
-let set_culling_mode s m =
-  s.culling_mode <- m
-
 let polygon_mode s =
   s.polygon_mode
 
-let set_polygon_mode s m =
-  s.polygon_mode <- m
 
 let depth_test s = 
   s.depth_test
 
-let set_depth_test s v = 
-  s.depth_test <- v
 
-let textures s = 
-  s.textures
+module LL = struct
+  
+  let create () =
+    let convert v = 
+      if v < 10 then v*10 else v
+    in
+    let major, minor = 
+      let str = GL.Pervasives.gl_version () in
+      Scanf.sscanf str "%i.%i" (fun a b -> (a, convert b))
+    in
+    let glsl = 
+      let str = GL.Pervasives.glsl_version () in
+      Scanf.sscanf str "%i.%i" (fun a b -> a * 100 + (convert b))
+    in
+    let textures = GL.Pervasives.max_textures () in
+    {
+      major   ;
+      minor   ;
+      glsl    ;
+      textures;
+      culling_mode = DrawParameter.CullingMode.CullNone;
+      polygon_mode = DrawParameter.PolygonMode.DrawFill;
+      depth_test   = false;
+      texture_unit = 0;
+      bound_texture = Array.make_matrix textures 3 None;
+      linked_program = None;
+      bound_vbo = None;
+      bound_vao = None
+    }
 
-let texture_unit s = 
-  s.texture_unit
+  let set_culling_mode s m =
+    s.culling_mode <- m
 
-let set_texture_unit s i = 
-  s.texture_unit <- i
+  let set_polygon_mode s m =
+    s.polygon_mode <- m
 
-let bound_texture s i targ = 
-  if i >= s.textures then
-    raise (Invalid_texture_unit i);
-  s.bound_texture.(i).(Obj.magic targ)
+  let set_depth_test s v = 
+    s.depth_test <- v
 
-let set_bound_texture s i targ t = 
-  if i >= s.textures then
-    raise (Invalid_texture_unit i);
-  s.bound_texture.(i).(Obj.magic targ) <- t
+  let textures s = 
+    s.textures
 
-let linked_program s = 
-  s.linked_program
+  let texture_unit s = 
+    s.texture_unit
 
-let set_linked_program s p =
-  s.linked_program <- p
+  let set_texture_unit s i = 
+    s.texture_unit <- i
 
-let bound_vbo s = 
-  s.bound_vbo
+  let bound_texture s i targ = 
+    if i >= s.textures then
+      raise (Invalid_texture_unit i);
+    s.bound_texture.(i).(Obj.magic targ)
 
-let set_bound_vbo s v = 
-  s.bound_vbo <- v
+  let set_bound_texture s i targ t = 
+    if i >= s.textures then
+      raise (Invalid_texture_unit i);
+    s.bound_texture.(i).(Obj.magic targ) <- t
 
-let bound_vao s = 
-  s.bound_vao
+  let linked_program s = 
+    s.linked_program
 
-let set_bound_vao s v = 
-  s.bound_vao <- v
+  let set_linked_program s p =
+    s.linked_program <- p
+
+  let bound_vbo s = 
+    s.bound_vbo
+
+  let set_bound_vbo s v = 
+    s.bound_vbo <- v
+
+  let bound_vao s = 
+    s.bound_vao
+
+  let set_bound_vao s v = 
+    s.bound_vao <- v
+
+end

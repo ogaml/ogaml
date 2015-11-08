@@ -34,7 +34,7 @@ let test_vao1 () =
     << Vertex.create ~position:Vector3f.unit_y ()
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic vsource DrawMode.Triangles in
   assert (VertexArray.length vao = 9)
 
 let test_vao2 () = 
@@ -47,7 +47,7 @@ let test_vao2 () =
     << Vertex.create ~position:Vector3f.unit_x ()
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic vsource DrawMode.Triangles in
   assert (VertexArray.length vao = 18)
 
 let test_vao3 () = 
@@ -80,7 +80,7 @@ let test_vao5 () =
     << Vertex.create ~position:Vector3f.unit_x ~texcoord:(1.,1.) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
     << Vertex.create ~position:Vector3f.unit_x ~texcoord:(1.,1.) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic vsource DrawMode.Triangles in
   assert (VertexArray.length vao = 48)
 
 let test_vao6 () = 
@@ -90,8 +90,8 @@ let test_vao6 () =
     << Vertex.create ~position:Vector3f.unit_y ()
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
-  let vao = VertexArray.dynamic vsource in
-  VertexArray.draw state vao prog
+  let vao = VertexArray.dynamic vsource DrawMode.Triangles in
+  VertexArray.LL.draw state vao prog
 
 let test_vao7 () = 
   let vsource = VertexArray.(Source.(
@@ -100,9 +100,9 @@ let test_vao7 () =
     << Vertex.create ~position:Vector3f.unit_y ()
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic vsource DrawMode.Triangles in
   try 
-    VertexArray.draw state vao prog;
+    VertexArray.LL.draw state vao prog;
     assert false
   with
     VertexArray.Missing_attribute _ -> ()
@@ -115,9 +115,9 @@ let test_vao8 () =
     << Vertex.create ~position:Vector3f.unit_y ~color:(`RGB Color.RGB.white) ()
     << Vertex.create ~position:Vector3f.unit_x ~color:(`RGB Color.RGB.white) ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic vsource DrawMode.Triangles in
   try 
-    VertexArray.draw state vao prog;
+    VertexArray.LL.draw state vao prog;
     assert false
   with
     VertexArray.Invalid_attribute _ -> ()

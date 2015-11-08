@@ -3,7 +3,7 @@ open OgamlMath
 
 let window = Window.create ~width:800 ~height:600
 
-let () = Internal.Pervasives.color 1. 1. 1. 1.
+let () = GL.Pervasives.color 1. 1. 1. 1.
 
 let initial_time = ref 0.
 
@@ -27,9 +27,9 @@ let cube_source =
   Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
 
 
-let axis = VertexArray.static axis_source Enum.DrawMode.Lines
+let axis = VertexArray.static axis_source DrawMode.Lines
 
-let cube = VertexArray.static cube_source Enum.DrawMode.Triangles
+let cube = VertexArray.static cube_source DrawMode.Triangles
 
 let default_program = 
   Program.from_source_pp (Window.state window)

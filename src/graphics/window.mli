@@ -1,3 +1,4 @@
+
 exception Missing_uniform of string
 
 exception Invalid_uniform of string
@@ -45,6 +46,11 @@ val clear : t -> color:bool -> depth:bool -> stencil:bool -> unit
 (** Returns the internal GL state of the window *)
 val state : t -> State.t
 
-(** Returns the internal window of this window, should only be used internally *)
-val internal : t -> OgamlCore.Core.Window.t
+
+module LL : sig
+  
+  (** Returns the internal window of this window, should only be used internally *)
+  val internal : t -> OgamlCore.LL.Window.t
+
+end
 

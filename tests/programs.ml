@@ -59,15 +59,15 @@ let test_program1 () =
              }"))
     ]
   in
-  Program.iter_attributes prog (fun att ->
+  Program.LL.iter_attributes prog (fun att ->
     assert ((Program.Attribute.name att) = "param3");
-    assert ((Program.Attribute.kind att) = Enum.GlslType.Float2);
+    assert ((Program.Attribute.kind att) = GL.Types.GlslType.Float2);
   );
-  Program.iter_uniforms prog (fun att ->
+  Program.LL.iter_uniforms prog (fun att ->
     let n = Program.Uniform.name att in
     let k = Program.Uniform.kind att in
-    assert ((n = "param1" && k = Enum.GlslType.Float2) ||
-            (n = "param2" && k = Enum.GlslType.Float));
+    assert ((n = "param1" && k = GL.Types.GlslType.Float2) ||
+            (n = "param2" && k = GL.Types.GlslType.Float));
   )
 
 let test_program2 () = 
