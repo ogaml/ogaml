@@ -36,5 +36,6 @@ clean:
 	cd src/core/ && make clean;
 	cd src/math/ && make clean;
 	cd src/graphics/ && make clean;
-	cd tests/ && make clean
+	cd tests/ && make clean;
+	cd examples/ && make clean
 
