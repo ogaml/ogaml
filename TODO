@@ -95,7 +95,7 @@ New GL Implementation :
     ✔ Hide Data.t ? & more data conversions @done(2015-11-06 17:57) @project(New GL Implementation)
     ✔ Safe destroy function for VertexArrays @done(2015-11-08 13:45) @project(New GL Implementation)
     ✔ Clean Enum according to what can be hidden in Internal @done(2015-11-08 13:59) @project(New GL Implementation)
-  ☐ Hide core functions in low-level submodules (like Program.LL.bind)
+  ✔ Hide core functions in low-level submodules (like Program.LL.bind) @done(2015-11-09 00:42) @project(New GL Implementation)
 
 Math part:
   ✔ Fix a notation convention @done(2015-10-29 18:32) @project(Math part)
@@ -117,7 +117,7 @@ Math part:
 GL part:
   ✔ Implement indexing (high priority !!) @done(2015-11-02 21:38) @project(GL part)
   ☐ Parameterize clear with color, remove call to Internal from example
-  ☐ Implement OBJ loading in Model
+  ✔ Implement OBJ loading in Model @done(2015-11-09 00:43) @project(GL part)
   ☐ Implement model creation - modification in Model
   ✔ Move Polys to GL and output models rather than float arrays @done(2015-11-08 15:45) @project(GL part)
   ✔ Implement glGetString in config for debug @done(2015-10-29 13:21) @project(GL part)
