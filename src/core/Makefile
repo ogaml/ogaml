@@ -52,7 +52,6 @@ ML_NAT = $(ML_SOURCES:.ml=.cmx)
 ML_CMIS = $(ML_INTERFACES:.mli=.cmi)
 
 
-
 # Compilation
 
 default: .depend core_lib
@@ -61,7 +60,7 @@ core_lib: ml_stubs $(STUBS_TARGETS) $(ML_CMIS) $(ML_OBJ) $(ML_NAT)
 	$(OCAMLFIND) $(OCAMLOPT) -pack -o ogamlCore.cmx $(OS_WIN_LIB)/$(OS_WIN_LIB).cmx $(ML_CMIS) $(ML_NAT);
 	$(OCAMLFIND) $(OCAMLC) -pack -o ogamlCore.cmo $(OS_WIN_LIB)/$(OS_WIN_LIB).cmo $(ML_CMIS) $(ML_OBJ);
 	$(OCAMLFIND) $(OCAMLMKLIB) -o ogamlCore ogamlCore.cmx ogamlCore.cmo\
-	  $(STUBS_OBJECTS) -ccopt '"$(GLOBAL_CLIBS)"'
+	  $(STUBS_OBJECTS) $(MKLIB_LIBS) $(GLOBAL_CLIBS)
 
 ml_stubs: 
 	cd $(OS_WIN_LIB) && make
@@ -79,10 +78,10 @@ ml_stubs:
 	$(PPCOMMAND) -o $@ $<
 
 %.o:%.m
-	$(CLANG) -c -o ./$(notdir $@) $(OCAML_C_FLAGS) $(GLOBAL_OBJCOPTS) $<
+	$(CLANG) -c -o ./$(notdir $@) $(OCAML_C_FLAGS) $(GLOBAL_OBJCOPTS) $(GLOBAL_CLIBS) $<
 
 %.o:%.c
-	$(OCAMLC) -c -o ./$(notdir $@) $<
+	$(OCAMLC) -c -o ./$(notdir $@) -cclib "$(GLOBAL_CLIBS)" $<
 
 
 # Cleaning

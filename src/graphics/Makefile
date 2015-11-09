@@ -62,7 +62,7 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS)
 	$(PPCOMMAND) -o $@ $<
 
 %.o:%.c
-	$(OCAMLFIND) $(OCAMLC) -o ./$(notdir $@) -c -ccopt '$(COPTS)' $<
+	$(OCAMLFIND) $(OCAMLC) -o ./$(notdir $@) -c $< -ccopt '$(COPTS)' -cclib "$(GLOBAL_CLIBS)"
 
 
 
