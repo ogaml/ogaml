@@ -7,17 +7,22 @@ let window = Window.create ~width:100 ~height:100
 
 let state = Window.state window
 
+let test_program0 () =
+  let (a,b) = State.version state in
+  Printf.printf "GL version : %i.%i\n" a b;
+  Printf.printf "GLSL version : %i\n%!" (State.glsl_version state)
+
 let test_program1 () = 
   let prog = Program.from_source_list
     state
     ~vertex_source:[
-      (130, (`String "#version 130
+      (110, (`String "#version 110
               
              uniform vec2 param1;
 
              uniform float param2;
 
-             in vec2 param3;
+             attribute vec2 param3;
 
              void main () {
 
@@ -39,13 +44,11 @@ let test_program1 () =
              }"))
     ]
     ~fragment_source:[
-      (130, (`String "#version 130
+      (110, (`String "#version 110
 
-             out vec4 color;
-      
              void main () {
 
-               color = vec4(1.0, 1.0, 1.0, 1.0);
+               gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 
              }"));
       (150, (`String "#version 150
@@ -97,6 +100,7 @@ let test_program2 () =
   ignore prog
 
 let () = 
+  test_program0 ();
   test_program1 ();
   Printf.printf "\tTest 1 passed\n%!";
   test_program2 ();

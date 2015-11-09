@@ -8,24 +8,64 @@ let window = Window.create ~width:100 ~height:100
 
 let state = Window.state window
 
-let prog = Program.from_source_pp
+let prog = Program.from_source_list
     state
-    ~vertex_source:
-      (`String "in vec3 pos;
+    ~vertex_source:[
+      (130, `String "#version 130
+
+             in vec3 pos;
 
              void main () {
 
                 gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);
 
-             }")
-    ~fragment_source:
-      (`String "out vec4 color;
+             }");
+      (110, `String "#version 110
+
+             varying vec3 pos;
+
+             void main () {
+
+                gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);
+
+             }");
+      (150, `String "#version 130
+
+             in vec3 pos;
+
+             void main () {
+
+                gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);
+
+             }");
+    ]
+    ~fragment_source:[
+      (130, `String "#version 130
+      
+             out vec4 color;
       
              void main () {
 
                color = vec4(1.0, 1.0, 1.0, 1.0);
 
-             }")
+             }");
+      (110, `String "#version 110
+      
+             void main () {
+
+               gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+
+             }");
+      (150, `String "#version 150
+      
+             out vec4 color;
+      
+             void main () {
+
+               color = vec4(1.0, 1.0, 1.0, 1.0);
+
+             }");
+    ]
 
 let test_vao1 () =
   let vsource = VertexArray.(Source.(
