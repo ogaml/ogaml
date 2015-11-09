@@ -185,4 +185,9 @@ module Mouse : sig
 end
 
 
+module Keyboard : sig
+
+  val key_down : Display.t -> Event.key -> bool
+
+end
 

@@ -105,6 +105,49 @@ module Window = struct
       | _  -> Unknown
     end)
 
+  let key_to_keysym = Keycode.(function
+    |A -> X11.Event.Char 'a'   |B -> X11.Event.Char 'b'
+    |C -> X11.Event.Char 'c'   |D -> X11.Event.Char 'd'
+    |E -> X11.Event.Char 'e'   |F -> X11.Event.Char 'f'
+    |G -> X11.Event.Char 'g'   |H -> X11.Event.Char 'h'
+    |I -> X11.Event.Char 'i'   |J -> X11.Event.Char 'j'
+    |K -> X11.Event.Char 'k'   |L -> X11.Event.Char 'l'
+    |M -> X11.Event.Char 'm'   |N -> X11.Event.Char 'n'
+    |O -> X11.Event.Char 'o'   |P -> X11.Event.Char 'p'
+    |Q -> X11.Event.Char 'q'   |R -> X11.Event.Char 'r'
+    |S -> X11.Event.Char 's'   |T -> X11.Event.Char 't'
+    |U -> X11.Event.Char 'u'   |V -> X11.Event.Char 'v'
+    |W -> X11.Event.Char 'w'   |X -> X11.Event.Char 'x'
+    |Y -> X11.Event.Char 'y'   |Z -> X11.Event.Char 'z'
+    |Num1 -> X11.Event.Code 10 |Num2 -> X11.Event.Code 11
+    |Num3 -> X11.Event.Code 12 |Num4 -> X11.Event.Code 13
+    |Num5 -> X11.Event.Code 14 |Num6 -> X11.Event.Code 15
+    |Num7 -> X11.Event.Code 16 |Num8 -> X11.Event.Code 17
+    |Num9 -> X11.Event.Code 18 |Num0 -> X11.Event.Code 19
+    |Numpad1 -> X11.Event.Code 87 |Numpad2 -> X11.Event.Code 88
+    |Numpad3 -> X11.Event.Code 89 |Numpad4 -> X11.Event.Code 83
+    |Numpad5 -> X11.Event.Code 84 |Numpad6 -> X11.Event.Code 85
+    |Numpad7 -> X11.Event.Code 79 |Numpad8 -> X11.Event.Code 80
+    |Numpad9 -> X11.Event.Code 81 |Numpad0 -> X11.Event.Code 90
+    |NumpadMinus -> X11.Event.Code 82 |NumpadTimes -> X11.Event.Code 63
+    |NumpadPlus  -> X11.Event.Code 86 |NumpadDiv   -> X11.Event.Code 106
+    |NumpadDot   -> X11.Event.Code 91 |NumpadReturn-> X11.Event.Code 104
+    |Escape   -> X11.Event.Code 9   |Tab    -> X11.Event.Code 23  
+    |LControl -> X11.Event.Code 37  |LShift -> X11.Event.Code 50  
+    |LAlt     -> X11.Event.Code 64  |Space  -> X11.Event.Code 65  
+    |RControl -> X11.Event.Code 105 |RShift -> X11.Event.Code 62  
+    |RAlt     -> X11.Event.Code 108 |Return -> X11.Event.Code 36  
+    |Up       -> X11.Event.Code 111 |Left   -> X11.Event.Code 113 
+    |Down     -> X11.Event.Code 116 |Right  -> X11.Event.Code 114 
+    |F1       -> X11.Event.Code 67  |F2     -> X11.Event.Code 68  
+    |F3       -> X11.Event.Code 69  |F4     -> X11.Event.Code 70  
+    |F5       -> X11.Event.Code 71  |F6     -> X11.Event.Code 72  
+    |F7       -> X11.Event.Code 73  |F8     -> X11.Event.Code 74  
+    |F9       -> X11.Event.Code 75  |F10    -> X11.Event.Code 76  
+    |F11      -> X11.Event.Code 95  |F12    -> X11.Event.Code 96  
+    |Delete   -> X11.Event.Code 22  |Unknown-> assert false
+  )
+
   let value_to_button = Button.(function
     |1 -> Left
     |2 -> Middle
@@ -175,13 +218,24 @@ end
 
 module Keyboard = struct
 
-  let is_pressed key = false
+  let is_pressed key = 
+    match key with
+    |Keycode.Unknown -> false
+    | _ ->
+      let d = X11.Display.create () in
+      X11.Keyboard.key_down d (Window.key_to_keysym key)
 
-  let is_shift_down () = false
+  let is_shift_down () = 
+    (is_pressed Keycode.LShift) || 
+    (is_pressed Keycode.RShift)
 
-  let is_ctrl_down () = false
+  let is_ctrl_down () = 
+    (is_pressed Keycode.LControl) || 
+    (is_pressed Keycode.RControl)
 
-  let is_alt_down () = false
+  let is_alt_down () = 
+    (is_pressed Keycode.LAlt) || 
+    (is_pressed Keycode.RAlt)
 
 end
 

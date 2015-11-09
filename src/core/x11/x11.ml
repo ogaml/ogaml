@@ -274,3 +274,11 @@ module Mouse = struct
     = "caml_xquery_button_down"
 
 end
+
+
+module Keyboard = struct
+
+  external key_down : Display.t -> Event.key -> bool 
+    = "caml_is_key_down"
+
+end

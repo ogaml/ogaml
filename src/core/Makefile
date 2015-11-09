@@ -8,7 +8,7 @@ COCOA_STUBS = application_delegate_stubs.m event_stubs.m glcontext_stubs.m\
 	      window_controller_stubs.m 
 
 XLIB_STUBS = atoms_stubs.c display_stubs.c event_stubs.c glx_stubs.c\
-	     mouse_stubs.c window_stubs.c 
+	     mouse_stubs.c keyboard_stubs.c window_stubs.c 
 
 UTILS_STUBS = stubs.c
 

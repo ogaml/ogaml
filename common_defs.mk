@@ -22,7 +22,7 @@ ifeq ($(UNAME), Linux)
     PP_DEFINE = __LINUX__
     OS_WIN_LIB = x11
     GLOBAL_OBJCOPTS =
-    GLOBAL_CLIBS = -lX11 -lGL
+    GLOBAL_CLIBS = -lX11 -lGL -lX11-xcb -lxcb
   endif
 endif
 ifeq ($(UNAME), Darwin)

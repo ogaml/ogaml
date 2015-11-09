@@ -65,7 +65,7 @@ Window part:
   ☐ Window titles
   ☐ Window attributes abstract type ? May contain title, size, etc @unsure
   ☐ Same for GL context attributes ? @unsure
-  ☐ Real-time state Keyboard module
+  ✔ Real-time state Keyboard module @done(2015-11-09 16:56) @project(Window part)
   ✔ Real-time state Mouse module @done(2015-11-01 23:59) @project(Window part)
   ✔ Graphical functions display & clear - requires binding GLX for X11 ** @done(2015-10-29 18:33) @project(Window part)
 
