@@ -74,10 +74,13 @@ let test_program1 () =
   )
 
 let test_program2 () = 
-  let prog = Program.from_source_pp
+  let prog = Program.from_source_list
     state
-    ~vertex_source: (`String
-             "uniform vec2 param1;
+    ~vertex_source: [
+      (130, `String
+             "#version 130
+             
+             uniform vec2 param1;
 
              uniform float param2;
 
@@ -87,15 +90,66 @@ let test_program2 () =
 
                 gl_Position = vec4(param1.x, param1.y, param2, param3.x);
 
-             }")
-    ~fragment_source: (`String 
-             "out vec4 color;
+             }");
+      (150, `String
+             "#version 150
+             
+             uniform vec2 param1;
+
+             uniform float param2;
+
+             in vec2 param3;
+
+             void main () {
+
+                gl_Position = vec4(param1.x, param1.y, param2, param3.x);
+
+             }");
+      (110, `String
+             "#version 110
+             
+             uniform vec2 param1;
+
+             uniform float param2;
+
+             attribute vec2 param3;
+
+             void main () {
+
+                gl_Position = vec4(param1.x, param1.y, param2, param3.x);
+
+             }");
+
+      ]
+    ~fragment_source: [
+      (130, `String 
+             "#version 130
+             
+             out vec4 color;
       
              void main () {
 
                color = vec4(1.0, 1.0, 1.0, 1.0);
 
-             }")
+             }");
+      (110, `String 
+             "#version 110
+             
+             void main () {
+
+               gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+
+             }");
+      (150, `String 
+             "#version 150
+             
+             out vec4 color;
+      
+             void main () {
+
+               color = vec4(1.0, 1.0, 1.0, 1.0);
+
+             }")]
   in
   ignore prog
 
