@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OPAM_DEPEND = "cppo"
+OPAM_DEPEND="cppo"
 
 export DISPLAY=:99.0
 /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99.0 -screen 0 800x600x16
