@@ -1,0 +1,11 @@
+LL_impl_cocoa.cmo : keycode.cmi event.cmi button.cmi
+LL_impl_cocoa.cmx : keycode.cmi event.cmi button.cmi
+LL_impl_x11.cmo : keycode.cmi event.cmi button.cmi
+LL_impl_x11.cmx : keycode.cmi event.cmi button.cmi
+LL.cmi : keycode.cmi event.cmi button.cmi
+button.cmi :
+event.cmi : keycode.cmi button.cmi
+keycode.cmi :
+x11/x11.cmo : x11/x11.cmi
+x11/x11.cmx : x11/x11.cmi
+x11/x11.cmi :

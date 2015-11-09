@@ -10,7 +10,6 @@
 *.so
 *.out
 *.d
-*.depend
 
 # ocamlbuild working directory
 _build/

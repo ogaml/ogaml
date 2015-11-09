@@ -2,6 +2,8 @@
 
 #### Ocaml multimedia library
 
+[![Build Status](https://travis-ci.org/ogaml/ogaml.svg?branch=master)](https://travis-ci.org/ogaml/ogaml)
+
 This is only in early stages...
 
 * Current dependencies : 

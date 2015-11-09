@@ -1,0 +1,49 @@
+GL.cmo : drawParameter.cmi drawMode.cmi color.cmi GL.cmi
+GL.cmx : drawParameter.cmx drawMode.cmi color.cmx GL.cmi
+color.cmo : color.cmi
+color.cmx : color.cmi
+drawParameter.cmo : drawParameter.cmi
+drawParameter.cmx : drawParameter.cmi
+image.cmo : color.cmi image.cmi
+image.cmx : color.cmx image.cmi
+keyboard.cmo : ../core/LL.cmi keyboard.cmi
+keyboard.cmx : ../core/LL.cmi keyboard.cmi
+model.cmo : vertexArray.cmi color.cmi model.cmi
+model.cmx : vertexArray.cmx color.cmx model.cmi
+mouse.cmo : window.cmi ../core/LL.cmi mouse.cmi
+mouse.cmx : window.cmx ../core/LL.cmi mouse.cmi
+poly.cmo : vertexArray.cmi ../math/vector3f.cmi color.cmi poly.cmi
+poly.cmx : vertexArray.cmx ../math/vector3f.cmx color.cmx poly.cmi
+program.cmo : state.cmi GL.cmi program.cmi
+program.cmx : state.cmx GL.cmx program.cmi
+state.cmo : GL.cmi drawParameter.cmi state.cmi
+state.cmx : GL.cmx drawParameter.cmx state.cmi
+texture.cmo : state.cmi image.cmi GL.cmi texture.cmi
+texture.cmx : state.cmx image.cmx GL.cmx texture.cmi
+uniform.cmo : texture.cmi state.cmi program.cmi GL.cmi color.cmi uniform.cmi
+uniform.cmx : texture.cmx state.cmx program.cmx GL.cmx color.cmx uniform.cmi
+vertexArray.cmo : state.cmi program.cmi GL.cmi drawMode.cmi color.cmi \
+    vertexArray.cmi
+vertexArray.cmx : state.cmx program.cmx GL.cmx drawMode.cmi color.cmx \
+    vertexArray.cmi
+window.cmo : vertexArray.cmi uniform.cmi state.cmi program.cmi \
+    ../core/LL.cmi GL.cmi drawParameter.cmi window.cmi
+window.cmx : vertexArray.cmx uniform.cmx state.cmx program.cmx \
+    ../core/LL.cmi GL.cmx drawParameter.cmx window.cmi
+GL.cmi : drawParameter.cmi drawMode.cmi color.cmi
+color.cmi :
+drawMode.cmi :
+drawParameter.cmi :
+image.cmi : color.cmi
+keyboard.cmi :
+model.cmi : vertexArray.cmi color.cmi
+mouse.cmi : window.cmi
+poly.cmi : vertexArray.cmi
+program.cmi : state.cmi GL.cmi
+sprite.cmi :
+state.cmi : GL.cmi drawParameter.cmi
+texture.cmi : state.cmi image.cmi
+uniform.cmi : texture.cmi state.cmi program.cmi color.cmi
+vertexArray.cmi : state.cmi program.cmi drawMode.cmi color.cmi
+window.cmi : vertexArray.cmi uniform.cmi state.cmi program.cmi \
+    drawParameter.cmi

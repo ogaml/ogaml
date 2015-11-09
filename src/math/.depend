@@ -1,0 +1,21 @@
+constants.cmo : constants.cmi
+constants.cmx : constants.cmi
+matrix3D.cmo : vector3f.cmi quaternion.cmi matrix3D.cmi
+matrix3D.cmx : vector3f.cmx quaternion.cmx matrix3D.cmi
+poly.cmo : vector3fs.cmi vector3f.cmi poly.cmi
+poly.cmx : vector3fs.cmx vector3f.cmx poly.cmi
+quaternion.cmo : vector3f.cmi quaternion.cmi
+quaternion.cmx : vector3f.cmx quaternion.cmi
+vector3f.cmo : vector3i.cmi vector3f.cmi
+vector3f.cmx : vector3i.cmx vector3f.cmi
+vector3fs.cmo : vector3f.cmi constants.cmi vector3fs.cmi
+vector3fs.cmx : vector3f.cmx constants.cmx vector3fs.cmi
+vector3i.cmo : vector3i.cmi
+vector3i.cmx : vector3i.cmi
+constants.cmi :
+matrix3D.cmi : vector3f.cmi quaternion.cmi
+poly.cmi : vector3f.cmi
+quaternion.cmi : vector3f.cmi
+vector3f.cmi : vector3i.cmi
+vector3fs.cmi : vector3f.cmi
+vector3i.cmi :
