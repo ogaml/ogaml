@@ -6,7 +6,8 @@ exception Invalid_uniform of string
 type uniform = 
   | Vector3f of OgamlMath.Vector3f.t
   | Matrix3D of OgamlMath.Matrix3D.t
-  | Color of Color.RGB.t
+  | Color    of Color.RGB.t
+  | Texture2D of Texture.Texture2D.t
 
 module UniformMap = Map.Make (struct
 
@@ -26,10 +27,12 @@ let matrix3D s mat m = UniformMap.add s (Matrix3D mat) m
 
 let color s c m = UniformMap.add s (Color (Color.rgb c)) m
 
+let texture2D s t m = UniformMap.add s (Texture2D t) m
+
 
 module LL = struct
 
-  let bind map u =
+  let bind state map u =
     let name = Program.Uniform.name u in
     let v = 
       try UniformMap.find name map
@@ -52,6 +55,9 @@ module LL = struct
         Color.RGB.(
           GL.Uniform.float4 location c.r c.g c.b c.a
         )
+    | Texture2D t, GL.Types.GlslType.Sampler2D ->
+        Texture.Texture2D.LL.bind state (Some t);
+        GL.Uniform.int1 location (State.LL.texture_unit state)
     | _ -> raise (Invalid_uniform (Printf.sprintf "Uniform %s has wrong type" name))
 
 end

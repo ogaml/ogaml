@@ -35,7 +35,7 @@ let test_vao1 () =
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
   let vao = VertexArray.dynamic vsource DrawMode.Triangles in
-  assert (VertexArray.length vao = 9)
+  assert (VertexArray.length vao = 3)
 
 let test_vao2 () = 
   let vsource = VertexArray.(Source.(
@@ -48,7 +48,7 @@ let test_vao2 () =
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
   let vao = VertexArray.dynamic vsource DrawMode.Triangles in
-  assert (VertexArray.length vao = 18)
+  assert (VertexArray.length vao = 6)
 
 let test_vao3 () = 
   try
@@ -81,7 +81,7 @@ let test_vao5 () =
     << Vertex.create ~position:Vector3f.unit_x ~texcoord:(1.,1.) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
   )) in
   let vao = VertexArray.dynamic vsource DrawMode.Triangles in
-  assert (VertexArray.length vao = 48)
+  assert (VertexArray.length vao = 4)
 
 let test_vao6 () = 
   let vsource = VertexArray.(Source.(

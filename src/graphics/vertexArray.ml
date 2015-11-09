@@ -40,6 +40,7 @@ module Source = struct
     texcoord : string option;
     normal   : string option;
     color    : string option;
+    mutable length   : int;
     data     : GL.Data.t;
   }
 
@@ -54,6 +55,7 @@ module Source = struct
       texcoord;
       normal;
       color;
+      length = 0;
       data = GL.Data.create size
     }
 
@@ -102,9 +104,11 @@ module Source = struct
       |Some vec -> GL.Data.add_color src.data vec
       | _ -> ()
     end;
-    src
+    src.length <- src.length + 1
 
-  let (<<) src v = add src v
+  let (<<) src v = add src v; src
+
+  let length src = src.length
 
   let size_of_attrib = function
     |Position -> 3
@@ -161,7 +165,7 @@ let dynamic src mode =
   {
    buffer; vao; 
    size = GL.Data.length data;
-   length = GL.Data.length data; 
+   length = Source.length src; 
    attribs = Source.attribs src;
    stride = Source.stride src;
    mode;  
@@ -179,7 +183,7 @@ let static src mode =
   {
    buffer; vao; 
    size = GL.Data.length data;
-   length = GL.Data.length data; 
+   length = Source.length src; 
    attribs = Source.attribs src;
    stride = Source.stride src;
    mode;
@@ -200,7 +204,7 @@ let rebuild t src mode =
    buffer = t.buffer;
    vao    = t.vao;
    size   = max (GL.Data.length data) (t.size);
-   length = GL.Data.length data;
+   length = Source.length src;
    attribs = Source.attribs src;
    stride = Source.stride src;
    mode;
@@ -272,6 +276,6 @@ module LL = struct
     if not t.valid then
       raise (Invalid_buffer "Cannot draw buffer, it may have been destroyed");
     bind state t prog;
-    GL.VAO.draw t.mode 0 (t.length * 4)
+    GL.VAO.draw t.mode 0 t.length
 
 end

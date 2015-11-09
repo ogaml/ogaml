@@ -61,7 +61,7 @@ let cube src corner size =
     (bdl,nmx,cmx,uv1); (bul,nmx,cmx,uv2); (ful,nmx,cmx,uv3);
     (bdl,nmx,cmx,uv1); (ful,nmx,cmx,uv3); (fdl,nmx,cmx,uv4);
   ]
-  |> List.fold_left add src
+  |> List.iter (add src); src
 
 
 let axis src start length =
@@ -99,5 +99,5 @@ let axis src start length =
     (begy, coly, n, uv); (endy, coly, n, uv);
     (begz, colz, n, uv); (endz, colz, n, uv)
   ]
-  |> List.fold_left add src
+  |> List.iter (add src); src
 

@@ -37,9 +37,11 @@ module Source : sig
 
   val requires_color : t -> bool
 
-  val add : t -> Vertex.t -> t
+  val add : t -> Vertex.t -> unit
 
   val (<<) : t -> Vertex.t -> t
+
+  val length : t -> int
 
 end
 

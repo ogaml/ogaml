@@ -72,7 +72,7 @@ let from_obj ?scale:(scale = 1.0) ?color:(color = `RGB Color.RGB.white) data src
       Array.length normals, 
       Array.length uvs 
   in
-  List.fold_left (fun src (v,u,n) ->
+  List.iter (fun (v,u,n) ->
     let position = 
       match v with
       |None when VertexArray.Source.requires_position src -> 
@@ -105,7 +105,7 @@ let from_obj ?scale:(scale = 1.0) ?color:(color = `RGB Color.RGB.white) data src
       else None
     in
     VertexArray.(Source.add src (Vertex.create ?position ?texcoord ?color ?normal ()))
-  ) src !ftable
+  ) !ftable; src
 
 
 

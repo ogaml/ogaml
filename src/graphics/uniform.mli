@@ -24,10 +24,13 @@ val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> t
 (** Adds a color to a uniform structure *)
 val color : string -> Color.t -> t -> t
 
+(** Adds a 2D texture to a uniform structure *)
+val texture2D : string -> Texture.Texture2D.t -> t -> t
+
 
 module LL : sig
 
   (** Binds a value to a program uniform *)
-  val bind : t -> Program.Uniform.t -> unit
+  val bind : State.t -> t -> Program.Uniform.t -> unit
 
 end

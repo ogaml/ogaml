@@ -44,7 +44,7 @@ let draw ~window ~vertices ~program ~uniform ~parameters =
     GL.Pervasives.depthtest depth_testing
   end;
   Program.LL.use window.state (Some program);
-  Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind uniform unif);
+  Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind window.state uniform unif);
   VertexArray.LL.draw window.state vertices program
 
 let clear win ~color ~depth ~stencil = 

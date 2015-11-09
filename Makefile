@@ -45,6 +45,8 @@ tests: math_lib core_lib graphics_lib
 install: math_lib core_lib graphics_lib
 	$(OCAMLFIND) install ogaml META $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES)
 
+reinstall:math_lib core_lib graphics_lib uninstall install
+
 uninstall:
 	$(OCAMLFIND) remove "ogaml"
 
@@ -56,4 +58,4 @@ clean:
 	cd tests/ && make clean;
 	cd examples/ && make clean
 
-.PHONY: install uninstall examples
+.PHONY: install uninstall reinstall examples
