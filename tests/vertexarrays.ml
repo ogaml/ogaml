@@ -22,7 +22,7 @@ let prog = Program.from_source_list
              }");
       (110, `String "#version 110
 
-             varying vec3 pos;
+             attribute vec3 pos;
 
              void main () {
 
