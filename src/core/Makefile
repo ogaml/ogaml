@@ -95,7 +95,7 @@ clean:
 # Dependencies
 
 .depend:
-	$(DEPCOMMAND) *.ml *.mli $(OS_WIN_LIB)/*.ml $(OS_WIN_LIB)/*.mli > .depend
+	$(DEPCOMMAND) *.ml *.mli cocoa/*.ml cocoa/*.mli x11/*.ml x11/*.mli > .depend
 
 include .depend
 

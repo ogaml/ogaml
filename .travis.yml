@@ -1,9 +1,19 @@
 language: c
+
 sudo: required
+
 script: bash -ex .travis-ci.sh
+
 env:
 - OCAML_VERSION=4.02.1
 - OCAML_VERSION=4.02.0
+
 os:
 - linux
-- osx
+
+addons:
+  apt:
+    packages:
+      - libx11-dev 
+      - xorg-dev
+      - libgl1-mesa-dev
