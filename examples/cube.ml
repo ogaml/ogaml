@@ -1,7 +1,9 @@
 open OgamlGraphics
 open OgamlMath
 
-let window = Window.create ~width:800 ~height:600
+let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
+
+let window = Window.create ~width:800 ~height:600 ~settings
 
 let () = GL.Pervasives.color 1. 1. 1. 1.
 
@@ -150,7 +152,7 @@ let rec event_loop () =
 (* Main loop *)
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear window ~color:true ~depth:true ~stencil:false;
+    Window.clear window;
     display ();
     Window.display window;
     (* We only capture the mouse and listen to the keyboard when focused *)

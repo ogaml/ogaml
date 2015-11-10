@@ -16,3 +16,4 @@ B src/graphics
 B tests
 B examples
 
+PKG ogaml.graphics

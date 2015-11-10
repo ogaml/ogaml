@@ -8,7 +8,9 @@
 
 open OgamlGraphics
  
-let window = Window.create ~width:800 ~height:600 
+let settings = ContextSettings.create ()
+
+let window = Window.create ~width:800 ~height:600 ~settings
 
 let rec event_loop () =
   match Window.poll_event window with
@@ -21,7 +23,7 @@ let rec event_loop () =
 
 let rec main_loop () = 
   if Window.is_open window then begin 
-    Window.clear window ~color:true ~stencil:false ~depth:false;
+    Window.clear window;
     (* Display here *)
     Window.display window;
     event_loop ();

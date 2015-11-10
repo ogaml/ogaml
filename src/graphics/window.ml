@@ -4,13 +4,14 @@ exception Missing_uniform of string
 
 exception Invalid_uniform of string
 
-type t = {state : State.t; internal : LL.Window.t}
+type t = {state : State.t; internal : LL.Window.t; settings : ContextSettings.t}
 
-let create ~width ~height = 
+let create ~width ~height ~settings =
   let internal = LL.Window.create ~width ~height in
   {
     state = State.LL.create ();
-    internal
+    internal;
+    settings
   }
 
 let close win = LL.Window.close win.internal
@@ -47,7 +48,16 @@ let draw ~window ~vertices ~program ~uniform ~parameters =
   Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind window.state uniform unif);
   VertexArray.LL.draw window.state vertices program
 
-let clear win ~color ~depth ~stencil = 
+let clear win = 
+  let cc = ContextSettings.color win.settings in
+  if State.clear_color win.state <> cc then begin
+    let crgb = Color.rgb cc in
+    State.LL.set_clear_color win.state cc;
+    Color.RGB.(GL.Pervasives.color crgb.r crgb.g crgb.b crgb.a)
+  end;
+  let color = ContextSettings.color_clearing win.settings in
+  let depth = ContextSettings.depth_testing  win.settings in
+  let stencil = ContextSettings.stenciling   win.settings in
   GL.Pervasives.clear color depth stencil
 
 let state win = win.state

@@ -3,7 +3,9 @@ open OgamlGraphics
 let () =
   Printf.printf "Beginning program tests...\n%!"
 
-let window = Window.create ~width:100 ~height:100
+let settings = ContextSettings.create ()
+
+let window = Window.create ~width:100 ~height:100 ~settings
 
 let state = Window.state window
 

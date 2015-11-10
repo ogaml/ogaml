@@ -116,7 +116,9 @@ Math part:
 
 GL part:
   ✔ Implement indexing (high priority !!) @done(2015-11-02 21:38) @project(GL part)
-  ☐ Parameterize clear with color, remove call to Internal from example
+  ✔ Parameterize clear with color, remove call to Internal from example @done(2015-11-10 17:20) @project(GL part)
+  ✔ Better clear @done(2015-11-10 17:20) @project(GL part)
+  ☐ More uniforms
   ✔ Implement OBJ loading in Model @done(2015-11-09 00:43) @project(GL part)
   ☐ Implement model creation - modification in Model
   ✔ Move Polys to GL and output models rather than float arrays @done(2015-11-08 15:45) @project(GL part)

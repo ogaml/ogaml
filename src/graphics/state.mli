@@ -34,6 +34,9 @@ val polygon_mode : t -> DrawParameter.PolygonMode.t
 (** Returns if depth testing is currently activated or not *)
 val depth_test : t -> bool
 
+(** Returns the clear color *)
+val clear_color : t -> Color.t
+
 
 module LL : sig
 
@@ -81,6 +84,9 @@ module LL : sig
 
   (** Returns the currently bound VAO *)
   val bound_vao : t -> GL.VAO.t option
+
+  (** Sets the current clear color *)
+  val set_clear_color : t -> Color.t -> unit
 
 end
 

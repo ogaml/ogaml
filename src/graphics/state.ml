@@ -14,6 +14,7 @@ type t = {
   mutable linked_program : GL.Program.t option;
   mutable bound_vbo : GL.VBO.t option;
   mutable bound_vao : GL.VAO.t option;
+  mutable color : Color.t
 }
 
 let version s = 
@@ -40,6 +41,9 @@ let polygon_mode s =
 
 let depth_test s = 
   s.depth_test
+
+let clear_color s = 
+  s.color
 
 
 module LL = struct
@@ -69,7 +73,8 @@ module LL = struct
       bound_texture = Array.make_matrix textures 3 None;
       linked_program = None;
       bound_vbo = None;
-      bound_vao = None
+      bound_vao = None;
+      color = `RGB (Color.RGB.transparent)
     }
 
   let set_culling_mode s m =
@@ -117,5 +122,8 @@ module LL = struct
 
   let set_bound_vao s v = 
     s.bound_vao <- v
+
+  let set_clear_color s c = 
+    s.color <- c
 
 end

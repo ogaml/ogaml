@@ -6,7 +6,7 @@ exception Invalid_uniform of string
 type t
 
 (** Creates a window of size width x height *)
-val create : width:int -> height:int -> t
+val create : width:int -> height:int -> settings:ContextSettings.t -> t
 
 (** Closes a window, but does not free the memory.
   * This should prevent segfaults when calling functions on this window. *)
@@ -41,7 +41,7 @@ val draw :
   parameters : DrawParameter.t -> unit
 
 (** Clears the window *)
-val clear : t -> color:bool -> depth:bool -> stencil:bool -> unit
+val clear : t -> unit
 
 (** Returns the internal GL state of the window *)
 val state : t -> State.t

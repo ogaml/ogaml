@@ -2,9 +2,9 @@ uniform mat4 MVMatrix;
 
 uniform mat4 VMatrix;
 
-in vec4 out_color;
-
 in vec3 out_normal;
+
+in vec4 out_color;
 
 out vec4 frag_color;
 

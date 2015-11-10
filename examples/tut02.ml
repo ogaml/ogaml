@@ -8,8 +8,10 @@
 
 open OgamlGraphics
 open OgamlMath
+
+let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
  
-let window = Window.create ~width:800 ~height:600 
+let window = Window.create ~width:800 ~height:600 ~settings
 
 let vertex_shader_source = "
   in vec3 position;
@@ -73,7 +75,7 @@ let rec event_loop () =
 
 let rec main_loop () = 
   if Window.is_open window then begin 
-    Window.clear window ~color:true ~stencil:false ~depth:false;
+    Window.clear window;
     Window.draw ~window ~vertices ~program ~parameters ~uniform;
     Window.display window;
     event_loop ();
