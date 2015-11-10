@@ -12,7 +12,7 @@ module Vertex : sig
   type t
 
   val create : ?position:OgamlMath.Vector3f.t ->
-               ?texcoord:(float * float)      ->
+               ?texcoord:OgamlMath.Vector2f.t ->
                ?normal:OgamlMath.Vector3f.t   ->
                ?color:Color.t -> unit -> t
 

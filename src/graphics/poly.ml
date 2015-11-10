@@ -21,7 +21,10 @@ let cube src corner size =
     prop (-1.) unit_z
   in
   let uv1, uv2, uv3, uv4 = 
-    (0., 0.), (0.,1.), (1.,1.), (1.,0.)
+    Vector2f.({x = 0.; y = 0.}),
+    Vector2f.({x = 0.; y = 1.}),
+    Vector2f.({x = 1.; y = 1.}),
+    Vector2f.({x = 1.; y = 0.})
   in
   let cx, cy, cz, cmx, cmy, cmz = 
     `RGB Color.RGB.blue,
@@ -93,7 +96,7 @@ let axis src start length =
     `RGB Color.RGB.blue
   in
   let n = Vector3f.zero in
-  let uv = (0.,0.) in
+  let uv = Vector2f.zero in
   [ 
     (begx, colx, n, uv); (endx, colx, n, uv);
     (begy, coly, n, uv); (endy, coly, n, uv);

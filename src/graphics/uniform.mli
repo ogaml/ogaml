@@ -18,6 +18,21 @@ val empty : t
 (** Adds a vector3f to a uniform structure *)
 val vector3f : string -> OgamlMath.Vector3f.t -> t -> t
 
+(** Adds a vector2f to a uniform structure *)
+val vector2f : string -> OgamlMath.Vector2f.t -> t -> t
+
+(** Adds a vector3i to a uniform structure *)
+val vector3i : string -> OgamlMath.Vector3i.t -> t -> t
+
+(** Adds a vector2i to a uniform structure *)
+val vector2i : string -> OgamlMath.Vector2i.t -> t -> t
+
+(** Adds an integer to a uniform structure *)
+val int : string -> int -> t -> t
+
+(** Adds a float to a uniform structure *)
+val float : string -> float -> t -> t
+
 (** Adds a matrix3D to a uniform structure *)
 val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> t
 

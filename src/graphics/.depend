@@ -14,8 +14,10 @@ model.cmo : vertexArray.cmi color.cmi model.cmi
 model.cmx : vertexArray.cmx color.cmx model.cmi
 mouse.cmo : window.cmi ../core/LL.cmi mouse.cmi
 mouse.cmx : window.cmx ../core/LL.cmi mouse.cmi
-poly.cmo : vertexArray.cmi ../math/vector3f.cmi color.cmi poly.cmi
-poly.cmx : vertexArray.cmx ../math/vector3f.cmx color.cmx poly.cmi
+poly.cmo : vertexArray.cmi ../math/vector3f.cmi ../math/vector2f.cmi \
+    color.cmi poly.cmi
+poly.cmx : vertexArray.cmx ../math/vector3f.cmx ../math/vector2f.cmx \
+    color.cmx poly.cmi
 program.cmo : state.cmi GL.cmi program.cmi
 program.cmx : state.cmx GL.cmx program.cmi
 state.cmo : GL.cmi drawParameter.cmi color.cmi state.cmi

@@ -117,10 +117,10 @@ let test_vao4 () =
 let test_vao5 () = 
   let vsource = VertexArray.(Source.(
     empty ~position:"pos" ~color:"col" ~texcoord:"uv" ~normal:"normal" ~size:4 ()
-    << Vertex.create ~position:Vector3f.unit_z ~texcoord:(1.,1.) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
-    << Vertex.create ~position:Vector3f.unit_y ~texcoord:(1.,1.) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
-    << Vertex.create ~position:Vector3f.unit_x ~texcoord:(1.,1.) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
-    << Vertex.create ~position:Vector3f.unit_x ~texcoord:(1.,1.) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
+    << Vertex.create ~position:Vector3f.unit_z ~texcoord:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
+    << Vertex.create ~position:Vector3f.unit_y ~texcoord:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
+    << Vertex.create ~position:Vector3f.unit_x ~texcoord:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
+    << Vertex.create ~position:Vector3f.unit_x ~texcoord:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
   )) in
   let vao = VertexArray.dynamic vsource DrawMode.Triangles in
   assert (VertexArray.length vao = 4)

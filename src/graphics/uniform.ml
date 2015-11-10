@@ -4,10 +4,15 @@ exception Unknown_uniform of string
 exception Invalid_uniform of string
 
 type uniform = 
-  | Vector3f of OgamlMath.Vector3f.t
-  | Matrix3D of OgamlMath.Matrix3D.t
-  | Color    of Color.RGB.t
+  | Vector3f  of OgamlMath.Vector3f.t
+  | Vector2f  of OgamlMath.Vector2f.t
+  | Vector3i  of OgamlMath.Vector3i.t
+  | Vector2i  of OgamlMath.Vector2i.t
+  | Matrix3D  of OgamlMath.Matrix3D.t
+  | Color     of Color.RGB.t
   | Texture2D of Texture.Texture2D.t
+  | Float     of float
+  | Int       of int
 
 module UniformMap = Map.Make (struct
 
@@ -23,11 +28,21 @@ let empty = UniformMap.empty
 
 let vector3f s v m = UniformMap.add s (Vector3f v) m
 
+let vector2f s v m = UniformMap.add s (Vector2f v) m
+
+let vector3i s v m = UniformMap.add s (Vector3i v) m
+
+let vector2i s v m = UniformMap.add s (Vector2i v) m
+
 let matrix3D s mat m = UniformMap.add s (Matrix3D mat) m
 
 let color s c m = UniformMap.add s (Color (Color.rgb c)) m
 
 let texture2D s t m = UniformMap.add s (Texture2D t) m
+
+let int s i m = UniformMap.add s (Int i) m
+
+let float s f m = UniformMap.add s (Float f) m
 
 
 module LL = struct
@@ -46,6 +61,18 @@ module LL = struct
     | Vector3f v, GL.Types.GlslType.Float3   -> 
         OgamlMath.Vector3f.(
           GL.Uniform.float3 location v.x v.y v.z
+        )
+    | Vector2f v, GL.Types.GlslType.Float2   -> 
+        OgamlMath.Vector2f.(
+          GL.Uniform.float2 location v.x v.y
+        )
+    | Vector3i v, GL.Types.GlslType.Int3 -> 
+        OgamlMath.Vector3i.(
+          GL.Uniform.int3 location v.x v.y v.z
+        )
+    | Vector2i v, GL.Types.GlslType.Int2 -> 
+        OgamlMath.Vector2i.(
+          GL.Uniform.int2 location v.x v.y
         )
     | Matrix3D m, GL.Types.GlslType.Float4x4 -> 
         OgamlMath.Matrix3D.(

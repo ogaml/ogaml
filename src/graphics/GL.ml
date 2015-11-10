@@ -15,6 +15,10 @@ module Types = struct
   module GlslType = struct
 
     type t =
+      | Int
+      | Int2
+      | Int3
+      | Int4
       | Float
       | Float2
       | Float3
@@ -184,10 +188,10 @@ module Data = struct
     t.data.{t.length+3} <- c.Color.RGB.a;
     t.length <- t.length+4
 
-  let add_2f t (a,b) = 
+  let add_2f t v = 
     alloc t 2;
-    t.data.{t.length+0} <- a;
-    t.data.{t.length+1} <- b;
+    t.data.{t.length+0} <- v.OgamlMath.Vector2f.x;
+    t.data.{t.length+1} <- v.OgamlMath.Vector2f.x;
     t.length <- t.length+2
 
   let of_matrix m = {

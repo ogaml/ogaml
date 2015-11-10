@@ -26,6 +26,10 @@ module Types : sig
   module GlslType : sig
 
     type t =
+      | Int
+      | Int2
+      | Int3
+      | Int4
       | Float
       | Float2
       | Float3
@@ -157,7 +161,7 @@ module Data : sig
   val add_color : t -> Color.t -> unit
 
   (** Adds two floats to the data *)
-  val add_2f : t -> float * float -> unit
+  val add_2f : t -> OgamlMath.Vector2f.t -> unit
 
   (** Returns the data associated to a matrix TEMPORARY *)
   val of_matrix : OgamlMath.Matrix3D.t -> t

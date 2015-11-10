@@ -1,17 +1,6 @@
 
 exception Bad_format of string
 
-let read_file filename =
-  let chan = open_in filename in
-  let len = in_channel_length chan in
-  let str = Bytes.create len in
-  really_input chan str 0 len;
-  close_in chan; str
-
-let to_source = function
-  | `File   s -> read_file s
-  | `String s -> s
-
 type tokens = Slash | Float of float | Int of int | F | VT | VN | V
 
 let rec junk_spaces stream = 
@@ -24,52 +13,56 @@ let rec junk_line stream =
   |'\n' -> ()
   | _   -> junk_line stream
 
-let rec tokenize_nb i stream = 
+let rec tokenize_nb line i stream = 
   match Stream.next stream with
-  |'0'..'9' as c -> tokenize_nb (i*10 + (Char.code c - 48)) stream
-  |' ' -> Int i
-  |'.' -> Float (tokenize_float (float_of_int i) 10. stream)
-  | _  -> raise (Bad_format "Cannot parse OBJ file, expected int")
+  |'0'..'9' as c -> tokenize_nb line (i*10 + (Char.code c - 48)) stream
+  |' ' |'\n' |'\r' -> Int i
+  |'.' -> Float (tokenize_float line (float_of_int i) 10. stream)
+  | c  -> raise (Bad_format (Printf.sprintf "Cannot parse OBJ file, expected int (char %c, line %i)" c line))
 
-and tokenize_float i r stream =
+and tokenize_float line i r stream =
   match Stream.next stream with
-  |'0'..'9' as c -> tokenize_float (i +. float_of_int (Char.code c - 48) /. r) (r*.10.) stream
-  |' ' -> i
-  | _ -> raise (Bad_format ("Cannot parse OBJ file, expected float"))
+  |'0'..'9' as c -> tokenize_float line (i +. float_of_int (Char.code c - 48) /. r) (r*.10.) stream
+  |' ' | '\n' |'\r' -> i
+  | c -> raise (Bad_format (Printf.sprintf "Cannot parse OBJ file, expected float (char %c, line %i)" c line))
 
-and tokenize_obj stream = 
+and tokenize_obj line stream = 
   junk_spaces stream;
   match Stream.peek stream with
   |Some(c) -> begin
+    print_char c;
     match c with
-    |'0'..'9' -> (tokenize_nb 0 stream :: (tokenize_obj stream))
+    |'0'..'9' -> 
+        let tt = tokenize_nb line 0 stream in
+        tt :: (tokenize_obj line stream)
     |'-' -> 
         Stream.junk stream; 
         junk_spaces stream; 
         begin 
-          match tokenize_nb 0 stream with
-          |Int i -> (Int (-i) :: (tokenize_obj stream))
-          |Float f -> (Float (-.f) :: (tokenize_obj stream))
+          match tokenize_nb line 0 stream with
+          |Int i -> (Int (-i) :: (tokenize_obj line stream))
+          |Float f -> (Float (-.f) :: (tokenize_obj line stream))
           | _ -> assert false
         end
     |'.' -> 
         Stream.junk stream; 
-        (Float(tokenize_float 0. 10. stream) :: (tokenize_obj stream))
+        let tt = tokenize_float line 0. 10. stream in
+        (Float tt :: (tokenize_obj line stream))
     |'/' -> 
         Stream.junk stream;
-        (Slash :: (tokenize_obj stream))
+        (Slash :: (tokenize_obj line stream))
     |'v' -> begin
       Stream.junk stream;
       match Stream.next stream with
-      |' ' -> V :: (tokenize_obj stream)
-      |'t' -> VT :: (tokenize_obj stream)
-      |'n' -> VN :: (tokenize_obj stream)
-      | _  -> junk_line stream; tokenize_obj stream
+      |' ' -> V :: (tokenize_obj line stream)
+      |'t' -> Stream.junk stream; VT :: (tokenize_obj line stream)
+      |'n' -> Stream.junk stream; VN :: (tokenize_obj line stream)
+      | _  -> junk_line stream; tokenize_obj (line + 1) stream
     end
-    |'f' -> F :: (tokenize_obj stream)
+    |'f' -> Stream.junk stream; F :: (tokenize_obj line stream)
     | _  -> 
         junk_line stream; 
-        tokenize_obj stream
+        tokenize_obj (line + 1) stream
   end
   |None -> []
 
@@ -106,105 +99,60 @@ let rec parse_tokens lv lvt lvn lf = function
         (OgamlMath.Vector3f.({x;y;z}) :: lvn)
         lf t
   |F :: l -> 
-      let (tri,l) = parse_triangle l in
-      parse_tokens lv lvt lvn (tri :: lf) l
+      let ((a,b,c),l) = parse_triangle l in
+      parse_tokens lv lvt lvn (a :: b :: c :: lf) l
   | _ -> raise (Bad_format "Cannot parse OBJ file")
 
 
 let from_obj ?scale:(scale = 1.0) ?color:(color = `RGB Color.RGB.white) data src = 
-  let str = to_source data in
-  let lines = Str.split (Str.regexp "[\r\n]+") str in
-  let vtable = ref [] in
-  let ntable = ref [] in
-  let ttable = ref [] in
-  let ftable = ref [] in
-  List.iteri(fun i line ->
-    try 
-      Scanf.sscanf line "%s" (function
-        |"v"  -> Scanf.sscanf line "%_s %f %f %f" 
-                (fun x y z -> vtable := OgamlMath.Vector3f.({x;y;z})::!vtable)
-        |"vt" -> Scanf.sscanf line "%_s %f %f" 
-                (fun x y -> ttable := (x,y)::!ttable)
-        |"vn" -> Scanf.sscanf line "%_s %f %f %f"
-                (fun x y z -> ntable := OgamlMath.Vector3f.({x;y;z})::!ntable)
-        |"f"  -> begin
-          try 
-            Scanf.sscanf line "%_s %i/%i/%i %i/%i/%i %i/%i/%i%_s"
-                (fun a1 b1 c1 a2 b2 c2 a3 b3 c3 -> ftable := 
-                    (Some a1, Some b1, Some c1) :: 
-                    (Some a2, Some b2, Some c2) :: 
-                    (Some a3, Some b3, Some c3) :: !ftable)
-          with Scanf.Scan_failure _ -> begin
-            try
-              Scanf.sscanf line "%_s %i//%i %i//%i %i//%i%_s"
-                  (fun a1 c1 a2 c2 a3 c3 -> ftable := 
-                      (Some a1,None,Some c1) :: 
-                      (Some a2,None,Some c2) :: 
-                      (Some a3,None,Some c3) :: !ftable)
-            with Scanf.Scan_failure _ -> begin
-              try 
-                Scanf.sscanf line "%_s %i/%i %i/%i %i/%i%_s"
-                    (fun a1 b1 a2 b2 a3 b3 -> ftable := 
-                        (Some a1,Some b1,None) :: 
-                        (Some a2,Some b2,None) :: 
-                        (Some a3,Some b3,None) :: !ftable)
-              with Scanf.Scan_failure _ -> begin
-                Scanf.sscanf line "%_s %i %i %i%_s"
-                    (fun a1 a2 a3 -> ftable := 
-                        (Some a1,None,None) :: 
-                        (Some a2,None,None) :: 
-                        (Some a3,None,None) :: !ftable)
-              end
-            end
-          end
-          end
-        | _   -> ())
-    with Scanf.Scan_failure _ -> raise (Bad_format (
-        Printf.sprintf "Bad OBJ format line %i : %s" i line
-      ))
-    ) lines;
-  let vertices = Array.of_list !vtable in
-  let normals  = Array.of_list !ntable in
-  let uvs      = Array.of_list !ttable in
-  let nv, nn, nu = 
-      Array.length vertices, 
-      Array.length normals, 
-      Array.length uvs 
+  let lv, lvt, lvn, lf = 
+    match data with
+    |`String str -> 
+      let stream = (Stream.of_string str) in
+      tokenize_obj 0 stream |> parse_tokens [] [] [] []
+    |`File   str -> 
+      let chan = open_in str in
+      let stream = (Stream.of_channel chan) in
+      let res = tokenize_obj 0 stream |> parse_tokens [] [] [] [] in
+      close_in chan;
+      res
+  in
+  let av, avt, avn = 
+    Array.of_list lv,
+    Array.of_list lvt,
+    Array.of_list lvn
   in
   List.iter (fun (v,u,n) ->
     let position = 
-      match v with
-      |None when VertexArray.Source.requires_position src -> 
-          raise (Bad_format "Vertex positions requested but not provided")
-      | _ when not (VertexArray.Source.requires_position src) -> None
-      |Some v when v > 0 -> Some (OgamlMath.Vector3f.prop scale (vertices.(nv - v)))
-      |Some v -> Some (OgamlMath.Vector3f.prop scale (vertices.(- v - 1)))
-      | _ -> assert false
-    in    
+      if VertexArray.Source.requires_position src then begin
+        match v with
+        |None -> raise (Bad_format "Vertex positions requested but not provided")
+        |Some v when v > 0 -> Some (OgamlMath.Vector3f.prop scale (av.(Array.length av - v)))
+        |Some v -> Some (OgamlMath.Vector3f.prop scale (av.(- v - 1)))
+      end else None
+    in
     let texcoord = 
-      match u with
-      |None when VertexArray.Source.requires_uv src -> 
-          raise (Bad_format "UV coordinates requested but not provided")
-      | _ when not (VertexArray.Source.requires_uv src) -> None
-      |Some v when v > 0 -> Some (uvs.(nu - v))
-      |Some v -> Some (uvs.(-v - 1))
-      | _ -> assert false
+      if VertexArray.Source.requires_uv src then begin
+        match u with
+        |None -> raise (Bad_format "UV coordinates requested but not provided")
+        |Some v when v > 0 -> Some (avt.(Array.length avt - v))
+        |Some v -> Some (avt.(- v - 1))
+      end else None
     in
     let normal = 
-      match n with
-      |None when VertexArray.Source.requires_normal src -> 
-          raise (Bad_format "Normals requested but not provided")
-      | _ when not (VertexArray.Source.requires_normal src) -> None
-      |Some v when v > 0 -> Some (normals.(nn - v))
-      |Some v -> Some (normals.(- v - 1))
-      | _ -> assert false
+      if VertexArray.Source.requires_normal src then begin
+        match v with
+        |None -> raise (Bad_format "Normals requested but not provided")
+        |Some v when v > 0 -> Some (avn.(Array.length avn - v))
+        |Some v -> Some (avn.(- v - 1))
+      end else None
     in
     let color = 
       if VertexArray.Source.requires_color src then Some color
       else None
     in
     VertexArray.(Source.add src (Vertex.create ?position ?texcoord ?color ?normal ()))
-  ) !ftable; src
+  ) lf; src
 
 
 

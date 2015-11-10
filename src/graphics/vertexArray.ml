@@ -12,7 +12,7 @@ module Vertex = struct
 
   type t = {
     position : OgamlMath.Vector3f.t option;
-    texcoord : (float * float) option;
+    texcoord : OgamlMath.Vector2f.t option;
     normal   : OgamlMath.Vector3f.t option;
     color    : Color.t option
   }
