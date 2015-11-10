@@ -58,7 +58,7 @@ module Window = struct
     not win.closed
 
   let has_focus win =
-    true
+    X11.Window.has_focus win.display win.window
 
   let keysym_to_key = Keycode.(function
     | X11.Event.Code i -> begin

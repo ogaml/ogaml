@@ -80,3 +80,14 @@ caml_size_window(value disp, value win)
 }
 
 
+// INPUT   a display, a window
+// OUTPUT  true iff the window has focus
+CAMLprim value
+caml_has_focus(value disp, value win)
+{
+  CAMLparam2(disp, win);
+  Window result;
+  int state;
+  XGetInputFocus((Display*) disp, &result, &state);
+  CAMLreturn(Val_bool(((Window)win) == result));
+}

@@ -77,6 +77,8 @@ module Window : sig
 
   val swap : Display.t -> t -> unit
 
+  val has_focus : Display.t -> t -> bool
+
 end
 
 

@@ -134,6 +134,8 @@ module Window = struct
 
   external swap : Display.t -> t -> unit = "caml_glx_swap_buffers"
 
+  external has_focus : Display.t -> t -> bool = "caml_has_focus"
+
 
   (* Implementation of abstract functions *)
   let root_of ?screen display =

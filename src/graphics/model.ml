@@ -12,6 +12,105 @@ let to_source = function
   | `File   s -> read_file s
   | `String s -> s
 
+type tokens = Slash | Float of float | Int of int | F | VT | VN | V
+
+let rec junk_spaces stream = 
+  match Stream.peek stream with
+  |Some ' ' -> Stream.junk stream; junk_spaces stream
+  | _ -> ()
+
+let rec junk_line stream = 
+  match Stream.next stream with
+  |'\n' -> ()
+  | _   -> junk_line stream
+
+let rec tokenize_nb i stream = 
+  match Stream.next stream with
+  |'0'..'9' as c -> tokenize_nb (i*10 + (Char.code c - 48)) stream
+  |' ' -> Int i
+  |'.' -> Float (tokenize_float (float_of_int i) 10. stream)
+  | _  -> raise (Bad_format "Cannot parse OBJ file, expected int")
+
+and tokenize_float i r stream =
+  match Stream.next stream with
+  |'0'..'9' as c -> tokenize_float (i +. float_of_int (Char.code c - 48) /. r) (r*.10.) stream
+  |' ' -> i
+  | _ -> raise (Bad_format ("Cannot parse OBJ file, expected float"))
+
+and tokenize_obj stream = 
+  junk_spaces stream;
+  match Stream.peek stream with
+  |Some(c) -> begin
+    match c with
+    |'0'..'9' -> (tokenize_nb 0 stream :: (tokenize_obj stream))
+    |'-' -> 
+        Stream.junk stream; 
+        junk_spaces stream; 
+        begin 
+          match tokenize_nb 0 stream with
+          |Int i -> (Int (-i) :: (tokenize_obj stream))
+          |Float f -> (Float (-.f) :: (tokenize_obj stream))
+          | _ -> assert false
+        end
+    |'.' -> 
+        Stream.junk stream; 
+        (Float(tokenize_float 0. 10. stream) :: (tokenize_obj stream))
+    |'/' -> 
+        Stream.junk stream;
+        (Slash :: (tokenize_obj stream))
+    |'v' -> begin
+      Stream.junk stream;
+      match Stream.next stream with
+      |' ' -> V :: (tokenize_obj stream)
+      |'t' -> VT :: (tokenize_obj stream)
+      |'n' -> VN :: (tokenize_obj stream)
+      | _  -> junk_line stream; tokenize_obj stream
+    end
+    |'f' -> F :: (tokenize_obj stream)
+    | _  -> 
+        junk_line stream; 
+        tokenize_obj stream
+  end
+  |None -> []
+
+let rec parse_point = function
+  |Int x :: Slash :: Int y :: Slash :: Int z :: t -> ((Some x, Some y, Some z), t)
+  |Int x :: Slash :: Slash :: Int z :: t -> ((Some x, None, Some z), t)
+  |Int x :: Slash :: Int y :: Slash :: t -> ((Some x, Some y, None), t)
+  |Int x :: Slash :: Int y :: t -> ((Some x, Some y, None), t)
+  |Int x :: Slash :: Slash :: t-> ((Some x, None, None), t)
+  |Int x :: Slash :: t -> ((Some x, None, None), t)
+  |Int x :: t -> ((Some x, None, None), t)
+  | _ -> raise (Bad_format "Cannot parse OBJ file : bad point format")
+
+let rec parse_triangle l = 
+  let (pt1, l) = parse_point l in
+  let (pt2, l) = parse_point l in
+  let (pt3, l) = parse_point l in
+  ((pt1, pt2, pt3), l)
+
+let rec parse_tokens lv lvt lvn lf = function
+  |[] -> (lv, lvt, lvn, lf)
+  |V :: Float x :: Float y :: Float z :: t-> 
+      parse_tokens
+        (OgamlMath.Vector3f.({x;y;z}) :: lv)
+        lvt lvn lf t
+  |VT :: Float x :: Float y :: t ->
+      parse_tokens
+        lv
+        (OgamlMath.Vector2f.({x;y}) :: lvt)
+        lvn lf t
+  |VN :: Float x :: Float y :: Float z :: t ->
+      parse_tokens
+        lv lvt
+        (OgamlMath.Vector3f.({x;y;z}) :: lvn)
+        lf t
+  |F :: l -> 
+      let (tri,l) = parse_triangle l in
+      parse_tokens lv lvt lvn (tri :: lf) l
+  | _ -> raise (Bad_format "Cannot parse OBJ file")
+
+
 let from_obj ?scale:(scale = 1.0) ?color:(color = `RGB Color.RGB.white) data src = 
   let str = to_source data in
   let lines = Str.split (Str.regexp "[\r\n]+") str in
