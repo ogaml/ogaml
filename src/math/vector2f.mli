@@ -1,14 +1,12 @@
-(* Operations on immutable 3 floats vectors *)
+(* Operations on immutable 2 floats vectors *)
 
-type t = {x : float; y : float; z : float}
+type t = {x : float; y : float}
 
 val zero : t
 
 val unit_x : t
 
 val unit_y : t
-
-val unit_z : t
 
 val add : t -> t -> t
 
@@ -18,17 +16,13 @@ val prop : float -> t -> t
 
 val div : float -> t -> t
 
-val floor : t -> Vector3i.t
+val floor : t -> Vector2i.t
 
-val from_int : Vector3i.t -> t
-
-val project : t -> Vector2f.t
-
-val lift : Vector2f.t -> t
+val from_int : Vector2i.t -> t
 
 val dot : t -> t -> float
 
-val cross : t -> t -> t
+val det : t -> t -> float
 
 val angle : t -> t -> float
 
@@ -46,10 +40,7 @@ val normalize : t -> t
 
 val print : t -> string
 
-(* Returns the normalized direction vector from point1 to point 2 
- * Equivalent to normalize @ sub *)
 val direction : t -> t -> t
 
-(* Returns the point u + tv *)
 val endpoint : t -> t -> float -> t
 

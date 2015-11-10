@@ -3,9 +3,6 @@
 (* Type of 4x4 matrices stored in a flat column major array *)
 type t
 
-(* Temporary ? *)
-val to_bigarray : t -> (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t
-
 (* Zero matrix *)
 val zero : unit -> t
 
@@ -66,5 +63,8 @@ val perspective : near:float -> far:float -> width:float -> height:float ->
 (* Inverse perspective projection matrix *)
 val iperspective : near:float -> far:float -> width:float -> height:float ->
     fov:float -> t
+
+(* Returns the matrix as a bigarray *)
+val to_bigarray : t -> (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t
 
 

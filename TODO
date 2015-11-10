@@ -103,8 +103,8 @@ Math part:
   ✔ Write a Makefile @done(2015-10-24 10:12) @project(Math part)
   ✔ Write tests @done(2015-10-29 18:32) @project(Math part)
   ✔ Implement Matrix3f @done(2015-10-24 11:10) @project(Math part)
-  ☐ Implement Vector3i
-  ☐ Implement Vector2i and Vector2f
+  ✔ Implement Vector3i @done(2015-11-10 11:27) @project(Math part)
+  ✔ Implement Vector2i and Vector2f @done(2015-11-10 11:27) @project(Math part)
   ✔ Add more complex functions to matrix3f (look_at, clipping, etc...) @done(2015-10-24 11:55) @project(Math part)
   ✔ Debug matrices... Really @done(2015-10-25 09:17) @project(Math part)
   ✔ Recode inverse matrices after debugging @done(2015-10-25 09:20) @project(Math part)

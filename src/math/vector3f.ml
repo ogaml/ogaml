@@ -44,6 +44,17 @@ let from_int v = {
   z = float_of_int v.Vector3i.z
 }
 
+let project v = {
+  Vector2f.x = v.x;
+  Vector2f.y = v.y
+}
+
+let lift v = {
+  x = v.Vector2f.x;
+  y = v.Vector2f.y;
+  z = 0.
+}
+
 let dot u v = 
   u.x *. v.x +.
   u.y *. v.y +.
@@ -63,6 +74,12 @@ let norm v =
 
 let normalize v = 
   div (norm v) v
+
+let clamp u a b = {
+  x = min b.x (max u.x a.x);
+  y = min b.y (max u.y a.y);
+  z = min b.z (max u.z a.z)
+}
 
 let max v = 
   max (max v.x v.y) v.z
