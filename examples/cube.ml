@@ -168,7 +168,7 @@ let rec main_loop () =
 
 (* Start *)
 let () =
-  Printf.printf "Rendering %i vertices\n%!" (VertexArray.length cube / 7);
+  Printf.printf "Rendering %i vertices\n%!" (VertexArray.length cube);
   initial_time := Unix.gettimeofday ();
   main_loop ();
   Printf.printf "Avg FPS: %f\n%!" (float_of_int (!frame_count) /. (Unix.gettimeofday () -. !initial_time));
