@@ -41,7 +41,7 @@ module Source = struct
     normal   : string option;
     color    : string option;
     mutable length   : int;
-    data     : GL.Data.t;
+    data     : (float, GL.Data.float_32) GL.Data.t;
   }
 
   let empty ?position ?normal ?texcoord ?color ~size () = 
@@ -56,7 +56,7 @@ module Source = struct
       normal;
       color;
       length = 0;
-      data = GL.Data.create size
+      data = GL.Data.create_float size
     }
 
   let requires_position s = s.position <> None

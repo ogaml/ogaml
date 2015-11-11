@@ -42,6 +42,7 @@ contextSettings.cmi : color.cmi
 drawMode.cmi :
 drawParameter.cmi :
 image.cmi : color.cmi
+indexArray.cmi : GL.cmi
 keyboard.cmi :
 model.cmi : vertexArray.cmi color.cmi
 mouse.cmi : window.cmi
