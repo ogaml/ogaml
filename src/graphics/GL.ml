@@ -206,7 +206,7 @@ module Data = struct
   let add_2f t v = 
     alloc t 2;
     t.data.{t.length+0} <- v.OgamlMath.Vector2f.x;
-    t.data.{t.length+1} <- v.OgamlMath.Vector2f.x;
+    t.data.{t.length+1} <- v.OgamlMath.Vector2f.y;
     t.length <- t.length+2
 
   let add_int32 t i =

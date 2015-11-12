@@ -36,7 +36,6 @@ let parse_bmp str =
   let height = input_32bit_le str 22 in
   let bpp  = input_16bit_le str 28 in
   let size = width * height * (bpp / 8) in
-  Printf.printf "%i %i %i %i %i %i\n%!" data_pos width height size bpp (String.length str);
   let data = Bytes.make size '\000' in
   for i = 0 to size - 1 do
     match i mod 4 with
