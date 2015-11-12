@@ -172,6 +172,12 @@ module Data : sig
   (** Adds two floats to the data *)
   val add_2f : (float, float_32) t -> OgamlMath.Vector2f.t -> unit
 
+  (** Adds an int to the data *)
+  val add_int : (int32, int_32) t -> int -> unit
+
+  (** Adds an int32 to the data *)
+  val add_int32 : (int32, int_32) t -> int32 -> unit
+
   (** Returns the data associated to a matrix *)
   val of_matrix : OgamlMath.Matrix3D.t -> (float, float_32) t
 
@@ -400,10 +406,10 @@ module EBO : sig
   val destroy : t -> unit
 
   (** Sets the data of the currently bound EBO *)
-  val data : int -> (int, Data.int_32) Data.t option -> Types.VBOKind.t -> unit
+  val data : int -> (int32, Data.int_32) Data.t option -> Types.VBOKind.t -> unit
 
   (** Sets some subset of the data of the currently bound EBO *)
-  val subdata : int -> int -> (int, Data.int_32) Data.t -> unit
+  val subdata : int -> int -> (int32, Data.int_32) Data.t -> unit
 
 end
 

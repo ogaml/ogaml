@@ -1,4 +1,6 @@
 
+exception Invalid_buffer of string
+
 module Source : sig
 
   type t

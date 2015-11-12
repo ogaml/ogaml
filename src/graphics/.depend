@@ -8,6 +8,8 @@ drawParameter.cmo : drawParameter.cmi
 drawParameter.cmx : drawParameter.cmi
 image.cmo : color.cmi image.cmi
 image.cmx : color.cmx image.cmi
+indexArray.cmo : GL.cmi indexArray.cmi
+indexArray.cmx : GL.cmx indexArray.cmi
 keyboard.cmo : ../core/LL.cmi keyboard.cmi
 keyboard.cmx : ../core/LL.cmi keyboard.cmi
 model.cmo : vertexArray.cmi color.cmi model.cmi

@@ -144,6 +144,7 @@ module Data = struct
 
   type ('a, 'b) t = {
     mutable data   : ('a, 'b) batype;
+    mutable kind   : ('a, 'b) Bigarray.kind;
     mutable size   : int;
     mutable length : int
   }
@@ -155,7 +156,7 @@ module Data = struct
         Bigarray.c_layout
         (max i 1)
     in
-    {data = arr; size = (max i 1); length = 0}
+    {data = arr; kind = Bigarray.int32; size = (max i 1); length = 0}
 
   let create_float i = 
     let arr = 
@@ -164,13 +165,13 @@ module Data = struct
         Bigarray.c_layout
         (max i 1)
     in
-    {data = arr; size = (max i 1); length = 0}
+    {data = arr; kind = Bigarray.float32; size = (max i 1); length = 0}
 
 
   let double t = 
     let arr = 
       Bigarray.Array1.create
-        Bigarray.float32
+        t.kind
         Bigarray.c_layout
         (t.size * 2)
     in
@@ -208,8 +209,17 @@ module Data = struct
     t.data.{t.length+1} <- v.OgamlMath.Vector2f.x;
     t.length <- t.length+2
 
+  let add_int32 t i =
+    alloc t 1;
+    t.data.{t.length} <- i;
+    t.length <- t.length+1
+
+  let add_int t i = 
+    add_int32 t (Int32.of_int i)
+
   let of_matrix m = {
     data = OgamlMath.Matrix3D.to_bigarray m;
+    kind = Bigarray.float32;
     size = 16;
     length = 16
   }
@@ -384,9 +394,9 @@ module EBO = struct
 
   external destroy : t -> unit = "caml_destroy_buffer"
 
-  external data : int -> (int, Data.int_32) Data.t option -> Types.VBOKind.t -> unit = "caml_ebo_data"
+  external data : int -> (int32, Data.int_32) Data.t option -> Types.VBOKind.t -> unit = "caml_ebo_data"
 
-  external subdata : int -> int -> (int, Data.int_32) Data.t -> unit = "caml_ebo_subdata"
+  external subdata : int -> int -> (int32, Data.int_32) Data.t -> unit = "caml_ebo_subdata"
 
 end
 
