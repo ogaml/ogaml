@@ -26,4 +26,8 @@ eval `opam config env`
 opam install ${OPAM_DEPEND}
 
 make tests
+make install
+make clean
+make examples
+make uninstall
 
