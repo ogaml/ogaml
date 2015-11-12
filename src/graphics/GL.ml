@@ -136,27 +136,42 @@ end
 
 module Data = struct
 
-  type batype = (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t
+  type ('a, 'b) batype = ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t
 
-  type t = {
-    mutable data   : batype;
+  type float_32 = Bigarray.float32_elt
+
+  type int_32 = Bigarray.int32_elt
+
+  type ('a, 'b) t = {
+    mutable data   : ('a, 'b) batype;
+    mutable kind   : ('a, 'b) Bigarray.kind;
     mutable size   : int;
     mutable length : int
   }
 
-  let create i = 
+  let create_int i = 
     let arr = 
       Bigarray.Array1.create 
-        Bigarray.float32 
+        Bigarray.int32
         Bigarray.c_layout
         (max i 1)
     in
-    {data = arr; size = (max i 1); length = 0}
+    {data = arr; kind = Bigarray.int32; size = (max i 1); length = 0}
+
+  let create_float i = 
+    let arr = 
+      Bigarray.Array1.create 
+        Bigarray.float32
+        Bigarray.c_layout
+        (max i 1)
+    in
+    {data = arr; kind = Bigarray.float32; size = (max i 1); length = 0}
+
 
   let double t = 
     let arr = 
       Bigarray.Array1.create
-        Bigarray.float32
+        t.kind
         Bigarray.c_layout
         (t.size * 2)
     in
@@ -191,11 +206,20 @@ module Data = struct
   let add_2f t v = 
     alloc t 2;
     t.data.{t.length+0} <- v.OgamlMath.Vector2f.x;
-    t.data.{t.length+1} <- v.OgamlMath.Vector2f.x;
+    t.data.{t.length+1} <- v.OgamlMath.Vector2f.y;
     t.length <- t.length+2
+
+  let add_int32 t i =
+    alloc t 1;
+    t.data.{t.length} <- i;
+    t.length <- t.length+1
+
+  let add_int t i = 
+    add_int32 t (Int32.of_int i)
 
   let of_matrix m = {
     data = OgamlMath.Matrix3D.to_bigarray m;
+    kind = Bigarray.float32;
     size = 16;
     length = 16
   }
@@ -328,11 +352,28 @@ module VBO = struct
 
   external bind : t option -> unit = "caml_bind_vbo"
 
-  external data : int -> Data.t option -> Types.VBOKind.t -> unit = "caml_vbo_data"
+  external data : int -> (float, Data.float_32) Data.t option -> Types.VBOKind.t -> unit = "caml_vbo_data"
 
-  external subdata : int -> int -> Data.t -> unit = "caml_vbo_subdata"
+  external subdata : int -> int -> (float, Data.float_32) Data.t -> unit = "caml_vbo_subdata"
 
   external destroy : t -> unit = "caml_destroy_buffer"
+
+end
+
+
+module EBO = struct
+
+  type t
+
+  external create : unit -> t = "caml_create_buffer"
+
+  external bind : t option -> unit = "caml_bind_ebo"
+
+  external destroy : t -> unit = "caml_destroy_buffer"
+
+  external data : int -> (int32, Data.int_32) Data.t option -> Types.VBOKind.t -> unit = "caml_ebo_data"
+
+  external subdata : int -> int -> (int32, Data.int_32) Data.t -> unit = "caml_ebo_subdata"
 
 end
 
@@ -356,6 +397,8 @@ module VAO = struct
     int -> int -> Types.GlIntType.t -> int -> int -> unit = "caml_attrib_int"
 
   external draw : DrawMode.t -> int -> int -> unit = "caml_draw_arrays"
+
+  external draw_elements : DrawMode.t -> int -> unit = "caml_draw_elements"
 
 end
 
@@ -386,23 +429,23 @@ module Uniform = struct
 
   external uint4 : int -> int -> int -> int -> int -> unit = "caml_uniform4ui"
 
-  external abst_mat2 : int -> Data.batype -> unit = "caml_uniform_mat2"
+  external abst_mat2 : int -> (float, Data.float_32) Data.batype -> unit = "caml_uniform_mat2"
 
-  external abst_mat3 : int -> Data.batype -> unit = "caml_uniform_mat3"
+  external abst_mat3 : int -> (float, Data.float_32) Data.batype -> unit = "caml_uniform_mat3"
 
-  external abst_mat4 : int -> Data.batype -> unit = "caml_uniform_mat4"
+  external abst_mat4 : int -> (float, Data.float_32) Data.batype -> unit = "caml_uniform_mat4"
 
-  external abst_mat23 : int -> Data.batype -> unit = "caml_uniform_mat23"
+  external abst_mat23 : int -> (float, Data.float_32) Data.batype -> unit = "caml_uniform_mat23"
 
-  external abst_mat32 : int -> Data.batype -> unit = "caml_uniform_mat32"
+  external abst_mat32 : int -> (float, Data.float_32) Data.batype -> unit = "caml_uniform_mat32"
 
-  external abst_mat24 : int -> Data.batype -> unit = "caml_uniform_mat24"
+  external abst_mat24 : int -> (float, Data.float_32) Data.batype -> unit = "caml_uniform_mat24"
 
-  external abst_mat42 : int -> Data.batype -> unit = "caml_uniform_mat42"
+  external abst_mat42 : int -> (float, Data.float_32) Data.batype -> unit = "caml_uniform_mat42"
 
-  external abst_mat34 : int -> Data.batype -> unit = "caml_uniform_mat34"
+  external abst_mat34 : int -> (float, Data.float_32) Data.batype -> unit = "caml_uniform_mat34"
 
-  external abst_mat43 : int -> Data.batype -> unit = "caml_uniform_mat43"
+  external abst_mat43 : int -> (float, Data.float_32) Data.batype -> unit = "caml_uniform_mat43"
 
   let mat2  i m = abst_mat2  i m.Data.data
 

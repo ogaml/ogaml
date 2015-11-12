@@ -58,7 +58,7 @@ let vertex_source = VertexArray.Source.(
     << vertex3
 )
 
-let vertices = VertexArray.static vertex_source DrawMode.Triangles
+let vertices = VertexArray.static vertex_source
 
 let parameters = DrawParameter.make ()
 
@@ -76,7 +76,7 @@ let rec event_loop () =
 let rec main_loop () = 
   if Window.is_open window then begin 
     Window.clear window;
-    Window.draw ~window ~vertices ~program ~parameters ~uniform;
+    Window.draw ~window ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ();
     Window.display window;
     event_loop ();
     main_loop ();

@@ -35,10 +35,13 @@ val display : t -> unit
 (** Draws a vertex array *)
 val draw : 
   window     : t -> 
-  vertices   : 'a VertexArray.t -> 
+  ?indices   : 'a IndexArray.t ->
+  vertices   : 'b VertexArray.t -> 
   program    : Program.t -> 
   uniform    : Uniform.t ->
-  parameters : DrawParameter.t -> unit
+  parameters : DrawParameter.t ->
+  mode       : DrawMode.t ->
+  unit -> unit
 
 (** Clears the window *)
 val clear : t -> unit

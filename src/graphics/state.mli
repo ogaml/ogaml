@@ -88,6 +88,12 @@ module LL : sig
   (** Sets the current clear color *)
   val set_clear_color : t -> Color.t -> unit
 
+  (** Sets the currently bound EBO *)
+  val set_bound_ebo : t -> GL.EBO.t option -> unit
+
+  (** Returns the currently bound EBO *)
+  val bound_ebo : t -> GL.EBO.t option
+
 end
 
 

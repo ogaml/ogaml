@@ -29,9 +29,9 @@ let cube_source =
   Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
 
 
-let axis = VertexArray.static axis_source DrawMode.Lines
+let axis = VertexArray.static axis_source 
 
-let cube = VertexArray.static cube_source DrawMode.Triangles
+let cube = VertexArray.static cube_source 
 
 let default_program = 
   Program.from_source_pp (Window.state window)
@@ -75,12 +75,12 @@ let display () =
     |> Uniform.matrix3D "MVMatrix" mv
     |> Uniform.matrix3D "VMatrix" view
   in
-  Window.draw ~window ~vertices:cube ~uniform ~program:normal_program ~parameters;
+  Window.draw ~window ~vertices:cube ~uniform ~program:normal_program ~parameters ~mode:DrawMode.Triangles ();
   let uniform =
     Uniform.empty
     |> Uniform.matrix3D "MVPMatrix" vp
   in
-  Window.draw ~window ~vertices:axis ~uniform ~program:default_program ~parameters
+  Window.draw ~window ~vertices:axis ~uniform ~program:default_program ~parameters ~mode:DrawMode.Lines ()
 
 
 (* Camera *)
@@ -168,7 +168,7 @@ let rec main_loop () =
 
 (* Start *)
 let () =
-  Printf.printf "Rendering %i vertices\n%!" (VertexArray.length cube / 7);
+  Printf.printf "Rendering %i vertices\n%!" (VertexArray.length cube);
   initial_time := Unix.gettimeofday ();
   main_loop ();
   Printf.printf "Avg FPS: %f\n%!" (float_of_int (!frame_count) /. (Unix.gettimeofday () -. !initial_time));

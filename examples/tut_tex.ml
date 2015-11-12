@@ -1,7 +1,9 @@
 open OgamlGraphics
 open OgamlMath
+
+let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
  
-let window = Window.create ~width:800 ~height:600 
+let window = Window.create ~width:800 ~height:600 ~settings
 
 let () = GL.Pervasives.color 1.0 1.0 1.0 1.0
 
@@ -45,22 +47,22 @@ let program =
 let vertex1 = 
   VertexArray.Vertex.create 
     ~position:Vector3f.({x = -0.75; y = 0.75; z = 0.0}) 
-    ~texcoord:(0.,1.) ()
+    ~texcoord:Vector2f.({x = 0.; y = 1.}) ()
 
 let vertex2 = 
   VertexArray.Vertex.create
     ~position:Vector3f.({x = 0.75; y = 0.75; z = 0.0}) 
-    ~texcoord:(1.,1.) ()
+    ~texcoord:Vector2f.({x = 1.; y = 1.}) ()
 
 let vertex3 =
   VertexArray.Vertex.create
     ~position:Vector3f.({x = -0.75; y = -0.75; z = 0.0}) 
-    ~texcoord:(0.,0.) ()
+    ~texcoord:Vector2f.({x = 0.; y = 0.}) ()
 
 let vertex4 =
   VertexArray.Vertex.create
     ~position:Vector3f.({x = 0.75; y = -0.75; z = 0.0}) 
-    ~texcoord:(1.,0.) ()
+    ~texcoord:Vector2f.({x = 1.; y = 0.}) ()
 
 let vertex_source = VertexArray.Source.(
     empty ~position:"position" ~texcoord:"uv" ~size:4 ()
@@ -70,7 +72,7 @@ let vertex_source = VertexArray.Source.(
     << vertex4
 )
 
-let vertices = VertexArray.static vertex_source DrawMode.TriangleStrip
+let vertices = VertexArray.static vertex_source
 
 let texture = Texture.Texture2D.create (Window.state window) (`File "examples/mario-block.bmp")
 
@@ -91,8 +93,8 @@ let rec event_loop () =
 
 let rec main_loop () = 
   if Window.is_open window then begin 
-    Window.clear window ~color:true ~stencil:false ~depth:false;
-    Window.draw ~window ~vertices ~program ~parameters ~uniform;
+    Window.clear window;
+    Window.draw ~window ~vertices ~program ~parameters ~uniform ~mode:DrawMode.TriangleStrip ();
     Window.display window;
     event_loop ();
     main_loop ();

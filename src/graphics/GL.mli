@@ -148,29 +148,44 @@ end
 (** Represents openGL data internally *)
 module Data : sig
 
-  (** Type of data *)
-  type t  
+  (** Type of floats stored in data *)
+  type float_32
+
+  (** Type of ints stored in data *)
+  type int_32
+
+  (** Type of data using caml type 'a and storing type 'b *)
+  type ('a, 'b) t  
 
   (** Creates some data, the integer must be the expected size *)
-  val create : int -> t
+  val create_int : int -> (int32, int_32) t
+
+  (** Creates some data, the integer must be the expected size *)
+  val create_float : int -> (float, float_32) t
 
   (** Adds a vector3f to the data *)
-  val add_3f : t -> OgamlMath.Vector3f.t -> unit
+  val add_3f : (float, float_32) t -> OgamlMath.Vector3f.t -> unit
 
   (** Adds a color to the data *)
-  val add_color : t -> Color.t -> unit
+  val add_color : (float, float_32) t -> Color.t -> unit
 
   (** Adds two floats to the data *)
-  val add_2f : t -> OgamlMath.Vector2f.t -> unit
+  val add_2f : (float, float_32) t -> OgamlMath.Vector2f.t -> unit
 
-  (** Returns the data associated to a matrix TEMPORARY *)
-  val of_matrix : OgamlMath.Matrix3D.t -> t
+  (** Adds an int to the data *)
+  val add_int : (int32, int_32) t -> int -> unit
+
+  (** Adds an int32 to the data *)
+  val add_int32 : (int32, int_32) t -> int32 -> unit
+
+  (** Returns the data associated to a matrix *)
+  val of_matrix : OgamlMath.Matrix3D.t -> (float, float_32) t
 
   (** Returns the length of some data*)
-  val length : t -> int
+  val length : ('a, 'b) t -> int
 
   (** Returns the data at position i (debug only) *)
-  val get : t -> int -> float
+  val get : ('a, 'b) t -> int -> 'a 
 
 end
 
@@ -334,13 +349,37 @@ module VBO : sig
   val bind : t option -> unit
 
   (** Sets the data of the currently bound VBO *)
-  val data : int -> Data.t option -> Types.VBOKind.t -> unit
+  val data : int -> (float, Data.float_32) Data.t option -> Types.VBOKind.t -> unit
 
   (** Sets some subset of the data of the currently bound VBO *)
-  val subdata : int -> int -> Data.t -> unit
+  val subdata : int -> int -> (float, Data.float_32) Data.t -> unit
 
   (** Destroys a VBO *)
   val destroy : t -> unit
+
+end
+
+
+(** Represents an openGL element buffer *)
+module EBO : sig
+
+  (** Type of an EBO *)
+  type t
+
+  (** Creates an EBO *)
+  val create : unit -> t
+
+  (** Binds an EBO *)
+  val bind : t option -> unit
+
+  (** Destroys an EBO *)
+  val destroy : t -> unit
+
+  (** Sets the data of the currently bound EBO *)
+  val data : int -> (int32, Data.int_32) Data.t option -> Types.VBOKind.t -> unit
+
+  (** Sets some subset of the data of the currently bound EBO *)
+  val subdata : int -> int -> (int32, Data.int_32) Data.t -> unit
 
 end
 
@@ -372,6 +411,9 @@ module VAO : sig
   (** Draws the currently bound VAO *)
   val draw : DrawMode.t -> int -> int -> unit
 
+  (** Draws an element array using the currently bound VAO and EBO *)
+  val draw_elements : DrawMode.t -> int -> unit
+
 end
 
 
@@ -402,23 +444,23 @@ module Uniform : sig
 
   val uint4 : Program.u_location -> int -> int -> int -> int ->unit
 
-  val mat2  : Program.u_location -> Data.t -> unit
+  val mat2  : Program.u_location -> (float, Data.float_32) Data.t -> unit
 
-  val mat23 : Program.u_location -> Data.t -> unit
+  val mat23 : Program.u_location -> (float, Data.float_32) Data.t -> unit
 
-  val mat24 : Program.u_location -> Data.t -> unit
+  val mat24 : Program.u_location -> (float, Data.float_32) Data.t -> unit
 
-  val mat32 : Program.u_location -> Data.t -> unit
+  val mat32 : Program.u_location -> (float, Data.float_32) Data.t -> unit
 
-  val mat3  : Program.u_location -> Data.t -> unit
+  val mat3  : Program.u_location -> (float, Data.float_32) Data.t -> unit
 
-  val mat34 : Program.u_location -> Data.t -> unit
+  val mat34 : Program.u_location -> (float, Data.float_32) Data.t -> unit
 
-  val mat42 : Program.u_location -> Data.t -> unit
+  val mat42 : Program.u_location -> (float, Data.float_32) Data.t -> unit
 
-  val mat43 : Program.u_location -> Data.t -> unit
+  val mat43 : Program.u_location -> (float, Data.float_32) Data.t -> unit
 
-  val mat4  : Program.u_location -> Data.t -> unit
+  val mat4  : Program.u_location -> (float, Data.float_32) Data.t -> unit
 
 end
 
