@@ -27,11 +27,12 @@ module Source = struct
 end
 
 
-type static = unit
+type static 
 
-type dynamic = unit
+type dynamic
 
 type _ t = {
+  indices : bool;
   buffer  : GL.EBO.t;
   size    : int;
   length  : int;
@@ -45,10 +46,11 @@ let dynamic src =
   GL.EBO.data (GL.Data.length data * 4) (Some data) (GL.Types.VBOKind.DynamicDraw);
   GL.EBO.bind None;
   {
-   buffer;
-   size = GL.Data.length data;
-   length = Source.length src; 
-   valid = true
+    indices = true;
+    buffer;
+    size = GL.Data.length data;
+    length = Source.length src; 
+    valid = true
   }
 
 let static src = 
@@ -58,10 +60,11 @@ let static src =
   GL.EBO.data (GL.Data.length data * 4) (Some data) (GL.Types.VBOKind.StaticDraw);
   GL.EBO.bind None;
   {
-   buffer;
-   size = GL.Data.length data;
-   length = Source.length src; 
-   valid = true
+    indices = true;
+    buffer;
+    size = GL.Data.length data;
+    length = Source.length src; 
+    valid = true
   }
 
 let rebuild t src =
@@ -74,10 +77,11 @@ let rebuild t src =
   GL.EBO.subdata 0 (GL.Data.length data * 4) data;
   GL.EBO.bind None;
   {
-   buffer = t.buffer;
-   size   = max (GL.Data.length data) (t.size);
-   length = Source.length src;
-   valid  = true
+    indices = true;
+    buffer = t.buffer;
+    size   = max (GL.Data.length data) (t.size);
+    length = Source.length src;
+    valid  = true
   }
 
 let length t = t.length
@@ -88,11 +92,15 @@ let destroy t =
   GL.EBO.destroy t.buffer;
   t.valid <- false
 
+
 module LL = struct
 
-  let buffer t = 
+  let bind state t = 
     if not t.valid then
-      raise (Invalid_buffer "Cannot get buffer, it may have been destroyed");
-    t.buffer
+      raise (Invalid_buffer "Cannot bind buffer, it may have been destroyed");
+    if State.LL.bound_ebo state <> (Some t.buffer) then begin
+      GL.EBO.bind (Some t.buffer);
+      State.LL.set_bound_ebo state (Some t.buffer);
+    end
 
 end

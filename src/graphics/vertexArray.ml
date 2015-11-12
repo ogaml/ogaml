@@ -139,9 +139,9 @@ module Source = struct
 
 end
 
-type static = unit
+type static
 
-type dynamic = unit
+type dynamic
 
 type _ t = {
   buffer  : GL.VBO.t;
@@ -150,12 +150,11 @@ type _ t = {
   length  : int;
   attribs : (Source.attrib * string * int) list;
   stride  : int;
-  mode    : DrawMode.t;
   mutable bound : Program.t option;
   mutable valid : bool
 }
 
-let dynamic src mode = 
+let dynamic src = 
   let vao    = GL.VAO.create () in
   let buffer = GL.VBO.create () in
   let data = src.Source.data in
@@ -168,12 +167,11 @@ let dynamic src mode =
    length = Source.length src; 
    attribs = Source.attribs src;
    stride = Source.stride src;
-   mode;  
    bound = None;
    valid = true
   }
 
-let static src mode = 
+let static src = 
   let vao    = GL.VAO.create () in
   let buffer = GL.VBO.create () in
   let data = src.Source.data in
@@ -186,12 +184,11 @@ let static src mode =
    length = Source.length src; 
    attribs = Source.attribs src;
    stride = Source.stride src;
-   mode;
    bound = None;
    valid = true
   }
 
-let rebuild t src mode =
+let rebuild t src =
   if not t.valid then
     raise (Invalid_buffer "Cannot rebuild buffer, it may have been destroyed");
   let data = src.Source.data in
@@ -207,59 +204,9 @@ let rebuild t src mode =
    length = Source.length src;
    attribs = Source.attribs src;
    stride = Source.stride src;
-   mode;
    bound  = t.bound;
    valid  = true
   }
-
-let bind state t prog = 
-  if not t.valid then
-    raise (Invalid_buffer "Cannot bind buffer, it may have been destroyed");
-  if t.bound <> Some prog then begin
-    t.bound <- Some prog;
-    GL.VAO.bind (Some t.vao);
-    State.LL.set_bound_vao state (Some t.vao);
-    GL.VBO.bind (Some t.buffer);
-    State.LL.set_bound_vbo state (Some t.buffer);
-    let attribs = ref t.attribs in
-    let rec find_remove s = function
-      | [] -> 
-        raise (Missing_attribute 
-          (Printf.sprintf "Attribute %s not provided in vertex source" s)
-        )
-      | (e,h,off)::t when h = s -> (e,off,t)
-      | h::t -> 
-        let (e,off,l) = find_remove s t in 
-        (e,off,h::l)
-    in
-    Program.LL.iter_attributes prog 
-      (fun att ->
-        let (typ,offset,l) = find_remove (Program.Attribute.name att) !attribs in
-        attribs := l;
-        if Source.type_of_attrib typ <> Program.Attribute.kind att then
-          raise (Invalid_attribute
-            (Printf.sprintf "Attribute %s has invalid type"
-              (Program.Attribute.name att)
-            ));
-        GL.VAO.enable_attrib (Program.Attribute.location att);
-        GL.VAO.attrib_float 
-          (Program.Attribute.location att)
-          (Source.size_of_attrib typ)
-          (GL.Types.GlFloatType.Float)
-          (offset   * 4)
-          (t.stride * 4)
-      );
-    if !attribs <> [] then
-      raise (Invalid_attribute
-        (Printf.sprintf "Attribute %s not required by program" 
-          (let (_,s,_) = List.hd !attribs in s)
-        ))
-  end
-  else if State.LL.bound_vao state <> (Some t.vao) then begin
-    GL.VAO.bind (Some t.vao);
-    State.LL.set_bound_vao state (Some t.vao);
-    State.LL.set_bound_vbo state (Some t.buffer);
-  end
 
 let length t = t.length
 
@@ -272,10 +219,55 @@ let destroy t =
 
 module LL = struct
 
-  let draw state t prog = 
+  let bind state t prog = 
     if not t.valid then
-      raise (Invalid_buffer "Cannot draw buffer, it may have been destroyed");
-    bind state t prog;
-    GL.VAO.draw t.mode 0 t.length
+      raise (Invalid_buffer "Cannot bind buffer, it may have been destroyed");
+    if t.bound <> Some prog then begin
+      t.bound <- Some prog;
+      GL.VAO.bind (Some t.vao);
+      State.LL.set_bound_vao state (Some t.vao);
+      GL.VBO.bind (Some t.buffer);
+      State.LL.set_bound_vbo state (Some t.buffer);
+      let attribs = ref t.attribs in
+      let rec find_remove s = function
+        | [] -> 
+          raise (Missing_attribute 
+            (Printf.sprintf "Attribute %s not provided in vertex source" s)
+          )
+        | (e,h,off)::t when h = s -> (e,off,t)
+        | h::t -> 
+          let (e,off,l) = find_remove s t in 
+          (e,off,h::l)
+      in
+      Program.LL.iter_attributes prog 
+        (fun att ->
+          let (typ,offset,l) = find_remove (Program.Attribute.name att) !attribs in
+          attribs := l;
+          if Source.type_of_attrib typ <> Program.Attribute.kind att then
+            raise (Invalid_attribute
+              (Printf.sprintf "Attribute %s has invalid type"
+                (Program.Attribute.name att)
+              ));
+          GL.VAO.enable_attrib (Program.Attribute.location att);
+          GL.VAO.attrib_float 
+            (Program.Attribute.location att)
+            (Source.size_of_attrib typ)
+            (GL.Types.GlFloatType.Float)
+            (offset   * 4)
+            (t.stride * 4)
+        );
+      if !attribs <> [] then
+        raise (Invalid_attribute
+          (Printf.sprintf "Attribute %s not required by program" 
+            (let (_,s,_) = List.hd !attribs in s)
+          ))
+    end
+    else if State.LL.bound_vao state <> (Some t.vao) then begin
+      GL.VAO.bind (Some t.vao);
+      State.LL.set_bound_vao state (Some t.vao);
+      State.LL.set_bound_vbo state (Some t.buffer);
+    end
 
 end
+
+

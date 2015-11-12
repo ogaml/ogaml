@@ -14,6 +14,7 @@ type t = {
   mutable linked_program : GL.Program.t option;
   mutable bound_vbo : GL.VBO.t option;
   mutable bound_vao : GL.VAO.t option;
+  mutable bound_ebo : GL.EBO.t option;
   mutable color : Color.t
 }
 
@@ -74,6 +75,7 @@ module LL = struct
       linked_program = None;
       bound_vbo = None;
       bound_vao = None;
+      bound_ebo = None;
       color = `RGB (Color.RGB.transparent)
     }
 
@@ -122,6 +124,12 @@ module LL = struct
 
   let set_bound_vao s v = 
     s.bound_vao <- v
+
+  let bound_ebo s = 
+    s.bound_ebo
+
+  let set_bound_ebo s v = 
+    s.bound_ebo <- v
 
   let set_clear_color s c = 
     s.color <- c

@@ -361,6 +361,23 @@ module VBO = struct
 end
 
 
+module EBO = struct
+
+  type t
+
+  external create : unit -> t = "caml_create_buffer"
+
+  external bind : t option -> unit = "caml_bind_ebo"
+
+  external destroy : t -> unit = "caml_destroy_buffer"
+
+  external data : int -> (int32, Data.int_32) Data.t option -> Types.VBOKind.t -> unit = "caml_ebo_data"
+
+  external subdata : int -> int -> (int32, Data.int_32) Data.t -> unit = "caml_ebo_subdata"
+
+end
+
+
 module VAO = struct
 
   type t
@@ -381,22 +398,7 @@ module VAO = struct
 
   external draw : DrawMode.t -> int -> int -> unit = "caml_draw_arrays"
 
-end
-
-
-module EBO = struct
-
-  type t
-
-  external create : unit -> t = "caml_create_buffer"
-
-  external bind : t option -> unit = "caml_bind_ebo"
-
-  external destroy : t -> unit = "caml_destroy_buffer"
-
-  external data : int -> (int32, Data.int_32) Data.t option -> Types.VBOKind.t -> unit = "caml_ebo_data"
-
-  external subdata : int -> int -> (int32, Data.int_32) Data.t -> unit = "caml_ebo_subdata"
+  external draw_elements : DrawMode.t -> int -> unit = "caml_draw_elements"
 
 end
 

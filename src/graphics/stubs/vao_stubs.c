@@ -201,3 +201,19 @@ caml_draw_arrays(value mode, value start, value end)
 
   CAMLreturn(Val_unit);
 }
+
+
+// INPUT   a draw mode, a number of elements
+// OUTPUT  nothing, draws the requested number of elements from
+//         the currently bound EBO and VAO
+CAMLprim value
+caml_draw_elements(value mode, value nb)
+{
+  CAMLparam2(mode, nb);
+
+  glDrawElements(Drawmode_val(mode), Int_val(nb), GL_UNSIGNED_INT, (void*)0);
+
+  CAMLreturn(Val_unit);
+}
+
+

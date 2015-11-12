@@ -34,7 +34,7 @@ val destroy : 'a t -> unit
 
 module LL : sig
 
-  val buffer : 'a t -> GL.EBO.t
+  val bind : State.t -> 'a t -> unit
 
 end
 

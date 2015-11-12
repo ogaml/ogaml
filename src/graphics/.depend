@@ -8,8 +8,8 @@ drawParameter.cmo : drawParameter.cmi
 drawParameter.cmx : drawParameter.cmi
 image.cmo : color.cmi image.cmi
 image.cmx : color.cmx image.cmi
-indexArray.cmo : GL.cmi indexArray.cmi
-indexArray.cmx : GL.cmx indexArray.cmi
+indexArray.cmo : state.cmi GL.cmi indexArray.cmi
+indexArray.cmx : state.cmx GL.cmx indexArray.cmi
 keyboard.cmo : ../core/LL.cmi keyboard.cmi
 keyboard.cmx : ../core/LL.cmi keyboard.cmi
 model.cmo : vertexArray.cmi color.cmi model.cmi
@@ -28,23 +28,21 @@ texture.cmo : state.cmi image.cmi GL.cmi texture.cmi
 texture.cmx : state.cmx image.cmx GL.cmx texture.cmi
 uniform.cmo : texture.cmi state.cmi program.cmi GL.cmi color.cmi uniform.cmi
 uniform.cmx : texture.cmx state.cmx program.cmx GL.cmx color.cmx uniform.cmi
-vertexArray.cmo : state.cmi program.cmi GL.cmi drawMode.cmi color.cmi \
-    vertexArray.cmi
-vertexArray.cmx : state.cmx program.cmx GL.cmx drawMode.cmi color.cmx \
-    vertexArray.cmi
+vertexArray.cmo : state.cmi program.cmi GL.cmi color.cmi vertexArray.cmi
+vertexArray.cmx : state.cmx program.cmx GL.cmx color.cmx vertexArray.cmi
 window.cmo : vertexArray.cmi uniform.cmi state.cmi program.cmi \
-    ../core/LL.cmi GL.cmi drawParameter.cmi contextSettings.cmi color.cmi \
-    window.cmi
+    ../core/LL.cmi indexArray.cmi GL.cmi drawParameter.cmi \
+    contextSettings.cmi color.cmi window.cmi
 window.cmx : vertexArray.cmx uniform.cmx state.cmx program.cmx \
-    ../core/LL.cmi GL.cmx drawParameter.cmx contextSettings.cmx color.cmx \
-    window.cmi
+    ../core/LL.cmi indexArray.cmx GL.cmx drawParameter.cmx \
+    contextSettings.cmx color.cmx window.cmi
 GL.cmi : drawParameter.cmi drawMode.cmi color.cmi
 color.cmi :
 contextSettings.cmi : color.cmi
 drawMode.cmi :
 drawParameter.cmi :
 image.cmi : color.cmi
-indexArray.cmi : GL.cmi
+indexArray.cmi : state.cmi
 keyboard.cmi :
 model.cmi : vertexArray.cmi color.cmi
 mouse.cmi : window.cmi
@@ -54,6 +52,6 @@ sprite.cmi :
 state.cmi : GL.cmi drawParameter.cmi color.cmi
 texture.cmi : state.cmi image.cmi
 uniform.cmi : texture.cmi state.cmi program.cmi color.cmi
-vertexArray.cmi : state.cmi program.cmi drawMode.cmi color.cmi
+vertexArray.cmi : state.cmi program.cmi color.cmi
 window.cmi : vertexArray.cmi uniform.cmi state.cmi program.cmi \
-    drawParameter.cmi contextSettings.cmi
+    indexArray.cmi drawParameter.cmi drawMode.cmi contextSettings.cmi

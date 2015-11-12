@@ -28,7 +28,7 @@ let poll_event win = LL.Window.poll_event win.internal
 
 let display win = LL.Window.display win.internal
 
-let draw ~window ~vertices ~program ~uniform ~parameters =
+let draw ~window ?indices ~vertices ~program ~uniform ~parameters ~mode () = 
   let cull_mode = DrawParameter.culling parameters in
   if State.culling_mode window.state <> cull_mode then begin
     State.LL.set_culling_mode window.state cull_mode;
@@ -46,7 +46,12 @@ let draw ~window ~vertices ~program ~uniform ~parameters =
   end;
   Program.LL.use window.state (Some program);
   Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind window.state uniform unif);
-  VertexArray.LL.draw window.state vertices program
+  VertexArray.LL.bind window.state vertices program;
+  match indices with
+  |None -> GL.VAO.draw mode 0 (VertexArray.length vertices)
+  |Some ebo -> 
+    IndexArray.LL.bind window.state ebo;
+    GL.VAO.draw_elements mode (IndexArray.length ebo) 
 
 let clear win = 
   let cc = ContextSettings.color win.settings in

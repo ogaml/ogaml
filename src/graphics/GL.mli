@@ -360,6 +360,30 @@ module VBO : sig
 end
 
 
+(** Represents an openGL element buffer *)
+module EBO : sig
+
+  (** Type of an EBO *)
+  type t
+
+  (** Creates an EBO *)
+  val create : unit -> t
+
+  (** Binds an EBO *)
+  val bind : t option -> unit
+
+  (** Destroys an EBO *)
+  val destroy : t -> unit
+
+  (** Sets the data of the currently bound EBO *)
+  val data : int -> (int32, Data.int_32) Data.t option -> Types.VBOKind.t -> unit
+
+  (** Sets some subset of the data of the currently bound EBO *)
+  val subdata : int -> int -> (int32, Data.int_32) Data.t -> unit
+
+end
+
+
 (** Represents an openGL vertex array *)
 module VAO : sig
 
@@ -387,29 +411,8 @@ module VAO : sig
   (** Draws the currently bound VAO *)
   val draw : DrawMode.t -> int -> int -> unit
 
-end
-
-
-(** Represents an openGL element buffer *)
-module EBO : sig
-
-  (** Type of an EBO *)
-  type t
-
-  (** Creates an EBO *)
-  val create : unit -> t
-
-  (** Binds an EBO *)
-  val bind : t option -> unit
-
-  (** Destroys an EBO *)
-  val destroy : t -> unit
-
-  (** Sets the data of the currently bound EBO *)
-  val data : int -> (int32, Data.int_32) Data.t option -> Types.VBOKind.t -> unit
-
-  (** Sets some subset of the data of the currently bound EBO *)
-  val subdata : int -> int -> (int32, Data.int_32) Data.t -> unit
+  (** Draws an element array using the currently bound VAO and EBO *)
+  val draw_elements : DrawMode.t -> int -> unit
 
 end
 
