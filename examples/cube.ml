@@ -22,11 +22,33 @@ let axis_source =
 let cube_source = 
   let src = VertexArray.Source.empty 
     ~position:"in_position" 
-    ~color:"in_color" 
     ~normal:"in_normal"
     ~size:36 () 
   in
-  Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
+(*   Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) *)
+  src
+
+let cube_model = Model.empty ()
+
+let () = 
+  let pt0 = Model.add_point cube_model ~vertex:Vector3f.({x = -1.; y = -1.; z = -1.}) () in
+  let pt1 = Model.add_point cube_model ~vertex:Vector3f.({x = -1.; y = -1.; z =  1.}) () in
+  let pt2 = Model.add_point cube_model ~vertex:Vector3f.({x =  1.; y = -1.; z = -1.}) () in
+  let pt3 = Model.add_point cube_model ~vertex:Vector3f.({x =  1.; y = -1.; z =  1.}) () in
+  let pt4 = Model.add_point cube_model ~vertex:Vector3f.({x = -1.; y =  1.; z = -1.}) () in
+  let pt5 = Model.add_point cube_model ~vertex:Vector3f.({x = -1.; y =  1.; z =  1.}) () in
+  let pt6 = Model.add_point cube_model ~vertex:Vector3f.({x =  1.; y =  1.; z = -1.}) () in
+  let pt7 = Model.add_point cube_model ~vertex:Vector3f.({x =  1.; y =  1.; z =  1.}) () in
+  Model.make_face cube_model (pt4,pt5,pt6); Model.make_face cube_model (pt6,pt5,pt7);
+  Model.make_face cube_model (pt5,pt1,pt7); Model.make_face cube_model (pt7,pt1,pt3);
+  Model.make_face cube_model (pt7,pt3,pt6); Model.make_face cube_model (pt6,pt3,pt2);
+  Model.make_face cube_model (pt4,pt0,pt5); Model.make_face cube_model (pt5,pt0,pt1);
+  Model.make_face cube_model (pt6,pt2,pt4); Model.make_face cube_model (pt4,pt2,pt0);
+  Model.make_face cube_model (pt1,pt0,pt3); Model.make_face cube_model (pt3,pt0,pt2);
+  Model.scale cube_model 0.5;
+  Model.compute_normals cube_model;
+  Model.source cube_model ~vertex_source:cube_source ()
+
 
 
 let axis = VertexArray.static axis_source 
@@ -67,7 +89,7 @@ let display () =
   let parameters =
     DrawParameter.(make 
       ~depth_test:true 
-      ~culling:CullingMode.CullCounterClockwise ())
+      ~culling:CullingMode.CullClockwise ())
   in
   let uniform =
     Uniform.empty

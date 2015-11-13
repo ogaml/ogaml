@@ -1,10 +1,211 @@
 
+open OgamlMath
+
+exception Invalid_model of string
+
 exception Bad_format of string
+
+type vertex = int
+
+type normal = int
+
+type uv = int
+
+type point = int
+
+module TIntSet = Set.Make (struct
+
+  type t = (int * int * int)
+
+  let compare = compare
+
+end)
+
+type t = {
+  ivertices : (Vector3f.t, int) Hashtbl.t;
+  vertices  : (int, Vector3f.t) Hashtbl.t;
+  inormals  : (Vector3f.t, int) Hashtbl.t;
+  normals   : (int, Vector3f.t) Hashtbl.t;
+  iuvs      : (Vector2f.t, int) Hashtbl.t;
+  uvs       : (int, Vector2f.t) Hashtbl.t;
+  ipoints   : (int * int option * int option, int) Hashtbl.t;
+  points    : (int, int * int option * int option) Hashtbl.t;
+  mutable faces : TIntSet.t;
+  mutable nbv   : int;
+  mutable nbn   : int;
+  mutable nbu   : int;
+  mutable nbp   : int;
+}
+
+let empty () = 
+  {
+    ivertices = Hashtbl.create 13;
+    vertices  = Hashtbl.create 13;
+    inormals  = Hashtbl.create 13;
+    normals   = Hashtbl.create 13;
+    iuvs      = Hashtbl.create 13;
+    uvs       = Hashtbl.create 13;
+    ipoints   = Hashtbl.create 13;
+    points    = Hashtbl.create 13;
+    faces     = TIntSet.empty;
+    nbv       = 0;
+    nbn       = 0;
+    nbu       = 0;
+    nbp       = 0;
+  }
+
+let scale t f = 
+  Hashtbl.iter (fun i v -> 
+    Hashtbl.replace t.vertices i (Vector3f.prop f v);
+    Hashtbl.remove t.ivertices v;
+    Hashtbl.replace t.ivertices (Vector3f.prop f v) i
+  ) t.vertices 
+
+let translate t tr = 
+  Hashtbl.iter (fun i v -> 
+    Hashtbl.replace t.vertices i (Vector3f.add tr v);
+    Hashtbl.remove t.ivertices v;
+    Hashtbl.replace t.ivertices (Vector3f.add tr v) i
+  ) t.vertices 
+
+let add_vertex t vert = 
+  try 
+    Hashtbl.find t.ivertices vert
+  with Not_found -> begin
+    Hashtbl.add t.vertices t.nbv vert;
+    Hashtbl.add t.ivertices vert t.nbv;
+    t.nbv <- t.nbv + 1;
+    t.nbv - 1
+  end
+
+let add_normal t norm = 
+  try 
+    Hashtbl.find t.inormals norm
+  with Not_found -> begin
+    Hashtbl.add t.normals t.nbn norm;
+    Hashtbl.add t.inormals norm t.nbn;
+    t.nbn <- t.nbn + 1;
+    t.nbn - 1
+  end
+
+let add_uv t uv = 
+  try
+    Hashtbl.find t.iuvs uv
+  with Not_found -> begin
+    Hashtbl.add t.uvs t.nbu uv;
+    Hashtbl.add t.iuvs uv t.nbu;
+    t.nbu <- t.nbu + 1;
+    t.nbu - 1
+  end
+
+let make_point t (i,j,k) = 
+  try
+    Hashtbl.find t.ipoints (i,j,k)
+  with Not_found -> begin
+    Hashtbl.add t.points t.nbp (i,j,k);
+    Hashtbl.add t.ipoints (i,j,k) t.nbp;
+    t.nbp <- t.nbp + 1;
+    t.nbp - 1
+  end
+
+let add_point t ~vertex ?normal ?uv () = 
+  let i = add_vertex t vertex in
+  let j = 
+    match normal with
+    |None -> None
+    |Some n -> Some (add_normal t n)
+  in
+  let k = 
+    match uv with
+    |None -> None
+    |Some u -> Some (add_uv t u)
+  in
+  make_point t (i,j,k)
+
+let make_face t (i,j,k) = 
+  t.faces <- TIntSet.add (i,j,k) t.faces
+
+let compute_normals t = 
+  TIntSet.fold (fun (i,j,k) s ->
+    let (vti,nmi,uvi) as pti = Hashtbl.find t.points i in
+    let (vtj,nmj,uvj) as ptj = Hashtbl.find t.points j in
+    let (vtk,nmk,uvk) as ptk = Hashtbl.find t.points k in
+    let pointi = Hashtbl.find t.vertices vti in
+    let pointj = Hashtbl.find t.vertices vtj in
+    let pointk = Hashtbl.find t.vertices vtk in
+    let newi = 
+      if nmi <> None then i
+      else begin
+        let normal = Vector3f.cross (Vector3f.sub pointj pointi)
+                                    (Vector3f.sub pointk pointi)
+        in
+        let newnmi = add_normal t normal in
+        make_point t (vti, Some newnmi, uvi)
+      end
+    in
+    let newj = 
+      if nmj <> None then j
+      else begin
+        let normal = Vector3f.cross (Vector3f.sub pointk pointj)
+                                    (Vector3f.sub pointi pointj)
+        in
+        let newnmj = add_normal t normal in
+        make_point t (vtj, Some newnmj, uvj)
+      end
+    in
+    let newk = 
+      if nmk <> None then k
+      else begin
+        let normal = Vector3f.cross (Vector3f.sub pointi pointk)
+                                    (Vector3f.sub pointj pointk)
+        in
+        let newnmk = add_normal t normal in
+        make_point t (vtk, Some newnmk, uvk)
+      end
+    in
+    TIntSet.add (newi, newj, newk) s
+  ) t.faces TIntSet.empty
+  |> fun s -> t.faces <- s
+ 
+let source_point t source point = 
+  let (vt,nm,uv) as pt = Hashtbl.find t.points point in
+  let position = Hashtbl.find t.vertices vt in
+  let normal = 
+    match nm with
+    |None when VertexArray.Source.requires_normal source ->
+       raise (Invalid_model "Normals are requested by source but not provided in the model")
+    |Some i when VertexArray.Source.requires_normal source ->
+        Some (Hashtbl.find t.normals i)
+    | _ -> None
+  in
+  let texcoord = 
+    match uv with
+    |None when VertexArray.Source.requires_uv source ->
+       raise (Invalid_model "Normals are requested by source but not provided in the model")
+    |Some i when VertexArray.Source.requires_uv source -> 
+        Some (Hashtbl.find t.uvs i)
+    | _ -> None
+  in
+  VertexArray.Vertex.create ~position ?normal ?texcoord ()
+  |> VertexArray.Source.add source
+
+let source_non_indexed t source = 
+  TIntSet.iter (fun (i,j,k) ->
+    source_point t source i; 
+    source_point t source j; 
+    source_point t source k
+  ) t.faces
+
+let source t ?index_source ~vertex_source () = 
+  source_non_indexed t vertex_source
+
+(* TEMPORARY (TODO) *)
+let from_obj f = empty ()
 
 (** OBJ Parsing **)
 
 (** Tokenizer **)
-type nb = Int of int | Float of float
+(*type nb = Int of int | Float of float
 
 type tokens = Slash | Number of nb | F | VT | VN | V 
 
@@ -207,4 +408,4 @@ let from_obj ?scale:(scale = 1.0) ?color:(color = `RGB Color.RGB.white) data src
 
 
 
-
+*)

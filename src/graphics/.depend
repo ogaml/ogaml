@@ -12,8 +12,10 @@ indexArray.cmo : state.cmi GL.cmi indexArray.cmi
 indexArray.cmx : state.cmx GL.cmx indexArray.cmi
 keyboard.cmo : ../core/LL.cmi keyboard.cmi
 keyboard.cmx : ../core/LL.cmi keyboard.cmi
-model.cmo : vertexArray.cmi color.cmi model.cmi
-model.cmx : vertexArray.cmx color.cmx model.cmi
+model.cmo : vertexArray.cmi ../math/vector3f.cmi ../math/vector2f.cmi \
+    model.cmi
+model.cmx : vertexArray.cmx ../math/vector3f.cmx ../math/vector2f.cmx \
+    model.cmi
 mouse.cmo : window.cmi ../core/LL.cmi mouse.cmi
 mouse.cmx : window.cmx ../core/LL.cmi mouse.cmi
 poly.cmo : vertexArray.cmi ../math/vector3f.cmi ../math/vector2f.cmi \
@@ -44,7 +46,7 @@ drawParameter.cmi :
 image.cmi : color.cmi
 indexArray.cmi : state.cmi
 keyboard.cmi :
-model.cmi : vertexArray.cmi color.cmi
+model.cmi : vertexArray.cmi indexArray.cmi
 mouse.cmi : window.cmi
 poly.cmi : vertexArray.cmi
 program.cmi : state.cmi GL.cmi
