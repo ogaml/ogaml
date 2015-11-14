@@ -231,9 +231,6 @@ let source_non_indexed t source =
 let source t ?index_source ~vertex_source () = 
   source_non_indexed t vertex_source
 
-(* TEMPORARY (TODO) *)
-let from_obj f = empty ()
-
 (** OBJ Parsing **)
 
 type lit = Int of int | Float of float
@@ -407,9 +404,7 @@ let to_source = function
   | `String s -> s
 
 let from_obj src = 
-  Printf.printf "Tokenizing...\n%!";
   let tokens = tokenize_full (to_source src) in
-  Printf.printf "Parsing...\n%!";
   let lv, lvt, lvn, lf = parse_tokens [] [] [] [] tokens in
   let model = empty () in
   let offsets_v  = Array.make (List.length lv ) 0 in
@@ -433,11 +428,8 @@ let from_obj src =
     in
     make_point model newv newvn newvt None 
   in
-  Printf.printf "Iterating vertices...\n%!";
   List.iteri (fun i v -> offsets_v.(i)  <- add_vertex model v) lv;
-  Printf.printf "Iterating uvs...\n%!";
   List.iteri (fun i v -> offsets_vt.(i) <- add_uv model     v) lvt;
-  Printf.printf "Iterating normals...\n%!";
   List.iteri (fun i v -> offsets_vn.(i) <- add_normal model v) lvn;
   List.iter (fun (pt1, pt2, pt3) ->
     let a = create_pt model pt1 in

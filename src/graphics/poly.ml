@@ -46,23 +46,23 @@ let cube src corner size =
     Source.add src vertex
   in
   [
-    (fdl,nz,cz,uv1); (ful,nz,cz,uv2); (fur,nz,cz,uv3);
-    (fdl,nz,cz,uv1); (fur,nz,cz,uv3); (fdr,nz,cz,uv4);
-
-    (ful,ny,cy,uv1); (bul,ny,cy,uv2); (bur,ny,cy,uv3);
-    (ful,ny,cy,uv1); (bur,ny,cy,uv3); (fur,ny,cy,uv4);
-
-    (bul,nmz,cmz,uv1); (bdl,nmz,cmz,uv2); (bdr,nmz,cmz,uv3);
-    (bul,nmz,cmz,uv1); (bdr,nmz,cmz,uv3); (bur,nmz,cmz,uv4);
-
-    (bdl,nmy,cmy,uv1); (fdl,nmy,cmy,uv2); (fdr,nmy,cmy,uv3);
-    (bdl,nmy,cmy,uv1); (fdr,nmy,cmy,uv3); (bdr,nmy,cmy,uv4);
-
-    (fdr,nx,cx,uv1); (fur,nx,cx,uv2); (bur,nx,cx,uv3);
-    (fdr,nx,cx,uv1); (bur,nx,cx,uv3); (bdr,nx,cx,uv4);
-
-    (bdl,nmx,cmx,uv1); (bul,nmx,cmx,uv2); (ful,nmx,cmx,uv3);
-    (bdl,nmx,cmx,uv1); (ful,nmx,cmx,uv3); (fdl,nmx,cmx,uv4);
+    (fur,nz,cz,uv3);   (ful,nz,cz,uv2);   (fdl,nz,cz,uv1);   
+    (fdr,nz,cz,uv4);   (fur,nz,cz,uv3);   (fdl,nz,cz,uv1);   
+                                                             
+    (bur,ny,cy,uv3);   (bul,ny,cy,uv2);   (ful,ny,cy,uv1);   
+    (fur,ny,cy,uv4);   (bur,ny,cy,uv3);   (ful,ny,cy,uv1);   
+                                                             
+    (bdr,nmz,cmz,uv3); (bdl,nmz,cmz,uv2); (bul,nmz,cmz,uv1); 
+    (bur,nmz,cmz,uv4); (bdr,nmz,cmz,uv3); (bul,nmz,cmz,uv1); 
+                                                             
+    (fdr,nmy,cmy,uv3); (fdl,nmy,cmy,uv2); (bdl,nmy,cmy,uv1); 
+    (bdr,nmy,cmy,uv4); (fdr,nmy,cmy,uv3); (bdl,nmy,cmy,uv1); 
+                                                             
+    (bur,nx,cx,uv3);   (fur,nx,cx,uv2);   (fdr,nx,cx,uv1);   
+    (bdr,nx,cx,uv4);   (bur,nx,cx,uv3);   (fdr,nx,cx,uv1);   
+                                                             
+    (ful,nmx,cmx,uv3); (bul,nmx,cmx,uv2); (bdl,nmx,cmx,uv1); 
+    (fdl,nmx,cmx,uv4); (ful,nmx,cmx,uv3); (bdl,nmx,cmx,uv1); 
   ]
   |> List.iter (add src); src
 
