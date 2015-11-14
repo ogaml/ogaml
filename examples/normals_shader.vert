@@ -4,7 +4,7 @@ in vec3 in_position;
 
 in vec3 in_normal;
 
-vec4 in_color = vec4(1.0, 0.0, 0.0, 1.0);
+uniform vec4 in_color;
 
 out vec3 out_normal;
 

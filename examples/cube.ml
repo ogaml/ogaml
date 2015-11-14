@@ -26,30 +26,10 @@ let cube_source =
     ~size:36 () 
   in
 (*   Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) *)
-  src
-
-let cube_model = Model.empty ()
-
-let () = 
-  let pt0 = Model.add_point cube_model ~vertex:Vector3f.({x = -1.; y = -1.; z = -1.}) () in
-  let pt1 = Model.add_point cube_model ~vertex:Vector3f.({x = -1.; y = -1.; z =  1.}) () in
-  let pt2 = Model.add_point cube_model ~vertex:Vector3f.({x =  1.; y = -1.; z = -1.}) () in
-  let pt3 = Model.add_point cube_model ~vertex:Vector3f.({x =  1.; y = -1.; z =  1.}) () in
-  let pt4 = Model.add_point cube_model ~vertex:Vector3f.({x = -1.; y =  1.; z = -1.}) () in
-  let pt5 = Model.add_point cube_model ~vertex:Vector3f.({x = -1.; y =  1.; z =  1.}) () in
-  let pt6 = Model.add_point cube_model ~vertex:Vector3f.({x =  1.; y =  1.; z = -1.}) () in
-  let pt7 = Model.add_point cube_model ~vertex:Vector3f.({x =  1.; y =  1.; z =  1.}) () in
-  Model.make_face cube_model (pt4,pt5,pt6); Model.make_face cube_model (pt6,pt5,pt7);
-  Model.make_face cube_model (pt5,pt1,pt7); Model.make_face cube_model (pt7,pt1,pt3);
-  Model.make_face cube_model (pt7,pt3,pt6); Model.make_face cube_model (pt6,pt3,pt2);
-  Model.make_face cube_model (pt4,pt0,pt5); Model.make_face cube_model (pt5,pt0,pt1);
-  Model.make_face cube_model (pt6,pt2,pt4); Model.make_face cube_model (pt4,pt2,pt0);
-  Model.make_face cube_model (pt1,pt0,pt3); Model.make_face cube_model (pt3,pt0,pt2);
-  Model.scale cube_model 0.5;
+  let cube_model = Model.from_obj (`File "examples/sibenik.obj") in
   Model.compute_normals cube_model;
-  Model.source cube_model ~vertex_source:cube_source ()
-
-
+  Model.source cube_model ~vertex_source:src ();
+  src
 
 let axis = VertexArray.static axis_source 
 
@@ -81,7 +61,8 @@ let display () =
   let t = Unix.gettimeofday () in
   let view = Matrix3D.look_at_eulerian ~from:!position ~theta:!view_theta ~phi:!view_phi in
   let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
-  let model = Matrix3D.rotation rot_vector !rot_angle in
+(*   let model = Matrix3D.rotation rot_vector !rot_angle in *)
+  let model = Matrix3D.identity () in
   let vp = Matrix3D.product proj view in
   let mv = Matrix3D.product view model in
   let mvp = Matrix3D.product vp model in
@@ -89,13 +70,14 @@ let display () =
   let parameters =
     DrawParameter.(make 
       ~depth_test:true 
-      ~culling:CullingMode.CullClockwise ())
+      ~culling:CullingMode.CullCounterClockwise ())
   in
   let uniform =
     Uniform.empty
     |> Uniform.matrix3D "MVPMatrix" mvp
     |> Uniform.matrix3D "MVMatrix" mv
     |> Uniform.matrix3D "VMatrix" view
+    |> Uniform.color "in_color" (`RGB Color.RGB.({r = 0.7; g = 0.7; b = 0.7; a = 1.0}))
   in
   Window.draw ~window ~vertices:cube ~uniform ~program:normal_program ~parameters ~mode:DrawMode.Triangles ();
   let uniform =

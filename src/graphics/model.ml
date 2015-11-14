@@ -13,6 +13,8 @@ type uv = int
 
 type point = int
 
+type color = int
+
 module TIntSet = Set.Make (struct
 
   type t = (int * int * int)
@@ -28,13 +30,16 @@ type t = {
   normals   : (int, Vector3f.t) Hashtbl.t;
   iuvs      : (Vector2f.t, int) Hashtbl.t;
   uvs       : (int, Vector2f.t) Hashtbl.t;
-  ipoints   : (int * int option * int option, int) Hashtbl.t;
-  points    : (int, int * int option * int option) Hashtbl.t;
+  ipoints   : (int * int option * int option * int option, int) Hashtbl.t;
+  points    : (int, int * int option * int option * int option) Hashtbl.t;
+  icolors   : (Color.t, int) Hashtbl.t;
+  colors    : (int, Color.t) Hashtbl.t;
   mutable faces : TIntSet.t;
   mutable nbv   : int;
   mutable nbn   : int;
   mutable nbu   : int;
   mutable nbp   : int;
+  mutable nbc   : int;
 }
 
 let empty () = 
@@ -47,11 +52,14 @@ let empty () =
     uvs       = Hashtbl.create 13;
     ipoints   = Hashtbl.create 13;
     points    = Hashtbl.create 13;
+    icolors   = Hashtbl.create 13;
+    colors    = Hashtbl.create 13;
     faces     = TIntSet.empty;
     nbv       = 0;
     nbn       = 0;
     nbu       = 0;
     nbp       = 0;
+    nbc       = 0;
   }
 
 let scale t f = 
@@ -98,17 +106,28 @@ let add_uv t uv =
     t.nbu - 1
   end
 
-let make_point t (i,j,k) = 
+let add_color t color = 
   try
-    Hashtbl.find t.ipoints (i,j,k)
+    Hashtbl.find t.icolors color
   with Not_found -> begin
-    Hashtbl.add t.points t.nbp (i,j,k);
-    Hashtbl.add t.ipoints (i,j,k) t.nbp;
+    Hashtbl.add t.colors t.nbc color;
+    Hashtbl.add t.icolors color t.nbc;
+    t.nbc <- t.nbc + 1;
+    t.nbc - 1
+  end
+
+
+let make_point t v n u c = 
+  try
+    Hashtbl.find t.ipoints (v,n,u,c)
+  with Not_found -> begin
+    Hashtbl.add t.points t.nbp (v,n,u,c);
+    Hashtbl.add t.ipoints (v,n,u,c) t.nbp;
     t.nbp <- t.nbp + 1;
     t.nbp - 1
   end
 
-let add_point t ~vertex ?normal ?uv () = 
+let add_point t ~vertex ?normal ?uv ?color () = 
   let i = add_vertex t vertex in
   let j = 
     match normal with
@@ -120,16 +139,21 @@ let add_point t ~vertex ?normal ?uv () =
     |None -> None
     |Some u -> Some (add_uv t u)
   in
-  make_point t (i,j,k)
+  let l = 
+    match color with
+    |None -> None
+    |Some c -> Some (add_color t c)
+  in
+  make_point t i j k l
 
 let make_face t (i,j,k) = 
   t.faces <- TIntSet.add (i,j,k) t.faces
 
 let compute_normals t = 
   TIntSet.fold (fun (i,j,k) s ->
-    let (vti,nmi,uvi) as pti = Hashtbl.find t.points i in
-    let (vtj,nmj,uvj) as ptj = Hashtbl.find t.points j in
-    let (vtk,nmk,uvk) as ptk = Hashtbl.find t.points k in
+    let (vti,nmi,uvi,coi) as pti = Hashtbl.find t.points i in
+    let (vtj,nmj,uvj,coj) as ptj = Hashtbl.find t.points j in
+    let (vtk,nmk,uvk,cok) as ptk = Hashtbl.find t.points k in
     let pointi = Hashtbl.find t.vertices vti in
     let pointj = Hashtbl.find t.vertices vtj in
     let pointk = Hashtbl.find t.vertices vtk in
@@ -140,7 +164,7 @@ let compute_normals t =
                                     (Vector3f.sub pointk pointi)
         in
         let newnmi = add_normal t normal in
-        make_point t (vti, Some newnmi, uvi)
+        make_point t vti (Some newnmi) uvi coi
       end
     in
     let newj = 
@@ -150,7 +174,7 @@ let compute_normals t =
                                     (Vector3f.sub pointi pointj)
         in
         let newnmj = add_normal t normal in
-        make_point t (vtj, Some newnmj, uvj)
+        make_point t vtj (Some newnmj) uvj coj
       end
     in
     let newk = 
@@ -160,7 +184,7 @@ let compute_normals t =
                                     (Vector3f.sub pointj pointk)
         in
         let newnmk = add_normal t normal in
-        make_point t (vtk, Some newnmk, uvk)
+        make_point t vtk (Some newnmk) uvk cok
       end
     in
     TIntSet.add (newi, newj, newk) s
@@ -168,7 +192,7 @@ let compute_normals t =
   |> fun s -> t.faces <- s
  
 let source_point t source point = 
-  let (vt,nm,uv) as pt = Hashtbl.find t.points point in
+  let (vt,nm,uv,co) as pt = Hashtbl.find t.points point in
   let position = Hashtbl.find t.vertices vt in
   let normal = 
     match nm with
@@ -186,7 +210,15 @@ let source_point t source point =
         Some (Hashtbl.find t.uvs i)
     | _ -> None
   in
-  VertexArray.Vertex.create ~position ?normal ?texcoord ()
+  let color = 
+    match co with
+    |None when VertexArray.Source.requires_color source ->
+       raise (Invalid_model "Colors are requested by source but not provided in the model")
+    |Some i when VertexArray.Source.requires_color source -> 
+        Some (Hashtbl.find t.colors i)
+    | _ -> None
+  in
+  VertexArray.Vertex.create ~position ?normal ?texcoord ?color ()
   |> VertexArray.Source.add source
 
 let source_non_indexed t source = 
@@ -204,121 +236,116 @@ let from_obj f = empty ()
 
 (** OBJ Parsing **)
 
-(** Tokenizer **)
-(*type nb = Int of int | Float of float
+type lit = Int of int | Float of float
 
-type tokens = Slash | Number of nb | F | VT | VN | V 
+let lit_to_float = function
+  |Int i -> float_of_int i
+  |Float f -> f
 
-let rec junk_spaces stream = 
-  match Stream.peek stream with
-  |Some ' ' -> Stream.junk stream; junk_spaces stream
-  | _ -> ()
+let lit_to_int = function
+  |Int i -> i
+  |Float f -> int_of_float f
 
-let rec junk_line stream = 
-  match Stream.next stream with
-  |'\n' -> ()
-  | _   -> junk_line stream
 
-let rec tokenize_nb line acc mul i stream = 
-  match Stream.next stream with
-  |'0'..'9' as c -> 
-      tokenize_nb line acc mul (i*10 + (Char.code c - 48)) stream
-  |' ' |'\r' -> 
-      tokenize_obj line (Number (Int (mul * i)) :: acc) stream
-  |'/' -> 
-      tokenize_obj line (Slash :: Number (Int (mul * i)) :: acc) stream
-  |'\n' -> 
-      tokenize_obj (line +1) (Number (Int (mul * i)) :: acc) stream
-  |'.' -> 
-      tokenize_float line acc (float_of_int mul) (float_of_int i) 10. stream
-  |'e' ->
-      tokenize_exp line acc (float_of_int (mul * i)) 0 1 stream
-  | c  -> 
-      raise (Bad_format 
-        (Printf.sprintf "Cannot parse OBJ file, expected int (char %c, line %i)" c line))
+type loc = {line : int; str : string}
 
-and tokenize_float line acc mul i r stream =
-  match Stream.next stream with
-  |'0'..'9' as c -> 
-      tokenize_float line acc mul (i +. float_of_int (Char.code c - 48) /. r) (r*.10.) stream
-  |' ' |'\r' -> 
-      tokenize_obj line (Number (Float (mul *. i)) :: acc) stream
-  |'e' ->
-      tokenize_exp line acc (mul *. i) 0 1 stream
-  |'/' ->
-      tokenize_obj line (Slash :: Number (Float (mul *. i)) :: acc) stream
-  |'\n' -> 
-      tokenize_obj (line + 1) (Number (Float (mul *. i)) :: acc) stream
-  | c -> raise (Bad_format (Printf.sprintf "Cannot parse OBJ file, expected float (char %c, line %i)" c line))
 
-and tokenize_exp line acc f e sign stream = 
-  match Stream.next stream with
-  |'0'..'9' as c -> 
-      tokenize_exp line acc f (e * 10 + (Char.code c - 48)) sign stream
-  |' ' |'\r' ->
-      tokenize_obj line (Number (Float (f *. (10. ** (float_of_int (sign * e))))) :: acc) stream
-  |'/' ->
-      tokenize_obj line (Slash :: Number (Float (f *. (10. ** (float_of_int (sign * e))))) :: acc) stream
-  |'-' ->
-      tokenize_exp line acc f e (-1) stream
-  |'\n' -> 
-      tokenize_obj (line + 1) (Number (Float (f *. (10. ** (float_of_int (sign * e))))) :: acc) stream
-  | c -> raise (Bad_format (Printf.sprintf "Cannot parse OBJ file, expected exp (char %c, line %i)" c line))
+type tokens = Slash   of loc | 
+              Literal of loc * lit | 
+              F       of loc | 
+              VT      of loc | 
+              VN      of loc |
+              V       of loc |
+              Unknown of loc
 
-and tokenize_obj line acc stream = 
-  junk_spaces stream;
-  match Stream.peek stream with
-  |Some(c) -> begin
-    match c with
-    |'0'..'9' -> 
-        tokenize_nb line acc 1 0 stream
-    |'-' -> 
-        Stream.junk stream; 
-        junk_spaces stream; 
-        tokenize_nb line acc (-1) 0 stream
-    |'.' -> 
-        Stream.junk stream; 
-        tokenize_float line acc 1. 0. 10. stream
-    |'/' -> 
-        Stream.junk stream;
-        tokenize_obj line (Slash :: acc) stream
-    |'v' -> begin
-      Stream.junk stream;
-      match Stream.next stream with
-      |' ' -> tokenize_obj line (V::acc) stream
-      |'t' -> Stream.junk stream; tokenize_obj line (VT :: acc) stream
-      |'n' -> Stream.junk stream; tokenize_obj line (VN :: acc) stream
-      | _  -> junk_line stream; tokenize_obj (line + 1) acc stream
-    end
-    |'f' -> Stream.junk stream; tokenize_obj line (F :: acc) stream
-    | _  -> 
-        junk_line stream; 
-        tokenize_obj (line + 1) acc stream
+let int_regex = Str.regexp "-?[0-9]*$"
+
+let float_regex = Str.regexp "-?[0-9]*\\(\\.[0-9]*\\)?\\([eE]\\([-+]\\)?[0-9]+\\)?$"
+
+
+let tokenize loc w = 
+  if Str.string_match int_regex w 0 then
+    Literal (loc, Int (int_of_string w))
+  else if Str.string_match float_regex w 0 then
+    Literal (loc, Float (float_of_string w))
+  else if w = "f" then
+    F loc
+  else if w = "vt" then
+    VT loc
+  else if w = "vn" then
+    VN loc
+  else if w = "v" then
+    V loc
+  else if w = "/" then
+    Slash loc
+  else
+    Unknown loc
+
+let tokenize_delim loc = function
+  |Str.Text s -> tokenize loc s
+  |Str.Delim s -> Slash loc
+
+let tokenize_line i str = 
+  let lstr = Str.split (Str.regexp " ") str in
+  let loc = {line = i; str} in
+  match lstr with
+  |[] -> []
+  |h::t -> begin
+    match tokenize loc h with
+    |Unknown _-> []
+    |token    -> 
+      List.map (Str.full_split (Str.regexp "/")) t
+      |> List.flatten
+      |> List.map (tokenize_delim loc)
+      |> fun l -> token::l
   end
-  |None -> List.rev acc
 
-(** Parser **)
-let rec pprint l n = 
-  match l with
-  |_ when n = 0 -> print_endline ""
-  |[] -> print_endline ""
-  |V  :: t -> Printf.printf "v "; pprint t (n-1)
-  |VT :: t -> Printf.printf "vt "; pprint t (n-1)
-  |VN :: t -> Printf.printf "vn "; pprint t (n-1)
-  |F :: t -> Printf.printf "f "; pprint t (n-1)
-  |Number (Int i) :: t -> Printf.printf "%i " i; pprint t (n-1)
-  |Number (Float f) :: t -> Printf.printf "%f " f; pprint t (n-1)
-  |Slash :: t -> Printf.printf "/"; pprint t (n-1)
+let tokenize_full str = 
+  let lstr = Str.split_delim (Str.regexp "\r?\n") str in
+  List.mapi (fun i l ->
+    match tokenize_line i l with
+    |[] -> []
+    |Unknown _ :: _ -> []
+    |l -> l
+  ) lstr
+  |> List.flatten
+
+let extract_loc = function
+  |Literal (loc, _) 
+  |Slash loc        
+  |F  loc
+  |VT loc
+  |VN loc
+  |V  loc
+  |Unknown loc -> loc
 
 let rec parse_point = function
-  |Number (Int x) :: Slash :: Number (Int y) :: Slash :: Number (Int z) :: t -> ((Some x, Some y, Some z), t)
-  |Number (Int x) :: Slash :: Slash :: Number (Int z) :: t -> ((Some x, None, Some z), t)
-  |Number (Int x) :: Slash :: Number (Int y) :: Slash :: t -> ((Some x, Some y, None), t)
-  |Number (Int x) :: Slash :: Number (Int y) :: t -> ((Some x, Some y, None), t)
-  |Number (Int x) :: Slash :: Slash :: t-> ((Some x, None, None), t)
-  |Number (Int x) :: Slash :: t -> ((Some x, None, None), t)
-  |Number (Int x) :: t -> ((Some x, None, None), t)
-  | _ -> raise (Bad_format "Cannot parse OBJ file : bad point format")
+  |Literal (_, Int x) :: Slash _ :: Literal (_, Int y) :: Slash _ :: Literal (_, Int z) :: t -> 
+    ((x, Some y, Some z), t)
+  |Literal (_, Int x) :: Slash _ :: Slash _ :: Literal (_, Int z) :: t -> 
+    ((x, None, Some z), t)
+  |Literal (_, Int x) :: Slash _ :: Literal (_, Int y) :: Slash _ :: t -> 
+    ((x, Some y, None), t)
+  |Literal (_, Int x) :: Slash _ :: Literal (_, Int y) :: t -> 
+    ((x, Some y, None), t)
+  |Literal (_, Int x) :: Slash _ :: Slash _ :: t-> 
+    ((x, None, None), t)
+  |Literal (_, Int x) :: Slash _ :: t -> 
+    ((x, None, None), t)
+  |Literal (_, Int x) :: t -> 
+    ((x, None, None), t)
+  |token :: _ -> 
+    let loc = extract_loc token in 
+    raise (Bad_format (Printf.sprintf "Format error in OBJ file, line %i : %s" loc.line loc.str))
+  |[] -> 
+    raise (Bad_format ("Format error in OBJ file, unexpected end of file"))
+
+let rec parse_rectangle l = 
+  let (pt1, l) = parse_point l in
+  let (pt2, l) = parse_point l in
+  let (pt3, l) = parse_point l in
+  let (pt4, l) = parse_point l in
+  ((pt1, pt2, pt3), (pt1, pt3, pt4), l)
 
 let rec parse_triangle l = 
   let (pt1, l) = parse_point l in
@@ -326,86 +353,86 @@ let rec parse_triangle l =
   let (pt3, l) = parse_point l in
   ((pt1, pt2, pt3), l)
 
-let to_float = function
-  |Int i -> float_of_int i
-  |Float f -> f
-
 let rec parse_tokens lv lvt lvn lf = function
   |[] -> (lv, lvt, lvn, lf)
-  |V :: Number x :: Number y :: Number z :: t-> 
-      let x,y,z = to_float x, to_float y, to_float z in
+  |V _ :: Literal (_,x) :: Literal (_,y) :: Literal (_,z) :: t-> 
+      let x,y,z = lit_to_float x, lit_to_float y, lit_to_float z in
       parse_tokens
         (OgamlMath.Vector3f.({x;y;z}) :: lv)
         lvt lvn lf t
-  |VT :: Number x :: Number y :: t ->
-      let x,y = to_float x, to_float y in
+  |VT _ :: Literal (_,x) :: Literal (_,y) :: Literal(_,_) :: t ->
+      let x,y = lit_to_float x, lit_to_float y in
       parse_tokens
         lv
         (OgamlMath.Vector2f.({x;y}) :: lvt)
         lvn lf t
-  |VN :: Number x :: Number y :: Number z :: t ->
-      let x,y,z = to_float x, to_float y, to_float z in
+  |VT _ :: Literal (_,x) :: Literal (_,y) :: t ->
+      let x,y = lit_to_float x, lit_to_float y in
+      parse_tokens
+        lv
+        (OgamlMath.Vector2f.({x;y}) :: lvt)
+        lvn lf t
+  |VN _ :: Literal (_,x) :: Literal (_,y) :: Literal (_,z) :: t ->
+      let x,y,z = lit_to_float x, lit_to_float y, lit_to_float z in
       parse_tokens
         lv lvt
         (OgamlMath.Vector3f.({x;y;z}) :: lvn)
         lf t
-  |F :: l -> 
-      let ((a,b,c),l) = parse_triangle l in
-      parse_tokens lv lvt lvn (a :: b :: c :: lf) l
-  | _ -> raise (Bad_format "Cannot parse OBJ file")
+  |F _ :: l -> 
+      let newlf, tail = 
+        try 
+          let (tri1, tri2, t) = parse_rectangle l in
+          tri1 :: tri2 :: lf, t
+        with 
+          Bad_format _ -> begin
+            let (tri, t) = parse_triangle l in
+            tri :: lf, t
+        end
+      in
+      parse_tokens lv lvt lvn newlf tail
+  |token :: _ -> 
+    let loc = extract_loc token in 
+    raise (Bad_format (Printf.sprintf "Format error in OBJ file, line %i : %s" loc.line loc.str))
 
-let from_obj ?scale:(scale = 1.0) ?color:(color = `RGB Color.RGB.white) data src = 
-  let lv, lvt, lvn, lf = 
-    match data with
-    |`String str -> 
-      let stream = (Stream.of_string str) in
-      let tokens = tokenize_obj 0 [] stream in
-      parse_tokens [] [] [] [] tokens
-    |`File   str -> 
-      let chan = open_in str in
-      let stream = (Stream.of_channel chan) in
-      let tokens = tokenize_obj 0 [] stream in
-      let res = parse_tokens [] [] [] [] tokens in
-      close_in chan;
-      res
+let read_file filename =
+  let chan = open_in filename in
+  let len = in_channel_length chan in
+  let str = Bytes.create len in
+  really_input chan str 0 len;
+  close_in chan; str
+
+let to_source = function
+  | `File   s -> read_file s
+  | `String s -> s
+
+let from_obj src = 
+  let tokens = tokenize_full (to_source src) in
+  let lv, lvt, lvn, lf = parse_tokens [] [] [] [] tokens in
+  let model = empty () in
+  let create_pt model (v,vt,vn) = 
+    let newv = if v < 0 then -v-1 else model.nbv - v in
+    let newvt = 
+      match vt with
+      |None -> None
+      |Some vt -> Some(if vt < 0 then -vt-1 else model.nbu - vt)
+    in
+    let newvn = 
+      match vn with
+      |None -> None
+      |Some vn -> Some(if vn < 0 then -vn-1 else model.nbn - vn)
+    in
+    make_point model newv newvn newvt None 
   in
-  let av, avt, avn = 
-    Array.of_list lv,
-    Array.of_list lvt,
-    Array.of_list lvn
-  in
-  List.iter (fun (v,u,n) ->
-    let position = 
-      if VertexArray.Source.requires_position src then begin
-        match v with
-        |None -> raise (Bad_format "Vertex positions requested but not provided")
-        |Some v when v > 0 -> Some (OgamlMath.Vector3f.prop scale (av.(Array.length av - v)))
-        |Some v -> Some (OgamlMath.Vector3f.prop scale (av.(- v - 1)))
-      end else None
-    in
-    let texcoord = 
-      if VertexArray.Source.requires_uv src then begin
-        match u with
-        |None -> raise (Bad_format "UV coordinates requested but not provided")
-        |Some v when v > 0 -> Some (avt.(Array.length avt - v))
-        |Some v -> Some (avt.(- v - 1))
-      end else None
-    in
-    let normal = 
-      if VertexArray.Source.requires_normal src then begin
-        match n with
-        |None -> raise (Bad_format "Normals requested but not provided")
-        |Some v when v > 0 -> Some (avn.(Array.length avn - v))
-        |Some v -> Some (avn.(- v - 1))
-      end else None
-    in
-    let color = 
-      if VertexArray.Source.requires_color src then Some color
-      else None
-    in
-    VertexArray.(Source.add src (Vertex.create ?position ?texcoord ?color ?normal ()))
-  ) lf; src
+  List.iter (fun v -> add_vertex model v |> ignore) lv;
+  List.iter (fun v -> add_uv model     v |> ignore) lvt;
+  List.iter (fun v -> add_normal model v |> ignore) lvn;
+  List.iter (fun (pt1, pt2, pt3) ->
+    let a = create_pt model pt1 in
+    let b = create_pt model pt2 in
+    let c = create_pt model pt3 in
+    make_face model (a,b,c)
+  ) lf;
+  model
 
 
 
-*)

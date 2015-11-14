@@ -13,6 +13,8 @@ type uv
 
 type point
 
+type color
+
 val empty : unit -> t
 
 val from_obj : [`File of string | `String of string] -> t
@@ -27,11 +29,14 @@ val add_normal : t -> OgamlMath.Vector3f.t -> normal
 
 val add_uv : t -> OgamlMath.Vector2f.t -> uv
 
-val make_point : t -> (vertex * normal option * uv option) -> point
+val add_color : t -> Color.t -> color
+
+val make_point : t -> vertex -> normal option -> uv option -> color option -> point
 
 val add_point : t -> vertex:OgamlMath.Vector3f.t ->
                     ?normal:OgamlMath.Vector3f.t ->
-                    ?uv:OgamlMath.Vector2f.t -> unit -> point
+                    ?uv:OgamlMath.Vector2f.t -> 
+                    ?color:Color.t -> unit -> point
 
 val make_face : t -> (point * point * point) -> unit
 
