@@ -300,15 +300,16 @@ let tokenize_line i str =
       |> fun l -> token::l
   end
 
+let rec tokenize_lines_cps i l k = 
+  match l with
+  |[] -> k []
+  |h::t -> 
+    let tokens = tokenize_line i h in
+    tokenize_lines_cps (i+1) t (fun l -> k (tokens @ l))
+
 let tokenize_full str = 
   let lstr = Str.split_delim (Str.regexp "\r?\n") str in
-  List.mapi (fun i l ->
-    match tokenize_line i l with
-    |[] -> []
-    |Unknown _ :: _ -> []
-    |l -> l
-  ) lstr
-  |> List.flatten
+  tokenize_lines_cps 0 lstr (fun l -> l)
 
 let extract_loc = function
   |Literal (loc, _) 
@@ -406,26 +407,38 @@ let to_source = function
   | `String s -> s
 
 let from_obj src = 
+  Printf.printf "Tokenizing...\n%!";
   let tokens = tokenize_full (to_source src) in
+  Printf.printf "Parsing...\n%!";
   let lv, lvt, lvn, lf = parse_tokens [] [] [] [] tokens in
   let model = empty () in
+  let offsets_v  = Array.make (List.length lv ) 0 in
+  let offsets_vt = Array.make (List.length lvt) 0 in
+  let offsets_vn = Array.make (List.length lvn) 0 in
   let create_pt model (v,vt,vn) = 
-    let newv = if v < 0 then -v-1 else model.nbv - v in
+    let newv = if v < 0 then offsets_v.(-v-1) 
+               else offsets_v.(Array.length offsets_v - v) 
+    in
     let newvt = 
       match vt with
       |None -> None
-      |Some vt -> Some(if vt < 0 then -vt-1 else model.nbu - vt)
+      |Some vt -> Some(if vt < 0 then offsets_vt.(-vt-1) 
+                       else offsets_vt.(Array.length offsets_vt - vt))
     in
     let newvn = 
       match vn with
       |None -> None
-      |Some vn -> Some(if vn < 0 then -vn-1 else model.nbn - vn)
+      |Some vn -> Some(if vn < 0 then offsets_vn.(-vn-1)
+                       else offsets_vn.(Array.length offsets_vn - vn))
     in
     make_point model newv newvn newvt None 
   in
-  List.iter (fun v -> add_vertex model v |> ignore) lv;
-  List.iter (fun v -> add_uv model     v |> ignore) lvt;
-  List.iter (fun v -> add_normal model v |> ignore) lvn;
+  Printf.printf "Iterating vertices...\n%!";
+  List.iteri (fun i v -> offsets_v.(i)  <- add_vertex model v) lv;
+  Printf.printf "Iterating uvs...\n%!";
+  List.iteri (fun i v -> offsets_vt.(i) <- add_uv model     v) lvt;
+  Printf.printf "Iterating normals...\n%!";
+  List.iteri (fun i v -> offsets_vn.(i) <- add_normal model v) lvn;
   List.iter (fun (pt1, pt2, pt3) ->
     let a = create_pt model pt1 in
     let b = create_pt model pt2 in

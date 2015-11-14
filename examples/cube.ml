@@ -26,7 +26,7 @@ let cube_source =
     ~size:36 () 
   in
 (*   Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) *)
-  let cube_model = Model.from_obj (`File "examples/sibenik.obj") in
+  let cube_model = Model.from_obj (`File "examples/buddha.obj") in
   Model.compute_normals cube_model;
   Model.source cube_model ~vertex_source:src ();
   src
@@ -70,7 +70,7 @@ let display () =
   let parameters =
     DrawParameter.(make 
       ~depth_test:true 
-      ~culling:CullingMode.CullCounterClockwise ())
+      ~culling:CullingMode.CullClockwise ())
   in
   let uniform =
     Uniform.empty
@@ -130,7 +130,15 @@ let handle_keys () =
         !position
         {x = 0.15 *. (cos !view_theta);
          y = 0.;
-         z = -. 0.15 *. (sin !view_theta)})
+         z = -. 0.15 *. (sin !view_theta)});
+    if is_pressed LShift then
+      position := Vector3f.(add
+        !position
+        {x = 0.; y = -0.15; z = 0.});
+    if is_pressed Space then
+      position := Vector3f.(add
+        !position
+        {x = 0.; y = 0.15; z = 0.})
   ))
 
 
