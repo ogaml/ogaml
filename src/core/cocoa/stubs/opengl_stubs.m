@@ -16,7 +16,10 @@
 
 -(void)keyDown:(NSEvent *)event
 {
-  [self pushNSEvent:event];
+  OGEvent* ogevent = [[OGEvent alloc] initWithKeyDown:[event keyCode]
+                                           characters:[event characters]
+                                        modifierFlags:[NSEvent modifierFlags]];
+  [self pushEvent:ogevent];
 }
 
 -(void)keyUp:(NSEvent *)event
@@ -29,10 +32,7 @@
 
 -(void)mouseDown:(NSEvent *)event
 {
-  OGEvent* ogevent = [[OGEvent alloc] initWithKeyDown:[event keyCode]
-                                           characters:[event characters]
-                                        modifierFlags:[NSEvent modifierFlags]];
-  [self pushEvent:ogevent];
+  [self pushNSEvent:event];
 }
 
 -(void)mouseUp:(NSEvent *)event
