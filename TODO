@@ -16,25 +16,23 @@ Cocoa specific:
   ☐ Check if window size is in points instead of pixels
   ☐ Window doesn't resign being key on mission control
 
-General:
-  ☐ Make a log system ? @unsure @comment(Théo: It might be redundant if the user uses dolog for instance, but it also occured to me we could provide one)
-
-Window part:
+OgamlCore:
+  ☐ Log system
   ☐ Window titles
-  ☐ Window attributes abstract type ? May contain title, size, etc @unsure
-  ☐ Same for GL context attributes ? @unsure
+  ☐ Context customisation
+  ☐ Encapsulate parameters (title, depth buffer size, etc..)
 
-Math part:
+OgamlMath:
   ☐ Matrices, quaternions and vector exceptions
 
-GL part:
-  ☐ Implement model creation - modification in Model
-  ☐ Implement PNG
-  ☐ Implement JPG
-  ☐ Implement Image
-  ☐ Organize image parsing
+OgamlGraphics:
+  ☐ Better normal computations in Model
+  ☐ Indexing in Model
+  ☐ Custom vertex arrays
+  ☐ Implement PNG parsing
+  ☐ Implement JPG parsing
+  ☐ Organize image parsing in modules
   ☐ Better support for all formats (for example 24,32 bit bmps)
-  ☐ Add other kinds of textures @unsure
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
