@@ -1,17 +1,48 @@
-General:
-
 Objective-C formatting:
   ☐ Choose how to align labels
   ☐ Add more comments
   ☐ Add nil tests to catch initialization problems
-  ✔ Move init_arp in cocoa/utils_stubs @done(2015-10-31 00:30) @project(Objective-C formatting)
 
 Cocoa specific:
+  ☐ Add menus without plagiarizing SFML @option(parametrize)
+  ☐ Add some option to switch between Ctrl and Cmd @question
+  ☐ Add some function to handle keyRepeatDelay and keyRepeatInterval for NSEvent
+  ☐ Consider converting every event to OGEvent before pushing (instead of having both NSEvent and OGEvent) @unsure
+  ☐ Update the view (and probably other things) when resizing
+  ☐ Handle left/right modifiers for keycodes
+  ☐ Apparently modifiers do not raise keyDown at all so we have to deal with it
+  ☐ Discuss the possibility to dissociate mouse and cursor to get delta events @source(https://developer.apple.com/library/mac/documentation/GraphicsImaging/Reference/Quartz_Services_Ref/#//apple_ref/c/func/CGAssociateMouseAndMouseCursorPosition)
+  ☐ Differentiate between Middle and Other for mouse
+  ☐ Check if window size is in points instead of pixels
+  ☐ Window doesn't resign being key on mission control
+
+General:
+  ☐ Make a log system ? @unsure @comment(Théo: It might be redundant if the user uses dolog for instance, but it also occured to me we could provide one)
+
+Window part:
+  ☐ Window titles
+  ☐ Window attributes abstract type ? May contain title, size, etc @unsure
+  ☐ Same for GL context attributes ? @unsure
+
+Math part:
+  ☐ Matrices, quaternions and vector exceptions
+
+GL part:
+  ☐ Implement model creation - modification in Model
+  ☐ Implement PNG
+  ☐ Implement JPG
+  ☐ Implement Image
+  ☐ Organize image parsing
+  ☐ Better support for all formats (for example 24,32 bit bmps)
+  ☐ Add other kinds of textures @unsure
+
+＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
+Archive:
+  ✔ Move init_arp in cocoa/utils_stubs @done(2015-10-31 00:30) @project(Objective-C formatting)
   ✔ Remove application t type @unsure @done(2015-10-20 21:59) @project(Cocoa specific)
   ✔ Separate functions for all window methods @done(2015-10-20 20:16) @project(Cocoa specific)
   ✔ Make use of Delegate or remove @done(2015-10-20 22:03) @project(Cocoa specific)
   ✔ Add menus to application @done(2015-10-20 21:34) @project(Cocoa specific)
-  ☐ Add menus without plagiarizing SFML @option(parametrize)
   ✔ Menus should be clickable on launch @issue @done(2015-10-26 22:19) @project(Cocoa specific)
   ✔ Implement applicationName of OGApplication @unsure @done(2015-10-20 21:14) @project(Cocoa specific)
   ✔ Close application when all windows are (through delegate probably) @done(2015-10-20 22:03) @project(Cocoa specific)
@@ -20,23 +51,11 @@ Cocoa specific:
   ✘ See if close shouldn't be used instead of performClose @cancelled(2015-10-26 01:43) @project(Cocoa specific)
   ✔ Remove quiting when all window closed @done(2015-10-26 01:46) @project(Cocoa specific)
   ✔ Add handling of events (like application quitting) @done(2015-10-26 22:19) @project(Cocoa specific)
-  ☐ Add some option to switch between Ctrl and Cmd @question
-  ☐ Add some function to handle keyRepeatDelay and keyRepeatInterval for NSEvent
-  ☐ Consider converting every event to OGEvent before pushing (instead of having both NSEvent and OGEvent) @unsure
   ✔ Key events should be converted to OGEvent to save the modifier flags of the time it is raised and not handled @done(2015-11-07 19:26) @project(Cocoa specific)
   ✔ Handle application creation and running with a boolean @done(2015-10-26 01:43) @project(Cocoa specific)
   ✔ Implement window destroy properly @done(2015-10-26 02:04) @project(Cocoa specific)
   ✔ Add window closed event @done(2015-10-31 00:30) @project(Cocoa specific)
-  ☐ Update the view (and probably other things) when resizing
-  ☐ Handle left/right modifiers for keycodes
-  ☐ Apparently modifiers do not raise keyDown at all so we have to deal with it
-  ☐ Discuss the possibility to dissociate mouse and cursor to get delta events @source(https://developer.apple.com/library/mac/documentation/GraphicsImaging/Reference/Quartz_Services_Ref/#//apple_ref/c/func/CGAssociateMouseAndMouseCursorPosition)
-  ☐ Differentiate between Middle and Other for mouse
   ✔ Every size might have been specified in points for Cocoa, use scale whenever necessary @important @review @comment(At least for the events, but it might also be wrong in window size definition) @done(2015-11-02 16:35) @project(Cocoa specific)
-  ☐ Check if window size is in points instead of pixels
-  ☐ Window doesn't resign being key on mission control
-
-Xlib specific:
   ✔ Match on clientmessage in ogamlWindow_xlib for safety @done(2015-10-20 20:29) @project(Xlib specific)
   ✘ Avoid re-creating events (should profile before) -- takes 4e-7 sec @cancelled(2015-10-20 21:06) @project(Xlib specific)
   ✔ Remove unsafe casts of events @done(2015-10-20 21:10) @project(Xlib specific)
@@ -50,11 +69,6 @@ Xlib specific:
   ✔ Implement caml_glx_swap_buffers @done(2015-10-23 23:24) @project(Xlib specific)
   ✔ Correctly free glx calls when destroying window @done(2015-10-28 09:43) @project(Xlib specific)
   ✔ Binding GLX ** (later) @done(2015-10-28 09:43) @project(Xlib specific)
-
-General:
-  ☐ Make a log system ? @unsure @comment(Théo: It might be redundant if the user uses dolog for instance, but it also occured to me we could provide one)
-
-Window part:
   ✔ Add keys enumeration @done(2015-10-23 09:46) @project(Window part)
   ✔ Add buttons enumeration @done(2015-10-23 09:50) @project(Window part)
   ✔ Parameterize Keypressed/Keyreleased events with key @commented_out @done(2015-10-31 23:58) @project(Window part)
@@ -62,42 +76,35 @@ Window part:
   ✔ Parameterize Movement events with position @commented_out @done(2015-10-31 23:58) @project(Window part)
   ✘ Put shared code directly in ogamlWindow.ml (like the Event module ?) -- use packs @cancelled(2015-10-21 17:45) @project(Window part)
   ✔ Maybe merge window_impl and mouse_impl... it would probably be cleaner @done(2015-11-08 12:42) @project(Window part)
-  ☐ Window titles
-  ☐ Window attributes abstract type ? May contain title, size, etc @unsure
-  ☐ Same for GL context attributes ? @unsure
   ✔ Real-time state Keyboard module @done(2015-11-09 16:56) @project(Window part)
   ✔ Real-time state Mouse module @done(2015-11-01 23:59) @project(Window part)
   ✔ Graphical functions display & clear - requires binding GLX for X11 ** @done(2015-10-29 18:33) @project(Window part)
-
-New GL Implementation :
   ✔ Base @done(2015-11-08 13:59) @project(New GL Implementation)
-    ✔ Implement State @done(2015-11-04 15:10) @project(New GL Implementation)
-    ✔ Implement Internal.Texture @done(2015-11-05 00:25) @project(New GL Implementation)
-    ✔ Implement Texture @done(2015-11-05 01:22) @project(New GL Implementation)
-    ✔ Implement Internal.Shader @done(2015-11-05 10:44) @project(New GL Implementation)
-    ✘ Implement Shader -- Hidden in program @cancelled(2015-11-05 10:45) @project(New GL Implementation)
-    ✔ Implement Internal.Program @done(2015-11-05 13:09) @project(New GL Implementation)
-    ✔ Implement Program @done(2015-11-05 20:06) @project(New GL Implementation)
-    ✔ Implement Internal.VBO @done(2015-11-06 10:07) @project(New GL Implementation)
-    ✔ Implement Internal.VAO @done(2015-11-06 10:07) @project(New GL Implementation)
-    ✔ Implement Uniform @done(2015-11-06 11:04) @project(New GL Implementation)
-    ✔ Implement DrawParameter @done(2015-11-06 10:33) @project(New GL Implementation)
-    ✔ Implement VertexArray @done(2015-11-06 19:02) @project(New GL Implementation)
-    ✔ Update State @done(2015-11-06 18:08) @project(New GL Implementation)
-    ✔ Hide State.t in Window @done(2015-11-06 19:56) @project(New GL Implementation)
-    ✔ Implement window draw and clear functions @done(2015-11-06 22:18) @project(New GL Implementation)
-    ✔ Rework cube test @done(2015-11-06 23:31) @project(New GL Implementation)
-    ✔ Add error for shader creation @done(2015-11-08 13:20) @project(New GL Implementation)
-    ✔ Add error for program creation @done(2015-11-08 13:20) @project(New GL Implementation)
-    ✔ Better program creation (auto versioning) @done(2015-11-08 12:50) @project(New GL Implementation)
-    ✔ Hide uniform & attribute locations ? @done(2015-11-08 13:26) @project(New GL Implementation)
-    ✔ Move Uniform externals to Internal and remove all Field(data,0) in uniform bindings @done(2015-11-08 13:40) @project(New GL Implementation)
-    ✔ Hide Data.t ? & more data conversions @done(2015-11-06 17:57) @project(New GL Implementation)
-    ✔ Safe destroy function for VertexArrays @done(2015-11-08 13:45) @project(New GL Implementation)
-    ✔ Clean Enum according to what can be hidden in Internal @done(2015-11-08 13:59) @project(New GL Implementation)
+  ✔ Implement State @done(2015-11-04 15:10) @project(New GL Implementation)
+  ✔ Implement Internal.Texture @done(2015-11-05 00:25) @project(New GL Implementation)
+  ✔ Implement Texture @done(2015-11-05 01:22) @project(New GL Implementation)
+  ✔ Implement Internal.Shader @done(2015-11-05 10:44) @project(New GL Implementation)
+  ✘ Implement Shader -- Hidden in program @cancelled(2015-11-05 10:45) @project(New GL Implementation)
+  ✔ Implement Internal.Program @done(2015-11-05 13:09) @project(New GL Implementation)
+  ✔ Implement Program @done(2015-11-05 20:06) @project(New GL Implementation)
+  ✔ Implement Internal.VBO @done(2015-11-06 10:07) @project(New GL Implementation)
+  ✔ Implement Internal.VAO @done(2015-11-06 10:07) @project(New GL Implementation)
+  ✔ Implement Uniform @done(2015-11-06 11:04) @project(New GL Implementation)
+  ✔ Implement DrawParameter @done(2015-11-06 10:33) @project(New GL Implementation)
+  ✔ Implement VertexArray @done(2015-11-06 19:02) @project(New GL Implementation)
+  ✔ Update State @done(2015-11-06 18:08) @project(New GL Implementation)
+  ✔ Hide State.t in Window @done(2015-11-06 19:56) @project(New GL Implementation)
+  ✔ Implement window draw and clear functions @done(2015-11-06 22:18) @project(New GL Implementation)
+  ✔ Rework cube test @done(2015-11-06 23:31) @project(New GL Implementation)
+  ✔ Add error for shader creation @done(2015-11-08 13:20) @project(New GL Implementation)
+  ✔ Add error for program creation @done(2015-11-08 13:20) @project(New GL Implementation)
+  ✔ Better program creation (auto versioning) @done(2015-11-08 12:50) @project(New GL Implementation)
+  ✔ Hide uniform & attribute locations ? @done(2015-11-08 13:26) @project(New GL Implementation)
+  ✔ Move Uniform externals to Internal and remove all Field(data,0) in uniform bindings @done(2015-11-08 13:40) @project(New GL Implementation)
+  ✔ Hide Data.t ? & more data conversions @done(2015-11-06 17:57) @project(New GL Implementation)
+  ✔ Safe destroy function for VertexArrays @done(2015-11-08 13:45) @project(New GL Implementation)
+  ✔ Clean Enum according to what can be hidden in Internal @done(2015-11-08 13:59) @project(New GL Implementation)
   ✔ Hide core functions in low-level submodules (like Program.LL.bind) @done(2015-11-09 00:42) @project(New GL Implementation)
-
-Math part:
   ✔ Fix a notation convention @done(2015-10-29 18:32) @project(Math part)
   ✔ Implement Vector3f @done(2015-10-24 10:07) @project(Math part)
   ✔ Write a Makefile @done(2015-10-24 10:12) @project(Math part)
@@ -108,19 +115,15 @@ Math part:
   ✔ Add more complex functions to matrix3f (look_at, clipping, etc...) @done(2015-10-24 11:55) @project(Math part)
   ✔ Debug matrices... Really @done(2015-10-25 09:17) @project(Math part)
   ✔ Recode inverse matrices after debugging @done(2015-10-25 09:20) @project(Math part)
-  ☐ Matrices, quaternions and vector exceptions
   ✔ Implement Quaternions @done(2015-11-01 00:03) @project(Math part)
   ✔ Implement polygons @done(2015-10-26 16:33) @project(Math part)
   ✔ Parameterize Poly.axis with vector3f @done(2015-11-08 15:45) @project(Math part)
   ✔ Rename matrix3f in matrix3D @done(2015-10-30 10:08) @project(Math part)
-
-GL part:
   ✔ Implement indexing (high priority !!) @done(2015-11-02 21:38) @project(GL part)
   ✔ Parameterize clear with color, remove call to Internal from example @done(2015-11-10 17:20) @project(GL part)
   ✔ Better clear @done(2015-11-10 17:20) @project(GL part)
   ✔ More uniforms @done(2015-11-10 23:50) @project(GL part)
   ✔ Implement OBJ loading in Model @done(2015-11-09 00:43) @project(GL part)
-  ☐ Implement model creation - modification in Model
   ✔ Move Polys to GL and output models rather than float arrays @done(2015-11-08 15:45) @project(GL part)
   ✔ Implement glGetString in config for debug @done(2015-10-29 13:21) @project(GL part)
   ✔ Bind face culling, front_face @done(2015-10-26 21:31) @project(GL part)
@@ -141,13 +144,5 @@ GL part:
   ✔ Fix shader compilation not returning an error when failing (use glGetShaderiv with GL_COMPILE_STATUS) @done(2015-10-29 15:59) @project(GL part)
   ✔ Add version option when compiling shaders @done(2015-10-29 15:44) @project(GL part)
   ✔ Implement BMP @done(2015-11-02 18:44) @project(GL part)
-  ☐ Implement PNG
-  ☐ Implement JPG
-  ☐ Implement Image
   ✔ Implement Texture @done(2015-11-02 20:07) @project(GL part)
-  ☐ Organize image parsing
-  ☐ Better support for all formats (for example 24,32 bit bmps)
-  ☐ Add other kinds of textures @unsure
   ✔ Let the user choose the active texture when binding @done(2015-11-02 20:07) @project(GL part)
-
-
