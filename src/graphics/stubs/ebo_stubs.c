@@ -14,7 +14,7 @@
   #include <GL/gl.h>
 #endif
 #include <caml/bigarray.h>
-#include "../../utils/stubs.h"
+#include "utils.h"
 
 
 GLenum EBOKind_val(value kind) 

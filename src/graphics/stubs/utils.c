@@ -1,6 +1,6 @@
 #define CAML_NAME_SPACE
 
-#include "stubs.h"
+#include "utils.h"
 
 struct custom_operations empty_custom_opts = {
   .identifier  = "obj_st handling",

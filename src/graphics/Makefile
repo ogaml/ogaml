@@ -6,16 +6,13 @@ INCLUDE_DIRS = -I ../utils/ -I ../math/ -I ../core/
 
 GRAPHICS_STUBS = shader_stubs.c program_stubs.c texture_stubs.c\
 	         vao_stubs.c vbo_stubs.c uniform_stubs.c\
-		 render_stubs.c ebo_stubs.c
+		 render_stubs.c ebo_stubs.c utils.c
 
-UTILS_STUBS = stubs.c
-
-STUBS_SRC = $(addprefix $(STUBS_DIR)/, $(GRAPHICS_STUBS)) \
-	    $(addprefix ../utils/, $(UTILS_STUBS))
+STUBS_SRC = $(addprefix $(STUBS_DIR)/, $(GRAPHICS_STUBS)) 
 
 STUBS_TARGET = $(STUBS_SRC:.c=.o)
 
-STUBS_OBJS = $(GRAPHICS_STUBS:.c=.o) $(UTILS_STUBS:.c=.o)
+STUBS_OBJS = $(GRAPHICS_STUBS:.c=.o) 
 
 MLSOURCES = color.ml drawParameter.ml GL.ml state.ml contextSettings.ml\
 	    image.ml texture.ml program.ml vertexArray.ml indexArray.ml\

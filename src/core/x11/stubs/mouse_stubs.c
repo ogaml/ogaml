@@ -1,5 +1,5 @@
 #include <X11/Xlib.h>
-#include "../../../utils/stubs.h"
+#include "utils.h"
 
 
 // INPUT   a display, a window, a position

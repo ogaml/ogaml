@@ -1,5 +1,5 @@
 #include <X11/Xlib.h>
-#include "../../../utils/stubs.h"
+#include "utils.h"
 
 
 Display* current_display = NULL;

@@ -2,7 +2,7 @@
 #include <xcb/xcb.h>
 #include <X11/Xlib-xcb.h>
 #include <X11/keysym.h>
-#include "../../../utils/stubs.h"
+#include "utils.h"
 
 CAMLprim value
 caml_is_key_down(value display, value code)

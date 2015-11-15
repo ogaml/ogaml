@@ -14,7 +14,7 @@
   #include <GL/gl.h>
 #endif
 #include <caml/bigarray.h>
-#include "../../utils/stubs.h"
+#include "utils.h"
 
 
 #define MLvar_Minify  (254173077)

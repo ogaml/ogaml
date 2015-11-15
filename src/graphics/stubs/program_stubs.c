@@ -13,7 +13,7 @@
 #else
   #include <GL/gl.h>
 #endif
-#include "../../utils/stubs.h"
+#include "utils.h"
 
 
 int Val_type(GLenum type)

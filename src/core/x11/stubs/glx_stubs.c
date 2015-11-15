@@ -2,7 +2,7 @@
 #include <GL/gl.h>
 #include <GL/glx.h>
 #include <memory.h>
-#include "../../../utils/stubs.h"
+#include "utils.h"
 
 
 // INPUT   : a display, a screen number, an attribute list

@@ -5,12 +5,10 @@ include ../../common_defs.mk
 
 COCOA_STUBS = application_delegate_stubs.m event_stubs.m glcontext_stubs.m\
 	      utils_stubs.m window_stubs.m application_stubs.m opengl_stubs.m\
-	      window_controller_stubs.m 
+	      window_controller_stubs.m utils.m
 
 XLIB_STUBS = atoms_stubs.c display_stubs.c event_stubs.c glx_stubs.c\
-	     mouse_stubs.c keyboard_stubs.c window_stubs.c 
-
-UTILS_STUBS = stubs.c
+	     mouse_stubs.c keyboard_stubs.c window_stubs.c utils.c
 
 OS_WIN_STUBS =
 
@@ -23,19 +21,17 @@ endif
 
 STUBS_SOURCES = $(addprefix $(OS_WIN_LIB)/$(STUBS_DIR)/, $(OS_WIN_STUBS)) 
 	    
-UTILS_SOURCES  =$(addprefix ../utils/, $(UTILS_STUBS))
-
 STUBS_TARGETS = 
 
 STUBS_OBJECTS = 
 
 ifeq ($(OS_WIN_LIB), cocoa)
-  STUBS_TARGETS = $(STUBS_SOURCES:.m=.o) $(UTILS_SOURCES:.c=.o)
-  STUBS_OBJECTS = $(OS_WIN_STUBS:.m=.o) $(UTILS_STUBS:.c=.o)
+  STUBS_TARGETS = $(STUBS_SOURCES:.m=.o)
+  STUBS_OBJECTS = $(OS_WIN_STUBS:.m=.o)
 endif
 ifeq ($(OS_WIN_LIB), x11)
-  STUBS_TARGETS = $(STUBS_SOURCES:.c=.o) $(UTILS_SOURCES:.c=.o)
-  STUBS_OBJECTS = $(OS_WIN_STUBS:.c=.o) $(UTILS_STUBS:.c=.o)
+  STUBS_TARGETS = $(STUBS_SOURCES:.c=.o)
+  STUBS_OBJECTS = $(OS_WIN_STUBS:.c=.o)
 endif
 
 
