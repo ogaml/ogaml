@@ -17,9 +17,8 @@ CORE_FILES = src/core/*.a src/core/*.cmi src/core/*.cma src/core/*.cmxa\
 
 MATH_FILES = src/math/*.a src/math/*.cmi src/math/*.cma src/math/*.cmxa
 
-GRAPH_FILES = src/graphics/*.a src/graphics/*.cmi src/graphics/*.cma\
+GRAPH_FILES = src/graphics/*.a src/graphics/[!GL]*.cmi src/graphics/*.cma\
 	      src/graphics/*.cmxa src/graphics/*.so 
-
 
 # Compilation
 

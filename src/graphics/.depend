@@ -48,6 +48,7 @@ indexArray.cmi : state.cmi
 keyboard.cmi :
 model.cmi : vertexArray.cmi indexArray.cmi color.cmi
 mouse.cmi : window.cmi
+ogamlGraphics.cmi :
 poly.cmi : vertexArray.cmi
 program.cmi : state.cmi GL.cmi
 sprite.cmi :

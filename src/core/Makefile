@@ -39,7 +39,7 @@ endif
 
 ML_SOURCES = LL.ml 
 
-ML_INTERFACES = button.mli keycode.mli event.mli
+ML_INTERFACES = button.mli keycode.mli event.mli 
 
 ML_OBJ = $(ML_SOURCES:.ml=.cmo)
 

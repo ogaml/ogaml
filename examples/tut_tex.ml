@@ -5,8 +5,6 @@ let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
  
 let window = Window.create ~width:800 ~height:600 ~settings
 
-let () = GL.Pervasives.color 1.0 1.0 1.0 1.0
-
 let vertex_shader_source = "
   in vec3 position;
   

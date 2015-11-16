@@ -5,8 +5,6 @@ let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
 
 let window = Window.create ~width:800 ~height:600 ~settings
 
-let () = GL.Pervasives.color 1. 1. 1. 1.
-
 let initial_time = ref 0.
 
 let frame_count  = ref 0
