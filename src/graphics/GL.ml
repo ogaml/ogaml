@@ -167,7 +167,6 @@ module Data = struct
     in
     {data = arr; kind = Bigarray.float32; size = (max i 1); length = 0}
 
-
   let double t = 
     let arr = 
       Bigarray.Array1.create

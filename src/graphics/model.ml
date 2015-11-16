@@ -15,6 +15,7 @@ type point = int
 
 type color = int
 
+
 module TIntSet = Set.Make (struct
 
   type t = (int * int * int)
@@ -22,6 +23,67 @@ module TIntSet = Set.Make (struct
   let compare = compare
 
 end)
+
+module IndexedTable = struct
+
+  type 'a t = {
+    indices : ('a, int) Hashtbl.t;
+    mutable data   : 'a array;
+    mutable size   : int;
+    mutable length : int
+  }
+
+  let double t = 
+    let arr = Array.make (t.size * 2) t.data.(0) in
+    Array.blit t.data 0 arr 0 t.size;
+    t.size <- t.size * 2;
+    t.data <- arr
+
+  let rec alloc t i = 
+    let space = t.size - t.length in
+    if space < i then begin
+      double t;
+      alloc t i
+    end
+
+  let create n def = 
+    {
+      indices = Hashtbl.create 97;
+      data = Array.make n def;
+      size = n;
+      length = 0
+    }
+
+  let reset t n = 
+    Hashtbl.reset t.indices;
+    t.data <- Array.make n t.data.(0);
+    t.size <- n;
+    t.length <- 0
+
+  let shrink t =
+    t.data <- Array.sub t.data 0 t.length;
+    t.size <- t.length
+
+  let add t e = 
+    if not (Hashtbl.mem t.indices e) then begin 
+      alloc t 1;
+      t.data.(t.length) <- e;
+      t.length <- t.length + 1
+    end
+
+  let length t = 
+    t.length
+
+  let get t i = 
+    t.data.(i)
+
+  let id t e =
+    Hashtbl.find t.indices e
+
+end
+
+
+
 
 type t = {
   ivertices : (Vector3f.t, int) Hashtbl.t;
@@ -146,10 +208,16 @@ let add_point t ~vertex ?normal ?uv ?color () =
   in
   make_point t i j k l
 
-let make_face t (i,j,k) = 
-  t.faces <- TIntSet.add (i,j,k) t.faces
+let sort_tuple (i,j,k) = 
+  let mini = min i (min j k) in
+  if i = mini then (i,j,k)
+  else if j = mini then (j,k,i)
+  else (k,i,j)
 
-let compute_normals t = 
+let make_face t f = 
+  t.faces <- TIntSet.add (sort_tuple f) t.faces
+
+let compute_face_normals t = 
   TIntSet.fold (fun (i,j,k) s ->
     let (vti,nmi,uvi,coi) as pti = Hashtbl.find t.points i in
     let (vtj,nmj,uvj,coj) as ptj = Hashtbl.find t.points j in
@@ -157,40 +225,63 @@ let compute_normals t =
     let pointi = Hashtbl.find t.vertices vti in
     let pointj = Hashtbl.find t.vertices vtj in
     let pointk = Hashtbl.find t.vertices vtk in
+    let normal = Vector3f.cross (Vector3f.sub pointj pointi)
+                                (Vector3f.sub pointk pointi)
+    in
+    let newnm  = add_normal t normal in
     let newi = 
       if nmi <> None then i
-      else begin
-        let normal = Vector3f.cross (Vector3f.sub pointj pointi)
-                                    (Vector3f.sub pointk pointi)
-        in
-        let newnmi = add_normal t normal in
-        make_point t vti (Some newnmi) uvi coi
-      end
+      else 
+        make_point t vti (Some newnm) uvi coi
     in
     let newj = 
       if nmj <> None then j
-      else begin
-        let normal = Vector3f.cross (Vector3f.sub pointk pointj)
-                                    (Vector3f.sub pointi pointj)
-        in
-        let newnmj = add_normal t normal in
-        make_point t vtj (Some newnmj) uvj coj
-      end
+      else
+        make_point t vtj (Some newnm) uvj coj
     in
     let newk = 
       if nmk <> None then k
-      else begin
-        let normal = Vector3f.cross (Vector3f.sub pointi pointk)
-                                    (Vector3f.sub pointj pointk)
-        in
-        let newnmk = add_normal t normal in
-        make_point t vtk (Some newnmk) uvk cok
-      end
+      else
+        make_point t vtk (Some newnm) uvk cok
     in
-    TIntSet.add (newi, newj, newk) s
+    TIntSet.add (sort_tuple (newi, newj, newk)) s
   ) t.faces TIntSet.empty
   |> fun s -> t.faces <- s
- 
+
+let compute_smooth_normals t = 
+  let normal_sums = Array.make t.nbv Vector3f.zero in
+  TIntSet.iter (fun (i,j,k) ->
+    let (vti,_,_,_) as pti = Hashtbl.find t.points i in
+    let (vtj,_,_,_) as ptj = Hashtbl.find t.points j in
+    let (vtk,_,_,_) as ptk = Hashtbl.find t.points k in
+    let pointi = Hashtbl.find t.vertices vti in
+    let pointj = Hashtbl.find t.vertices vtj in
+    let pointk = Hashtbl.find t.vertices vtk in
+    let normal = Vector3f.cross (Vector3f.sub pointj pointi)
+                                (Vector3f.sub pointk pointi)
+    in
+    normal_sums.(vti) <- Vector3f.add normal_sums.(vti) normal;
+    normal_sums.(vtj) <- Vector3f.add normal_sums.(vtj) normal;
+    normal_sums.(vtk) <- Vector3f.add normal_sums.(vtk) normal;
+  ) t.faces;
+  TIntSet.fold (fun (i,j,k) s ->
+    let (vti,_,uvi,coi) as pti = Hashtbl.find t.points i in
+    let (vtj,_,uvj,coj) as ptj = Hashtbl.find t.points j in
+    let (vtk,_,uvk,cok) as ptk = Hashtbl.find t.points k in
+    let newnmi = add_normal t (Vector3f.normalize normal_sums.(vti)) in
+    let newnmj = add_normal t (Vector3f.normalize normal_sums.(vtj)) in
+    let newnmk = add_normal t (Vector3f.normalize normal_sums.(vtk)) in
+    let pt1 = make_point t vti (Some newnmi) uvi coi in
+    let pt2 = make_point t vtj (Some newnmj) uvj coj in
+    let pt3 = make_point t vtk (Some newnmk) uvk cok in
+    TIntSet.add (sort_tuple (pt1, pt2, pt3)) s
+  ) t.faces TIntSet.empty
+  |> fun s -> t.faces <- s
+
+let compute_normals ?smooth:(smooth = false) t = 
+  if smooth then compute_smooth_normals t
+  else compute_face_normals t
+
 let source_point t source point = 
   let (vt,nm,uv,co) as pt = Hashtbl.find t.points point in
   let position = Hashtbl.find t.vertices vt in
@@ -228,8 +319,20 @@ let source_non_indexed t source =
     source_point t source k
   ) t.faces
 
+let source_indexed t indices source = 
+  TIntSet.iter (fun (i,j,k) ->
+    IndexArray.Source.add indices i;
+    IndexArray.Source.add indices j;
+    IndexArray.Source.add indices k
+  ) t.faces;
+  for i = 0 to t.nbp - 1 do
+    source_point t source i
+  done
+
 let source t ?index_source ~vertex_source () = 
-  source_non_indexed t vertex_source
+  match index_source with
+  |None -> source_non_indexed t vertex_source
+  |Some indices -> source_indexed t indices vertex_source
 
 (** OBJ Parsing **)
 

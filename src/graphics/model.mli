@@ -40,7 +40,7 @@ val add_point : t -> vertex:OgamlMath.Vector3f.t ->
 
 val make_face : t -> (point * point * point) -> unit
 
-val compute_normals : t -> unit
+val compute_normals : ?smooth:bool -> t -> unit
 
 val source : t -> ?index_source:IndexArray.Source.t ->
                    vertex_source:VertexArray.Source.t -> unit -> unit

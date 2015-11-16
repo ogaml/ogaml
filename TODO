@@ -26,8 +26,9 @@ OgamlMath:
   ☐ Matrices, quaternions and vector exceptions
 
 OgamlGraphics:
-  ☐ Better normal computations in Model
+  ✔ Better normal computations in Model @done(2015-11-15 23:22) @project(OgamlGraphics)
   ☐ Indexing in Model
+  ☐ Clean unused data in Models
   ☐ Custom vertex arrays
   ☐ Implement PNG parsing
   ☐ Implement JPG parsing

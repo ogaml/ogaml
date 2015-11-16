@@ -2,7 +2,7 @@ include ../../common_defs.mk
 
 # Override
 
-INCLUDE_DIRS = -I ../utils/ -I ../math/ -I ../core/
+INCLUDE_DIRS = -I ../math/ -I ../core/
 
 GRAPHICS_STUBS = shader_stubs.c program_stubs.c texture_stubs.c\
 	         vao_stubs.c vbo_stubs.c uniform_stubs.c\
