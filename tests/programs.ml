@@ -64,16 +64,7 @@ let test_program1 () =
              }"))
     ]
   in
-  Program.LL.iter_attributes prog (fun att ->
-    assert ((Program.Attribute.name att) = "param3");
-    assert ((Program.Attribute.kind att) = GL.Types.GlslType.Float2);
-  );
-  Program.LL.iter_uniforms prog (fun att ->
-    let n = Program.Uniform.name att in
-    let k = Program.Uniform.kind att in
-    assert ((n = "param1" && k = GL.Types.GlslType.Float2) ||
-            (n = "param2" && k = GL.Types.GlslType.Float));
-  )
+  ignore prog
 
 let test_program2 () = 
   let prog = Program.from_source_list
