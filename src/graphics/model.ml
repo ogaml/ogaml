@@ -16,18 +16,10 @@ type point = int
 type color = int
 
 
-module TIntSet = Set.Make (struct
-
-  type t = (int * int * int)
-
-  let compare = compare
-
-end)
-
 module IndexedTable = struct
 
   type 'a t = {
-    indices : ('a, int) Hashtbl.t;
+    mutable indices : ('a, int) Hashtbl.t;
     mutable data   : 'a array;
     mutable size   : int;
     mutable length : int
@@ -55,10 +47,18 @@ module IndexedTable = struct
     }
 
   let reset t n = 
-    Hashtbl.reset t.indices;
+    t.indices <- Hashtbl.create 97;
     t.data <- Array.make n t.data.(0);
     t.size <- n;
     t.length <- 0
+
+  let copy t = 
+    {
+      indices = t.indices;
+      data    = t.data;
+      size    = t.size;
+      length  = t.length
+    }
 
   let shrink t =
     t.data <- Array.sub t.data 0 t.length;
@@ -67,9 +67,15 @@ module IndexedTable = struct
   let add t e = 
     if not (Hashtbl.mem t.indices e) then begin 
       alloc t 1;
+      Hashtbl.add t.indices e t.length;
       t.data.(t.length) <- e;
       t.length <- t.length + 1
     end
+
+  let replace t i e = 
+    Hashtbl.remove t.indices t.data.(i);
+    Hashtbl.replace t.indices e i;
+    t.data.(i) <- e
 
   let length t = 
     t.length
@@ -80,114 +86,82 @@ module IndexedTable = struct
   let id t e =
     Hashtbl.find t.indices e
 
+  let iter t f = 
+    for i = 0 to t.length - 1 do
+      f i t.data.(i);
+    done
+
+  let blit t1 t2 = 
+    t1.indices <- t2.indices;
+    t1.data    <- t2.data;
+    t1.length  <- t2.length;
+    t1.size    <- t2.size
+
 end
 
 
 
 
 type t = {
-  ivertices : (Vector3f.t, int) Hashtbl.t;
-  vertices  : (int, Vector3f.t) Hashtbl.t;
-  inormals  : (Vector3f.t, int) Hashtbl.t;
-  normals   : (int, Vector3f.t) Hashtbl.t;
-  iuvs      : (Vector2f.t, int) Hashtbl.t;
-  uvs       : (int, Vector2f.t) Hashtbl.t;
-  ipoints   : (int * int option * int option * int option, int) Hashtbl.t;
-  points    : (int, int * int option * int option * int option) Hashtbl.t;
-  icolors   : (Color.t, int) Hashtbl.t;
-  colors    : (int, Color.t) Hashtbl.t;
-  mutable faces : TIntSet.t;
-  mutable nbv   : int;
-  mutable nbn   : int;
-  mutable nbu   : int;
-  mutable nbp   : int;
-  mutable nbc   : int;
+  vertices  : Vector3f.t IndexedTable.t;
+  normals   : Vector3f.t IndexedTable.t;
+  uvs       : Vector2f.t IndexedTable.t;
+  colors    : Color.t    IndexedTable.t;
+  points    : (int * int option * int option * int option) IndexedTable.t;
+  faces     : (int * int * int) IndexedTable.t;
 }
 
 let empty () = 
   {
-    ivertices = Hashtbl.create 13;
-    vertices  = Hashtbl.create 13;
-    inormals  = Hashtbl.create 13;
-    normals   = Hashtbl.create 13;
-    iuvs      = Hashtbl.create 13;
-    uvs       = Hashtbl.create 13;
-    ipoints   = Hashtbl.create 13;
-    points    = Hashtbl.create 13;
-    icolors   = Hashtbl.create 13;
-    colors    = Hashtbl.create 13;
-    faces     = TIntSet.empty;
-    nbv       = 0;
-    nbn       = 0;
-    nbu       = 0;
-    nbp       = 0;
-    nbc       = 0;
+    vertices  = IndexedTable.create 13 Vector3f.zero;
+    normals   = IndexedTable.create 13 Vector3f.zero;
+    uvs       = IndexedTable.create 13 Vector2f.zero;
+    colors    = IndexedTable.create 13 (`RGB Color.RGB.black);
+    points    = IndexedTable.create 13 (0, None, None, None);
+    faces     = IndexedTable.create 13 (0, 0, 0);
   }
 
+let shrink t = 
+  IndexedTable.shrink t.vertices;
+  IndexedTable.shrink t.normals ;
+  IndexedTable.shrink t.uvs     ;
+  IndexedTable.shrink t.colors  ;
+  IndexedTable.shrink t.points  ;
+  IndexedTable.shrink t.faces
+
 let scale t f = 
-  Hashtbl.iter (fun i v -> 
-    Hashtbl.replace t.vertices i (Vector3f.prop f v);
-    Hashtbl.remove t.ivertices v;
-    Hashtbl.replace t.ivertices (Vector3f.prop f v) i
-  ) t.vertices 
+  IndexedTable.iter 
+    t.vertices 
+    (fun i v -> 
+      IndexedTable.replace t.vertices i (Vector3f.prop f v)
+    )
 
 let translate t tr = 
-  Hashtbl.iter (fun i v -> 
-    Hashtbl.replace t.vertices i (Vector3f.add tr v);
-    Hashtbl.remove t.ivertices v;
-    Hashtbl.replace t.ivertices (Vector3f.add tr v) i
-  ) t.vertices 
+  IndexedTable.iter 
+    t.vertices 
+    (fun i v -> 
+      IndexedTable.replace t.vertices i (Vector3f.add tr v)
+    )
 
 let add_vertex t vert = 
-  try 
-    Hashtbl.find t.ivertices vert
-  with Not_found -> begin
-    Hashtbl.add t.vertices t.nbv vert;
-    Hashtbl.add t.ivertices vert t.nbv;
-    t.nbv <- t.nbv + 1;
-    t.nbv - 1
-  end
+  IndexedTable.add t.vertices vert;
+  IndexedTable.id t.vertices vert
 
 let add_normal t norm = 
-  try 
-    Hashtbl.find t.inormals norm
-  with Not_found -> begin
-    Hashtbl.add t.normals t.nbn norm;
-    Hashtbl.add t.inormals norm t.nbn;
-    t.nbn <- t.nbn + 1;
-    t.nbn - 1
-  end
+  IndexedTable.add t.normals norm;
+  IndexedTable.id t.normals norm 
 
 let add_uv t uv = 
-  try
-    Hashtbl.find t.iuvs uv
-  with Not_found -> begin
-    Hashtbl.add t.uvs t.nbu uv;
-    Hashtbl.add t.iuvs uv t.nbu;
-    t.nbu <- t.nbu + 1;
-    t.nbu - 1
-  end
+  IndexedTable.add t.uvs uv;
+  IndexedTable.id t.uvs uv 
 
-let add_color t color = 
-  try
-    Hashtbl.find t.icolors color
-  with Not_found -> begin
-    Hashtbl.add t.colors t.nbc color;
-    Hashtbl.add t.icolors color t.nbc;
-    t.nbc <- t.nbc + 1;
-    t.nbc - 1
-  end
-
+let add_color t col = 
+  IndexedTable.add t.colors col;
+  IndexedTable.id t.colors col
 
 let make_point t v n u c = 
-  try
-    Hashtbl.find t.ipoints (v,n,u,c)
-  with Not_found -> begin
-    Hashtbl.add t.points t.nbp (v,n,u,c);
-    Hashtbl.add t.ipoints (v,n,u,c) t.nbp;
-    t.nbp <- t.nbp + 1;
-    t.nbp - 1
-  end
+  IndexedTable.add t.points (v,n,u,c);
+  IndexedTable.id t.points (v,n,u,c)
 
 let add_point t ~vertex ?normal ?uv ?color () = 
   let i = add_vertex t vertex in
@@ -215,82 +189,74 @@ let sort_tuple (i,j,k) =
   else (k,i,j)
 
 let make_face t f = 
-  t.faces <- TIntSet.add (sort_tuple f) t.faces
+  IndexedTable.add t.faces (sort_tuple f)
 
 let compute_face_normals t = 
-  TIntSet.fold (fun (i,j,k) s ->
-    let (vti,nmi,uvi,coi) as pti = Hashtbl.find t.points i in
-    let (vtj,nmj,uvj,coj) as ptj = Hashtbl.find t.points j in
-    let (vtk,nmk,uvk,cok) as ptk = Hashtbl.find t.points k in
-    let pointi = Hashtbl.find t.vertices vti in
-    let pointj = Hashtbl.find t.vertices vtj in
-    let pointk = Hashtbl.find t.vertices vtk in
+  let oldpoints = IndexedTable.copy t.points in
+  IndexedTable.reset t.points 13;
+  IndexedTable.reset t.normals 13;
+  IndexedTable.iter t.faces (fun idf (a,b,c) ->
+    let (vti,_,uvi,coi) as pti = IndexedTable.get oldpoints a in
+    let (vtj,_,uvj,coj) as ptj = IndexedTable.get oldpoints b in
+    let (vtk,_,uvk,cok) as ptk = IndexedTable.get oldpoints c in
+    let pointi = IndexedTable.get t.vertices vti in
+    let pointj = IndexedTable.get t.vertices vtj in
+    let pointk = IndexedTable.get t.vertices vtk in
     let normal = Vector3f.cross (Vector3f.sub pointj pointi)
                                 (Vector3f.sub pointk pointi)
     in
     let newnm  = add_normal t normal in
-    let newi = 
-      if nmi <> None then i
-      else 
-        make_point t vti (Some newnm) uvi coi
-    in
-    let newj = 
-      if nmj <> None then j
-      else
-        make_point t vtj (Some newnm) uvj coj
-    in
-    let newk = 
-      if nmk <> None then k
-      else
-        make_point t vtk (Some newnm) uvk cok
-    in
-    TIntSet.add (sort_tuple (newi, newj, newk)) s
-  ) t.faces TIntSet.empty
-  |> fun s -> t.faces <- s
+    let newa = make_point t vti (Some newnm) uvi coi in
+    let newb = make_point t vtj (Some newnm) uvj coj in
+    let newc = make_point t vtk (Some newnm) uvk cok in
+    IndexedTable.replace t.faces idf (newa, newb, newc)
+  )
 
 let compute_smooth_normals t = 
-  let normal_sums = Array.make t.nbv Vector3f.zero in
-  TIntSet.iter (fun (i,j,k) ->
-    let (vti,_,_,_) as pti = Hashtbl.find t.points i in
-    let (vtj,_,_,_) as ptj = Hashtbl.find t.points j in
-    let (vtk,_,_,_) as ptk = Hashtbl.find t.points k in
-    let pointi = Hashtbl.find t.vertices vti in
-    let pointj = Hashtbl.find t.vertices vtj in
-    let pointk = Hashtbl.find t.vertices vtk in
+  let normal_sums = Array.make (IndexedTable.length t.vertices) Vector3f.zero in
+  let oldpoints = IndexedTable.copy t.points in
+  IndexedTable.reset t.points  13;
+  IndexedTable.reset t.normals 13;
+  IndexedTable.iter t.faces (fun idf (a,b,c) ->
+    let (vti,_,_,_) as pti = IndexedTable.get oldpoints a in
+    let (vtj,_,_,_) as ptj = IndexedTable.get oldpoints b in
+    let (vtk,_,_,_) as ptk = IndexedTable.get oldpoints c in
+    let pointi = IndexedTable.get t.vertices vti in
+    let pointj = IndexedTable.get t.vertices vtj in
+    let pointk = IndexedTable.get t.vertices vtk in
     let normal = Vector3f.cross (Vector3f.sub pointj pointi)
                                 (Vector3f.sub pointk pointi)
     in
     normal_sums.(vti) <- Vector3f.add normal_sums.(vti) normal;
     normal_sums.(vtj) <- Vector3f.add normal_sums.(vtj) normal;
     normal_sums.(vtk) <- Vector3f.add normal_sums.(vtk) normal;
-  ) t.faces;
-  TIntSet.fold (fun (i,j,k) s ->
-    let (vti,_,uvi,coi) as pti = Hashtbl.find t.points i in
-    let (vtj,_,uvj,coj) as ptj = Hashtbl.find t.points j in
-    let (vtk,_,uvk,cok) as ptk = Hashtbl.find t.points k in
+  );
+  IndexedTable.iter t.faces (fun idf (a,b,c) ->
+    let (vti,_,uvi,coi) as pti = IndexedTable.get oldpoints a in
+    let (vtj,_,uvj,coj) as ptj = IndexedTable.get oldpoints b in
+    let (vtk,_,uvk,cok) as ptk = IndexedTable.get oldpoints c in
     let newnmi = add_normal t (Vector3f.normalize normal_sums.(vti)) in
     let newnmj = add_normal t (Vector3f.normalize normal_sums.(vtj)) in
     let newnmk = add_normal t (Vector3f.normalize normal_sums.(vtk)) in
-    let pt1 = make_point t vti (Some newnmi) uvi coi in
-    let pt2 = make_point t vtj (Some newnmj) uvj coj in
-    let pt3 = make_point t vtk (Some newnmk) uvk cok in
-    TIntSet.add (sort_tuple (pt1, pt2, pt3)) s
-  ) t.faces TIntSet.empty
-  |> fun s -> t.faces <- s
+    let newa = make_point t vti (Some newnmi) uvi coi in
+    let newb = make_point t vtj (Some newnmj) uvj coj in
+    let newc = make_point t vtk (Some newnmk) uvk cok in
+    IndexedTable.replace t.faces idf (newa, newb, newc)
+  ) 
 
 let compute_normals ?smooth:(smooth = false) t = 
   if smooth then compute_smooth_normals t
   else compute_face_normals t
 
 let source_point t source point = 
-  let (vt,nm,uv,co) as pt = Hashtbl.find t.points point in
-  let position = Hashtbl.find t.vertices vt in
+  let (vt,nm,uv,co) as pt = IndexedTable.get t.points point in
+  let position = IndexedTable.get t.vertices vt in
   let normal = 
     match nm with
     |None when VertexArray.Source.requires_normal source ->
        raise (Invalid_model "Normals are requested by source but not provided in the model")
     |Some i when VertexArray.Source.requires_normal source ->
-        Some (Hashtbl.find t.normals i)
+        Some (IndexedTable.get t.normals i)
     | _ -> None
   in
   let texcoord = 
@@ -298,7 +264,7 @@ let source_point t source point =
     |None when VertexArray.Source.requires_uv source ->
        raise (Invalid_model "Normals are requested by source but not provided in the model")
     |Some i when VertexArray.Source.requires_uv source -> 
-        Some (Hashtbl.find t.uvs i)
+        Some (IndexedTable.get t.uvs i)
     | _ -> None
   in
   let color = 
@@ -306,26 +272,26 @@ let source_point t source point =
     |None when VertexArray.Source.requires_color source ->
        raise (Invalid_model "Colors are requested by source but not provided in the model")
     |Some i when VertexArray.Source.requires_color source -> 
-        Some (Hashtbl.find t.colors i)
+        Some (IndexedTable.get t.colors i)
     | _ -> None
   in
   VertexArray.Vertex.create ~position ?normal ?texcoord ?color ()
   |> VertexArray.Source.add source
 
 let source_non_indexed t source = 
-  TIntSet.iter (fun (i,j,k) ->
+  IndexedTable.iter t.faces (fun idf (i,j,k) ->
     source_point t source i; 
     source_point t source j; 
     source_point t source k
-  ) t.faces
+  ) 
 
 let source_indexed t indices source = 
-  TIntSet.iter (fun (i,j,k) ->
+  IndexedTable.iter t.faces (fun idf (i,j,k) ->
     IndexArray.Source.add indices i;
     IndexArray.Source.add indices j;
     IndexArray.Source.add indices k
-  ) t.faces;
-  for i = 0 to t.nbp - 1 do
+  );
+  for i = 0 to (IndexedTable.length t.points) - 1 do
     source_point t source i
   done
 

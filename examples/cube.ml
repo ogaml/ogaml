@@ -19,23 +19,16 @@ let axis_source =
   in
   Poly.axis src Vector3f.({x = -1.; y = -1.; z = -1.}) Vector3f.({x = 5.; y = 5.; z = 5.})
 
-let index_source, cube_source = 
+let cube_source = 
   let src = VertexArray.Source.empty 
     ~position:"in_position" 
-(*     ~color:"in_color" *)
+    ~color:"in_color"
     ~normal:"in_normal"
     ~size:36 () 
   in
-  let indices = IndexArray.Source.empty 36 in
-  let model = Model.from_obj (`File "examples/sibenik.obj") in
-  Model.compute_normals model;
-  Model.source model ~index_source:indices ~vertex_source:src ();
-  indices, src
-(*   Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) *)
+  Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
 
 let axis = VertexArray.static axis_source 
-
-let cubei = IndexArray.static index_source
 
 let cube = VertexArray.static cube_source 
 
@@ -65,8 +58,7 @@ let display () =
   let t = Unix.gettimeofday () in
   let view = Matrix3D.look_at_eulerian ~from:!position ~theta:!view_theta ~phi:!view_phi in
   let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
-(*   let model = Matrix3D.rotation rot_vector !rot_angle in *)
-  let model = Matrix3D.identity () in
+  let model = Matrix3D.rotation rot_vector !rot_angle in
   let vp = Matrix3D.product proj view in
   let mv = Matrix3D.product view model in
   let mvp = Matrix3D.product vp model in
@@ -81,9 +73,8 @@ let display () =
     |> Uniform.matrix3D "MVPMatrix" mvp
     |> Uniform.matrix3D "MVMatrix" mv
     |> Uniform.matrix3D "VMatrix" view
-    |> Uniform.color "in_color" (`RGB Color.RGB.({r = 0.7; g = 0.7; b = 0.7; a = 1.0}))
   in
-  Window.draw ~window ~vertices:cube ~indices:cubei ~uniform ~program:normal_program ~parameters ~mode:DrawMode.Triangles ();
+  Window.draw ~window ~vertices:cube ~uniform ~program:normal_program ~parameters ~mode:DrawMode.Triangles ();
   let uniform =
     Uniform.empty
     |> Uniform.matrix3D "MVPMatrix" vp
