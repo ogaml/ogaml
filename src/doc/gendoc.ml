@@ -91,8 +91,8 @@ let rec type_expr_to_string = function
   | Arrow (t1,t2) -> 
       if type_expr_simple t1 then Printf.sprintf "%s -> %s" (type_expr_to_string t1) (type_expr_to_string t2)
       else Printf.sprintf "(%s) -> %s" (type_expr_to_string t1) (type_expr_to_string t2)
-  | TypeTuple (t1,t2) ->
-      Printf.sprintf "(%s, %s)" (type_expr_to_string t1) (type_expr_to_string t2)
+  | TypeTuple tl ->
+      Printf.sprintf "(%s)" (concat_sep " * " type_expr_to_string tl)
   | NamedParam (s,t) ->
       if type_expr_simple t then Printf.sprintf "%s:%s" s (type_expr_to_string t)
       else Printf.sprintf "%s:(%s)" s (type_expr_to_string t)

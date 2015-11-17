@@ -80,13 +80,18 @@ value_type:
 delim_value_type:
   | t = value_type {t}
   | t1 = funparam_type; ARROW; t2 = delim_value_type {AST.Arrow (t1,t2)}
-  | t1 = value_type; STAR; t2 = delim_value_type {AST.TypeTuple (t1,t2)}
+  | t = tuple_type {AST.TypeTuple t}
   ;
 
 funparam_type:
   | t = value_type {t}
   | n = LIDENT; COLON; t = value_type {AST.NamedParam(n,t)}
   | QMARK; n = LIDENT; COLON; t = value_type {AST.OptionalParam(n,t)}
+  ;
+
+tuple_type:
+  | t = value_type; STAR; t2 = value_type {[t;t2]}
+  | t = value_type; STAR; t2 = tuple_type {t::t2}
   ;
 
 type_expr:

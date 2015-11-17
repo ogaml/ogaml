@@ -24,7 +24,7 @@ and type_expr =
   | PolyVariant of variance * ((string * type_expr option) list)
   | PolyType of string
   | Arrow of type_expr * type_expr
-  | TypeTuple of type_expr * type_expr
+  | TypeTuple of type_expr list
   | NamedParam of string * type_expr
   | OptionalParam of string * type_expr
   | Variant of (string * type_expr option) list
