@@ -10,141 +10,6 @@
 **)
 
 
-(** Low-level GL enumerations *)
-module Types : sig
-
-  (** Shader types enumeration *)
-  module ShaderType : sig
-
-    type t = 
-      | Fragment
-      | Vertex
-
-  end
-
-  (** GLSL types enumeration *)
-  module GlslType : sig
-
-    type t =
-      | Int
-      | Int2
-      | Int3
-      | Int4
-      | Float
-      | Float2
-      | Float3
-      | Float4
-      | Float2x2
-      | Float2x3
-      | Float2x4
-      | Float3x2
-      | Float3x3
-      | Float3x4
-      | Float4x2
-      | Float4x3
-      | Float4x4
-      | Sampler1D
-      | Sampler2D
-      | Sampler3D
-
-  end
-
-  (** Texture targets enumeration *)
-  module TextureTarget : sig
-
-    type t = 
-      | Texture1D
-      | Texture2D
-      | Texture3D
-
-  end
-
-  (** Pixel format enumeration *)
-  module PixelFormat : sig
-
-    type t = 
-      | R
-      | RG
-      | RGB
-      | BGR
-      | RGBA
-      | BGRA
-      | Depth
-      | DepthStencil
-
-  end
-
-  (** Texture format enumeration *)
-  module TextureFormat : sig
-
-    type t = 
-      | RGB
-      | RGBA
-      | Depth
-      | DepthStencil
-
-  end
-
-  (** Texture minify filter values *)
-  module MinifyFilter : sig
-
-    type t = 
-      | Nearest
-      | Linear
-      | NearestMipmap
-      | LinearMipmap
-
-  end
-
-  (** Texture magnify filter values *)
-  module MagnifyFilter : sig
-
-    type t = 
-      | Nearest
-      | Linear
-
-  end
-
-  (** VBO kinds enumeration *)
-  module VBOKind : sig
-
-    type t = 
-      | StaticDraw
-      | DynamicDraw
-
-  end
-
-  (** GL float types *)
-  module GlFloatType : sig
-
-    type t = 
-      | Byte
-      | UByte
-      | Short
-      | UShort
-      | Int
-      | UInt
-      | Float
-      | Double
-
-  end
-
-  (** GL int types *)
-  module GlIntType : sig
-
-    type t  =
-      | Byte
-      | UByte
-      | Short
-      | UShort
-      | Int
-      | UInt
-
-  end
-
-end
-
-
 (** Represents openGL data internally *)
 module Data : sig
 
@@ -233,15 +98,15 @@ module Texture : sig
   val activate : int -> unit
 
   (** Binds a texture to the current point with a given format *)
-  val bind : Types.TextureTarget.t -> t option -> unit
+  val bind : GLTypes.TextureTarget.t -> t option -> unit
 
   (** Associates an image with the currently bound texture *)
-  val image : Types.TextureTarget.t -> Types.PixelFormat.t -> (int * int) 
-    -> Types.TextureFormat.t -> Bytes.t -> unit
+  val image : GLTypes.TextureTarget.t -> GLTypes.PixelFormat.t -> (int * int) 
+           -> GLTypes.TextureFormat.t -> Bytes.t -> unit
 
   (** Sets the value of a parameter of the currently bound texture2D *)
-  val parameter2D : [`Magnify of Types.MagnifyFilter.t 
-                    |`Minify  of Types.MinifyFilter.t] -> unit
+  val parameter2D : [`Magnify of GLTypes.MagnifyFilter.t 
+                    |`Minify  of GLTypes.MinifyFilter.t] -> unit
 
   (** Deletes a texture from the memory *)
   val destroy : t -> unit
@@ -256,7 +121,7 @@ module Shader : sig
   type t
 
   (** Creates an empty shader *)
-  val create : Types.ShaderType.t -> t
+  val create : GLTypes.ShaderType.t -> t
 
   (** Returns true iff the shader is valid *)
   val valid : t -> bool
@@ -313,10 +178,10 @@ module Program : sig
   val aname : t -> int -> string
 
   (** Returns the type of a uniform from its index *)
-  val utype : t -> int -> Types.GlslType.t
+  val utype : t -> int -> GLTypes.GlslType.t
 
   (** Returns the type of an attribute from its index *)
-  val atype : t -> int -> Types.GlslType.t
+  val atype : t -> int -> GLTypes.GlslType.t
 
   (** Returns the number of uniforms *)
   val ucount : t -> int
@@ -349,7 +214,7 @@ module VBO : sig
   val bind : t option -> unit
 
   (** Sets the data of the currently bound VBO *)
-  val data : int -> (float, Data.float_32) Data.t option -> Types.VBOKind.t -> unit
+  val data : int -> (float, Data.float_32) Data.t option -> GLTypes.VBOKind.t -> unit
 
   (** Sets some subset of the data of the currently bound VBO *)
   val subdata : int -> int -> (float, Data.float_32) Data.t -> unit
@@ -376,7 +241,7 @@ module EBO : sig
   val destroy : t -> unit
 
   (** Sets the data of the currently bound EBO *)
-  val data : int -> (int32, Data.int_32) Data.t option -> Types.VBOKind.t -> unit
+  val data : int -> (int32, Data.int_32) Data.t option -> GLTypes.VBOKind.t -> unit
 
   (** Sets some subset of the data of the currently bound EBO *)
   val subdata : int -> int -> (int32, Data.int_32) Data.t -> unit
@@ -403,10 +268,10 @@ module VAO : sig
   val enable_attrib : Program.a_location -> unit
 
   (** Binds a floating point attribute to an offset and a type in a VBO *)
-  val attrib_float : Program.a_location -> int -> Types.GlFloatType.t -> int -> int -> unit
+  val attrib_float : Program.a_location -> int -> GLTypes.GlFloatType.t -> int -> int -> unit
 
   (** Binds an integer attribute to an offset and a type in a VBO *)
-  val attrib_int : Program.a_location -> int -> Types.GlIntType.t -> int -> int -> unit
+  val attrib_int : Program.a_location -> int -> GLTypes.GlIntType.t -> int -> int -> unit
 
   (** Draws the currently bound VAO *)
   val draw : DrawMode.t -> int -> int -> unit

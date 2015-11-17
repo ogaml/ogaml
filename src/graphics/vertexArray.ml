@@ -128,10 +128,10 @@ module Source = struct
                       Color   , src.color]
 
   let type_of_attrib = function
-    |Position -> GL.Types.GlslType.Float3
-    |Color    -> GL.Types.GlslType.Float4
-    |Normal   -> GL.Types.GlslType.Float3
-    |Texcoord -> GL.Types.GlslType.Float2
+    |Position -> GLTypes.GlslType.Float3
+    |Color    -> GLTypes.GlslType.Float4
+    |Normal   -> GLTypes.GlslType.Float3
+    |Texcoord -> GLTypes.GlslType.Float2
 
   let stride src = 
     List.fold_left (fun v (t,_,_) -> v + size_of_attrib t) 0 (attribs src)
@@ -159,7 +159,7 @@ let dynamic src =
   let buffer = GL.VBO.create () in
   let data = src.Source.data in
   GL.VBO.bind (Some buffer);
-  GL.VBO.data (GL.Data.length data * 4) (Some data) (GL.Types.VBOKind.DynamicDraw);
+  GL.VBO.data (GL.Data.length data * 4) (Some data) (GLTypes.VBOKind.DynamicDraw);
   GL.VBO.bind None;
   {
    buffer; vao; 
@@ -176,7 +176,7 @@ let static src =
   let buffer = GL.VBO.create () in
   let data = src.Source.data in
   GL.VBO.bind (Some buffer);
-  GL.VBO.data (GL.Data.length data * 4) (Some data) (GL.Types.VBOKind.StaticDraw);
+  GL.VBO.data (GL.Data.length data * 4) (Some data) (GLTypes.VBOKind.StaticDraw);
   GL.VBO.bind None;
   {
    buffer; vao; 
@@ -194,7 +194,7 @@ let rebuild t src =
   let data = src.Source.data in
   GL.VBO.bind (Some t.buffer);
   if t.size < GL.Data.length data then
-    GL.VBO.data (GL.Data.length data * 4) None (GL.Types.VBOKind.DynamicDraw);
+    GL.VBO.data (GL.Data.length data * 4) None (GLTypes.VBOKind.DynamicDraw);
   GL.VBO.subdata 0 (GL.Data.length data * 4) data;
   GL.VBO.bind None;
   {
@@ -252,7 +252,7 @@ module LL = struct
           GL.VAO.attrib_float 
             (Program.Attribute.location att)
             (Source.size_of_attrib typ)
-            (GL.Types.GlFloatType.Float)
+            (GLTypes.GlFloatType.Float)
             (offset   * 4)
             (t.stride * 4)
         );

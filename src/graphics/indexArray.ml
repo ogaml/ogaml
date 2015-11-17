@@ -43,7 +43,7 @@ let dynamic src =
   let buffer = GL.EBO.create () in
   let data = src.Source.data in
   GL.EBO.bind (Some buffer);
-  GL.EBO.data (GL.Data.length data * 4) (Some data) (GL.Types.VBOKind.DynamicDraw);
+  GL.EBO.data (GL.Data.length data * 4) (Some data) (GLTypes.VBOKind.DynamicDraw);
   GL.EBO.bind None;
   {
     indices = true;
@@ -57,7 +57,7 @@ let static src =
   let buffer = GL.EBO.create () in
   let data = src.Source.data in
   GL.EBO.bind (Some buffer);
-  GL.EBO.data (GL.Data.length data * 4) (Some data) (GL.Types.VBOKind.StaticDraw);
+  GL.EBO.data (GL.Data.length data * 4) (Some data) (GLTypes.VBOKind.StaticDraw);
   GL.EBO.bind None;
   {
     indices = true;
@@ -73,7 +73,7 @@ let rebuild t src =
   let data = src.Source.data in
   GL.EBO.bind (Some t.buffer);
   if t.size < GL.Data.length data then
-    GL.EBO.data (GL.Data.length data * 4) None (GL.Types.VBOKind.DynamicDraw);
+    GL.EBO.data (GL.Data.length data * 4) None (GLTypes.VBOKind.DynamicDraw);
   GL.EBO.subdata 0 (GL.Data.length data * 4) data;
   GL.EBO.bind None;
   {

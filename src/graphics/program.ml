@@ -8,7 +8,7 @@ exception Invalid_version of string
 
 module Uniform = struct
 
-  type t = {name : string; kind : GL.Types.GlslType.t; location : GL.Program.u_location}
+  type t = {name : string; kind : GLTypes.GlslType.t; location : GL.Program.u_location}
 
   let name u = u.name
 
@@ -21,7 +21,7 @@ end
 
 module Attribute = struct
 
-  type t = {name : string; kind : GL.Types.GlslType.t; location : GL.Program.a_location}
+  type t = {name : string; kind : GLTypes.GlslType.t; location : GL.Program.a_location}
 
   let name a = a.name
 
@@ -57,8 +57,8 @@ let from_source ~vertex_source ~fragment_source =
   let vertex_source   = to_source vertex_source   in
   let fragment_source = to_source fragment_source in
   let program = GL.Program.create () in
-  let vshader = GL.Shader.create GL.Types.ShaderType.Vertex   in
-  let fshader = GL.Shader.create GL.Types.ShaderType.Fragment in
+  let vshader = GL.Shader.create GLTypes.ShaderType.Vertex   in
+  let fshader = GL.Shader.create GLTypes.ShaderType.Fragment in
   if not (GL.Shader.valid vshader) ||
      not (GL.Shader.valid fshader) ||
      not (GL.Program.valid program) then

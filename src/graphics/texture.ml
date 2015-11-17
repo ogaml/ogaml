@@ -15,25 +15,25 @@ module Texture2D = struct
       let bound_tex = 
         State.LL.bound_texture 
           st (State.LL.texture_unit st) 
-          GL.Types.TextureTarget.Texture2D 
+          GLTypes.TextureTarget.Texture2D 
       in
       match tex with
       |None when bound_tex <> None -> begin
         State.LL.set_bound_texture
           st (State.LL.texture_unit st)
-          GL.Types.TextureTarget.Texture2D
+          GLTypes.TextureTarget.Texture2D
           None;
         GL.Texture.bind 
-          GL.Types.TextureTarget.Texture2D
+          GLTypes.TextureTarget.Texture2D
           None
       end
       |Some(t) when bound_tex <> Some t.internal -> begin
         State.LL.set_bound_texture
           st (State.LL.texture_unit st)
-          GL.Types.TextureTarget.Texture2D
+          GLTypes.TextureTarget.Texture2D
           (Some t.internal);
         GL.Texture.bind 
-          GL.Types.TextureTarget.Texture2D
+          GLTypes.TextureTarget.Texture2D
           (Some t.internal)
       end
       | _ -> ()
@@ -60,16 +60,16 @@ module Texture2D = struct
     LL.bind st (Some tex);
     (* Load the corresponding image *)
     GL.Texture.image
-      GL.Types.TextureTarget.Texture2D
-      GL.Types.PixelFormat.RGBA
+      GLTypes.TextureTarget.Texture2D
+      GLTypes.PixelFormat.RGBA
       (width, height)
-      GL.Types.TextureFormat.RGBA
+      GLTypes.TextureFormat.RGBA
       data;
     (* Set the parameters *)
     GL.Texture.parameter2D 
-      (`Magnify GL.Types.MagnifyFilter.Nearest);
+      (`Magnify GLTypes.MagnifyFilter.Nearest);
     GL.Texture.parameter2D
-      (`Minify  GL.Types.MinifyFilter.Nearest);
+      (`Minify  GLTypes.MinifyFilter.Nearest);
     (* Return the texture *)
     tex
 

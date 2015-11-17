@@ -18,7 +18,7 @@ MLSOURCES = color.ml drawParameter.ml GL.ml state.ml contextSettings.ml\
 	    image.ml texture.ml program.ml vertexArray.ml indexArray.ml\
 	    model.ml poly.ml uniform.ml window.ml mouse.ml keyboard.ml
 
-MLINTERFACES = drawMode.mli
+MLINTERFACES = drawMode.mli GLTypes.mli
 
 MLOBJS = $(MLSOURCES:.ml=.cmo)
 
