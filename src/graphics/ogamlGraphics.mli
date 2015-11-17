@@ -1,71 +1,103 @@
- 
+(** 2D and 3D rendering, provides high-level and type-safe wrappers 
+  * around openGL functions *)
+
+(** Color manipulation and creation *)
 module Color : sig
 
+  (** Manipulation of RGBA colors *)
   module RGB : sig
 
+    (** Type of a color in RGBA format *)
     type t = {r : float; g : float; b : float; a : float}
 
+    (** Opaque black *)
     val black : t
 
+    (** Opaque white *)
     val white : t
 
+    (** Opaque red *)
     val red : t
 
+    (** Opaque green *)
     val green : t
 
+    (** Opaque blue *)
     val blue : t
 
+    (** Opaque yellow *)
     val yellow : t
 
+    (** Opaque magenta *)
     val magenta : t
 
+    (** Opaque cyan *)
     val cyan : t
 
+    (** Transparent black *)
     val transparent : t
 
+    (** Clamps all the values of a color between 0 and 1 *)
     val clamp : t -> t
 
   end
 
-
+  (** Manipulation of HSVA colors *)
   module HSV : sig
 
+    (** Type of a color in HSVA format *)
     type t = {h : float; s : float; v : float; a : float}
 
+    (** Opaque black *)
     val black : t
 
+    (** Opaque white *)
     val white : t
 
+    (** Opaque red *)
     val red : t
 
+    (** Opaque green *)
     val green : t
 
+    (** Opaque blue *)
     val blue : t
 
+    (** Opaque yellow *)
     val yellow : t
 
+    (** Opaque magenta *)
     val magenta : t
 
+    (** Opaque cyan *)
     val cyan : t
 
+    (** Transparent black *)
     val transparent : t
 
+    (** Clamps the s,v,a values of a color between 0 and 1, 
+      * and h between 0 and 2*pi *)
     val clamp : t -> t
 
   end
 
 
+  (** Polymorphic variant representing both color formats *)
   type t = [`HSV of HSV.t | `RGB of RGB.t]
 
-
+  (** Converts a color from RGB to HSV *)
   val rgb_to_hsv : RGB.t -> HSV.t
 
+  (** Converts a color from HSV to RGB *)
   val hsv_to_rgb : HSV.t -> RGB.t
 
+  (** Converts a color to HSV *)
   val hsv : t -> HSV.t
 
+  (** Converts a color to RGB *)
   val rgb : t -> RGB.t
 
+  (** Clamps a color w.r.t RGB.clamp and HSV.clamp *)
   val clamp : t -> t
 
 end
