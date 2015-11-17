@@ -39,7 +39,7 @@ abstract: %s
 ---\n\n"
   !curr_module !curr_prefix (get_doc ())
 
-let make_field s = 
+let make_field s (values, vtype) = 
   Printf.fprintf (get_chan ())
 "{%% capture listing %%}
 %s
@@ -47,8 +47,9 @@ let make_field s =
 {%% capture description %%}
 %s
 {%% endcapture %%}
-{%% include docelem.html listing=listing description=description %%}\n\n"
-  s (get_doc ())
+%s
+{%% include docelem.html listing=listing description=description %s %%}\n\n"
+  s (get_doc ()) values vtype
 
 
 
@@ -130,6 +131,25 @@ let rec field_to_string = function
   end
   | _ -> assert false
 
+let rec field_info = function
+  |ConcreteType (_, _, Variant v) -> begin
+    List.fold_left (fun str (s, opt) ->
+      let data = 
+        match opt with
+        |None -> s
+        |Some b -> Printf.sprintf "%s of %s" s (type_expr_to_string b)
+      in
+      Printf.sprintf "%s{%% include add_value.html value=\"%s\" %%}\n" str data
+    ) "" v, "values=values"
+  end
+  |ConcreteType (_, _, Record r) -> begin
+    List.fold_left (fun str (s, t) ->
+      let data = Printf.sprintf "%s : %s" s (type_expr_to_string t) in
+      Printf.sprintf "%s{%% include add_value.html value=\"%s\" %%}\n" str data 
+    ) "" r, "struct_values=values"
+  end
+  | _ -> "", ""
+
 let rec document_ast = function
   |[] -> ()
   |Comment _ :: t -> 
@@ -174,7 +194,7 @@ let rec document_ast = function
     document_ast t
   | f :: t -> 
     let str = field_to_string f in
-    make_field str;
+    make_field str (field_info f);
     document_ast t
 
 let print_position lexbuf =
