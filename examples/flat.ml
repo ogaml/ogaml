@@ -54,14 +54,14 @@ let draw_rectangle w h x y color =
   in
   let vertex4 =
     VertexArray.Vertex.create
-      ~position:Vector3f.({x = -0.75 ; y = 0.75 ; z = 0.})
+      ~position:Vector3f.({x = -0.75 ; y = 0.75 ; z = 0.}) ()
   in
   let vertex_source = VertexArray.Source.(
-      empty ~position:"position" ~size:3 ()
+      empty ~position:"position" ~size:4 ()
       << vertex1
       << vertex2
       << vertex3
-      (* << vertex4 *)
+      << vertex4
   )
   in
   let vertices = VertexArray.static vertex_source in
