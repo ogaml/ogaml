@@ -100,9 +100,14 @@ type_expr:
   | v = delim_value_type {v}
   ;
 
+optional_comment:
+  | s = DOCCOMMENT {Some s}
+  | s = TITLECOMMENT {Some s}
+  | {None}
+
 record_content:
-  | s = LIDENT; COLON; t = delim_value_type {[s,t]}
-  | s = LIDENT; COLON; t = delim_value_type; SEMICOLON; c = record_content {(s,t)::c}
+  | s = LIDENT; COLON; t = delim_value_type; opt = optional_comment {[opt,s,t]}
+  | s = LIDENT; COLON; t = delim_value_type; SEMICOLON; opt = optional_comment; c = record_content {(opt,s,t)::c}
   ;
 
 variant:

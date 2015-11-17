@@ -74,7 +74,7 @@ let rec type_expr_to_string = function
   | ModuleType (s,e) -> Printf.sprintf "%s.%s" s (type_expr_to_string e)
   | AtomType s -> s
   | Record l -> 
-      let record_param_to_string (a,b) = Printf.sprintf "%s : %s" a (type_expr_to_string b) in
+      let record_param_to_string (_,a,b) = Printf.sprintf "%s : %s" a (type_expr_to_string b) in
       Printf.sprintf "{%s}" (concat_sep "; " record_param_to_string l)
   | PolyVariant (v,l) ->
       let variant_param_to_string (a,b) = 
@@ -143,9 +143,11 @@ let rec field_info = function
     ) "" v, "values=values"
   end
   |ConcreteType (_, _, Record r) -> begin
-    List.fold_left (fun str (s, t) ->
+    List.fold_left (fun str (com, s, t) ->
       let data = Printf.sprintf "%s : %s" s (type_expr_to_string t) in
-      Printf.sprintf "%s{%% include add_value.html value=\"%s\" %%}\n" str data 
+      match com with
+      |None -> Printf.sprintf "%s{%% include add_value.html value=\"%s\" %%}\n" str data 
+      |Some c -> Printf.sprintf "%s{%% include add_value.html value=\"%s\" desc=\"%s\" %%}\n" str data c
     ) "" r, "struct_values=values"
   end
   | _ -> "", ""

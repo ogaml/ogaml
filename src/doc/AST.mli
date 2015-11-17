@@ -20,7 +20,7 @@ and type_param =
 and type_expr = 
   | ModuleType of string * type_expr
   | AtomType of string
-  | Record of (string * type_expr) list
+  | Record of (string option * string * type_expr) list
   | PolyVariant of variance * ((string * type_expr option) list)
   | PolyType of string
   | Arrow of type_expr * type_expr
