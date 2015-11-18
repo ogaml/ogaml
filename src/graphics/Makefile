@@ -8,17 +8,17 @@ GRAPHICS_STUBS = shader_stubs.c program_stubs.c texture_stubs.c\
 	         vao_stubs.c vbo_stubs.c uniform_stubs.c\
 		 render_stubs.c ebo_stubs.c utils.c
 
-STUBS_SRC = $(addprefix $(STUBS_DIR)/, $(GRAPHICS_STUBS)) 
+STUBS_SRC = $(addprefix $(STUBS_DIR)/, $(GRAPHICS_STUBS))
 
 STUBS_TARGET = $(STUBS_SRC:.c=.o)
 
-STUBS_OBJS = $(GRAPHICS_STUBS:.c=.o) 
+STUBS_OBJS = $(GRAPHICS_STUBS:.c=.o)
 
 MLSOURCES = color.ml drawParameter.ml GL.ml state.ml contextSettings.ml\
 	    image.ml texture.ml program.ml vertexArray.ml indexArray.ml\
-	    model.ml poly.ml uniform.ml window.ml mouse.ml keyboard.ml
+	    model.ml poly.ml uniform.ml shape.ml window.ml mouse.ml keyboard.ml
 
-MLINTERFACES = drawMode.mli 
+MLINTERFACES = drawMode.mli
 
 MLOBJS = $(MLSOURCES:.ml=.cmo)
 
@@ -50,10 +50,10 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS)
 	$(OCAMLFIND) $(OCAMLC) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../core/ogamlCore.cma ../math/ogamlMath.cma -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLFIND) $(OCAMLOPT) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../core/ogamlCore.cmxa ../math/ogamlMath.cmxa -c $< -o $@ 
+	$(OCAMLFIND) $(OCAMLOPT) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../core/ogamlCore.cmxa ../math/ogamlMath.cmxa -c $< -o $@
 
 %.cmo:%.ml
-	$(OCAMLFIND) $(OCAMLC) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../core/ogamlCore.cma ../math/ogamlMath.cma -c $< -o $@ 
+	$(OCAMLFIND) $(OCAMLC) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../core/ogamlCore.cma ../math/ogamlMath.cma -c $< -o $@
 
 %.ml:%.mlpp %.cmi
 	$(PPCOMMAND) -o $@ $<
@@ -78,4 +78,3 @@ clean:
 include .depend
 
 .PHONY: .depend
-

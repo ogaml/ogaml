@@ -28,7 +28,7 @@ let poll_event win = LL.Window.poll_event win.internal
 
 let display win = LL.Window.display win.internal
 
-let draw ~window ?indices ~vertices ~program ~uniform ~parameters ~mode () = 
+let draw ~window ?indices ~vertices ~program ~uniform ~parameters ~mode () =
   let cull_mode = DrawParameter.culling parameters in
   if State.culling_mode window.state <> cull_mode then begin
     State.LL.set_culling_mode window.state cull_mode;
@@ -49,11 +49,11 @@ let draw ~window ?indices ~vertices ~program ~uniform ~parameters ~mode () =
   VertexArray.LL.bind window.state vertices program;
   match indices with
   |None -> GL.VAO.draw mode 0 (VertexArray.length vertices)
-  |Some ebo -> 
+  |Some ebo ->
     IndexArray.LL.bind window.state ebo;
-    GL.VAO.draw_elements mode (IndexArray.length ebo) 
+    GL.VAO.draw_elements mode (IndexArray.length ebo)
 
-let clear win = 
+let clear win =
   let cc = ContextSettings.color win.settings in
   if State.clear_color win.state <> cc then begin
     let crgb = Color.rgb cc in
@@ -67,10 +67,49 @@ let clear win =
 
 let state win = win.state
 
+let draw_shape =
+  let vertex_shader_source = "
+    //in vec2 position;
+    in vec3 position;
 
-module LL = struct 
+    void main() {
+
+      //gl_Position = vec4(position, 0.0, 1.0);
+      gl_Position = vec4(position, 1.0);
+
+    }
+  "
+  in
+  let fragment_shader_source = "
+    out vec4 out_color;
+
+    void main() {
+
+      out_color = vec4(1.0, 0.0, 0.0, 1.0);
+
+    }
+  "
+  in
+  fun window shape ->
+    let program =
+      Program.from_source_pp
+        (state window)
+        ~vertex_source:(`String vertex_shader_source)
+        ~fragment_source:(`String fragment_shader_source)
+    in
+    let parameters = DrawParameter.make () in
+    let uniform = Uniform.empty in
+    let vertices = Shape.get_vertex_array shape in
+    draw ~window
+         ~vertices
+         ~program
+         ~parameters
+         ~uniform
+         ~mode:DrawMode.Triangles ()
+
+
+module LL = struct
 
   let internal win = win.internal
 
 end
-
