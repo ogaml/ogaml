@@ -1,28 +1,32 @@
+open OgamlMath
+
 type t = VertexArray.static VertexArray.t
 
 let create_rectangle ~x ~y ~width ~height ~color () =
-  (* TODO Stop ignoring the arguments *)
+  let mk_point x y =
+    Vector3f.from_int (Vector3i.lift { Vector2i.x = x ; Vector2i.y = y })
+  in
   let vertex1 =
     VertexArray.Vertex.create
-      ~position:Vector3f.({x = -0.75 ; y = -0.75 ; z = 0.0})
+      ~position:(mk_point x y)
       ~color
       ()
   in
   let vertex2 =
     VertexArray.Vertex.create
-      ~position:(Vector3f.({x = 0.75 ; y = -0.75 ; z = 0.0}))
+      ~position:(mk_point (x+width) y)
       ~color
       ()
   in
   let vertex3 =
     VertexArray.Vertex.create
-      ~position:Vector3f.({x = 0.75 ; y = 0.75 ; z = 0.0})
+      ~position:(mk_point (x+width) (y+height))
       ~color
       ()
   in
   let vertex4 =
     VertexArray.Vertex.create
-      ~position:Vector3f.({x = -0.75 ; y = 0.75 ; z = 0.0})
+      ~position:(mk_point x (y+height))
       ~color
       ()
   in

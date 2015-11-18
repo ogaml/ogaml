@@ -69,6 +69,8 @@ let state win = win.state
 
 let draw_shape =
   let vertex_shader_source = "
+    uniform vec2 size;
+
     in vec3 position;
     in vec4 color;
 
@@ -76,7 +78,9 @@ let draw_shape =
 
     void main() {
 
-      gl_Position = vec4(position, 1.0);
+      gl_Position.x = 2.0 * position.x / size.x - 1.0;
+      gl_Position.y = 2.0 * position.y / size.y - 1.0;
+      gl_Position.z = 0.0;
 
       frag_color = color;
 
@@ -103,7 +107,13 @@ let draw_shape =
         ~fragment_source:(`String fragment_shader_source)
     in
     let parameters = DrawParameter.make () in
-    let uniform = Uniform.empty in
+    let (sx,sy) = size window in
+    let uniform =
+      Uniform.empty
+      |> Uniform.vector2f "size" OgamlMath.(
+           Vector2f.from_int Vector2i.({ x = sx ; y = sy })
+         )
+    in
     let vertices = Shape.get_vertex_array shape in
     draw ~window
          ~vertices
