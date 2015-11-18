@@ -24,10 +24,10 @@ poly.cmx : vertexArray.cmx ../math/vector3f.cmx ../math/vector2f.cmx \
     color.cmx poly.cmi
 program.cmo : state.cmi GL.cmi program.cmi
 program.cmx : state.cmx GL.cmx program.cmi
-shape.cmo : vertexArray.cmi ../math/vector3i.cmi ../math/vector3f.cmi \
-    ../math/vector2i.cmi shape.cmi
-shape.cmx : vertexArray.cmx ../math/vector3i.cmx ../math/vector3f.cmx \
-    ../math/vector2i.cmx shape.cmi
+shape.cmo : vertexArray.cmi ../math/vector3f.cmi ../math/vector2f.cmi \
+    ../math/constants.cmi shape.cmi
+shape.cmx : vertexArray.cmx ../math/vector3f.cmx ../math/vector2f.cmx \
+    ../math/constants.cmx shape.cmi
 state.cmo : GL.cmi drawParameter.cmi color.cmi state.cmi
 state.cmx : GL.cmx drawParameter.cmx color.cmx state.cmi
 texture.cmo : state.cmi image.cmi GL.cmi texture.cmi

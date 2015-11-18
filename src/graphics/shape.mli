@@ -5,11 +5,13 @@ type t
 
 (** Creates a rectangle *)
 val create_rectangle :
-  x      : int ->
-  y      : int ->
-  width  : int ->
-  height : int ->
-  color  : Color.t ->
+  x         : int ->
+  y         : int ->
+  width     : int ->
+  height    : int ->
+  color     : Color.t ->
+  ?origin   : float * float ->
+  ?rotation : float ->
   unit -> t
 
 
