@@ -1,3 +1,6 @@
+(** This code is just horrible, please don't look at it, I just wanted to 
+  * code a doc generator for Jekyll as fast as possible *)
+
 open Lexing
 open AST
 
@@ -30,6 +33,41 @@ let get_doc () =
   |None -> ""
   |Some c -> curr_doc := None; c
 
+let remove_spaces_star s = 
+  let i = ref 0 in
+  while s.[!i] = ' ' do
+    incr i
+  done;
+  if s.[!i] = '*' then 
+    incr i;
+  Str.string_after s !i
+
+let rec parse_related s = 
+  try
+    let i = Str.search_forward (Str.regexp "@see:\\([A-Za-z\\.]*\\)") s 0 in
+    let related = Str.matched_group 1 s in
+    let s_begin = Str.first_chars s i in
+    let s_end = 
+      if i + 6 + (String.length related) >= String.length s then ""
+      else Str.string_after s (i + 6 + (String.length related)) 
+    in
+    let (lrel, sleft) = parse_related s_end in
+    (related::lrel, s_begin ^ sleft)
+  with
+    Not_found -> ([], s)
+
+let parse_comment s = 
+  let rec implode_sep sep = function
+    |[] -> ""
+    |[t] -> t
+    |h::t -> Printf.sprintf "%s%s%s" h sep (implode_sep sep t)
+  in
+  let related, s_left = parse_related s in
+  Str.split (Str.regexp "\n") s_left
+  |> List.map remove_spaces_star
+  |> implode_sep "\n"
+  |> fun s -> (related,s)
+
 let begin_module () = 
   Printf.fprintf (get_chan ())
 "---
@@ -37,9 +75,15 @@ modulename: %s
 prefix: %s
 abstract: %s
 ---\n\n"
-  !curr_module !curr_prefix (get_doc ())
+  !curr_module !curr_prefix (snd (parse_comment (get_doc ())))
 
 let make_field s (values, vtype) = 
+  let related, com = parse_comment (get_doc ()) in
+  let related_str = 
+    List.fold_left (fun s r ->
+      Printf.sprintf "%s related=\"%s\"" s r
+    ) "" related
+  in
   Printf.fprintf (get_chan ())
 "{%% capture listing %%}
 %s
@@ -48,8 +92,8 @@ let make_field s (values, vtype) =
 %s
 {%% endcapture %%}
 %s
-{%% include docelem.html listing=listing description=description %s %%}\n\n"
-  s (get_doc ()) values vtype
+{%% include docelem.html listing=listing description=description %s%s %%}\n\n"
+  s com values vtype related_str
 
 
 
@@ -100,7 +144,7 @@ let rec type_expr_to_string = function
       if type_expr_simple t then Printf.sprintf "?%s:%s" s (type_expr_to_string t)
       else Printf.sprintf "?%s:(%s)" s (type_expr_to_string t)
   | Variant l ->
-      let variant_param_to_string (a,b) = 
+      let variant_param_to_string (_,a,b) = 
         match b with
         |Some b -> Printf.sprintf "%s of %s" a (type_expr_to_string b) 
         |None -> a
@@ -133,13 +177,15 @@ let rec field_to_string = function
 
 let rec field_info = function
   |ConcreteType (_, _, Variant v) -> begin
-    List.fold_left (fun str (s, opt) ->
+    List.fold_left (fun str (com, s, opt) ->
       let data = 
         match opt with
         |None -> s
         |Some b -> Printf.sprintf "%s of %s" s (type_expr_to_string b)
       in
-      Printf.sprintf "%s{%% include add_value.html value=\"%s\" %%}\n" str data
+      match com with
+      |None -> Printf.sprintf "%s{%% include add_value.html value=\"%s\" %%}\n" str data
+      |Some c -> Printf.sprintf "%s{%% include add_value.html value=\"%s\" desc=\"%s\" %%}\n" str data c
     ) "" v, "values=values"
   end
   |ConcreteType (_, _, Record r) -> begin
@@ -160,7 +206,7 @@ let rec document_ast = function
     begin 
       match !curr_doc, !curr_chan with
       | _, None |None, _ -> ()
-      |Some t, Some c -> Printf.fprintf c "\n## %s\n" t
+      |Some t, Some c -> Printf.fprintf c "\n## %s\n" (snd (parse_comment t))
     end;
     curr_doc := Some s;
     document_ast t
@@ -168,7 +214,7 @@ let rec document_ast = function
     begin
       match !curr_chan with
       |None -> ()
-      |Some c -> Printf.fprintf c "### %s\n\n" s
+      |Some c -> Printf.fprintf c "### %s\n\n" (snd (parse_comment s))
     end;
     document_ast t
   |Module (s,l) :: t -> 
@@ -248,3 +294,4 @@ let _ =
   for i = 1 to Array.length Sys.argv - 1 do
     document Sys.argv.(i)
   done
+

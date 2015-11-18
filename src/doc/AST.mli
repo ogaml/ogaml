@@ -27,6 +27,6 @@ and type_expr =
   | TypeTuple of type_expr list
   | NamedParam of string * type_expr
   | OptionalParam of string * type_expr
-  | Variant of (string * type_expr option) list
+  | Variant of (string option * string * type_expr option) list
   | ParamType of (type_expr * type_expr)
 

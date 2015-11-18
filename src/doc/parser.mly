@@ -20,8 +20,6 @@ file:
   ;
 
 module_field:
-  |s = COMMENT
-    {AST.Comment s}
   |s = DOCCOMMENT
     {AST.Documentation s}
   |s = TITLECOMMENT
@@ -101,8 +99,7 @@ type_expr:
   ;
 
 optional_comment:
-  | s = DOCCOMMENT {Some s}
-  | s = TITLECOMMENT {Some s}
+  | s = COMMENT {Some s}
   | {None}
 
 record_content:
@@ -111,10 +108,10 @@ record_content:
   ;
 
 variant:
-  | u = UIDENT {[(u,None)]}
-  | u = UIDENT; OF; t = delim_value_type {[(u,Some t)]}
-  | u = UIDENT; PIPE; v = variant {(u,None) :: v}
-  | u = UIDENT; OF; t = delim_value_type; PIPE; v = variant {(u, Some t) :: v}
+  | u = UIDENT; opt = optional_comment {[(opt,u,None)]}
+  | u = UIDENT; OF; t = delim_value_type; opt = optional_comment {[(opt,u,Some t)]}
+  | u = UIDENT; opt = optional_comment; PIPE; v = variant {(opt,u,None) :: v}
+  | u = UIDENT; OF; t = delim_value_type; opt = optional_comment; PIPE; v = variant {(opt,u,Some t) :: v}
   ;
 
 vp_content:
