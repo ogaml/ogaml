@@ -35,12 +35,23 @@ let get_doc () =
 
 let remove_spaces_star s = 
   let i = ref 0 in
-  while s.[!i] = ' ' do
+  let n = String.length s in 
+  while !i < n && s.[!i] = ' ' do
     incr i
   done;
-  if s.[!i] = '*' then 
-    incr i;
-  Str.string_after s !i
+  if !i = n then ""
+  else begin 
+    if s.[!i] = '*' then 
+      incr i;
+    Str.string_after s !i
+  end
+
+let inline_code s = 
+  Str.global_replace (Str.regexp "\\$\\([^\\$]*\\)\\$") "{% include inline-ocaml.html code=\"\\1\" %}" s
+
+let process_line_jumps s = 
+  Str.global_replace (Str.regexp "\r*\n\n") "<br/>\n" s 
+  |> Str.global_replace (Str.regexp "<br/>\n\n") "<br/><br/>\n" 
 
 let rec parse_related s = 
   try
@@ -63,12 +74,15 @@ let parse_comment s =
     |h::t -> Printf.sprintf "%s%s%s" h sep (implode_sep sep t)
   in
   let related, s_left = parse_related s in
-  Str.split (Str.regexp "\n") s_left
+  Str.split_delim (Str.regexp "\r*\n") s_left
   |> List.map remove_spaces_star
   |> implode_sep "\n"
+  |> inline_code
+  |> process_line_jumps
   |> fun s -> (related,s)
 
 let begin_module () = 
+  Printf.printf "Documenting module %s\n%!" !curr_module;
   Printf.fprintf (get_chan ())
 "---
 modulename: %s 
@@ -206,7 +220,7 @@ let rec document_ast = function
     begin 
       match !curr_doc, !curr_chan with
       | _, None |None, _ -> ()
-      |Some t, Some c -> Printf.fprintf c "\n## %s\n" (snd (parse_comment t))
+      |Some t, Some c -> Printf.fprintf c "\n%s\n" (snd (parse_comment t))
     end;
     curr_doc := Some s;
     document_ast t

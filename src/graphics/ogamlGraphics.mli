@@ -103,39 +103,51 @@ module Color : sig
 end
 
 
+(** Draw modes enumeration *)
 module DrawMode : sig
+  (** This module consists of only one type enumerating OpenGL draw modes *)
 
+  (** OpenGL draw modes *)
   type t =
-    | TriangleStrip
+    | TriangleStrip 
     | TriangleFan
     | Triangles
     | Lines
 
 end
 
-
+(** Encapsulates draw parameters used for rendering *)
 module DrawParameter : sig
 
+  (** Type of a set of draw parameters *)
   type t
 
+  (** Culling modes enumeration *)
   module CullingMode : sig
+    (** This module consists of only one type enumerating OpenGL culling modes *)
 
+    (** Backface culling modes *)
     type t = 
-      | CullNone
-      | CullClockwise
-      | CullCounterClockwise
+      | CullNone (* Culls no face *)
+      | CullClockwise (* Culls all faces displayed in CW order from the camera POV *)
+      | CullCounterClockwise (* Same with CCW *)
 
   end
 
+  (** Polygon modes enumeration *)
   module PolygonMode : sig
 
+    (** This module consists of only one type enumerating OpenGL polygon modes *)
     type t = 
-      | DrawVertices
-      | DrawLines
-      | DrawFill
+      | DrawVertices (* Draws only vertices *)
+      | DrawLines (* Draws only lines *)
+      | DrawFill (* Draws full polygons *)
 
   end
 
+  (** Creates a set of draw parameters 
+    * @see:OgamlGraphics.DrawParameter.CullingMode
+    * @see:OgamlGraphics.DrawParameter.PolygonMode *)
   val make : ?culling:CullingMode.t -> 
              ?polygon:PolygonMode.t ->
              ?depth_test:bool ->
@@ -144,6 +156,7 @@ module DrawParameter : sig
 end
 
 
+(** Image manipulation and creation *)
 module Image : sig
 
   type t
@@ -161,10 +174,12 @@ module Image : sig
 end
 
 
+(** High-level wrapper around OpenGL index arrays *)
 module IndexArray : sig
 
   exception Invalid_buffer of string
 
+  (** Represents a source of indices *)
   module Source : sig
 
     type t
@@ -198,6 +213,7 @@ module IndexArray : sig
 end
 
 
+(** High-level wrapper around OpenGL vertex arrays *)
 module VertexArray : sig
 
   exception Invalid_buffer of string
@@ -208,6 +224,7 @@ module VertexArray : sig
 
   exception Missing_attribute of string
 
+  (** Represents a vertex *)
   module Vertex : sig
 
     type t
@@ -219,7 +236,7 @@ module VertexArray : sig
 
   end
 
-
+  (** Represents a source of vertices *)
   module Source : sig
 
     type t
@@ -265,6 +282,7 @@ module VertexArray : sig
 end
 
 
+(** Creation, loading and manipulation of 3D models *)
 module Model : sig
 
   exception Invalid_model of string
@@ -316,6 +334,7 @@ module Model : sig
 end
 
 
+(** Creation of basic polygons and polyhedra *)
 module Poly : sig
 
   val cube : VertexArray.Source.t -> OgamlMath.Vector3f.t ->
@@ -327,16 +346,31 @@ module Poly : sig
 end
 
 
+(** Encapsulates data for context creation *)
 module ContextSettings : sig
 
+  (** Type of the settings structure *)
   type t
 
+  (** Creates new settings using the following parameters : 
+    *
+    *   $color$ - background color used when clearing (defaults to opaque black) 
+    *
+    *   $clear_color$ - whether to clear the color buffer or not when calling clear (defaults to true) 
+    *
+    *   $depth$ - whether to clear the depth buffer or not when calling clear (defaults to true) 
+    *
+    *   $stencil$ - whether to clear the stencil buffer or not when calling clear (defauls to false) 
+    *
+    * @see:OgamlGraphics.Color
+    *)
   val create : ?color:Color.t -> ?clear_color:bool -> 
                ?depth:bool -> ?stencil:bool -> unit -> t
 
 end
 
 
+(** Encapsulates data about an OpenGL internal state *)
 module State : sig
 
   exception Invalid_texture_unit of int
@@ -362,6 +396,7 @@ module State : sig
 end
 
 
+(** High-level wrapper around GL shader programs *)
 module Program : sig
 
   exception Compilation_error of string
@@ -387,8 +422,10 @@ module Program : sig
 end
 
 
+(** High-level wrapper around GL textures *)
 module Texture : sig
 
+  (** Represents a simple 2D texture *)
   module Texture2D : sig
 
     type t
@@ -402,6 +439,7 @@ module Texture : sig
 end
 
 
+(** Encapsulates a group of uniforms for rendering *)
 module Uniform : sig
 
   exception Unknown_uniform of string
@@ -433,30 +471,55 @@ module Uniform : sig
 end
 
 
+(** High-level window wrapper for rendering and event management *)
 module Window : sig
 
+  (*** Error Handling *)
+  (** Raised if a uniform variable is missing when calling draw *)
   exception Missing_uniform of string
 
+  (** Raised when calling draw if a uniform variable has an incorrect type *)
   exception Invalid_uniform of string
 
+  (** The type of a window *)
   type t
 
+  (** Creates a window of size $width$ x $height$. 
+    * This window will create its openGL context following the specified settings.
+    * @see:OgamlGraphics.ContextSettings *)
   val create : width:int -> height:int -> settings:ContextSettings.t -> t
 
+  (** Closes a window, but does not free the memory. 
+    * This should prevent segfaults when calling functions on this window. *)
   val close : t -> unit
 
+  (** Frees the window and the memory *)
   val destroy : t -> unit
 
+  (*** Information About Windows *)
+  (** Returns in pixel the width and height of the window 
+    * (it only takes into account the size of the content where you can draw, *ie* the useful information). *)
   val size : t -> (int * int)
 
+  (** Tells whether the window is currently open *)
   val is_open : t -> bool
 
+  (** Return true iff the window has the focus *)
   val has_focus : t -> bool
 
+  (*** Event Handling *)
+  (** Returns the next event on the event stack, or None if the stack is empty.
+    * @see:OgamlCore.Event *)
   val poll_event : t -> OgamlCore.Event.t option
 
+  (*** Displaying and Drawing *)
+  (** Displays the window after the GL calls *)
   val display : t -> unit
 
+  (** Draws a vertex array using with the given program, uniforms, draw parameters, and an optional index array.
+    * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.VertexArray
+    * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform 
+    * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
   val draw : 
     window     : t -> 
     ?indices   : 'a IndexArray.t ->
@@ -467,36 +530,63 @@ module Window : sig
     mode       : DrawMode.t ->
     unit -> unit
 
+  (** Clears the window *)
   val clear : t -> unit
 
+  (** Returns the internal GL state of the window 
+    * @see:OgamlGraphics.State *)
   val state : t -> State.t
 
 end
 
 
+(** Getting real-time mouse information *)
 module Mouse : sig
 
+  (*** Accessing position *)
+  (** Returns the position of the cursor relatively to the screen.
+    *
+    * $let (x,y) = position ()$ assigns the number of pixels from the left of 
+    * the screen to the cursor in $x$ and the number of pixels from the top in $y$
+  *)
   val position : unit -> (int * int)
 
+  (** Returns the position of the cursor relatively to a window.
+    * @see:OgamlGraphics.Window *)
   val relative_position : Window.t -> (int * int)
 
+  (*** Setting position *)
+  (** Sets the position of the cursor relatively to the screen *)
   val set_position : (int * int) -> unit
 
+  (** Sets the position of the cursor relatively to a window 
+    * @see:OgamlGraphics.Window *)
   val set_relative_position : Window.t -> (int * int) -> unit
 
+  (*** Accessing button information *)
+  (** Check whether a given mouse button is currently held down
+    * @see:OgamlCore.Button *)
   val is_pressed : OgamlCore.Button.t -> bool
 
 end
 
 
+(** Getting real-time keyboard information *)
 module Keyboard : sig
 
+  (*** Polling keyboard *)
+  (** $is_pressed key$ will return $true$ iff $key$ is currently pressed 
+    * @see:OgamlCore.Keycode *)
   val is_pressed : OgamlCore.Keycode.t -> bool
 
+  (*** Accessing modifiers information *)
+  (** $true$ iff the shift modifier is active *)
   val is_shift_down : unit -> bool
 
+  (** $true$ iff the control modifier (or cmd on OSX) is active *)
   val is_ctrl_down : unit -> bool
 
+  (** $true$ iff the alt modifier is active *)
   val is_alt_down : unit -> bool
 
 end
