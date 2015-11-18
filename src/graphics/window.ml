@@ -69,23 +69,28 @@ let state win = win.state
 
 let draw_shape =
   let vertex_shader_source = "
-    //in vec2 position;
     in vec3 position;
+    in vec4 color;
+
+    out vec4 frag_color;
 
     void main() {
 
-      //gl_Position = vec4(position, 0.0, 1.0);
       gl_Position = vec4(position, 1.0);
+
+      frag_color = color;
 
     }
   "
   in
   let fragment_shader_source = "
-    out vec4 out_color;
+    in vec4 frag_color;
+
+    out vec4 pixel_color;
 
     void main() {
 
-      out_color = vec4(1.0, 0.0, 0.0, 1.0);
+      pixel_color = frag_color;
 
     }
   "
