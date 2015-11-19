@@ -4,6 +4,9 @@
 (** Color manipulation and creation *)
 module Color : sig
 
+  (** This module provides an easy way to manipulate colors with
+    * different formats and to convert between them. *)
+
   (** Manipulation of RGBA colors *)
   module RGB : sig
 
@@ -82,19 +85,27 @@ module Color : sig
   end
 
 
-  (** Polymorphic variant representing both color formats *)
+  (** Polymorphic variant representing both color formats 
+    * @see:OgamlGraphics.Color.HSV
+    * @see:OgamlGraphics.Color.RGB *)
   type t = [`HSV of HSV.t | `RGB of RGB.t]
 
-  (** Converts a color from RGB to HSV *)
+  (** Converts a color from RGB to HSV
+    * @see:OgamlGraphics.Color.HSV
+    * @see:OgamlGraphics.Color.RGB *)
   val rgb_to_hsv : RGB.t -> HSV.t
 
-  (** Converts a color from HSV to RGB *)
+  (** Converts a color from HSV to RGB
+    * @see:OgamlGraphics.Color.HSV
+    * @see:OgamlGraphics.Color.RGB *)
   val hsv_to_rgb : HSV.t -> RGB.t
 
-  (** Converts a color to HSV *)
+  (** Converts a color to HSV
+    * @see:OgamlGraphics.Color.HSV *)
   val hsv : t -> HSV.t
 
-  (** Converts a color to RGB *)
+  (** Converts a color to RGB
+    * @see:OgamlGraphics.Color.RGB *)
   val rgb : t -> RGB.t
 
   (** Clamps a color w.r.t RGB.clamp and HSV.clamp *)
@@ -118,6 +129,10 @@ end
 
 (** Encapsulates draw parameters used for rendering *)
 module DrawParameter : sig
+
+  (** This module encapsulates the data passed to the GPU when rendering. 
+    * State changes are optimized such that calling a rendering primitive 
+    * with the same parameters twice does not induce a state change. *)
 
   (** Type of a set of draw parameters *)
   type t
@@ -159,17 +174,27 @@ end
 (** Image manipulation and creation *)
 module Image : sig
 
+  (** This module provides a safe way to load and access images stored in the RAM.
+    * Images stored this way are uncompressed arrays of bytes and are therefore 
+    * not meant to be stored in large quantities. *)
+
+  (** Type of an image stored in the RAM *)
   type t
 
+  (** Creates an image from a file, or an empty image with a given size filled with a default color
+    * @see:OgamlGraphics.Color *)
   val create : [`File of string | `Empty of int * int * Color.t] -> t
 
+  (** Return the size of an image *)
   val size : t -> (int * int)
 
+  (** Sets a pixel of an image
+    * @see:OgamlGraphics.Color *)
   val set : t -> int -> int -> Color.t -> unit
 
+  (** Gets the color of a pixel of an image 
+    * @see:OgamlGraphics.Color.RGB *)
   val get : t -> int -> int -> Color.RGB.t
-
-  val data : t -> Bytes.t
 
 end
 
@@ -177,37 +202,68 @@ end
 (** High-level wrapper around OpenGL index arrays *)
 module IndexArray : sig
 
+  (** This modules provides a high-level and safe access to
+    * openGL index arrays. Index arrays can be passed to 3D rendering
+    * primitives and are used to render 3D models more efficiently. *)
+
+  (** Raised when trying to access a destroyed buffer *)
   exception Invalid_buffer of string
 
   (** Represents a source of indices *)
   module Source : sig
 
+    (** This module provides a way to store indices in a source
+      * before creating an index array. 
+      *
+      * Note that a source is a mutable structure, therefore 
+      * add and (<<) will directly modify the source. 
+      *
+      * Sources are redimensionned as needed when adding indices. *)
+
+    (** Type of a source of indices *)
     type t
 
+    (** An empty source *)
     val empty : int -> t
 
+    (** Adds an integer index to a source (redimensions the source as needed) *)
     val add : t -> int -> unit
 
+    (** Syntaxic sugar for sequences of additions
+      *
+      * $source << index1 << index2 << index3$ *)
     val (<<) : t -> int -> t
 
+    (** Returns the length of a source *)
     val length : t -> int
 
   end
 
+  (** Phantom type for static index arrays *)
   type static
 
+  (** Phantom type for dynamic index arrays *)
   type dynamic
 
+  (** Type of an index array (static or dynamic) *)
   type 'a t 
 
+  (** Creates a static index array. A static array is faster but can not be modified after creation.
+    * @see:OgamlGraphics.Source *)
   val static : Source.t -> static t
 
+  (** Creates a dynamic index array that can be modified after creation.
+    * @see:OgamlGraphics.Source *)
   val dynamic : Source.t -> dynamic t
 
+  (** Rebuilds a dynamic index array from a source
+    * @see:OgamlGraphics.Source *)
   val rebuild : dynamic t -> Source.t -> dynamic t
 
+  (** Returns the length of an index array *)
   val length : 'a t -> int
 
+  (** Destroys and free an index array from the memory *)
   val destroy : 'a t -> unit
 
 end
@@ -216,19 +272,37 @@ end
 (** High-level wrapper around OpenGL vertex arrays *)
 module VertexArray : sig
 
+  (** This modules provides a high-level and safe access to
+    * openGL vertex arrays. Vertex arrays are used to store
+    * vertices on the GPU and can be used to render 3D models. *)
+
+  (** Raised when trying to access a destroyed array *)
   exception Invalid_buffer of string
 
+  (** Raised if a vertex passed to a source has a wrong type *)
   exception Invalid_vertex of string
 
+  (** Raised if an attribute defined in a GLSL program does not 
+    * have a type matching the vertex's *)
   exception Invalid_attribute of string
 
+  (** Raised when trying to draw with a vertex array containing an
+    * attribute that has not been declared in the GLSL program *)
   exception Missing_attribute of string
 
   (** Represents a vertex *)
   module Vertex : sig
 
+    (** This module encapsulates vertices that can be passed to
+      * a source *)
+
+    (** Type of a vertex *)
     type t
 
+    (** Creates a vertex containing various optional attributes 
+      * @see:OgamlMath.Vector3f
+      * @see:OgamlMath.Vector2f
+      * @see:OgamlGraphics.Color *)
     val create : ?position:OgamlMath.Vector3f.t ->
                 ?texcoord:OgamlMath.Vector2f.t ->
                 ?normal:OgamlMath.Vector3f.t   ->
@@ -239,20 +313,40 @@ module VertexArray : sig
   (** Represents a source of vertices *)
   module Source : sig
 
+    (** This module provides a way to store vertices in a source
+      * before creating a vertex array. 
+      *
+      * Note that a source is a mutable structure, therefore 
+      * add and (<<) will directly modify the source. 
+      *
+      * Sources are redimensionned as needed when adding vertices. *)
+
+    (** Type of a source *)
     type t
 
+    (** Creates an empty source of a given initial size. The source will 
+      * be redimensionned as needed.
+      *
+      * The optional arguments specify whether a source should expect vertices
+      * having the corrsponding attributes, and the name of the attribute
+      * in the GLSL program that will be used *)
     val empty : ?position:string -> 
                 ?normal  :string -> 
                 ?texcoord:string ->
                 ?color   :string ->
                 size:int -> unit -> t
 
+    (** Returns true iff the source contains (and requests) vertices with
+      * a position attribute *)
     val requires_position : t -> bool
 
+    (** See requires_position *)
     val requires_normal   : t -> bool
 
+    (** See requires_position *)
     val requires_uv : t -> bool
 
+    (** See requires_position *)
     val requires_color : t -> bool
 
     val add : t -> Vertex.t -> unit
@@ -360,7 +454,7 @@ module ContextSettings : sig
     *
     *   $depth$ - whether to clear the depth buffer or not when calling clear (defaults to true) 
     *
-    *   $stencil$ - whether to clear the stencil buffer or not when calling clear (defauls to false) 
+    *   $stencil$ - whether to clear the stencil buffer or not when calling clear (defaults to false) 
     *
     * @see:OgamlGraphics.Color
     *)
