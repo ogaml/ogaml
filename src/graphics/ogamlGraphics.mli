@@ -612,13 +612,24 @@ end
 (** High-level wrapper around GL textures *)
 module Texture : sig
 
+  (** This module provides wrappers around different kinds
+    * of OpenGL textures *)
+
   (** Represents a simple 2D texture *)
   module Texture2D : sig
 
+    (** This modules provides an abstraction of openGL 2D textures
+      * that can be used for 2D rendering (with sprites) or
+      * 3D rendering when passed to a GLSL program. *)
+
+    (** Type of a 2D texture *)
     type t
 
+    (** Creates a texture from a state and a source (a file or an image)
+      * @see:OgamlGraphics.State *)
     val create : State.t -> [< `File of string | `Image of Image.t ] -> t
 
+    (** Returns the size of a texture *)
     val size : t -> (int * int)
 
   end
@@ -629,30 +640,50 @@ end
 (** Encapsulates a group of uniforms for rendering *)
 module Uniform : sig
 
+  (** This module encapsulates a set of uniforms that
+    * can be passed to GLSL programs *)
+
+  (** Raised when trying to draw using a program 
+    * that requires a uniform not provided in the set *)
   exception Unknown_uniform of string
 
+  (** Raised when the type of a uniform is not matching
+    * the type required by the GLSL program *)
   exception Invalid_uniform of string
 
+  (** Type of a set of uniforms *)
   type t
 
+  (** Empty set of uniforms *)
   val empty : t
 
+  (** $vector3f name vec set$ adds the uniform $vec$ to $set$.
+    * The uniform should be refered to as $name$ in a GLSL program.
+    * @see:OgamlMath.Vector3f *)
   val vector3f : string -> OgamlMath.Vector3f.t -> t -> t
 
+  (** See vector3f @see:OgamlMath.Vector2f *)
   val vector2f : string -> OgamlMath.Vector2f.t -> t -> t
 
+  (** See vector3f @see:OgamlMath.Vector3i *)
   val vector3i : string -> OgamlMath.Vector3i.t -> t -> t
 
+  (** See vector3f @see:OgamlMath.Vector2i *)
   val vector2i : string -> OgamlMath.Vector2i.t -> t -> t
 
+  (** See vector3f *)
   val int : string -> int -> t -> t
 
+  (** See vector3f *)
   val float : string -> float -> t -> t
 
+  (** See vector3f @see:OgamlMath.Matrix3D *)
   val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> t
 
+  (** See vector3f @see:OgamlGraphics.Color *)
   val color : string -> Color.t -> t -> t
 
+  (** See vector3f @see:OgamlGraphics.Texture.Texture2D *)
   val texture2D : string -> Texture.Texture2D.t -> t -> t
 
 end
