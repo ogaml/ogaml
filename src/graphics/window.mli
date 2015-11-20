@@ -33,15 +33,18 @@ val poll_event : t -> OgamlCore.Event.t option
 val display : t -> unit
 
 (** Draws a vertex array *)
-val draw : 
-  window     : t -> 
+val draw :
+  window     : t ->
   ?indices   : 'a IndexArray.t ->
-  vertices   : 'b VertexArray.t -> 
-  program    : Program.t -> 
+  vertices   : 'b VertexArray.t ->
+  program    : Program.t ->
   uniform    : Uniform.t ->
   parameters : DrawParameter.t ->
   mode       : DrawMode.t ->
   unit -> unit
+
+(** Draws a 2D shape *)
+val draw_shape : t -> Shape.t -> unit
 
 (** Clears the window *)
 val clear : t -> unit
@@ -51,9 +54,8 @@ val state : t -> State.t
 
 
 module LL : sig
-  
+
   (** Returns the internal window of this window, should only be used internally *)
   val internal : t -> OgamlCore.LL.Window.t
 
 end
-

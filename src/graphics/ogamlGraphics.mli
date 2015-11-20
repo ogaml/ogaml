@@ -689,6 +689,27 @@ module Uniform : sig
 end
 
 
+module Shape : sig
+
+  (** Module for creating 2D shapes *)
+
+  (** Type of shapes *)
+  type t
+
+  (** Creates a rectangle *)
+  val create_rectangle :
+    x         : int ->
+    y         : int ->
+    width     : int ->
+    height    : int ->
+    color     : Color.t ->
+    ?origin   : float * float ->
+    ?rotation : float ->
+    unit -> t
+
+end
+
+
 (** High-level window wrapper for rendering and event management *)
 module Window : sig
 
@@ -753,6 +774,9 @@ module Window : sig
     parameters : DrawParameter.t ->
     mode       : DrawMode.t ->
     unit -> unit
+
+  (** Draws a 2D shape *)
+  val draw_shape : t -> Shape.t -> unit
 
   (** Clears the window *)
   val clear : t -> unit

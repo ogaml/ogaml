@@ -34,6 +34,7 @@ OgamlGraphics:
   ☐ Implement JPG parsing
   ☐ Organize image parsing in modules
   ☐ Better support for all formats (for example 24,32 bit bmps)
+  ☐ Document Shape
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:

@@ -13,7 +13,7 @@ PACKAGES = -package bigarray,unix,str
 # Install constants
 
 CORE_FILES = src/core/*.a src/core/*.cmi src/core/*.cma src/core/*.cmxa\
-	     src/core/*.so 
+	     src/core/*.so
 
 MATH_FILES = src/math/*.a src/math/*.cmi src/math/*.cma src/math/*.cmxa
 
@@ -29,18 +29,19 @@ default: math_lib core_lib graphics_lib
 math_lib:
 	cd src/math/ && make
 
-core_lib: 
+core_lib:
 	cd src/core/ && make
 
 graphics_lib: core_lib math_lib
 	cd src/graphics/ && make
 
-examples: 
+examples:
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/cube.ml -o cube.out;
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/tut01.ml -o tut01.out;
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/tut02.ml -o tut02.out;
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/tut_tex.ml -o tut_tex.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/tut_idx.ml -o tut_idx.out
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/tut_idx.ml -o tut_idx.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/flat.ml -o flat.out
 
 tests: math_lib core_lib graphics_lib
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/programs.ml -o main.out && ./main.out &&\
