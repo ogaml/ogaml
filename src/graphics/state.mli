@@ -62,10 +62,10 @@ module LL : sig
   val texture_unit : t -> int
 
   (** Sets the currently bound texture to a texture unit and a target *)
-  val set_bound_texture : t -> int -> GL.Types.TextureTarget.t -> GL.Texture.t option -> unit
+  val set_bound_texture : t -> int -> GLTypes.TextureTarget.t -> GL.Texture.t option -> unit
 
   (** Returns the texture currently bound to a texture unit and a target *)
-  val bound_texture : t -> int -> GL.Types.TextureTarget.t -> GL.Texture.t option
+  val bound_texture : t -> int -> GLTypes.TextureTarget.t -> GL.Texture.t option
 
   (** Sets the currently linked program *)
   val set_linked_program : t -> GL.Program.t option -> unit

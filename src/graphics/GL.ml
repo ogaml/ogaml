@@ -1,139 +1,3 @@
-
-(** Low-level GL enumerations *)
-module Types = struct
-
-  (** Shader types enumeration *)
-  module ShaderType = struct
-
-    type t = 
-      | Fragment
-      | Vertex
-
-  end
-
-  (** GLSL types enumeration *)
-  module GlslType = struct
-
-    type t =
-      | Int
-      | Int2
-      | Int3
-      | Int4
-      | Float
-      | Float2
-      | Float3
-      | Float4
-      | Float2x2
-      | Float2x3
-      | Float2x4
-      | Float3x2
-      | Float3x3
-      | Float3x4
-      | Float4x2
-      | Float4x3
-      | Float4x4
-      | Sampler1D
-      | Sampler2D
-      | Sampler3D
-
-  end
-
-  (** Texture targets enumeration *)
-  module TextureTarget = struct
-
-    type t = 
-      | Texture1D
-      | Texture2D
-      | Texture3D
-
-  end
-
-  (** Pixel format enumeration *)
-  module PixelFormat = struct
-
-    type t = 
-      | R
-      | RG
-      | RGB
-      | BGR
-      | RGBA
-      | BGRA
-      | Depth
-      | DepthStencil
-
-  end
-
-  (** Texture format enumeration *)
-  module TextureFormat = struct
-
-    type t = 
-      | RGB
-      | RGBA
-      | Depth
-      | DepthStencil
-
-  end
-
-  (** Texture minify filter values *)
-  module MinifyFilter = struct
-
-    type t = 
-      | Nearest
-      | Linear
-      | NearestMipmap
-      | LinearMipmap
-
-  end
-
-  (** Texture magnify filter values *)
-  module MagnifyFilter = struct
-
-    type t = 
-      | Nearest
-      | Linear
-
-  end
-
-  (** VBO kinds enumeration *)
-  module VBOKind = struct
-
-    type t = 
-      | StaticDraw
-      | DynamicDraw
-
-  end
-
-  (** GL float types *)
-  module GlFloatType = struct
-
-    type t = 
-      | Byte
-      | UByte
-      | Short
-      | UShort
-      | Int
-      | UInt
-      | Float
-      | Double
-
-  end
-
-  (** GL int types *)
-  module GlIntType = struct
-
-    type t  =
-      | Byte
-      | UByte
-      | Short
-      | UShort
-      | Int
-      | UInt
-
-  end
-
-end
-
-
 module Data = struct
 
   type ('a, 'b) batype = ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t
@@ -257,8 +121,8 @@ module Texture = struct
 
 
   (* Abstract functions *)
-  external image2D : Types.TextureTarget.t -> Types.PixelFormat.t ->
-    (int * int) -> Types.TextureFormat.t -> Bytes.t -> unit = "caml_tex_image_2D"
+  external image2D : GLTypes.TextureTarget.t -> GLTypes.PixelFormat.t ->
+    (int * int) -> GLTypes.TextureFormat.t -> Bytes.t -> unit = "caml_tex_image_2D"
 
 
   (* Exposed functions *)
@@ -266,19 +130,19 @@ module Texture = struct
 
   external activate : int -> unit = "caml_activate_texture"
 
-  external bind : Types.TextureTarget.t -> t option -> unit = "caml_bind_texture"
+  external bind : GLTypes.TextureTarget.t -> t option -> unit = "caml_bind_texture"
 
   external parameter2D : 
-    [`Magnify of Types.MagnifyFilter.t |`Minify  of Types.MinifyFilter.t] 
+    [`Magnify of GLTypes.MagnifyFilter.t |`Minify  of GLTypes.MinifyFilter.t] 
     -> unit = "caml_tex_parameter_2D"
 
   external destroy : t -> unit = "caml_destroy_texture"
 
   let image target = 
     match target with
-    |Types.TextureTarget.Texture1D -> failwith "Not yet implemented"
-    |Types.TextureTarget.Texture2D -> image2D target
-    |Types.TextureTarget.Texture3D -> failwith "Not yet implemented"
+    |GLTypes.TextureTarget.Texture1D -> failwith "Not yet implemented"
+    |GLTypes.TextureTarget.Texture2D -> image2D target
+    |GLTypes.TextureTarget.Texture3D -> failwith "Not yet implemented"
 
 end
 
@@ -287,7 +151,7 @@ module Shader = struct
 
   type t
 
-  external create : Types.ShaderType.t -> t = "caml_create_shader"
+  external create : GLTypes.ShaderType.t -> t = "caml_create_shader"
 
   external valid : t -> bool = "caml_valid_shader"
 
@@ -334,9 +198,9 @@ module Program = struct
 
   external aname : t -> int -> string = "caml_attribute_name"
 
-  external utype : t -> int -> Types.GlslType.t = "caml_uniform_type"
+  external utype : t -> int -> GLTypes.GlslType.t = "caml_uniform_type"
 
-  external atype : t -> int -> Types.GlslType.t = "caml_attribute_type"
+  external atype : t -> int -> GLTypes.GlslType.t = "caml_attribute_type"
 
   external log : t -> string = "caml_program_log"
 
@@ -351,7 +215,7 @@ module VBO = struct
 
   external bind : t option -> unit = "caml_bind_vbo"
 
-  external data : int -> (float, Data.float_32) Data.t option -> Types.VBOKind.t -> unit = "caml_vbo_data"
+  external data : int -> (float, Data.float_32) Data.t option -> GLTypes.VBOKind.t -> unit = "caml_vbo_data"
 
   external subdata : int -> int -> (float, Data.float_32) Data.t -> unit = "caml_vbo_subdata"
 
@@ -370,7 +234,7 @@ module EBO = struct
 
   external destroy : t -> unit = "caml_destroy_buffer"
 
-  external data : int -> (int32, Data.int_32) Data.t option -> Types.VBOKind.t -> unit = "caml_ebo_data"
+  external data : int -> (int32, Data.int_32) Data.t option -> GLTypes.VBOKind.t -> unit = "caml_ebo_data"
 
   external subdata : int -> int -> (int32, Data.int_32) Data.t -> unit = "caml_ebo_subdata"
 
@@ -390,10 +254,10 @@ module VAO = struct
   external enable_attrib : int -> unit = "caml_enable_attrib"
 
   external attrib_float : 
-    int -> int -> Types.GlFloatType.t -> int -> int -> unit = "caml_attrib_float"
+    int -> int -> GLTypes.GlFloatType.t -> int -> int -> unit = "caml_attrib_float"
 
   external attrib_int : 
-    int -> int -> Types.GlIntType.t -> int -> int -> unit = "caml_attrib_int"
+    int -> int -> GLTypes.GlIntType.t -> int -> int -> unit = "caml_attrib_int"
 
   external draw : DrawMode.t -> int -> int -> unit = "caml_draw_arrays"
 

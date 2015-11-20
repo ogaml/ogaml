@@ -18,7 +18,7 @@ MLSOURCES = color.ml drawParameter.ml GL.ml state.ml contextSettings.ml\
 	    image.ml texture.ml program.ml vertexArray.ml indexArray.ml\
 	    model.ml poly.ml uniform.ml shape.ml window.ml mouse.ml keyboard.ml
 
-MLINTERFACES = drawMode.mli
+MLINTERFACES = drawMode.mli GLTypes.mli
 
 MLOBJS = $(MLSOURCES:.ml=.cmo)
 
@@ -34,11 +34,11 @@ COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast -Wno-pointer-sign
 default: .depend graphics_lib
 
 
-graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS)
+graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) ogamlGraphics.cmi
 	$(OCAMLFIND) $(OCAMLC) -pack -o ogamlGraphics.cmo $(MLCMIS) $(MLOBJS);
 	$(OCAMLFIND) $(OCAMLOPT) -pack -o ogamlGraphics.cmx $(MLCMIS) $(MLNATOBJS);
 	$(OCAMLFIND) $(OCAMLMKLIB) -o ogamlGraphics $(STUBS_OBJS) ogamlGraphics.cmo ogamlGraphics.cmx\
-	  $(MLOBJS) $(MLNATOBJS) $(GLOBAL_CLIBS)
+	  $(MLOBJS) $(MLNATOBJS) $(GLOBAL_CLIBS) 
 
 %.cma:%.cmo
 	$(OCAMLFIND) $(OCAMLC) -a -o $@ $(INCLUDE_DIRS) $<

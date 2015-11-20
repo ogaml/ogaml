@@ -17,9 +17,10 @@ CORE_FILES = src/core/*.a src/core/*.cmi src/core/*.cma src/core/*.cmxa\
 
 MATH_FILES = src/math/*.a src/math/*.cmi src/math/*.cma src/math/*.cmxa
 
-GRAPH_FILES = src/graphics/*.a src/graphics/*.cmi src/graphics/*.cma\
-	      src/graphics/*.cmxa src/graphics/*.so
+GRAPH_FILES = src/graphics/*.a src/graphics/[!GL]*.cmi src/graphics/*.cma\
+	      src/graphics/*.cmxa src/graphics/*.so 
 
+DOC_FILES = src/graphics/ogamlGraphics.mli src/core/ogamlCore.mli
 
 # Compilation
 
@@ -47,6 +48,11 @@ tests: math_lib core_lib graphics_lib
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/vertexarrays.ml -o main.out && ./main.out &&\
 	echo "Tests passed !"
 
+doc:
+	ocamlbuild -use-ocamlfind -use-menhir -I src/doc -package unix,str gendoc.native;
+	./gendoc.native $(DOC_FILES);
+	ocamlbuild -clean
+
 install: math_lib core_lib graphics_lib
 	$(OCAMLFIND) install ogaml META $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES)
 
@@ -57,10 +63,12 @@ uninstall:
 
 clean:
 	rm -rf *.out;
+	rm -rf doc;
+	ocamlbuild -clean;
 	cd src/core/ && make clean;
 	cd src/math/ && make clean;
 	cd src/graphics/ && make clean;
 	cd tests/ && make clean;
 	cd examples/ && make clean
 
-.PHONY: install uninstall reinstall examples
+.PHONY: install uninstall reinstall examples doc

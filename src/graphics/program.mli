@@ -22,7 +22,7 @@ module Uniform : sig
   val name : t -> string
 
   (** Returns the type of a uniform *)
-  val kind : t -> GL.Types.GlslType.t
+  val kind : t -> GLTypes.GlslType.t
 
   (** Returns the location of a uniform.
     * This is a low-level value and should only be
@@ -42,7 +42,7 @@ module Attribute : sig
   val name : t -> string
 
   (** Returns the type of an attribute *)
-  val kind : t -> GL.Types.GlslType.t
+  val kind : t -> GLTypes.GlslType.t
 
   (** Returns the location of an attribute.
     * This is a low-level value and should only be

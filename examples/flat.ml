@@ -4,9 +4,6 @@ open OgamlMath
 let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
 let window = Window.create ~width:800 ~height:600 ~settings
 
-(* Setting the clear color to white *)
-let () = GL.Pervasives.color 1.0 1.0 1.0 1.0
-
 let rect = Shape.create_rectangle ~width:400
                                   ~height:300
                                   ~x:200

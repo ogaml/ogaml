@@ -10,7 +10,13 @@ let window = Window.create ~width:100 ~height:100 ~settings
 
 let state = Window.state window
 
-let prog = Program.from_source_list
+let parameters = DrawParameter.make ()
+
+let mode = DrawMode.Triangles
+
+let uniform = Uniform.empty
+
+let program = Program.from_source_list
     state
     ~vertex_source:[
       (130, `String "#version 130
@@ -133,7 +139,7 @@ let test_vao6 () =
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
   let vao = VertexArray.dynamic vsource in
-  VertexArray.LL.bind state vao prog
+  Window.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ()
 
 let test_vao7 () = 
   let vsource = VertexArray.(Source.(
@@ -144,7 +150,7 @@ let test_vao7 () =
   )) in
   let vao = VertexArray.dynamic vsource in
   try 
-    VertexArray.LL.bind state vao prog;
+    Window.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ();
     assert false
   with
     VertexArray.Missing_attribute _ -> ()
@@ -159,7 +165,7 @@ let test_vao8 () =
   )) in
   let vao = VertexArray.dynamic vsource in
   try 
-    VertexArray.LL.bind state vao prog;
+    Window.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ();
     assert false
   with
     VertexArray.Invalid_attribute _ -> ()

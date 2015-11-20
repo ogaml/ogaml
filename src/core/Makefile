@@ -39,7 +39,7 @@ endif
 
 ML_SOURCES = LL.ml 
 
-ML_INTERFACES = button.mli keycode.mli event.mli
+ML_INTERFACES = button.mli keycode.mli event.mli 
 
 ML_OBJ = $(ML_SOURCES:.ml=.cmo)
 
@@ -52,7 +52,7 @@ ML_CMIS = $(ML_INTERFACES:.mli=.cmi)
 
 default: .depend core_lib
 
-core_lib: ml_stubs $(STUBS_TARGETS) $(ML_CMIS) $(ML_OBJ) $(ML_NAT)
+core_lib: ml_stubs $(STUBS_TARGETS) $(ML_CMIS) $(ML_OBJ) $(ML_NAT) ogamlCore.cmi
 	$(OCAMLFIND) $(OCAMLOPT) -pack -o ogamlCore.cmx $(OS_WIN_LIB)/$(OS_WIN_LIB).cmx $(ML_CMIS) $(ML_NAT);
 	$(OCAMLFIND) $(OCAMLC) -pack -o ogamlCore.cmo $(OS_WIN_LIB)/$(OS_WIN_LIB).cmo $(ML_CMIS) $(ML_OBJ);
 	$(OCAMLFIND) $(OCAMLMKLIB) -o ogamlCore ogamlCore.cmx ogamlCore.cmo\

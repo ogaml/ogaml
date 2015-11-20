@@ -27,13 +27,14 @@ OgamlMath:
 
 OgamlGraphics:
   ✔ Better normal computations in Model @done(2015-11-15 23:22) @project(OgamlGraphics)
-  ☐ Indexing in Model
-  ☐ Clean unused data in Models
+  ✔ Indexing in Model @done(2015-11-16 22:55) @project(OgamlGraphics)
+  ✔ Clean unused data in Models @done(2015-11-16 22:55) @project(OgamlGraphics)
   ☐ Custom vertex arrays
   ☐ Implement PNG parsing
   ☐ Implement JPG parsing
   ☐ Organize image parsing in modules
   ☐ Better support for all formats (for example 24,32 bit bmps)
+  ☐ Document Shape
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:

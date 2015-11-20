@@ -58,31 +58,31 @@ module LL = struct
     in
     let location = Program.Uniform.location u in
     match (v, Program.Uniform.kind u) with
-    | Vector3f v, GL.Types.GlslType.Float3   -> 
+    | Vector3f v, GLTypes.GlslType.Float3   -> 
         OgamlMath.Vector3f.(
           GL.Uniform.float3 location v.x v.y v.z
         )
-    | Vector2f v, GL.Types.GlslType.Float2   -> 
+    | Vector2f v, GLTypes.GlslType.Float2   -> 
         OgamlMath.Vector2f.(
           GL.Uniform.float2 location v.x v.y
         )
-    | Vector3i v, GL.Types.GlslType.Int3 -> 
+    | Vector3i v, GLTypes.GlslType.Int3 -> 
         OgamlMath.Vector3i.(
           GL.Uniform.int3 location v.x v.y v.z
         )
-    | Vector2i v, GL.Types.GlslType.Int2 -> 
+    | Vector2i v, GLTypes.GlslType.Int2 -> 
         OgamlMath.Vector2i.(
           GL.Uniform.int2 location v.x v.y
         )
-    | Matrix3D m, GL.Types.GlslType.Float4x4 -> 
+    | Matrix3D m, GLTypes.GlslType.Float4x4 -> 
         OgamlMath.Matrix3D.(
           GL.Uniform.mat4 location (GL.Data.of_matrix m)
         )
-    | Color    c, GL.Types.GlslType.Float4   -> 
+    | Color    c, GLTypes.GlslType.Float4   -> 
         Color.RGB.(
           GL.Uniform.float4 location c.r c.g c.b c.a
         )
-    | Texture2D t, GL.Types.GlslType.Sampler2D ->
+    | Texture2D t, GLTypes.GlslType.Sampler2D ->
         Texture.Texture2D.LL.bind state (Some t);
         GL.Uniform.int1 location (State.LL.texture_unit state)
     | _ -> raise (Invalid_uniform (Printf.sprintf "Uniform %s has wrong type" name))
