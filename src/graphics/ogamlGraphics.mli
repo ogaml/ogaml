@@ -1,4 +1,4 @@
-(** 2D and 3D rendering, provides high-level and type-safe wrappers 
+(** 2D and 3D rendering, provides high-level and type-safe wrappers
   * around openGL functions *)
 
 (** Color manipulation and creation *)
@@ -78,14 +78,14 @@ module Color : sig
     (** Transparent black *)
     val transparent : t
 
-    (** Clamps the s,v,a values of a color between 0 and 1, 
+    (** Clamps the s,v,a values of a color between 0 and 1,
       * and h between 0 and 2*pi *)
     val clamp : t -> t
 
   end
 
 
-  (** Polymorphic variant representing both color formats 
+  (** Polymorphic variant representing both color formats
     * @see:OgamlGraphics.Color.HSV
     * @see:OgamlGraphics.Color.RGB *)
   type t = [`HSV of HSV.t | `RGB of RGB.t]
@@ -120,7 +120,7 @@ module DrawMode : sig
 
   (** OpenGL draw modes *)
   type t =
-    | TriangleStrip 
+    | TriangleStrip
     | TriangleFan
     | Triangles
     | Lines
@@ -130,8 +130,8 @@ end
 (** Encapsulates draw parameters used for rendering *)
 module DrawParameter : sig
 
-  (** This module encapsulates the data passed to the GPU when rendering. 
-    * State changes are optimized such that calling a rendering primitive 
+  (** This module encapsulates the data passed to the GPU when rendering.
+    * State changes are optimized such that calling a rendering primitive
     * with the same parameters twice does not induce a state change. *)
 
   (** Type of a set of draw parameters *)
@@ -142,7 +142,7 @@ module DrawParameter : sig
     (** This module consists of only one type enumerating OpenGL culling modes *)
 
     (** Backface culling modes *)
-    type t = 
+    type t =
       | CullNone (* Culls no face *)
       | CullClockwise (* Culls all faces displayed in CW order from the camera POV *)
       | CullCounterClockwise (* Same with CCW *)
@@ -153,17 +153,17 @@ module DrawParameter : sig
   module PolygonMode : sig
 
     (** This module consists of only one type enumerating OpenGL polygon modes *)
-    type t = 
+    type t =
       | DrawVertices (* Draws only vertices *)
       | DrawLines (* Draws only lines *)
       | DrawFill (* Draws full polygons *)
 
   end
 
-  (** Creates a set of draw parameters 
+  (** Creates a set of draw parameters
     * @see:OgamlGraphics.DrawParameter.CullingMode
     * @see:OgamlGraphics.DrawParameter.PolygonMode *)
-  val make : ?culling:CullingMode.t -> 
+  val make : ?culling:CullingMode.t ->
              ?polygon:PolygonMode.t ->
              ?depth_test:bool ->
              unit -> t
@@ -175,7 +175,7 @@ end
 module Image : sig
 
   (** This module provides a safe way to load and access images stored in the RAM.
-    * Images stored this way are uncompressed arrays of bytes and are therefore 
+    * Images stored this way are uncompressed arrays of bytes and are therefore
     * not meant to be stored in large quantities. *)
 
   (** Type of an image stored in the RAM *)
@@ -192,7 +192,7 @@ module Image : sig
     * @see:OgamlGraphics.Color *)
   val set : t -> int -> int -> Color.t -> unit
 
-  (** Gets the color of a pixel of an image 
+  (** Gets the color of a pixel of an image
     * @see:OgamlGraphics.Color.RGB *)
   val get : t -> int -> int -> Color.RGB.t
 
@@ -213,10 +213,10 @@ module IndexArray : sig
   module Source : sig
 
     (** This module provides a way to store indices in a source
-      * before creating an index array. 
+      * before creating an index array.
       *
-      * Note that a source is a mutable structure, therefore 
-      * add and (<<) will directly modify the source. 
+      * Note that a source is a mutable structure, therefore
+      * add and (<<) will directly modify the source.
       *
       * Sources are redimensionned as needed when adding indices. *)
 
@@ -246,7 +246,7 @@ module IndexArray : sig
   type dynamic
 
   (** Type of an index array (static or dynamic) *)
-  type 'a t 
+  type 'a t
 
   (** Creates a static index array. A static array is faster but can not be modified after creation.
     * @see:OgamlGraphics.IndexArray.Source *)
@@ -282,7 +282,7 @@ module VertexArray : sig
   (** Raised if a vertex passed to a source has a wrong type *)
   exception Invalid_vertex of string
 
-  (** Raised if an attribute defined in a GLSL program does not 
+  (** Raised if an attribute defined in a GLSL program does not
     * have a type matching the vertex's *)
   exception Invalid_attribute of string
 
@@ -299,7 +299,7 @@ module VertexArray : sig
     (** Type of a vertex *)
     type t
 
-    (** Creates a vertex containing various optional attributes 
+    (** Creates a vertex containing various optional attributes
       * @see:OgamlMath.Vector3f
       * @see:OgamlMath.Vector2f
       * @see:OgamlGraphics.Color *)
@@ -314,24 +314,24 @@ module VertexArray : sig
   module Source : sig
 
     (** This module provides a way to store vertices in a source
-      * before creating a vertex array. 
+      * before creating a vertex array.
       *
-      * Note that a source is a mutable structure, therefore 
-      * add and (<<) will directly modify the source. 
+      * Note that a source is a mutable structure, therefore
+      * add and (<<) will directly modify the source.
       *
       * Sources are redimensionned as needed when adding vertices. *)
 
     (** Type of a source *)
     type t
 
-    (** Creates an empty source of a given initial size. The source will 
+    (** Creates an empty source of a given initial size. The source will
       * be redimensionned as needed.
       *
       * The optional arguments specify whether a source should expect vertices
       * having the corrsponding attributes, and the name of the attribute
       * in the GLSL program that will be used *)
-    val empty : ?position:string -> 
-                ?normal  :string -> 
+    val empty : ?position:string ->
+                ?normal  :string ->
                 ?texcoord:string ->
                 ?color   :string ->
                 size:int -> unit -> t
@@ -349,7 +349,7 @@ module VertexArray : sig
     (** See requires_position *)
     val requires_color : t -> bool
 
-    (** Adds a vertex to a source. Redimensions the source if needed. 
+    (** Adds a vertex to a source. Redimensions the source if needed.
       * @see:OgamlGraphics.VertexArray.Vertex *)
     val add : t -> Vertex.t -> unit
 
@@ -370,7 +370,7 @@ module VertexArray : sig
   type dynamic
 
   (** Type of a vertex array (static or dynamic) *)
-  type 'a t 
+  type 'a t
 
   (** Creates a static array from a source. A static array is faster
     * but cannot be modified later. @see:OgamlGraphics.VertexArray.Source *)
@@ -380,7 +380,7 @@ module VertexArray : sig
     * @see:OgamlGraphics.VertexArray.Source *)
   val dynamic : Source.t -> dynamic t
 
-  (** Rebuils a dynamic vertex array from a source 
+  (** Rebuils a dynamic vertex array from a source
     * @see:OgamlGraphics.VertexArray.Source *)
   val rebuild : dynamic t -> Source.t -> dynamic t
 
@@ -444,11 +444,11 @@ module Model : sig
     * and returns its location *)
   val add_vertex : t -> OgamlMath.Vector3f.t -> vertex
 
-  (** Adds a normal to a model @see:OgamlMath.Vector3f 
+  (** Adds a normal to a model @see:OgamlMath.Vector3f
     * and returns its location *)
   val add_normal : t -> OgamlMath.Vector3f.t -> normal
 
-  (** Adds some UV coordinates to a model @see:OgamlMath.Vector2f 
+  (** Adds some UV coordinates to a model @see:OgamlMath.Vector2f
     * and returns its location *)
   val add_uv : t -> OgamlMath.Vector2f.t -> uv
 
@@ -467,7 +467,7 @@ module Model : sig
     * @see:OgamlGraphics.Color *)
   val add_point : t -> vertex:OgamlMath.Vector3f.t ->
                       ?normal:OgamlMath.Vector3f.t ->
-                      ?uv:OgamlMath.Vector2f.t -> 
+                      ?uv:OgamlMath.Vector2f.t ->
                       ?color:Color.t -> unit -> point
 
   (** Constructs a face from three point locations *)
@@ -478,7 +478,7 @@ module Model : sig
   val compute_normals : ?smooth:bool -> t -> unit
 
   (** Appends a model to a vertex source. Uses indexing if an index source is provided.
-    * Use Triangles as DrawMode with this source. 
+    * Use Triangles as DrawMode with this source.
     * @see:OgamlGraphics.IndexArray.Source
     * @see:OgamlGraphics.VertexArray.Source *)
   val source : t -> ?index_source:IndexArray.Source.t ->
@@ -489,12 +489,12 @@ end
 
 (** Creation of basic polygons and polyhedra *)
 module Poly : sig
-  
-  (** This module provides helper functions that construct 
+
+  (** This module provides helper functions that construct
     * various polygons and polyhedra *)
 
-  (** $cube source corner size$ appends to $source$ some CCW-oriented 
-    * triangles forming a cube whose bottom-left-back vertex is $corner$ and of 
+  (** $cube source corner size$ appends to $source$ some CCW-oriented
+    * triangles forming a cube whose bottom-left-back vertex is $corner$ and of
     * a given $size$. Use Triangles as DrawMode with this source.
     * @see:OgamlGraphics.VertexArray.Source
     * @see:OgamlMath.Vector3f *)
@@ -503,7 +503,7 @@ module Poly : sig
 
   (** $axis source min max$ appends to $source$ 3 axis going
     * from $min.x$ to $max.x$, $min.y$ to $max.y$ and $min.z$ to $max.z$.
-    * Use Lines as DrawMode with this source. 
+    * Use Lines as DrawMode with this source.
     * @see:OgamlGraphics.VertexArray.Source
     * @see:OgamlMath.Vector3f *)
   val axis : VertexArray.Source.t -> OgamlMath.Vector3f.t ->
@@ -520,19 +520,19 @@ module ContextSettings : sig
   (** Type of the settings structure *)
   type t
 
-  (** Creates new settings using the following parameters : 
+  (** Creates new settings using the following parameters :
     *
-    *   $color$ - background color used when clearing (defaults to opaque black) 
+    *   $color$ - background color used when clearing (defaults to opaque black)
     *
-    *   $clear_color$ - whether to clear the color buffer or not when calling clear (defaults to true) 
+    *   $clear_color$ - whether to clear the color buffer or not when calling clear (defaults to true)
     *
-    *   $depth$ - whether to clear the depth buffer or not when calling clear (defaults to true) 
+    *   $depth$ - whether to clear the depth buffer or not when calling clear (defaults to true)
     *
-    *   $stencil$ - whether to clear the stencil buffer or not when calling clear (defaults to false) 
+    *   $stencil$ - whether to clear the stencil buffer or not when calling clear (defaults to false)
     *
     * @see:OgamlGraphics.Color
     *)
-  val create : ?color:Color.t -> ?clear_color:bool -> 
+  val create : ?color:Color.t -> ?clear_color:bool ->
                ?depth:bool -> ?stencil:bool -> unit -> t
 
 end
@@ -589,20 +589,20 @@ module Program : sig
     * The source must begin with a version assigment $#version xxx$ *)
   val from_source : vertex_source:src -> fragment_source:src -> t
 
-  (** Compiles a program from a state (gotten from a window) and 
+  (** Compiles a program from a state (gotten from a window) and
     * a list of sources paired with their required GLSL version.
     * The function will chose the best source for the current context.
     * @see:OgamlGraphics.State *)
-  val from_source_list : State.t 
-                        -> vertex_source:(int * src) list  
-                        -> fragment_source:(int * src) list -> t 
+  val from_source_list : State.t
+                        -> vertex_source:(int * src) list
+                        -> fragment_source:(int * src) list -> t
 
   (** Compiles a program from a vertex source and a fragment source.
     * The source should not begin with a $#version xxx$ assignment,
     * as the function will preprocess the sources and prepend the
     * best version declaration.
     * @see:OgamlGraphics.State *)
-  val from_source_pp : State.t 
+  val from_source_pp : State.t
                       -> vertex_source:src
                       -> fragment_source:src -> t
 
@@ -643,7 +643,7 @@ module Uniform : sig
   (** This module encapsulates a set of uniforms that
     * can be passed to GLSL programs *)
 
-  (** Raised when trying to draw using a program 
+  (** Raised when trying to draw using a program
     * that requires a uniform not provided in the set *)
   exception Unknown_uniform of string
 
@@ -696,14 +696,26 @@ module Shape : sig
   (** Type of shapes *)
   type t
 
+  (** Creates a convex polygon given a list of points.
+    * points is this list of points,
+    * origin is the origin of the polygon whoose coordinates are taken with
+    * respect to the first point of points (which is also the default origin) *)
+  val create_polygon :
+    points    : OgamlMath.Vector2i.t list ->
+    color     : Color.t ->
+    ?origin   : OgamlMath.Vector2f.t ->
+    ?position : OgamlMath.Vector2i.t ->
+    ?scale    : OgamlMath.Vector2f.t ->
+    ?rotation : float ->
+    unit -> t
+
   (** Creates a rectangle *)
   val create_rectangle :
-    x         : int ->
-    y         : int ->
-    width     : int ->
-    height    : int ->
+    position  : OgamlMath.Vector2i.t ->
+    size      : OgamlMath.Vector2i.t ->
     color     : Color.t ->
-    ?origin   : float * float ->
+    ?origin   : OgamlMath.Vector2f.t ->
+    ?scale    : OgamlMath.Vector2f.t ->
     ?rotation : float ->
     unit -> t
 
@@ -729,12 +741,12 @@ module Window : sig
   (** The type of a window *)
   type t
 
-  (** Creates a window of size $width$ x $height$. 
+  (** Creates a window of size $width$ x $height$.
     * This window will create its openGL context following the specified settings.
     * @see:OgamlGraphics.ContextSettings *)
   val create : width:int -> height:int -> settings:ContextSettings.t -> t
 
-  (** Closes a window, but does not free the memory. 
+  (** Closes a window, but does not free the memory.
     * This should prevent segfaults when calling functions on this window. *)
   val close : t -> unit
 
@@ -742,7 +754,7 @@ module Window : sig
   val destroy : t -> unit
 
   (*** Information About Windows *)
-  (** Returns in pixel the width and height of the window 
+  (** Returns in pixel the width and height of the window
     * (it only takes into account the size of the content where you can draw, *ie* the useful information). *)
   val size : t -> (int * int)
 
@@ -763,13 +775,13 @@ module Window : sig
 
   (** Draws a vertex array using with the given program, uniforms, draw parameters, and an optional index array.
     * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.VertexArray
-    * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform 
+    * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
-  val draw : 
-    window     : t -> 
+  val draw :
+    window     : t ->
     ?indices   : 'a IndexArray.t ->
-    vertices   : 'b VertexArray.t -> 
-    program    : Program.t -> 
+    vertices   : 'b VertexArray.t ->
+    program    : Program.t ->
     uniform    : Uniform.t ->
     parameters : DrawParameter.t ->
     mode       : DrawMode.t ->
@@ -781,7 +793,7 @@ module Window : sig
   (** Clears the window *)
   val clear : t -> unit
 
-  (** Returns the internal GL state of the window 
+  (** Returns the internal GL state of the window
     * @see:OgamlGraphics.State *)
   val state : t -> State.t
 
@@ -797,7 +809,7 @@ module Mouse : sig
   (*** Accessing position *)
   (** Returns the position of the cursor relatively to the screen.
     *
-    * $let (x,y) = position ()$ assigns the number of pixels from the left of 
+    * $let (x,y) = position ()$ assigns the number of pixels from the left of
     * the screen to the cursor in $x$ and the number of pixels from the top in $y$
   *)
   val position : unit -> (int * int)
@@ -810,7 +822,7 @@ module Mouse : sig
   (** Sets the position of the cursor relatively to the screen *)
   val set_position : (int * int) -> unit
 
-  (** Sets the position of the cursor relatively to a window 
+  (** Sets the position of the cursor relatively to a window
     * @see:OgamlGraphics.Window *)
   val set_relative_position : Window.t -> (int * int) -> unit
 
@@ -829,7 +841,7 @@ module Keyboard : sig
     * to check if a key is currently pressed for example. *)
 
   (*** Polling keyboard *)
-  (** $is_pressed key$ will return $true$ iff $key$ is currently pressed 
+  (** $is_pressed key$ will return $true$ iff $key$ is currently pressed
     * @see:OgamlCore.Keycode *)
   val is_pressed : OgamlCore.Keycode.t -> bool
 
@@ -844,6 +856,3 @@ module Keyboard : sig
   val is_alt_down : unit -> bool
 
 end
-
-
-
