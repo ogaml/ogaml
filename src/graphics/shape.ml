@@ -24,11 +24,12 @@ let apply_transformations position origin rotation corner point =
   })
   |> fun point ->
   (* Rotation *)
+  let theta = rotation *. Constants.pi /. 180. in
   Vector2f.({
-    x = cos(rotation) *. (point.x-.origin.x) -.
-        sin(rotation) *. (point.y-.origin.y) +. origin.x ;
-    y = sin(rotation) *. (point.x-.origin.x) +.
-        cos(rotation) *. (point.y-.origin.y) +. origin.y
+    x = cos(theta) *. (point.x-.position.x) -.
+        sin(theta) *. (point.y-.position.y) +. position.x ;
+    y = sin(theta) *. (point.x-.position.x) +.
+        cos(theta) *. (point.y-.position.y) +. position.y
   })
 
 let rec foreachtwo f res = function
