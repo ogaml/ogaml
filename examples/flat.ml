@@ -4,11 +4,11 @@ open OgamlMath
 let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
 let window = Window.create ~width:800 ~height:600 ~settings
 
-let rect = Shape.create_rectangle ~position:Vector2i.({ x = 250 ; y = 150 })
-                                  ~size:Vector2i.({ x = 400 ; y = 300 })
-                                  ~color:(`RGB Color.RGB.blue) ()
+let rect  = Shape.create_rectangle ~position:Vector2i.({ x = 200 ; y = 150 })
+                                   ~size:Vector2i.({ x = 400 ; y = 300 })
+                                   ~color:(`RGB Color.RGB.blue) ()
 
-let rect2 = Shape.create_rectangle ~position:Vector2i.({ x = 250 ; y = 150 })
+let rect2 = Shape.create_rectangle ~position:Vector2i.({ x = 400 ; y = 300 })
                                    ~size:Vector2i.({ x = 400 ; y = 300 })
                                    ~origin:Vector2f.({ x = 200. ; y = 150. })
                                    ~rotation:20.
@@ -20,7 +20,7 @@ let rect3 = Shape.create_rectangle ~position:Vector2i.zero
                                    ~rotation:45.
                                    ~color:(`RGB Color.RGB.green) ()
 
-let rect4 = Shape.create_rectangle ~position:Vector2i.zero
+let rect4 = Shape.create_rectangle ~position:Vector2i.({ x = 400 ; y = 300 })
                                    ~size:Vector2i.({ x = 400 ; y = 300 })
                                    ~color:(`RGB Color.RGB.yellow) ()
 
