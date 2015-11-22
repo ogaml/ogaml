@@ -118,4 +118,12 @@ let rotate shape delta =
   shape.shape_vals.rotation <- mod_float (shape.shape_vals.rotation +. delta)
                                          360.
 
+let get_position shape = Vector2f.floor shape.shape_vals.position
+
+let get_origin shape = shape.shape_vals.origin
+
+let get_rotation shape = shape.shape_vals.rotation
+
+let get_color shape = shape.shape_vals.color
+
 let get_vertex_array shape = shape.vertices

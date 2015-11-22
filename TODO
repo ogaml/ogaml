@@ -36,6 +36,12 @@ OgamlGraphics:
   ☐ Better support for all formats (for example 24,32 bit bmps)
   ☐ Document Shape
 
+Shape:
+  ☐ Change the notion of corner of a Shape (it wouldn't work for circles for instance)
+  ☐ Add circles (as regular polygons)
+  ☐ Add scale
+  ☐ Floats of ints for position?
+
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
   ✔ Move init_arp in cocoa/utils_stubs @done(2015-10-31 00:30) @project(Objective-C formatting)

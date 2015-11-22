@@ -46,6 +46,19 @@ val translate : t -> OgamlMath.Vector2i.t -> unit
 (** Rotates the shape by the given angle. *)
 val rotate : t -> float -> unit
 
+(** Returns the position of the origin in window coordinates. *)
+val get_position : t -> OgamlMath.Vector2i.t
+
+(** Returns the position of the origin with respect to the first point of the
+  * shape. *)
+val get_origin : t -> OgamlMath.Vector2f.t
+
+(** Returns the angle of rotation of the sape. *)
+val get_rotation : t -> float
+
+(** Returns the filling color of the shape. *)
+val get_color : t -> Color.t
+
 (** LL: Shouldn't be exposed *)
 
 (** Get the underlying vertex array. *)
