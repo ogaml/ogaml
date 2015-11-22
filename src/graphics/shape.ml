@@ -98,25 +98,35 @@ let create_rectangle ~position
                  ~scale
                  ~rotation ()
 
+(* Applies the modifications to shape_vals *)
+let update shape =
+  shape.vertices <- vertices_of_vals shape.shape_vals
+
 let set_position shape position =
-  shape.shape_vals.position <- Vector2f.from_int position
+  shape.shape_vals.position <- Vector2f.from_int position ;
+  update shape
 
 let set_origin shape origin =
-  shape.shape_vals.origin <- origin
+  shape.shape_vals.origin <- origin ;
+  update shape
 
 let set_rotation shape rotation =
-  shape.shape_vals.rotation <- rotation
+  shape.shape_vals.rotation <- rotation ;
+  update shape
 
 let set_color shape color =
-  shape.shape_vals.color <- color
+  shape.shape_vals.color <- color ;
+  update shape
 
 let translate shape delta =
   shape.shape_vals.position
-    <- Vector2f.(add (from_int delta) shape.shape_vals.position)
+    <- Vector2f.(add (from_int delta) shape.shape_vals.position) ;
+  update shape
 
 let rotate shape delta =
   shape.shape_vals.rotation <- mod_float (shape.shape_vals.rotation +. delta)
-                                         360.
+                                         360. ;
+  update shape
 
 let get_position shape = Vector2f.floor shape.shape_vals.position
 
