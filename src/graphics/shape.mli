@@ -16,7 +16,8 @@ val create_polygon :
   ?rotation : float ->
   unit -> t
 
-(** Creates a rectangle *)
+(** Creates a rectangle.
+  * Its origin is positioned with respect to the bottom-left corner. *)
 val create_rectangle :
   position  : OgamlMath.Vector2i.t ->
   size      : OgamlMath.Vector2i.t ->
@@ -26,8 +27,26 @@ val create_rectangle :
   ?rotation : float ->
   unit -> t
 
+(** Sets the position of the origin in the window. *)
+val set_position : t -> OgamlMath.Vector2i.t -> unit
+
+(** Sets the position of the origin with respect to the first point of the
+  * shape. *)
+val set_origin : t -> OgamlMath.Vector2f.t -> unit
+
+(** Sets the angle of rotation of the shape. *)
+val set_rotation : t -> float -> unit
+
+(** Sets the filling color of the shape. *)
+val set_color : t -> Color.t -> unit
+
+(** Translates the shape by the given vector. *)
+val translate : t -> OgamlMath.Vector2i.t -> unit
+
+(** Rotates the shape by the given angle. *)
+val rotate : t -> float -> unit
 
 (** LL: Shouldn't be exposed *)
 
-(** Get the underlying vertex array *)
+(** Get the underlying vertex array. *)
 val get_vertex_array : t -> VertexArray.static VertexArray.t

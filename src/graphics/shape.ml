@@ -98,4 +98,24 @@ let create_rectangle ~position
                  ~scale
                  ~rotation ()
 
+let set_position shape position =
+  shape.shape_vals.position <- Vector2f.from_int position
+
+let set_origin shape origin =
+  shape.shape_vals.origin <- origin
+
+let set_rotation shape rotation =
+  shape.shape_vals.rotation <- rotation
+
+let set_color shape color =
+  shape.shape_vals.color <- color
+
+let translate shape delta =
+  shape.shape_vals.position
+    <- Vector2f.(add (from_int delta) shape.shape_vals.position)
+
+let rotate shape delta =
+  shape.shape_vals.rotation <- mod_float (shape.shape_vals.rotation +. delta)
+                                         360.
+
 let get_vertex_array shape = shape.vertices
