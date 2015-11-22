@@ -47,9 +47,13 @@ let draw () =
 let animate = let d = ref 0. and growing = ref true in fun () ->
   Shape.rotate polygon 1. ;
   Shape.rotate rect3 (-1.) ;
-  Shape.set_scale rect Vector2f.({ x = 1. +. !d ; y = 1. +. !d }) ;
+  Shape.rotate rect4 0.1 ;
+  Shape.set_scale rect Vector2f.({ x = 1. +. 2. *. !d ; y = 1. +. 2. *. !d }) ;
+  Shape.set_scale rect2 Vector2f.({ x = 1. -. !d ; y = 1. +. !d }) ;
+  Shape.set_scale rect4 Vector2f.({ x = 1. -. 2. *. !d ; y = 1. -. 2. *. !d }) ;
+  Shape.translate polygon Vector2f.(floor { x = 30. *. !d ; y = 0. }) ;
   d := if !growing then !d +. 0.01 else !d -. 0.01 ;
-  if abs_float !d >= 1.2 then growing := not (!growing)
+  if abs_float !d >= 0.2 then growing := not (!growing)
 
 let rec handle_events () =
   match Window.poll_event window with
