@@ -39,7 +39,7 @@ OgamlGraphics:
 Shape:
   ☐ Change the notion of corner of a Shape (it wouldn't work for circles for instance)
   ☐ Add circles (as regular polygons)
-  ☐ Add scale
+  ✔ Add scale @done(2015-11-22 20:33) @project(Shape)
   ☐ Floats of ints for position?
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿

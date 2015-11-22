@@ -44,6 +44,13 @@ let draw () =
   Window.draw_shape window rect4 ;
   Window.draw_shape window polygon
 
+let animate = let d = ref 0. and growing = ref true in fun () ->
+  Shape.rotate polygon 1. ;
+  Shape.rotate rect3 (-1.) ;
+  Shape.set_scale rect Vector2f.({ x = 1. +. !d ; y = 1. +. !d }) ;
+  d := if !growing then !d +. 0.01 else !d -. 0.01 ;
+  if abs_float !d >= 1.2 then growing := not (!growing)
+
 let rec handle_events () =
   match Window.poll_event window with
   | Some e -> OgamlCore.Event.(
@@ -58,10 +65,7 @@ let rec each_frame () =
     Window.clear window ;
     draw () ;
     Window.display window ;
-    (* Besides events, let's have some fun *)
-    Shape.rotate polygon 1.    ;
-    Shape.rotate rect3   (-1.) ;
-    (***)
+    animate () ;
     handle_events () ;
     each_frame ()
   end

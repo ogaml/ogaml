@@ -730,6 +730,9 @@ module Shape : sig
   (** Sets the angle of rotation of the shape. *)
   val set_rotation : t -> float -> unit
 
+  (** Sets the scale of the shape. *)
+  val set_scale : t -> OgamlMath.Vector2f.t -> unit
+
   (** Sets the filling color of the shape. *)
   val set_color : t -> Color.t -> unit
 
@@ -738,6 +741,9 @@ module Shape : sig
 
   (** Rotates the shape by the given angle. *)
   val rotate : t -> float -> unit
+
+  (** Scales the shape. *)
+  val scale : t -> OgamlMath.Vector2f.t -> unit
 
   (** Returns the position of the origin in window coordinates. *)
   val get_position : t -> OgamlMath.Vector2i.t
@@ -748,6 +754,9 @@ module Shape : sig
 
   (** Returns the angle of rotation of the sape. *)
   val get_rotation : t -> float
+
+  (** Returns the scale of the shape. *)
+  val get_scale : t -> OgamlMath.Vector2f.t
 
   (** Returns the filling color of the shape. *)
   val get_color : t -> Color.t

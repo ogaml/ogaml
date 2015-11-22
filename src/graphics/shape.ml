@@ -16,11 +16,17 @@ type t = {
 
 (* Applys transformations to a point
  * corner is the first point (typically top-left corner) *)
-let apply_transformations position origin rotation corner point =
+let apply_transformations position origin rotation scale corner point =
   (* Position offset *)
   Vector2f.({
     x = point.x +. position.x -. origin.x -. corner.x ;
     y = point.y +. position.y -. origin.y -. corner.y
+  })
+  |> fun point ->
+  (* Scale *)
+  Vector2f.({
+    x = (point.x -. position.x) *. scale.x +. position.x ;
+    y = (point.y -. position.y) *. scale.y +. position.y
   })
   |> fun point ->
   (* Rotation *)
@@ -44,7 +50,8 @@ let vertices_of_vals vals =
                                                        ~size:0 ())
   | corner :: _ ->
     List.map
-      (apply_transformations vals.position vals.origin vals.rotation corner)
+      (apply_transformations
+        vals.position vals.origin vals.rotation vals.scale corner)
       vals.points
     |> List.map Vector3f.lift
     |> List.map (fun v ->
@@ -65,7 +72,7 @@ let create_polygon ~points
                    ~color
                    ?origin:(origin=Vector2f.zero)
                    ?position:(position=Vector2i.zero)
-                   ?scale:(scale=Vector2f.zero)
+                   ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
                    ?rotation:(rotation=0.) () =
   let points = List.map Vector2f.from_int points in
   let position = Vector2f.from_int position in
@@ -87,7 +94,7 @@ let create_rectangle ~position
                      ~size
                      ~color
                      ?origin:(origin=Vector2f.zero)
-                     ?scale:(scale=Vector2f.zero)
+                     ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
                      ?rotation:(rotation=0.) () =
   let w = Vector2i.({ x = size.x ; y = 0 })
   and h = Vector2i.({ x = 0 ; y = size.y }) in
@@ -114,6 +121,10 @@ let set_rotation shape rotation =
   shape.shape_vals.rotation <- rotation ;
   update shape
 
+let set_scale shape scale =
+  shape.shape_vals.scale <- scale ;
+  update shape
+
 let set_color shape color =
   shape.shape_vals.color <- color ;
   update shape
@@ -124,15 +135,25 @@ let translate shape delta =
   update shape
 
 let rotate shape delta =
-  shape.shape_vals.rotation <- mod_float (shape.shape_vals.rotation +. delta)
-                                         360. ;
-  update shape
+  mod_float (shape.shape_vals.rotation +. delta) 360.
+  |> set_rotation shape
+
+let scale shape scale =
+  let mul v w =
+    Vector2f.({
+      x = v.x *. w.x ;
+      y = v.y *. w.y
+    })
+  in
+  set_scale shape (mul scale shape.shape_vals.scale)
 
 let get_position shape = Vector2f.floor shape.shape_vals.position
 
 let get_origin shape = shape.shape_vals.origin
 
 let get_rotation shape = shape.shape_vals.rotation
+
+let get_scale shape = shape.shape_vals.scale
 
 let get_color shape = shape.shape_vals.color
 
