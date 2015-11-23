@@ -81,6 +81,7 @@ let draw_shape =
       gl_Position.x = 2.0 * position.x / size.x - 1.0;
       gl_Position.y = 2.0 * (size.y - position.y) / size.y - 1.0;
       gl_Position.z = 0.0;
+      gl_Position.w = 1.0;
 
       frag_color = color;
 
