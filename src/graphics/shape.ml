@@ -105,6 +105,32 @@ let create_rectangle ~position
                  ~scale
                  ~rotation ()
 
+let create_regular ~position
+                   ~radius
+                   ~amount
+                   ~color
+                   ?origin:(origin=Vector2f.zero)
+                   ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
+                   ?rotation:(rotation=0.) () =
+  let rec vertices k l =
+    if k > amount then l
+    else begin
+      let fk = float_of_int k in
+      let fn = float_of_int amount in
+      Vector2f.({
+        x = radius *. (cos (2. *. fk *. Constants.pi /. fn)) ;
+        y = radius *. (sin (2. *. fk *. Constants.pi /. fn))
+      }) :: l
+      |> vertices (k+1)
+    end
+  in
+  create_polygon ~points:(List.map Vector2f.floor (vertices 0 []))
+                 ~color
+                 ~origin
+                 ~position
+                 ~scale
+                 ~rotation ()
+
 (* Applies the modifications to shape_vals *)
 let update shape =
   shape.vertices <- vertices_of_vals shape.shape_vals

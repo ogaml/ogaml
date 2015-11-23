@@ -27,6 +27,18 @@ val create_rectangle :
   ?rotation : float ->
   unit -> t
 
+(** Creates a regular polygon with a given number of vertices.
+  * When this number is high, one can expect a circle. *)
+val create_regular :
+  position  : OgamlMath.Vector2i.t ->
+  radius    : float ->
+  amount    : int ->
+  color     : Color.t ->
+  ?origin   : OgamlMath.Vector2f.t ->
+  ?scale    : OgamlMath.Vector2f.t ->
+  ?rotation : float ->
+  unit -> t
+
 (** Sets the position of the origin in the window. *)
 val set_position : t -> OgamlMath.Vector2i.t -> unit
 

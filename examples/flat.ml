@@ -37,17 +37,26 @@ let polygon = Shape.create_polygon
                 ~position:Vector2i.({ x = 100 ; y = 400 })
                 ()
 
+let regular = Shape.create_regular
+                ~position:Vector2i.({ x = 400 ; y = 500 })
+                ~radius:50.
+                ~amount:50
+                ~color:(`RGB Color.RGB.cyan)
+                ()
+
 let draw () =
   Window.draw_shape window rect ;
   Window.draw_shape window rect2 ;
   Window.draw_shape window rect3 ;
   Window.draw_shape window rect4 ;
-  Window.draw_shape window polygon
+  Window.draw_shape window polygon ;
+  Window.draw_shape window regular
 
 let animate = let d = ref 0. and growing = ref true in fun () ->
   Shape.rotate polygon 1. ;
   Shape.rotate rect3 (-1.) ;
   Shape.rotate rect4 0.1 ;
+  Shape.set_rotation regular (100. *. !d) ;
   Shape.set_scale rect Vector2f.({ x = 1. +. 2. *. !d ; y = 1. +. 2. *. !d }) ;
   Shape.set_scale rect2 Vector2f.({ x = 1. -. !d ; y = 1. +. !d }) ;
   Shape.set_scale rect4 Vector2f.({ x = 1. -. 2. *. !d ; y = 1. -. 2. *. !d }) ;
