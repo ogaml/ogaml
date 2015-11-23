@@ -44,13 +44,37 @@ let regular = Shape.create_regular
                 ~color:(`RGB Color.RGB.cyan)
                 ()
 
+let regular2 = Shape.create_regular
+                 ~position:Vector2i.({ x = 500 ; y = 550 })
+                 ~radius:50.
+                 ~amount:5
+                 ~color:(`RGB Color.RGB.magenta)
+                 ()
+
+let regular3 = Shape.create_regular
+                 ~position:Vector2i.({ x = 600 ; y = 600 })
+                 ~radius:50.
+                 ~amount:100
+                 ~color:(`RGB Color.RGB.blue)
+                 ()
+
+let regular4 = Shape.create_regular
+                 ~position:Vector2i.({ x = 700 ; y = 300 })
+                 ~radius:50.
+                 ~amount:200
+                 ~color:(`RGB Color.RGB.({r = 0.5 ; g = 0.3 ; b = 0.4 ; a = 1.}))
+                 ()
+
 let draw () =
   Window.draw_shape window rect ;
   Window.draw_shape window rect2 ;
   Window.draw_shape window rect3 ;
   Window.draw_shape window rect4 ;
   Window.draw_shape window polygon ;
-  Window.draw_shape window regular
+  Window.draw_shape window regular ;
+  Window.draw_shape window regular2 ;
+  Window.draw_shape window regular3 ;
+  Window.draw_shape window regular4
 
 let animate = let d = ref 0. and growing = ref true in fun () ->
   Shape.rotate polygon 1. ;
