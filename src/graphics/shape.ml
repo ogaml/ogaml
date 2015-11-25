@@ -63,7 +63,7 @@ let vertices_of_vals vals =
       (fun source a b -> VertexArray.Source.(source << edge << a << b))
       VertexArray.Source.(empty ~position:"position"
                                 ~color:"color"
-                                ~size:(3 * (List.length vertices)) ())
+                                ~size:(3 * ((List.length vertices) - 1)) ())
       vertices
   |> VertexArray.static
 
