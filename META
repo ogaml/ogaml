@@ -19,3 +19,9 @@ package "math" (
   archive(byte) = "ogamlMath.cma"
   archive(native) = "ogamlMath.cmxa"
 )
+
+package "utils" (
+  requires = "bigarray,unix"
+  archive(byte) = "ogamlUtils.cma"
+  archive(native) = "ogamlUtils.cmxa"
+)

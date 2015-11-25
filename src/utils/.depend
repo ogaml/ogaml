@@ -1,0 +1,10 @@
+dequeue.cmo : dequeue.cmi
+dequeue.cmx : dequeue.cmi
+graph.cmo : priorityQueue.cmi dequeue.cmi graph.cmi
+graph.cmx : priorityQueue.cmx dequeue.cmx graph.cmi
+priorityQueue.cmo : priorityQueue.cmi
+priorityQueue.cmx : priorityQueue.cmi
+bounding.cmi :
+dequeue.cmi :
+graph.cmi :
+priorityQueue.cmi :

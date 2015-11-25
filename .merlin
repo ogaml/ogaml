@@ -4,6 +4,8 @@ S src/core/xlib
 S src/core/cocoa
 S src/math
 S src/graphics
+S src/utils
+S src/physics
 S tests
 S examples
 
@@ -13,6 +15,8 @@ B src/core/xlib
 B src/core/cocoa
 B src/math
 B src/graphics
+B src/utils
+B src/physics
 B tests
 B examples
 
