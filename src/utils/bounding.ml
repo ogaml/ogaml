@@ -214,7 +214,6 @@ module B3D = struct
       (Vector3f.add b.aabb_corner offset, b.aabb_size)
     | _ -> assert false
 
-
 end
 
 
