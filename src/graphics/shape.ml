@@ -1,16 +1,18 @@
 open OgamlMath
 
 type shape_vals = {
-  mutable points   : Vector2f.t list ; (* Maybe something more generic *)
-  mutable position : Vector2f.t ;
-  mutable origin   : Vector2f.t ;
-  mutable rotation : float ;
-  mutable scale    : Vector2f.t ; (* ignored for the moment *)
-  mutable color    : Color.t
+  mutable points    : Vector2f.t list ;
+  mutable position  : Vector2f.t ;
+  mutable origin    : Vector2f.t ;
+  mutable rotation  : float ;
+  mutable scale     : Vector2f.t ;
+  mutable thickness : int ;
+  mutable color     : Color.t
 }
 
 type t = {
   mutable vertices : VertexArray.static VertexArray.t ;
+  mutable outline  : VertexArray.static VertexArray.t ;
   shape_vals       : shape_vals
 }
 
@@ -67,20 +69,26 @@ let create_polygon ~points
                    ?origin:(origin=Vector2f.zero)
                    ?position:(position=Vector2i.zero)
                    ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
-                   ?rotation:(rotation=0.) () =
+                   ?rotation:(rotation=0.)
+                   ?thickness:(thickness=0) () =
   let points = List.map Vector2f.from_int points in
   let position = Vector2f.from_int position in
   let vals = {
-    points   = points ;
-    position = position ;
-    origin   = origin ;
-    rotation = rotation ;
-    scale    = scale ;
-    color    = color
+    points    = points ;
+    position  = position ;
+    origin    = origin ;
+    rotation  = rotation ;
+    scale     = scale ;
+    thickness = thickness ;
+    color     = color
   }
   in
   {
     vertices   = vertices_of_vals vals ;
+    outline    = VertexArray.static
+                   VertexArray.Source.(empty ~position:"position"
+                                             ~color:"color"
+                                             ~size:0 ()) ;
     shape_vals = vals
   }
 
@@ -89,7 +97,8 @@ let create_rectangle ~position
                      ~color
                      ?origin:(origin=Vector2f.zero)
                      ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
-                     ?rotation:(rotation=0.) () =
+                     ?rotation:(rotation=0.)
+                     ?thickness:(thickness=0) () =
   let w = Vector2i.({ x = size.x ; y = 0 })
   and h = Vector2i.({ x = 0 ; y = size.y }) in
   create_polygon ~points:Vector2i.([zero ; w ; size ; h])
@@ -97,7 +106,8 @@ let create_rectangle ~position
                  ~origin
                  ~position
                  ~scale
-                 ~rotation ()
+                 ~rotation
+                 ~thickness ()
 
 let create_regular ~position
                    ~radius
@@ -105,7 +115,8 @@ let create_regular ~position
                    ~color
                    ?origin:(origin=Vector2f.zero)
                    ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
-                   ?rotation:(rotation=0.) () =
+                   ?rotation:(rotation=0.)
+                   ?thickness:(thickness=0) () =
   let rec vertices k l =
     if k > amount then l
     else begin
@@ -123,7 +134,8 @@ let create_regular ~position
                  ~origin
                  ~position
                  ~scale
-                 ~rotation ()
+                 ~rotation
+                 ~thickness ()
 
 (* Applies the modifications to shape_vals *)
 let update shape =
@@ -143,6 +155,10 @@ let set_rotation shape rotation =
 
 let set_scale shape scale =
   shape.shape_vals.scale <- scale ;
+  update shape
+
+let set_thickness shape thickness =
+  shape.shape_vals.thickness <- thickness ;
   update shape
 
 let set_color shape color =
@@ -174,6 +190,8 @@ let get_origin shape = shape.shape_vals.origin
 let get_rotation shape = shape.shape_vals.rotation
 
 let get_scale shape = shape.shape_vals.scale
+
+let get_thickness shape = shape.shape_vals.thickness
 
 let get_color shape = shape.shape_vals.color
 

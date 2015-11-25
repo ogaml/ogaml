@@ -702,35 +702,38 @@ module Shape : sig
     * All coordinates are taken with respect to the top-left corner of the
     * shape. *)
   val create_polygon :
-    points    : OgamlMath.Vector2i.t list ->
-    color     : Color.t ->
-    ?origin   : OgamlMath.Vector2f.t ->
-    ?position : OgamlMath.Vector2i.t ->
-    ?scale    : OgamlMath.Vector2f.t ->
-    ?rotation : float ->
+    points     : OgamlMath.Vector2i.t list ->
+    color      : Color.t ->
+    ?origin    : OgamlMath.Vector2f.t ->
+    ?position  : OgamlMath.Vector2i.t ->
+    ?scale     : OgamlMath.Vector2f.t ->
+    ?rotation  : float ->
+    ?thickness : int ->
     unit -> t
 
   (** Creates a rectangle.
     * Its origin is positioned with respect to the top-left corner. *)
   val create_rectangle :
-    position  : OgamlMath.Vector2i.t ->
-    size      : OgamlMath.Vector2i.t ->
-    color     : Color.t ->
-    ?origin   : OgamlMath.Vector2f.t ->
-    ?scale    : OgamlMath.Vector2f.t ->
-    ?rotation : float ->
+    position   : OgamlMath.Vector2i.t ->
+    size       : OgamlMath.Vector2i.t ->
+    color      : Color.t ->
+    ?origin    : OgamlMath.Vector2f.t ->
+    ?scale     : OgamlMath.Vector2f.t ->
+    ?rotation  : float ->
+    ?thickness : int ->
     unit -> t
 
   (** Creates a regular polygon with a given number of vertices.
     * When this number is high, one can expect a circle. *)
   val create_regular :
-    position  : OgamlMath.Vector2i.t ->
-    radius    : float ->
-    amount    : int ->
-    color     : Color.t ->
-    ?origin   : OgamlMath.Vector2f.t ->
-    ?scale    : OgamlMath.Vector2f.t ->
-    ?rotation : float ->
+    position   : OgamlMath.Vector2i.t ->
+    radius     : float ->
+    amount     : int ->
+    color      : Color.t ->
+    ?origin    : OgamlMath.Vector2f.t ->
+    ?scale     : OgamlMath.Vector2f.t ->
+    ?rotation  : float ->
+    ?thickness : int ->
     unit -> t
 
   (** Sets the position of the origin in the window *)
@@ -745,6 +748,9 @@ module Shape : sig
 
   (** Sets the scale of the shape. *)
   val set_scale : t -> OgamlMath.Vector2f.t -> unit
+
+  (** Sets the thickness of the outline. *)
+  val set_thickness : t -> int -> unit
 
   (** Sets the filling color of the shape. *)
   val set_color : t -> Color.t -> unit
@@ -770,6 +776,9 @@ module Shape : sig
 
   (** Returns the scale of the shape. *)
   val get_scale : t -> OgamlMath.Vector2f.t
+
+  (** Returns the thickness of the outline. *)
+  val get_thickness : t -> int
 
   (** Returns the filling color of the shape. *)
   val get_color : t -> Color.t

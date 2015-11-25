@@ -37,10 +37,12 @@ OgamlGraphics:
   ☐ Document Shape
 
 Shape:
-  ☐ Change the notion of corner of a Shape (it wouldn't work for circles for instance)
-  ☐ Add circles (as regular polygons)
+  ✔ Change the notion of corner of a Shape (it wouldn't work for circles for instance) @done(2015-11-25 21:51) @project(Shape)
+  ✔ Add circles (as regular polygons) @done(2015-11-25 21:51) @project(Shape)
   ✔ Add scale @done(2015-11-22 20:33) @project(Shape)
   ☐ Floats of ints for position?
+  ☐ Add thickness
+  ☐ Add lines
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
