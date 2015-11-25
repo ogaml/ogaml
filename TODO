@@ -24,6 +24,7 @@ OgamlCore:
 
 OgamlMath:
   ☐ Matrices, quaternions and vector exceptions
+  ☐ Doc
 
 OgamlGraphics:
   ✔ Better normal computations in Model @done(2015-11-15 23:22) @project(OgamlGraphics)

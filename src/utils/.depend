@@ -1,3 +1,5 @@
+bounding.cmo : bounding.cmi
+bounding.cmx : bounding.cmi
 dequeue.cmo : dequeue.cmi
 dequeue.cmx : dequeue.cmi
 graph.cmo : priorityQueue.cmi dequeue.cmi graph.cmi

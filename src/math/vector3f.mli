@@ -28,6 +28,8 @@ val lift : Vector2f.t -> t
 
 val dot : t -> t -> float
 
+val product : t -> t -> t
+
 val cross : t -> t -> t
 
 val angle : t -> t -> float
@@ -37,6 +39,10 @@ val squared_norm : t -> float
 val norm : t -> float
 
 val clamp : t -> t -> t -> t
+
+val map : t -> (float -> float) -> t
+
+val map2 : t -> t -> (float -> float -> float) -> t
 
 val max : t -> float
 

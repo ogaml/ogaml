@@ -24,6 +24,8 @@ val lift : Vector2i.t -> t
 
 val dot : t -> t -> int
 
+val product : t -> t -> t
+
 val cross : t -> t -> t
 
 val angle : t -> t -> float
@@ -33,6 +35,10 @@ val squared_norm : t -> int
 val norm : t -> float
 
 val clamp : t -> t -> t -> t
+
+val map : t -> (int -> int) -> t
+
+val map2 : t -> t -> (int -> int -> int) -> t
 
 val max : t -> int
 

@@ -49,6 +49,12 @@ let dot v1 v2 =
   v1.y * v2.y + 
   v1.z * v2.z
 
+let product u v = {
+  x = u.x * v.x;
+  y = u.y * v.y;
+  z = u.z * v.z
+}
+
 let cross u v = {
   x = u.y * v.z - u.z * v.y;
   y = u.z * v.x - u.x * v.z;
@@ -69,6 +75,12 @@ let clamp u a b = {
   y = min b.y (max u.y a.y);
   z = min b.z (max u.z a.z)
 }
+
+let map u f = 
+  {x = f u.x; y = f u.y; z = f u.z}
+
+let map2 v w f = 
+  {x = f v.x w.x; y = f v.y w.y; z = f v.z w.z}
 
 let max u = 
   max (max u.x u.y) u.z

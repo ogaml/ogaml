@@ -31,6 +31,11 @@ let dot v1 v2 =
   v1.x * v2.x + 
   v1.y * v2.y 
 
+let product u v = {
+  x = u.x * v.x;
+  y = u.y * v.y;
+}
+
 let det u v = 
   u.x * v.y - u.y * v.x
 
@@ -47,6 +52,12 @@ let clamp u a b = {
   x = min b.x (max u.x a.x);
   y = min b.y (max u.y a.y);
 }
+
+let map u f = 
+  {x = f u.x; y = f u.y}
+
+let map2 v w f = 
+  {x = f v.x w.x; y = f v.y w.y}
 
 let max u = 
   max u.x u.y
