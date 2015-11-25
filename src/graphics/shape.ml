@@ -14,13 +14,12 @@ type t = {
   shape_vals       : shape_vals
 }
 
-(* Applys transformations to a point
- * corner is the first point (typically top-left corner) *)
-let apply_transformations position origin rotation scale corner point =
+(* Applys transformations to a point *)
+let apply_transformations position origin rotation scale point =
   (* Position offset *)
   Vector2f.({
-    x = point.x +. position.x -. origin.x -. corner.x ;
-    y = point.y +. position.y -. origin.y -. corner.y
+    x = point.x +. position.x -. origin.x ;
+    y = point.y +. position.y -. origin.y
   })
   |> fun point ->
   (* Scale *)
@@ -44,29 +43,24 @@ let rec foreachtwo f res = function
 
 (* Turns a shape_vals to a VertexArray *)
 let vertices_of_vals vals =
-  match vals.points with
-  | [] -> VertexArray.static VertexArray.Source.(empty ~position:"position"
-                                                       ~color:"color"
-                                                       ~size:0 ())
-  | corner :: _ ->
-    List.map
-      (apply_transformations
-        vals.position vals.origin vals.rotation vals.scale corner)
-      vals.points
-    |> List.map Vector3f.lift
-    |> List.map (fun v ->
-      VertexArray.Vertex.create ~position:v ~color:vals.color ()
-    )
-    |> function
-    | [] -> assert false
-    | edge :: vertices ->
-      foreachtwo
-        (fun source a b -> VertexArray.Source.(source << edge << a << b))
-        VertexArray.Source.(empty ~position:"position"
-                                  ~color:"color"
-                                  ~size:(3 * (List.length vertices)) ())
-        vertices
-    |> VertexArray.static
+  List.map
+    (apply_transformations
+      vals.position vals.origin vals.rotation vals.scale)
+    vals.points
+  |> List.map Vector3f.lift
+  |> List.map (fun v ->
+    VertexArray.Vertex.create ~position:v ~color:vals.color ()
+  )
+  |> function
+  | [] -> assert false
+  | edge :: vertices ->
+    foreachtwo
+      (fun source a b -> VertexArray.Source.(source << edge << a << b))
+      VertexArray.Source.(empty ~position:"position"
+                                ~color:"color"
+                                ~size:(3 * (List.length vertices)) ())
+      vertices
+  |> VertexArray.static
 
 let create_polygon ~points
                    ~color
@@ -118,8 +112,8 @@ let create_regular ~position
       let fk = float_of_int k in
       let fn = float_of_int amount in
       Vector2f.({
-        x = radius *. (cos (2. *. fk *. Constants.pi /. fn)) ;
-        y = radius *. (sin (2. *. fk *. Constants.pi /. fn))
+        x = radius *. (cos (2. *. fk *. Constants.pi /. fn)) +. radius ;
+        y = radius *. (sin (2. *. fk *. Constants.pi /. fn)) +. radius
       }) :: l
       |> vertices (k+1)
     end

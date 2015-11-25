@@ -2,97 +2,107 @@ open OgamlGraphics
 open OgamlMath
 
 let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
-let window = Window.create ~width:800 ~height:600 ~settings
+let window = Window.create ~width:900 ~height:600 ~settings
 
-let rect  = Shape.create_rectangle ~position:Vector2i.({ x = 200 ; y = 150 })
-                                   ~size:Vector2i.({ x = 400 ; y = 300 })
-                                   ~color:(`RGB Color.RGB.blue) ()
+let rectangle1 =
+  Shape.create_rectangle
+    ~position:Vector2i.({ x = 50 ; y = 75 })
+    ~size:Vector2i.({ x = 200 ; y = 150 })
+    ~color:(`RGB Color.RGB.blue)
+    ()
 
-let rect2 = Shape.create_rectangle ~position:Vector2i.({ x = 400 ; y = 300 })
-                                   ~size:Vector2i.({ x = 400 ; y = 300 })
-                                   ~origin:Vector2f.({ x = 200. ; y = 150. })
-                                   ~rotation:20.
-                                   ~color:(`RGB Color.RGB.red) ()
+let rectangle2 =
+  Shape.create_rectangle
+    ~position:Vector2i.({ x = 150 ; y = 450 })
+    ~size:Vector2i.({ x = 200 ; y = 150 })
+    ~origin:Vector2f.({ x = 100. ; y = 75. })
+    ~color:(`RGB Color.RGB.red)
+    ()
 
-let rect3 = Shape.create_rectangle ~position:Vector2i.zero
-                                   ~size:Vector2i.({ x = 400 ; y = 300 })
-                                   ~origin:Vector2f.({ x = 200. ; y = 150. })
-                                   ~rotation:45.
-                                   ~color:(`RGB Color.RGB.green) ()
+let polygon1 =
+  Shape.create_polygon
+    ~points:Vector2i.([
+      { x =   0 ; y =  80 } ;
+      { x =  40 ; y =   0 } ;
+      { x = 120 ; y =   0 } ;
+      { x = 160 ; y =  80 } ;
+      { x =  80 ; y = 160 }
+    ])
+    ~color:(`RGB Color.RGB.green)
+    ~position:Vector2i.({ x = 370 ; y = 70 })
+    ()
 
-let rect4 = Shape.create_rectangle ~position:Vector2i.({ x = 400 ; y = 300 })
-                                   ~size:Vector2i.({ x = 400 ; y = 300 })
-                                   ~color:(`RGB Color.RGB.yellow) ()
+let polygon2 =
+  Shape.create_polygon
+    ~points:Vector2i.([
+      { x =   0 ; y =  80 } ;
+      { x =  40 ; y =   0 } ;
+      { x = 120 ; y =   0 } ;
+      { x = 160 ; y =  80 } ;
+      { x =  80 ; y = 160 }
+    ])
+    ~color:(`RGB Color.RGB.magenta)
+    ~origin:Vector2f.({ x = 80. ; y = 80. })
+    ~position:Vector2i.({ x = 450 ; y = 450 })
+    ()
 
-let polygon = Shape.create_polygon
-                ~points:Vector2i.([
-                  { x =  0 ; y = 40 } ;
-                  { x = 20 ; y =  0 } ;
-                  { x = 60 ; y =  0 } ;
-                  { x = 80 ; y = 40 } ;
-                  { x = 40 ; y = 80 }
-                ])
-                ~color:(`RGB Color.RGB.black)
-                ~origin:Vector2f.({ x = 40. ; y = 0. })
-                ~position:Vector2i.({ x = 100 ; y = 400 })
-                ()
+let regular1 =
+  Shape.create_regular
+    ~position:Vector2i.({ x = 650 ; y = 50 })
+    ~radius:100.
+    ~amount:10
+    ~color:(`RGB Color.RGB.cyan)
+    ()
 
-let regular = Shape.create_regular
-                ~position:Vector2i.({ x = 400 ; y = 500 })
-                ~radius:50.
-                ~amount:50
-                ~color:(`RGB Color.RGB.cyan)
-                ()
-
-let regular2 = Shape.create_regular
-                 ~position:Vector2i.({ x = 500 ; y = 550 })
-                 ~radius:50.
-                 ~amount:5
-                 ~color:(`RGB Color.RGB.magenta)
-                 ()
-
-let regular3 = Shape.create_regular
-                 ~position:Vector2i.({ x = 600 ; y = 600 })
-                 ~radius:50.
-                 ~amount:100
-                 ~color:(`RGB Color.RGB.blue)
-                 ()
-
-let regular4 = Shape.create_regular
-                 ~position:Vector2i.({ x = 700 ; y = 300 })
-                 ~radius:50.
-                 ~amount:200
-                 ~color:(`RGB Color.RGB.({r = 0.5 ; g = 0.3 ; b = 0.4 ; a = 1.}))
-                 ()
+let regular2 =
+  Shape.create_regular
+    ~position:Vector2i.({ x = 750 ; y = 450 })
+    ~radius:100.
+    ~origin:Vector2f.({ x = 100. ; y = 100. })
+    ~amount:10
+    ~color:(`RGB Color.RGB.yellow)
+    ()
 
 let draw () =
-  Window.draw_shape window rect ;
-  Window.draw_shape window rect2 ;
-  Window.draw_shape window rect3 ;
-  Window.draw_shape window rect4 ;
-  Window.draw_shape window polygon ;
-  Window.draw_shape window regular ;
-  Window.draw_shape window regular2 ;
-  Window.draw_shape window regular3 ;
-  Window.draw_shape window regular4
+  Window.draw_shape window rectangle1 ;
+  Window.draw_shape window rectangle2 ;
+  Window.draw_shape window polygon1 ;
+  Window.draw_shape window polygon2 ;
+  Window.draw_shape window regular1 ;
+  Window.draw_shape window regular2
 
-let animate = let d = ref 0. and growing = ref true in fun () ->
-  Shape.rotate polygon 1. ;
-  Shape.rotate rect3 (-1.) ;
-  Shape.rotate rect4 0.1 ;
-  Shape.set_rotation regular (100. *. !d) ;
-  Shape.set_scale rect Vector2f.({ x = 1. +. 2. *. !d ; y = 1. +. 2. *. !d }) ;
-  Shape.set_scale rect2 Vector2f.({ x = 1. -. !d ; y = 1. +. !d }) ;
-  Shape.set_scale rect4 Vector2f.({ x = 1. -. 2. *. !d ; y = 1. -. 2. *. !d }) ;
-  Shape.translate polygon Vector2f.(floor { x = 30. *. !d ; y = 0. }) ;
-  d := if !growing then !d +. 0.01 else !d -. 0.01 ;
-  if abs_float !d >= 0.2 then growing := not (!growing)
+let do_all action param =
+  action rectangle1 param ;
+  action rectangle2 param ;
+  action polygon1 param ;
+  action polygon2 param ;
+  action regular1 param ;
+  action regular2 param
 
 let rec handle_events () =
+  let open OgamlCore in
   match Window.poll_event window with
-  | Some e -> OgamlCore.Event.(
+  | Some e -> Event.(
       match e with
       | Closed -> Window.close window
+      | Event.KeyPressed k -> Keycode.(
+        match k.Event.KeyEvent.key with
+        | Q when k.Event.KeyEvent.control -> Window.close window
+        (* Moving around all shapes *)
+        | Z -> do_all Shape.translate Vector2i.({ x =  0 ; y = -5 })
+        | Q -> do_all Shape.translate Vector2i.({ x = -5 ; y =  0 })
+        | S -> do_all Shape.translate Vector2i.({ x =  0 ; y =  5 })
+        | D -> do_all Shape.translate Vector2i.({ x =  5 ; y =  0 })
+        (* Do a slow barrel roll *)
+        | O -> do_all Shape.rotate (-5.)
+        | P -> do_all Shape.rotate 5.
+        (* Resizing *)
+        | F -> do_all Shape.scale Vector2f.({ x = 0.8  ; y = 1.   })
+        | H -> do_all Shape.scale Vector2f.({ x = 1.25 ; y = 1.   })
+        | T -> do_all Shape.scale Vector2f.({ x = 1.   ; y = 1.25 })
+        | G -> do_all Shape.scale Vector2f.({ x = 1.   ; y = 0.8  })
+        | _ -> ()
+      )
       | _      -> ()
     ) ; handle_events ()
   | None -> ()
@@ -102,7 +112,6 @@ let rec each_frame () =
     Window.clear window ;
     draw () ;
     Window.display window ;
-    animate () ;
     handle_events () ;
     each_frame ()
   end

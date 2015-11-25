@@ -698,8 +698,9 @@ module Shape : sig
 
   (** Creates a convex polygon given a list of points.
     * points is this list of points,
-    * origin is the origin of the polygon whoose coordinates are taken with
-    * respect to the first point of points (which is also the default origin) *)
+    * origin is the origin of the polygon.
+    * All coordinates are taken with respect to the top-left corner of the
+    * shape. *)
   val create_polygon :
     points    : OgamlMath.Vector2i.t list ->
     color     : Color.t ->
@@ -710,7 +711,7 @@ module Shape : sig
     unit -> t
 
   (** Creates a rectangle.
-    * Its origin is positioned with respect to the bottom-left corner. *)
+    * Its origin is positioned with respect to the top-left corner. *)
   val create_rectangle :
     position  : OgamlMath.Vector2i.t ->
     size      : OgamlMath.Vector2i.t ->
