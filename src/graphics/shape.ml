@@ -54,7 +54,10 @@ let vertices_of_vals vals =
     VertexArray.Vertex.create ~position:v ~color:vals.color ()
   )
   |> function
-  | [] -> assert false
+  | [] -> VertexArray.static
+            VertexArray.Source.(empty ~position:"position"
+                                      ~color:"color"
+                                      ~size:0 ())
   | edge :: vertices ->
     foreachtwo
       (fun source a b -> VertexArray.Source.(source << edge << a << b))
