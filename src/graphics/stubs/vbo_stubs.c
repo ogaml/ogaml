@@ -16,6 +16,8 @@
 #include <caml/bigarray.h>
 #include "utils.h"
 
+#define BUFFER(_a) (*(GLuint*) Data_custom_val(_a))
+
 
 GLenum VBOKind_val(value kind) 
 {
@@ -33,17 +35,50 @@ GLenum VBOKind_val(value kind)
 }
 
 
+void finalise_buffer(value v)
+{
+  glDeleteBuffers(1,&BUFFER(v));
+}
+
+int compare_buffer(value v1, value v2)
+{
+  GLuint i1 = BUFFER(v1);
+  GLuint i2 = BUFFER(v2);
+  if(i1 < i2) return -1;
+  else if(i1 == i2) return 0;
+  else return 1;
+}
+
+intnat hash_buffer(value v)
+{
+  GLuint i = BUFFER(v);
+  return i;
+}
+
+static struct custom_operations buffer_custom_ops = {
+  identifier: "buffer gc handling",
+  finalize:    finalise_buffer,
+  compare:     compare_buffer,
+  hash:        hash_buffer,
+  serialize:   custom_serialize_default,
+  deserialize: custom_deserialize_default
+};
+
+
 // INPUT   nothing
 // OUTPUT  a buffer name
 CAMLprim value
 caml_create_buffer(value unit)
 {
   CAMLparam0();
+  CAMLlocal1(v);
 
   GLuint buf[1];
   glGenBuffers(1, buf);
+  v = caml_alloc_custom( &buffer_custom_ops, sizeof(GLuint), 0, 1);
+  memcpy( Data_custom_val(v), buf, sizeof(GLuint) );
 
-  CAMLreturn((value)buf[0]);
+  CAMLreturn(v);
 }
 
 
@@ -56,7 +91,7 @@ caml_bind_vbo(value buf)
   if(buf == Val_none)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
   else
-    glBindBuffer(GL_ARRAY_BUFFER, (GLuint)(Some_val(buf)));
+    glBindBuffer(GL_ARRAY_BUFFER, BUFFER(Some_val(buf)));
   CAMLreturn(Val_unit);
 }
 
@@ -67,8 +102,7 @@ CAMLprim value
 caml_destroy_buffer(value buf)
 {
   CAMLparam1(buf);
-  GLuint tmp = (GLuint)buf;
-  glDeleteBuffers(1, &tmp);
+  glDeleteBuffers(1, &BUFFER(buf));
   CAMLreturn(Val_unit);
 }
 

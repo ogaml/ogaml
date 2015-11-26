@@ -123,6 +123,9 @@ module Shader : sig
   (** Creates an empty shader *)
   val create : GLTypes.ShaderType.t -> t
 
+  (** Deletes a shader *)
+  val delete : t -> unit
+
   (** Returns true iff the shader is valid *)
   val valid : t -> bool
 
@@ -162,6 +165,9 @@ module Program : sig
   (** Attaches a shader to a program *)
   val attach : t -> Shader.t -> unit
 
+  (** Detaches a shader from a program *)
+  val detach : t -> Shader.t -> unit
+
   (** Links the program *)
   val link : t -> unit
 
@@ -197,6 +203,9 @@ module Program : sig
 
   (** Returns the log of the program *)
   val log : t -> string
+
+  (** Deletes a program *)
+  val delete : t -> unit
 
 end
 

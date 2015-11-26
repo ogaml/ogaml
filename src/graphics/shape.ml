@@ -206,10 +206,6 @@ let update shape =
   let color     = shape.shape_vals.color
   and thickness = shape.shape_vals.thickness in
   let points    = actual_points shape.shape_vals in
-  VertexArray.destroy shape.vertices;
-  (match shape.outline with
-   |None -> ()
-   |Some v -> VertexArray.destroy v);
   shape.vertices <- vertices_of_points points color ;
   shape.outline  <- outline_of_points points thickness (`RGB Color.RGB.black)
 

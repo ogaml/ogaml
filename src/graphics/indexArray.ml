@@ -1,6 +1,4 @@
 
-exception Invalid_buffer of string
-
 module Source = struct
 
   type t = {
@@ -36,7 +34,6 @@ type _ t = {
   buffer  : GL.EBO.t;
   size    : int;
   length  : int;
-  mutable valid : bool
 }
 
 let dynamic src = 
@@ -50,7 +47,6 @@ let dynamic src =
     buffer;
     size = GL.Data.length data;
     length = Source.length src; 
-    valid = true
   }
 
 let static src = 
@@ -64,12 +60,9 @@ let static src =
     buffer;
     size = GL.Data.length data;
     length = Source.length src; 
-    valid = true
   }
 
 let rebuild t src =
-  if not t.valid then
-    raise (Invalid_buffer "Cannot rebuild buffer, it may have been destroyed");
   let data = src.Source.data in
   GL.EBO.bind (Some t.buffer);
   if t.size < GL.Data.length data then
@@ -81,23 +74,14 @@ let rebuild t src =
     buffer = t.buffer;
     size   = max (GL.Data.length data) (t.size);
     length = Source.length src;
-    valid  = true
   }
 
 let length t = t.length
-
-let destroy t =
-  if not t.valid then
-    raise (Invalid_buffer "Cannot destroy buffer : already destroyed");
-  GL.EBO.destroy t.buffer;
-  t.valid <- false
 
 
 module LL = struct
 
   let bind state t = 
-    if not t.valid then
-      raise (Invalid_buffer "Cannot bind buffer, it may have been destroyed");
     if State.LL.bound_ebo state <> (Some t.buffer) then begin
       GL.EBO.bind (Some t.buffer);
       State.LL.set_bound_ebo state (Some t.buffer);
