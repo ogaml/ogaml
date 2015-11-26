@@ -6,13 +6,13 @@ type shape_vals = {
   mutable origin    : Vector2f.t ;
   mutable rotation  : float ;
   mutable scale     : Vector2f.t ;
-  mutable thickness : int ;
+  mutable thickness : float ;
   mutable color     : Color.t
 }
 
 type t = {
   mutable vertices : VertexArray.static VertexArray.t ;
-  mutable outline  : VertexArray.static VertexArray.t ;
+  mutable outline  : (VertexArray.static VertexArray.t) option ;
   shape_vals       : shape_vals
 }
 
@@ -43,16 +43,19 @@ let rec foreachtwo f res = function
   | a :: b :: r -> foreachtwo f (f res a b) (b :: r)
   | _ -> res
 
-(* Turns a shape_vals to a VertexArray *)
-let vertices_of_vals vals =
+(* Computes the actual points of a shape from its vals *)
+let actual_points vals =
   List.map
     (apply_transformations
       vals.position vals.origin vals.rotation vals.scale)
     vals.points
   |> List.map Vector3f.lift
-  |> List.map (fun v ->
-    VertexArray.Vertex.create ~position:v ~color:vals.color ()
-  )
+
+(* Turns actual points to a VertexArray for the shape *)
+let vertices_of_points points color =
+  List.map (fun v ->
+    VertexArray.Vertex.create ~position:v ~color ()
+  ) points
   |> function
   | [] -> VertexArray.static
             VertexArray.Source.(empty ~position:"position"
@@ -65,7 +68,49 @@ let vertices_of_vals vals =
                                 ~color:"color"
                                 ~size:(3 * ((List.length vertices) - 1)) ())
       vertices
-  |> VertexArray.static
+    |> VertexArray.static
+
+(* Takes the actual points and compute the outline *)
+let outline_of_points points thickness color =
+  match points with
+  | [] -> None
+  | head :: _ ->
+    if thickness <= 0. then None
+    (* We'll deal with thickness of 1 later *)
+    (* In the last case, we just draw a rectangle for each line *)
+    else begin
+      let tovtx v =
+        VertexArray.Vertex.create ~position:v ~color ()
+      in
+      foreachtwo
+        (
+          let open Vector3f in
+          let v = { x = 0. ; y = 0. ; z = 1. } in
+          fun source a b ->
+            let u = direction a b in
+            let w = cross u v in
+            let t = prop (thickness /. 2.) w in
+            let v1 = tovtx (add a t)
+            and v2 = tovtx (add b t)
+            and v3 = tovtx (sub b t)
+            and v4 = tovtx (sub a t) in
+            VertexArray.Source.(
+              (* Fist triangle *)
+              source << v1
+                     << v2
+                     << v3
+                     (* Then the second *)
+                     << v3
+                     << v4
+                     << v1
+            )
+        )
+        VertexArray.Source.(empty ~position:"position"
+                                  ~color:"color"
+                                  ~size:(6 * (List.length points)) ())
+        (head :: (List.rev points))
+      |> fun x -> Some (VertexArray.static x)
+    end
 
 let create_polygon ~points
                    ~color
@@ -73,7 +118,7 @@ let create_polygon ~points
                    ?position:(position=Vector2i.zero)
                    ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
                    ?rotation:(rotation=0.)
-                   ?thickness:(thickness=0) () =
+                   ?thickness:(thickness=0.) () =
   let points = List.map Vector2f.from_int points in
   let position = Vector2f.from_int position in
   let vals = {
@@ -86,12 +131,10 @@ let create_polygon ~points
     color     = color
   }
   in
+  let points = actual_points vals in
   {
-    vertices   = vertices_of_vals vals ;
-    outline    = VertexArray.static
-                   VertexArray.Source.(empty ~position:"position"
-                                             ~color:"color"
-                                             ~size:0 ()) ;
+    vertices   = vertices_of_points points color ;
+    outline    = outline_of_points points thickness (`RGB Color.RGB.black) ;
     shape_vals = vals
   }
 
@@ -101,7 +144,7 @@ let create_rectangle ~position
                      ?origin:(origin=Vector2f.zero)
                      ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
                      ?rotation:(rotation=0.)
-                     ?thickness:(thickness=0) () =
+                     ?thickness:(thickness=0.) () =
   let w = Vector2i.({ x = size.x ; y = 0 })
   and h = Vector2i.({ x = 0 ; y = size.y }) in
   create_polygon ~points:Vector2i.([zero ; w ; size ; h])
@@ -119,7 +162,7 @@ let create_regular ~position
                    ?origin:(origin=Vector2f.zero)
                    ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
                    ?rotation:(rotation=0.)
-                   ?thickness:(thickness=0) () =
+                   ?thickness:(thickness=0.) () =
   let rec vertices k l =
     if k > amount then l
     else begin
@@ -142,7 +185,11 @@ let create_regular ~position
 
 (* Applies the modifications to shape_vals *)
 let update shape =
-  shape.vertices <- vertices_of_vals shape.shape_vals
+  let color     = shape.shape_vals.color
+  and thickness = shape.shape_vals.thickness in
+  let points    = actual_points shape.shape_vals in
+  shape.vertices <- vertices_of_points points color ;
+  shape.outline  <- outline_of_points points thickness (`RGB Color.RGB.black)
 
 let set_position shape position =
   shape.shape_vals.position <- Vector2f.from_int position ;
@@ -199,3 +246,5 @@ let get_thickness shape = shape.shape_vals.thickness
 let get_color shape = shape.shape_vals.color
 
 let get_vertex_array shape = shape.vertices
+
+let get_outline shape = shape.outline

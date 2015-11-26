@@ -79,6 +79,11 @@ let do_all action param =
   action regular1 param ;
   action regular2 param
 
+let gothicker shape yes =
+  Shape.set_thickness
+    shape
+    ((Shape.get_thickness shape) +. if yes then 1. else (-1.))
+
 let rec handle_events () =
   let open OgamlCore in
   match Window.poll_event window with
@@ -101,6 +106,9 @@ let rec handle_events () =
         | H -> do_all Shape.scale Vector2f.({ x = 1.25 ; y = 1.   })
         | T -> do_all Shape.scale Vector2f.({ x = 1.   ; y = 1.25 })
         | G -> do_all Shape.scale Vector2f.({ x = 1.   ; y = 0.8  })
+        (* This is thick! *)
+        | V -> do_all gothicker false
+        | B -> do_all gothicker true
         | _ -> ()
       )
       | _      -> ()

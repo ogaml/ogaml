@@ -121,7 +121,18 @@ let draw_shape =
          ~program
          ~parameters
          ~uniform
-         ~mode:DrawMode.Triangles ()
+         ~mode:DrawMode.Triangles () ;
+    (* Drawing the outline if necessary *)
+    match Shape.get_outline shape with
+    | None -> ()
+    | Some vertices ->
+      draw
+        ~window
+        ~vertices
+        ~program
+        ~parameters
+        ~uniform
+        ~mode:DrawMode.Triangles ()
 
 
 module LL = struct

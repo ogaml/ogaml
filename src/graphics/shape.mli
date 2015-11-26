@@ -15,7 +15,7 @@ val create_polygon :
   ?position  : OgamlMath.Vector2i.t ->
   ?scale     : OgamlMath.Vector2f.t ->
   ?rotation  : float ->
-  ?thickness : int ->
+  ?thickness : float ->
   unit -> t
 
 (** Creates a rectangle.
@@ -27,7 +27,7 @@ val create_rectangle :
   ?origin    : OgamlMath.Vector2f.t ->
   ?scale     : OgamlMath.Vector2f.t ->
   ?rotation  : float ->
-  ?thickness : int ->
+  ?thickness : float ->
   unit -> t
 
 (** Creates a regular polygon with a given number of vertices.
@@ -40,7 +40,7 @@ val create_regular :
   ?origin    : OgamlMath.Vector2f.t ->
   ?scale     : OgamlMath.Vector2f.t ->
   ?rotation  : float ->
-  ?thickness : int ->
+  ?thickness : float ->
   unit -> t
 
 (** Sets the position of the origin in the window. *)
@@ -57,7 +57,7 @@ val set_rotation : t -> float -> unit
 val set_scale : t -> OgamlMath.Vector2f.t -> unit
 
 (** Sets the thickness of the outline. *)
-val set_thickness : t -> int -> unit
+val set_thickness : t -> float -> unit
 
 (** Sets the filling color of the shape. *)
 val set_color : t -> Color.t -> unit
@@ -85,7 +85,7 @@ val get_rotation : t -> float
 val get_scale : t -> OgamlMath.Vector2f.t
 
 (** Returns the thickness of the outline. *)
-val get_thickness : t -> int
+val get_thickness : t -> float
 
 (** Returns the filling color of the shape. *)
 val get_color : t -> Color.t
@@ -94,3 +94,6 @@ val get_color : t -> Color.t
 
 (** Get the underlying vertex array. *)
 val get_vertex_array : t -> VertexArray.static VertexArray.t
+
+(** Get the underlying outline *)
+val get_outline : t -> VertexArray.static VertexArray.t option
