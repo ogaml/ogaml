@@ -43,6 +43,17 @@ let rec foreachtwo f res = function
   | a :: b :: r -> foreachtwo f (f res a b) (b :: r)
   | _ -> res
 
+let foralltwo f res =
+  let rec aux first res = function
+    | a :: b :: r -> aux first (f res a b) (b :: r)
+    | a :: []     -> f res a first
+    | []          -> res
+  in
+  function
+  | [] -> res
+  | first :: r -> aux first res (first :: r)
+
+
 (* Computes the actual points of a shape from its vals *)
 let actual_points vals =
   List.map
@@ -88,10 +99,10 @@ let outline_of_points points thickness color =
         |> Vector3f.div (float_of_int (List.length points))
       in
       (* Then we compute the outline *)
-      foreachtwo
+      foralltwo
         (
           let open Vector3f in
-          let v = { x = 0. ; y = 0. ; z = -1. } in
+          let v = { x = 0. ; y = 0. ; z = 1. } in
           fun source a b ->
             (* Normal to the direction (a b) *)
             let n =
@@ -126,7 +137,7 @@ let outline_of_points points thickness color =
         VertexArray.Source.(empty ~position:"position"
                                   ~color:"color"
                                   ~size:(6 * (List.length points)) ())
-        (head :: (List.rev points))
+        points
       |> fun x -> Some (VertexArray.static x)
     end
 
