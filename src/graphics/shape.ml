@@ -82,18 +82,36 @@ let outline_of_points points thickness color =
       let tovtx v =
         VertexArray.Vertex.create ~position:v ~color ()
       in
+      (* We need to compute the center of the polygon first *)
+      let c =
+        List.fold_left Vector3f.add Vector3f.zero points
+        |> Vector3f.prop (float_of_int (List.length points))
+      in
+      (* Then we compute the outline *)
       foreachtwo
         (
           let open Vector3f in
           let v = { x = 0. ; y = 0. ; z = 1. } in
           fun source a b ->
-            let u = direction a b in
-            let w = cross u v in
-            let t = prop thickness w in
-            let v1 = tovtx a
-            and v2 = tovtx b
-            and v3 = tovtx (sub b t)
-            and v4 = tovtx (sub a t) in
+            (* Normal to the direction (a b) *)
+            let n =
+              let u = direction a b in
+              cross u v
+            in
+            (* First the directions form the center *)
+            let da = direction c a
+            and db = direction c b in
+            (* The local thickness *)
+            let xa = thickness /. (dot n da)
+            and xb = thickness /. (dot n db) in
+            (* The vector for this thickness *)
+            let vxa = prop xa da
+            and vxb = prop xb db in
+            (* Finally the vertices *)
+            let v1 = tovtx (add a vxa)
+            and v2 = tovtx (add b vxb)
+            and v3 = tovtx b
+            and v4 = tovtx a in
             VertexArray.Source.(
               (* Fist triangle *)
               source << v1
