@@ -85,13 +85,13 @@ let outline_of_points points thickness color =
       (* We need to compute the center of the polygon first *)
       let c =
         List.fold_left Vector3f.add Vector3f.zero points
-        |> Vector3f.prop (float_of_int (List.length points))
+        |> Vector3f.div (float_of_int (List.length points))
       in
       (* Then we compute the outline *)
       foreachtwo
         (
           let open Vector3f in
-          let v = { x = 0. ; y = 0. ; z = 1. } in
+          let v = { x = 0. ; y = 0. ; z = -1. } in
           fun source a b ->
             (* Normal to the direction (a b) *)
             let n =
@@ -206,6 +206,10 @@ let update shape =
   let color     = shape.shape_vals.color
   and thickness = shape.shape_vals.thickness in
   let points    = actual_points shape.shape_vals in
+  VertexArray.destroy shape.vertices;
+  (match shape.outline with
+   |None -> ()
+   |Some v -> VertexArray.destroy v);
   shape.vertices <- vertices_of_points points color ;
   shape.outline  <- outline_of_points points thickness (`RGB Color.RGB.black)
 

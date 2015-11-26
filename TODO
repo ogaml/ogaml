@@ -35,6 +35,7 @@ OgamlGraphics:
   ☐ Organize image parsing in modules
   ☐ Better support for all formats (for example 24,32 bit bmps)
   ☐ Document Shape
+  ☐ Destroy VAOs, VBOs, EBOs, programs in Gc.finalize
 
 Shape:
   ✔ Change the notion of corner of a Shape (it wouldn't work for circles for instance) @done(2015-11-25 21:51) @project(Shape)
