@@ -75,7 +75,7 @@ let outline_of_points points thickness color =
   match points with
   | [] -> None
   | head :: _ ->
-    if thickness <= 0. then None
+    if thickness = 0. then None
     (* We'll deal with thickness of 1 later *)
     (* In the last case, we just draw a rectangle for each line *)
     else begin
