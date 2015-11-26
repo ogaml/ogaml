@@ -85,13 +85,13 @@ let outline_of_points points thickness color =
       (* We need to compute the center of the polygon first *)
       let c =
         List.fold_left Vector3f.add Vector3f.zero points
-        |> Vector3f.prop (float_of_int (List.length points))
+        |> Vector3f.prop (1. /. (float_of_int (List.length points)))
       in
       (* Then we compute the outline *)
       foreachtwo
         (
           let open Vector3f in
-          let v = { x = 0. ; y = 0. ; z = 1. } in
+          let v = { x = 0. ; y = 0. ; z = -1. } in
           fun source a b ->
             (* Normal to the direction (a b) *)
             let n =
