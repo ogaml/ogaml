@@ -43,7 +43,7 @@ Shape:
   ☐ Floats of ints for position?
   ✔ Add thickness @done(2015-11-26 01:00) @project(Shape)
   ☐ Fix connectivity for outline
-  ☐ Pick inset / outward whatever
+  ✔ Pick inset / outward whatever @done(2015-11-26 12:20) @project(Shape)
   ☐ Add color for outline
   ☐ Add lines
 

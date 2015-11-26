@@ -89,9 +89,9 @@ let outline_of_points points thickness color =
           fun source a b ->
             let u = direction a b in
             let w = cross u v in
-            let t = prop (thickness /. 2.) w in
-            let v1 = tovtx (add a t)
-            and v2 = tovtx (add b t)
+            let t = prop thickness w in
+            let v1 = tovtx a
+            and v2 = tovtx b
             and v3 = tovtx (sub b t)
             and v4 = tovtx (sub a t) in
             VertexArray.Source.(
@@ -175,7 +175,7 @@ let create_regular ~position
       |> vertices (k+1)
     end
   in
-  create_polygon ~points:(List.map Vector2f.floor (vertices 0 []))
+  create_polygon ~points:(List.map Vector2f.floor (List.rev (vertices 0 [])))
                  ~color
                  ~origin
                  ~position
