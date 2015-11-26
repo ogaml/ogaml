@@ -206,9 +206,6 @@ module IndexArray : sig
     * openGL index arrays. Index arrays can be passed to 3D rendering
     * primitives and are used to render 3D models more efficiently. *)
 
-  (** Raised when trying to access a destroyed buffer *)
-  exception Invalid_buffer of string
-
   (** Represents a source of indices *)
   module Source : sig
 
@@ -263,9 +260,6 @@ module IndexArray : sig
   (** Returns the length of an index array *)
   val length : 'a t -> int
 
-  (** Destroys and frees an index array from the VRAM *)
-  val destroy : 'a t -> unit
-
 end
 
 
@@ -275,9 +269,6 @@ module VertexArray : sig
   (** This modules provides a high-level and safe access to
     * openGL vertex arrays. Vertex arrays are used to store
     * vertices on the GPU and can be used to render 3D models. *)
-
-  (** Raised when trying to access a destroyed array *)
-  exception Invalid_buffer of string
 
   (** Raised if a vertex passed to a source has a wrong type *)
   exception Invalid_vertex of string
@@ -386,9 +377,6 @@ module VertexArray : sig
 
   (** Returns the length of a vertex array *)
   val length : 'a t -> int
-
-  (** Destroys and frees a vertex array from the VRAM *)
-  val destroy : 'a t -> unit
 
 end
 

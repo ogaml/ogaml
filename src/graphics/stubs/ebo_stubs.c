@@ -16,6 +16,8 @@
 #include <caml/bigarray.h>
 #include "utils.h"
 
+#define BUFFER(_a) (*(GLuint*) Data_custom_val(_a))
+
 
 GLenum EBOKind_val(value kind) 
 {
@@ -42,7 +44,7 @@ caml_bind_ebo(value buf)
   if(buf == Val_none)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   else
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (GLuint)(Some_val(buf)));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BUFFER(Some_val(buf)));
   CAMLreturn(Val_unit);
 }
 

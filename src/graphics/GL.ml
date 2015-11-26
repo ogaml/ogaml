@@ -153,6 +153,8 @@ module Shader = struct
 
   external create : GLTypes.ShaderType.t -> t = "caml_create_shader"
 
+  external delete : t -> unit = "caml_delete_shader"
+
   external valid : t -> bool = "caml_valid_shader"
 
   external source : t -> string -> unit = "caml_source_shader"
@@ -180,6 +182,8 @@ module Program = struct
 
   external attach : t -> Shader.t -> unit = "caml_attach_shader"
 
+  external detach : t -> Shader.t -> unit = "caml_detach_shader"
+
   external link : t -> unit = "caml_link_program"
 
   external uloc : t -> string -> int = "caml_uniform_location"
@@ -203,6 +207,8 @@ module Program = struct
   external atype : t -> int -> GLTypes.GlslType.t = "caml_attribute_type"
 
   external log : t -> string = "caml_program_log"
+
+  external delete : t -> unit = "caml_delete_program"
 
 end
 

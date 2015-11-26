@@ -34,8 +34,6 @@ end
 
 type t = { 
            program    : GL.Program.t; 
-           vertex     : GL.Shader.t;
-           fragment   : GL.Shader.t;
            uniforms   : Uniform.t   list;
            attributes : Attribute.t list
          }
@@ -80,6 +78,10 @@ let from_source ~vertex_source ~fragment_source =
   GL.Program.attach program vshader;
   GL.Program.attach program fshader;
   GL.Program.link program;
+  GL.Program.detach program vshader;
+  GL.Program.detach program fshader;
+  GL.Shader.delete vshader;
+  GL.Shader.delete fshader;
   if GL.Program.status program = false then begin
     let log = GL.Program.log program in
     let msg = Printf.sprintf "Error while linking GLSL program : %s" log in
@@ -113,8 +115,6 @@ let from_source ~vertex_source ~fragment_source =
   in
   {
     program;
-    vertex   = vshader;
-    fragment = fshader;
     uniforms = uniforms (GL.Program.ucount program);
     attributes = attributes (GL.Program.acount program);
   }

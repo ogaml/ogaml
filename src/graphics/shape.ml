@@ -262,10 +262,6 @@ let update shape =
   let points    = actual_points shape.shape_vals in
   let bisectors = actual_bisectors shape.shape_vals in
   let out_color = `RGB Color.RGB.black in
-  VertexArray.destroy shape.vertices;
-  (match shape.outline with
-   |None -> ()
-   |Some v -> VertexArray.destroy v);
   shape.vertices <- vertices_of_points points color ;
   shape.outline  <- outline_of_points points bisectors thickness out_color
 

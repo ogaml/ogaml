@@ -44,6 +44,18 @@ caml_create_shader(value type)
 
 
 // INPUT   a shader
+// OUTPUT  deletes the shader
+CAMLprim value
+caml_delete_shader(value shader)
+{
+  CAMLparam1(shader);
+  glDeleteShader(shader);
+  CAMLreturn(Val_unit);
+}
+
+
+
+// INPUT   a shader
 // OUTPUT  true iff it is valid
 CAMLprim value
 caml_valid_shader(value shader)
