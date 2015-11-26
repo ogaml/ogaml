@@ -690,38 +690,41 @@ module Shape : sig
     * All coordinates are taken with respect to the top-left corner of the
     * shape. *)
   val create_polygon :
-    points     : OgamlMath.Vector2i.t list ->
-    color      : Color.t ->
-    ?origin    : OgamlMath.Vector2f.t ->
-    ?position  : OgamlMath.Vector2i.t ->
-    ?scale     : OgamlMath.Vector2f.t ->
-    ?rotation  : float ->
-    ?thickness : float ->
+    points        : OgamlMath.Vector2i.t list ->
+    color         : Color.t ->
+    ?origin       : OgamlMath.Vector2f.t ->
+    ?position     : OgamlMath.Vector2i.t ->
+    ?scale        : OgamlMath.Vector2f.t ->
+    ?rotation     : float ->
+    ?thickness    : float ->
+    ?border_color : Color.t ->
     unit -> t
 
   (** Creates a rectangle.
     * Its origin is positioned with respect to the top-left corner. *)
   val create_rectangle :
-    position   : OgamlMath.Vector2i.t ->
-    size       : OgamlMath.Vector2i.t ->
-    color      : Color.t ->
-    ?origin    : OgamlMath.Vector2f.t ->
-    ?scale     : OgamlMath.Vector2f.t ->
-    ?rotation  : float ->
-    ?thickness : float ->
+    position      : OgamlMath.Vector2i.t ->
+    size          : OgamlMath.Vector2i.t ->
+    color         : Color.t ->
+    ?origin       : OgamlMath.Vector2f.t ->
+    ?scale        : OgamlMath.Vector2f.t ->
+    ?rotation     : float ->
+    ?thickness    : float ->
+    ?border_color : Color.t ->
     unit -> t
 
   (** Creates a regular polygon with a given number of vertices.
     * When this number is high, one can expect a circle. *)
   val create_regular :
-    position   : OgamlMath.Vector2i.t ->
-    radius     : float ->
-    amount     : int ->
-    color      : Color.t ->
-    ?origin    : OgamlMath.Vector2f.t ->
-    ?scale     : OgamlMath.Vector2f.t ->
-    ?rotation  : float ->
-    ?thickness : float ->
+    position      : OgamlMath.Vector2i.t ->
+    radius        : float ->
+    amount        : int ->
+    color         : Color.t ->
+    ?origin       : OgamlMath.Vector2f.t ->
+    ?scale        : OgamlMath.Vector2f.t ->
+    ?rotation     : float ->
+    ?thickness    : float ->
+    ?border_color : Color.t ->
     unit -> t
 
   (** Sets the position of the origin in the window *)

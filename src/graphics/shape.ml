@@ -8,7 +8,8 @@ type shape_vals = {
   mutable rotation  : float ;
   mutable scale     : Vector2f.t ;
   mutable thickness : float ;
-  mutable color     : Color.t
+  mutable color     : Color.t ;
+  mutable out_color : Color.t
 }
 
 type t = {
@@ -186,7 +187,8 @@ let create_polygon ~points
                    ?position:(position=Vector2i.zero)
                    ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
                    ?rotation:(rotation=0.)
-                   ?thickness:(thickness=0.) () =
+                   ?thickness:(thickness=0.)
+                   ?border_color:(out_color=(`RGB Color.RGB.black)) () =
   let points = List.map Vector2f.from_int points in
   let bisectors = bisectors_of_points points in
   let position = Vector2f.from_int position in
@@ -198,12 +200,12 @@ let create_polygon ~points
     rotation  = rotation ;
     scale     = scale ;
     thickness = thickness ;
-    color     = color
+    color     = color ;
+    out_color = out_color
   }
   in
   let points    = actual_points vals in
   let bisectors = actual_bisectors vals in
-  let out_color = `RGB Color.RGB.black in
   {
     vertices   = vertices_of_points points color ;
     outline    = outline_of_points points bisectors thickness out_color ;
@@ -216,7 +218,8 @@ let create_rectangle ~position
                      ?origin:(origin=Vector2f.zero)
                      ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
                      ?rotation:(rotation=0.)
-                     ?thickness:(thickness=0.) () =
+                     ?thickness:(thickness=0.)
+                     ?border_color:(border_color=(`RGB Color.RGB.black)) () =
   let w = Vector2i.({ x = size.x ; y = 0 })
   and h = Vector2i.({ x = 0 ; y = size.y }) in
   create_polygon ~points:Vector2i.([zero ; w ; size ; h])
@@ -225,7 +228,8 @@ let create_rectangle ~position
                  ~position
                  ~scale
                  ~rotation
-                 ~thickness ()
+                 ~thickness
+                 ~border_color ()
 
 let create_regular ~position
                    ~radius
@@ -234,7 +238,8 @@ let create_regular ~position
                    ?origin:(origin=Vector2f.zero)
                    ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
                    ?rotation:(rotation=0.)
-                   ?thickness:(thickness=0.) () =
+                   ?thickness:(thickness=0.)
+                   ?border_color:(border_color=(`RGB Color.RGB.black)) () =
   let rec vertices k l =
     if k > amount then l
     else begin
@@ -253,7 +258,8 @@ let create_regular ~position
                  ~position
                  ~scale
                  ~rotation
-                 ~thickness ()
+                 ~thickness
+                 ~border_color ()
 
 (* Applies the modifications to shape_vals *)
 let update shape =
@@ -261,7 +267,7 @@ let update shape =
   and thickness = shape.shape_vals.thickness in
   let points    = actual_points shape.shape_vals in
   let bisectors = actual_bisectors shape.shape_vals in
-  let out_color = `RGB Color.RGB.black in
+  let out_color = shape.shape_vals.out_color in
   shape.vertices <- vertices_of_points points color ;
   shape.outline  <- outline_of_points points bisectors thickness out_color
 
@@ -287,6 +293,10 @@ let set_thickness shape thickness =
 
 let set_color shape color =
   shape.shape_vals.color <- color ;
+  update shape
+
+let set_border_color shape color =
+  shape.shape_vals.out_color <- color ;
   update shape
 
 let translate shape delta =
@@ -318,6 +328,8 @@ let get_scale shape = shape.shape_vals.scale
 let get_thickness shape = shape.shape_vals.thickness
 
 let get_color shape = shape.shape_vals.color
+
+let get_border_color shape = shape.shape_vals.out_color
 
 let get_vertex_array shape = shape.vertices
 

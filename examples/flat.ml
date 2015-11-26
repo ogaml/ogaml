@@ -9,6 +9,7 @@ let rectangle1 =
     ~position:Vector2i.({ x = 50 ; y = 75 })
     ~size:Vector2i.({ x = 200 ; y = 150 })
     ~color:(`RGB Color.RGB.blue)
+    ~border_color:(`RGB Color.RGB.red)
     ()
 
 let rectangle2 =
@@ -17,6 +18,7 @@ let rectangle2 =
     ~size:Vector2i.({ x = 200 ; y = 150 })
     ~origin:Vector2f.({ x = 100. ; y = 75. })
     ~color:(`RGB Color.RGB.red)
+    ~border_color:(`RGB Color.RGB.blue)
     ()
 
 let polygon1 =
@@ -29,6 +31,7 @@ let polygon1 =
       { x =  80 ; y = 160 }
     ])
     ~color:(`RGB Color.RGB.green)
+    ~border_color:(`RGB Color.RGB.magenta)
     ~position:Vector2i.({ x = 370 ; y = 70 })
     ()
 
@@ -42,6 +45,7 @@ let polygon2 =
       { x =  80 ; y = 160 }
     ])
     ~color:(`RGB Color.RGB.magenta)
+    ~border_color:(`RGB Color.RGB.green)
     ~origin:Vector2f.({ x = 80. ; y = 80. })
     ~position:Vector2i.({ x = 450 ; y = 450 })
     ()
@@ -52,6 +56,7 @@ let regular1 =
     ~radius:100.
     ~amount:10
     ~color:(`RGB Color.RGB.cyan)
+    ~border_color:(`RGB Color.RGB.yellow)
     ()
 
 let regular2 =
@@ -61,6 +66,7 @@ let regular2 =
     ~origin:Vector2f.({ x = 100. ; y = 100. })
     ~amount:10
     ~color:(`RGB Color.RGB.yellow)
+    ~border_color:(`RGB Color.RGB.cyan)
     ()
 
 let draw () =
