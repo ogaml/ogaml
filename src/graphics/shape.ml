@@ -2,7 +2,6 @@ open OgamlMath
 
 type shape_vals = {
   mutable points    : Vector2f.t list ;
-  mutable bisectors : Vector2f.t list ;
   mutable position  : Vector2f.t ;
   mutable origin    : Vector2f.t ;
   mutable rotation  : float ;
@@ -37,34 +36,6 @@ let foralltwo f res =
   | first :: r -> aux first res (first :: r)
 
 
-(* Producing bisectors *)
-let bisectors_of_points points =
-  (* First compute the normals *)
-  let v = Vector3f.({ x = 0. ; y = 0. ; z = 1. }) in
-  foralltwo
-    (fun l a b ->
-      let a3 = Vector3f.lift a
-      and b3 = Vector3f.lift b in
-      let ab = Vector3f.direction a3 b3 in
-      (Vector3f.project (Vector3f.cross ab v)) :: l
-    )
-    []
-    points
-  (* Then we can finally get the bisectors *)
-  |>
-  foralltwo
-    (fun l n1 n2 ->
-      Vector2f.(
-        prop 0.5 (add n1 n2)
-      ) :: l
-    )
-    []
-  (* The last thing is to put all that in order *)
-  (* |> List.rev
-  |> function
-     | []     -> []
-     | a :: r -> a :: (List.rev r) *)
-
 (* Applys transformations to a point *)
 let apply_transformations position origin rotation scale point =
   (* Position offset *)
@@ -96,30 +67,6 @@ let actual_points vals =
     vals.points
   |> List.map Vector3f.lift
 
-(* Computes the actual bisectors *)
-let actual_bisectors vals =
-  (* Apply the scale TODO *)
-  (* List.map
-    (fun vec ->
-      Vector2f.({
-        x = vec.x *. vals.scale.x /. vals.scale.y ;
-        y = vec.y *. vals.scale.y /. vals.scale.x
-      })
-    ) *)
-    vals.bisectors
-  (* |> List.map Vector2f.normalize *)
-  (* Apply the rotation *)
-  |>
-  List.map
-    (fun vec ->
-      let theta = vals.rotation *. Constants.pi /. 180. in
-      Vector2f.({
-        Vector3f.x = cos(theta) *. vec.x -. sin(theta) *. vec.y ;
-        Vector3f.y = sin(theta) *. vec.x +. cos(theta) *. vec.y ;
-        Vector3f.z = 0.
-      })
-    )
-
 (* Turns actual points to a VertexArray for the shape *)
 let vertices_of_points points color =
   List.map (fun v ->
@@ -139,8 +86,35 @@ let vertices_of_points points color =
       vertices
     |> VertexArray.static
 
-(* Takes the actual points and their bisectors and computes the outline *)
-let outline_of_points points bisectors thickness color =
+(* Producing bisectors out of actual points *)
+let bisectors_of_points points =
+  (* First compute the normals *)
+  let v = Vector3f.({ x = 0. ; y = 0. ; z = 1. }) in
+  foralltwo
+    (fun l a b ->
+      let open Vector3f in
+      let ab = direction a b in
+      (cross ab v) :: l
+    )
+    []
+    points
+  (* Then we can finally get the bisectors *)
+  |>
+  foralltwo
+    (fun l n1 n2 ->
+      Vector3f.(
+        prop 0.5 (add n1 n2)
+      ) :: l
+    )
+    []
+  (* The last thing is to put all that in order *)
+  (* |> List.rev
+  |> function
+     | []     -> []
+     | a :: r -> a :: (List.rev r) *)
+
+(* Takes the actual points and computes the outline *)
+let outline_of_points points thickness color =
   match points with
   | [] -> None
   | head :: _ ->
@@ -148,6 +122,9 @@ let outline_of_points points bisectors thickness color =
     (* We'll deal with thickness of 1 later *)
     (* In the last case, we just draw a rectangle for each line *)
     else begin
+      (* First the bisectors *)
+      let bisectors = bisectors_of_points points in
+      (* Then the outline *)
       let tovtx v =
         VertexArray.Vertex.create ~position:v ~color ()
       in
@@ -201,11 +178,9 @@ let create_polygon ~points
                    ?thickness:(thickness=0.)
                    ?border_color:(out_color=(`RGB Color.RGB.black)) () =
   let points = List.map Vector2f.from_int points in
-  let bisectors = bisectors_of_points points in
   let position = Vector2f.from_int position in
   let vals = {
     points    = points ;
-    bisectors = bisectors ;
     position  = position ;
     origin    = origin ;
     rotation  = rotation ;
@@ -216,10 +191,9 @@ let create_polygon ~points
   }
   in
   let points    = actual_points vals in
-  let bisectors = actual_bisectors vals in
   {
     vertices   = vertices_of_points points color ;
-    outline    = outline_of_points points bisectors thickness out_color ;
+    outline    = outline_of_points points thickness out_color ;
     shape_vals = vals
   }
 
@@ -277,10 +251,9 @@ let update shape =
   let color     = shape.shape_vals.color
   and thickness = shape.shape_vals.thickness in
   let points    = actual_points shape.shape_vals in
-  let bisectors = actual_bisectors shape.shape_vals in
   let out_color = shape.shape_vals.out_color in
   shape.vertices <- vertices_of_points points color ;
-  shape.outline  <- outline_of_points points bisectors thickness out_color
+  shape.outline  <- outline_of_points points thickness out_color
 
 let set_position shape position =
   shape.shape_vals.position <- Vector2f.from_int position ;
