@@ -43,9 +43,9 @@ Shape:
   ✔ Add scale @done(2015-11-22 20:33) @project(Shape)
   ☐ Floats of ints for position?
   ✔ Add thickness @done(2015-11-26 01:00) @project(Shape)
-  ☐ Fix connectivity for outline
+  ✔ Fix connectivity for outline @done(2015-11-27 01:02) @project(Shape)
   ✔ Pick inset / outward whatever @done(2015-11-26 12:20) @project(Shape)
-  ☐ Add color for outline
+  ✔ Add color for outline @done(2015-11-27 01:02) @project(Shape)
   ☐ Add lines
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
