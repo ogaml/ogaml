@@ -246,6 +246,39 @@ let create_regular ~position
                  ~thickness
                  ~border_color ()
 
+let create_line ~thickness
+                ~color
+                ?top:(top=Vector2i.zero)
+                ~tip
+                ?position:(position=Vector2i.zero)
+                ?origin:(origin=Vector2f.zero)
+                ?rotation:(rotation=0.) () =
+  let a = Vector2f.from_int top
+  and b = Vector2f.from_int tip in
+  let a3 = Vector3f.lift a
+  and b3 = Vector3f.lift b in
+  let n = Vector3f.(
+    let u = direction a3 b3 in
+    let v = { x = 0. ; y = 0. ; z = 1. } in
+    let n = cross u v in
+    project n
+  ) in
+  let points = List.map Vector2f.floor Vector2f.(
+    let delta = prop (thickness /. 2.) n in
+    [
+      add a delta ;
+      add b delta ;
+      sub b delta ;
+      sub a delta
+    ]
+  ) in
+  create_polygon ~points
+                 ~color
+                 ~origin
+                 ~position
+                 ~rotation
+                 ()
+
 (* Applies the modifications to shape_vals *)
 let update shape =
   let color     = shape.shape_vals.color

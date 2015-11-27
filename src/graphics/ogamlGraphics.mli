@@ -253,7 +253,7 @@ module IndexArray : sig
     * @see:OgamlGraphics.IndexArray.Source *)
   val dynamic : Source.t -> dynamic t
 
-  (** $rebuild array src offset$ rebuilds $array$ starting from 
+  (** $rebuild array src offset$ rebuilds $array$ starting from
     * the index at position $offset$ using $src$.
     *
     * The index array is modified in-place and is resized as needed.
@@ -377,7 +377,7 @@ module VertexArray : sig
     * @see:OgamlGraphics.VertexArray.Source *)
   val dynamic : Source.t -> dynamic t
 
-  (** $rebuild array src offset$ rebuilds $array$ starting from 
+  (** $rebuild array src offset$ rebuilds $array$ starting from
     * the vertex at position $offset$ using $src$.
     *
     * The vertex array is modified in-place and is resized as needed.
@@ -734,6 +734,17 @@ module Shape : sig
     ?rotation     : float ->
     ?thickness    : float ->
     ?border_color : Color.t ->
+    unit -> t
+
+  (** Creates a line from $top$ (zero by default) to $tip$. *)
+  val create_line :
+    thickness : float ->
+    color     : Color.t ->
+    ?top      : OgamlMath.Vector2i.t ->
+    tip       : OgamlMath.Vector2i.t ->
+    ?position : OgamlMath.Vector2i.t ->
+    ?origin   : OgamlMath.Vector2f.t ->
+    ?rotation : float ->
     unit -> t
 
   (** Sets the position of the origin in the window *)

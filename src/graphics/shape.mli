@@ -46,6 +46,17 @@ val create_regular :
   ?border_color : Color.t ->
   unit -> t
 
+(** Creates a line from $top$ (zero by default) to $tip$. *)
+val create_line :
+  thickness : float ->
+  color     : Color.t ->
+  ?top      : OgamlMath.Vector2i.t ->
+  tip       : OgamlMath.Vector2i.t ->
+  ?position : OgamlMath.Vector2i.t ->
+  ?origin   : OgamlMath.Vector2f.t ->
+  ?rotation : float ->
+  unit -> t
+
 (** Sets the position of the origin in the window. *)
 val set_position : t -> OgamlMath.Vector2i.t -> unit
 

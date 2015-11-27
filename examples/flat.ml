@@ -69,13 +69,44 @@ let regular2 =
     ~border_color:(`RGB Color.RGB.cyan)
     ()
 
+let line1 =
+  Shape.create_line
+    ~thickness:3.
+    ~tip:Vector2i.({ x = 300 ; y = 0 })
+    ~position:Vector2i.({ x = 50 ; y = 300 })
+    ~color:(`RGB Color.RGB.({ r = 0.21 ; g = 0.2 ; b = 0.23 ; a = 1. }))
+    ()
+
+let line2 =
+  Shape.create_line
+    ~thickness:3.
+    ~tip:Vector2i.({ x = 300 ; y = 0 })
+    ~position:Vector2i.({ x = 700 ; y = 300 })
+    ~origin:Vector2f.({ x = 150. ; y = 0. })
+    ~color:(`RGB Color.RGB.({ r = 0.21 ; g = 0.2 ; b = 0.23 ; a = 1. }))
+    ()
+
+let circle =
+  Shape.create_regular
+    ~position:Vector2i.({ x = 450 ; y = 300 })
+    ~radius:10.
+    ~origin:Vector2f.({ x = 10. ; y = 10. })
+    ~amount:48
+    ~color:(`RGB Color.RGB.({ r = 1. ; g = 1. ; b = 1. ; a = 0. }))
+    ~thickness:3.
+    ~border_color:(`RGB Color.RGB.({ r = 0.21 ; g = 0.2 ; b = 0.23 ; a = 1. }))
+    ()
+
 let draw () =
   Window.draw_shape window rectangle1 ;
   Window.draw_shape window rectangle2 ;
   Window.draw_shape window polygon1 ;
   Window.draw_shape window polygon2 ;
   Window.draw_shape window regular1 ;
-  Window.draw_shape window regular2
+  Window.draw_shape window regular2 ;
+  Window.draw_shape window line1 ;
+  Window.draw_shape window line2 ;
+  Window.draw_shape window circle
 
 let do_all action param =
   action rectangle1 param ;
@@ -83,7 +114,10 @@ let do_all action param =
   action polygon1 param ;
   action polygon2 param ;
   action regular1 param ;
-  action regular2 param
+  action regular2 param ;
+  action line1 param ;
+  action line2 param ;
+  action circle param
 
 let gothicker shape yes =
   Shape.set_thickness
