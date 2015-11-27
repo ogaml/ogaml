@@ -14,6 +14,7 @@
   #include <GL/gl.h>
 #endif
 #include <caml/bigarray.h>
+#include <string.h>
 #include "utils.h"
 
 #define VAO(_a) (*(GLuint*) Data_custom_val(_a))
@@ -46,7 +47,7 @@ GLenum Floattype_val(value type)
 
     case 7:
       return GL_DOUBLE;
-  
+
     default:
       failwith("Caml variant error in Floattype_val(1)");
   }
@@ -124,12 +125,12 @@ intnat hash_vao(value v)
 }
 
 static struct custom_operations vao_custom_ops = {
-  identifier: "vao gc handling",
-  finalize:    finalise_vao,
-  compare:     compare_vao,
-  hash:        hash_vao,
-  serialize:   custom_serialize_default,
-  deserialize: custom_deserialize_default
+  .identifier  = "vao gc handling",
+  .finalize    =  finalise_vao,
+  .compare     =  compare_vao,
+  .hash        =  hash_vao,
+  .serialize   =  custom_serialize_default,
+  .deserialize =  custom_deserialize_default
 };
 
 
@@ -186,7 +187,7 @@ caml_enable_attrib(value loc)
 }
 
 
-// INPUT   an attribute location, its size, its type, 
+// INPUT   an attribute location, its size, its type,
 //         an offset, a stride
 // OUTPUT  nothing, sets the float attribute pointer
 CAMLprim value
@@ -205,7 +206,7 @@ caml_attrib_float(value loc, value size, value type, value off, value stride)
 }
 
 
-// INPUT   an attribute location, its size, its type, 
+// INPUT   an attribute location, its size, its type,
 //         an offset, a stride
 // OUTPUT  nothing, sets the float attribute pointer
 CAMLprim value
@@ -249,5 +250,3 @@ caml_draw_elements(value mode, value nb)
 
   CAMLreturn(Val_unit);
 }
-
-

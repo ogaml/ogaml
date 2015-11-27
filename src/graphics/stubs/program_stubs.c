@@ -13,6 +13,7 @@
 #else
   #include <GL/gl.h>
 #endif
+#include <string.h>
 #include "utils.h"
 
 #define PROGRAM(_a) (*(GLuint*) Data_custom_val(_a))
@@ -34,7 +35,7 @@ int Val_type(GLenum type)
     case GL_FLOAT_MAT2x3 : return 9;
     case GL_FLOAT_MAT2x4 : return 10;
     case GL_FLOAT_MAT3x2 : return 11;
-    case GL_FLOAT_MAT3   : return 12; 
+    case GL_FLOAT_MAT3   : return 12;
     case GL_FLOAT_MAT3x4 : return 13;
     case GL_FLOAT_MAT4x2 : return 14;
     case GL_FLOAT_MAT4x3 : return 15;
@@ -68,12 +69,12 @@ intnat hash_program(value v)
 }
 
 static struct custom_operations program_custom_ops = {
-  identifier: "program gc handling",
-  finalize:    finalise_program,
-  compare:     compare_program,
-  hash:        hash_program,
-  serialize:   custom_serialize_default,
-  deserialize: custom_deserialize_default
+  .identifier  = "program gc handling",
+  .finalize    =  finalise_program,
+  .compare     =  compare_program,
+  .hash        =  hash_program,
+  .serialize   =  custom_serialize_default,
+  .deserialize =  custom_deserialize_default
 };
 
 
@@ -162,7 +163,7 @@ caml_uniform_count(value prog)
 }
 
 
-// INPUT   a program 
+// INPUT   a program
 // OUTPUT  returns the number of active attributes
 CAMLprim value
 caml_attribute_count(value prog)
@@ -197,7 +198,7 @@ caml_link_program(value prog)
 }
 
 
-// INPUT   a program 
+// INPUT   a program
 // OUTPUT  returns true iff the linking was successful
 CAMLprim value
 caml_program_status(value prog)
@@ -207,7 +208,7 @@ caml_program_status(value prog)
   glGetProgramiv(PROGRAM(prog), GL_LINK_STATUS, &tmp);
   if(tmp == GL_FALSE)
     CAMLreturn(Val_false);
-  else 
+  else
     CAMLreturn(Val_true);
 }
 
@@ -280,7 +281,7 @@ caml_uniform_name(value id, value index)
 
 
 // INPUT   : a program id, an attribute index
-// OUTPUT  : the name of the attribute 
+// OUTPUT  : the name of the attribute
 CAMLprim value
 caml_attribute_name(value id, value index)
 {
@@ -342,4 +343,3 @@ caml_attribute_type(value id, value index)
 
   CAMLreturn(Val_int(Val_type(tmp_type)));
 }
-

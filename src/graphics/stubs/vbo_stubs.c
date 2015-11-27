@@ -14,12 +14,13 @@
   #include <GL/gl.h>
 #endif
 #include <caml/bigarray.h>
+#include <string.h>
 #include "utils.h"
 
 #define BUFFER(_a) (*(GLuint*) Data_custom_val(_a))
 
 
-GLenum VBOKind_val(value kind) 
+GLenum VBOKind_val(value kind)
 {
   switch(Int_val(kind))
   {
@@ -56,12 +57,12 @@ intnat hash_buffer(value v)
 }
 
 static struct custom_operations buffer_custom_ops = {
-  identifier: "buffer gc handling",
-  finalize:    finalise_buffer,
-  compare:     compare_buffer,
-  hash:        hash_buffer,
-  serialize:   custom_serialize_default,
-  deserialize: custom_deserialize_default
+  .identifier  = "buffer gc handling",
+  .finalize    =  finalise_buffer,
+  .compare     =  compare_buffer,
+  .hash        =  hash_buffer,
+  .serialize   =  custom_serialize_default,
+  .deserialize =  custom_deserialize_default
 };
 
 
@@ -108,7 +109,7 @@ caml_destroy_buffer(value buf)
 
 
 // INPUT   a length, some data (option), a mode
-// OUTPUT  nothing, updates the bound buffer with the data 
+// OUTPUT  nothing, updates the bound buffer with the data
 CAMLprim value
 caml_vbo_data(value len, value opt, value mode)
 {
@@ -152,5 +153,3 @@ caml_vbo_copy_subdata(value bufr, value bufw, value offr, value offw, value leng
 
   CAMLreturn(Val_unit);
 }
-
-
