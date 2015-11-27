@@ -253,9 +253,12 @@ module IndexArray : sig
     * @see:OgamlGraphics.IndexArray.Source *)
   val dynamic : Source.t -> dynamic t
 
-  (** Rebuilds a dynamic index array from a source
+  (** $rebuild array src offset$ rebuilds $array$ starting from 
+    * the index at position $offset$ using $src$.
+    *
+    * The index array is modified in-place and is resized as needed.
     * @see:OgamlGraphics.IndexArray.Source *)
-  val rebuild : dynamic t -> Source.t -> dynamic t
+  val rebuild : dynamic t -> Source.t -> int -> unit
 
   (** Returns the length of an index array *)
   val length : 'a t -> int
@@ -269,6 +272,9 @@ module VertexArray : sig
   (** This modules provides a high-level and safe access to
     * openGL vertex arrays. Vertex arrays are used to store
     * vertices on the GPU and can be used to render 3D models. *)
+
+  (** Raised when trying to rebuild a vertex array from an invalid source *)
+  exception Invalid_source of string
 
   (** Raised if a vertex passed to a source has a wrong type *)
   exception Invalid_vertex of string
@@ -371,9 +377,12 @@ module VertexArray : sig
     * @see:OgamlGraphics.VertexArray.Source *)
   val dynamic : Source.t -> dynamic t
 
-  (** Rebuils a dynamic vertex array from a source
+  (** $rebuild array src offset$ rebuilds $array$ starting from 
+    * the vertex at position $offset$ using $src$.
+    *
+    * The vertex array is modified in-place and is resized as needed.
     * @see:OgamlGraphics.VertexArray.Source *)
-  val rebuild : dynamic t -> Source.t -> dynamic t
+  val rebuild : dynamic t -> Source.t -> int -> unit
 
   (** Returns the length of a vertex array *)
   val length : 'a t -> int

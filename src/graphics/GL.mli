@@ -228,6 +228,9 @@ module VBO : sig
   (** Sets some subset of the data of the currently bound VBO *)
   val subdata : int -> int -> (float, Data.float_32) Data.t -> unit
 
+  (** Copy some data between VBOs *)
+  val copy_subdata : t -> t -> int -> int -> int -> unit
+
   (** Destroys a VBO *)
   val destroy : t -> unit
 
@@ -254,6 +257,9 @@ module EBO : sig
 
   (** Sets some subset of the data of the currently bound EBO *)
   val subdata : int -> int -> (int32, Data.int_32) Data.t -> unit
+
+  (** Copy some data between EBOs *)
+  val copy_subdata : t -> t -> int -> int -> int -> unit
 
 end
 

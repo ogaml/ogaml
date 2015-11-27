@@ -225,6 +225,8 @@ module VBO = struct
 
   external subdata : int -> int -> (float, Data.float_32) Data.t -> unit = "caml_vbo_subdata"
 
+  external copy_subdata : t -> t -> int -> int -> int -> unit = "caml_vbo_copy_subdata"
+
   external destroy : t -> unit = "caml_destroy_buffer"
 
 end
@@ -243,6 +245,8 @@ module EBO = struct
   external data : int -> (int32, Data.int_32) Data.t option -> GLTypes.VBOKind.t -> unit = "caml_ebo_data"
 
   external subdata : int -> int -> (int32, Data.int_32) Data.t -> unit = "caml_ebo_subdata"
+
+  external copy_subdata : t -> t -> int -> int -> int -> unit = "caml_vbo_copy_subdata"
 
 end
 

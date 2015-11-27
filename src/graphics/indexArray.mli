@@ -23,7 +23,7 @@ val static : Source.t -> static t
 
 val dynamic : Source.t -> dynamic t
 
-val rebuild : dynamic t -> Source.t -> dynamic t
+val rebuild : dynamic t -> Source.t -> int -> unit
 
 val length : 'a t -> int
 

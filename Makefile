@@ -12,13 +12,11 @@ PACKAGES = -package bigarray,unix,str
 
 # Install constants
 
-CORE_FILES = src/core/*.a src/core/*.cmi src/core/*.cma src/core/*.cmxa\
-	     src/core/*.so
+CORE_FILES = src/core/*ogamlCore.*
 
-MATH_FILES = src/math/*.a src/math/*.cmi src/math/*.cma src/math/*.cmxa
+MATH_FILES = src/math/*ogamlMath.*
 
-GRAPH_FILES = src/graphics/*.a src/graphics/[!GL]*.cmi src/graphics/*.cma\
-	      src/graphics/*.cmxa src/graphics/*.so 
+GRAPH_FILES = src/graphics/*ogamlGraphics.*
 
 DOC_FILES = src/graphics/ogamlGraphics.mli src/core/ogamlCore.mli
 

@@ -1,4 +1,6 @@
 
+exception Invalid_source of string
+
 exception Invalid_vertex of string
 
 exception Invalid_attribute of string
@@ -53,7 +55,7 @@ val static : Source.t -> static t
 
 val dynamic : Source.t -> dynamic t
 
-val rebuild : dynamic t -> Source.t -> dynamic t
+val rebuild : dynamic t -> Source.t -> int -> unit
 
 val length : 'a t -> int
 

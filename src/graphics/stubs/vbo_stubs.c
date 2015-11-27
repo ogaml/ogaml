@@ -133,3 +133,24 @@ caml_vbo_subdata(value off, value len, value data)
   glBufferSubData(GL_ARRAY_BUFFER, Int_val(off), Int_val(len), c_dat);
   CAMLreturn(Val_unit);
 }
+
+
+// INPUT   two buffers, two offsets, a length
+// OUTPUT  nothing, copy length bytes from the first buffer to the second one
+CAMLprim value
+caml_vbo_copy_subdata(value bufr, value bufw, value offr, value offw, value length)
+{
+  CAMLparam5(bufr, bufw, offr, offw, length);
+
+  glBindBuffer(GL_COPY_READ_BUFFER , BUFFER(bufr));
+  glBindBuffer(GL_COPY_WRITE_BUFFER, BUFFER(bufw));
+
+  glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, Int_val(offr), Int_val(offw), Int_val(length));
+
+  glBindBuffer(GL_COPY_READ_BUFFER , 0);
+  glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+
+  CAMLreturn(Val_unit);
+}
+
+

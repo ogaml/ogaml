@@ -1,4 +1,6 @@
 
+exception Invalid_source of string
+
 exception Invalid_vertex of string
 
 exception Invalid_attribute of string
@@ -142,10 +144,10 @@ type static
 type dynamic
 
 type _ t = {
-  buffer  : GL.VBO.t;
+  mutable buffer  : GL.VBO.t;
   vao     : GL.VAO.t;
-  size    : int;
-  length  : int;
+  mutable size    : int;
+  mutable length  : int;
   attribs : (Source.attrib * string * int) list;
   stride  : int;
   mutable bound : Program.t option;
@@ -183,22 +185,30 @@ let static src =
    bound = None;
   }
 
-let rebuild t src =
+let rebuild t src start =
   let data = src.Source.data in
-  GL.VBO.bind (Some t.buffer);
-  if t.size < GL.Data.length data then
-    GL.VBO.data (GL.Data.length data * 4) None (GLTypes.VBOKind.DynamicDraw);
-  GL.VBO.subdata 0 (GL.Data.length data * 4) data;
+  let start_vals = t.stride * start in
+  if Source.attribs src <> t.attribs then
+    raise (Invalid_source "Cannot rebuild vertex array : incompatible vertex source");
+  let new_buffer, new_binding = 
+    if t.size < GL.Data.length data + start_vals then begin
+      let buf = GL.VBO.create () in
+      GL.VBO.bind (Some buf);
+      GL.VBO.data ((GL.Data.length data + start_vals) * 4) None (GLTypes.VBOKind.DynamicDraw);
+      GL.VBO.bind None;
+      GL.VBO.copy_subdata t.buffer buf 0 0 (start_vals * 4); 
+      buf, None
+    end else 
+      t.buffer, t.bound
+  in
+  GL.VBO.bind (Some new_buffer);
+  GL.VBO.subdata (start_vals * 4) (GL.Data.length data * 4) data;
   GL.VBO.bind None;
-  {
-   buffer = t.buffer;
-   vao    = t.vao;
-   size   = max (GL.Data.length data) (t.size);
-   length = Source.length src;
-   attribs = Source.attribs src;
-   stride = Source.stride src;
-   bound  = t.bound;
-  }
+  t.buffer <- new_buffer;
+  t.bound  <- new_binding;
+  t.length <- Source.length src + start;
+  t.size   <- max (GL.Data.length data + start_vals) t.size
+
 
 let length t = t.length
 
