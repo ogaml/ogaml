@@ -98,6 +98,18 @@ let actual_points vals =
 
 (* Computes the actual bisectors *)
 let actual_bisectors vals =
+  (* Apply the scale TODO *)
+  (* List.map
+    (fun vec ->
+      Vector2f.({
+        x = vec.x *. vals.scale.x /. vals.scale.y ;
+        y = vec.y *. vals.scale.y /. vals.scale.x
+      })
+    ) *)
+    vals.bisectors
+  (* |> List.map Vector2f.normalize *)
+  (* Apply the rotation *)
+  |>
   List.map
     (fun vec ->
       let theta = vals.rotation *. Constants.pi /. 180. in
@@ -107,7 +119,6 @@ let actual_bisectors vals =
         Vector3f.z = 0.
       })
     )
-    vals.bisectors
 
 (* Turns actual points to a VertexArray for the shape *)
 let vertices_of_points points color =
