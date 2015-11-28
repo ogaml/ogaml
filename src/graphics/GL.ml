@@ -57,6 +57,13 @@ module Data = struct
     t.data.{t.length+2} <- vec.OgamlMath.Vector3f.z;
     t.length <- t.length+3
 
+  let add_3i t vec = 
+    alloc t 3;
+    t.data.{t.length+0} <- Int32.of_int vec.OgamlMath.Vector3i.x;
+    t.data.{t.length+1} <- Int32.of_int vec.OgamlMath.Vector3i.y;
+    t.data.{t.length+2} <- Int32.of_int vec.OgamlMath.Vector3i.z;
+    t.length <- t.length+3
+
   let add_color t col = 
     alloc t 4;
     let c = Color.rgb col in
@@ -72,9 +79,20 @@ module Data = struct
     t.data.{t.length+1} <- v.OgamlMath.Vector2f.y;
     t.length <- t.length+2
 
+  let add_2i t v = 
+    alloc t 2;
+    t.data.{t.length+0} <- Int32.of_int v.OgamlMath.Vector2i.x;
+    t.data.{t.length+1} <- Int32.of_int v.OgamlMath.Vector2i.y;
+    t.length <- t.length+2
+
   let add_int32 t i =
     alloc t 1;
     t.data.{t.length} <- i;
+    t.length <- t.length+1
+
+  let add_float t f = 
+    alloc t 1;
+    t.data.{t.length} <- f;
     t.length <- t.length+1
 
   let add_int t i = 
@@ -221,9 +239,9 @@ module VBO = struct
 
   external bind : t option -> unit = "caml_bind_vbo"
 
-  external data : int -> (float, Data.float_32) Data.t option -> GLTypes.VBOKind.t -> unit = "caml_vbo_data"
+  external data : int -> ('a, 'b) Data.t option -> GLTypes.VBOKind.t -> unit = "caml_vbo_data"
 
-  external subdata : int -> int -> (float, Data.float_32) Data.t -> unit = "caml_vbo_subdata"
+  external subdata : int -> int -> ('a, 'b) Data.t -> unit = "caml_vbo_subdata"
 
   external copy_subdata : t -> t -> int -> int -> int -> unit = "caml_vbo_copy_subdata"
 
