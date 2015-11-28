@@ -109,7 +109,7 @@ let fragment_shader_source_tex_130 = "
 
   void main() {
 
-    out_color = vec4(texture(my_texture, frag_uv).rgb, 1.0);
+    out_color = texture(my_texture, frag_uv);
 
   }
 "

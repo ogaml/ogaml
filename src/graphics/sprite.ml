@@ -38,23 +38,30 @@ let get_vertices size position origin rotation scale =
     { x = size.x ; y = 0.     },
     { x = 0.     ; y = size.y }
   ) in
-  Vector2f.([ zero ; w ; add w h ; h ])
+  Vector2f.([ zero ; w ; h ; add w h ])
   |> List.map (apply_transformations position origin rotation scale)
   |> List.combine Vector2f.([
     { x = 0. ; y = 1. } ;
     { x = 1. ; y = 1. } ;
-    { x = 1. ; y = 0. } ;
-    { x = 0. ; y = 0. }
+    { x = 0. ; y = 0. } ;
+    { x = 1. ; y = 0. }
   ])
   |> List.map (fun (pos,coord) ->
     VertexArray.Vertex.create
      ~position:(Vector3f.lift pos)
      ~texcoord:coord ()
   )
-  |> VertexArray.Source.(List.fold_left
-       (fun source v -> source << v)
-       (empty ~position:"position" ~texcoord:"uv" ~size:4 ()))
-  |> VertexArray.static
+  |> function
+  | [ a ; b ; c ; d ] ->
+    VertexArray.Source.(
+        empty ~position:"position" ~texcoord:"uv" ~size:4 ()
+        << a
+        << b
+        << c
+        << d
+    )
+    |> VertexArray.static
+  | _ -> assert false
 
 let create ~texture
            ?origin:(origin=Vector2f.zero)
