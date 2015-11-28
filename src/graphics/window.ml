@@ -12,7 +12,7 @@ type t = {
 }
 
 (** 2D drawing program *)
-let vertex_shader_source = "
+let vertex_shader_source_130 = "
   uniform vec2 size;
 
   in vec3 position;
@@ -32,7 +32,7 @@ let vertex_shader_source = "
   }
 "
 
-let fragment_shader_source = "
+let fragment_shader_source_130 = "
   in vec4 frag_color;
 
   out vec4 pixel_color;
@@ -44,17 +44,59 @@ let fragment_shader_source = "
   }
 "
 
+let vertex_shader_source_110 = "
+  #version 110
+
+  uniform vec2 size;
+
+  attribute vec3 position;
+  attribute vec4 color;
+
+  varying vec4 frag_color;
+
+  void main() {
+
+    gl_Position.x = 2.0 * position.x / size.x - 1.0;
+    gl_Position.y = 2.0 * (size.y - position.y) / size.y - 1.0;
+    gl_Position.z = 0.0;
+    gl_Position.w = 1.0;
+
+    frag_color = color;
+
+  }
+"
+
+let fragment_shader_source_110 = "
+  #version 110
+
+  varying vec4 frag_color;
+
+  void main() {
+
+    gl_FragColor = frag_color;
+
+  }
+"
+
+
 let create ~width ~height ~settings =
   let internal = LL.Window.create ~width ~height in
   let state = State.LL.create () in
+  let program2D = 
+    if State.is_glsl_version_supported state 130 then
+      Program.from_source_pp state
+        ~vertex_source:(`String vertex_shader_source_130)
+        ~fragment_source:(`String fragment_shader_source_130)
+    else 
+      Program.from_source 
+        ~vertex_source:(`String vertex_shader_source_110)
+        ~fragment_source:(`String fragment_shader_source_110)
+  in
   {
     state;
     internal;
     settings;
-    program2D = 
-      Program.from_source_pp state
-        ~vertex_source:(`String vertex_shader_source)
-        ~fragment_source:(`String fragment_shader_source)
+    program2D;
   }
 
 let close win = LL.Window.close win.internal
