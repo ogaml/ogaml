@@ -348,11 +348,7 @@ let get_color shape = shape.shape_vals.color
 
 let get_border_color shape = shape.shape_vals.out_color
 
-let get_vertex_array shape = shape.vertices
-
-let get_outline shape = shape.outline
-
-let draw ~window ~shape = 
+let draw ~window ~shape =
   let program = Window.LL.program window in
   let parameters = DrawParameter.make () in
   let (sx,sy) = Window.size window in
@@ -362,8 +358,8 @@ let draw ~window ~shape =
           Vector2f.from_int Vector2i.({ x = sx ; y = sy })
         )
   in
-  let vertices = get_vertex_array shape in
-  VertexArray.draw 
+  let vertices = shape.vertices in
+  VertexArray.draw
         ~window
         ~vertices
         ~program
@@ -371,7 +367,7 @@ let draw ~window ~shape =
         ~uniform
         ~mode:DrawMode.Triangles () ;
   (* Drawing the outline if necessary *)
-  match get_outline shape with
+  match shape.outline with
   | None -> ()
   | Some vertices ->
     VertexArray.draw
@@ -381,5 +377,3 @@ let draw ~window ~shape =
       ~parameters
       ~uniform
       ~mode:DrawMode.Triangles ()
-
-
