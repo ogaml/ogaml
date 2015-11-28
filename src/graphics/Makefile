@@ -16,7 +16,7 @@ STUBS_OBJS = $(GRAPHICS_STUBS:.c=.o)
 
 MLSOURCES = color.ml drawParameter.ml GL.ml state.ml contextSettings.ml\
 	    image.ml texture.ml program.ml uniform.ml window.ml indexArray.ml\
-	    vertexArray.ml model.ml poly.ml shape.ml sprite.ml mouse.ml keyboard.ml
+	    vertexArray.ml vertexMap.ml model.ml poly.ml shape.ml sprite.ml mouse.ml keyboard.ml
 
 MLINTERFACES = drawMode.mli GLTypes.mli
 
