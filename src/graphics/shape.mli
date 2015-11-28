@@ -1,4 +1,4 @@
-(** Module for creating 2D shapes *)
+(** Creation and manipulation of 2D shapes *)
 
 (** Type of shapes *)
 type t
@@ -57,7 +57,7 @@ val create_line :
   ?rotation : float ->
   unit -> t
 
-(** Draws a shape *)
+(** Draws a shape. *)
 val draw : window:Window.t -> shape:t -> unit
 
 (** Sets the position of the origin in the window. *)

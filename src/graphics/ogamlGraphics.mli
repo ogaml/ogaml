@@ -762,9 +762,8 @@ module Poly : sig
 end
 
 
+(** Creation and manipulation of 2D shapes *)
 module Shape : sig
-
-  (** Module for creating 2D shapes *)
 
   (** Type of shapes *)
   type t
@@ -823,10 +822,10 @@ module Shape : sig
     ?rotation : float ->
     unit -> t
 
-  (** Draws a shape *)
+  (** Draws a shape. *)
   val draw : window:Window.t -> shape:t -> unit
 
-  (** Sets the position of the origin in the window *)
+  (** Sets the position of the origin in the window. *)
   val set_position : t -> OgamlMath.Vector2i.t -> unit
 
   (** Sets the position of the origin with respect to the first point of the
@@ -874,6 +873,27 @@ module Shape : sig
   val get_color : t -> Color.t
 
 end
+
+(** Creation and manipulation of 2D sprites *)
+module Sprite : sig
+
+  (** Type of sprites *)
+  type t
+
+  (** Creates a sprite. *)
+  val create_sprite :
+    texture   : Texture.Texture2D.t ->
+    ?origin   : OgamlMath.Vector2f.t ->
+    ?position : OgamlMath.Vector2i.t ->
+    ?scale    : OgamlMath.Vector2f.t ->
+    ?rotation : float ->
+    unit -> t
+
+  (** Draws a sprite. *)
+  val draw : window:Window.t -> sprite:t -> unit
+
+end
+
 
 
 (** Getting real-time mouse information *)

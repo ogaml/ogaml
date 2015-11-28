@@ -30,6 +30,10 @@ shape.cmo : window.cmi vertexArray.cmi ../math/vector3f.cmi \
 shape.cmx : window.cmx vertexArray.cmx ../math/vector3f.cmx \
     ../math/vector2i.cmx ../math/vector2f.cmx uniform.cmx drawParameter.cmx \
     drawMode.cmi ../math/constants.cmx color.cmx shape.cmi
+sprite.cmo : vertexArray.cmi ../math/vector3f.cmi ../math/vector2i.cmi \
+    ../math/vector2f.cmi texture.cmi sprite.cmi
+sprite.cmx : vertexArray.cmx ../math/vector3f.cmx ../math/vector2i.cmx \
+    ../math/vector2f.cmx texture.cmx sprite.cmi
 state.cmo : GL.cmi drawParameter.cmi color.cmi state.cmi
 state.cmx : GL.cmx drawParameter.cmx color.cmx state.cmi
 texture.cmo : state.cmi image.cmi GLTypes.cmi GL.cmi texture.cmi
@@ -63,7 +67,7 @@ ogamlGraphics.cmi : ../core/ogamlCore.cmi
 poly.cmi : vertexArray.cmi
 program.cmi : state.cmi GLTypes.cmi GL.cmi
 shape.cmi : window.cmi color.cmi
-sprite.cmi :
+sprite.cmi : window.cmi texture.cmi
 state.cmi : GLTypes.cmi GL.cmi drawParameter.cmi color.cmi
 texture.cmi : state.cmi image.cmi
 uniform.cmi : texture.cmi state.cmi program.cmi color.cmi
