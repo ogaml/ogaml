@@ -59,10 +59,13 @@ val rebuild : dynamic t -> Source.t -> int -> unit
 
 val length : 'a t -> int
 
-
-module LL : sig
-
-  val bind : State.t -> 'a t -> Program.t -> unit
-
-end
+val draw :
+  vertices   : 'a t ->
+  window     : Window.t ->
+  ?indices   : 'b IndexArray.t ->
+  program    : Program.t ->
+  uniform    : Uniform.t ->
+  parameters : DrawParameter.t ->
+  mode       : DrawMode.t ->
+  unit -> unit
 

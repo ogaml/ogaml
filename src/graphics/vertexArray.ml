@@ -213,55 +213,79 @@ let rebuild t src start =
 let length t = t.length
 
 
-module LL = struct
+let bind state t prog = 
+  if t.bound <> Some prog then begin
+    t.bound <- Some prog;
+    GL.VAO.bind (Some t.vao);
+    State.LL.set_bound_vao state (Some t.vao);
+    GL.VBO.bind (Some t.buffer);
+    State.LL.set_bound_vbo state (Some t.buffer);
+    let attribs = ref t.attribs in
+    let rec find_remove s = function
+      | [] -> 
+        raise (Missing_attribute 
+          (Printf.sprintf "Attribute %s not provided in vertex source" s)
+        )
+      | (e,h,off)::t when h = s -> (e,off,t)
+      | h::t -> 
+        let (e,off,l) = find_remove s t in 
+        (e,off,h::l)
+    in
+    Program.LL.iter_attributes prog 
+      (fun att ->
+        let (typ,offset,l) = find_remove (Program.Attribute.name att) !attribs in
+        attribs := l;
+        if Source.type_of_attrib typ <> Program.Attribute.kind att then
+          raise (Invalid_attribute
+            (Printf.sprintf "Attribute %s has invalid type"
+              (Program.Attribute.name att)
+            ));
+        GL.VAO.enable_attrib (Program.Attribute.location att);
+        GL.VAO.attrib_float 
+          (Program.Attribute.location att)
+          (Source.size_of_attrib typ)
+          (GLTypes.GlFloatType.Float)
+          (offset   * 4)
+          (t.stride * 4)
+      );
+    if !attribs <> [] then
+      raise (Invalid_attribute
+        (Printf.sprintf "Attribute %s not required by program" 
+          (let (_,s,_) = List.hd !attribs in s)
+        ))
+  end
+  else if State.LL.bound_vao state <> (Some t.vao) then begin
+    GL.VAO.bind (Some t.vao);
+    State.LL.set_bound_vao state (Some t.vao);
+    State.LL.set_bound_vbo state (Some t.buffer);
+  end
 
-  let bind state t prog = 
-    if t.bound <> Some prog then begin
-      t.bound <- Some prog;
-      GL.VAO.bind (Some t.vao);
-      State.LL.set_bound_vao state (Some t.vao);
-      GL.VBO.bind (Some t.buffer);
-      State.LL.set_bound_vbo state (Some t.buffer);
-      let attribs = ref t.attribs in
-      let rec find_remove s = function
-        | [] -> 
-          raise (Missing_attribute 
-            (Printf.sprintf "Attribute %s not provided in vertex source" s)
-          )
-        | (e,h,off)::t when h = s -> (e,off,t)
-        | h::t -> 
-          let (e,off,l) = find_remove s t in 
-          (e,off,h::l)
-      in
-      Program.LL.iter_attributes prog 
-        (fun att ->
-          let (typ,offset,l) = find_remove (Program.Attribute.name att) !attribs in
-          attribs := l;
-          if Source.type_of_attrib typ <> Program.Attribute.kind att then
-            raise (Invalid_attribute
-              (Printf.sprintf "Attribute %s has invalid type"
-                (Program.Attribute.name att)
-              ));
-          GL.VAO.enable_attrib (Program.Attribute.location att);
-          GL.VAO.attrib_float 
-            (Program.Attribute.location att)
-            (Source.size_of_attrib typ)
-            (GLTypes.GlFloatType.Float)
-            (offset   * 4)
-            (t.stride * 4)
-        );
-      if !attribs <> [] then
-        raise (Invalid_attribute
-          (Printf.sprintf "Attribute %s not required by program" 
-            (let (_,s,_) = List.hd !attribs in s)
-          ))
-    end
-    else if State.LL.bound_vao state <> (Some t.vao) then begin
-      GL.VAO.bind (Some t.vao);
-      State.LL.set_bound_vao state (Some t.vao);
-      State.LL.set_bound_vbo state (Some t.buffer);
-    end
 
-end
+let draw ~vertices ~window ?indices ~program ~uniform ~parameters ~mode () =
+  let cull_mode = DrawParameter.culling parameters in
+  let state = Window.state window in
+  if State.culling_mode state <> cull_mode then begin
+    State.LL.set_culling_mode state cull_mode;
+    GL.Pervasives.culling cull_mode
+  end;
+  let poly_mode = DrawParameter.polygon parameters in
+  if State.polygon_mode state <> poly_mode then begin
+    State.LL.set_polygon_mode state poly_mode;
+    GL.Pervasives.polygon poly_mode
+  end;
+  let depth_testing = DrawParameter.depth_test parameters in
+  if State.depth_test state <> depth_testing then begin
+    State.LL.set_depth_test state depth_testing;
+    GL.Pervasives.depthtest depth_testing
+  end;
+  Program.LL.use state (Some program);
+  Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind state uniform unif);
+  bind state vertices program;
+  match indices with
+  |None -> GL.VAO.draw mode 0 (length vertices)
+  |Some ebo ->
+    IndexArray.LL.bind state ebo;
+    GL.VAO.draw_elements mode (IndexArray.length ebo)
+
 
 

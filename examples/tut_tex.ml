@@ -92,7 +92,7 @@ let rec event_loop () =
 let rec main_loop () = 
   if Window.is_open window then begin 
     Window.clear window;
-    Window.draw ~window ~vertices ~program ~parameters ~uniform ~mode:DrawMode.TriangleStrip ();
+    VertexArray.draw ~window ~vertices ~program ~parameters ~uniform ~mode:DrawMode.TriangleStrip ();
     Window.display window;
     event_loop ();
     main_loop ();

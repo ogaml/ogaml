@@ -127,6 +127,7 @@ module DrawMode : sig
 
 end
 
+
 (** Encapsulates draw parameters used for rendering *)
 module DrawParameter : sig
 
@@ -171,6 +172,57 @@ module DrawParameter : sig
 end
 
 
+(** Encapsulates data for context creation *)
+module ContextSettings : sig
+
+  (** This module encapsulates the settings used to create a GL context *)
+
+  (** Type of the settings structure *)
+  type t
+
+  (** Creates new settings using the following parameters :
+    *
+    *   $color$ - background color used when clearing (defaults to opaque black)
+    *
+    *   $clear_color$ - whether to clear the color buffer or not when calling clear (defaults to true)
+    *
+    *   $depth$ - whether to clear the depth buffer or not when calling clear (defaults to true)
+    *
+    *   $stencil$ - whether to clear the stencil buffer or not when calling clear (defaults to false)
+    *
+    * @see:OgamlGraphics.Color
+    *)
+  val create : ?color:Color.t -> ?clear_color:bool ->
+               ?depth:bool -> ?stencil:bool -> unit -> t
+
+end
+
+
+(** Encapsulates data about an OpenGL internal state *)
+module State : sig
+
+  (** This module encapsulates a copy of the internal GL state.
+    * This allows efficient optimizations of state changes *)
+
+  (** Type of a GL state *)
+  type t
+
+  (** Returns the GL version supported by this state in (major, minor) format *)
+  val version : t -> (int * int)
+
+  (** Returns true iff the given GL version in (major, minor) format
+    * is supported by the given state *)
+  val is_version_supported : t -> (int * int) -> bool
+
+  (** Returns the GLSL version supported by this state *)
+  val glsl_version : t -> int
+
+  (** Returns true iff the given GLSL version is supported by this state *)
+  val is_glsl_version_supported : t -> int -> bool
+
+end
+
+
 (** Image manipulation and creation *)
 module Image : sig
 
@@ -195,6 +247,193 @@ module Image : sig
   (** Gets the color of a pixel of an image
     * @see:OgamlGraphics.Color.RGB *)
   val get : t -> int -> int -> Color.RGB.t
+
+end
+
+
+(** High-level wrapper around GL textures *)
+module Texture : sig
+
+  (** This module provides wrappers around different kinds
+    * of OpenGL textures *)
+
+  (** Represents a simple 2D texture *)
+  module Texture2D : sig
+
+    (** This modules provides an abstraction of openGL 2D textures
+      * that can be used for 2D rendering (with sprites) or
+      * 3D rendering when passed to a GLSL program. *)
+
+    (** Type of a 2D texture *)
+    type t
+
+    (** Creates a texture from a state and a source (a file or an image)
+      * @see:OgamlGraphics.State *)
+    val create : State.t -> [< `File of string | `Image of Image.t ] -> t
+
+    (** Returns the size of a texture *)
+    val size : t -> (int * int)
+
+  end
+
+end
+
+
+(** High-level wrapper around GL shader programs *)
+module Program : sig
+
+  (** This module provides a high-level wrapper around GL shader programs
+    * and can be used to compile shaders. *)
+
+  (** Raised when the compilation of a program fails *)
+  exception Compilation_error of string
+
+  (** Raised when the linking of a program fails *)
+  exception Linking_error of string
+
+  (** Raised when trying to compile a program with a version
+    * that is not supported by the current context *)
+  exception Invalid_version of string
+
+  (** Type of a program *)
+  type t
+
+  (** Type of a source, from a file or from a string *)
+  type src = [`File of string | `String of string]
+
+  (** Compiles a program from a vertex source and a fragment source.
+    * The source must begin with a version assigment $#version xxx$ *)
+  val from_source : vertex_source:src -> fragment_source:src -> t
+
+  (** Compiles a program from a state (gotten from a window) and
+    * a list of sources paired with their required GLSL version.
+    * The function will chose the best source for the current context.
+    * @see:OgamlGraphics.State *)
+  val from_source_list : State.t
+                        -> vertex_source:(int * src) list
+                        -> fragment_source:(int * src) list -> t
+
+  (** Compiles a program from a vertex source and a fragment source.
+    * The source should not begin with a $#version xxx$ assignment,
+    * as the function will preprocess the sources and prepend the
+    * best version declaration.
+    * @see:OgamlGraphics.State *)
+  val from_source_pp : State.t
+                      -> vertex_source:src
+                      -> fragment_source:src -> t
+
+end
+
+
+(** Encapsulates a group of uniforms for rendering *)
+module Uniform : sig
+
+  (** This module encapsulates a set of uniforms that
+    * can be passed to GLSL programs *)
+
+  (** Raised when trying to draw using a program
+    * that requires a uniform not provided in the set *)
+  exception Unknown_uniform of string
+
+  (** Raised when the type of a uniform is not matching
+    * the type required by the GLSL program *)
+  exception Invalid_uniform of string
+
+  (** Type of a set of uniforms *)
+  type t
+
+  (** Empty set of uniforms *)
+  val empty : t
+
+  (** $vector3f name vec set$ adds the uniform $vec$ to $set$.
+    * The uniform should be refered to as $name$ in a GLSL program.
+    * @see:OgamlMath.Vector3f *)
+  val vector3f : string -> OgamlMath.Vector3f.t -> t -> t
+
+  (** See vector3f @see:OgamlMath.Vector2f *)
+  val vector2f : string -> OgamlMath.Vector2f.t -> t -> t
+
+  (** See vector3f @see:OgamlMath.Vector3i *)
+  val vector3i : string -> OgamlMath.Vector3i.t -> t -> t
+
+  (** See vector3f @see:OgamlMath.Vector2i *)
+  val vector2i : string -> OgamlMath.Vector2i.t -> t -> t
+
+  (** See vector3f *)
+  val int : string -> int -> t -> t
+
+  (** See vector3f *)
+  val float : string -> float -> t -> t
+
+  (** See vector3f @see:OgamlMath.Matrix3D *)
+  val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> t
+
+  (** See vector3f @see:OgamlGraphics.Color *)
+  val color : string -> Color.t -> t -> t
+
+  (** See vector3f @see:OgamlGraphics.Texture.Texture2D *)
+  val texture2D : string -> Texture.Texture2D.t -> t -> t
+
+end
+
+
+(** High-level window wrapper for rendering and event management *)
+module Window : sig
+
+  (** This module provides a high-level wrapper around the low-level
+    * window interface of OgamlCore and also provides drawing functions.
+    *
+    * Windows encapsulate a copy of the GL state that can be retrieved
+    * to obtain information about the GL context. *)
+
+  (*** Error Handling *)
+  (** Raised if a uniform variable is missing when calling draw *)
+  exception Missing_uniform of string
+
+  (** Raised when calling draw if a uniform variable has an incorrect type *)
+  exception Invalid_uniform of string
+
+  (** The type of a window *)
+  type t
+
+  (** Creates a window of size $width$ x $height$.
+    * This window will create its openGL context following the specified settings.
+    * @see:OgamlGraphics.ContextSettings *)
+  val create : width:int -> height:int -> settings:ContextSettings.t -> t
+
+  (** Closes a window, but does not free the memory.
+    * This should prevent segfaults when calling functions on this window. *)
+  val close : t -> unit
+
+  (** Frees the window and the memory *)
+  val destroy : t -> unit
+
+  (*** Information About Windows *)
+  (** Returns in pixel the width and height of the window
+    * (it only takes into account the size of the content where you can draw, *ie* the useful information). *)
+  val size : t -> (int * int)
+
+  (** Tells whether the window is currently open *)
+  val is_open : t -> bool
+
+  (** Return true iff the window has the focus *)
+  val has_focus : t -> bool
+
+  (*** Event Handling *)
+  (** Returns the next event on the event stack, or None if the stack is empty.
+    * @see:OgamlCore.Event *)
+  val poll_event : t -> OgamlCore.Event.t option
+
+  (*** Displaying and Drawing *)
+  (** Displays the window after the GL calls *)
+  val display : t -> unit
+
+  (** Clears the window *)
+  val clear : t -> unit
+
+  (** Returns the internal GL state of the window
+    * @see:OgamlGraphics.State *)
+  val state : t -> State.t
 
 end
 
@@ -387,6 +626,20 @@ module VertexArray : sig
   (** Returns the length of a vertex array *)
   val length : 'a t -> int
 
+  (** Draws a vertex array using with the given program, uniforms, draw parameters, and an optional index array.
+    * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.Window
+    * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
+    * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
+  val draw :
+    vertices   : 'a t ->
+    window     : Window.t ->
+    ?indices   : 'b IndexArray.t ->
+    program    : Program.t ->
+    uniform    : Uniform.t ->
+    parameters : DrawParameter.t ->
+    mode       : DrawMode.t ->
+    unit -> unit
+
 end
 
 
@@ -509,183 +762,6 @@ module Poly : sig
 end
 
 
-(** Encapsulates data for context creation *)
-module ContextSettings : sig
-
-  (** This module encapsulates the settings used to create a GL context *)
-
-  (** Type of the settings structure *)
-  type t
-
-  (** Creates new settings using the following parameters :
-    *
-    *   $color$ - background color used when clearing (defaults to opaque black)
-    *
-    *   $clear_color$ - whether to clear the color buffer or not when calling clear (defaults to true)
-    *
-    *   $depth$ - whether to clear the depth buffer or not when calling clear (defaults to true)
-    *
-    *   $stencil$ - whether to clear the stencil buffer or not when calling clear (defaults to false)
-    *
-    * @see:OgamlGraphics.Color
-    *)
-  val create : ?color:Color.t -> ?clear_color:bool ->
-               ?depth:bool -> ?stencil:bool -> unit -> t
-
-end
-
-
-(** Encapsulates data about an OpenGL internal state *)
-module State : sig
-
-  (** This module encapsulates a copy of the internal GL state.
-    * This allows efficient optimizations of state changes *)
-
-  (** Type of a GL state *)
-  type t
-
-  (** Returns the GL version supported by this state in (major, minor) format *)
-  val version : t -> (int * int)
-
-  (** Returns true iff the given GL version in (major, minor) format
-    * is supported by the given state *)
-  val is_version_supported : t -> (int * int) -> bool
-
-  (** Returns the GLSL version supported by this state *)
-  val glsl_version : t -> int
-
-  (** Returns true iff the given GLSL version is supported by this state *)
-  val is_glsl_version_supported : t -> int -> bool
-
-end
-
-
-(** High-level wrapper around GL shader programs *)
-module Program : sig
-
-  (** This module provides a high-level wrapper around GL shader programs
-    * and can be used to compile shaders. *)
-
-  (** Raised when the compilation of a program fails *)
-  exception Compilation_error of string
-
-  (** Raised when the linking of a program fails *)
-  exception Linking_error of string
-
-  (** Raised when trying to compile a program with a version
-    * that is not supported by the current context *)
-  exception Invalid_version of string
-
-  (** Type of a program *)
-  type t
-
-  (** Type of a source, from a file or from a string *)
-  type src = [`File of string | `String of string]
-
-  (** Compiles a program from a vertex source and a fragment source.
-    * The source must begin with a version assigment $#version xxx$ *)
-  val from_source : vertex_source:src -> fragment_source:src -> t
-
-  (** Compiles a program from a state (gotten from a window) and
-    * a list of sources paired with their required GLSL version.
-    * The function will chose the best source for the current context.
-    * @see:OgamlGraphics.State *)
-  val from_source_list : State.t
-                        -> vertex_source:(int * src) list
-                        -> fragment_source:(int * src) list -> t
-
-  (** Compiles a program from a vertex source and a fragment source.
-    * The source should not begin with a $#version xxx$ assignment,
-    * as the function will preprocess the sources and prepend the
-    * best version declaration.
-    * @see:OgamlGraphics.State *)
-  val from_source_pp : State.t
-                      -> vertex_source:src
-                      -> fragment_source:src -> t
-
-end
-
-
-(** High-level wrapper around GL textures *)
-module Texture : sig
-
-  (** This module provides wrappers around different kinds
-    * of OpenGL textures *)
-
-  (** Represents a simple 2D texture *)
-  module Texture2D : sig
-
-    (** This modules provides an abstraction of openGL 2D textures
-      * that can be used for 2D rendering (with sprites) or
-      * 3D rendering when passed to a GLSL program. *)
-
-    (** Type of a 2D texture *)
-    type t
-
-    (** Creates a texture from a state and a source (a file or an image)
-      * @see:OgamlGraphics.State *)
-    val create : State.t -> [< `File of string | `Image of Image.t ] -> t
-
-    (** Returns the size of a texture *)
-    val size : t -> (int * int)
-
-  end
-
-end
-
-
-(** Encapsulates a group of uniforms for rendering *)
-module Uniform : sig
-
-  (** This module encapsulates a set of uniforms that
-    * can be passed to GLSL programs *)
-
-  (** Raised when trying to draw using a program
-    * that requires a uniform not provided in the set *)
-  exception Unknown_uniform of string
-
-  (** Raised when the type of a uniform is not matching
-    * the type required by the GLSL program *)
-  exception Invalid_uniform of string
-
-  (** Type of a set of uniforms *)
-  type t
-
-  (** Empty set of uniforms *)
-  val empty : t
-
-  (** $vector3f name vec set$ adds the uniform $vec$ to $set$.
-    * The uniform should be refered to as $name$ in a GLSL program.
-    * @see:OgamlMath.Vector3f *)
-  val vector3f : string -> OgamlMath.Vector3f.t -> t -> t
-
-  (** See vector3f @see:OgamlMath.Vector2f *)
-  val vector2f : string -> OgamlMath.Vector2f.t -> t -> t
-
-  (** See vector3f @see:OgamlMath.Vector3i *)
-  val vector3i : string -> OgamlMath.Vector3i.t -> t -> t
-
-  (** See vector3f @see:OgamlMath.Vector2i *)
-  val vector2i : string -> OgamlMath.Vector2i.t -> t -> t
-
-  (** See vector3f *)
-  val int : string -> int -> t -> t
-
-  (** See vector3f *)
-  val float : string -> float -> t -> t
-
-  (** See vector3f @see:OgamlMath.Matrix3D *)
-  val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> t
-
-  (** See vector3f @see:OgamlGraphics.Color *)
-  val color : string -> Color.t -> t -> t
-
-  (** See vector3f @see:OgamlGraphics.Texture.Texture2D *)
-  val texture2D : string -> Texture.Texture2D.t -> t -> t
-
-end
-
-
 module Shape : sig
 
   (** Module for creating 2D shapes *)
@@ -747,6 +823,9 @@ module Shape : sig
     ?rotation : float ->
     unit -> t
 
+  (** Draws a shape *)
+  val draw : window:Window.t -> shape:t -> unit
+
   (** Sets the position of the origin in the window *)
   val set_position : t -> OgamlMath.Vector2i.t -> unit
 
@@ -793,84 +872,6 @@ module Shape : sig
 
   (** Returns the filling color of the shape. *)
   val get_color : t -> Color.t
-
-end
-
-
-(** High-level window wrapper for rendering and event management *)
-module Window : sig
-
-  (** This module provides a high-level wrapper around the low-level
-    * window interface of OgamlCore and also provides drawing functions.
-    *
-    * Windows encapsulate a copy of the GL state that can be retrieved
-    * to obtain information about the GL context. *)
-
-  (*** Error Handling *)
-  (** Raised if a uniform variable is missing when calling draw *)
-  exception Missing_uniform of string
-
-  (** Raised when calling draw if a uniform variable has an incorrect type *)
-  exception Invalid_uniform of string
-
-  (** The type of a window *)
-  type t
-
-  (** Creates a window of size $width$ x $height$.
-    * This window will create its openGL context following the specified settings.
-    * @see:OgamlGraphics.ContextSettings *)
-  val create : width:int -> height:int -> settings:ContextSettings.t -> t
-
-  (** Closes a window, but does not free the memory.
-    * This should prevent segfaults when calling functions on this window. *)
-  val close : t -> unit
-
-  (** Frees the window and the memory *)
-  val destroy : t -> unit
-
-  (*** Information About Windows *)
-  (** Returns in pixel the width and height of the window
-    * (it only takes into account the size of the content where you can draw, *ie* the useful information). *)
-  val size : t -> (int * int)
-
-  (** Tells whether the window is currently open *)
-  val is_open : t -> bool
-
-  (** Return true iff the window has the focus *)
-  val has_focus : t -> bool
-
-  (*** Event Handling *)
-  (** Returns the next event on the event stack, or None if the stack is empty.
-    * @see:OgamlCore.Event *)
-  val poll_event : t -> OgamlCore.Event.t option
-
-  (*** Displaying and Drawing *)
-  (** Displays the window after the GL calls *)
-  val display : t -> unit
-
-  (** Draws a vertex array using with the given program, uniforms, draw parameters, and an optional index array.
-    * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.VertexArray
-    * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
-    * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
-  val draw :
-    window     : t ->
-    ?indices   : 'a IndexArray.t ->
-    vertices   : 'b VertexArray.t ->
-    program    : Program.t ->
-    uniform    : Uniform.t ->
-    parameters : DrawParameter.t ->
-    mode       : DrawMode.t ->
-    unit -> unit
-
-  (** Draws a 2D shape *)
-  val draw_shape : t -> Shape.t -> unit
-
-  (** Clears the window *)
-  val clear : t -> unit
-
-  (** Returns the internal GL state of the window
-    * @see:OgamlGraphics.State *)
-  val state : t -> State.t
 
 end
 

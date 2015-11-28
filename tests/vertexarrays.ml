@@ -139,7 +139,7 @@ let test_vao6 () =
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
   let vao = VertexArray.dynamic vsource in
-  Window.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ()
+  VertexArray.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ()
 
 let test_vao7 () = 
   let vsource = VertexArray.(Source.(
@@ -150,7 +150,7 @@ let test_vao7 () =
   )) in
   let vao = VertexArray.dynamic vsource in
   try 
-    Window.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ();
+    VertexArray.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ();
     assert false
   with
     VertexArray.Missing_attribute _ -> ()
@@ -165,7 +165,7 @@ let test_vao8 () =
   )) in
   let vao = VertexArray.dynamic vsource in
   try 
-    Window.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ();
+    VertexArray.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ();
     assert false
   with
     VertexArray.Invalid_attribute _ -> ()

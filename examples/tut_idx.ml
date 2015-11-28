@@ -108,11 +108,11 @@ let display () =
   (* Cube *)
   let parameters = DrawParameter.(make ~culling:CullingMode.CullCounterClockwise ~depth_test:true ()) in
   let uniform = Uniform.(empty |> matrix3D "MVP" matrixMVP |> color "color" (`RGB Color.RGB.red)) in
-  Window.draw ~window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ();
+  VertexArray.draw ~window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ();
   (* Edges *)
   let parameters = DrawParameter.(make ~polygon:PolygonMode.DrawLines ~depth_test:true ()) in
   let uniform = Uniform.(empty |> matrix3D "MVP" matrixMVP |> color "color" (`RGB Color.RGB.black)) in
-  Window.draw ~window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ()
+  VertexArray.draw ~window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ()
 
 let rec event_loop () =
   match Window.poll_event window with

@@ -351,3 +351,35 @@ let get_border_color shape = shape.shape_vals.out_color
 let get_vertex_array shape = shape.vertices
 
 let get_outline shape = shape.outline
+
+let draw ~window ~shape = 
+  let program = Window.LL.program window in
+  let parameters = DrawParameter.make () in
+  let (sx,sy) = Window.size window in
+  let uniform =
+    Uniform.empty
+    |> Uniform.vector2f "size" OgamlMath.(
+          Vector2f.from_int Vector2i.({ x = sx ; y = sy })
+        )
+  in
+  let vertices = get_vertex_array shape in
+  VertexArray.draw 
+        ~window
+        ~vertices
+        ~program
+        ~parameters
+        ~uniform
+        ~mode:DrawMode.Triangles () ;
+  (* Drawing the outline if necessary *)
+  match get_outline shape with
+  | None -> ()
+  | Some vertices ->
+    VertexArray.draw
+      ~window
+      ~vertices
+      ~program
+      ~parameters
+      ~uniform
+      ~mode:DrawMode.Triangles ()
+
+

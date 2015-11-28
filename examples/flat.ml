@@ -98,15 +98,15 @@ let circle =
     ()
 
 let draw () =
-  Window.draw_shape window rectangle1 ;
-  Window.draw_shape window rectangle2 ;
-  Window.draw_shape window polygon1 ;
-  Window.draw_shape window polygon2 ;
-  Window.draw_shape window regular1 ;
-  Window.draw_shape window regular2 ;
-  Window.draw_shape window line1 ;
-  Window.draw_shape window line2 ;
-  Window.draw_shape window circle
+  Shape.draw ~window ~shape:rectangle1 ;
+  Shape.draw ~window ~shape:rectangle2 ;
+  Shape.draw ~window ~shape:polygon1 ;
+  Shape.draw ~window ~shape:polygon2 ;
+  Shape.draw ~window ~shape:regular1 ;
+  Shape.draw ~window ~shape:regular2 ;
+  Shape.draw ~window ~shape:line1 ;
+  Shape.draw ~window ~shape:line2 ;
+  Shape.draw ~window ~shape:circle
 
 let do_all action param =
   action rectangle1 param ;
