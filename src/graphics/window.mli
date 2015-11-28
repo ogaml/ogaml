@@ -47,4 +47,7 @@ module LL : sig
   (** Returns the 2D drawing program associated to this window's context *)
   val program : t -> Program.t
 
+  (** Returns the 2D drawing program for sprites *)
+  val sprite_program : t -> Program.t
+
 end

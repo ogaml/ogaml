@@ -41,11 +41,11 @@ let get_vertices size position origin rotation scale =
   in
   VertexArray.static vertex_source
 
-let create_sprite ~texture
-                  ?origin:(origin=Vector2f.zero)
-                  ?position:(position=Vector2i.zero)
-                  ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
-                  ?rotation:(rotation=0.) () =
+let create ~texture
+           ?origin:(origin=Vector2f.zero)
+           ?position:(position=Vector2i.zero)
+           ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
+           ?rotation:(rotation=0.) () =
   let (w,h) = Texture.Texture2D.size texture in
   let size = Vector2f.({ x = float_of_int w ; y = float_of_int h }) in
   let position = Vector2f.from_int position in
@@ -60,4 +60,22 @@ let create_sprite ~texture
     scale    = scale
   }
 
-let draw ~window ~sprite = ()
+let draw ~window ~sprite =
+  let program = Window.LL.sprite_program window in
+  let parameters = DrawParameter.make () in
+  let (sx,sy) = Window.size window in
+  let uniform =
+    Uniform.empty
+    |> Uniform.vector2f "size" OgamlMath.(
+         Vector2f.from_int Vector2i.({ x = sx ; y = sy })
+       )
+    |> Uniform.texture2D "my_texture" sprite.texture
+  in
+  let vertices = sprite.vertices in
+  VertexArray.draw
+        ~window
+        ~vertices
+        ~program
+        ~parameters
+        ~uniform
+        ~mode:DrawMode.TriangleStrip ()

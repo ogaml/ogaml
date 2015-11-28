@@ -4,7 +4,7 @@
 type t
 
 (** Creates a sprite. *)
-val create_sprite :
+val create :
   texture   : Texture.Texture2D.t ->
   ?origin   : OgamlMath.Vector2f.t ->
   ?position : OgamlMath.Vector2i.t ->

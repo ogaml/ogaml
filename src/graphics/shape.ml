@@ -355,8 +355,8 @@ let draw ~window ~shape =
   let uniform =
     Uniform.empty
     |> Uniform.vector2f "size" OgamlMath.(
-          Vector2f.from_int Vector2i.({ x = sx ; y = sy })
-        )
+         Vector2f.from_int Vector2i.({ x = sx ; y = sy })
+       )
   in
   let vertices = shape.vertices in
   VertexArray.draw
