@@ -44,8 +44,10 @@ vertexArray.cmo : window.cmi uniform.cmi state.cmi program.cmi \
 vertexArray.cmx : window.cmx uniform.cmx state.cmx program.cmx \
     indexArray.cmx GLTypes.cmi GL.cmx drawParameter.cmx color.cmx \
     vertexArray.cmi
-vertexMap.cmo : vertexMap.cmi
-vertexMap.cmx : vertexMap.cmi
+vertexMap.cmo : window.cmi uniform.cmi state.cmi program.cmi indexArray.cmi \
+    GLTypes.cmi GL.cmi drawParameter.cmi color.cmi vertexMap.cmi
+vertexMap.cmx : window.cmx uniform.cmx state.cmx program.cmx indexArray.cmx \
+    GLTypes.cmi GL.cmx drawParameter.cmx color.cmx vertexMap.cmi
 window.cmo : state.cmi program.cmi ../core/ogamlCore.cmi ../core/LL.cmi \
     GL.cmi contextSettings.cmi color.cmi window.cmi
 window.cmx : state.cmx program.cmx ../core/ogamlCore.cmi ../core/LL.cmi \
@@ -71,5 +73,6 @@ texture.cmi : state.cmi image.cmi
 uniform.cmi : texture.cmi state.cmi program.cmi color.cmi
 vertexArray.cmi : window.cmi uniform.cmi program.cmi indexArray.cmi \
     drawParameter.cmi drawMode.cmi color.cmi
-vertexMap.cmi : state.cmi program.cmi color.cmi
+vertexMap.cmi : window.cmi uniform.cmi program.cmi indexArray.cmi \
+    drawParameter.cmi drawMode.cmi color.cmi
 window.cmi : state.cmi program.cmi ../core/ogamlCore.cmi contextSettings.cmi

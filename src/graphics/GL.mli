@@ -37,6 +37,15 @@ module Data : sig
   (** Adds two floats to the data *)
   val add_2f : (float, float_32) t -> OgamlMath.Vector2f.t -> unit
 
+  (** Adds a vector3i to the data *)
+  val add_3i : (int32, int_32) t -> OgamlMath.Vector3i.t -> unit
+
+  (** Adds two ints to the data *)
+  val add_2i : (int32, int_32) t -> OgamlMath.Vector2i.t -> unit
+
+  (** Adds a float to the data *)
+  val add_float : (float, float_32) t -> float -> unit
+
   (** Adds an int to the data *)
   val add_int : (int32, int_32) t -> int -> unit
 
@@ -223,10 +232,10 @@ module VBO : sig
   val bind : t option -> unit
 
   (** Sets the data of the currently bound VBO *)
-  val data : int -> (float, Data.float_32) Data.t option -> GLTypes.VBOKind.t -> unit
+  val data : int -> ('a, 'b) Data.t option -> GLTypes.VBOKind.t -> unit
 
   (** Sets some subset of the data of the currently bound VBO *)
-  val subdata : int -> int -> (float, Data.float_32) Data.t -> unit
+  val subdata : int -> int -> ('a, 'b) Data.t -> unit
 
   (** Copy some data between VBOs *)
   val copy_subdata : t -> t -> int -> int -> int -> unit

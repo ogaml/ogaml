@@ -262,8 +262,8 @@ let bind state t prog =
 
 
 let draw ~vertices ~window ?indices ~program ~uniform ~parameters ~mode () =
-  let cull_mode = DrawParameter.culling parameters in
   let state = Window.state window in
+  let cull_mode = DrawParameter.culling parameters in
   if State.culling_mode state <> cull_mode then begin
     State.LL.set_culling_mode state cull_mode;
     GL.Pervasives.culling cull_mode
