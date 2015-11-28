@@ -35,7 +35,7 @@ module Source : sig
 
   type t
 
-  val empty : attributes:string list -> size:int -> t
+  val empty : unit -> t
 
   val add : t -> Vertex.t -> unit
 

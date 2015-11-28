@@ -1,4 +1,4 @@
-(** Module for creating 2D shapes *)
+(** Creation and manipulation of 2D shapes *)
 
 (** Type of shapes *)
 type t
@@ -57,7 +57,7 @@ val create_line :
   ?rotation : float ->
   unit -> t
 
-(** Draws a shape *)
+(** Draws a shape. *)
 val draw : window:Window.t -> shape:t -> unit
 
 (** Sets the position of the origin in the window. *)
@@ -112,11 +112,3 @@ val get_color : t -> Color.t
 
 (** Returns the border color of the shape. *)
 val get_border_color : t -> Color.t
-
-(** LL: Shouldn't be exposed *)
-
-(** Get the underlying vertex array. *)
-val get_vertex_array : t -> VertexArray.static VertexArray.t
-
-(** Get the underlying outline *)
-val get_outline : t -> VertexArray.static VertexArray.t option

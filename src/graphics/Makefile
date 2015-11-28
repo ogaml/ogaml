@@ -16,7 +16,7 @@ STUBS_OBJS = $(GRAPHICS_STUBS:.c=.o)
 
 MLSOURCES = color.ml drawParameter.ml GL.ml state.ml contextSettings.ml\
 	    image.ml texture.ml program.ml uniform.ml window.ml indexArray.ml\
-	    vertexArray.ml model.ml poly.ml shape.ml mouse.ml keyboard.ml
+	    vertexArray.ml model.ml poly.ml shape.ml sprite.ml mouse.ml keyboard.ml
 
 MLINTERFACES = drawMode.mli GLTypes.mli
 
@@ -38,7 +38,7 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) ogamlGraphics.cmi
 	$(OCAMLFIND) $(OCAMLC) -pack -o ogamlGraphics.cmo $(MLCMIS) $(MLOBJS);
 	$(OCAMLFIND) $(OCAMLOPT) -pack -o ogamlGraphics.cmx $(MLCMIS) $(MLNATOBJS);
 	$(OCAMLFIND) $(OCAMLMKLIB) -o ogamlGraphics $(STUBS_OBJS) ogamlGraphics.cmo ogamlGraphics.cmx\
-	  $(MLOBJS) $(MLNATOBJS) $(GLOBAL_CLIBS) 
+	  $(MLOBJS) $(MLNATOBJS) $(GLOBAL_CLIBS)
 
 %.cma:%.cmo
 	$(OCAMLFIND) $(OCAMLC) -a -o $@ $(INCLUDE_DIRS) $<

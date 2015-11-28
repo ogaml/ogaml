@@ -1,8 +1,16 @@
-(** Module to handle sprites *)
+(** Creation and manipulation of 2D sprites *)
 
 (** Type of sprites *)
-(* type t *)
+type t
 
-(* val create : ?texture:Texture.t -> ~size:int*int -> t *)
+(** Creates a sprite. *)
+val create :
+  texture   : Texture.Texture2D.t ->
+  ?origin   : OgamlMath.Vector2f.t ->
+  ?position : OgamlMath.Vector2i.t ->
+  ?scale    : OgamlMath.Vector2f.t ->
+  ?rotation : float ->
+  unit -> t
 
-(* val draw_at : Window.t -> int * int -> unit *)
+(** Draws a sprite. *)
+val draw : window:Window.t -> sprite:t -> unit
