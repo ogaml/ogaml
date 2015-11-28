@@ -10,36 +10,51 @@ type t = {
   mutable scale    : Vector2f.t
 }
 
+(* Applys transformations to a point *)
+let apply_transformations position origin rotation scale point =
+  (* Position offset *)
+  Vector2f.({
+    x = point.x +. position.x -. origin.x ;
+    y = point.y +. position.y -. origin.y
+  })
+  |> fun point ->
+  (* Scale *)
+  Vector2f.({
+    x = (point.x -. position.x) *. scale.x +. position.x ;
+    y = (point.y -. position.y) *. scale.y +. position.y
+  })
+  |> fun point ->
+  (* Rotation *)
+  let theta = rotation *. Constants.pi /. 180. in
+  Vector2f.({
+    x = cos(theta) *. (point.x-.position.x) -.
+        sin(theta) *. (point.y-.position.y) +. position.x ;
+    y = sin(theta) *. (point.x-.position.x) +.
+        cos(theta) *. (point.y-.position.y) +. position.y
+  })
+
 let get_vertices size position origin rotation scale =
-  let vertex1 =
+  let (w,h) = Vector2f.(
+    { x = size.x ; y = 0.     },
+    { x = 0.     ; y = size.y }
+  ) in
+  Vector2f.([ zero ; w ; add w h ; h ])
+  |> List.map (apply_transformations position origin rotation scale)
+  |> List.combine Vector2f.([
+    { x = 0. ; y = 1. } ;
+    { x = 1. ; y = 1. } ;
+    { x = 1. ; y = 0. } ;
+    { x = 0. ; y = 0. }
+  ])
+  |> List.map (fun (pos,coord) ->
     VertexArray.Vertex.create
-      ~position:Vector3f.({x = -0.75; y = 0.75; z = 0.0})
-      ~texcoord:Vector2f.({x = 0.; y = 1.}) ()
-  in
-  let vertex2 =
-    VertexArray.Vertex.create
-      ~position:Vector3f.({x = 0.75; y = 0.75; z = 0.0})
-      ~texcoord:Vector2f.({x = 1.; y = 1.}) ()
-  in
-  let vertex3 =
-    VertexArray.Vertex.create
-      ~position:Vector3f.({x = -0.75; y = -0.75; z = 0.0})
-      ~texcoord:Vector2f.({x = 0.; y = 0.}) ()
-  in
-  let vertex4 =
-    VertexArray.Vertex.create
-      ~position:Vector3f.({x = 0.75; y = -0.75; z = 0.0})
-      ~texcoord:Vector2f.({x = 1.; y = 0.}) ()
-  in
-  let vertex_source = VertexArray.Source.(
-      empty ~position:"position" ~texcoord:"uv" ~size:4 ()
-      << vertex1
-      << vertex2
-      << vertex3
-      << vertex4
+     ~position:(Vector3f.lift pos)
+     ~texcoord:coord ()
   )
-  in
-  VertexArray.static vertex_source
+  |> VertexArray.Source.(List.fold_left
+       (fun source v -> source << v)
+       (empty ~position:"position" ~texcoord:"uv" ~size:4 ()))
+  |> VertexArray.static
 
 let create ~texture
            ?origin:(origin=Vector2f.zero)

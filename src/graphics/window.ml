@@ -141,13 +141,11 @@ let fragment_shader_source_tex_110 = "
 
   uniform sampler2D my_texture;
 
-  attribute vec2 frag_uv;
-
-  varying vec4 out_color;
+  varying vec2 frag_uv;
 
   void main() {
 
-    out_color = vec4(texture(my_texture, frag_uv).rgb, 1.0);
+    gl_FragColor = texture2D(my_texture, frag_uv);
 
   }
 "
