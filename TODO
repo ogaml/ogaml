@@ -30,7 +30,7 @@ OgamlGraphics:
   ✔ Indexing in Model @done(2015-11-16 22:55) @project(OgamlGraphics)
   ✔ Clean unused data in Models @done(2015-11-16 22:55) @project(OgamlGraphics)
   ✔ Custom vertex arrays @done(2015-11-29 00:43) @project(OgamlGraphics)
-  ☐ Test VertexMaps !!!
+  ✔ Test VertexMaps !!! @done(2015-11-29 18:55) @project(OgamlGraphics)
   ☐ Put vector2f/2i everywhere (instead of pairs)
   ☐ Implement PNG parsing
   ☐ Implement JPG parsing
