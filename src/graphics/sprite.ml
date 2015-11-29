@@ -101,3 +101,55 @@ let draw ~window ~sprite =
         ~parameters
         ~uniform
         ~mode:DrawMode.TriangleStrip ()
+
+let update sprite =
+  let vertices =
+    get_vertices
+      sprite.size
+      sprite.position
+      sprite.origin
+      sprite.rotation
+      sprite.scale
+  in
+  sprite.vertices <- vertices
+
+let set_position sprite position =
+  sprite.position <- Vector2f.from_int position ;
+  update sprite
+
+let set_origin sprite origin =
+  sprite.origin <- origin ;
+  update sprite
+
+let set_rotation sprite rotation =
+  sprite.rotation <- rotation ;
+  update sprite
+
+let set_scale sprite scale =
+  sprite.scale <- scale ;
+  update sprite
+
+let translate sprite delta =
+  sprite.position <- Vector2f.(add (from_int delta) sprite.position) ;
+  update sprite
+
+let rotate sprite delta =
+  mod_float (sprite.rotation +. delta) 360.
+  |> set_rotation sprite
+
+let scale sprite scale =
+  let mul v w =
+    Vector2f.({
+      x = v.x *. w.x ;
+      y = v.y *. w.y
+    })
+  in
+  set_scale sprite (mul scale sprite.scale)
+
+let get_position sprite = Vector2f.floor sprite.position
+
+let get_origin sprite = sprite.origin
+
+let get_rotation sprite = sprite.rotation
+
+let get_scale sprite = sprite.scale

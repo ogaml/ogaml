@@ -63,7 +63,7 @@ val draw : window:Window.t -> shape:t -> unit
 (** Sets the position of the origin in the window. *)
 val set_position : t -> OgamlMath.Vector2i.t -> unit
 
-(** Sets the position of the origin with respect to the first point of the
+(** Sets the position of the origin with respect to the top-left corner of the
   * shape. *)
 val set_origin : t -> OgamlMath.Vector2f.t -> unit
 
@@ -98,7 +98,7 @@ val get_position : t -> OgamlMath.Vector2i.t
   * shape. *)
 val get_origin : t -> OgamlMath.Vector2f.t
 
-(** Returns the angle of rotation of the sape. *)
+(** Returns the angle of rotation of the sprite. *)
 val get_rotation : t -> float
 
 (** Returns the scale of the shape. *)
