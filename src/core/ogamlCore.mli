@@ -5,8 +5,7 @@ module Button : sig
 
   (** Mouse buttons enumeration *)
   type t = 
-    | Unknown (* Used when an unrecognized mouse button is triggered. 
-               * You usually don't need to listen on it. *)
+    | Unknown (* Used when an unrecognized mouse button is triggered. You usually don't need to listen on it. *)
     | Left
     | Right
     | Middle
@@ -21,8 +20,7 @@ module Keycode : sig
 
   (** Keys enumeration *)
   type t =
-    | Unknown (* Used when an unrecognized key event is triggered.
-               * You usually don't need to listen on it. *)
+    | Unknown (* Used when an unrecognized key event is triggered. You usually don't need to listen on it. *)
     | A
     | B
     | C
