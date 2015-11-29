@@ -170,8 +170,10 @@ let create src kind =
    size_f   = lengthf;
    size_i   = lengthi;
    length   = Source.length src; 
-   stride_i = (List.fold_left (fun v (s,_,t) -> if Source.is_integer t then v+s else v) 0 attribs);
-   stride_f = (List.fold_left (fun v (s,_,t) -> if Source.is_integer t then v else v+s) 0 attribs);
+   stride_i = (List.fold_left 
+      (fun v (s,_,t) -> if Source.is_integer t then v+(Source.get_size t) else v) 0 attribs);
+   stride_f = (List.fold_left 
+      (fun v (s,_,t) -> if Source.is_integer t then v else v+(Source.get_size t)) 0 attribs);
    bound = None;
   }
 
