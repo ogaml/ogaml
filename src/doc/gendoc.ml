@@ -226,9 +226,12 @@ let rec document_ast = function
     document_ast t
   |Title s :: t ->
     begin
-      match !curr_chan with
-      |None -> ()
-      |Some c -> Printf.fprintf c "### %s\n\n" (snd (parse_comment s))
+      match !curr_doc, !curr_chan with
+      |_, None -> ()
+      |None, Some c -> Printf.fprintf c "### %s\n\n" (snd (parse_comment s))
+      |Some t, Some c -> Printf.fprintf c "\n%s\n" (snd (parse_comment t));
+                         curr_doc := None;
+                         Printf.fprintf c "### %s\n\n" (snd (parse_comment s))
     end;
     document_ast t
   |Module (s,l) :: t -> 

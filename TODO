@@ -31,12 +31,15 @@ OgamlGraphics:
   ✔ Clean unused data in Models @done(2015-11-16 22:55) @project(OgamlGraphics)
   ✔ Custom vertex arrays @done(2015-11-29 00:43) @project(OgamlGraphics)
   ✔ Test VertexMaps !!! @done(2015-11-29 18:55) @project(OgamlGraphics)
+  ☐ OgamlMath interface
+  ☐ Poly export to Model
+  ☐ Model merging
+  ☐ Sources merging
   ☐ Put vector2f/2i everywhere (instead of pairs)
   ☐ Implement PNG parsing
   ☐ Implement JPG parsing
   ☐ Organize image parsing in modules
   ☐ Better support for all formats (for example 24,32 bit bmps)
-  ☐ Document Shape
   ✔ Destroy VAOs, VBOs, EBOs, programs in Gc.finalize @done(2015-11-26 23:17) @project(OgamlGraphics)
 
 Shape:

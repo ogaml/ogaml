@@ -393,6 +393,7 @@ module Window : sig
   (** Raised when calling draw if a uniform variable has an incorrect type *)
   exception Invalid_uniform of string
 
+  (*** Window creation *)
   (** The type of a window *)
   type t
 
