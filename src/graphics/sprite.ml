@@ -41,10 +41,10 @@ let get_vertices size position origin rotation scale =
   Vector2f.([ zero ; w ; h ; add w h ])
   |> List.map (apply_transformations position origin rotation scale)
   |> List.combine Vector2f.([
-    { x = 1. ; y = 1. } ;
     { x = 0. ; y = 1. } ;
-    { x = 1. ; y = 0. } ;
-    { x = 0. ; y = 0. }
+    { x = 1. ; y = 1. } ;
+    { x = 0. ; y = 0. } ;
+    { x = 1. ; y = 0. }
   ])
   |> List.map (fun (coord,pos) ->
     VertexArray.Vertex.create
