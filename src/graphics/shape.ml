@@ -169,6 +169,33 @@ let outline_of_points points thickness color =
       |> fun x -> Some (VertexArray.static x)
     end
 
+let make_polygon ~points
+                 ~color
+                 ?origin:(origin=Vector2f.zero)
+                 ?position:(position=Vector2i.zero)
+                 ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
+                 ?rotation:(rotation=0.)
+                 ?thickness:(thickness=0.)
+                 ?border_color:(out_color=(`RGB Color.RGB.black)) () =
+  let position = Vector2f.from_int position in
+  let vals = {
+   points    = points ;
+   position  = position ;
+   origin    = origin ;
+   rotation  = rotation ;
+   scale     = scale ;
+   thickness = thickness ;
+   color     = color ;
+   out_color = out_color
+  }
+  in
+  let points    = actual_points vals in
+  {
+   vertices   = vertices_of_points points color ;
+   outline    = outline_of_points points thickness out_color ;
+   shape_vals = vals
+  }
+
 let create_polygon ~points
                    ~color
                    ?origin:(origin=Vector2f.zero)
@@ -176,26 +203,18 @@ let create_polygon ~points
                    ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
                    ?rotation:(rotation=0.)
                    ?thickness:(thickness=0.)
-                   ?border_color:(out_color=(`RGB Color.RGB.black)) () =
+                   ?border_color:(border_color=(`RGB Color.RGB.black)) () =
   let points = List.map Vector2f.from_int points in
-  let position = Vector2f.from_int position in
-  let vals = {
-    points    = points ;
-    position  = position ;
-    origin    = origin ;
-    rotation  = rotation ;
-    scale     = scale ;
-    thickness = thickness ;
-    color     = color ;
-    out_color = out_color
-  }
-  in
-  let points    = actual_points vals in
-  {
-    vertices   = vertices_of_points points color ;
-    outline    = outline_of_points points thickness out_color ;
-    shape_vals = vals
-  }
+  make_polygon
+    ~points
+    ~color
+    ~origin
+    ~position
+    ~scale
+    ~rotation
+    ~thickness
+    ~border_color
+    ()
 
 let create_rectangle ~position
                      ~size
@@ -226,7 +245,7 @@ let create_regular ~position
                    ?thickness:(thickness=0.)
                    ?border_color:(border_color=(`RGB Color.RGB.black)) () =
   let rec vertices k l =
-    if k > amount then l
+    if k >= amount then l
     else begin
       let fk = float_of_int k in
       let fn = float_of_int amount in
@@ -237,14 +256,14 @@ let create_regular ~position
       |> vertices (k+1)
     end
   in
-  create_polygon ~points:(List.map Vector2f.floor (List.rev (vertices 0 [])))
-                 ~color
-                 ~origin
-                 ~position
-                 ~scale
-                 ~rotation
-                 ~thickness
-                 ~border_color ()
+  make_polygon ~points:(List.rev (vertices 0 []))
+               ~color
+               ~origin
+               ~position
+               ~scale
+               ~rotation
+               ~thickness
+               ~border_color ()
 
 let create_line ~thickness
                 ~color
@@ -263,7 +282,7 @@ let create_line ~thickness
     let n = cross u v in
     project n
   ) in
-  let points = List.map Vector2f.floor Vector2f.(
+  let points = Vector2f.(
     let delta = prop (thickness /. 2.) n in
     [
       add a delta ;
@@ -272,11 +291,11 @@ let create_line ~thickness
       sub a delta
     ]
   ) in
-  create_polygon ~points
-                 ~color
-                 ~origin
-                 ~position
-                 ~rotation
+  make_polygon ~points
+               ~color
+               ~origin
+               ~position
+               ~rotation
                  ()
 
 (* Applies the modifications to shape_vals *)
@@ -334,23 +353,25 @@ let scale shape scale =
   in
   set_scale shape (mul scale shape.shape_vals.scale)
 
-let get_position shape = Vector2f.floor shape.shape_vals.position
+let position shape = Vector2f.floor shape.shape_vals.position
 
-let get_origin shape = shape.shape_vals.origin
+let origin shape = shape.shape_vals.origin
 
-let get_rotation shape = shape.shape_vals.rotation
+let rotation shape = shape.shape_vals.rotation
 
 let get_scale shape = shape.shape_vals.scale
 
-let get_thickness shape = shape.shape_vals.thickness
+let thickness shape = shape.shape_vals.thickness
 
-let get_color shape = shape.shape_vals.color
+let color shape = shape.shape_vals.color
 
-let get_border_color shape = shape.shape_vals.out_color
+let border_color shape = shape.shape_vals.out_color
 
 let draw ~window ~shape =
   let program = Window.LL.program window in
-  let parameters = DrawParameter.make () in
+  let parameters =
+    DrawParameter.make ~blend_mode:DrawParameter.BlendMode.alpha ()
+  in
   let size = Window.size window in
   let uniform =
     Uniform.empty

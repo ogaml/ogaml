@@ -172,7 +172,7 @@ module DrawParameter : sig
       (** This module consists of only one type enumerating openGL blending factors *)
 
       (** Blending factors *)
-      type t = 
+      type t =
         | Zero
         | One
         | SrcColor
@@ -197,7 +197,7 @@ module DrawParameter : sig
       (** This module consists of only one type enumerating openGL blending equations *)
 
       (** Blending equations @see:OgamlGraphics.DrawParameter.BlendMode.Factor *)
-      type t = 
+      type t =
         | None (* Default equation, replaces the old color by the new one *)
         | Add of Factor.t * Factor.t
         | Sub of Factor.t * Factor.t
@@ -219,17 +219,17 @@ module DrawParameter : sig
 
     (** Soft additive blending mode *)
     val soft_additive : t
-    
+
   end
 
   (** Creates a set of draw parameters
     * @see:OgamlGraphics.DrawParameter.CullingMode
-    * @see:OgamlGraphics.DrawParameter.PolygonMode 
+    * @see:OgamlGraphics.DrawParameter.PolygonMode
     * @see:OgamlGraphics.DrawParameter.BlendMode *)
   val make : ?culling:CullingMode.t ->
              ?polygon:PolygonMode.t ->
              ?depth_test:bool ->
-             ?blend_mode:BlendMode.t -> 
+             ?blend_mode:BlendMode.t ->
              unit -> t
 
 end
@@ -1085,23 +1085,23 @@ module Shape : sig
   val scale : t -> OgamlMath.Vector2f.t -> unit
 
   (** Returns the position of the origin in window coordinates. *)
-  val get_position : t -> OgamlMath.Vector2i.t
+  val position : t -> OgamlMath.Vector2i.t
 
   (** Returns the position of the origin with respect to the first point of the
     * shape. *)
-  val get_origin : t -> OgamlMath.Vector2f.t
+  val origin : t -> OgamlMath.Vector2f.t
 
   (** Returns the angle of rotation of the shape. *)
-  val get_rotation : t -> float
+  val rotation : t -> float
 
   (** Returns the scale of the shape. *)
   val get_scale : t -> OgamlMath.Vector2f.t
 
   (** Returns the thickness of the outline. *)
-  val get_thickness : t -> float
+  val thickness : t -> float
 
   (** Returns the filling color of the shape. *)
-  val get_color : t -> Color.t
+  val color : t -> Color.t
 
 end
 
@@ -1146,14 +1146,14 @@ module Sprite : sig
   val scale : t -> OgamlMath.Vector2f.t -> unit
 
   (** Returns the position of the origin in window coordinates. *)
-  val get_position : t -> OgamlMath.Vector2i.t
+  val position : t -> OgamlMath.Vector2i.t
 
   (** Returns the position of the origin with respect to the first point of the
     * sprite. *)
-  val get_origin : t -> OgamlMath.Vector2f.t
+  val origin : t -> OgamlMath.Vector2f.t
 
   (** Returns the angle of rotation of the sprite. *)
-  val get_rotation : t -> float
+  val rotation : t -> float
 
   (** Returns the scale of the sprite. *)
   val get_scale : t -> OgamlMath.Vector2f.t

@@ -92,23 +92,23 @@ val rotate : t -> float -> unit
 val scale : t -> OgamlMath.Vector2f.t -> unit
 
 (** Returns the position of the origin in window coordinates. *)
-val get_position : t -> OgamlMath.Vector2i.t
+val position : t -> OgamlMath.Vector2i.t
 
 (** Returns the position of the origin with respect to the first point of the
   * shape. *)
-val get_origin : t -> OgamlMath.Vector2f.t
+val origin : t -> OgamlMath.Vector2f.t
 
 (** Returns the angle of rotation of the sprite. *)
-val get_rotation : t -> float
+val rotation : t -> float
 
 (** Returns the scale of the shape. *)
 val get_scale : t -> OgamlMath.Vector2f.t
 
 (** Returns the thickness of the outline. *)
-val get_thickness : t -> float
+val thickness : t -> float
 
 (** Returns the filling color of the shape. *)
-val get_color : t -> Color.t
+val color : t -> Color.t
 
 (** Returns the border color of the shape. *)
-val get_border_color : t -> Color.t
+val border_color : t -> Color.t
