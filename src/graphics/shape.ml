@@ -245,7 +245,7 @@ let create_regular ~position
                    ?thickness:(thickness=0.)
                    ?border_color:(border_color=(`RGB Color.RGB.black)) () =
   let rec vertices k l =
-    if k > amount then l
+    if k >= amount then l
     else begin
       let fk = float_of_int k in
       let fn = float_of_int amount in
@@ -282,7 +282,7 @@ let create_line ~thickness
     let n = cross u v in
     project n
   ) in
-  let points = List.map Vector2f.floor Vector2f.(
+  let points = Vector2f.(
     let delta = prop (thickness /. 2.) n in
     [
       add a delta ;
@@ -291,11 +291,11 @@ let create_line ~thickness
       sub a delta
     ]
   ) in
-  create_polygon ~points
-                 ~color
-                 ~origin
-                 ~position
-                 ~rotation
+  make_polygon ~points
+               ~color
+               ~origin
+               ~position
+               ~rotation
                  ()
 
 (* Applies the modifications to shape_vals *)
