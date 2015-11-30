@@ -91,8 +91,8 @@ let circle =
     ~position:Vector2i.({ x = 450 ; y = 300 })
     ~radius:10.
     ~origin:Vector2f.({ x = 10. ; y = 10. })
-    ~amount:48
-    ~color:(`RGB Color.RGB.({ r = 1. ; g = 1. ; b = 1. ; a = 0. }))
+    ~amount:20
+    ~color:(`RGB Color.RGB.transparent)
     ~thickness:3.
     ~border_color:(`RGB Color.RGB.({ r = 0.21 ; g = 0.2 ; b = 0.23 ; a = 1. }))
     ()
