@@ -1,4 +1,6 @@
 
+exception Load_error of string
+
 type t
 
 val create : [`File of string | `Empty of int * int * Color.t] -> t

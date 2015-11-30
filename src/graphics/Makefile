@@ -6,7 +6,7 @@ INCLUDE_DIRS = -I ../math/ -I ../core/
 
 GRAPHICS_STUBS = shader_stubs.c program_stubs.c texture_stubs.c\
 	         vao_stubs.c vbo_stubs.c uniform_stubs.c\
-		 render_stubs.c ebo_stubs.c utils.c
+		 render_stubs.c ebo_stubs.c image_stubs.c blending_stubs.c utils.c
 
 STUBS_SRC = $(addprefix $(STUBS_DIR)/, $(GRAPHICS_STUBS))
 

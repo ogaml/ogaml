@@ -154,6 +154,8 @@ module DrawParameter : sig
   module PolygonMode : sig
 
     (** This module consists of only one type enumerating OpenGL polygon modes *)
+
+    (** Polygon drawing modes *)
     type t =
       | DrawVertices (* Draws only vertices *)
       | DrawLines (* Draws only lines *)
@@ -161,12 +163,73 @@ module DrawParameter : sig
 
   end
 
+  (** Blending modes manipulation *)
+  module BlendMode : sig
+
+    (** Blending factors enumeration *)
+    module Factor : sig
+
+      (** This module consists of only one type enumerating openGL blending factors *)
+
+      (** Blending factors *)
+      type t = 
+        | Zero
+        | One
+        | SrcColor
+        | OneMinusSrcColor
+        | DestColor
+        | OneMinusDestColor
+        | SrcAlpha
+        | SrcAlphaSaturate
+        | OneMinusSrcAlpha
+        | DestAlpha
+        | OneMinusDestAlpha
+        | ConstColor
+        | OneMinusConstColor
+        | ConstAlpha
+        | OneMinusConstAlpha
+
+    end
+
+    (** Blending equations enumeration *)
+    module Equation : sig
+
+      (** This module consists of only one type enumerating openGL blending equations *)
+
+      (** Blending equations @see:OgamlGraphics.DrawParameter.BlendMode.Factor *)
+      type t = 
+        | None (* Default equation, replaces the old color by the new one *)
+        | Add of Factor.t * Factor.t
+        | Sub of Factor.t * Factor.t
+
+    end
+
+    (** Blending mode structure. This encapsulates a color blending equation and an
+      * alpha blending equation. @see:OgamlGraphics.DrawParameter.BlendMode.Equation *)
+    type t = {color : Equation.t; alpha : Equation.t}
+
+    (** Default blending mode, replaces the old color by the new one *)
+    val default : t
+
+    (** Common alpha blending mode *)
+    val alpha : t
+
+    (** Additive blending mode *)
+    val additive : t
+
+    (** Soft additive blending mode *)
+    val soft_additive : t
+    
+  end
+
   (** Creates a set of draw parameters
     * @see:OgamlGraphics.DrawParameter.CullingMode
-    * @see:OgamlGraphics.DrawParameter.PolygonMode *)
+    * @see:OgamlGraphics.DrawParameter.PolygonMode 
+    * @see:OgamlGraphics.DrawParameter.BlendMode *)
   val make : ?culling:CullingMode.t ->
              ?polygon:PolygonMode.t ->
              ?depth_test:bool ->
+             ?blend_mode:BlendMode.t -> 
              unit -> t
 
 end

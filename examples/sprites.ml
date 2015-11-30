@@ -9,10 +9,18 @@ let texture =
     (Window.state window)
     (`File "examples/mario-block.bmp")
 
+let texture_png = 
+  Texture.Texture2D.create
+    (Window.state window)
+    (`File "examples/test.png")
+
 let sprite = Sprite.create ~texture ()
 
+let sprite2 = Sprite.create ~texture:texture_png ~position:(Vector2i.({x = 50; y = 50})) ()
+
 let draw () =
-  Sprite.draw ~window ~sprite
+  Sprite.draw ~window ~sprite;
+  Sprite.draw ~window ~sprite:sprite2
 
 let do_all action param =
   action sprite param
@@ -55,3 +63,5 @@ let rec each_frame () =
   end
 
 let () = each_frame ()
+
+

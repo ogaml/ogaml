@@ -94,6 +94,18 @@ module LL : sig
   (** Returns the currently bound EBO *)
   val bound_ebo : t -> GL.EBO.t option
 
+  (** Returns whether alpha blending is currently enabled *)
+  val blending : t -> bool
+
+  (** Sets if alpha blending is currently enabled *)
+  val set_blending : t -> bool -> unit
+
+  (** Returns the current blending mode *)
+  val blend_equation : t -> DrawParameter.BlendMode.t
+
+  (** Sets the current blending mode *)
+  val set_blend_equation : t -> DrawParameter.BlendMode.t -> unit
+
 end
 
 

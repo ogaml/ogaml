@@ -36,11 +36,13 @@ OgamlGraphics:
   ☐ Model merging
   ☐ Sources merging
   ☐ Put vector2f/2i everywhere (instead of pairs)
-  ☐ Implement PNG parsing
-  ☐ Implement JPG parsing
-  ☐ Organize image parsing in modules
-  ☐ Better support for all formats (for example 24,32 bit bmps)
+  ✔ Implement PNG parsing @done(2015-11-30 09:19) @project(OgamlGraphics)
+  ✔ Implement JPG parsing @done(2015-11-30 09:19) @project(OgamlGraphics)
+  ✘ Organize image parsing in modules @cancelled(2015-11-30 09:19) @project(OgamlGraphics)
+  ✔ Better support for all formats (for example 24,32 bit bmps) @done(2015-11-30 09:19) @project(OgamlGraphics)
+  ☐ Alpha !
   ✔ Destroy VAOs, VBOs, EBOs, programs in Gc.finalize @done(2015-11-26 23:17) @project(OgamlGraphics)
+  ☐ Remove state from Texture.create ?
 
 Shape:
   ✔ Change the notion of corner of a Shape (it wouldn't work for circles for instance) @done(2015-11-25 21:51) @project(Shape)

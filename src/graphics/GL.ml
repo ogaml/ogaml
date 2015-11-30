@@ -133,6 +133,23 @@ module Pervasives = struct
 end
 
 
+module Blending = struct
+
+  external enable : bool -> unit = "caml_blend_enable"
+
+  external blend_func_separate : 
+    DrawParameter.BlendMode.Factor.t ->
+    DrawParameter.BlendMode.Factor.t ->
+    DrawParameter.BlendMode.Factor.t ->
+    DrawParameter.BlendMode.Factor.t -> unit = "caml_blend_func_separate"
+
+  external blend_equation_separate : 
+    DrawParameter.BlendMode.Equation.t ->
+    DrawParameter.BlendMode.Equation.t -> unit = "caml_blend_equation_separate"
+
+end
+
+
 module Texture = struct
 
   type t

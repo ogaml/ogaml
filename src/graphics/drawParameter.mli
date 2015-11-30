@@ -25,10 +25,57 @@ module PolygonMode : sig
 
 end
 
+(** Blend mode *)
+module BlendMode : sig
+
+  module Factor : sig
+
+    type t = 
+      | Zero
+      | One
+      | SrcColor
+      | OneMinusSrcColor
+      | DestColor
+      | OneMinusDestColor
+      | SrcAlpha
+      | SrcAlphaSaturate
+      | OneMinusSrcAlpha
+      | DestAlpha
+      | OneMinusDestAlpha
+      | ConstColor
+      | OneMinusConstColor
+      | ConstAlpha
+      | OneMinusConstAlpha
+
+  end
+
+  module Equation : sig
+
+    type t = 
+      | None
+      | Add of Factor.t * Factor.t
+      | Sub of Factor.t * Factor.t
+
+  end
+
+  type t = {color : Equation.t; alpha : Equation.t}
+
+  val default : t
+
+  val alpha : t
+
+  val additive : t
+
+  val soft_additive : t
+  
+end
+
+
 (** Creates a set *)
 val make : ?culling:CullingMode.t -> 
            ?polygon:PolygonMode.t ->
            ?depth_test:bool ->
+           ?blend_mode:BlendMode.t -> 
            unit -> t
 
 (** Returns the value of the culling parameter *)
@@ -39,4 +86,6 @@ val polygon : t -> PolygonMode.t
 
 (** Returns the value of the depth test parameter *)
 val depth_test : t -> bool
+
+val blend_mode : t -> BlendMode.t
 

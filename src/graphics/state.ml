@@ -15,7 +15,9 @@ type t = {
   mutable bound_vbo : GL.VBO.t option;
   mutable bound_vao : GL.VAO.t option;
   mutable bound_ebo : GL.EBO.t option;
-  mutable color : Color.t
+  mutable color : Color.t;
+  mutable blending : bool;
+  mutable blend_equation : DrawParameter.BlendMode.t
 }
 
 let version s = 
@@ -76,7 +78,9 @@ module LL = struct
       bound_vbo = None;
       bound_vao = None;
       bound_ebo = None;
-      color = `RGB (Color.RGB.transparent)
+      color = `RGB (Color.RGB.transparent);
+      blending = false;
+      blend_equation = DrawParameter.BlendMode.default
     }
 
   let set_culling_mode s m =
@@ -133,5 +137,13 @@ module LL = struct
 
   let set_clear_color s c = 
     s.color <- c
+
+  let blending s = s.blending
+
+  let set_blending s b = s.blending <- b
+
+  let blend_equation s = s.blend_equation
+
+  let set_blend_equation s eq = s.blend_equation <- eq
 
 end

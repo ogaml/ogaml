@@ -94,6 +94,24 @@ module Pervasives : sig
 end
 
 
+(** OpenGL blending functions *)
+module Blending : sig
+
+  val enable : bool -> unit
+
+  val blend_func_separate : 
+    DrawParameter.BlendMode.Factor.t -> 
+    DrawParameter.BlendMode.Factor.t -> 
+    DrawParameter.BlendMode.Factor.t -> 
+    DrawParameter.BlendMode.Factor.t -> unit
+
+  val blend_equation_separate : 
+    DrawParameter.BlendMode.Equation.t ->
+    DrawParameter.BlendMode.Equation.t -> unit
+
+end
+
+
 (** Represents an openGL texture *)
 module Texture : sig
 
