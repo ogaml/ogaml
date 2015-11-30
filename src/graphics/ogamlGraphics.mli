@@ -989,7 +989,7 @@ module Shape : sig
     * All coordinates are taken with respect to the top-left corner of the
     * shape. *)
   val create_polygon :
-    points        : OgamlMath.Vector2f.t list ->
+    points        : OgamlMath.Vector2i.t list ->
     color         : Color.t ->
     ?origin       : OgamlMath.Vector2f.t ->
     ?position     : OgamlMath.Vector2i.t ->

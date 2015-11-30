@@ -23,12 +23,12 @@ let rectangle2 =
 
 let polygon1 =
   Shape.create_polygon
-    ~points:Vector2f.([
-      { x =   0. ; y =  80. } ;
-      { x =  40. ; y =   0. } ;
-      { x = 120. ; y =   0. } ;
-      { x = 160. ; y =  80. } ;
-      { x =  80. ; y = 160. }
+    ~points:Vector2i.([
+      { x =   0 ; y =  80 } ;
+      { x =  40 ; y =   0 } ;
+      { x = 120 ; y =   0 } ;
+      { x = 160 ; y =  80 } ;
+      { x =  80 ; y = 160 }
     ])
     ~color:(`RGB Color.RGB.green)
     ~border_color:(`RGB Color.RGB.magenta)
@@ -37,12 +37,12 @@ let polygon1 =
 
 let polygon2 =
   Shape.create_polygon
-    ~points:Vector2f.([
-      { x =   0. ; y =  80. } ;
-      { x =  40. ; y =   0. } ;
-      { x = 120. ; y =   0. } ;
-      { x = 160. ; y =  80. } ;
-      { x =  80. ; y = 160. }
+    ~points:Vector2i.([
+      { x =   0 ; y =  80 } ;
+      { x =  40 ; y =   0 } ;
+      { x = 120 ; y =   0 } ;
+      { x = 160 ; y =  80 } ;
+      { x =  80 ; y = 160 }
     ])
     ~color:(`RGB Color.RGB.magenta)
     ~border_color:(`RGB Color.RGB.green)

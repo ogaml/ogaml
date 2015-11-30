@@ -169,6 +169,33 @@ let outline_of_points points thickness color =
       |> fun x -> Some (VertexArray.static x)
     end
 
+let make_polygon ~points
+                 ~color
+                 ?origin:(origin=Vector2f.zero)
+                 ?position:(position=Vector2i.zero)
+                 ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
+                 ?rotation:(rotation=0.)
+                 ?thickness:(thickness=0.)
+                 ?border_color:(out_color=(`RGB Color.RGB.black)) () =
+  let position = Vector2f.from_int position in
+  let vals = {
+   points    = points ;
+   position  = position ;
+   origin    = origin ;
+   rotation  = rotation ;
+   scale     = scale ;
+   thickness = thickness ;
+   color     = color ;
+   out_color = out_color
+  }
+  in
+  let points    = actual_points vals in
+  {
+   vertices   = vertices_of_points points color ;
+   outline    = outline_of_points points thickness out_color ;
+   shape_vals = vals
+  }
+
 let create_polygon ~points
                    ~color
                    ?origin:(origin=Vector2f.zero)
@@ -176,26 +203,18 @@ let create_polygon ~points
                    ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
                    ?rotation:(rotation=0.)
                    ?thickness:(thickness=0.)
-                   ?border_color:(out_color=(`RGB Color.RGB.black)) () =
-  (* let points = List.map Vector2f.from_int points in *)
-  let position = Vector2f.from_int position in
-  let vals = {
-    points    = points ;
-    position  = position ;
-    origin    = origin ;
-    rotation  = rotation ;
-    scale     = scale ;
-    thickness = thickness ;
-    color     = color ;
-    out_color = out_color
-  }
-  in
-  let points    = actual_points vals in
-  {
-    vertices   = vertices_of_points points color ;
-    outline    = outline_of_points points thickness out_color ;
-    shape_vals = vals
-  }
+                   ?border_color:(border_color=(`RGB Color.RGB.black)) () =
+  let points = List.map Vector2f.from_int points in
+  make_polygon
+    ~points
+    ~color
+    ~origin
+    ~position
+    ~scale
+    ~rotation
+    ~thickness
+    ~border_color
+    ()
 
 let create_rectangle ~position
                      ~size
@@ -205,10 +224,9 @@ let create_rectangle ~position
                      ?rotation:(rotation=0.)
                      ?thickness:(thickness=0.)
                      ?border_color:(border_color=(`RGB Color.RGB.black)) () =
-  let size = Vector2f.from_int size in
-  let w = Vector2f.({ x = size.x ; y = 0. })
-  and h = Vector2f.({ x = 0. ; y = size.y }) in
-  create_polygon ~points:Vector2f.([zero ; w ; size ; h])
+  let w = Vector2i.({ x = size.x ; y = 0 })
+  and h = Vector2i.({ x = 0 ; y = size.y }) in
+  create_polygon ~points:Vector2i.([zero ; w ; size ; h])
                  ~color
                  ~origin
                  ~position
@@ -238,14 +256,14 @@ let create_regular ~position
       |> vertices (k+1)
     end
   in
-  create_polygon ~points:(List.rev (vertices 0 []))
-                 ~color
-                 ~origin
-                 ~position
-                 ~scale
-                 ~rotation
-                 ~thickness
-                 ~border_color ()
+  make_polygon ~points:(List.rev (vertices 0 []))
+               ~color
+               ~origin
+               ~position
+               ~scale
+               ~rotation
+               ~thickness
+               ~border_color ()
 
 let create_line ~thickness
                 ~color
@@ -264,7 +282,7 @@ let create_line ~thickness
     let n = cross u v in
     project n
   ) in
-  let points = (*List.map Vector2f.floor*) Vector2f.(
+  let points = List.map Vector2f.floor Vector2f.(
     let delta = prop (thickness /. 2.) n in
     [
       add a delta ;
