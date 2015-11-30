@@ -38,14 +38,14 @@ val rotate : t -> float -> unit
 val scale : t -> OgamlMath.Vector2f.t -> unit
 
 (** Returns the position of the origin in window coordinates. *)
-val get_position : t -> OgamlMath.Vector2i.t
+val position : t -> OgamlMath.Vector2i.t
 
 (** Returns the position of the origin with respect to the first point of the
   * sprite. *)
-val get_origin : t -> OgamlMath.Vector2f.t
+val origin : t -> OgamlMath.Vector2f.t
 
 (** Returns the angle of rotation of the sprite. *)
-val get_rotation : t -> float
+val rotation : t -> float
 
 (** Returns the scale of the sprite. *)
 val get_scale : t -> OgamlMath.Vector2f.t

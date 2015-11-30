@@ -146,10 +146,10 @@ let scale sprite scale =
   in
   set_scale sprite (mul scale sprite.scale)
 
-let get_position sprite = Vector2f.floor sprite.position
+let position sprite = Vector2f.floor sprite.position
 
-let get_origin sprite = sprite.origin
+let origin sprite = sprite.origin
 
-let get_rotation sprite = sprite.rotation
+let rotation sprite = sprite.rotation
 
 let get_scale sprite = sprite.scale

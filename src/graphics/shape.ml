@@ -353,19 +353,19 @@ let scale shape scale =
   in
   set_scale shape (mul scale shape.shape_vals.scale)
 
-let get_position shape = Vector2f.floor shape.shape_vals.position
+let position shape = Vector2f.floor shape.shape_vals.position
 
-let get_origin shape = shape.shape_vals.origin
+let origin shape = shape.shape_vals.origin
 
-let get_rotation shape = shape.shape_vals.rotation
+let rotation shape = shape.shape_vals.rotation
 
 let get_scale shape = shape.shape_vals.scale
 
-let get_thickness shape = shape.shape_vals.thickness
+let thickness shape = shape.shape_vals.thickness
 
-let get_color shape = shape.shape_vals.color
+let color shape = shape.shape_vals.color
 
-let get_border_color shape = shape.shape_vals.out_color
+let border_color shape = shape.shape_vals.out_color
 
 let draw ~window ~shape =
   let program = Window.LL.program window in

@@ -122,7 +122,7 @@ let do_all action param =
 let gothicker shape yes =
   Shape.set_thickness
     shape
-    ((Shape.get_thickness shape) +. if yes then 1. else (-1.))
+    ((Shape.thickness shape) +. if yes then 1. else (-1.))
 
 let rec handle_events () =
   let open OgamlCore in
