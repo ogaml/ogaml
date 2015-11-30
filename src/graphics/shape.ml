@@ -350,7 +350,9 @@ let get_border_color shape = shape.shape_vals.out_color
 
 let draw ~window ~shape =
   let program = Window.LL.program window in
-  let parameters = DrawParameter.make () in
+  let parameters =
+    DrawParameter.make ~blend_mode:DrawParameter.BlendMode.alpha ()
+  in
   let (sx,sy) = Window.size window in
   let uniform =
     Uniform.empty
