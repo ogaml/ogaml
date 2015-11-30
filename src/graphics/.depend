@@ -45,15 +45,13 @@ uniform.cmo : texture.cmi state.cmi program.cmi GLTypes.cmi GL.cmi color.cmi \
 uniform.cmx : texture.cmx state.cmx program.cmx GLTypes.cmi GL.cmx color.cmx \
     uniform.cmi
 vertexArray.cmo : window.cmi uniform.cmi state.cmi program.cmi \
-    indexArray.cmi GLTypes.cmi GL.cmi drawParameter.cmi color.cmi \
-    vertexArray.cmi
+    indexArray.cmi GLTypes.cmi GL.cmi color.cmi vertexArray.cmi
 vertexArray.cmx : window.cmx uniform.cmx state.cmx program.cmx \
-    indexArray.cmx GLTypes.cmi GL.cmx drawParameter.cmx color.cmx \
-    vertexArray.cmi
+    indexArray.cmx GLTypes.cmi GL.cmx color.cmx vertexArray.cmi
 vertexMap.cmo : window.cmi uniform.cmi state.cmi program.cmi indexArray.cmi \
-    GLTypes.cmi GL.cmi drawParameter.cmi color.cmi vertexMap.cmi
+    GLTypes.cmi GL.cmi color.cmi vertexMap.cmi
 vertexMap.cmx : window.cmx uniform.cmx state.cmx program.cmx indexArray.cmx \
-    GLTypes.cmi GL.cmx drawParameter.cmx color.cmx vertexMap.cmi
+    GLTypes.cmi GL.cmx color.cmx vertexMap.cmi
 window.cmo : state.cmi program.cmi ../core/ogamlCore.cmi ../core/LL.cmi \
     GL.cmi contextSettings.cmi color.cmi window.cmi
 window.cmx : state.cmx program.cmx ../core/ogamlCore.cmi ../core/LL.cmi \

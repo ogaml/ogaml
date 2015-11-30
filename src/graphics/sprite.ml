@@ -84,7 +84,7 @@ let create ~texture
 
 let draw ~window ~sprite =
   let program = Window.LL.sprite_program window in
-  let parameters = DrawParameter.make () in
+  let parameters = DrawParameter.make ~blend_mode:DrawParameter.BlendMode.alpha () in
   let (sx,sy) = Window.size window in
   let uniform =
     Uniform.empty

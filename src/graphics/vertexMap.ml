@@ -276,21 +276,7 @@ let bind state t prog =
 
 let draw ~vertices ~window ?indices ~program ~uniform ~parameters ~mode () =
   let state = Window.state window in
-  let cull_mode = DrawParameter.culling parameters in
-  if State.culling_mode state <> cull_mode then begin
-    State.LL.set_culling_mode state cull_mode;
-    GL.Pervasives.culling cull_mode
-  end;
-  let poly_mode = DrawParameter.polygon parameters in
-  if State.polygon_mode state <> poly_mode then begin
-    State.LL.set_polygon_mode state poly_mode;
-    GL.Pervasives.polygon poly_mode
-  end;
-  let depth_testing = DrawParameter.depth_test parameters in
-  if State.depth_test state <> depth_testing then begin
-    State.LL.set_depth_test state depth_testing;
-    GL.Pervasives.depthtest depth_testing
-  end;
+  State.LL.bind_draw_parameters state parameters;
   Program.LL.use state (Some program);
   Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind state uniform unif);
   bind state vertices program;

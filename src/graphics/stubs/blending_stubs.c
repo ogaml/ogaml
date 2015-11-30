@@ -18,12 +18,12 @@
 
 GLenum BlendFunc_val(value func) 
 {
-  switch(Int_val(func))
+  switch(Tag_val(func))
   {
-    case 1:
+    case 0:
       return GL_FUNC_ADD;
 
-    case 2:
+    case 1:
       return GL_FUNC_SUBTRACT;
 
     default:
@@ -117,9 +117,10 @@ caml_blend_equation_separate(value eqRGB, value eqA)
 {
   CAMLparam2(eqRGB, eqA);
 
-  glBlendEquationSeparate(
-      BlendFunc_val(eqRGB),
-      BlendFunc_val(eqA));
+  GLenum rgb_eq = (Is_long(eqRGB))? GL_FUNC_ADD : BlendFunc_val(eqRGB);
+  GLenum alp_eq = (Is_long(eqA))?   GL_FUNC_ADD : BlendFunc_val(eqA  );
+
+  glBlendEquationSeparate(rgb_eq, alp_eq);
 
   CAMLreturn(Val_unit);
 }

@@ -40,7 +40,7 @@ OgamlGraphics:
   ✔ Implement JPG parsing @done(2015-11-30 09:19) @project(OgamlGraphics)
   ✘ Organize image parsing in modules @cancelled(2015-11-30 09:19) @project(OgamlGraphics)
   ✔ Better support for all formats (for example 24,32 bit bmps) @done(2015-11-30 09:19) @project(OgamlGraphics)
-  ☐ Alpha !
+  ✔ Alpha ! @done(2015-11-30 11:16) @project(OgamlGraphics)
   ✔ Destroy VAOs, VBOs, EBOs, programs in Gc.finalize @done(2015-11-26 23:17) @project(OgamlGraphics)
   ☐ Remove state from Texture.create ?
 

@@ -106,6 +106,9 @@ module LL : sig
   (** Sets the current blending mode *)
   val set_blend_equation : t -> DrawParameter.BlendMode.t -> unit
 
+
+  val bind_draw_parameters : t -> DrawParameter.t -> unit
+
 end
 
 
