@@ -172,7 +172,7 @@ module DrawParameter : sig
       (** This module consists of only one type enumerating openGL blending factors *)
 
       (** Blending factors *)
-      type t = 
+      type t =
         | Zero
         | One
         | SrcColor
@@ -197,7 +197,7 @@ module DrawParameter : sig
       (** This module consists of only one type enumerating openGL blending equations *)
 
       (** Blending equations @see:OgamlGraphics.DrawParameter.BlendMode.Factor *)
-      type t = 
+      type t =
         | None (* Default equation, replaces the old color by the new one *)
         | Add of Factor.t * Factor.t
         | Sub of Factor.t * Factor.t
@@ -219,17 +219,17 @@ module DrawParameter : sig
 
     (** Soft additive blending mode *)
     val soft_additive : t
-    
+
   end
 
   (** Creates a set of draw parameters
     * @see:OgamlGraphics.DrawParameter.CullingMode
-    * @see:OgamlGraphics.DrawParameter.PolygonMode 
+    * @see:OgamlGraphics.DrawParameter.PolygonMode
     * @see:OgamlGraphics.DrawParameter.BlendMode *)
   val make : ?culling:CullingMode.t ->
              ?polygon:PolygonMode.t ->
              ?depth_test:bool ->
-             ?blend_mode:BlendMode.t -> 
+             ?blend_mode:BlendMode.t ->
              unit -> t
 
 end
@@ -989,7 +989,7 @@ module Shape : sig
     * All coordinates are taken with respect to the top-left corner of the
     * shape. *)
   val create_polygon :
-    points        : OgamlMath.Vector2i.t list ->
+    points        : OgamlMath.Vector2f.t list ->
     color         : Color.t ->
     ?origin       : OgamlMath.Vector2f.t ->
     ?position     : OgamlMath.Vector2i.t ->
