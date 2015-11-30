@@ -155,21 +155,18 @@ let display () =
 
 
 (* Camera *)
-let centerx, centery =
-  let (x,y) = Window.size window in
-  (x / 2, y / 2)
+let center = Vector2i.div 2 (Window.size window)
 
-let () =
-  Mouse.set_relative_position window (centerx, centery)
+let () = Mouse.set_relative_position window center
 
 let rec update_camera () =
-  let x,y = Mouse.relative_position window in
-  let dx, dy = x - centerx, y - centery in
+  let vmouse = Mouse.relative_position window in
+  let vdelta = Vector2i.sub vmouse center in
   let lim = Constants.pi /. 2. -. 0.1 in
-  view_theta := !view_theta -. 0.005 *. (float_of_int dx);
-  view_phi   := !view_phi   -. 0.005 *. (float_of_int dy);
+  view_theta := !view_theta -. 0.005 *. (float_of_int vdelta.OgamlMath.Vector2i.x);
+  view_phi   := !view_phi   -. 0.005 *. (float_of_int vdelta.OgamlMath.Vector2i.y);
   view_phi   := min (max !view_phi (-.lim)) lim;
-  Mouse.set_relative_position window (centerx, centery)
+  Mouse.set_relative_position window center
 
 (* Handle keys directly by polling the keyboard *)
 let handle_keys () =

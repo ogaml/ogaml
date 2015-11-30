@@ -50,7 +50,8 @@ let create = function
         Bytes.set img.data i a
     done; img
 
-let size img = (img.width, img.height)
+let size img = 
+  OgamlMath.Vector2i.({x = img.width; y = img.height})
 
 let set img x y c = 
   let r,g,b,a =

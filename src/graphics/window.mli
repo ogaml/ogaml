@@ -16,7 +16,7 @@ val close : t -> unit
 val destroy : t -> unit
 
 (** Return the size of a window *)
-val size : t -> (int * int)
+val size : t -> OgamlMath.Vector2i.t
 
 (** Return true iff the window is open *)
 val is_open : t -> bool

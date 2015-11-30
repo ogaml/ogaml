@@ -68,8 +68,8 @@ let create ~texture
            ?position:(position=Vector2i.zero)
            ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
            ?rotation:(rotation=0.) () =
-  let (w,h) = Texture.Texture2D.size texture in
-  let size = Vector2f.({ x = float_of_int w ; y = float_of_int h }) in
+  let sizei = Texture.Texture2D.size texture in
+  let size = Vector2f.from_int sizei in
   let position = Vector2f.from_int position in
   let vertices = get_vertices size position origin rotation scale in
   {
@@ -85,12 +85,11 @@ let create ~texture
 let draw ~window ~sprite =
   let program = Window.LL.sprite_program window in
   let parameters = DrawParameter.make ~blend_mode:DrawParameter.BlendMode.alpha () in
-  let (sx,sy) = Window.size window in
+  let sizei = Window.size window in
+  let size = Vector2f.from_int sizei in
   let uniform =
     Uniform.empty
-    |> Uniform.vector2f "size" OgamlMath.(
-         Vector2f.from_int Vector2i.({ x = sx ; y = sy })
-       )
+    |> Uniform.vector2f "size" size
     |> Uniform.texture2D "my_texture" sprite.texture
   in
   let vertices = sprite.vertices in

@@ -1,3 +1,6 @@
+
+exception Vector3f_exception of string
+
 type t = {x : float; y : float; z : float}
 
 let zero   = {x = 0.; y = 0.; z = 0.}
@@ -26,11 +29,15 @@ let prop f v = {
   z = f *. v.z
 }
 
-let div f v = {
-  x = v.x /. f;
-  y = v.y /. f;
-  z = v.z /. f
-}
+let div f v = 
+  if f = 0. then
+    raise (Vector3f_exception "Division by zero")
+  else
+    {
+      x = v.x /. f;
+      y = v.y /. f;
+      z = v.z /. f
+    }
 
 let floor v = {
   Vector3i.x = int_of_float v.x;
@@ -73,7 +80,11 @@ let norm v =
   sqrt (dot v v)
 
 let normalize v = 
-  div (norm v) v
+  let n = norm v in
+  if n = 0. then
+    raise (Vector3f_exception "Cannot normalize zero vector")
+  else 
+    div n v
 
 let clamp u a b = {
   x = min b.x (max u.x a.x);
@@ -94,8 +105,12 @@ let print u =
   Printf.sprintf "(x = %f; y = %f; z = %f)" u.x u.y u.z
 
 let direction u v = 
-  sub v u
-  |> normalize
+  let dir = sub v u in
+  let n = norm dir in
+  if n = 0. then
+    raise (Vector3f_exception "Cannot get normalized direction from identical points")
+  else
+    div n dir
 
 let endpoint u v t =
   prop t v

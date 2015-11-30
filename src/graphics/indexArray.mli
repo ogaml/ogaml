@@ -11,6 +11,8 @@ module Source : sig
 
   val length : t -> int
 
+  val append : t -> t -> t
+
 end
 
 type static

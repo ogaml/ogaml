@@ -22,6 +22,9 @@ module Data : sig
   (** Type of data using caml type 'a and storing type 'b *)
   type ('a, 'b) t  
 
+  (** Append the second array at the end of the first one *)
+  val append : ('a, 'b) t -> ('a, 'b) t -> unit
+
   (** Creates some data, the integer must be the expected size *)
   val create_int : int -> (int32, int_32) t
 

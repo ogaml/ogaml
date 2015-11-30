@@ -52,7 +52,8 @@ module Window = struct
     win.closed <- true
 
   let size win =
-    X11.Window.size win.display win.window
+    let (x,y) = X11.Window.size win.display win.window in
+    OgamlMath.Vector2i.({x;y})
 
   let is_open win =
     not win.closed
@@ -245,17 +246,19 @@ module Mouse = struct
 
   let position () = 
     let d = X11.Display.create () in
-    X11.Mouse.position d (X11.Window.root_of d)
+    let (x,y) = X11.Mouse.position d (X11.Window.root_of d) in
+    OgamlMath.Vector2i.({x;y})
 
   let relative_position win = 
-    X11.Mouse.position win.Window.display win.Window.window
+    let (x,y) = X11.Mouse.position win.Window.display win.Window.window in
+    OgamlMath.Vector2i.({x;y})
 
-  let set_position (x,y) = 
+  let set_position v = 
     let d = X11.Display.create () in
-    X11.Mouse.warp d (X11.Window.root_of d) x y
+    X11.Mouse.warp d (X11.Window.root_of d) v.OgamlMath.Vector2i.x v.OgamlMath.Vector2i.y
 
-  let set_relative_position win (x,y) = 
-    X11.Mouse.warp win.Window.display win.Window.window x y
+  let set_relative_position win v = 
+    X11.Mouse.warp win.Window.display win.Window.window v.OgamlMath.Vector2i.x v.OgamlMath.Vector2i.y
 
   let is_pressed button = 
     let d = X11.Display.create () in

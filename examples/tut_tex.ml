@@ -72,7 +72,7 @@ let vertex_source = VertexArray.Source.(
 
 let vertices = VertexArray.static vertex_source
 
-let texture = Texture.Texture2D.create (Window.state window) (`File "examples/mario-block.bmp")
+let texture = Texture.Texture2D.create (`File "examples/mario-block.bmp")
 
 let parameters = DrawParameter.make ()
 

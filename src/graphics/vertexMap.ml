@@ -127,6 +127,18 @@ module Source = struct
     let binds = StringMap.bindings src.types in
     offset_list 0 0 binds
 
+  let append s1 s2 =
+    if (StringMap.equal 
+         (fun (v1 : GLTypes.GlslType.t) 
+              (v2 : GLTypes.GlslType.t) -> v1 = v2
+         ) s1.types s2.types) 
+    then begin
+      s1.length <- s1.length + s2.length;
+      GL.Data.append s1.fdata s2.fdata;
+      GL.Data.append s1.idata s2.idata;
+      s1
+    end else 
+      raise (Invalid_source "Cannot append a source at the end of another source of different type")
 end
 
 

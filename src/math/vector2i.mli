@@ -1,5 +1,7 @@
 (* Operation on immutable 2 ints vectors *)
 
+exception Vector2i_exception of string
+
 type t = {x : int; y : int}
 
 val zero : t

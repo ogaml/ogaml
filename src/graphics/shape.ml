@@ -351,11 +351,11 @@ let get_border_color shape = shape.shape_vals.out_color
 let draw ~window ~shape =
   let program = Window.LL.program window in
   let parameters = DrawParameter.make () in
-  let (sx,sy) = Window.size window in
+  let size = Window.size window in
   let uniform =
     Uniform.empty
     |> Uniform.vector2f "size" OgamlMath.(
-         Vector2f.from_int Vector2i.({ x = sx ; y = sy })
+         Vector2f.from_int Vector2i.({ x = size.x ; y = size.y })
        )
   in
   let vertices = shape.vertices in

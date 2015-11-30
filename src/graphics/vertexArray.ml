@@ -136,6 +136,17 @@ module Source = struct
   let stride src = 
     List.fold_left (fun v (t,_,_) -> v + size_of_attrib t) 0 (attribs src)
 
+  let append s1 s2 =
+    if (requires_position s1) = (requires_position s2)
+    && (requires_normal   s1) = (requires_normal   s2)
+    && (requires_uv       s1) = (requires_uv       s2)
+    && (requires_color    s1) = (requires_color    s2)
+    then begin 
+      s1.length <- s1.length + s2.length;
+      GL.Data.append s1.data s2.data;
+      s1
+    end else 
+      raise (Invalid_source "Cannot append a source at the end of another source of different type")
 
 end
 

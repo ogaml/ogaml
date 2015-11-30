@@ -1,5 +1,7 @@
 (* Optimized operations on 3D (4x4) float matrices *)
 
+exception Matrix3D_exception of string
+
 (* Type of 4x4 matrices stored in a flat column major array *)
 type t
 

@@ -4,15 +4,9 @@ open OgamlMath
 let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
 let window = Window.create ~width:900 ~height:600 ~settings
 
-let texture =
-  Texture.Texture2D.create
-    (Window.state window)
-    (`File "examples/mario-block.bmp")
+let texture = Texture.Texture2D.create (`File "examples/mario-block.bmp")
 
-let texture_png = 
-  Texture.Texture2D.create
-    (Window.state window)
-    (`File "examples/test.png")
+let texture_png = Texture.Texture2D.create (`File "examples/test.png")
 
 let sprite = Sprite.create ~texture ()
 

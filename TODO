@@ -23,7 +23,8 @@ OgamlCore:
   ☐ Encapsulate parameters (title, depth buffer size, etc..)
 
 OgamlMath:
-  ☐ Matrices, quaternions and vector exceptions
+  ✔ Matrices, quaternions and vector exceptions @done(2015-11-30 21:58) @project(OgamlMath)
+  ☐ Interface
 
 OgamlGraphics:
   ✔ Better normal computations in Model @done(2015-11-15 23:22) @project(OgamlGraphics)
@@ -31,19 +32,21 @@ OgamlGraphics:
   ✔ Clean unused data in Models @done(2015-11-16 22:55) @project(OgamlGraphics)
   ✔ Custom vertex arrays @done(2015-11-29 00:43) @project(OgamlGraphics)
   ✔ Test VertexMaps !!! @done(2015-11-29 18:55) @project(OgamlGraphics)
-  ☐ OgamlMath interface
-  ☐ Poly export to Model
-  ☐ Model merging
-  ☐ Sources merging
-  ☐ Put vector2f/2i everywhere (instead of pairs)
+  ✔ Sources merging @done(2015-11-30 21:03) @project(OgamlGraphics)
+  ✔ Put vector2f/2i everywhere (instead of pairs) @done(2015-11-30 21:39) @project(OgamlGraphics)
   ✔ Implement PNG parsing @done(2015-11-30 09:19) @project(OgamlGraphics)
   ✔ Implement JPG parsing @done(2015-11-30 09:19) @project(OgamlGraphics)
   ✘ Organize image parsing in modules @cancelled(2015-11-30 09:19) @project(OgamlGraphics)
   ✔ Better support for all formats (for example 24,32 bit bmps) @done(2015-11-30 09:19) @project(OgamlGraphics)
   ✔ Alpha ! @done(2015-11-30 11:16) @project(OgamlGraphics)
   ✔ Destroy VAOs, VBOs, EBOs, programs in Gc.finalize @done(2015-11-26 23:17) @project(OgamlGraphics)
-  ☐ Remove state from Texture.create ?
+  ✔ Remove state from Texture.create ? @done(2015-11-30 20:41) @project(OgamlGraphics)
 
+Future work on Model:
+  ☐ Rewrite Model to add iterators, simplify the interface, and only index ad-hoc (when requested by source)
+  ☐ Poly export to Model.t
+  ☐ Model merging
+  
 Shape:
   ✔ Change the notion of corner of a Shape (it wouldn't work for circles for instance) @done(2015-11-25 21:51) @project(Shape)
   ✔ Add circles (as regular polygons) @done(2015-11-25 21:51) @project(Shape)

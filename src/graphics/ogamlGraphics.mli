@@ -301,7 +301,7 @@ module Image : sig
   val create : [`File of string | `Empty of int * int * Color.t] -> t
 
   (** Return the size of an image *)
-  val size : t -> (int * int)
+  val size : t -> OgamlMath.Vector2i.t
 
   (** Sets a pixel of an image
     * @see:OgamlGraphics.Color *)
@@ -330,12 +330,11 @@ module Texture : sig
     (** Type of a 2D texture *)
     type t
 
-    (** Creates a texture from a state and a source (a file or an image)
-      * @see:OgamlGraphics.State *)
-    val create : State.t -> [< `File of string | `Image of Image.t ] -> t
+    (** Creates a texture from a source (a file or an image) *)
+    val create : [< `File of string | `Image of Image.t ] -> t
 
     (** Returns the size of a texture *)
-    val size : t -> (int * int)
+    val size : t -> OgamlMath.Vector2i.t
 
   end
 
@@ -474,8 +473,9 @@ module Window : sig
 
   (*** Information About Windows *)
   (** Returns in pixel the width and height of the window
-    * (it only takes into account the size of the content where you can draw, *ie* the useful information). *)
-  val size : t -> (int * int)
+    * (it only takes into account the size of the content where you can draw, *ie* the useful information).
+    * @see:OgamlMath.Vector2i *)
+  val size : t -> OgamlMath.Vector2i.t
 
   (** Tells whether the window is currently open *)
   val is_open : t -> bool
@@ -536,6 +536,11 @@ module IndexArray : sig
 
     (** Returns the length of a source *)
     val length : t -> int
+
+    (** $append s1 s2$ appends the source $s2$ at the end of the source $s1$ (in place),
+      * and returns $s1$.
+      * Raises Invalid_source if types are incompatible. *)
+    val append : t -> t -> t
 
   end
 
@@ -660,6 +665,12 @@ module VertexArray : sig
 
     (** Returns the length of a source *)
     val length : t -> int
+
+    (** $append s1 s2$ appends the source $s2$ at the end of the source $s1$ (in place), 
+      * and returns $s1$.
+      * If the attribute names are different, the names in the source $s1$ are used.
+      * Raises Invalid_source if types are incompatible. *)
+    val append : t -> t -> t
 
   end
 
@@ -811,6 +822,11 @@ module VertexMap : sig
 
     (** Returns the length of a source *)
     val length : t -> int
+
+    (** $append s1 s2$ appends the source $s2$ at the end of the source $s1$ (in place),
+      * and returns $s1$.
+      * Raises Invalid_source if types are incompatible. *)
+    val append : t -> t -> t
 
   end
 
@@ -1154,23 +1170,23 @@ module Mouse : sig
 
   (*** Accessing position *)
   (** Returns the position of the cursor relatively to the screen.
-    *
-    * $let (x,y) = position ()$ assigns the number of pixels from the left of
-    * the screen to the cursor in $x$ and the number of pixels from the top in $y$
-  *)
-  val position : unit -> (int * int)
+    * @see:OgamlMath.Vector2i *)
+  val position : unit -> OgamlMath.Vector2i.t
 
   (** Returns the position of the cursor relatively to a window.
-    * @see:OgamlGraphics.Window *)
-  val relative_position : Window.t -> (int * int)
+    * @see:OgamlGraphics.Window
+    * @see:OgamlMath.Vector2i *)
+  val relative_position : Window.t -> OgamlMath.Vector2i.t
 
   (*** Setting position *)
-  (** Sets the position of the cursor relatively to the screen *)
-  val set_position : (int * int) -> unit
+  (** Sets the position of the cursor relatively to the screen
+    * @see:OgamlMath.Vector2i *)
+  val set_position : OgamlMath.Vector2i.t -> unit
 
   (** Sets the position of the cursor relatively to a window
-    * @see:OgamlGraphics.Window *)
-  val set_relative_position : Window.t -> (int * int) -> unit
+    * @see:OgamlGraphics.Window
+    * @see:OgamlMath.Vector2i *)
+  val set_relative_position : Window.t -> OgamlMath.Vector2i.t -> unit
 
   (*** Accessing button information *)
   (** Check whether a given mouse button is currently held down

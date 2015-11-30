@@ -1,3 +1,5 @@
+exception Quaternion_exception of string
+
 type t = {r : float; i : float; j : float; k : float}
 
 val zero : t

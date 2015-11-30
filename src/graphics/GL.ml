@@ -50,6 +50,13 @@ module Data = struct
       alloc t i
     end
 
+  let append t1 t2 = 
+    let n = t1.length in
+    alloc t1 t2.length;
+    Bigarray.Array1.sub t1.data n t2.length
+    |> Bigarray.Array1.blit t2.data;
+    t1.length <- n + t2.length
+
   let add_3f t vec = 
     alloc t 3;
     t.data.{t.length+0} <- vec.OgamlMath.Vector3f.x;

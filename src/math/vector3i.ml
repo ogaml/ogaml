@@ -1,4 +1,6 @@
 
+exception Vector3i_exception of string
+
 type t = {x : int; y : int; z : int}
 
 let zero = {x = 0; y = 0; z = 0}
@@ -27,11 +29,16 @@ let prop k u = {
   z = k * u.z
 }
 
-let div k u = {
-  x = u.x / k;
-  y = u.y / k;
-  z = u.z / k
-}
+let div k u = 
+  if k = 0 then 
+    raise (Vector3i_exception "Division by zero")
+  else
+    {
+      x = u.x / k;
+      y = u.y / k;
+      z = u.z / k
+    }
+
 
 let project v = {
   Vector2i.x = v.x;

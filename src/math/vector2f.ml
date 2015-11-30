@@ -1,4 +1,6 @@
 
+exception Vector2f_exception of string
+
 type t = {x : float; y : float}
 
 let zero   = {x = 0.; y = 0.}
@@ -22,10 +24,11 @@ let prop f v = {
   y = f *. v.y;
 }
 
-let div f v = {
-  x = v.x /. f;
-  y = v.y /. f;
-}
+let div f v = 
+  if f = 0. then 
+    raise (Vector2f_exception "Division by zero")
+  else 
+    {x = v.x /. f; y = v.y /. f}
 
 let floor v = {
   Vector2i.x = int_of_float v.x;
@@ -51,7 +54,11 @@ let norm v =
   sqrt (dot v v)
 
 let normalize v = 
-  div (norm v) v
+  let n = norm v in
+  if n = 0. then
+    raise (Vector2f_exception "Cannot normalize zero vector")
+  else 
+    div n v
 
 let clamp u a b = {
   x = min b.x (max u.x a.x);
@@ -71,8 +78,12 @@ let print u =
   Printf.sprintf "(x = %f; y = %f)" u.x u.y
 
 let direction u v = 
-  sub v u
-  |> normalize
+  let dir = sub v u in
+  let n = norm dir in
+  if n = 0. then
+    raise (Vector2f_exception "Cannot get normalized direction from identical points")
+  else
+    div n dir
 
 let endpoint u v t =
   prop t v

@@ -1,6 +1,8 @@
 include ../../common_defs.mk
 
 
+INCLUDE_DIRS = -I ../math/ -I ../core/
+
 # Stubs constants
 
 COCOA_STUBS = application_delegate_stubs.m event_stubs.m glcontext_stubs.m\
@@ -62,13 +64,13 @@ ml_stubs:
 	cd $(OS_WIN_LIB) && make
 
 %.cmi:%.mli
-	$(OCAMLFIND) $(OCAMLC) -c -o $@ $<
+	$(OCAMLFIND) $(OCAMLC) -c $(INCLUDE_DIRS) ../core/ogamlCore.cma ../math/ogamlMath.cma -o $@ $<
 
 %.cmx:%.ml
-	$(OCAMLFIND) $(OCAMLOPT) -c -for-pack OgamlCore -I $(OS_WIN_LIB)/ -o $@ $<
+	$(OCAMLFIND) $(OCAMLOPT) -c -for-pack OgamlCore $(INCLUDE_DIRS) ../core/ogamlCore.cmxa ../math/ogamlMath.cmxa -I $(OS_WIN_LIB)/ -o $@ $<
 
 %.cmo:%.ml
-	$(OCAMLFIND) $(OCAMLC) -c -for-pack OgamlCore -I $(OS_WIN_LIB)/ -o $@ $<
+	$(OCAMLFIND) $(OCAMLC) -c -for-pack OgamlCore $(INCLUDE_DIRS) ../core/ogamlCore.cma ../math/ogamlMath.cma -I $(OS_WIN_LIB)/ -o $@ $<
 
 %.ml:%.mlpp %.cmi
 	$(PPCOMMAND) -o $@ $<

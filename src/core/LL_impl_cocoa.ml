@@ -73,7 +73,8 @@ module Window = struct
     let i = int_of_float in
     Cocoa.(
       let (_,_,w,h) = NSRect.get (Cocoa.OGWindowController.content_frame win)
-      in i w, i h
+      in 
+      OgamlMath.Vector2i.({x = i w; y = i h})
     )
 
   let is_open win =
@@ -371,20 +372,20 @@ module Mouse = struct
   let position () =
     let (x,y) = Cocoa.NSEvent.proper_mouse_location () in
     let i = int_of_float in
-    i x , i y
+    OgamlMath.Vector2i.({x = i x; y = i y})
 
   let relative_position win =
     let (x,y) = Cocoa.OGWindowController.proper_relative_mouse_location win in
     let i = int_of_float in
-    i x , i y
+    OgamlMath.Vector2i.({x = i x; y = i y})
 
-  let set_position (x,y) =
+  let set_position v =
     let f = float_of_int in
-    Cocoa.Mouse.warp (f x) (f y)
+    Cocoa.Mouse.warp (f v.OgamlMath.Vector2i.x) (f v.OgamlMath.Vector2i.y)
 
-  let set_relative_position win (x,y) =
+  let set_relative_position win v =
     let f = float_of_int in
-    Cocoa.OGWindowController.set_proper_relative_mouse_location win (f x) (f y)
+    Cocoa.OGWindowController.set_proper_relative_mouse_location win (f v.OgamlMath.Vector2i.x) (f v.OgamlMath.Vector2i.y)
 
   let is_pressed button =
     let pressed_buttons = Cocoa.NSEvent.pressed_mouse_buttons () in

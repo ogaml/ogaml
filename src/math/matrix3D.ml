@@ -1,4 +1,6 @@
 
+exception Matrix3D_exception of string
+
 type t = (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t
 
 (* Utils, not exposed *)
@@ -58,7 +60,10 @@ let rotation v t =
   let c = cos t in
   let ic = 1. -. c in
   let s = sin t in
-  let vn = normalize v in
+  let vn = 
+    try normalize v 
+    with Vector3f_exception _ -> raise (Matrix3D_exception "Cannot get rotation matrix : zero axis")
+  in
   let (x,y,z) = (vn.x, vn.y, vn.z) in
   set 0 0 m (x *. x +. (1. -. x *. x) *. c);
   set 0 1 m (ic *. x *. y -. z *. s);
@@ -129,8 +134,14 @@ let from_quaternion q =
 let look_at ~from ~at ~up = 
   let open Vector3f in
   let dir = direction from at in
-  let up = normalize up in
-  let right = normalize (cross dir up) in
+  let up = 
+    try normalize up 
+    with Vector3f_exception _ -> raise (Matrix3D_exception "Cannot get look_at matrix : zero up direction")
+  in
+  let right = 
+    try normalize (cross dir up) 
+    with Vector3f_exception _ -> raise (Matrix3D_exception "Cannot get look_at matrix : from = at")
+  in
   let up = cross right dir in
   let m = identity () in
   set 0 0 m (right.x);
@@ -158,6 +169,9 @@ let look_at_eulerian ~from ~theta ~phi =
 
 let orthographic ~right ~left ~near ~far ~top ~bottom =
   let m = identity () in
+  if right = left   then raise (Matrix3D_exception "Cannot get orthographic matrix : right = left");
+  if near  = far    then raise (Matrix3D_exception "Cannot get orthographic matrix : near = far");
+  if top   = bottom then raise (Matrix3D_exception "Cannot get orthographic matrix : top = bottom");
   set 0 0 m (2. /. (right -. left));
   set 1 1 m (2. /. (top -. bottom));
   set 2 2 m (2. /. (near -. far));
@@ -177,6 +191,7 @@ let iorthographic ~right ~left ~near ~far ~top ~bottom =
   m
 
 let perspective ~near ~far ~width ~height ~fov =
+  if near  = far then raise (Matrix3D_exception "Cannot get perspective matrix : near = far");
   let aspect = width /. height in
   let top = (tan (fov /. 2.)) *. near in
   let right = top *. aspect in 

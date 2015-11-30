@@ -1,5 +1,7 @@
 (* Operations on immutable 3 floats vectors in spherical coordinates*)
 
+exception Vector3fs_exception of string
+
 type t = {r : float; t : float; p : float}
 
 val zero : t

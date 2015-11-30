@@ -190,8 +190,9 @@ module LL : sig
     (** Destroys and frees the window from the memory *)
     val destroy : t -> unit
 
-    (** Returns the size of a window *)
-    val size : t -> (int * int)
+    (** Returns the size of a window
+      * @see:OgamlMath.Vector2i *)
+    val size : t -> OgamlMath.Vector2i.t
 
     (** Returns $true$ iff the window is open *)
     val is_open : t -> bool
@@ -238,19 +239,23 @@ module LL : sig
       * in real-time. You should probably use the OgamlGraphics.Mouse
       * wrapper instead. *)
 
-    (** Returns the postion of the mouse in screen coordinates *)
-    val position : unit -> (int * int)
+    (** Returns the postion of the mouse in screen coordinates 
+      * @see:OgamlMath.Vector2i *)
+    val position : unit -> OgamlMath.Vector2i.t
 
     (** Returns the position of the mouse relatively to a window
-      * @see:OgamlCore.LL.Window *)
-    val relative_position : Window.t -> (int * int)
+      * @see:OgamlCore.LL.Window 
+      * @see:OgamlMath.Vector2i *)
+    val relative_position : Window.t -> OgamlMath.Vector2i.t
 
-    (** Sets the position of the cursor relatively to the screen *)
-    val set_position : (int * int) -> unit
+    (** Sets the position of the cursor relatively to the screen 
+      * @see:OgamlMath.Vector2i *)
+    val set_position : OgamlMath.Vector2i.t -> unit
 
     (** Sets the position of the cursor relatively to a window
-      * @see:OgamlCore.LL.Window *)
-    val set_relative_position : Window.t -> (int * int) -> unit
+      * @see:OgamlCore.LL.Window 
+      * @see:OgamlMath.Vector2i *)
+    val set_relative_position : Window.t -> OgamlMath.Vector2i.t -> unit
 
     (** Returns $true$ iff the given button is currently held down
       * by the user @see:OgamlCore.Button *)

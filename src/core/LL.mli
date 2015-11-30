@@ -15,7 +15,7 @@ module Window : sig
   val destroy : t -> unit
 
   (** Return the size of a window *)
-  val size : t -> (int * int)
+  val size : t -> OgamlMath.Vector2i.t
 
   (** Return true iff the window is open *)
   val is_open : t -> bool
@@ -51,13 +51,13 @@ end
 (** Getting real-time mouse information *)
 module Mouse : sig
 
-  val position : unit -> (int * int)
+  val position : unit -> OgamlMath.Vector2i.t
 
-  val relative_position : Window.t -> (int * int)
+  val relative_position : Window.t -> OgamlMath.Vector2i.t
 
-  val set_position : (int * int) -> unit
+  val set_position : OgamlMath.Vector2i.t -> unit
 
-  val set_relative_position : Window.t -> (int * int) -> unit
+  val set_relative_position : Window.t -> OgamlMath.Vector2i.t -> unit
 
   val is_pressed : Button.t -> bool
 

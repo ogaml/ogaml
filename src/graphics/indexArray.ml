@@ -22,6 +22,11 @@ module Source = struct
 
   let data src = src.data
 
+  let append s1 s2 =
+    s1.length <- s1.length + s2.length;
+    GL.Data.append s1.data s2.data;
+    s1
+
 end
 
 

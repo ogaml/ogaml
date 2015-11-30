@@ -5,7 +5,7 @@ type t
 
 val create : [`File of string | `Empty of int * int * Color.t] -> t
 
-val size : t -> (int * int)
+val size : t -> OgamlMath.Vector2i.t
 
 val set : t -> int -> int -> Color.t -> unit
 
