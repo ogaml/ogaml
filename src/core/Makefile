@@ -39,7 +39,7 @@ endif
 
 # ML constants
 
-ML_SOURCES = LL.ml 
+ML_SOURCES = LL.ml log.ml
 
 ML_INTERFACES = button.mli keycode.mli event.mli 
 

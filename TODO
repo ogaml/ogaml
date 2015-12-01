@@ -24,7 +24,7 @@ OgamlCore:
 
 OgamlMath:
   ✔ Matrices, quaternions and vector exceptions @done(2015-11-30 21:58) @project(OgamlMath)
-  ☐ Interface
+  ✔ Interface @done(2015-12-01 17:29) @project(OgamlMath)
 
 OgamlGraphics:
   ✔ Better normal computations in Model @done(2015-11-15 23:22) @project(OgamlGraphics)
