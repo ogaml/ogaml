@@ -1,12 +1,12 @@
-LL_impl_cocoa.cmo : keycode.cmi event.cmi button.cmi
-LL_impl_cocoa.cmx : keycode.cmi event.cmi button.cmi
-LL_impl_x11.cmo : keycode.cmi event.cmi button.cmi
-LL_impl_x11.cmx : keycode.cmi event.cmi button.cmi
-LL.cmi : keycode.cmi event.cmi button.cmi
+LL_impl_cocoa.cmo : ../math/ogamlMath.cmi keycode.cmi event.cmi button.cmi
+LL_impl_cocoa.cmx : ../math/ogamlMath.cmi keycode.cmi event.cmi button.cmi
+LL_impl_x11.cmo : ../math/ogamlMath.cmi keycode.cmi event.cmi button.cmi
+LL_impl_x11.cmx : ../math/ogamlMath.cmi keycode.cmi event.cmi button.cmi
+LL.cmi : ../math/ogamlMath.cmi keycode.cmi event.cmi button.cmi
 button.cmi :
 event.cmi : keycode.cmi button.cmi
 keycode.cmi :
-ogamlCore.cmi :
+ogamlCore.cmi : ../math/ogamlMath.cmi
 cocoa/cocoa.cmo : cocoa/cocoa.cmi
 cocoa/cocoa.cmx : cocoa/cocoa.cmi
 cocoa/cocoa.cmi :

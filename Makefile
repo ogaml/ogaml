@@ -18,7 +18,7 @@ MATH_FILES = src/math/*ogamlMath.*
 
 GRAPH_FILES = src/graphics/*ogamlGraphics.*
 
-DOC_FILES = src/graphics/ogamlGraphics.mli src/core/ogamlCore.mli
+DOC_FILES = src/graphics/ogamlGraphics.mli src/core/ogamlCore.mli src/math/ogamlMath.mli
 
 # Compilation
 

@@ -18,6 +18,7 @@ vector3i.cmo : vector2i.cmi vector3i.cmi
 vector3i.cmx : vector2i.cmx vector3i.cmi
 constants.cmi :
 matrix3D.cmi : vector3f.cmi quaternion.cmi
+ogamlMath.cmi :
 poly.cmi : vector3f.cmi
 quaternion.cmi : vector3f.cmi
 vector2f.cmi : vector2i.cmi

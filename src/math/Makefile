@@ -24,11 +24,11 @@ PACKNAME = OgamlMath
 
 default: .depend compile_math_nat compile_math_byte
 
-compile_math_nat: .depend $(MLCMIS) $(MLNATOBJS)
+compile_math_nat: .depend $(MLCMIS) $(MLNATOBJS) ogamlMath.cmi
 	$(OCAMLFIND) $(OCAMLOPT) -pack -o $(MLLIB).cmx $(MLCMIS) $(MLNATOBJS);
 	$(OCAMLFIND) $(OCAMLOPT) -a -o $(MLLIB).cmxa $(INCLUDE_DIRS) $(MLLIB).cmx
 
-compile_math_byte: .depend $(MLCMIS) $(MLOBJS)
+compile_math_byte: .depend $(MLCMIS) $(MLOBJS) ogamlMath.cmi
 	$(OCAMLFIND) $(OCAMLC) -pack -o $(MLLIB).cmo $(MLCMIS) $(MLOBJS);
 	$(OCAMLFIND) $(OCAMLC) -a -o $(MLLIB).cma $(INCLUDE_DIRS) $(MLLIB).cmo
 
