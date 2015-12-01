@@ -55,7 +55,7 @@ let process_line_jumps s =
 
 let rec parse_related s = 
   try
-    let i = Str.search_forward (Str.regexp "@see:\\([A-Za-z\\.]*\\)") s 0 in
+    let i = Str.search_forward (Str.regexp "@see:\\([A-Za-z0-9\\.]*\\)") s 0 in
     let related = Str.matched_group 1 s in
     let s_begin = Str.first_chars s i in
     let s_end = 

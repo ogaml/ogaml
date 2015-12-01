@@ -18,7 +18,6 @@ Cocoa specific:
 
 OgamlCore:
   ✔ Log system @done(2015-12-01 20:44) @project(OgamlCore)
-  ☐ Log program, texture, image errors
   ☐ Window titles
   ☐ Context customisation
   ☐ Encapsulate parameters (title, depth buffer size, etc..)
