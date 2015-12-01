@@ -26,6 +26,11 @@
   return self;
 }
 
+-(void)setTitle:(NSString*)title
+{
+  [m_window setTitle:title];
+}
+
 -(BOOL)windowShouldClose:(id)sender
 {
   (void)sender;
@@ -155,6 +160,19 @@ caml_cocoa_window_controller_init_with_window(value mlwindow)
   [wc initWithWindow:window];
 
   CAMLreturn( (value) wc );
+}
+
+CAMLprim value
+caml_cocoa_window_controller_set_title(value mlcontroller, value mltitle)
+{
+  CAMLparam2(mlcontroller,mltitle);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+  NSString* title = (NSString*) mltitle;
+
+  [controller setTitle:title];
+
+  CAMLreturn(Val_unit);
 }
 
 CAMLprim value

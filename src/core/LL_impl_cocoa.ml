@@ -45,6 +45,9 @@ module Window = struct
     (* Creating the delegate which we will return *)
     let win_ctrl = Cocoa.OGWindowController.init_with_window window in
 
+    (* Adding a title to the window *)
+    (* Cocoa.OGWindowController.set_title win_ctrl (Cocoa.NSString.create "Test"); *)
+
     (* But first we create and apply a new openGL context *)
     let attr = Cocoa.NSOpenGLPixelFormat.([
       #ifdef __OSX__
@@ -73,7 +76,7 @@ module Window = struct
     let i = int_of_float in
     Cocoa.(
       let (_,_,w,h) = NSRect.get (Cocoa.OGWindowController.content_frame win)
-      in 
+      in
       OgamlMath.Vector2i.({x = i w; y = i h})
     )
 

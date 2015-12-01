@@ -115,6 +115,8 @@ typedef union
 
 -(id)initWithWindow:(NSWindow*)window;
 
+-(void)setTitle:(NSString*)title;
+
 -(NSRect)frame;
 
 -(NSRect)contentFrame;
