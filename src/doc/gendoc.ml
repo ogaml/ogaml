@@ -168,7 +168,8 @@ let rec type_expr_to_string = function
       else 
         "..."
   | ParamType (t1, t2) ->
-      Printf.sprintf "%s %s" (type_expr_to_string t1) (type_expr_to_string t2)
+      if List.length t1 <= 1 then Printf.sprintf "%s %s" (concat_sep ", " type_expr_to_string t1) (type_expr_to_string t2)
+      else Printf.sprintf "(%s) %s" (concat_sep ", " type_expr_to_string t1) (type_expr_to_string t2)
 
 let rec field_to_string = function
   |AbstractType (opt,s) -> begin

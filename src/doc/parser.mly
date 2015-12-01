@@ -72,7 +72,17 @@ value_type:
   | LBRACK; GREATER; r = vp_content; RBRACK {AST.PolyVariant (AST.Greater, r)}
   | LBRACK; r = vp_content; RBRACK {AST.PolyVariant (AST.Equals, r)}
   | LPAREN; t = delim_value_type; RPAREN {t}
-  | r = value_type; t = atomic_type {AST.ParamType (r,t)}
+  | r = value_type_param; t = atomic_type {AST.ParamType (r,t)}
+  ;
+
+value_type_params:
+  | s = value_type; COMMA; t = value_type {[s;t]}
+  | s = value_type; COMMA; t = value_type_params {s::t}
+  ;
+
+value_type_param:
+  | s = value_type {[s]}
+  | LPAREN; l = value_type_params; RPAREN {l}
   ;
 
 delim_value_type:
