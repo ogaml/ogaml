@@ -67,6 +67,10 @@ module Window : sig
   val create_simple : display:Display.t -> parent:t -> size:(int * int) -> 
                       origin:(int * int) -> background:int -> t
 
+  val set_title : Display.t -> t -> string -> unit
+
+  val title : Display.t -> t -> string
+
   val map : Display.t -> t -> unit
 
   val unmap : Display.t -> t -> unit

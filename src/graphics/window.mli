@@ -1,8 +1,4 @@
 
-exception Missing_uniform of string
-
-exception Invalid_uniform of string
-
 type t
 
 (** Creates a window of size width x height *)

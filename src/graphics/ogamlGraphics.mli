@@ -448,13 +448,6 @@ module Window : sig
     * Windows encapsulate a copy of the GL state that can be retrieved
     * to obtain information about the GL context. *)
 
-  (*** Error Handling *)
-  (** Raised if a uniform variable is missing when calling draw *)
-  exception Missing_uniform of string
-
-  (** Raised when calling draw if a uniform variable has an incorrect type *)
-  exception Invalid_uniform of string
-
   (*** Window creation *)
   (** The type of a window *)
   type t

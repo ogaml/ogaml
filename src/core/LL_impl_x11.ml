@@ -8,7 +8,7 @@ module Window = struct
     mutable closed : bool
   }
 
-  let create ~width ~height ~title =
+  let create ~width ~height ~title ~settings =
     (* The display is a singleton in C (created only once) *)
     let display = X11.Display.create () in
     let window  =
@@ -41,9 +41,11 @@ module Window = struct
     in
     let context = X11.GLContext.create display vi in
     X11.Window.attach display window context;
+    X11.Window.set_title display window title;
     {display; window; context; closed = false}
 
-  let set_title win title = ()
+  let set_title win title = 
+    X11.Window.set_title win.display win.window title
 
   let close win =
     X11.Window.unmap win.display win.window;

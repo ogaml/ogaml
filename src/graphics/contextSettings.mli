@@ -12,3 +12,4 @@ val depth_testing : t -> bool
 
 val stenciling : t -> bool
 
+val to_ll : t -> OgamlCore.LL.ContextSettings.t

@@ -1,9 +1,5 @@
 open OgamlCore
 
-exception Missing_uniform of string
-
-exception Invalid_uniform of string
-
 type t = {
   state : State.t;
   internal : LL.Window.t;
@@ -151,7 +147,7 @@ let fragment_shader_source_tex_110 = "
 "
 
 let create ~width ~height ~title ~settings =
-  let internal = LL.Window.create ~width ~height ~title in
+  let internal = LL.Window.create ~width ~height ~title ~settings:(ContextSettings.to_ll settings) in
   let state = State.LL.create () in
   let program2D =
     if State.is_glsl_version_supported state 130 then
