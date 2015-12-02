@@ -50,7 +50,7 @@ module Window = struct
 
     (* But first we create and apply a new openGL context *)
     let attr = Cocoa.NSOpenGLPixelFormat.(
-      [ 
+      [
         #ifdef __OSX__
         NSOpenGLPFAOpenGLProfile NSOpenGLProfileVersion3_2Core ;
         #endif
@@ -61,12 +61,11 @@ module Window = struct
         NSOpenGLPFADoubleBuffer ;
         NSOpenGLPFAAccelerated
       ]
-      |> fun l -> 
-        if ContextSettings.aa_level settings > 0 then 
+      |> fun l ->
+        if ContextSettings.aa_level settings > 0 then
           NSOpenGLPFAMultisample ::
           NSOpenGLPFASampleBuffers 1 ::
-          NSOpenGLPFASamples (ContextSettings.aa_level settings) ::
-          NSOpenGLPFAAccelerated :: l
+          NSOpenGLPFASamples (ContextSettings.aa_level settings) :: l
         else l
     ) in
 
