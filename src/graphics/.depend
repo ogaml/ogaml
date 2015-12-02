@@ -4,8 +4,8 @@ GL.cmx : ../math/ogamlMath.cmi GLTypes.cmi drawParameter.cmx drawMode.cmi \
     color.cmx GL.cmi
 color.cmo : ../math/ogamlMath.cmi color.cmi
 color.cmx : ../math/ogamlMath.cmi color.cmi
-contextSettings.cmo : color.cmi contextSettings.cmi
-contextSettings.cmx : color.cmx contextSettings.cmi
+contextSettings.cmo : ../core/ogamlCore.cmi color.cmi contextSettings.cmi
+contextSettings.cmx : ../core/ogamlCore.cmi color.cmx contextSettings.cmi
 drawParameter.cmo : drawParameter.cmi
 drawParameter.cmx : drawParameter.cmi
 image.cmo : ../math/ogamlMath.cmi color.cmi image.cmi
@@ -72,7 +72,7 @@ GL.cmi : ../math/ogamlMath.cmi GLTypes.cmi drawParameter.cmi drawMode.cmi \
     color.cmi
 GLTypes.cmi :
 color.cmi :
-contextSettings.cmi : color.cmi
+contextSettings.cmi : ../core/ogamlCore.cmi color.cmi
 drawMode.cmi :
 drawParameter.cmi :
 image.cmi : ../math/ogamlMath.cmi color.cmi

@@ -212,10 +212,44 @@ module LL : sig
     * You should probably use the wrappers defined in OgamlGraphics
     * rather than this module. *)
 
+  (** Parameters to customize the GL context *)
+  module ContextSettings : sig
+
+    (** This module provides a way to customise the GL context
+      * when creating a window *)
+
+    (** Contains all the context settings *)
+    type t
+
+    (** Creates the settings associated to those parameters :
+      *
+      * - antialiasing : AA level (defaults to 0) 
+      *
+      * - depth_bits : depth buffer bits (defaults to 0)
+      *
+      * - stencil_bits : stencil buffer bits (defaults to 0)
+      *)
+    val create : 
+      ?antialiasing:int ->
+      ?depth_bits:int   ->
+      ?stencil_bits:int -> unit -> t
+
+    (** Returns the requested AA level *)
+    val aa_level : t -> int
+
+    (** Returns the requested number of depth buffer bits *)
+    val depth_bits : t -> int
+
+    (** Returns the requested number of stencil buffer bits *)
+    val stencil_bits : t -> int
+
+  end
+
+
   (** Window management *)
   module Window : sig
 
-    (** This modules provides a low-level interface to create and
+    (** This module provides a low-level interface to create and
       * manage windows. You should probably use the OgamlGraphics.Window
       * wrapper. *)
 
@@ -223,7 +257,7 @@ module LL : sig
     type t
 
     (** Creates a window of a given size *)
-    val create : width:int -> height:int -> title:string -> t
+    val create : width:int -> height:int -> title:string -> settings:ContextSettings.t -> t
 
     (** Sets the tite of the window. *)
     val set_title : t -> string -> unit

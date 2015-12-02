@@ -17,7 +17,7 @@ module Window = struct
         launched := true
       end
 
-  let create ~width ~height ~title =
+  let create ~width ~height ~title ~settings =
     init_app () ;
 
     (* Rect for setting the size -- offset is ignored we will center *)

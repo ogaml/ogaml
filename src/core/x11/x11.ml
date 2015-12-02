@@ -136,6 +136,10 @@ module Window = struct
 
   external has_focus : Display.t -> t -> bool = "caml_has_focus"
 
+  external set_title : Display.t -> t -> string -> unit = "caml_xwindow_set_title"
+
+  external title : Display.t -> t -> string = "caml_xwindow_get_title"
+
 
   (* Implementation of abstract functions *)
   let root_of ?screen display =

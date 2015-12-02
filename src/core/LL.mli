@@ -1,11 +1,29 @@
 
+module ContextSettings : sig
+
+  type t
+
+  val create : 
+    ?antialiasing:int ->
+    ?depth_bits:int   ->
+    ?stencil_bits:int -> unit -> t
+
+  val aa_level : t -> int
+
+  val depth_bits : t -> int
+
+  val stencil_bits : t -> int
+
+end
+
+
 (** Window creation and manipulation *)
 module Window : sig
 
   type t
 
   (** Creates a window of size width x height *)
-  val create : width:int -> height:int -> title:string -> t
+  val create : width:int -> height:int -> title:string -> settings:ContextSettings.t -> t
 
   (** Sets the tite of the window. *)
   val set_title : t -> string -> unit

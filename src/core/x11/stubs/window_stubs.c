@@ -35,6 +35,32 @@ caml_xroot_window(value disp, value screen)
 }
 
 
+// INPUT   display, window, string
+// OUTPUT  nothing, sets the title of the window
+CAMLprim value
+caml_xwindow_set_title(value disp, value win, value str)
+{
+  CAMLparam3(disp, win, str);
+  XStoreName((Display*)disp, (Window)win, String_val(str));
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   display, window
+// OUTPUT  the title of the window
+CAMLprim value
+caml_xwindow_get_title(value disp, value win)
+{
+  CAMLparam2(disp, win);
+  CAMLlocal1(res);
+  char* win_name;
+  XFetchName((Display*)disp, (Window)win, &win_name);
+  res = caml_copy_string(win_name);
+  XFree(win_name);
+  CAMLreturn(res);
+}
+
+
 // INPUT   display, window
 // OUTPUT  nothing, maps the window
 CAMLprim value

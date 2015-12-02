@@ -25,3 +25,4 @@ let depth_testing t = t.depth
 
 let stenciling t = t.stencil
 
+let to_ll t = OgamlCore.LL.ContextSettings.create ()
