@@ -49,19 +49,27 @@ module Window = struct
     Cocoa.OGWindowController.set_title win_ctrl (Cocoa.NSString.create title) ;
 
     (* But first we create and apply a new openGL context *)
-    let attr = Cocoa.NSOpenGLPixelFormat.([
-      #ifdef __OSX__
-      NSOpenGLPFAOpenGLProfile NSOpenGLProfileVersion3_2Core ;
-      #endif
-      NSOpenGLPFAColorSize 24 ;
-      NSOpenGLPFAAlphaSize 8  ;
-      NSOpenGLPFADepthSize (ContextSettings.depth_bits settings) ;
-      NSOpenGLPFAStencilSize (ContextSettings.stencil_bits settings) ;
-      NSOpenGLPFASampleBuffers (if ContextSettings.aa_level settings > 0 then 1 else 0);
-      NSOpenGLPFASamples       (ContextSettings.aa_level settings);
-      NSOpenGLPFADoubleBuffer ;
-      NSOpenGLPFAAccelerated
-    ]) in
+    let attr = Cocoa.NSOpenGLPixelFormat.(
+      [ 
+        #ifdef __OSX__
+        NSOpenGLPFAOpenGLProfile NSOpenGLProfileVersion3_2Core ;
+        #endif
+        NSOpenGLPFAColorSize 24 ;
+        NSOpenGLPFAAlphaSize 8  ;
+        NSOpenGLPFADepthSize (ContextSettings.depth_bits settings) ;
+        NSOpenGLPFAStencilSize (ContextSettings.stencil_bits settings) ;
+        NSOpenGLPFADoubleBuffer ;
+        NSOpenGLPFAAccelerated
+      ]
+      |> fun l -> 
+        if ContextSettings.aa_level settings > 0 then 
+          NSOpenGLPFAMultisample ::
+          NSOpenGLPFASampleBuffers 1 ::
+          NSOpenGLPFASamples (ContextSettings.aa_level settings) ::
+          NSOpenGLPFAAccelerated :: l
+        else l
+    ) in
+
     let pixel_format = Cocoa.NSOpenGLPixelFormat.init_with_attributes attr in
     let context = Cocoa.NSOpenGLContext.init_with_format pixel_format in
     Cocoa.OGWindowController.set_context win_ctrl context ;
