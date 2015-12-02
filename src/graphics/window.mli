@@ -6,7 +6,14 @@ exception Invalid_uniform of string
 type t
 
 (** Creates a window of size width x height *)
-val create : width:int -> height:int -> settings:ContextSettings.t -> t
+val create :
+  width:int ->
+  height:int ->
+  title:string ->
+  settings:ContextSettings.t -> t
+
+(** Changes the title of the window. *)
+val set_title : t -> string -> unit
 
 (** Closes a window, but does not free the memory.
   * This should prevent segfaults when calling functions on this window. *)

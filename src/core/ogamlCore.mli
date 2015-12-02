@@ -46,7 +46,7 @@ module Button : sig
   (** This module consists of only one type enumerating the mouse buttons *)
 
   (** Mouse buttons enumeration *)
-  type t = 
+  type t =
     | Unknown (* Used when an unrecognized mouse button is triggered. You usually don't need to listen on it. *)
     | Left
     | Right
@@ -183,7 +183,7 @@ module Event : sig
 
   (** Mouse movement event information *)
   module MouseEvent : sig
-    
+
     (** This module defines a public structure encapsulating information
       * about a mouse movement event *)
 
@@ -192,7 +192,7 @@ module Event : sig
 
   end
 
-  (** A variant type describing the possible events @see:OgamlCore.Event.KeyEvent 
+  (** A variant type describing the possible events @see:OgamlCore.Event.KeyEvent
     * @see:OgamlCore.Event.ButtonEvent @see:OgamlCore.Event.MouseEvent *)
   type t =
     | Closed (* The window sending the event has been closed *)
@@ -209,7 +209,7 @@ end
 module LL : sig
 
   (** This module provides a low-level access to the window system.
-    * You should probably use the wrappers defined in OgamlGraphics 
+    * You should probably use the wrappers defined in OgamlGraphics
     * rather than this module. *)
 
   (** Window management *)
@@ -223,7 +223,10 @@ module LL : sig
     type t
 
     (** Creates a window of a given size *)
-    val create : width:int -> height:int -> t
+    val create : width:int -> height:int -> title:string -> t
+
+    (** Sets the tite of the window. *)
+    val set_title : t -> string -> unit
 
     (** Closes a window, but does not free the memory.
       * This prevents segfaults when calling functions on this window. *)
@@ -242,7 +245,7 @@ module LL : sig
     (** Returns $true$ iff the window has the focus *)
     val has_focus : t -> bool
 
-    (** Returns the next event on the stack for this window 
+    (** Returns the next event on the stack for this window
       * @see:OgamlCore.Event *)
     val poll_event : t -> Event.t option
 
@@ -281,21 +284,21 @@ module LL : sig
       * in real-time. You should probably use the OgamlGraphics.Mouse
       * wrapper instead. *)
 
-    (** Returns the postion of the mouse in screen coordinates 
+    (** Returns the postion of the mouse in screen coordinates
       * @see:OgamlMath.Vector2i *)
     val position : unit -> OgamlMath.Vector2i.t
 
     (** Returns the position of the mouse relatively to a window
-      * @see:OgamlCore.LL.Window 
+      * @see:OgamlCore.LL.Window
       * @see:OgamlMath.Vector2i *)
     val relative_position : Window.t -> OgamlMath.Vector2i.t
 
-    (** Sets the position of the cursor relatively to the screen 
+    (** Sets the position of the cursor relatively to the screen
       * @see:OgamlMath.Vector2i *)
     val set_position : OgamlMath.Vector2i.t -> unit
 
     (** Sets the position of the cursor relatively to a window
-      * @see:OgamlCore.LL.Window 
+      * @see:OgamlCore.LL.Window
       * @see:OgamlMath.Vector2i *)
     val set_relative_position : Window.t -> OgamlMath.Vector2i.t -> unit
 

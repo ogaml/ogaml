@@ -150,8 +150,8 @@ let fragment_shader_source_tex_110 = "
   }
 "
 
-let create ~width ~height ~settings =
-  let internal = LL.Window.create ~width ~height in
+let create ~width ~height ~title ~settings =
+  let internal = LL.Window.create ~width ~height ~title in
   let state = State.LL.create () in
   let program2D =
     if State.is_glsl_version_supported state 130 then
@@ -180,6 +180,8 @@ let create ~width ~height ~settings =
     program2D;
     programTex;
   }
+
+let set_title win title = LL.Window.set_title win.internal title
 
 let close win = LL.Window.close win.internal
 

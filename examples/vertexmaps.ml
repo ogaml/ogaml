@@ -4,7 +4,7 @@ open OgamlMath
 let cube_shader = "
 
 uniform mat4 MVPMatrix;
-  
+
 in vec3 position;
 
 in int color;
@@ -35,13 +35,14 @@ void main() {
 
 let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
 
-let window = Window.create ~width:800 ~height:600 ~settings
+let window =
+  Window.create ~width:800 ~height:600 ~settings ~title:"VertexMap Example"
 
 let initial_time = ref 0.
 
 let frame_count  = ref 0
 
-let axis_source = 
+let axis_source =
   let src = VertexArray.Source.empty
     ~position:"in_position"
     ~color:"in_color"
@@ -49,16 +50,16 @@ let axis_source =
   in
   Poly.axis src Vector3f.({x = -1.; y = -1.; z = -1.}) Vector3f.({x = 5.; y = 5.; z = 5.})
 
-let color_bitmask (r,g,b) = 
+let color_bitmask (r,g,b) =
   (r lsl 16) lor (g lsl 8) lor b
 
-let make_vertex normal position (r,g,b) = 
+let make_vertex normal position (r,g,b) =
   VertexMap.Vertex.empty
   |> VertexMap.Vertex.vector3i "normal" normal
   |> VertexMap.Vertex.int "color" (color_bitmask (r,g,b))
   |> VertexMap.Vertex.vector3f "position" position
 
-let cube_source = 
+let cube_source =
   VertexMap.Source.(
     empty ()
     << make_vertex Vector3i.unit_x Vector3f.({x =  0.5; y =  0.5; z =  0.5}) (255, 0, 0)
@@ -87,7 +88,7 @@ let cube_source =
     << make_vertex Vector3i.(prop (-1) unit_z) Vector3f.({x = -0.5; y =  0.5; z = -0.5}) (0, 255, 255)
   )
 
-let cube_indices = 
+let cube_indices =
   IndexArray.Source.(
     empty 36
     << 0  << 1  << 3  << 3  << 1  << 2
@@ -98,13 +99,13 @@ let cube_indices =
     << 20 << 21 << 23 << 21 << 22 << 23
   )
 
-let axis = VertexArray.static axis_source 
+let axis = VertexArray.static axis_source
 
-let cube = VertexMap.static cube_source 
+let cube = VertexMap.static cube_source
 
 let indices = IndexArray.static cube_indices
 
-let default_program = 
+let default_program =
   Program.from_source_pp (Window.state window)
     ~vertex_source:(`File "examples/default_shader.vert")
     ~fragment_source:(`File "examples/default_shader.frag")
@@ -136,8 +137,8 @@ let display () =
   let mvp = Matrix3D.product vp model in
   rot_angle := !rot_angle +. (abs_float (cos t /. 10.)) /. 3.;
   let parameters =
-    DrawParameter.(make 
-      ~depth_test:true 
+    DrawParameter.(make
+      ~depth_test:true
       ~culling:CullingMode.CullClockwise ())
   in
   let uniform =
@@ -246,5 +247,3 @@ let rec main_loop () =
 let () =
   main_loop ();
   Window.destroy window
-
-

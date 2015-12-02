@@ -462,7 +462,14 @@ module Window : sig
   (** Creates a window of size $width$ x $height$.
     * This window will create its openGL context following the specified settings.
     * @see:OgamlGraphics.ContextSettings *)
-  val create : width:int -> height:int -> settings:ContextSettings.t -> t
+  val create :
+    width:int ->
+    height:int ->
+    title:string ->
+    settings:ContextSettings.t -> t
+
+  (** Changes the title of the window. *)
+  val set_title : t -> string -> unit
 
   (** Closes a window, but does not free the memory.
     * This should prevent segfaults when calling functions on this window. *)
@@ -666,7 +673,7 @@ module VertexArray : sig
     (** Returns the length of a source *)
     val length : t -> int
 
-    (** $append s1 s2$ appends the source $s2$ at the end of the source $s1$ (in place), 
+    (** $append s1 s2$ appends the source $s2$ at the end of the source $s1$ (in place),
       * and returns $s1$.
       * If the attribute names are different, the names in the source $s1$ are used.
       * Raises Invalid_source if types are incompatible. *)

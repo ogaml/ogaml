@@ -8,7 +8,7 @@ module Window = struct
     mutable closed : bool
   }
 
-  let create ~width ~height =
+  let create ~width ~height ~title =
     (* The display is a singleton in C (created only once) *)
     let display = X11.Display.create () in
     let window  =
@@ -42,6 +42,8 @@ module Window = struct
     let context = X11.GLContext.create display vi in
     X11.Window.attach display window context;
     {display; window; context; closed = false}
+
+  let set_title win title = ()
 
   let close win =
     X11.Window.unmap win.display win.window;
@@ -133,19 +135,19 @@ module Window = struct
     |NumpadMinus -> X11.Event.Code 82 |NumpadTimes -> X11.Event.Code 63
     |NumpadPlus  -> X11.Event.Code 86 |NumpadDiv   -> X11.Event.Code 106
     |NumpadDot   -> X11.Event.Code 91 |NumpadReturn-> X11.Event.Code 104
-    |Escape   -> X11.Event.Code 9   |Tab    -> X11.Event.Code 23  
-    |LControl -> X11.Event.Code 37  |LShift -> X11.Event.Code 50  
-    |LAlt     -> X11.Event.Code 64  |Space  -> X11.Event.Code 65  
-    |RControl -> X11.Event.Code 105 |RShift -> X11.Event.Code 62  
-    |RAlt     -> X11.Event.Code 108 |Return -> X11.Event.Code 36  
-    |Up       -> X11.Event.Code 111 |Left   -> X11.Event.Code 113 
-    |Down     -> X11.Event.Code 116 |Right  -> X11.Event.Code 114 
-    |F1       -> X11.Event.Code 67  |F2     -> X11.Event.Code 68  
-    |F3       -> X11.Event.Code 69  |F4     -> X11.Event.Code 70  
-    |F5       -> X11.Event.Code 71  |F6     -> X11.Event.Code 72  
-    |F7       -> X11.Event.Code 73  |F8     -> X11.Event.Code 74  
-    |F9       -> X11.Event.Code 75  |F10    -> X11.Event.Code 76  
-    |F11      -> X11.Event.Code 95  |F12    -> X11.Event.Code 96  
+    |Escape   -> X11.Event.Code 9   |Tab    -> X11.Event.Code 23
+    |LControl -> X11.Event.Code 37  |LShift -> X11.Event.Code 50
+    |LAlt     -> X11.Event.Code 64  |Space  -> X11.Event.Code 65
+    |RControl -> X11.Event.Code 105 |RShift -> X11.Event.Code 62
+    |RAlt     -> X11.Event.Code 108 |Return -> X11.Event.Code 36
+    |Up       -> X11.Event.Code 111 |Left   -> X11.Event.Code 113
+    |Down     -> X11.Event.Code 116 |Right  -> X11.Event.Code 114
+    |F1       -> X11.Event.Code 67  |F2     -> X11.Event.Code 68
+    |F3       -> X11.Event.Code 69  |F4     -> X11.Event.Code 70
+    |F5       -> X11.Event.Code 71  |F6     -> X11.Event.Code 72
+    |F7       -> X11.Event.Code 73  |F8     -> X11.Event.Code 74
+    |F9       -> X11.Event.Code 75  |F10    -> X11.Event.Code 76
+    |F11      -> X11.Event.Code 95  |F12    -> X11.Event.Code 96
     |Delete   -> X11.Event.Code 22  |Unknown-> assert false
   )
 
@@ -219,23 +221,23 @@ end
 
 module Keyboard = struct
 
-  let is_pressed key = 
+  let is_pressed key =
     match key with
     |Keycode.Unknown -> false
     | _ ->
       let d = X11.Display.create () in
       X11.Keyboard.key_down d (Window.key_to_keysym key)
 
-  let is_shift_down () = 
-    (is_pressed Keycode.LShift) || 
+  let is_shift_down () =
+    (is_pressed Keycode.LShift) ||
     (is_pressed Keycode.RShift)
 
-  let is_ctrl_down () = 
-    (is_pressed Keycode.LControl) || 
+  let is_ctrl_down () =
+    (is_pressed Keycode.LControl) ||
     (is_pressed Keycode.RControl)
 
-  let is_alt_down () = 
-    (is_pressed Keycode.LAlt) || 
+  let is_alt_down () =
+    (is_pressed Keycode.LAlt) ||
     (is_pressed Keycode.RAlt)
 
 end
@@ -244,23 +246,23 @@ end
 
 module Mouse = struct
 
-  let position () = 
+  let position () =
     let d = X11.Display.create () in
     let (x,y) = X11.Mouse.position d (X11.Window.root_of d) in
     OgamlMath.Vector2i.({x;y})
 
-  let relative_position win = 
+  let relative_position win =
     let (x,y) = X11.Mouse.position win.Window.display win.Window.window in
     OgamlMath.Vector2i.({x;y})
 
-  let set_position v = 
+  let set_position v =
     let d = X11.Display.create () in
     X11.Mouse.warp d (X11.Window.root_of d) v.OgamlMath.Vector2i.x v.OgamlMath.Vector2i.y
 
-  let set_relative_position win v = 
+  let set_relative_position win v =
     X11.Mouse.warp win.Window.display win.Window.window v.OgamlMath.Vector2i.x v.OgamlMath.Vector2i.y
 
-  let is_pressed button = 
+  let is_pressed button =
     let d = X11.Display.create () in
     let w = X11.Window.root_of d in
     match button with

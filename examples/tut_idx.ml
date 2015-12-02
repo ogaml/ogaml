@@ -3,8 +3,9 @@ open OgamlGraphics
 open OgamlMath
 
 let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
- 
-let window = Window.create ~width:800 ~height:600 ~settings
+
+let window =
+  Window.create ~width:800 ~height:600 ~settings ~title:"Indexing Tutorial"
 
 let vertex_shader_source = "
 
@@ -13,7 +14,7 @@ let vertex_shader_source = "
   in vec3 position;
 
   void main() {
-    
+
     gl_Position = MVP * vec4(position, 1.0);
 
   }
@@ -31,54 +32,54 @@ let fragment_shader_source = "
   }
 "
 
-let program = 
-  Program.from_source_pp 
+let program =
+  Program.from_source_pp
     (Window.state window)
     ~vertex_source:(`String vertex_shader_source)
     ~fragment_source:(`String fragment_shader_source)
 
-let vertex0 = 
-  VertexArray.Vertex.create 
+let vertex0 =
+  VertexArray.Vertex.create
     ~position:Vector3f.({x = -0.5; y = -0.5; z = -0.5}) ()
 
-let vertex1 = 
+let vertex1 =
   VertexArray.Vertex.create
     ~position:(Vector3f.({x = -0.5; y = -0.5; z = 0.5})) ()
 
-let vertex2 = 
+let vertex2 =
   VertexArray.Vertex.create
     ~position:(Vector3f.({x = -0.5; y =  0.5; z = -0.5})) ()
 
-let vertex3 = 
+let vertex3 =
   VertexArray.Vertex.create
     ~position:(Vector3f.({x = -0.5; y =  0.5; z = 0.5})) ()
 
-let vertex4 = 
+let vertex4 =
   VertexArray.Vertex.create
     ~position:(Vector3f.({x =  0.5; y = -0.5; z = -0.5})) ()
 
-let vertex5 = 
+let vertex5 =
   VertexArray.Vertex.create
     ~position:(Vector3f.({x =  0.5; y = -0.5; z = 0.5})) ()
 
-let vertex6 = 
+let vertex6 =
   VertexArray.Vertex.create
     ~position:(Vector3f.({x =  0.5; y =  0.5; z = -0.5})) ()
 
-let vertex7 = 
+let vertex7 =
   VertexArray.Vertex.create
     ~position:(Vector3f.({x =  0.5; y =  0.5; z = 0.5})) ()
 
 let vertex_source = VertexArray.Source.(
     empty ~position:"position" ~size:8 ()
-    << vertex0 << vertex1 << vertex2 
-    << vertex3 << vertex4 << vertex5 
-    << vertex6 << vertex7 
+    << vertex0 << vertex1 << vertex2
+    << vertex3 << vertex4 << vertex5
+    << vertex6 << vertex7
 )
 
 let index_source = IndexArray.Source.(
     empty 36
-    << 0 << 1 << 5 << 0 << 5 << 4 
+    << 0 << 1 << 5 << 0 << 5 << 4
     << 3 << 2 << 6 << 3 << 6 << 7
     << 1 << 3 << 7 << 1 << 7 << 5
     << 5 << 7 << 6 << 5 << 6 << 4
@@ -99,7 +100,7 @@ let matrixVP = Matrix3D.product proj view
 
 let rot_angle = ref 0.
 
-let display () = 
+let display () =
   let t = Unix.gettimeofday () in
   rot_angle := !rot_angle +. (abs_float (cos t /. 10.)) /. 3.;
   let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
@@ -123,8 +124,8 @@ let rec event_loop () =
   )
   |None -> ()
 
-let rec main_loop () = 
-  if Window.is_open window then begin 
+let rec main_loop () =
+  if Window.is_open window then begin
     Window.clear window;
     display ();
     Window.display window;
@@ -133,7 +134,3 @@ let rec main_loop () =
   end
 
 let () = main_loop ()
-
-
-
-

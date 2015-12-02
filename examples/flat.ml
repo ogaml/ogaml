@@ -2,7 +2,8 @@ open OgamlGraphics
 open OgamlMath
 
 let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
-let window = Window.create ~width:900 ~height:600 ~settings
+let window =
+  Window.create ~width:900 ~height:600 ~settings ~title:"Flat Example"
 
 let rectangle1 =
   Shape.create_rectangle

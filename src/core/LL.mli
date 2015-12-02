@@ -5,7 +5,10 @@ module Window : sig
   type t
 
   (** Creates a window of size width x height *)
-  val create : width:int -> height:int -> t
+  val create : width:int -> height:int -> title:string -> t
+
+  (** Sets the tite of the window. *)
+  val set_title : t -> string -> unit
 
   (** Closes a window, but does not free the memory.
     * This should prevent segfaults when calling functions on this window. *)

@@ -3,13 +3,14 @@ open OgamlMath
 
 let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
 
-let window = Window.create ~width:800 ~height:600 ~settings
+let window =
+  Window.create ~width:800 ~height:600 ~title:"Cube Example" ~settings
 
 let initial_time = ref 0.
 
 let frame_count  = ref 0
 
-let axis_source = 
+let axis_source =
   let src = VertexArray.Source.empty
     ~position:"in_position"
     ~color:"in_color"
@@ -17,20 +18,20 @@ let axis_source =
   in
   Poly.axis src Vector3f.({x = -1.; y = -1.; z = -1.}) Vector3f.({x = 5.; y = 5.; z = 5.})
 
-let cube_source = 
-  let src = VertexArray.Source.empty 
-    ~position:"in_position" 
+let cube_source =
+  let src = VertexArray.Source.empty
+    ~position:"in_position"
     ~color:"in_color"
     ~normal:"in_normal"
-    ~size:36 () 
+    ~size:36 ()
   in
   Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
 
-let axis = VertexArray.static axis_source 
+let axis = VertexArray.static axis_source
 
-let cube = VertexArray.static cube_source 
+let cube = VertexArray.static cube_source
 
-let default_program = 
+let default_program =
   Program.from_source_pp (Window.state window)
     ~vertex_source:(`File "examples/default_shader.vert")
     ~fragment_source:(`File "examples/default_shader.frag")
@@ -62,8 +63,8 @@ let display () =
   let mvp = Matrix3D.product vp model in
   rot_angle := !rot_angle +. (abs_float (cos t /. 10.)) /. 3.;
   let parameters =
-    DrawParameter.(make 
-      ~depth_test:true 
+    DrawParameter.(make
+      ~depth_test:true
       ~culling:CullingMode.CullClockwise ())
   in
   let uniform =
@@ -176,5 +177,3 @@ let () =
   main_loop ();
   Printf.printf "Avg FPS: %f\n%!" (float_of_int (!frame_count) /. (Unix.gettimeofday () -. !initial_time));
   Window.destroy window
-
-

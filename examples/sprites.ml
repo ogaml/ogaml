@@ -2,7 +2,8 @@ open OgamlGraphics
 open OgamlMath
 
 let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
-let window = Window.create ~width:900 ~height:600 ~settings
+let window =
+  Window.create ~width:900 ~height:600 ~settings ~title:"Sprite Example"
 
 let texture = Texture.Texture2D.create (`File "examples/mario-block.bmp")
 
@@ -57,5 +58,3 @@ let rec each_frame () =
   end
 
 let () = each_frame ()
-
-

@@ -17,7 +17,7 @@ module Window = struct
         launched := true
       end
 
-  let create ~width ~height =
+  let create ~width ~height ~title =
     init_app () ;
 
     (* Rect for setting the size -- offset is ignored we will center *)
@@ -35,7 +35,7 @@ module Window = struct
     (* Various settings *)
     Cocoa.(
       NSWindow.set_background_color window (NSColor.green ()) ;
-      NSWindow.make_key_and_order_front window;
+      NSWindow.make_key_and_order_front window ;
       NSWindow.center window ;
       (* NSWindow.make_main window ; *)
       NSWindow.set_for_events window ;
@@ -46,12 +46,12 @@ module Window = struct
     let win_ctrl = Cocoa.OGWindowController.init_with_window window in
 
     (* Adding a title to the window *)
-    (* Cocoa.OGWindowController.set_title win_ctrl (Cocoa.NSString.create "Test"); *)
+    Cocoa.OGWindowController.set_title win_ctrl (Cocoa.NSString.create title) ;
 
     (* But first we create and apply a new openGL context *)
     let attr = Cocoa.NSOpenGLPixelFormat.([
       #ifdef __OSX__
-      NSOpenGLPFAOpenGLProfile NSOpenGLProfileVersion3_2Core;
+      NSOpenGLPFAOpenGLProfile NSOpenGLProfileVersion3_2Core ;
       #endif
       NSOpenGLPFAColorSize 24 ;
       NSOpenGLPFAAlphaSize 8  ;
@@ -65,6 +65,9 @@ module Window = struct
 
     (* Finally returning the window controller *)
     win_ctrl
+
+  let set_title win title =
+    Cocoa.OGWindowController.set_title win (Cocoa.NSString.create title)
 
   let close win =
     Cocoa.OGWindowController.close_window win
