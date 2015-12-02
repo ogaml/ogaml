@@ -22,13 +22,14 @@ caml_glx_choose_visual(value disp, value scr, value attributes, value len)
     hd = Field(tl, 0);
     tl = Field(tl, 1);
     if(Is_long(hd)) {
+      attrs[i+1] = True;
       switch(Int_val(hd)) {
-        case 0 : attrs[i] = GLX_RGBA; break;
-        case 1 : attrs[i] = GLX_DOUBLEBUFFER; break;
-        case 2 : attrs[i] = GLX_STEREO; break;
+        case 0 : attrs[i] = GLX_DOUBLEBUFFER; break;
+        case 1 : attrs[i] = GLX_STEREO; break;
+        case 2 : attrs[i] = GLX_X_RENDERABLE; break;
         default: caml_failwith("Variant handling bug in glx_choose_visual");
       }
-      i++;
+      i += 2;
     } else {
       attrs[i+1] = Int_val(Field(hd,0));
       switch(Tag_val(hd)) {
@@ -45,6 +46,8 @@ caml_glx_choose_visual(value disp, value scr, value attributes, value len)
         case 10 : attrs[i] = GLX_ACCUM_BLUE_SIZE ; break;
         case 11 : attrs[i] = GLX_ACCUM_ALPHA_SIZE; break;
         case 12 : attrs[i] = GLX_ACCUM_GREEN_SIZE; break;
+        case 13 : attrs[i] = GLX_SAMPLES; break;
+        case 14 : attrs[i] = GLX_SAMPLE_BUFFERS; break;
         default: caml_failwith("Variant handling bug in glx_choose_visual");
       }
       i += 2;
@@ -52,14 +55,12 @@ caml_glx_choose_visual(value disp, value scr, value attributes, value len)
   }
 
   attrs[i] = None;
+  
+  int fbcount;
+  GLXFBConfig* fbc = glXChooseFBConfig((Display*)disp, Int_val(scr), attrs, &fbcount);
+  XVisualInfo* vis = glXGetVisualFromFBConfig((Display*)disp, fbc[0]);
 
-  CAMLreturn(
-      (value) glXChooseVisual(
-        (Display*)disp, 
-        Int_val(scr),
-        attrs
-      )
-  );
+  CAMLreturn((value) vis);
 }
 
 

@@ -137,6 +137,8 @@ module Pervasives = struct
 
   external max_textures : unit -> int = "caml_max_textures"
 
+  external msaa : bool -> unit = "caml_enable_msaa"
+
 end
 
 

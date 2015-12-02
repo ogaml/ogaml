@@ -1,4 +1,6 @@
 #include <X11/Xlib.h>
+#include <GL/gl.h>
+#include <GL/glx.h>
 #include "utils.h"
 
 
@@ -7,21 +9,41 @@
 // OUTPUT  new window 
 CAMLprim value
 caml_xcreate_simple_window(
-    value disp, value parent, value origin, value size, value bg
+    value disp, value parent, value origin, value size, value visual
   )
 {
-  CAMLparam5(disp, parent, origin, size, bg);
-  CAMLreturn((value) XCreateSimpleWindow(
+  CAMLparam5(disp, parent, origin, size, visual);
+
+  int depth = ((XVisualInfo*)visual)->depth;
+
+  Visual *vis = ((XVisualInfo*)visual)->visual;
+
+  unsigned int mask = CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask;
+
+  XSetWindowAttributes winAttr ;
+    winAttr.event_mask = StructureNotifyMask | KeyPressMask ;
+    winAttr.background_pixmap = None ;
+    winAttr.background_pixel  = 0    ;
+    winAttr.border_pixel      = 0    ;
+    winAttr.colormap = XCreateColormap((Display*)disp, (Window)parent, vis, AllocNone );
+ 
+
+  Window win = XCreateWindow(
         (Display*) disp, 
         (Window) parent,
         Int_val(Field(origin,0)),
         Int_val(Field(origin,1)),
         Int_val(Field(size,0)),
         Int_val(Field(size,1)),
-        0, 0,
-        Int_val(bg)
-    )
-  );
+        0,
+        depth,
+        InputOutput,
+        vis,
+        mask,
+        &winAttr
+    );
+
+  CAMLreturn((value)win);
 }
 
 

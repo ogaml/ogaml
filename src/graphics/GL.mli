@@ -94,6 +94,9 @@ module Pervasives : sig
   (** Returns the maximal number of textures *)
   val max_textures : unit -> int
 
+  (** Sets the MSAA *)
+  val msaa : bool -> unit
+
 end
 
 

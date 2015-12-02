@@ -6,6 +6,7 @@ type t = {
   minor : int;
   glsl  : int;
   textures : int;
+  mutable msaa : bool;
   mutable culling_mode  : DrawParameter.CullingMode.t;
   mutable polygon_mode  : DrawParameter.PolygonMode.t;
   mutable depth_test    : bool;
@@ -69,6 +70,7 @@ module LL = struct
       minor   ;
       glsl    ;
       textures;
+      msaa = false;
       culling_mode = DrawParameter.CullingMode.CullNone;
       polygon_mode = DrawParameter.PolygonMode.DrawFill;
       depth_test   = false;
@@ -93,6 +95,10 @@ module LL = struct
 
   let set_depth_test s v = 
     s.depth_test <- v
+
+  let msaa s = s.msaa
+
+  let set_msaa s b = s.msaa <- b
 
   let textures s = 
     s.textures

@@ -25,7 +25,6 @@ module VisualInfo : sig
   type attribute = 
     | BufferSize     of int
     | Level          of int
-    | RGBA           
     | DoubleBuffer
     | Stereo         
     | AuxBuffers     of int
@@ -39,6 +38,9 @@ module VisualInfo : sig
     | AccumBlueSize  of int
     | AccumAlphaSize of int
     | AccumGreenSize of int
+    | Renderable
+    | Samples        of int
+    | SampleBuffers  of int
 
   val choose : Display.t -> ?screen:int -> attribute list -> t
 
@@ -65,7 +67,7 @@ module Window : sig
   val root_of : ?screen:int -> Display.t -> t
 
   val create_simple : display:Display.t -> parent:t -> size:(int * int) -> 
-                      origin:(int * int) -> background:int -> t
+                      origin:(int * int) -> visual:VisualInfo.t -> t
 
   val set_title : Display.t -> t -> string -> unit
 

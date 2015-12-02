@@ -1,15 +1,17 @@
 
 type t
 
-val create : ?color:Color.t -> ?clear_color:bool -> 
-             ?depth:bool -> ?stencil:bool -> unit -> t
+val create : ?color:Color.t -> 
+             ?depth:int -> 
+             ?stencil:int -> 
+             ?msaa:int -> unit -> t
 
-val color : t -> Color.t
+val clearing_color : t -> Color.t
 
-val color_clearing : t -> bool
+val depth_bits : t -> int
 
-val depth_testing : t -> bool
+val stencil_bits : t -> int
 
-val stenciling : t -> bool
+val msaa : t -> int
 
 val to_ll : t -> OgamlCore.LL.ContextSettings.t

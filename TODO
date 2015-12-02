@@ -18,9 +18,9 @@ Cocoa specific:
 
 OgamlCore:
   ✔ Log system @done(2015-12-01 20:44) @project(OgamlCore)
-  ☐ Window titles
-  ☐ Context customisation
-  ☐ Encapsulate parameters (title, depth buffer size, etc..)
+  ✔ Window titles @done(2015-12-02 15:01) @project(OgamlCore)
+  ✔ Context customisation @done(2015-12-02 20:58) @project(OgamlCore)
+  ✔ Encapsulate parameters (title, depth buffer size, etc..) @done(2015-12-02 20:58) @project(OgamlCore)
 
 OgamlMath:
   ✔ Matrices, quaternions and vector exceptions @done(2015-11-30 21:58) @project(OgamlMath)

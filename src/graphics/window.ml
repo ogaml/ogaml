@@ -169,6 +169,10 @@ let create ~width ~height ~title ~settings =
         ~vertex_source:(`String vertex_shader_source_tex_110)
         ~fragment_source:(`String fragment_shader_source_tex_110)
   in
+  if ContextSettings.msaa settings > 0 then begin
+    State.LL.set_msaa state true;
+    GL.Pervasives.msaa true;
+  end;
   {
     state;
     internal;
@@ -194,16 +198,15 @@ let poll_event win = LL.Window.poll_event win.internal
 let display win = LL.Window.display win.internal
 
 let clear win =
-  let cc = ContextSettings.color win.settings in
+  let cc = ContextSettings.clearing_color win.settings in
   if State.clear_color win.state <> cc then begin
     let crgb = Color.rgb cc in
     State.LL.set_clear_color win.state cc;
     Color.RGB.(GL.Pervasives.color crgb.r crgb.g crgb.b crgb.a)
   end;
-  let color = ContextSettings.color_clearing win.settings in
-  let depth = ContextSettings.depth_testing  win.settings in
-  let stencil = ContextSettings.stenciling   win.settings in
-  GL.Pervasives.clear color depth stencil
+  let depth = ContextSettings.depth_bits win.settings > 0 in
+  let stencil = ContextSettings.stencil_bits win.settings > 0 in
+  GL.Pervasives.clear true depth stencil
 
 let state win = win.state
 

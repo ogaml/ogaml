@@ -52,6 +52,12 @@ module LL : sig
   (** Sets the current value of depth testing *)
   val set_depth_test : t -> bool -> unit
 
+  (** Get the current value of MSAA *)
+  val msaa : t -> bool
+
+  (** Sets the current value of MSAA *)
+  val set_msaa : t -> bool -> unit
+
   (** Returns the number of texture units available *)
   val textures : t -> int
 

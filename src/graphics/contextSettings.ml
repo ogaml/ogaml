@@ -1,28 +1,32 @@
 
 type t = {
           color  : Color.t;
-          clears : bool;
-          depth  : bool;
-          stencil: bool
+          depth  : int;
+          stencil: int;
+          msaa   : int
          }
 
 let create ?color:(color = `RGB Color.RGB.black)
-           ?clear_color:(clear_color = true)
-           ?depth:(depth = true)
-           ?stencil:(stencil = false) () =
+           ?depth:(depth = 24)
+           ?stencil:(stencil = 0)
+           ?msaa:(msaa = 0) () =
     {
      color;
-     clears = clear_color;
      depth;
-     stencil
+     stencil;
+     msaa
     }
 
-let color t = t.color
+let clearing_color t = t.color
 
-let color_clearing t = t.clears
+let depth_bits t = t.depth
 
-let depth_testing t = t.depth
+let stencil_bits t = t.stencil
 
-let stenciling t = t.stencil
+let msaa t = t.msaa
 
-let to_ll t = OgamlCore.LL.ContextSettings.create ()
+let to_ll t = 
+  OgamlCore.LL.ContextSettings.create 
+    ~antialiasing:t.msaa
+    ~depth_bits:t.depth
+    ~stencil_bits:t.stencil ()

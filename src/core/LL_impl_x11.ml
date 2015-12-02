@@ -11,13 +11,24 @@ module Window = struct
   let create ~width ~height ~title ~settings =
     (* The display is a singleton in C (created only once) *)
     let display = X11.Display.create () in
+    let vi = X11.VisualInfo.choose display (
+      [X11.VisualInfo.DepthSize 24;
+       X11.VisualInfo.DoubleBuffer;
+       X11.VisualInfo.DepthSize (ContextSettings.depth_bits settings); 
+       X11.VisualInfo.StencilSize (ContextSettings.stencil_bits settings)]
+      |> fun l -> 
+          if ContextSettings.aa_level settings > 0 then
+            X11.VisualInfo.SampleBuffers 1 ::
+            X11.VisualInfo.Samples (ContextSettings.aa_level settings) :: l
+          else l)
+    in
     let window  =
         X11.Window.create_simple
             ~display:display
             ~parent:(X11.Window.root_of display)
             ~size:(width,height)
             ~origin:(50,50)
-            ~background:0;
+            ~visual:vi
     in
     let atom = X11.Atom.intern display "WM_DELETE_WINDOW" false in
     begin
@@ -27,18 +38,13 @@ module Window = struct
     end;
     X11.Event.set_mask display window
       [X11.Event.ExposureMask;
-        X11.Event.KeyPressMask;
-        X11.Event.KeyReleaseMask;
-        X11.Event.ButtonPressMask;
-        X11.Event.ButtonReleaseMask;
-        X11.Event.PointerMotionMask];
+       X11.Event.KeyPressMask;
+       X11.Event.KeyReleaseMask;
+       X11.Event.ButtonPressMask;
+       X11.Event.ButtonReleaseMask;
+       X11.Event.PointerMotionMask];
     X11.Window.map display window;
     X11.Display.flush display;
-    let vi = X11.VisualInfo.choose display
-      [X11.VisualInfo.RGBA;
-      X11.VisualInfo.DepthSize 24;
-      X11.VisualInfo.DoubleBuffer]
-    in
     let context = X11.GLContext.create display vi in
     X11.Window.attach display window context;
     X11.Window.set_title display window title;

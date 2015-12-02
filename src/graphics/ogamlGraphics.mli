@@ -247,16 +247,18 @@ module ContextSettings : sig
     *
     *   $color$ - background color used when clearing (defaults to opaque black)
     *
-    *   $clear_color$ - whether to clear the color buffer or not when calling clear (defaults to true)
+    *   $depth$ - bits allocated to the depth buffer (defaults to 24)
     *
-    *   $depth$ - whether to clear the depth buffer or not when calling clear (defaults to true)
+    *   $stencil$ - bits allocated to the stencil buffer (defaults to 0)
     *
-    *   $stencil$ - whether to clear the stencil buffer or not when calling clear (defaults to false)
+    *   $msaa$ - MSAA level (defaults to 0)
     *
     * @see:OgamlGraphics.Color
     *)
-  val create : ?color:Color.t -> ?clear_color:bool ->
-               ?depth:bool -> ?stencil:bool -> unit -> t
+  val create : ?color:Color.t -> 
+               ?depth:int -> 
+               ?stencil:int -> 
+               ?msaa:int -> unit -> t
 
 end
 
