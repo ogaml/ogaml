@@ -12,8 +12,7 @@ module Window = struct
     (* The display is a singleton in C (created only once) *)
     let display = X11.Display.create () in
     let vi = X11.VisualInfo.choose display (
-      [X11.VisualInfo.DepthSize 24;
-       X11.VisualInfo.DoubleBuffer;
+      [X11.VisualInfo.DoubleBuffer;
        X11.VisualInfo.DepthSize (ContextSettings.depth_bits settings); 
        X11.VisualInfo.StencilSize (ContextSettings.stencil_bits settings)]
       |> fun l -> 
