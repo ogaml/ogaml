@@ -55,7 +55,10 @@ module Window = struct
       #endif
       NSOpenGLPFAColorSize 24 ;
       NSOpenGLPFAAlphaSize 8  ;
-      NSOpenGLPFADepthSize 24 ;
+      NSOpenGLPFADepthSize (ContextSettings.depth_bits settings) ;
+      NSOpenGLPFAStencilSize (ContextSettings.stencil_bits settings) ;
+      NSOpenGLPFASampleBuffers (if ContextSettings.aa_level settings > 0 then 1 else 0);
+      NSOpenGLPFASamples       (ContextSettings.aa_level settings);
       NSOpenGLPFADoubleBuffer ;
       NSOpenGLPFAAccelerated
     ]) in
