@@ -26,8 +26,6 @@ let cube_source =
     ~size:36 ()
   in
   Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
-  |> fun src -> Poly.cube src Vector3f.({x =  0.5; y =  0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
-  |> fun src -> Poly.cube src Vector3f.({x = -0.5; y =  0.5; z =  0.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
 
 let axis = VertexArray.static axis_source
 
@@ -58,9 +56,8 @@ let display () =
   (* Compute model matrix *)
   let t = Unix.gettimeofday () in
   let view = Matrix3D.look_at_eulerian ~from:!position ~theta:!view_theta ~phi:!view_phi in
-(*   let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in *)
-(*   let model = Matrix3D.rotation rot_vector !rot_angle in *)
-  let model = Matrix3D.identity () in
+  let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
+  let model = Matrix3D.rotation rot_vector !rot_angle in
   let vp = Matrix3D.product proj view in
   let mv = Matrix3D.product view model in
   let mvp = Matrix3D.product vp model in
