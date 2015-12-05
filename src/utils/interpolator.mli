@@ -99,25 +99,15 @@ val linear : float -> (float * float) list -> float -> float t
   * of $steps$ at constant speed *)
 val cst_linear : float -> float list -> float -> float t
 
-(** $quadratic start steps end$ creates a quadratic interpolator
-  * going from $start$ to $end$ passing through each point
-  * $(dt, pos)$ of $steps$ at time $dt$ *)
-val quadratic : float -> (float * float) list -> float -> float t
+(** $cubic (start, sm) steps (end, em)$ creates a cubic spline interpolator
+  * going from $start$ with tangent $sm$ to $end$ with tangeant $em$
+  * passing through each point $(dt, pos)$ of $steps$ at time $dt$ *)
+val cubic : float * float -> (float * float) list -> float * float -> float t
 
-(** $cst_quadratic start steps end$ creates a quadratic interpolator
-  * going from $start$ to $end$ passing through each point
-  * of $steps$ at constant speed *)
-val cst_quadratic : float -> float list -> float -> float t
-
-(** $cubic start steps end$ creates a cubic interpolator
-  * going from $start$ to $end$ passing through each point
-  * $(dt, pos)$ of $steps$ at time $dt$ *)
-val cubic : float -> (float * float) list -> float -> float t
-
-(** $cst_cubic start steps end$ creates a cubic interpolator
-  * going from $start$ to $end$ passing through each point
-  * of $steps$ at constant speed *)
-val cst_cubic : float -> float list -> float -> float t
+(** $cubic (start, sm) steps (end, em)$ creates a cubic spline interpolator
+  * going from $start$ with tangent $sm$ to $end$ with tangeant $em$
+  * passing through each point of $steps$ at constant speed *)
+val cst_cubic : float * float -> float list -> float * float -> float t
 
 
 (*** Composition *)
@@ -131,6 +121,13 @@ val compose : float t -> 'a t -> 'a t
 (** $map ip f$ returns a new interpolator that takes
   * the value of $ip$ and passes it to $f$. *)
 val map : 'a t -> ('a -> 'b) -> 'b t
+
+(** $map_right$ is an alias for $map$ *)
+val map_right : 'a t -> ('a -> 'b) -> 'b t
+
+(** $map_left f ip$ returns a function $g$ such that 
+  * $g(x) = ip(f(x))$ *)
+val map_left : ('a -> float) -> 'b t -> ('a -> 'b)
 
 (** Returns a pair-interpolator from a pair of interpolators.
   * 

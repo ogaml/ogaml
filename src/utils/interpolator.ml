@@ -61,31 +61,72 @@ let rec distance b l e =
   |[] -> abs_float (e -. b)
   |h::t -> abs_float (h -. b) +. (distance h t e)
 
-let times b l e = 
+let append_times b l e = 
   let dist = distance b l e in
   let rec times_aux b l acc =
     match l with
     |[] -> []
     |h::t -> 
       let new_acc = acc +. (abs_float (h -. b)) in
-      (new_acc /. dist, h) :: (times_aux h t new_acc)
+      let time = 
+        if dist = 0. then 0. 
+        else new_acc /. dist 
+      in
+      (time, h) :: (times_aux h t new_acc)
   in
   times_aux b l 0.
 
-let linear b l e = constant 0.
+let rec append_tangents pb tb l pe = 
+  match l with
+  |[] -> []
+  |[(t, pos)] -> 
+    let mk = (pe -. pos)/.(2.*.(1. -. t)) -. (pos -. pb)/.(2.*.(t -. tb)) in
+    [t,(pos,mk)]
+  |(t1,pos1)::(t2,pos2)::tail -> 
+    let mk = (pos2 -. pos1)/.(2.*.(t2 -. t1)) -. (pos1 -. pb)/.(2.*.(t1 -. tb)) in
+    (t1,(pos1,mk))::(append_tangents pos1 t1 ((t2,pos2)::tail) pe)
+
+let points b l e t = 
+  let rec points_aux b l = 
+    match l with
+    |[] -> (b, (1.,e))
+    |(cur_t, pt)::_ when t <= cur_t -> (b, (cur_t, pt))
+    |h::tail -> points_aux h tail
+  in
+  points_aux (0.,b) l
+
+let h00 t = 2. *. t *. t *. t -. 3. *. t *. t +. 1.
+
+let h10 t = t *. t *. t -. 2. *. t *. t +. t
+
+let h01 t = -. 2. *. t *. t *. t +. 3. *. t *. t
+
+let h11 t = t *. t *. t -. t *. t
+
+let linear b l e =
+  let func = fun t ->
+    let (t1, p1), (t2, p2) = points b l e t in
+    let fact = 
+      if t2 = t1 then 1.
+      else (t -. t1) /. (t2 -. t1) 
+    in
+    (1. -. fact) *. p1 +. fact *. p2
+  in
+  custom func
 
 let cst_linear b l e = 
-  linear b (times b l e) e
+  linear b (append_times b l e) e
 
-let quadratic b l e = constant 0.
+let cubic b l e = 
+  let l' = append_tangents (fst b) 0. l (fst e) in
+  let func = fun t -> 
+    let (_, (p1, tg1)), (_, (p2, tg2)) = points b l' e t in
+    (h00 t) *. p1 +. (h10 t) *. tg1 +. (h01 t) *. p2 +. (h11 t) *. tg2
+  in
+  custom func
 
-let cst_quadratic b l e = 
-  quadratic b (times b l e) e
-
-let cubic b l e = constant 0.
-
-let cst_cubic b l e =
-  cubic b (times b l e) e
+let cst_cubic b l e = 
+  cubic b (append_times (fst b) l (fst e)) e
 
 let compose ip1 ip2 = {
   ip1 with func = fun t -> ip2.func (ip1.func t)
@@ -94,6 +135,11 @@ let compose ip1 ip2 = {
 let map ip f = {
   ip with func = fun t -> f (ip.func t)
 }
+
+let map_right = map
+
+let map_left f ip =
+  fun a -> ip.func (f a)
 
 let pair ip1 ip2 = {
   func = (fun t -> (ip1.func t, ip2.func t));

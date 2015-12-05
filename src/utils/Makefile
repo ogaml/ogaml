@@ -2,9 +2,9 @@ include ../../common_defs.mk
 
 # Override
 
-INCLUDE_DIRS = 
+INCLUDE_DIRS = -I ../math/
 
-MLSOURCES = priorityQueue.ml dequeue.ml graph.ml
+MLSOURCES = priorityQueue.ml dequeue.ml graph.ml interpolator.ml
 
 MLINTERFACES =
 
@@ -32,13 +32,13 @@ compile_utils_byte: .depend $(MLCMIS) $(MLOBJS)
 	$(OCAMLFIND) $(OCAMLC) -a -o $(MLLIB).cma $(INCLUDE_DIRS) $(MLLIB).cmo
 
 %.cmi:%.mli
-	$(OCAMLFIND) $(OCAMLC) -c $< -o $@
+	$(OCAMLFIND) $(OCAMLC) $(INCLUDE_DIRS) ../math/ogamlMath.cma -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLFIND) $(OCAMLOPT) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLFIND) $(OCAMLOPT) $(INCLUDE_DIRS) ../math/ogamlMath.cmxa -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) $<
 
 %.cmo:%.ml
-	$(OCAMLFIND) $(OCAMLC) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLFIND) $(OCAMLC) $(INCLUDE_DIRS) ../math/ogamlMath.cma -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) $<
 
 %.ml:%.mlpp %.cmi
 	$(PPCOMMAND) -o $@ $<

@@ -1,12 +1,17 @@
-bounding.cmo : bounding.cmi
-bounding.cmx : bounding.cmi
+bounding.cmo : ../math/vector3f.cmi ../math/ogamlMath.cmi \
+    ../math/matrix3D.cmi bounding.cmi
+bounding.cmx : ../math/vector3f.cmx ../math/ogamlMath.cmi \
+    ../math/matrix3D.cmx bounding.cmi
 dequeue.cmo : dequeue.cmi
 dequeue.cmx : dequeue.cmi
 graph.cmo : priorityQueue.cmi dequeue.cmi graph.cmi
 graph.cmx : priorityQueue.cmx dequeue.cmx graph.cmi
+interpolator.cmo : ../math/ogamlMath.cmi interpolator.cmi
+interpolator.cmx : ../math/ogamlMath.cmi interpolator.cmi
 priorityQueue.cmo : priorityQueue.cmi
 priorityQueue.cmx : priorityQueue.cmi
-bounding.cmi :
+bounding.cmi : ../math/ogamlMath.cmi
 dequeue.cmi :
 graph.cmi :
+interpolator.cmi : ../math/ogamlMath.cmi
 priorityQueue.cmi :
