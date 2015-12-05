@@ -17,7 +17,7 @@ module Window = struct
         launched := true
       end
 
-  let create ~width ~height =
+  let create ~width ~height ~title ~settings =
     init_app () ;
 
     (* Rect for setting the size -- offset is ignored we will center *)
@@ -35,7 +35,7 @@ module Window = struct
     (* Various settings *)
     Cocoa.(
       NSWindow.set_background_color window (NSColor.green ()) ;
-      NSWindow.make_key_and_order_front window;
+      NSWindow.make_key_and_order_front window ;
       NSWindow.center window ;
       (* NSWindow.make_main window ; *)
       NSWindow.set_for_events window ;
@@ -45,23 +45,39 @@ module Window = struct
     (* Creating the delegate which we will return *)
     let win_ctrl = Cocoa.OGWindowController.init_with_window window in
 
+    (* Adding a title to the window *)
+    Cocoa.OGWindowController.set_title win_ctrl (Cocoa.NSString.create title) ;
+
     (* But first we create and apply a new openGL context *)
-    let attr = Cocoa.NSOpenGLPixelFormat.([
-      #ifdef __OSX__
-      NSOpenGLPFAOpenGLProfile NSOpenGLProfileVersion3_2Core;
-      #endif
-      NSOpenGLPFAColorSize 24 ;
-      NSOpenGLPFAAlphaSize 8  ;
-      NSOpenGLPFADepthSize 24 ;
-      NSOpenGLPFADoubleBuffer ;
-      NSOpenGLPFAAccelerated
-    ]) in
+    let attr = Cocoa.NSOpenGLPixelFormat.(
+      [
+        #ifdef __OSX__
+        NSOpenGLPFAOpenGLProfile NSOpenGLProfileVersion3_2Core ;
+        #endif
+        NSOpenGLPFAColorSize 24 ;
+        NSOpenGLPFAAlphaSize 8  ;
+        NSOpenGLPFADepthSize (ContextSettings.depth_bits settings) ;
+        NSOpenGLPFAStencilSize (ContextSettings.stencil_bits settings) ;
+        NSOpenGLPFADoubleBuffer ;
+        NSOpenGLPFAAccelerated
+      ]
+      |> fun l ->
+        if ContextSettings.aa_level settings > 0 then
+          NSOpenGLPFAMultisample ::
+          NSOpenGLPFASampleBuffers 1 ::
+          NSOpenGLPFASamples (ContextSettings.aa_level settings) :: l
+        else l
+    ) in
+
     let pixel_format = Cocoa.NSOpenGLPixelFormat.init_with_attributes attr in
     let context = Cocoa.NSOpenGLContext.init_with_format pixel_format in
     Cocoa.OGWindowController.set_context win_ctrl context ;
 
     (* Finally returning the window controller *)
     win_ctrl
+
+  let set_title win title =
+    Cocoa.OGWindowController.set_title win (Cocoa.NSString.create title)
 
   let close win =
     Cocoa.OGWindowController.close_window win
@@ -73,7 +89,8 @@ module Window = struct
     let i = int_of_float in
     Cocoa.(
       let (_,_,w,h) = NSRect.get (Cocoa.OGWindowController.content_frame win)
-      in i w, i h
+      in
+      OgamlMath.Vector2i.({x = i w; y = i h})
     )
 
   let is_open win =
@@ -371,20 +388,20 @@ module Mouse = struct
   let position () =
     let (x,y) = Cocoa.NSEvent.proper_mouse_location () in
     let i = int_of_float in
-    i x , i y
+    OgamlMath.Vector2i.({x = i x; y = i y})
 
   let relative_position win =
     let (x,y) = Cocoa.OGWindowController.proper_relative_mouse_location win in
     let i = int_of_float in
-    i x , i y
+    OgamlMath.Vector2i.({x = i x; y = i y})
 
-  let set_position (x,y) =
+  let set_position v =
     let f = float_of_int in
-    Cocoa.Mouse.warp (f x) (f y)
+    Cocoa.Mouse.warp (f v.OgamlMath.Vector2i.x) (f v.OgamlMath.Vector2i.y)
 
-  let set_relative_position win (x,y) =
+  let set_relative_position win v =
     let f = float_of_int in
-    Cocoa.OGWindowController.set_proper_relative_mouse_location win (f x) (f y)
+    Cocoa.OGWindowController.set_proper_relative_mouse_location win (f v.OgamlMath.Vector2i.x) (f v.OgamlMath.Vector2i.y)
 
   let is_pressed button =
     let pressed_buttons = Cocoa.NSEvent.pressed_mouse_buttons () in

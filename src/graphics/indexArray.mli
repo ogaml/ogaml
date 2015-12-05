@@ -1,6 +1,4 @@
 
-exception Invalid_buffer of string
-
 module Source : sig
 
   type t
@@ -12,6 +10,8 @@ module Source : sig
   val (<<) : t -> int -> t
 
   val length : t -> int
+
+  val append : t -> t -> t
 
 end
 
@@ -25,11 +25,9 @@ val static : Source.t -> static t
 
 val dynamic : Source.t -> dynamic t
 
-val rebuild : dynamic t -> Source.t -> dynamic t
+val rebuild : dynamic t -> Source.t -> int -> unit
 
 val length : 'a t -> int
-
-val destroy : 'a t -> unit
 
 
 module LL : sig

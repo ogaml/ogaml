@@ -291,6 +291,8 @@ module OGWindowController : sig
 
   val init_with_window : NSWindow.t -> t
 
+  val set_title : t -> NSString.t -> unit
+
   val process_event : t -> unit
 
   val frame : t -> NSRect.t

@@ -17,31 +17,47 @@ Cocoa specific:
   ☐ Window doesn't resign being key on mission control
 
 OgamlCore:
-  ☐ Log system
-  ☐ Window titles
-  ☐ Context customisation
-  ☐ Encapsulate parameters (title, depth buffer size, etc..)
+  ✔ Log system @done(2015-12-01 20:44) @project(OgamlCore)
+  ✔ Window titles @done(2015-12-02 15:01) @project(OgamlCore)
+  ✔ Context customisation @done(2015-12-02 20:58) @project(OgamlCore)
+  ✔ Encapsulate parameters (title, depth buffer size, etc..) @done(2015-12-02 20:58) @project(OgamlCore)
 
 OgamlMath:
-  ☐ Matrices, quaternions and vector exceptions
-  ☐ Doc
+  ✔ Matrices, quaternions and vector exceptions @done(2015-11-30 21:58) @project(OgamlMath)
+  ✔ Interface @done(2015-12-01 17:29) @project(OgamlMath)
 
 OgamlGraphics:
   ✔ Better normal computations in Model @done(2015-11-15 23:22) @project(OgamlGraphics)
   ✔ Indexing in Model @done(2015-11-16 22:55) @project(OgamlGraphics)
   ✔ Clean unused data in Models @done(2015-11-16 22:55) @project(OgamlGraphics)
-  ☐ Custom vertex arrays
-  ☐ Implement PNG parsing
-  ☐ Implement JPG parsing
-  ☐ Organize image parsing in modules
-  ☐ Better support for all formats (for example 24,32 bit bmps)
-  ☐ Document Shape
+  ✔ Custom vertex arrays @done(2015-11-29 00:43) @project(OgamlGraphics)
+  ✔ Test VertexMaps !!! @done(2015-11-29 18:55) @project(OgamlGraphics)
+  ✔ Sources merging @done(2015-11-30 21:03) @project(OgamlGraphics)
+  ✔ Put vector2f/2i everywhere (instead of pairs) @done(2015-11-30 21:39) @project(OgamlGraphics)
+  ✔ Implement PNG parsing @done(2015-11-30 09:19) @project(OgamlGraphics)
+  ✔ Implement JPG parsing @done(2015-11-30 09:19) @project(OgamlGraphics)
+  ✘ Organize image parsing in modules @cancelled(2015-11-30 09:19) @project(OgamlGraphics)
+  ✔ Better support for all formats (for example 24,32 bit bmps) @done(2015-11-30 09:19) @project(OgamlGraphics)
+  ✔ Alpha ! @done(2015-11-30 11:16) @project(OgamlGraphics)
+  ✔ Destroy VAOs, VBOs, EBOs, programs in Gc.finalize @done(2015-11-26 23:17) @project(OgamlGraphics)
+  ✔ Remove state from Texture.create ? @done(2015-11-30 20:41) @project(OgamlGraphics)
 
+Future work on Model:
+  ☐ Rewrite Model to add iterators, simplify the interface, and only index ad-hoc (when requested by source)
+  ☐ Poly export to Model.t
+  ☐ Model merging
+  
 Shape:
-  ☐ Change the notion of corner of a Shape (it wouldn't work for circles for instance)
-  ☐ Add circles (as regular polygons)
+  ✔ Change the notion of corner of a Shape (it wouldn't work for circles for instance) @done(2015-11-25 21:51) @project(Shape)
+  ✔ Add circles (as regular polygons) @done(2015-11-25 21:51) @project(Shape)
   ✔ Add scale @done(2015-11-22 20:33) @project(Shape)
-  ☐ Floats of ints for position?
+  ✘ Floats gof ints for position? @cancelled(2015-11-30 14:37) @project(Shape)
+  ✔ Add thickness @done(2015-11-26 01:00) @project(Shape)
+  ✔ Fix connectivity for outline @done(2015-11-27 01:02) @project(Shape)
+  ✔ Pick inset / outward whatever @done(2015-11-26 12:20) @project(Shape)
+  ✔ Add color for outline @done(2015-11-27 01:02) @project(Shape)
+  ✔ Fix scaling for outline @done(2015-11-27 16:55) @project(Shape)
+  ✔ Add lines @done(2015-11-27 18:13) @project(Shape)
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:

@@ -41,23 +41,23 @@ module Texture2D = struct
   end
 
 
-  let create st src = 
+  let create src = 
     (* Extract the texture parameters *)
     let width, height, data = 
       match src with
       | `File s -> 
         let img = Image.create (`File s) in
-        let x,y = Image.size img in
-        x, y, Image.data img
+        let v = Image.size img in
+        v.OgamlMath.Vector2i.x, v.OgamlMath.Vector2i.y, Image.data img
       | `Image img ->
-        let x,y = Image.size img in
-        x, y, Image.data img
+        let v = Image.size img in
+        v.OgamlMath.Vector2i.x, v.OgamlMath.Vector2i.y, Image.data img
     in
     (* Create the internal texture *)
     let internal = GL.Texture.create () in
     let tex = {internal; width; height} in
     (* Bind the texture *)
-    LL.bind st (Some tex);
+    GL.Texture.bind GLTypes.TextureTarget.Texture2D (Some internal);
     (* Load the corresponding image *)
     GL.Texture.image
       GLTypes.TextureTarget.Texture2D
@@ -70,12 +70,13 @@ module Texture2D = struct
       (`Magnify GLTypes.MagnifyFilter.Nearest);
     GL.Texture.parameter2D
       (`Minify  GLTypes.MinifyFilter.Nearest);
-    (* Return the texture *)
+    (* Unbind and return the texture *)
+    GL.Texture.bind GLTypes.TextureTarget.Texture2D None;
     tex
 
 
   let size tex = 
-    (tex.width, tex.height)
+    OgamlMath.Vector2i.({x = tex.width; y = tex.height})
 
 
   

@@ -1,12 +1,15 @@
 
-exception Missing_uniform of string
-
-exception Invalid_uniform of string
-
 type t
 
 (** Creates a window of size width x height *)
-val create : width:int -> height:int -> settings:ContextSettings.t -> t
+val create :
+  width:int ->
+  height:int ->
+  title:string ->
+  settings:ContextSettings.t -> t
+
+(** Changes the title of the window. *)
+val set_title : t -> string -> unit
 
 (** Closes a window, but does not free the memory.
   * This should prevent segfaults when calling functions on this window. *)
@@ -16,7 +19,7 @@ val close : t -> unit
 val destroy : t -> unit
 
 (** Return the size of a window *)
-val size : t -> (int * int)
+val size : t -> OgamlMath.Vector2i.t
 
 (** Return true iff the window is open *)
 val is_open : t -> bool
@@ -32,20 +35,6 @@ val poll_event : t -> OgamlCore.Event.t option
 (** Display the window after the GL calls *)
 val display : t -> unit
 
-(** Draws a vertex array *)
-val draw :
-  window     : t ->
-  ?indices   : 'a IndexArray.t ->
-  vertices   : 'b VertexArray.t ->
-  program    : Program.t ->
-  uniform    : Uniform.t ->
-  parameters : DrawParameter.t ->
-  mode       : DrawMode.t ->
-  unit -> unit
-
-(** Draws a 2D shape *)
-val draw_shape : t -> Shape.t -> unit
-
 (** Clears the window *)
 val clear : t -> unit
 
@@ -57,5 +46,11 @@ module LL : sig
 
   (** Returns the internal window of this window, should only be used internally *)
   val internal : t -> OgamlCore.LL.Window.t
+
+  (** Returns the 2D drawing program associated to this window's context *)
+  val program : t -> Program.t
+
+  (** Returns the 2D drawing program for sprites *)
+  val sprite_program : t -> Program.t
 
 end

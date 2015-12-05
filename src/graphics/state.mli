@@ -52,6 +52,12 @@ module LL : sig
   (** Sets the current value of depth testing *)
   val set_depth_test : t -> bool -> unit
 
+  (** Get the current value of MSAA *)
+  val msaa : t -> bool
+
+  (** Sets the current value of MSAA *)
+  val set_msaa : t -> bool -> unit
+
   (** Returns the number of texture units available *)
   val textures : t -> int
 
@@ -93,6 +99,21 @@ module LL : sig
 
   (** Returns the currently bound EBO *)
   val bound_ebo : t -> GL.EBO.t option
+
+  (** Returns whether alpha blending is currently enabled *)
+  val blending : t -> bool
+
+  (** Sets if alpha blending is currently enabled *)
+  val set_blending : t -> bool -> unit
+
+  (** Returns the current blending mode *)
+  val blend_equation : t -> DrawParameter.BlendMode.t
+
+  (** Sets the current blending mode *)
+  val set_blend_equation : t -> DrawParameter.BlendMode.t -> unit
+
+
+  val bind_draw_parameters : t -> DrawParameter.t -> unit
 
 end
 

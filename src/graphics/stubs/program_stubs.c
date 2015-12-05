@@ -13,7 +13,10 @@
 #else
   #include <GL/gl.h>
 #endif
+#include <string.h>
 #include "utils.h"
+
+#define PROGRAM(_a) (*(GLuint*) Data_custom_val(_a))
 
 
 int Val_type(GLenum type)
@@ -32,7 +35,7 @@ int Val_type(GLenum type)
     case GL_FLOAT_MAT2x3 : return 9;
     case GL_FLOAT_MAT2x4 : return 10;
     case GL_FLOAT_MAT3x2 : return 11;
-    case GL_FLOAT_MAT3   : return 12; 
+    case GL_FLOAT_MAT3   : return 12;
     case GL_FLOAT_MAT3x4 : return 13;
     case GL_FLOAT_MAT4x2 : return 14;
     case GL_FLOAT_MAT4x3 : return 15;
@@ -45,13 +48,60 @@ int Val_type(GLenum type)
 }
 
 
+void finalise_program(value v)
+{
+  glDeleteProgram(PROGRAM(v));
+}
+
+int compare_program(value v1, value v2)
+{
+  GLuint i1 = PROGRAM(v1);
+  GLuint i2 = PROGRAM(v2);
+  if(i1 < i2) return -1;
+  else if(i1 == i2) return 0;
+  else return 1;
+}
+
+intnat hash_program(value v)
+{
+  GLuint i = PROGRAM(v);
+  return i;
+}
+
+static struct custom_operations program_custom_ops = {
+  .identifier  = "program gc handling",
+  .finalize    =  finalise_program,
+  .compare     =  compare_program,
+  .hash        =  hash_program,
+  .serialize   =  custom_serialize_default,
+  .deserialize =  custom_deserialize_default
+};
+
+
 // INPUT   nothing
 // OUTPUT  a new gl program
 CAMLprim value
 caml_create_program(value unit)
 {
   CAMLparam0();
-  CAMLreturn((value)glCreateProgram());
+  CAMLlocal1(v);
+
+  GLuint prog = glCreateProgram();
+  v = caml_alloc_custom( &program_custom_ops, sizeof(GLuint), 0, 1);
+  memcpy( Data_custom_val(v), &prog, sizeof(GLuint) );
+
+  CAMLreturn(v);
+}
+
+
+// INPUT   a program
+// OUTPUT  deletes the program
+CAMLprim value
+caml_delete_program(value prog)
+{
+  CAMLparam1(prog);
+  glDeleteProgram(PROGRAM(prog));
+  CAMLreturn(Val_unit);
 }
 
 
@@ -61,7 +111,7 @@ CAMLprim value
 caml_valid_program(value prog)
 {
   CAMLparam1(prog);
-  CAMLreturn(Val_bool((GLuint)prog != 0));
+  CAMLreturn(Val_bool(PROGRAM(prog) != 0));
 }
 
 
@@ -72,7 +122,20 @@ caml_attach_shader(value prog, value sh)
 {
   CAMLparam2(sh, prog);
 
-  glAttachShader((GLuint)prog, (GLuint)sh);
+  glAttachShader(PROGRAM(prog), (GLuint)sh);
+
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   a program and a shader
+// OUTPUT  nothing, detaches the shader
+CAMLprim value
+caml_detach_shader(value prog, value sh)
+{
+  CAMLparam2(sh, prog);
+
+  glDetachShader(PROGRAM(prog), (GLuint)sh);
 
   CAMLreturn(Val_unit);
 }
@@ -84,7 +147,7 @@ CAMLprim value
 caml_attrib_location(value prog, value str)
 {
   CAMLparam2(prog, str);
-  CAMLreturn(Val_int(glGetAttribLocation((GLuint)prog,String_val(str))));
+  CAMLreturn(Val_int(glGetAttribLocation(PROGRAM(prog),String_val(str))));
 }
 
 
@@ -95,19 +158,19 @@ caml_uniform_count(value prog)
 {
   CAMLparam1(prog);
   GLint tmp;
-  glGetProgramiv((GLuint)prog, GL_ACTIVE_UNIFORMS, &tmp);
+  glGetProgramiv(PROGRAM(prog), GL_ACTIVE_UNIFORMS, &tmp);
   CAMLreturn(Val_int(tmp));
 }
 
 
-// INPUT   a program 
+// INPUT   a program
 // OUTPUT  returns the number of active attributes
 CAMLprim value
 caml_attribute_count(value prog)
 {
   CAMLparam1(prog);
   GLint tmp;
-  glGetProgramiv((GLuint)prog, GL_ACTIVE_ATTRIBUTES, &tmp);
+  glGetProgramiv(PROGRAM(prog), GL_ACTIVE_ATTRIBUTES, &tmp);
   CAMLreturn(Val_int(tmp));
 }
 
@@ -118,7 +181,7 @@ CAMLprim value
 caml_uniform_location(value prog, value str)
 {
   CAMLparam2(prog, str);
-  CAMLreturn(Val_int(glGetUniformLocation((GLuint)prog,String_val(str))));
+  CAMLreturn(Val_int(glGetUniformLocation(PROGRAM(prog),String_val(str))));
 }
 
 
@@ -129,23 +192,23 @@ caml_link_program(value prog)
 {
   CAMLparam1(prog);
 
-  glLinkProgram((GLuint)prog);
+  glLinkProgram(PROGRAM(prog));
 
   CAMLreturn(Val_unit);
 }
 
 
-// INPUT   a program 
+// INPUT   a program
 // OUTPUT  returns true iff the linking was successful
 CAMLprim value
 caml_program_status(value prog)
 {
   CAMLparam1(prog);
   GLint tmp;
-  glGetProgramiv((GLuint)prog, GL_LINK_STATUS, &tmp);
+  glGetProgramiv(PROGRAM(prog), GL_LINK_STATUS, &tmp);
   if(tmp == GL_FALSE)
     CAMLreturn(Val_false);
-  else 
+  else
     CAMLreturn(Val_true);
 }
 
@@ -160,7 +223,7 @@ caml_use_program(value prog)
   if(prog == Val_none)
     glUseProgram(0);
   else
-    glUseProgram((GLuint)Some_val(prog));
+    glUseProgram(PROGRAM(Some_val(prog)));
 
   CAMLreturn(Val_unit);
 }
@@ -175,12 +238,12 @@ caml_program_log(value id)
   CAMLlocal1(res);
 
   GLint tmp;
-  glGetProgramiv((GLuint)id, GL_INFO_LOG_LENGTH, &tmp);
+  glGetProgramiv(PROGRAM(id), GL_INFO_LOG_LENGTH, &tmp);
 
   GLsizei maxl = tmp;
   GLsizei len[1] = {0};
   GLchar* log = malloc(tmp * sizeof(GLchar));
-  glGetProgramInfoLog((GLuint)id, maxl, len, log);
+  glGetProgramInfoLog(PROGRAM(id), maxl, len, log);
 
   res = caml_copy_string(log);
 
@@ -199,7 +262,7 @@ caml_uniform_name(value id, value index)
   CAMLlocal1(res);
 
   GLint tmp;
-  glGetProgramiv((GLuint)id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &tmp);
+  glGetProgramiv(PROGRAM(id), GL_ACTIVE_UNIFORM_MAX_LENGTH, &tmp);
 
   GLsizei maxl = tmp;
   GLsizei tmp_len;
@@ -207,7 +270,7 @@ caml_uniform_name(value id, value index)
   GLenum  tmp_type;
   GLchar* name = malloc(tmp * sizeof(GLchar));
 
-  glGetActiveUniform((GLuint)id, Int_val(index), maxl, &tmp_len, &tmp_size, &tmp_type, name);
+  glGetActiveUniform(PROGRAM(id), Int_val(index), maxl, &tmp_len, &tmp_size, &tmp_type, name);
 
   res = caml_copy_string(name);
 
@@ -218,7 +281,7 @@ caml_uniform_name(value id, value index)
 
 
 // INPUT   : a program id, an attribute index
-// OUTPUT  : the name of the attribute 
+// OUTPUT  : the name of the attribute
 CAMLprim value
 caml_attribute_name(value id, value index)
 {
@@ -226,7 +289,7 @@ caml_attribute_name(value id, value index)
   CAMLlocal1(res);
 
   GLint tmp;
-  glGetProgramiv((GLuint)id, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &tmp);
+  glGetProgramiv(PROGRAM(id), GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &tmp);
 
   GLsizei maxl = tmp;
   GLsizei tmp_len;
@@ -234,7 +297,7 @@ caml_attribute_name(value id, value index)
   GLenum  tmp_type;
   GLchar* name = malloc(tmp * sizeof(GLchar));
 
-  glGetActiveAttrib((GLuint)id, Int_val(index), maxl, &tmp_len, &tmp_size, &tmp_type, name);
+  glGetActiveAttrib(PROGRAM(id), Int_val(index), maxl, &tmp_len, &tmp_size, &tmp_type, name);
 
   res = caml_copy_string(name);
 
@@ -257,7 +320,7 @@ caml_uniform_type(value id, value index)
   GLenum  tmp_type;
   GLchar  tmp_name;
 
-  glGetActiveUniform((GLuint)id, Int_val(index), 0, &tmp_len, &tmp_size, &tmp_type, &tmp_name);
+  glGetActiveUniform(PROGRAM(id), Int_val(index), 0, &tmp_len, &tmp_size, &tmp_type, &tmp_name);
 
   CAMLreturn(Val_int(Val_type(tmp_type)));
 }
@@ -276,8 +339,7 @@ caml_attribute_type(value id, value index)
   GLenum  tmp_type;
   GLchar  tmp_name;
 
-  glGetActiveAttrib((GLuint)id, Int_val(index), 0, &tmp_len, &tmp_size, &tmp_type, &tmp_name);
+  glGetActiveAttrib(PROGRAM(id), Int_val(index), 0, &tmp_len, &tmp_size, &tmp_type, &tmp_name);
 
   CAMLreturn(Val_int(Val_type(tmp_type)));
 }
-

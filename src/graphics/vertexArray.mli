@@ -1,5 +1,5 @@
 
-exception Invalid_buffer of string
+exception Invalid_source of string
 
 exception Invalid_vertex of string
 
@@ -43,6 +43,8 @@ module Source : sig
 
   val length : t -> int
 
+  val append : t -> t -> t
+
 end
 
 type static
@@ -55,16 +57,17 @@ val static : Source.t -> static t
 
 val dynamic : Source.t -> dynamic t
 
-val rebuild : dynamic t -> Source.t -> dynamic t
+val rebuild : dynamic t -> Source.t -> int -> unit
 
 val length : 'a t -> int
 
-val destroy : 'a t -> unit
-
-
-module LL : sig
-
-  val bind : State.t -> 'a t -> Program.t -> unit
-
-end
+val draw :
+  vertices   : 'a t ->
+  window     : Window.t ->
+  ?indices   : 'b IndexArray.t ->
+  program    : Program.t ->
+  uniform    : Uniform.t ->
+  parameters : DrawParameter.t ->
+  mode       : DrawMode.t ->
+  unit -> unit
 

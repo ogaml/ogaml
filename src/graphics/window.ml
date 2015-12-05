@@ -1,18 +1,187 @@
 open OgamlCore
 
-exception Missing_uniform of string
+type t = {
+  state : State.t;
+  internal : LL.Window.t;
+  settings : ContextSettings.t;
+  program2D : Program.t;
+  programTex : Program.t
+}
 
-exception Invalid_uniform of string
+(** 2D drawing program *)
+let vertex_shader_source_130 = "
+  uniform vec2 size;
 
-type t = {state : State.t; internal : LL.Window.t; settings : ContextSettings.t}
+  in vec3 position;
+  in vec4 color;
 
-let create ~width ~height ~settings =
-  let internal = LL.Window.create ~width ~height in
-  {
-    state = State.LL.create ();
-    internal;
-    settings
+  out vec4 frag_color;
+
+  void main() {
+
+    gl_Position.x = 2.0 * position.x / size.x - 1.0;
+    gl_Position.y = 2.0 * (size.y - position.y) / size.y - 1.0;
+    gl_Position.z = 0.0;
+    gl_Position.w = 1.0;
+
+    frag_color = color;
+
   }
+"
+
+let fragment_shader_source_130 = "
+  in vec4 frag_color;
+
+  out vec4 pixel_color;
+
+  void main() {
+
+    pixel_color = frag_color;
+
+  }
+"
+
+let vertex_shader_source_110 = "
+  #version 110
+
+  uniform vec2 size;
+
+  attribute vec3 position;
+  attribute vec4 color;
+
+  varying vec4 frag_color;
+
+  void main() {
+
+    gl_Position.x = 2.0 * position.x / size.x - 1.0;
+    gl_Position.y = 2.0 * (size.y - position.y) / size.y - 1.0;
+    gl_Position.z = 0.0;
+    gl_Position.w = 1.0;
+
+    frag_color = color;
+
+  }
+"
+
+let fragment_shader_source_110 = "
+  #version 110
+
+  varying vec4 frag_color;
+
+  void main() {
+
+    gl_FragColor = frag_color;
+
+  }
+"
+
+(* Sprite drawing program *)
+let vertex_shader_source_tex_130 = "
+  uniform vec2 size;
+
+  in vec3 position;
+  in vec2 uv;
+
+  out vec2 frag_uv;
+
+  void main() {
+
+    gl_Position.x = 2.0 * position.x / size.x - 1.0;
+    gl_Position.y = 2.0 * (size.y - position.y) / size.y - 1.0;
+    gl_Position.z = 0.0;
+    gl_Position.w = 1.0;
+
+    frag_uv = uv;
+
+  }
+"
+
+let fragment_shader_source_tex_130 = "
+  uniform sampler2D my_texture;
+
+  in vec2 frag_uv;
+
+  out vec4 out_color;
+
+  void main() {
+
+    out_color = texture(my_texture, frag_uv);
+
+  }
+"
+
+let vertex_shader_source_tex_110 = "
+  #version 110
+
+  uniform vec2 size;
+
+  attribute vec3 position;
+  attribute vec2 uv;
+
+  varying vec2 frag_uv;
+
+  void main() {
+
+    gl_Position.x = 2.0 * position.x / size.x - 1.0;
+    gl_Position.y = 2.0 * (size.y - position.y) / size.y - 1.0;
+    gl_Position.z = 0.0;
+    gl_Position.w = 1.0;
+
+    frag_uv = uv;
+
+  }
+"
+
+let fragment_shader_source_tex_110 = "
+  #version 110
+
+  uniform sampler2D my_texture;
+
+  varying vec2 frag_uv;
+
+  void main() {
+
+    gl_FragColor = texture2D(my_texture, frag_uv);
+
+  }
+"
+
+let create ~width ~height ~title ~settings =
+  let internal = LL.Window.create ~width ~height ~title ~settings:(ContextSettings.to_ll settings) in
+  let state = State.LL.create () in
+  let program2D =
+    if State.is_glsl_version_supported state 130 then
+      Program.from_source_pp state
+        ~vertex_source:(`String vertex_shader_source_130)
+        ~fragment_source:(`String fragment_shader_source_130)
+    else
+      Program.from_source
+        ~vertex_source:(`String vertex_shader_source_110)
+        ~fragment_source:(`String fragment_shader_source_110)
+  in
+  let programTex =
+    if State.is_glsl_version_supported state 130 then
+      Program.from_source_pp state
+        ~vertex_source:(`String vertex_shader_source_tex_130)
+        ~fragment_source:(`String fragment_shader_source_tex_130)
+    else
+      Program.from_source
+        ~vertex_source:(`String vertex_shader_source_tex_110)
+        ~fragment_source:(`String fragment_shader_source_tex_110)
+  in
+  if ContextSettings.msaa settings > 0 then begin
+    State.LL.set_msaa state true;
+    GL.Pervasives.msaa true;
+  end;
+  {
+    state;
+    internal;
+    settings;
+    program2D;
+    programTex;
+  }
+
+let set_title win title = LL.Window.set_title win.internal title
 
 let close win = LL.Window.close win.internal
 
@@ -28,103 +197,26 @@ let poll_event win = LL.Window.poll_event win.internal
 
 let display win = LL.Window.display win.internal
 
-let draw ~window ?indices ~vertices ~program ~uniform ~parameters ~mode () =
-  let cull_mode = DrawParameter.culling parameters in
-  if State.culling_mode window.state <> cull_mode then begin
-    State.LL.set_culling_mode window.state cull_mode;
-    GL.Pervasives.culling cull_mode
-  end;
-  let poly_mode = DrawParameter.polygon parameters in
-  if State.polygon_mode window.state <> poly_mode then begin
-    State.LL.set_polygon_mode window.state poly_mode;
-    GL.Pervasives.polygon poly_mode
-  end;
-  let depth_testing = DrawParameter.depth_test parameters in
-  if State.depth_test window.state <> depth_testing then begin
-    State.LL.set_depth_test window.state depth_testing;
-    GL.Pervasives.depthtest depth_testing
-  end;
-  Program.LL.use window.state (Some program);
-  Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind window.state uniform unif);
-  VertexArray.LL.bind window.state vertices program;
-  match indices with
-  |None -> GL.VAO.draw mode 0 (VertexArray.length vertices)
-  |Some ebo ->
-    IndexArray.LL.bind window.state ebo;
-    GL.VAO.draw_elements mode (IndexArray.length ebo)
-
 let clear win =
-  let cc = ContextSettings.color win.settings in
+  let cc = ContextSettings.clearing_color win.settings in
   if State.clear_color win.state <> cc then begin
     let crgb = Color.rgb cc in
     State.LL.set_clear_color win.state cc;
     Color.RGB.(GL.Pervasives.color crgb.r crgb.g crgb.b crgb.a)
   end;
-  let color = ContextSettings.color_clearing win.settings in
-  let depth = ContextSettings.depth_testing  win.settings in
-  let stencil = ContextSettings.stenciling   win.settings in
-  GL.Pervasives.clear color depth stencil
+  let depth = ContextSettings.depth_bits win.settings > 0 in
+  let stencil = ContextSettings.stencil_bits win.settings > 0 in
+  GL.Pervasives.clear true depth stencil
 
 let state win = win.state
-
-let draw_shape =
-  let vertex_shader_source = "
-    uniform vec2 size;
-
-    in vec3 position;
-    in vec4 color;
-
-    out vec4 frag_color;
-
-    void main() {
-
-      gl_Position.x = 2.0 * position.x / size.x - 1.0;
-      gl_Position.y = 2.0 * (size.y - position.y) / size.y - 1.0;
-      gl_Position.z = 0.0;
-
-      frag_color = color;
-
-    }
-  "
-  in
-  let fragment_shader_source = "
-    in vec4 frag_color;
-
-    out vec4 pixel_color;
-
-    void main() {
-
-      pixel_color = frag_color;
-
-    }
-  "
-  in
-  fun window shape ->
-    let program =
-      Program.from_source_pp
-        (state window)
-        ~vertex_source:(`String vertex_shader_source)
-        ~fragment_source:(`String fragment_shader_source)
-    in
-    let parameters = DrawParameter.make () in
-    let (sx,sy) = size window in
-    let uniform =
-      Uniform.empty
-      |> Uniform.vector2f "size" OgamlMath.(
-           Vector2f.from_int Vector2i.({ x = sx ; y = sy })
-         )
-    in
-    let vertices = Shape.get_vertex_array shape in
-    draw ~window
-         ~vertices
-         ~program
-         ~parameters
-         ~uniform
-         ~mode:DrawMode.Triangles ()
 
 
 module LL = struct
 
   let internal win = win.internal
+
+  let program win = win.program2D
+
+  let sprite_program win = win.programTex
 
 end

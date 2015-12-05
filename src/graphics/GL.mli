@@ -22,6 +22,9 @@ module Data : sig
   (** Type of data using caml type 'a and storing type 'b *)
   type ('a, 'b) t  
 
+  (** Append the second array at the end of the first one *)
+  val append : ('a, 'b) t -> ('a, 'b) t -> unit
+
   (** Creates some data, the integer must be the expected size *)
   val create_int : int -> (int32, int_32) t
 
@@ -36,6 +39,15 @@ module Data : sig
 
   (** Adds two floats to the data *)
   val add_2f : (float, float_32) t -> OgamlMath.Vector2f.t -> unit
+
+  (** Adds a vector3i to the data *)
+  val add_3i : (int32, int_32) t -> OgamlMath.Vector3i.t -> unit
+
+  (** Adds two ints to the data *)
+  val add_2i : (int32, int_32) t -> OgamlMath.Vector2i.t -> unit
+
+  (** Adds a float to the data *)
+  val add_float : (float, float_32) t -> float -> unit
 
   (** Adds an int to the data *)
   val add_int : (int32, int_32) t -> int -> unit
@@ -82,6 +94,27 @@ module Pervasives : sig
   (** Returns the maximal number of textures *)
   val max_textures : unit -> int
 
+  (** Sets the MSAA *)
+  val msaa : bool -> unit
+
+end
+
+
+(** OpenGL blending functions *)
+module Blending : sig
+
+  val enable : bool -> unit
+
+  val blend_func_separate : 
+    DrawParameter.BlendMode.Factor.t -> 
+    DrawParameter.BlendMode.Factor.t -> 
+    DrawParameter.BlendMode.Factor.t -> 
+    DrawParameter.BlendMode.Factor.t -> unit
+
+  val blend_equation_separate : 
+    DrawParameter.BlendMode.Equation.t ->
+    DrawParameter.BlendMode.Equation.t -> unit
+
 end
 
 
@@ -123,6 +156,9 @@ module Shader : sig
   (** Creates an empty shader *)
   val create : GLTypes.ShaderType.t -> t
 
+  (** Deletes a shader *)
+  val delete : t -> unit
+
   (** Returns true iff the shader is valid *)
   val valid : t -> bool
 
@@ -162,6 +198,9 @@ module Program : sig
   (** Attaches a shader to a program *)
   val attach : t -> Shader.t -> unit
 
+  (** Detaches a shader from a program *)
+  val detach : t -> Shader.t -> unit
+
   (** Links the program *)
   val link : t -> unit
 
@@ -198,6 +237,9 @@ module Program : sig
   (** Returns the log of the program *)
   val log : t -> string
 
+  (** Deletes a program *)
+  val delete : t -> unit
+
 end
 
 
@@ -214,10 +256,13 @@ module VBO : sig
   val bind : t option -> unit
 
   (** Sets the data of the currently bound VBO *)
-  val data : int -> (float, Data.float_32) Data.t option -> GLTypes.VBOKind.t -> unit
+  val data : int -> ('a, 'b) Data.t option -> GLTypes.VBOKind.t -> unit
 
   (** Sets some subset of the data of the currently bound VBO *)
-  val subdata : int -> int -> (float, Data.float_32) Data.t -> unit
+  val subdata : int -> int -> ('a, 'b) Data.t -> unit
+
+  (** Copy some data between VBOs *)
+  val copy_subdata : t -> t -> int -> int -> int -> unit
 
   (** Destroys a VBO *)
   val destroy : t -> unit
@@ -245,6 +290,9 @@ module EBO : sig
 
   (** Sets some subset of the data of the currently bound EBO *)
   val subdata : int -> int -> (int32, Data.int_32) Data.t -> unit
+
+  (** Copy some data between EBOs *)
+  val copy_subdata : t -> t -> int -> int -> int -> unit
 
 end
 

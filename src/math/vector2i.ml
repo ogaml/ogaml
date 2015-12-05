@@ -1,4 +1,6 @@
 
+exception Vector2i_exception of string
+
 type t = {x : int; y : int}
 
 let zero = {x = 0; y = 0}
@@ -22,10 +24,14 @@ let prop k u = {
   y = k * u.y;
 }
 
-let div k u = {
-  x = u.x / k;
-  y = u.y / k;
-}
+let div k u = 
+  if k = 0 then 
+    raise (Vector2i_exception "Division by zero")
+  else
+    {
+      x = u.x / k;
+      y = u.y / k;
+    }
 
 let dot v1 v2 = 
   v1.x * v2.x + 

@@ -12,17 +12,15 @@ PACKAGES = -package bigarray,unix,str
 
 # Install constants
 
-CORE_FILES = src/core/*.a src/core/*.cmi src/core/*.cma src/core/*.cmxa\
-	     src/core/*.so
+CORE_FILES = src/core/*ogamlCore.*
 
-MATH_FILES = src/math/*.a src/math/*.cmi src/math/*.cma src/math/*.cmxa
+MATH_FILES = src/math/*ogamlMath.*
 
-GRAPH_FILES = src/graphics/*.a src/graphics/[!GL]*.cmi src/graphics/*.cma\
-	      src/graphics/*.cmxa src/graphics/*.so 
+GRAPH_FILES = src/graphics/*ogamlGraphics.*
 
 UTILS_FILES = src/utils/*.a src/utils/*.cmi src/utils/*.cma src/utils/*.cmxa
 
-DOC_FILES = src/graphics/ogamlGraphics.mli src/core/ogamlCore.mli
+DOC_FILES = src/graphics/ogamlGraphics.mli src/core/ogamlCore.mli src/math/ogamlMath.mli
 
 # Compilation
 
@@ -46,7 +44,9 @@ examples:
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/tut02.ml -o tut02.out;
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/tut_tex.ml -o tut_tex.out;
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/tut_idx.ml -o tut_idx.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/flat.ml -o flat.out
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/flat.ml -o flat.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/vertexmaps.ml -o vertexmaps.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/sprites.ml -o sprites.out
 
 tests: math_lib core_lib graphics_lib utils_lib
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/programs.ml -o main.out && ./main.out &&\

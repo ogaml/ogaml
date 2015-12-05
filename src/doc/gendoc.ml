@@ -55,7 +55,7 @@ let process_line_jumps s =
 
 let rec parse_related s = 
   try
-    let i = Str.search_forward (Str.regexp "@see:\\([A-Za-z\\.]*\\)") s 0 in
+    let i = Str.search_forward (Str.regexp "@see:\\([A-Za-z0-9\\.]*\\)") s 0 in
     let related = Str.matched_group 1 s in
     let s_begin = Str.first_chars s i in
     let s_end = 
@@ -168,7 +168,8 @@ let rec type_expr_to_string = function
       else 
         "..."
   | ParamType (t1, t2) ->
-      Printf.sprintf "%s %s" (type_expr_to_string t1) (type_expr_to_string t2)
+      if List.length t1 <= 1 then Printf.sprintf "%s %s" (concat_sep ", " type_expr_to_string t1) (type_expr_to_string t2)
+      else Printf.sprintf "(%s) %s" (concat_sep ", " type_expr_to_string t1) (type_expr_to_string t2)
 
 let rec field_to_string = function
   |AbstractType (opt,s) -> begin
@@ -226,9 +227,12 @@ let rec document_ast = function
     document_ast t
   |Title s :: t ->
     begin
-      match !curr_chan with
-      |None -> ()
-      |Some c -> Printf.fprintf c "### %s\n\n" (snd (parse_comment s))
+      match !curr_doc, !curr_chan with
+      |_, None -> ()
+      |None, Some c -> Printf.fprintf c "### %s\n\n" (snd (parse_comment s))
+      |Some t, Some c -> Printf.fprintf c "\n%s\n" (snd (parse_comment t));
+                         curr_doc := None;
+                         Printf.fprintf c "### %s\n\n" (snd (parse_comment s))
     end;
     document_ast t
   |Module (s,l) :: t -> 

@@ -1,6 +1,4 @@
 
-exception Invalid_buffer of string
-
 module Source = struct
 
   type t = {
@@ -24,6 +22,11 @@ module Source = struct
 
   let data src = src.data
 
+  let append s1 s2 =
+    s1.length <- s1.length + s2.length;
+    GL.Data.append s1.data s2.data;
+    s1
+
 end
 
 
@@ -32,11 +35,9 @@ type static
 type dynamic
 
 type _ t = {
-  indices : bool;
-  buffer  : GL.EBO.t;
-  size    : int;
-  length  : int;
-  mutable valid : bool
+  mutable buffer  : GL.EBO.t;
+  mutable size    : int;
+  mutable length  : int;
 }
 
 let dynamic src = 
@@ -46,11 +47,9 @@ let dynamic src =
   GL.EBO.data (GL.Data.length data * 4) (Some data) (GLTypes.VBOKind.DynamicDraw);
   GL.EBO.bind None;
   {
-    indices = true;
     buffer;
     size = GL.Data.length data;
     length = Source.length src; 
-    valid = true
   }
 
 let static src = 
@@ -60,44 +59,39 @@ let static src =
   GL.EBO.data (GL.Data.length data * 4) (Some data) (GLTypes.VBOKind.StaticDraw);
   GL.EBO.bind None;
   {
-    indices = true;
     buffer;
     size = GL.Data.length data;
     length = Source.length src; 
-    valid = true
   }
 
-let rebuild t src =
-  if not t.valid then
-    raise (Invalid_buffer "Cannot rebuild buffer, it may have been destroyed");
+let rebuild t src start =
   let data = src.Source.data in
-  GL.EBO.bind (Some t.buffer);
-  if t.size < GL.Data.length data then
-    GL.EBO.data (GL.Data.length data * 4) None (GLTypes.VBOKind.DynamicDraw);
-  GL.EBO.subdata 0 (GL.Data.length data * 4) data;
+  let new_buffer = 
+    if t.size < GL.Data.length data + start then begin
+      let buf = GL.EBO.create () in
+      GL.EBO.bind (Some buf);
+      GL.EBO.data ((GL.Data.length data + start) * 4) None (GLTypes.VBOKind.DynamicDraw);
+      GL.EBO.bind None;
+      GL.EBO.copy_subdata t.buffer buf 0 0 (start * 4); 
+      buf
+    end else 
+      t.buffer
+  in
+  GL.EBO.bind (Some new_buffer);
+  GL.EBO.subdata (start * 4) (GL.Data.length data * 4) data;
   GL.EBO.bind None;
-  {
-    indices = true;
-    buffer = t.buffer;
-    size   = max (GL.Data.length data) (t.size);
-    length = Source.length src;
-    valid  = true
-  }
+  t.buffer <- new_buffer;
+  t.length <- Source.length src + start;
+  t.size   <- max (GL.Data.length data + start) t.size
+
+
 
 let length t = t.length
-
-let destroy t =
-  if not t.valid then
-    raise (Invalid_buffer "Cannot destroy buffer : already destroyed");
-  GL.EBO.destroy t.buffer;
-  t.valid <- false
 
 
 module LL = struct
 
   let bind state t = 
-    if not t.valid then
-      raise (Invalid_buffer "Cannot bind buffer, it may have been destroyed");
     if State.LL.bound_ebo state <> (Some t.buffer) then begin
       GL.EBO.bind (Some t.buffer);
       State.LL.set_bound_ebo state (Some t.buffer);

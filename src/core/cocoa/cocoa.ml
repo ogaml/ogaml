@@ -367,6 +367,9 @@ module OGWindowController = struct
   external init_with_window : NSWindow.t -> t
     = "caml_cocoa_window_controller_init_with_window"
 
+  external set_title : t -> NSString.t -> unit
+    = "caml_cocoa_window_controller_set_title"
+
   external process_event : t -> unit
     = "caml_cocoa_window_controller_process_event"
 

@@ -1,3 +1,5 @@
+exception Quaternion_exception of string
+
 type t = {r : float; i : float; j : float; k : float}
 
 let zero = {r = 0.; i = 0.; j = 0.; k = 0.}
@@ -48,10 +50,14 @@ let squared_norm q =
 
 let norm q = sqrt (squared_norm q)
 
-let normalize q = prop (1. /. norm q) q
+let normalize q = 
+  let n = norm q in
+  if n = 0. then raise (Quaternion_exception "Cannot normalize zero quaternion")
+  else prop (1. /. n) q
 
 let inverse q = 
   let nq = squared_norm q in
-  prop (1. /. nq) (conj q)
+  if nq = 0. then raise (Quaternion_exception "Cannot inverse zero quaternion")
+  else prop (1. /. nq) (conj q)
 
 

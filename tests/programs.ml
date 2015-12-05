@@ -5,7 +5,7 @@ let () =
 
 let settings = ContextSettings.create ()
 
-let window = Window.create ~width:100 ~height:100 ~settings
+let window = Window.create ~width:100 ~height:100 ~settings ~title:""
 
 let state = Window.state window
 
@@ -14,12 +14,12 @@ let test_program0 () =
   Printf.printf "GL version : %i.%i\n" a b;
   Printf.printf "GLSL version : %i\n%!" (State.glsl_version state)
 
-let test_program1 () = 
+let test_program1 () =
   let prog = Program.from_source_list
     state
     ~vertex_source:[
       (110, (`String "#version 110
-              
+
              uniform vec2 param1;
 
              uniform float param2;
@@ -32,7 +32,7 @@ let test_program1 () =
 
              }"));
       (150, (`String "#version 150
-              
+
              uniform vec2 param1;
 
              uniform float param2;
@@ -56,7 +56,7 @@ let test_program1 () =
       (150, (`String "#version 150
 
              out vec4 color;
-      
+
              void main () {
 
                color = vec4(1.0, 1.0, 1.0, 1.0);
@@ -66,13 +66,13 @@ let test_program1 () =
   in
   ignore prog
 
-let test_program2 () = 
+let test_program2 () =
   let prog = Program.from_source_list
     state
     ~vertex_source: [
       (130, `String
              "#version 130
-             
+
              uniform vec2 param1;
 
              uniform float param2;
@@ -86,7 +86,7 @@ let test_program2 () =
              }");
       (150, `String
              "#version 150
-             
+
              uniform vec2 param1;
 
              uniform float param2;
@@ -100,7 +100,7 @@ let test_program2 () =
              }");
       (110, `String
              "#version 110
-             
+
              uniform vec2 param1;
 
              uniform float param2;
@@ -115,29 +115,29 @@ let test_program2 () =
 
       ]
     ~fragment_source: [
-      (130, `String 
+      (130, `String
              "#version 130
-             
+
              out vec4 color;
-      
+
              void main () {
 
                color = vec4(1.0, 1.0, 1.0, 1.0);
 
              }");
-      (110, `String 
+      (110, `String
              "#version 110
-             
+
              void main () {
 
                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 
              }");
-      (150, `String 
+      (150, `String
              "#version 150
-             
+
              out vec4 color;
-      
+
              void main () {
 
                color = vec4(1.0, 1.0, 1.0, 1.0);
@@ -146,7 +146,7 @@ let test_program2 () =
   in
   ignore prog
 
-let () = 
+let () =
   test_program0 ();
   test_program1 ();
   Printf.printf "\tTest 1 passed\n%!";

@@ -49,7 +49,6 @@ module VisualInfo = struct
   type attribute = 
     | BufferSize     of int
     | Level          of int
-    | RGBA           
     | DoubleBuffer
     | Stereo         
     | AuxBuffers     of int
@@ -63,6 +62,9 @@ module VisualInfo = struct
     | AccumBlueSize  of int
     | AccumAlphaSize of int
     | AccumGreenSize of int
+    | Renderable
+    | Samples        of int
+    | SampleBuffers  of int
 
 
   (* Abstract functions *)
@@ -72,22 +74,15 @@ module VisualInfo = struct
 
   (* Implementation of abstract functions *)
   let choose display ?screen attl =
-    let att_length = 
-      List.fold_left (fun v e ->
-        match e with
-        |RGBA |Stereo |DoubleBuffer -> v+1
-        | _ -> v+2
-      ) 0 attl
-    in
     match screen with
     |None -> abstract_choose_vinfo 
         display 
-        (Display.default_screen display) 
-        attl att_length
+        (Display.default_screen display)
+        attl (List.length attl * 2)
     |Some(s) -> abstract_choose_vinfo 
         display 
         s attl
-        att_length
+        (List.length attl * 2)
 
 
 end
@@ -117,7 +112,7 @@ module Window = struct
   external abstract_root_window : Display.t -> int -> t = "caml_xroot_window"
 
   external abstract_create_simple_window : 
-    Display.t -> t -> (int * int) -> (int * int) -> int -> t
+    Display.t -> t -> (int * int) -> (int * int) -> VisualInfo.t -> t
     = "caml_xcreate_simple_window"
 
 
@@ -136,6 +131,10 @@ module Window = struct
 
   external has_focus : Display.t -> t -> bool = "caml_has_focus"
 
+  external set_title : Display.t -> t -> string -> unit = "caml_xwindow_set_title"
+
+  external title : Display.t -> t -> string = "caml_xwindow_get_title"
+
 
   (* Implementation of abstract functions *)
   let root_of ?screen display =
@@ -143,8 +142,8 @@ module Window = struct
     |None -> abstract_root_window display (Display.default_screen display)
     |Some(s) -> abstract_root_window display s
 
-  let create_simple ~display ~parent ~size ~origin ~background = 
-    abstract_create_simple_window display parent origin size background
+  let create_simple ~display ~parent ~size ~origin ~visual = 
+    abstract_create_simple_window display parent origin size visual
 
 
 end

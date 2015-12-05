@@ -1,4 +1,6 @@
 
+exception Vector3fs_exception of string
+
 type t = {r : float; t : float; p : float}
 
 let zero = {r = 0.; t = 0.; p = 0.}
@@ -32,7 +34,10 @@ let prop f v =
   }
 
 let div f v = 
-  prop (1. /. f) v
+  if f = 0. then
+    raise (Vector3fs_exception "Division by zero")
+  else
+    prop (1. /. f) v
 
 let to_cartesian v = 
   Vector3f.({
@@ -52,7 +57,11 @@ let norm v =
   abs_float v.r
 
 let normalize v = 
-  div (norm v) v
+  let n = norm v in
+  if n = 0. then
+    raise (Vector3fs_exception "Cannot normalize zero vector")
+  else 
+    div n v
 
 let print u = 
   Printf.sprintf "(r = %f; t = %f; p = %f)" u.r u.t u.p

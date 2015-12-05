@@ -50,11 +50,25 @@ module Data = struct
       alloc t i
     end
 
+  let append t1 t2 = 
+    let n = t1.length in
+    alloc t1 t2.length;
+    Bigarray.Array1.sub t1.data n t2.length
+    |> Bigarray.Array1.blit t2.data;
+    t1.length <- n + t2.length
+
   let add_3f t vec = 
     alloc t 3;
     t.data.{t.length+0} <- vec.OgamlMath.Vector3f.x;
     t.data.{t.length+1} <- vec.OgamlMath.Vector3f.y;
     t.data.{t.length+2} <- vec.OgamlMath.Vector3f.z;
+    t.length <- t.length+3
+
+  let add_3i t vec = 
+    alloc t 3;
+    t.data.{t.length+0} <- Int32.of_int vec.OgamlMath.Vector3i.x;
+    t.data.{t.length+1} <- Int32.of_int vec.OgamlMath.Vector3i.y;
+    t.data.{t.length+2} <- Int32.of_int vec.OgamlMath.Vector3i.z;
     t.length <- t.length+3
 
   let add_color t col = 
@@ -72,9 +86,20 @@ module Data = struct
     t.data.{t.length+1} <- v.OgamlMath.Vector2f.y;
     t.length <- t.length+2
 
+  let add_2i t v = 
+    alloc t 2;
+    t.data.{t.length+0} <- Int32.of_int v.OgamlMath.Vector2i.x;
+    t.data.{t.length+1} <- Int32.of_int v.OgamlMath.Vector2i.y;
+    t.length <- t.length+2
+
   let add_int32 t i =
     alloc t 1;
     t.data.{t.length} <- i;
+    t.length <- t.length+1
+
+  let add_float t f = 
+    alloc t 1;
+    t.data.{t.length} <- f;
     t.length <- t.length+1
 
   let add_int t i = 
@@ -111,6 +136,25 @@ module Pervasives = struct
   external gl_version : unit -> string = "caml_gl_version"
 
   external max_textures : unit -> int = "caml_max_textures"
+
+  external msaa : bool -> unit = "caml_enable_msaa"
+
+end
+
+
+module Blending = struct
+
+  external enable : bool -> unit = "caml_blend_enable"
+
+  external blend_func_separate : 
+    DrawParameter.BlendMode.Factor.t ->
+    DrawParameter.BlendMode.Factor.t ->
+    DrawParameter.BlendMode.Factor.t ->
+    DrawParameter.BlendMode.Factor.t -> unit = "caml_blend_func_separate"
+
+  external blend_equation_separate : 
+    DrawParameter.BlendMode.Equation.t ->
+    DrawParameter.BlendMode.Equation.t -> unit = "caml_blend_equation_separate"
 
 end
 
@@ -153,6 +197,8 @@ module Shader = struct
 
   external create : GLTypes.ShaderType.t -> t = "caml_create_shader"
 
+  external delete : t -> unit = "caml_delete_shader"
+
   external valid : t -> bool = "caml_valid_shader"
 
   external source : t -> string -> unit = "caml_source_shader"
@@ -180,6 +226,8 @@ module Program = struct
 
   external attach : t -> Shader.t -> unit = "caml_attach_shader"
 
+  external detach : t -> Shader.t -> unit = "caml_detach_shader"
+
   external link : t -> unit = "caml_link_program"
 
   external uloc : t -> string -> int = "caml_uniform_location"
@@ -204,6 +252,8 @@ module Program = struct
 
   external log : t -> string = "caml_program_log"
 
+  external delete : t -> unit = "caml_delete_program"
+
 end
 
 
@@ -215,9 +265,11 @@ module VBO = struct
 
   external bind : t option -> unit = "caml_bind_vbo"
 
-  external data : int -> (float, Data.float_32) Data.t option -> GLTypes.VBOKind.t -> unit = "caml_vbo_data"
+  external data : int -> ('a, 'b) Data.t option -> GLTypes.VBOKind.t -> unit = "caml_vbo_data"
 
-  external subdata : int -> int -> (float, Data.float_32) Data.t -> unit = "caml_vbo_subdata"
+  external subdata : int -> int -> ('a, 'b) Data.t -> unit = "caml_vbo_subdata"
+
+  external copy_subdata : t -> t -> int -> int -> int -> unit = "caml_vbo_copy_subdata"
 
   external destroy : t -> unit = "caml_destroy_buffer"
 
@@ -237,6 +289,8 @@ module EBO = struct
   external data : int -> (int32, Data.int_32) Data.t option -> GLTypes.VBOKind.t -> unit = "caml_ebo_data"
 
   external subdata : int -> int -> (int32, Data.int_32) Data.t -> unit = "caml_ebo_subdata"
+
+  external copy_subdata : t -> t -> int -> int -> int -> unit = "caml_vbo_copy_subdata"
 
 end
 

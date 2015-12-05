@@ -2,18 +2,19 @@ open OgamlGraphics
 open OgamlMath
 
 let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
- 
-let window = Window.create ~width:800 ~height:600 ~settings
+
+let window =
+  Window.create ~width:800 ~height:600 ~settings ~title:"Texture Tutorial"
 
 let vertex_shader_source = "
   in vec3 position;
-  
+
   in vec2 uv;
 
   out vec2 frag_uv;
 
   void main() {
-    
+
     gl_Position = vec4(position, 1.0);
 
     frag_uv = uv;
@@ -36,48 +37,48 @@ let fragment_shader_source = "
   }
 "
 
-let program = 
-  Program.from_source_pp 
+let program =
+  Program.from_source_pp
     (Window.state window)
     ~vertex_source:(`String vertex_shader_source)
     ~fragment_source:(`String fragment_shader_source)
 
-let vertex1 = 
-  VertexArray.Vertex.create 
-    ~position:Vector3f.({x = -0.75; y = 0.75; z = 0.0}) 
+let vertex1 =
+  VertexArray.Vertex.create
+    ~position:Vector3f.({x = -0.75; y = 0.75; z = 0.0})
     ~texcoord:Vector2f.({x = 0.; y = 1.}) ()
 
-let vertex2 = 
+let vertex2 =
   VertexArray.Vertex.create
-    ~position:Vector3f.({x = 0.75; y = 0.75; z = 0.0}) 
+    ~position:Vector3f.({x = 0.75; y = 0.75; z = 0.0})
     ~texcoord:Vector2f.({x = 1.; y = 1.}) ()
 
 let vertex3 =
   VertexArray.Vertex.create
-    ~position:Vector3f.({x = -0.75; y = -0.75; z = 0.0}) 
+    ~position:Vector3f.({x = -0.75; y = -0.75; z = 0.0})
     ~texcoord:Vector2f.({x = 0.; y = 0.}) ()
 
 let vertex4 =
   VertexArray.Vertex.create
-    ~position:Vector3f.({x = 0.75; y = -0.75; z = 0.0}) 
+    ~position:Vector3f.({x = 0.75; y = -0.75; z = 0.0})
     ~texcoord:Vector2f.({x = 1.; y = 0.}) ()
 
 let vertex_source = VertexArray.Source.(
     empty ~position:"position" ~texcoord:"uv" ~size:4 ()
-    << vertex1 
-    << vertex2 
+    << vertex1
+    << vertex2
     << vertex3
     << vertex4
 )
 
 let vertices = VertexArray.static vertex_source
 
-let texture = Texture.Texture2D.create (Window.state window) (`File "examples/mario-block.bmp")
+let texture = Texture.Texture2D.create (`File "examples/mario-block.bmp")
 
 let parameters = DrawParameter.make ()
 
-let uniform = 
-  Uniform.empty 
+let uniform =
+  Uniform.empty
   |> Uniform.texture2D "my_texture" texture
 
 let rec event_loop () =
@@ -89,17 +90,13 @@ let rec event_loop () =
   )
   |None -> ()
 
-let rec main_loop () = 
-  if Window.is_open window then begin 
+let rec main_loop () =
+  if Window.is_open window then begin
     Window.clear window;
-    Window.draw ~window ~vertices ~program ~parameters ~uniform ~mode:DrawMode.TriangleStrip ();
+    VertexArray.draw ~window ~vertices ~program ~parameters ~uniform ~mode:DrawMode.TriangleStrip ();
     Window.display window;
     event_loop ();
     main_loop ();
   end
 
 let () = main_loop ()
-
-
-
-

@@ -1,11 +1,11 @@
 
+exception Invalid_source of string
+
 exception Invalid_vertex of string
 
 exception Invalid_attribute of string
 
 exception Missing_attribute of string
-
-exception Invalid_buffer of string
 
 
 module Vertex = struct
@@ -136,6 +136,17 @@ module Source = struct
   let stride src = 
     List.fold_left (fun v (t,_,_) -> v + size_of_attrib t) 0 (attribs src)
 
+  let append s1 s2 =
+    if (requires_position s1) = (requires_position s2)
+    && (requires_normal   s1) = (requires_normal   s2)
+    && (requires_uv       s1) = (requires_uv       s2)
+    && (requires_color    s1) = (requires_color    s2)
+    then begin 
+      s1.length <- s1.length + s2.length;
+      GL.Data.append s1.data s2.data;
+      s1
+    end else 
+      raise (Invalid_source "Cannot append a source at the end of another source of different type")
 
 end
 
@@ -144,14 +155,13 @@ type static
 type dynamic
 
 type _ t = {
-  buffer  : GL.VBO.t;
+  mutable buffer  : GL.VBO.t;
   vao     : GL.VAO.t;
-  size    : int;
-  length  : int;
+  mutable size    : int;
+  mutable length  : int;
   attribs : (Source.attrib * string * int) list;
   stride  : int;
   mutable bound : Program.t option;
-  mutable valid : bool
 }
 
 let dynamic src = 
@@ -168,7 +178,6 @@ let dynamic src =
    attribs = Source.attribs src;
    stride = Source.stride src;
    bound = None;
-   valid = true
   }
 
 let static src = 
@@ -185,89 +194,95 @@ let static src =
    attribs = Source.attribs src;
    stride = Source.stride src;
    bound = None;
-   valid = true
   }
 
-let rebuild t src =
-  if not t.valid then
-    raise (Invalid_buffer "Cannot rebuild buffer, it may have been destroyed");
+let rebuild t src start =
   let data = src.Source.data in
-  GL.VBO.bind (Some t.buffer);
-  if t.size < GL.Data.length data then
-    GL.VBO.data (GL.Data.length data * 4) None (GLTypes.VBOKind.DynamicDraw);
-  GL.VBO.subdata 0 (GL.Data.length data * 4) data;
+  let start_vals = t.stride * start in
+  if Source.attribs src <> t.attribs then
+    raise (Invalid_source "Cannot rebuild vertex array : incompatible vertex source");
+  let new_buffer, new_binding = 
+    if t.size < GL.Data.length data + start_vals then begin
+      let buf = GL.VBO.create () in
+      GL.VBO.bind (Some buf);
+      GL.VBO.data ((GL.Data.length data + start_vals) * 4) None (GLTypes.VBOKind.DynamicDraw);
+      GL.VBO.bind None;
+      GL.VBO.copy_subdata t.buffer buf 0 0 (start_vals * 4); 
+      buf, None
+    end else 
+      t.buffer, t.bound
+  in
+  GL.VBO.bind (Some new_buffer);
+  GL.VBO.subdata (start_vals * 4) (GL.Data.length data * 4) data;
   GL.VBO.bind None;
-  {
-   buffer = t.buffer;
-   vao    = t.vao;
-   size   = max (GL.Data.length data) (t.size);
-   length = Source.length src;
-   attribs = Source.attribs src;
-   stride = Source.stride src;
-   bound  = t.bound;
-   valid  = true
-  }
+  t.buffer <- new_buffer;
+  t.bound  <- new_binding;
+  t.length <- Source.length src + start;
+  t.size   <- max (GL.Data.length data + start_vals) t.size
+
 
 let length t = t.length
 
-let destroy t =
-  if not t.valid then
-    raise (Invalid_buffer "Cannot destroy buffer : already destroyed");
-  GL.VAO.destroy t.vao;
-  GL.VBO.destroy t.buffer;
-  t.valid <- false
 
-module LL = struct
+let bind state t prog = 
+  if t.bound <> Some prog then begin
+    t.bound <- Some prog;
+    GL.VAO.bind (Some t.vao);
+    State.LL.set_bound_vao state (Some t.vao);
+    GL.VBO.bind (Some t.buffer);
+    State.LL.set_bound_vbo state (Some t.buffer);
+    let attribs = ref t.attribs in
+    let rec find_remove s = function
+      | [] -> 
+        raise (Missing_attribute 
+          (Printf.sprintf "Attribute %s not provided in vertex source" s)
+        )
+      | (e,h,off)::t when h = s -> (e,off,t)
+      | h::t -> 
+        let (e,off,l) = find_remove s t in 
+        (e,off,h::l)
+    in
+    Program.LL.iter_attributes prog 
+      (fun att ->
+        let (typ,offset,l) = find_remove (Program.Attribute.name att) !attribs in
+        attribs := l;
+        if Source.type_of_attrib typ <> Program.Attribute.kind att then
+          raise (Invalid_attribute
+            (Printf.sprintf "Attribute %s has invalid type"
+              (Program.Attribute.name att)
+            ));
+        GL.VAO.enable_attrib (Program.Attribute.location att);
+        GL.VAO.attrib_float 
+          (Program.Attribute.location att)
+          (Source.size_of_attrib typ)
+          (GLTypes.GlFloatType.Float)
+          (offset   * 4)
+          (t.stride * 4)
+      );
+    if !attribs <> [] then
+      raise (Invalid_attribute
+        (Printf.sprintf "Attribute %s not required by program" 
+          (let (_,s,_) = List.hd !attribs in s)
+        ))
+  end
+  else if State.LL.bound_vao state <> (Some t.vao) then begin
+    GL.VAO.bind (Some t.vao);
+    State.LL.set_bound_vao state (Some t.vao);
+    State.LL.set_bound_vbo state (Some t.buffer);
+  end
 
-  let bind state t prog = 
-    if not t.valid then
-      raise (Invalid_buffer "Cannot bind buffer, it may have been destroyed");
-    if t.bound <> Some prog then begin
-      t.bound <- Some prog;
-      GL.VAO.bind (Some t.vao);
-      State.LL.set_bound_vao state (Some t.vao);
-      GL.VBO.bind (Some t.buffer);
-      State.LL.set_bound_vbo state (Some t.buffer);
-      let attribs = ref t.attribs in
-      let rec find_remove s = function
-        | [] -> 
-          raise (Missing_attribute 
-            (Printf.sprintf "Attribute %s not provided in vertex source" s)
-          )
-        | (e,h,off)::t when h = s -> (e,off,t)
-        | h::t -> 
-          let (e,off,l) = find_remove s t in 
-          (e,off,h::l)
-      in
-      Program.LL.iter_attributes prog 
-        (fun att ->
-          let (typ,offset,l) = find_remove (Program.Attribute.name att) !attribs in
-          attribs := l;
-          if Source.type_of_attrib typ <> Program.Attribute.kind att then
-            raise (Invalid_attribute
-              (Printf.sprintf "Attribute %s has invalid type"
-                (Program.Attribute.name att)
-              ));
-          GL.VAO.enable_attrib (Program.Attribute.location att);
-          GL.VAO.attrib_float 
-            (Program.Attribute.location att)
-            (Source.size_of_attrib typ)
-            (GLTypes.GlFloatType.Float)
-            (offset   * 4)
-            (t.stride * 4)
-        );
-      if !attribs <> [] then
-        raise (Invalid_attribute
-          (Printf.sprintf "Attribute %s not required by program" 
-            (let (_,s,_) = List.hd !attribs in s)
-          ))
-    end
-    else if State.LL.bound_vao state <> (Some t.vao) then begin
-      GL.VAO.bind (Some t.vao);
-      State.LL.set_bound_vao state (Some t.vao);
-      State.LL.set_bound_vbo state (Some t.buffer);
-    end
 
-end
+let draw ~vertices ~window ?indices ~program ~uniform ~parameters ~mode () =
+  let state = Window.state window in
+  State.LL.bind_draw_parameters state parameters;
+  Program.LL.use state (Some program);
+  Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind state uniform unif);
+  bind state vertices program;
+  match indices with
+  |None -> GL.VAO.draw mode 0 (length vertices)
+  |Some ebo ->
+    IndexArray.LL.bind state ebo;
+    GL.VAO.draw_elements mode (IndexArray.length ebo)
+
 
 

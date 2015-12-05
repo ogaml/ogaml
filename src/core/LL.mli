@@ -1,11 +1,32 @@
 
+module ContextSettings : sig
+
+  type t
+
+  val create : 
+    ?antialiasing:int ->
+    ?depth_bits:int   ->
+    ?stencil_bits:int -> unit -> t
+
+  val aa_level : t -> int
+
+  val depth_bits : t -> int
+
+  val stencil_bits : t -> int
+
+end
+
+
 (** Window creation and manipulation *)
 module Window : sig
 
   type t
 
   (** Creates a window of size width x height *)
-  val create : width:int -> height:int -> t
+  val create : width:int -> height:int -> title:string -> settings:ContextSettings.t -> t
+
+  (** Sets the tite of the window. *)
+  val set_title : t -> string -> unit
 
   (** Closes a window, but does not free the memory.
     * This should prevent segfaults when calling functions on this window. *)
@@ -15,7 +36,7 @@ module Window : sig
   val destroy : t -> unit
 
   (** Return the size of a window *)
-  val size : t -> (int * int)
+  val size : t -> OgamlMath.Vector2i.t
 
   (** Return true iff the window is open *)
   val is_open : t -> bool
@@ -51,13 +72,13 @@ end
 (** Getting real-time mouse information *)
 module Mouse : sig
 
-  val position : unit -> (int * int)
+  val position : unit -> OgamlMath.Vector2i.t
 
-  val relative_position : Window.t -> (int * int)
+  val relative_position : Window.t -> OgamlMath.Vector2i.t
 
-  val set_position : (int * int) -> unit
+  val set_position : OgamlMath.Vector2i.t -> unit
 
-  val set_relative_position : Window.t -> (int * int) -> unit
+  val set_relative_position : Window.t -> OgamlMath.Vector2i.t -> unit
 
   val is_pressed : Button.t -> bool
 

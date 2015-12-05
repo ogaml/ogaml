@@ -1,12 +1,53 @@
+
+(** Log system *)
+module Log : sig
+
+  (** Enumeration of log message levels *)
+  type level = Debug | Warn | Error | Info | Fatal
+
+  (** Type of a log *)
+  type t
+
+  (** Creates a log
+    *
+    * - output : output channel of log messages (defaults to stderr)
+    *
+    * - debug : if false, debug messages will be ignored (defaults to true)
+    *
+    * - color : if false, messages will not be colored (defaults to true)
+    *
+    * - short : if true, timestamps will be shortened (defaults to false) *)
+  val create : ?output:out_channel -> ?debug:bool -> ?color:bool -> ?short:bool -> unit -> t
+
+  (** Logs a message *)
+  val log : t -> level -> ('a, out_channel, unit) format -> 'a
+
+  (** Logs a debug message *)
+  val debug : t -> ('a, out_channel, unit) format -> 'a
+
+  (** Logs a warn message *)
+  val warn  : t -> ('a, out_channel, unit) format -> 'a
+
+  (** Logs an error message *)
+  val error : t -> ('a, out_channel, unit) format -> 'a
+
+  (** Logs an info message *)
+  val info  : t -> ('a, out_channel, unit) format -> 'a
+
+  (** Logs a fatal error message *)
+  val fatal : t -> ('a, out_channel, unit) format -> 'a
+
+end
+
+
 (** Mouse buttons *)
 module Button : sig
 
   (** This module consists of only one type enumerating the mouse buttons *)
 
   (** Mouse buttons enumeration *)
-  type t = 
-    | Unknown (* Used when an unrecognized mouse button is triggered. 
-               * You usually don't need to listen on it. *)
+  type t =
+    | Unknown (* Used when an unrecognized mouse button is triggered. You usually don't need to listen on it. *)
     | Left
     | Right
     | Middle
@@ -21,8 +62,7 @@ module Keycode : sig
 
   (** Keys enumeration *)
   type t =
-    | Unknown (* Used when an unrecognized key event is triggered.
-               * You usually don't need to listen on it. *)
+    | Unknown (* Used when an unrecognized key event is triggered. You usually don't need to listen on it. *)
     | A
     | B
     | C
@@ -143,7 +183,7 @@ module Event : sig
 
   (** Mouse movement event information *)
   module MouseEvent : sig
-    
+
     (** This module defines a public structure encapsulating information
       * about a mouse movement event *)
 
@@ -152,7 +192,7 @@ module Event : sig
 
   end
 
-  (** A variant type describing the possible events @see:OgamlCore.Event.KeyEvent 
+  (** A variant type describing the possible events @see:OgamlCore.Event.KeyEvent
     * @see:OgamlCore.Event.ButtonEvent @see:OgamlCore.Event.MouseEvent *)
   type t =
     | Closed (* The window sending the event has been closed *)
@@ -169,13 +209,47 @@ end
 module LL : sig
 
   (** This module provides a low-level access to the window system.
-    * You should probably use the wrappers defined in OgamlGraphics 
+    * You should probably use the wrappers defined in OgamlGraphics
     * rather than this module. *)
+
+  (** Parameters to customize the GL context *)
+  module ContextSettings : sig
+
+    (** This module provides a way to customise the GL context
+      * when creating a window *)
+
+    (** Contains all the context settings *)
+    type t
+
+    (** Creates the settings associated to those parameters :
+      *
+      * - antialiasing : AA level (defaults to 0) 
+      *
+      * - depth_bits : depth buffer bits (defaults to 0)
+      *
+      * - stencil_bits : stencil buffer bits (defaults to 0)
+      *)
+    val create : 
+      ?antialiasing:int ->
+      ?depth_bits:int   ->
+      ?stencil_bits:int -> unit -> t
+
+    (** Returns the requested AA level *)
+    val aa_level : t -> int
+
+    (** Returns the requested number of depth buffer bits *)
+    val depth_bits : t -> int
+
+    (** Returns the requested number of stencil buffer bits *)
+    val stencil_bits : t -> int
+
+  end
+
 
   (** Window management *)
   module Window : sig
 
-    (** This modules provides a low-level interface to create and
+    (** This module provides a low-level interface to create and
       * manage windows. You should probably use the OgamlGraphics.Window
       * wrapper. *)
 
@@ -183,7 +257,10 @@ module LL : sig
     type t
 
     (** Creates a window of a given size *)
-    val create : width:int -> height:int -> t
+    val create : width:int -> height:int -> title:string -> settings:ContextSettings.t -> t
+
+    (** Sets the tite of the window. *)
+    val set_title : t -> string -> unit
 
     (** Closes a window, but does not free the memory.
       * This prevents segfaults when calling functions on this window. *)
@@ -192,8 +269,9 @@ module LL : sig
     (** Destroys and frees the window from the memory *)
     val destroy : t -> unit
 
-    (** Returns the size of a window *)
-    val size : t -> (int * int)
+    (** Returns the size of a window
+      * @see:OgamlMath.Vector2i *)
+    val size : t -> OgamlMath.Vector2i.t
 
     (** Returns $true$ iff the window is open *)
     val is_open : t -> bool
@@ -201,7 +279,7 @@ module LL : sig
     (** Returns $true$ iff the window has the focus *)
     val has_focus : t -> bool
 
-    (** Returns the next event on the stack for this window 
+    (** Returns the next event on the stack for this window
       * @see:OgamlCore.Event *)
     val poll_event : t -> Event.t option
 
@@ -240,19 +318,23 @@ module LL : sig
       * in real-time. You should probably use the OgamlGraphics.Mouse
       * wrapper instead. *)
 
-    (** Returns the postion of the mouse in screen coordinates *)
-    val position : unit -> (int * int)
+    (** Returns the postion of the mouse in screen coordinates
+      * @see:OgamlMath.Vector2i *)
+    val position : unit -> OgamlMath.Vector2i.t
 
     (** Returns the position of the mouse relatively to a window
-      * @see:OgamlCore.LL.Window *)
-    val relative_position : Window.t -> (int * int)
+      * @see:OgamlCore.LL.Window
+      * @see:OgamlMath.Vector2i *)
+    val relative_position : Window.t -> OgamlMath.Vector2i.t
 
-    (** Sets the position of the cursor relatively to the screen *)
-    val set_position : (int * int) -> unit
+    (** Sets the position of the cursor relatively to the screen
+      * @see:OgamlMath.Vector2i *)
+    val set_position : OgamlMath.Vector2i.t -> unit
 
     (** Sets the position of the cursor relatively to a window
-      * @see:OgamlCore.LL.Window *)
-    val set_relative_position : Window.t -> (int * int) -> unit
+      * @see:OgamlCore.LL.Window
+      * @see:OgamlMath.Vector2i *)
+    val set_relative_position : Window.t -> OgamlMath.Vector2i.t -> unit
 
     (** Returns $true$ iff the given button is currently held down
       * by the user @see:OgamlCore.Button *)

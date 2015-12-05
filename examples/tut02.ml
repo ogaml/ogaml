@@ -10,14 +10,15 @@ open OgamlGraphics
 open OgamlMath
 
 let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
- 
-let window = Window.create ~width:800 ~height:600 ~settings
+
+let window =
+  Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°02"
 
 let vertex_shader_source = "
   in vec3 position;
 
   void main() {
-    
+
     gl_Position = vec4(position, 1.0);
 
   }
@@ -33,17 +34,17 @@ let fragment_shader_source = "
   }
 "
 
-let program = 
-  Program.from_source_pp 
+let program =
+  Program.from_source_pp
     (Window.state window)
     ~vertex_source:(`String vertex_shader_source)
     ~fragment_source:(`String fragment_shader_source)
 
-let vertex1 = 
-  VertexArray.Vertex.create 
+let vertex1 =
+  VertexArray.Vertex.create
     ~position:Vector3f.({x = -0.75; y = -0.75; z = 0.0}) ()
 
-let vertex2 = 
+let vertex2 =
   VertexArray.Vertex.create
     ~position:(Vector3f.({x = 0.; y = 0.75; z = 0.0})) ()
 
@@ -53,8 +54,8 @@ let vertex3 =
 
 let vertex_source = VertexArray.Source.(
     empty ~position:"position" ~size:3 ()
-    << vertex1 
-    << vertex2 
+    << vertex1
+    << vertex2
     << vertex3
 )
 
@@ -73,17 +74,13 @@ let rec event_loop () =
   )
   |None -> ()
 
-let rec main_loop () = 
-  if Window.is_open window then begin 
+let rec main_loop () =
+  if Window.is_open window then begin
     Window.clear window;
-    Window.draw ~window ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ();
+    VertexArray.draw ~window ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ();
     Window.display window;
     event_loop ();
     main_loop ();
   end
 
 let () = main_loop ()
-
-
-
-

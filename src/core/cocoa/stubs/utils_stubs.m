@@ -192,9 +192,9 @@ caml_cocoa_gen_string(value str)
 {
   CAMLparam1(str);
 
-  char* tmp = String_val(str);
+  const char* tmp = String_val(str);
 
-  NSString* data = [NSString stringWithFormat:@"%s" , tmp];
+  NSString* data = [NSString stringWithUTF8String:tmp];
 
   CAMLreturn((value) data);
 }

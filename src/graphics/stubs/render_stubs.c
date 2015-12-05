@@ -111,6 +111,20 @@ caml_culling_mode(value mode)
 }
 
 
+// INPUT   a boolean
+// OUTPUT  nothing, (des)activates MSAA
+CAMLprim value
+caml_enable_msaa(value active)
+{
+  CAMLparam0();
+  if(Bool_val(active))
+    glEnable(GL_MULTISAMPLE);
+  else
+    glDisable(GL_MULTISAMPLE);
+  CAMLreturn(Val_unit);
+}
+
+
 // INPUT   a polygon mode
 // OUTPUT  nothing, sets the polygon mode
 CAMLprim value
