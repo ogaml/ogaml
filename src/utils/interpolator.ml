@@ -14,7 +14,8 @@ let mod_neg t =
 
 let mod_neg2 t = 
   let vt = mod_float t 2. in
-  if vt < 0. then 2. +. vt
+  if vt < -1. then 2. +. vt
+  else if vt < 0. then -. vt
   else if vt > 1. then 2. -. vt
   else vt
 
@@ -120,8 +121,10 @@ let cst_linear b l e =
 let cubic b l e = 
   let l' = append_tangents (fst b) 0. l (fst e) in
   let func = fun t -> 
-    let (_, (p1, tg1)), (_, (p2, tg2)) = points b l' e t in
-    (h00 t) *. p1 +. (h10 t) *. tg1 +. (h01 t) *. p2 +. (h11 t) *. tg2
+    let (t1, (p1, tg1)), (t2, (p2, tg2)) = points b l' e t in
+    let fact = (t -. t1) /. (t2 -. t1) in
+    let dx = t2 -. t1 in
+    (h00 fact) *. p1 +. (h10 fact) *. tg1 *. dx +. (h01 fact) *. p2 +. (h11 fact) *. tg2 *. dx
   in
   custom func
 
