@@ -15,6 +15,9 @@ val set_title : t -> string -> unit
   * This should prevent segfaults when calling functions on this window. *)
 val close : t -> unit
 
+(** Sets the viewport of a window *)
+val viewport : t -> width:int -> height:int -> left:int -> top:int -> unit
+
 (** Free the window and the memory *)
 val destroy : t -> unit
 

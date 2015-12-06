@@ -154,6 +154,19 @@ caml_depth_test(value b)
 }
 
 
+// INPUT   x, y, width, height
+// OUTPUT  nothing, sets the glViewport
+CAMLprim value
+caml_viewport(value x, value y, value w, value h)
+{
+  CAMLparam4(x,y,w,h);
+
+  glViewport(Int_val(x), Int_val(y), Int_val(w), Int_val(h));
+
+  CAMLreturn(Val_unit);
+}
+
+
 // INPUT   nothing
 // OUTPUT  the current GL version
 CAMLprim value

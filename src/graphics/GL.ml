@@ -125,6 +125,8 @@ module Pervasives = struct
 
   external color : float -> float -> float -> float -> unit = "caml_clear_color"
 
+  external viewport : int -> int -> int -> int -> unit = "caml_viewport"
+
   external culling : DrawParameter.CullingMode.t -> unit = "caml_culling_mode"
 
   external polygon : DrawParameter.PolygonMode.t -> unit = "caml_polygon_mode"

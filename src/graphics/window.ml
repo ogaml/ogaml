@@ -185,6 +185,9 @@ let set_title win title = LL.Window.set_title win.internal title
 
 let close win = LL.Window.close win.internal
 
+let viewport win ~width ~height ~left ~top =
+  GL.Pervasives.viewport left (-top) width height
+
 let destroy win = LL.Window.destroy win.internal
 
 let is_open win = LL.Window.is_open win.internal

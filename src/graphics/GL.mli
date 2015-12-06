@@ -76,6 +76,9 @@ module Pervasives : sig
   (** Sets the clear color *)
   val color : float -> float -> float -> float -> unit
 
+  (** Sets the viewport *)
+  val viewport : int -> int -> int -> int -> unit
+
   (** Sets the current culling mode *)
   val culling : DrawParameter.CullingMode.t -> unit
 
