@@ -71,6 +71,8 @@ module Window : sig
 
   val set_title : Display.t -> t -> string -> unit
 
+  val set_size_hints : Display.t -> t -> (int * int) -> (int * int) -> unit
+
   val title : Display.t -> t -> string
 
   val map : Display.t -> t -> unit
@@ -80,6 +82,8 @@ module Window : sig
   val destroy : Display.t -> t -> unit
 
   val size : Display.t -> t -> (int * int)
+
+  val resize : Display.t -> t -> int -> int -> unit
 
   val swap : Display.t -> t -> unit
 

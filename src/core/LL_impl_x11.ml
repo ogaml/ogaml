@@ -5,7 +5,8 @@ module Window = struct
     display : X11.Display.t;
     window  : X11.Window.t;
     context : X11.GLContext.t;
-    mutable closed : bool
+    mutable closed : bool;
+    mutable size : OgamlMath.Vector2i.t
   }
 
   let create ~width ~height ~title ~settings =
@@ -35,8 +36,11 @@ module Window = struct
       |None -> assert false
       |Some(a) -> X11.Atom.set_wm_protocols display window [a]
     end;
+    if ContextSettings.resizable settings = false then
+      X11.Window.set_size_hints display window (width,height) (width,height);
     X11.Event.set_mask display window
       [X11.Event.ExposureMask;
+       X11.Event.StructureNotifyMask;
        X11.Event.KeyPressMask;
        X11.Event.KeyReleaseMask;
        X11.Event.ButtonPressMask;
@@ -47,7 +51,7 @@ module Window = struct
     let context = X11.GLContext.create display vi in
     X11.Window.attach display window context;
     X11.Window.set_title display window title;
-    {display; window; context; closed = false}
+    {display; window; context; closed = false; size = OgamlMath.Vector2i.({x = width; y = height})}
 
   let set_title win title =
     X11.Window.set_title win.display win.window title
@@ -60,7 +64,8 @@ module Window = struct
     X11.Window.destroy win.display win.window;
     win.closed <- true
 
-  let resize win size = ()
+  let resize win size =
+    X11.Window.resize win.display win.window size.OgamlMath.Vector2i.x size.OgamlMath.Vector2i.y
 
   let size win =
     let (x,y) = X11.Window.size win.display win.window in
@@ -216,6 +221,9 @@ module Window = struct
               MouseEvent.x = pos.X11.Event.x;
               MouseEvent.y = pos.X11.Event.y
           })
+      | X11.Event.ConfigureNotify when size win <> win.size ->
+          win.size <- size win;
+          Some Event.Resized
       | _ -> None
     end
     | None -> None
