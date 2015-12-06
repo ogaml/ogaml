@@ -146,6 +146,7 @@ caml_set_wm_size_hints(value disp, value win, value minsize, value maxsize)
 {
   CAMLparam4(disp, win, minsize, maxsize);
   XSizeHints* hints = XAllocSizeHints();
+  hints->flags      = PMinSize | PMaxSize;
   hints->min_width  = Int_val(Field(minsize,0));
   hints->min_height = Int_val(Field(minsize,1));
   hints->max_width  = Int_val(Field(maxsize,0));

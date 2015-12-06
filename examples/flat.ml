@@ -1,7 +1,7 @@
 open OgamlGraphics
 open OgamlMath
 
-let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ~msaa:8 ()
+let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ~msaa:8 ~resizable:true ()
 let window =
   Window.create ~width:900 ~height:600 ~settings ~title:"Flat Example"
 
