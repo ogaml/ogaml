@@ -225,6 +225,13 @@ caml_cocoa_event_pressed_mouse_buttons(value unit)
   return self;
 }
 
+- (instancetype)initWithResizedWindow
+{
+  m_type = OGResizedWindowEvent;
+
+  return self;
+}
+
 - (instancetype)initWithKeyUp:(unsigned short)keyCode
                    characters:(NSString *)characters
                 modifierFlags:(NSEventModifierFlags)modifierFlags
@@ -314,6 +321,10 @@ caml_ogevent_get_content(value mlogevent)
         li = extract_modifier_flags(info.modifierFlags);
         Store_field(key_info, 2, li);
       Store_field(result, 0, key_info);
+      break;
+
+    case OGResizedWindowEvent:
+      result = Val_int(1);
       break;
   };
 

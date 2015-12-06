@@ -144,6 +144,15 @@
   return [m_window isKeyWindow];
 }
 
+// Handling resizing of a window
+-(void)windowDidResize:(NSNotification *)notification
+{
+  (void)notification;
+
+  OGEvent* ogevent = [[OGEvent alloc] initWithResizedWindow];
+  [m_view pushEvent:ogevent];
+}
+
 @end
 
 ////////////////////////////////////////////////////////////////////////////////

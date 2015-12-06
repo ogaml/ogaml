@@ -253,9 +253,10 @@ module Window = struct
                 | MouseMoved     -> Some (Event.MouseMoved (mouse_loc win))
                 | _              -> None
               )
-          | OGEvent.CloseWindow  -> Some Event.Closed
-          | OGEvent.KeyUp   info -> Some (Event.KeyPressed  (mk_key_event info))
-          | OGEvent.KeyDown info -> Some (Event.KeyReleased (mk_key_event info))
+          | OGEvent.CloseWindow   -> Some Event.Closed
+          | OGEvent.KeyUp   inf   -> Some (Event.KeyPressed  (mk_key_event inf))
+          | OGEvent.KeyDown inf   -> Some (Event.KeyReleased (mk_key_event inf))
+          | OGEvent.ResizedWindow -> Some Event.Resized
         )
     | None -> None
 

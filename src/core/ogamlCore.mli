@@ -196,6 +196,7 @@ module Event : sig
     * @see:OgamlCore.Event.ButtonEvent @see:OgamlCore.Event.MouseEvent *)
   type t =
     | Closed (* The window sending the event has been closed *)
+    | Resized (* The window has been resized by the user *)
     | KeyPressed     of KeyEvent.t  (* A key has been pressed *)
     | KeyReleased    of KeyEvent.t  (* A key has been released *)
     | ButtonPressed  of ButtonEvent.t (* A mouse button has been pressed *)

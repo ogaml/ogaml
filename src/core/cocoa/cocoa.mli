@@ -151,6 +151,7 @@ module OGEvent : sig
     | CloseWindow
     | KeyUp       of key_info
     | KeyDown     of key_info
+    | ResizedWindow
 
   val get_content : t -> content
 

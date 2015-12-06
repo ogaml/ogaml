@@ -156,6 +156,7 @@ module OGEvent = struct
     | CloseWindow
     | KeyUp       of key_info
     | KeyDown     of key_info
+    | ResizedWindow
 
   external get_content : t -> content = "caml_ogevent_get_content"
 

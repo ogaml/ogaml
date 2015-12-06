@@ -20,7 +20,8 @@ typedef enum
   OGCocoaEvent,
   OGCloseWindowEvent,
   OGKeyDown,
-  OGKeyUp
+  OGKeyUp,
+  OGResizedWindowEvent
 } OGEventType;
 
 typedef struct
@@ -45,6 +46,8 @@ typedef union
 - (instancetype)initWithNSEvent:(NSEvent*)nsevent;
 
 - (instancetype)initWithCloseWindow;
+
+- (instancetype)initWithResizedWindow;
 
 - (instancetype)initWithKeyUp:(unsigned short)keyCode
                    characters:(NSString *)characters
@@ -138,5 +141,10 @@ typedef union
 -(NSPoint)properRelativeMouseLocation;
 
 -(void)setProperRelativeMouseLocationTo:(NSPoint)loc;
+
+-(BOOL)hasFocus;
+
+// Handling resizing of a window
+-(void)windowDidResize:(NSNotification *)notification;
 
 @end
