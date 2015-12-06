@@ -37,6 +37,9 @@ val depth_test : t -> bool
 (** Returns the clear color *)
 val clear_color : t -> Color.t
 
+(** Asserts that no GL error occured *)
+val assert_no_error : t -> unit
+
 
 module LL : sig
 

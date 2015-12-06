@@ -101,11 +101,14 @@ let rec event_loop () =
 let rec main_loop () =
   if Window.is_open window then begin
     Window.clear window ;
-    draw () ;
+    draw ();
     Window.display window ;
     event_loop () ;
     main_loop ()
   end
 
-let () = main_loop ()
+let () = 
+  main_loop ();
+  print_endline "OK";
+  Window.destroy window
 

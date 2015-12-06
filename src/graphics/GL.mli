@@ -73,6 +73,9 @@ module Pervasives : sig
   (** Clears the current display buffer *)
   val clear : bool -> bool -> bool -> unit
 
+  (** Returns the GL error on top of the stack *)
+  val error : unit -> GLTypes.GlError.t option
+
   (** Sets the clear color *)
   val color : float -> float -> float -> float -> unit
 

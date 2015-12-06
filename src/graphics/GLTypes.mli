@@ -127,5 +127,17 @@ module GlIntType : sig
 
 end
 
+(** GL errors *)
+module GlError : sig
 
+  type t = 
+    | Invalid_enum
+    | Invalid_value
+    | Invalid_op
+    | Invalid_fbop
+    | Out_of_memory
+    | Stack_underflow
+    | Stack_overflow
+
+end
 

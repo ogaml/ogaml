@@ -285,6 +285,9 @@ module State : sig
   (** Returns true iff the given GLSL version is supported by this state *)
   val is_glsl_version_supported : t -> int -> bool
 
+  (** Asserts that no openGL error occured internally. Used for debugging and testing. *)
+  val assert_no_error : t -> unit
+
 end
 
 

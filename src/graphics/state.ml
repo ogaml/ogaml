@@ -49,6 +49,9 @@ let depth_test s =
 let clear_color s = 
   s.color
 
+let assert_no_error s = 
+  assert (GL.Pervasives.error () = None)
+
 
 module LL = struct
   
