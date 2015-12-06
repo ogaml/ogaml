@@ -106,7 +106,7 @@ GLenum Drawmode_val(value mode)
 
 void finalise_vao(value v)
 {
-  glDeleteBuffers(1,&VAO(v));
+  glDeleteVertexArrays(1,&VAO(v));
 }
 
 int compare_vao(value v1, value v2)
@@ -159,8 +159,9 @@ caml_bind_vao(value buf)
   CAMLparam1(buf);
   if(buf == Val_none)
     glBindVertexArray(0);
-  else
+  else {
     glBindVertexArray(VAO(Some_val(buf)));
+  }
   CAMLreturn(Val_unit);
 }
 
