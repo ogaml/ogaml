@@ -223,16 +223,18 @@ module LL : sig
 
     (** Creates the settings associated to those parameters :
       *
-      * - antialiasing : AA level (defaults to 0) 
+      * - antialiasing : AA level (defaults to 0)
       *
       * - depth_bits : depth buffer bits (defaults to 0)
       *
       * - stencil_bits : stencil buffer bits (defaults to 0)
       *)
-    val create : 
+    val create :
       ?antialiasing:int ->
       ?depth_bits:int   ->
-      ?stencil_bits:int -> unit -> t
+      ?stencil_bits:int ->
+      ?resizable:bool   ->
+      unit -> t
 
     (** Returns the requested AA level *)
     val aa_level : t -> int

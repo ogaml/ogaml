@@ -3,16 +3,20 @@ module ContextSettings : sig
 
   type t
 
-  val create : 
+  val create :
     ?antialiasing:int ->
     ?depth_bits:int   ->
-    ?stencil_bits:int -> unit -> t
+    ?stencil_bits:int ->
+    ?resizable:bool   ->
+    unit -> t
 
   val aa_level : t -> int
 
   val depth_bits : t -> int
 
   val stencil_bits : t -> int
+
+  val resizable : t -> bool
 
 end
 
