@@ -17,15 +17,11 @@ module NSRect = struct
 
   type t
 
-  external a_create : float -> float -> float -> float -> t
+  external create : float -> float -> float -> float -> t
     = "caml_cocoa_create_nsrect"
 
   external get : t -> float * float * float * float
     = "caml_cocoa_get_nsrect"
-
-  let create x y w h =
-    let f = float_of_int in
-    a_create (f x) (f y) (f w) (f h)
 
 end
 

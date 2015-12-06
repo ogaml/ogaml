@@ -21,7 +21,8 @@ module Window = struct
     init_app () ;
 
     (* Rect for setting the size -- offset is ignored we will center *)
-    let rect = Cocoa.NSRect.create 0 0 width height in
+    let f = float_of_int in
+    let rect = Cocoa.NSRect.create 0. 0. (f width) (f height) in
 
     (* Now creating an NSWindow *)
     let window = Cocoa.NSWindow.(
@@ -100,12 +101,11 @@ module Window = struct
   let resize win size =
     let open Cocoa in
     let (x,y,oldw,oldh) = NSRect.get (OGWindowController.frame win) in
-    let i = int_of_float in
-    let (x,y,oldw,oldh) = (i x, i y, i oldw, i oldh) in
     let (w,h) = OgamlMath.Vector2i.(
       size.x , size.y
     ) in
-    let frame = NSRect.create (x+(oldw-w)/2) (y+(oldh-h)/2) w h in
+    let (w,h) = float_of_int w, float_of_int h in
+    let frame = NSRect.create (x+.(oldw-.w)/.2.) (y+.(oldh-.h)/.2.) w h in
     OGWindowController.resize win frame
 
   let is_open win =

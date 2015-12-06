@@ -17,7 +17,7 @@ module NSRect : sig
 
   type t
 
-  val create : int -> int -> int -> int -> t
+  val create : float -> float -> float -> float -> t
 
   val get : t -> float * float * float * float
 
