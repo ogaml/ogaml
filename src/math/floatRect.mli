@@ -4,6 +4,10 @@ val create : Vector2f.t -> Vector2f.t -> t
 
 val corner : t -> Vector2f.t
 
+val position : t -> Vector2f.t
+
+val size : t -> Vector2f.t
+
 val center : t -> Vector2f.t
 
 val area : t -> float

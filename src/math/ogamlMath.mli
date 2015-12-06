@@ -415,6 +415,12 @@ module IntRect : sig
   (** Returns the position of a rectangle *)
   val corner : t -> Vector2i.t
 
+  (** Alias for corner *)
+  val position : t -> Vector2i.t
+
+  (** Returns the size of a rectangle *)
+  val size : t -> Vector2i.t
+
   (** Returns the center of a rectangle *)
   val center : t -> Vector2i.t
 
@@ -450,6 +456,12 @@ module FloatRect : sig
 
   (** Returns the position of a rectangle *)
   val corner : t -> Vector2f.t
+
+  (** Alias for corner *)
+  val position : t -> Vector2f.t
+
+  (** Returns the size of a rectangle *)
+  val size : t -> Vector2f.t
 
   (** Returns the center of a rectangle *)
   val center : t -> Vector2f.t

@@ -11,6 +11,12 @@ let corner t =
   {Vector2i.x = t.x;
    Vector2i.y = t.y}
 
+let position = corner
+
+let size t =
+  {Vector2i.x = t.width;
+   Vector2i.y = t.height}
+
 let center t = 
   {Vector2i.x = (t.x + t.width ) / 2; 
    Vector2i.y = (t.y + t.height) / 2}
