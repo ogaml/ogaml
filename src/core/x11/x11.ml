@@ -127,11 +127,15 @@ module Window = struct
 
   external size : Display.t -> t -> (int * int) = "caml_size_window"
 
+  external resize : Display.t -> t -> int -> int -> unit = "caml_resize_window"
+
   external swap : Display.t -> t -> unit = "caml_glx_swap_buffers"
 
   external has_focus : Display.t -> t -> bool = "caml_has_focus"
 
   external set_title : Display.t -> t -> string -> unit = "caml_xwindow_set_title"
+
+  external set_size_hints : Display.t -> t -> (int * int) -> (int * int) -> unit = "caml_set_wm_size_hints"
 
   external title : Display.t -> t -> string = "caml_xwindow_get_title"
 
