@@ -153,6 +153,13 @@
   [m_view pushEvent:ogevent];
 }
 
+-(void)resize:(NSRect)frame
+{
+  [m_window setFrame:[m_window frameRectForContentRect:frame]
+             display:YES
+             animate:[m_window isVisible]];
+}
+
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -357,4 +364,16 @@ caml_cocoa_controller_has_focus(value mlcontroller)
   BOOL res = [controller hasFocus];
 
   CAMLreturn(Val_bool(res));
+}
+
+CAMLprim value
+caml_cocoa_controller_resize(value mlcontroller, value mlframe)
+{
+  CAMLparam2(mlcontroller,mlframe);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+  NSRect* frame = (NSRect*) Data_custom_val(mlframe);
+  [controller resize:*frame];
+
+  CAMLreturn(Val_unit);
 }

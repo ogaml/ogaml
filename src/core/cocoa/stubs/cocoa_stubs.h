@@ -147,4 +147,6 @@ typedef union
 // Handling resizing of a window
 -(void)windowDidResize:(NSNotification *)notification;
 
+-(void)resize:(NSRect)frame;
+
 @end

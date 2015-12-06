@@ -478,6 +478,10 @@ module Window : sig
   (** Frees the window and the memory *)
   val destroy : t -> unit
 
+  (** Resizes the window.
+    * @see:OgamlMath.Vector2i *)
+  val resize : t -> OgamlMath.Vector2i.t -> unit
+
   (*** Information About Windows *)
   (** Returns in pixel the width and height of the window
     * (it only takes into account the size of the content where you can draw, *ie* the useful information).

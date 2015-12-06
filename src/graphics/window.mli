@@ -21,6 +21,9 @@ val viewport : t -> width:int -> height:int -> left:int -> top:int -> unit
 (** Free the window and the memory *)
 val destroy : t -> unit
 
+(** Resize the window *)
+val resize : t -> OgamlMath.Vector2i.t -> unit
+
 (** Return the size of a window *)
 val size : t -> OgamlMath.Vector2i.t
 

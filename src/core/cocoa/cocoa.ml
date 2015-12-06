@@ -404,4 +404,6 @@ module OGWindowController = struct
 
   external has_focus : t -> bool = "caml_cocoa_controller_has_focus"
 
+  external resize : t -> NSRect.t -> unit = "caml_cocoa_controller_resize"
+
 end

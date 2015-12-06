@@ -13,9 +13,9 @@ module Window = struct
     let display = X11.Display.create () in
     let vi = X11.VisualInfo.choose display (
       [X11.VisualInfo.DoubleBuffer;
-       X11.VisualInfo.DepthSize (ContextSettings.depth_bits settings); 
+       X11.VisualInfo.DepthSize (ContextSettings.depth_bits settings);
        X11.VisualInfo.StencilSize (ContextSettings.stencil_bits settings)]
-      |> fun l -> 
+      |> fun l ->
           if ContextSettings.aa_level settings > 0 then
             X11.VisualInfo.SampleBuffers 1 ::
             X11.VisualInfo.Samples (ContextSettings.aa_level settings) :: l
@@ -49,7 +49,7 @@ module Window = struct
     X11.Window.set_title display window title;
     {display; window; context; closed = false}
 
-  let set_title win title = 
+  let set_title win title =
     X11.Window.set_title win.display win.window title
 
   let close win =
@@ -59,6 +59,8 @@ module Window = struct
   let destroy win =
     X11.Window.destroy win.display win.window;
     win.closed <- true
+
+  let resize win size = ()
 
   let size win =
     let (x,y) = X11.Window.size win.display win.window in

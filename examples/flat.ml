@@ -150,6 +150,8 @@ let rec handle_events () =
         (* This is thick! *)
         | V -> do_all gothicker false
         | B -> do_all gothicker true
+        (* Resizing the window *)
+        | M -> Window.resize window Vector2i.({ x = 500 ; y = 400 })
         | _ -> ()
       )
       | _      -> ()

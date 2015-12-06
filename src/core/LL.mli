@@ -42,6 +42,9 @@ module Window : sig
   (** Return the size of a window *)
   val size : t -> OgamlMath.Vector2i.t
 
+  (** Resize a window *)
+  val resize : t -> OgamlMath.Vector2i.t -> unit
+
   (** Return true iff the window is open *)
   val is_open : t -> bool
 

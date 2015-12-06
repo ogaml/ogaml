@@ -320,4 +320,6 @@ module OGWindowController : sig
 
   val has_focus : t -> bool
 
+  val resize : t -> NSRect.t -> unit
+
 end

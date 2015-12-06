@@ -190,6 +190,8 @@ let viewport win ~width ~height ~left ~top =
 
 let destroy win = LL.Window.destroy win.internal
 
+let resize win size = LL.Window.resize win.internal size
+
 let is_open win = LL.Window.is_open win.internal
 
 let has_focus win = LL.Window.has_focus win.internal

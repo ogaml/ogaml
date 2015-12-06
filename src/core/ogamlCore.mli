@@ -276,6 +276,10 @@ module LL : sig
       * @see:OgamlMath.Vector2i *)
     val size : t -> OgamlMath.Vector2i.t
 
+    (** Resize a window
+      * @see:OgamlMath.Vector2i *)
+    val resize : t -> OgamlMath.Vector2i.t -> unit
+
     (** Returns $true$ iff the window is open *)
     val is_open : t -> bool
 
