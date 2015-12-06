@@ -400,6 +400,84 @@ module Vector3fs : sig
 end
 
 
+(** Operations on integer rectangles *)
+module IntRect : sig
+
+  (** This module defines the IntRect type and various operations on it. *)
+
+  (** Type of immutable rectangles of integers *)
+  type t = {x : int; y : int; width : int; height : int}
+
+  (** $create position size$ creates a rectangle at position $position$ and
+    * of size $size$ *)
+  val create : Vector2i.t -> Vector2i.t -> t
+
+  (** Returns the position of a rectangle *)
+  val corner : t -> Vector2i.t
+
+  (** Returns the center of a rectangle *)
+  val center : t -> Vector2i.t
+
+  (** Returns the area of a rectangle *)
+  val area : t -> int
+
+  (** Scales a rectangle *)
+  val scale : t -> Vector2i.t -> t
+
+  (** Translates a rectangle *)
+  val translate : t -> Vector2i.t -> t
+
+  (** $intersect t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
+  val intersect : t -> t -> bool
+
+  (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
+  val contains : t -> Vector2i.t -> bool
+
+end
+
+
+(** Operations on float rectangles *)
+module FloatRect : sig
+
+  (** This module defines the FloatRect type and various operations on it. *)
+
+  (** Type of immutable rectangles of floats *)
+  type t = {x : float; y : float; width : float; height : float}
+
+  (** $create position size$ creates a rectangle at position $position$ and
+    * of size $size$ *)
+  val create : Vector2f.t -> Vector2f.t -> t
+
+  (** Returns the position of a rectangle *)
+  val corner : t -> Vector2f.t
+
+  (** Returns the center of a rectangle *)
+  val center : t -> Vector2f.t
+
+  (** Returns the area of a rectangle *)
+  val area : t -> float
+
+  (** Scales a rectangle *)
+  val scale : t -> Vector2f.t -> t
+
+  (** Translates a rectangle *)
+  val translate : t -> Vector2f.t -> t
+
+  (** Converts an integer rectangle to a float rectangle *)
+  val from_int : IntRect.t -> t
+
+  (** Converts a float rectangle to an integer rectangle *)
+  val floor : t -> IntRect.t
+
+  (** $intersect t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
+  val intersect : t -> t -> bool
+
+  (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
+  val contains : t -> Vector2f.t -> bool
+
+end
+
+
 (** Operations on immutable quaternions *)
 module Quaternion : sig
 
