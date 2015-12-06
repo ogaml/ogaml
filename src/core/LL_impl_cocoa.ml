@@ -26,8 +26,13 @@ module Window = struct
     (* Now creating an NSWindow *)
     let window = Cocoa.NSWindow.(
       create ~frame:rect
-              (* Might good to be modifiable later *)
-              ~style_mask:[Titled;Closable;Miniaturizable;Resizable]
+              ~style_mask:(
+                  [Titled;Closable;Miniaturizable]
+                  |> fun m ->
+                    if ContextSettings.resizable settings
+                    then Resizable :: m
+                    else m
+                )
               ~backing:Buffered
               ~defer:false ()
     ) in

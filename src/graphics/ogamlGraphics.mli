@@ -255,10 +255,12 @@ module ContextSettings : sig
     *
     * @see:OgamlGraphics.Color
     *)
-  val create : ?color:Color.t -> 
-               ?depth:int -> 
-               ?stencil:int -> 
-               ?msaa:int -> unit -> t
+  val create : ?color:Color.t ->
+               ?depth:int ->
+               ?stencil:int ->
+               ?msaa:int ->
+               ?resizable:bool ->
+               unit -> t
 
 end
 
