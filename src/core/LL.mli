@@ -25,6 +25,9 @@ module Window : sig
   (** Resize a window *)
   val resize : t -> OgamlMath.Vector2i.t -> unit
 
+  (** Toggle FullScreen mode *)
+  val toggle_fullscreen : t -> unit
+
   (** Return true iff the window is open *)
   val is_open : t -> bool
 

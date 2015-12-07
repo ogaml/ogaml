@@ -149,4 +149,6 @@ typedef union
 
 -(void)resize:(NSRect)frame;
 
+-(void)toggleFullScreen;
+
 @end

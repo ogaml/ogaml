@@ -322,4 +322,6 @@ module OGWindowController : sig
 
   val resize : t -> NSRect.t -> unit
 
+  val toggle_fullscreen : t -> unit
+
 end

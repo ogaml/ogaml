@@ -160,6 +160,11 @@
              animate:[m_window isVisible]];
 }
 
+-(void)toggleFullScreen
+{
+  [m_window toggleFullScreen:nil];
+}
+
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -374,6 +379,17 @@ caml_cocoa_controller_resize(value mlcontroller, value mlframe)
   OGWindowController* controller = (OGWindowController*) mlcontroller;
   NSRect* frame = (NSRect*) Data_custom_val(mlframe);
   [controller resize:*frame];
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_controller_toggle_fullscreen(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+  [controller toggleFullScreen];
 
   CAMLreturn(Val_unit);
 }

@@ -67,11 +67,13 @@ module Window = struct
   let resize win size =
     X11.Window.resize win.display win.window size.OgamlMath.Vector2i.x size.OgamlMath.Vector2i.y
 
+  let toggle_fullscreen win = ()
+
   let size win =
     let (x,y) = X11.Window.size win.display win.window in
     OgamlMath.Vector2i.({x;y})
 
-  let rect win = 
+  let rect win =
     let (width,height) = X11.Window.size win.display win.window in
     let (x,y) = X11.Window.position win.display win.window in
     OgamlMath.IntRect.({x; y; width; height})

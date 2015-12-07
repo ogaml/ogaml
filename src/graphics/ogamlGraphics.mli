@@ -170,7 +170,7 @@ module DrawParameter : sig
       * providing a viewport *)
 
     (** Type of a viewport *)
-    type t = 
+    type t =
       | Full (* Full window viewport *)
       | Relative of OgamlMath.FloatRect.t (* Viewport given as a fraction of the window's size *)
       | Absolute of OgamlMath.IntRect.t (* Viewport given in pixels *)
@@ -464,6 +464,9 @@ module Window : sig
   (** Resizes the window.
     * @see:OgamlMath.Vector2i *)
   val resize : t -> OgamlMath.Vector2i.t -> unit
+
+  (** Toggles the full screen mode of a window. *)
+  val toggle_fullscreen : t -> unit
 
   (** Returns the rectangle associated to a window, in screen coordinates
     * @see:OgamlMath.IntRect *)

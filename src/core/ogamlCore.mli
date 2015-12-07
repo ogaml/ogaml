@@ -279,7 +279,7 @@ module LL : sig
     (** Destroys and frees the window from the memory *)
     val destroy : t -> unit
 
-    (** Returns the rectangle associated to a window, in screen coordinates 
+    (** Returns the rectangle associated to a window, in screen coordinates
       * @see:OgamlMath.IntRect *)
     val rect : t -> OgamlMath.IntRect.t
 
@@ -290,6 +290,9 @@ module LL : sig
     (** Resize a window
       * @see:OgamlMath.Vector2i *)
     val resize : t -> OgamlMath.Vector2i.t -> unit
+
+    (** Toggle the full screen mode of a window *)
+    val toggle_fullscreen : t -> unit
 
     (** Returns $true$ iff the window is open *)
     val is_open : t -> bool
