@@ -41,12 +41,20 @@ module Window = struct
     X11.Event.set_mask display window
       [X11.Event.ExposureMask;
        X11.Event.StructureNotifyMask;
+       X11.Event.SubstructureNotifyMask;
        X11.Event.KeyPressMask;
        X11.Event.KeyReleaseMask;
        X11.Event.ButtonPressMask;
        X11.Event.ButtonReleaseMask;
        X11.Event.PointerMotionMask];
     X11.Window.map display window;
+    if ContextSettings.fullscreen settings then begin
+      let prop = X11.Atom.intern display "_NET_WM_STATE" true in
+      let atom_fs = X11.Atom.intern display "_NET_WM_STATE_FULLSCREEN" true in
+      match prop, atom_fs with
+      |None, _ |_, None -> failwith "fullscreen not supported"
+      |Some prop, Some atom -> X11.Atom.send_event display window prop [X11.Atom.wm_toggle;atom]
+    end;
     X11.Display.flush display;
     let context = X11.GLContext.create display vi in
     X11.Window.attach display window context;
@@ -67,7 +75,12 @@ module Window = struct
   let resize win size =
     X11.Window.resize win.display win.window size.OgamlMath.Vector2i.x size.OgamlMath.Vector2i.y
 
-  let toggle_fullscreen win = ()
+  let toggle_fullscreen win = 
+    let prop = X11.Atom.intern win.display "_NET_WM_STATE" true in
+    let atom_fs = X11.Atom.intern win.display "_NET_WM_STATE_FULLSCREEN" true in
+    match prop, atom_fs with
+    |None, _ |_, None -> failwith "fullscreen not supported"
+    |Some prop, Some atom -> X11.Atom.send_event win.display win.window prop [X11.Atom.wm_toggle;atom]
 
   let size win =
     let (x,y) = X11.Window.size win.display win.window in

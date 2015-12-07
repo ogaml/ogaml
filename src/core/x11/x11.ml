@@ -163,19 +163,47 @@ module Atom = struct
 
 
   (* Abstract functions *)
+  external abstract_wm_add : unit -> t = "caml_wm_add"
+
+  external abstract_wm_remove : unit -> t = "caml_wm_remove"
+
+  external abstract_wm_toggle : unit -> t = "caml_wm_toggle"
+
   external abstract_setwm_protocols : 
     Display.t -> Window.t -> t array -> int -> unit
     = "caml_xset_wm_protocols"
 
+  external abstract_change_property :
+    Display.t -> Window.t -> t -> t array -> int -> unit
+    = "caml_xchange_property"
+
+  external abstract_send_event :
+    Display.t -> Window.t -> t -> t array -> int -> unit
+    = "caml_xsend_event"
 
   (* Exposed functions *)
   external intern : Display.t -> string -> bool -> t option = "caml_xintern_atom"
+
 
 
   (* Implementation *)
   let set_wm_protocols disp win plist = 
     let arr = Array.of_list plist in
     abstract_setwm_protocols disp win arr (Array.length arr)
+
+  let change_property disp win atom plist = 
+    let arr = Array.of_list plist in
+    abstract_change_property disp win atom arr (Array.length arr)
+
+  let send_event disp win atom plist = 
+    let arr = Array.of_list plist in
+    abstract_send_event disp win atom arr (Array.length arr)
+
+  let wm_add = abstract_wm_add ()
+
+  let wm_remove = abstract_wm_remove ()
+
+  let wm_toggle = abstract_wm_toggle ()
 
 end
 

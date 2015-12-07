@@ -29,7 +29,7 @@ OgamlMath:
 OgamlGraphics:
   ✔ Optionalize all parameters @done(2015-12-07 16:20) @project(OgamlGraphics)
   ✔ Add MSAA to DrawParameter (and state) @done(2015-12-07 16:40) @project(OgamlGraphics)
-  ☐ Fullscreen for X11
+  ✔ Fullscreen for X11 @done(2015-12-07 17:44) @project(OgamlGraphics)
   ✘ Add Rects to Window, Texture, Image, Sprite @cancelled(2015-12-07 10:04) @project(OgamlGraphics)
   ✔ Add viewport to DrawParameter @done(2015-12-07 09:59) @project(OgamlGraphics)
   ✔ Remove clear_color from settings @done(2015-12-07 10:16) @project(OgamlGraphics)

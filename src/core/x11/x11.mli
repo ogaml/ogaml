@@ -100,7 +100,17 @@ module Atom : sig
 
   val intern : Display.t -> string -> bool -> t option
 
+  val wm_add : t
+
+  val wm_remove : t
+
+  val wm_toggle : t
+
   val set_wm_protocols : Display.t -> Window.t -> t list -> unit
+
+  val change_property : Display.t -> Window.t -> t -> t list -> unit
+
+  val send_event : Display.t -> Window.t -> t -> t list -> unit
 
 end
 
