@@ -64,7 +64,6 @@ let display () =
   rot_angle := !rot_angle +. (abs_float (cos t /. 10.)) /. 3.;
   let parameters =
     DrawParameter.(make
-      ~depth_test:true
       ~culling:CullingMode.CullClockwise ())
   in
   let uniform =

@@ -95,7 +95,7 @@ type t = {
 
 let make ?culling:(culling = CullingMode.CullNone)
          ?polygon:(polygon = PolygonMode.DrawFill) 
-         ?depth_test:(depth_test = false)
+         ?depth_test:(depth_test = true)
          ?blend_mode:(blend_mode = BlendMode.default)
          ?viewport:(viewport = Viewport.Full)
          () = 

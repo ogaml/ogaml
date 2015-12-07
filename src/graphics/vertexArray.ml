@@ -272,7 +272,10 @@ let bind state t prog =
   end
 
 
-let draw ~vertices ~window ?indices ~program ~uniform ~parameters ~mode () =
+let draw ~vertices ~window ?indices ~program 
+         ?uniform:(uniform = Uniform.empty) 
+         ?parameters:(parameters = DrawParameter.make ()) 
+         ~mode () =
   let state = Window.state window in
   Window.LL.bind_draw_parameters window parameters;
   Program.LL.use state (Some program);

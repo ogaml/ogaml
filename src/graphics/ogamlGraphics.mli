@@ -144,7 +144,7 @@ module DrawParameter : sig
 
     (** Backface culling modes *)
     type t =
-      | CullNone (* Culls no face *)
+      | CullNone (* Culls no face (default) *)
       | CullClockwise (* Culls all faces displayed in CW order from the camera POV *)
       | CullCounterClockwise (* Same with CCW *)
 
@@ -159,7 +159,7 @@ module DrawParameter : sig
     type t =
       | DrawVertices (* Draws only vertices *)
       | DrawLines (* Draws only lines *)
-      | DrawFill (* Draws full polygons *)
+      | DrawFill (* Draws full polygons (default) *)
 
   end
 
@@ -171,7 +171,7 @@ module DrawParameter : sig
 
     (** Type of a viewport *)
     type t =
-      | Full (* Full window viewport *)
+      | Full (* Full window viewport (default) *)
       | Relative of OgamlMath.FloatRect.t (* Viewport given as a fraction of the window's size *)
       | Absolute of OgamlMath.IntRect.t (* Viewport given in pixels *)
 
@@ -236,7 +236,10 @@ module DrawParameter : sig
 
   end
 
-  (** Creates a set of draw parameters
+  (** Creates a set of draw parameters. 
+    *
+    * $depth_test$ defaults to true. 
+    * See the corresponding modules for the default values of the other parameters.
     * @see:OgamlGraphics.DrawParameter.CullingMode
     * @see:OgamlGraphics.DrawParameter.PolygonMode
     * @see:OgamlGraphics.DrawParameter.Viewport
@@ -702,7 +705,12 @@ module VertexArray : sig
   (** Returns the length of a vertex array *)
   val length : 'a t -> int
 
-  (** Draws a vertex array using the given program, uniforms, draw parameters, and an optional index array.
+  (** Draws a vertex array on a window using the given parameters.
+    * 
+    * $uniform$ should provide the uniforms required by $program$ (defaults to empty)
+    *
+    * $parameters$ defaults to $DrawParameter.make ()$
+    *
     * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.Window
     * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
@@ -711,8 +719,8 @@ module VertexArray : sig
     window     : Window.t ->
     ?indices   : 'b IndexArray.t ->
     program    : Program.t ->
-    uniform    : Uniform.t ->
-    parameters : DrawParameter.t ->
+    ?uniform    : Uniform.t ->
+    ?parameters : DrawParameter.t ->
     mode       : DrawMode.t ->
     unit -> unit
 
@@ -858,7 +866,12 @@ module VertexMap : sig
   (** Returns the length of a vertex map *)
   val length : 'a t -> int
 
-  (** Draws a vertex map using the given program, uniforms, draw parameters, and an optional index array.
+  (** Draws a vertex map on a window using the given parameters.
+    * 
+    * $uniform$ should provide the uniforms required by $program$ (defaults to empty)
+    *
+    * $parameters$ defaults to $DrawParameter.make ()$
+    *
     * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.Window
     * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
@@ -867,8 +880,8 @@ module VertexMap : sig
     window     : Window.t ->
     ?indices   : 'b IndexArray.t ->
     program    : Program.t ->
-    uniform    : Uniform.t ->
-    parameters : DrawParameter.t ->
+    ?uniform    : Uniform.t ->
+    ?parameters : DrawParameter.t ->
     mode       : DrawMode.t ->
     unit -> unit
 
@@ -1054,8 +1067,13 @@ module Shape : sig
     ?rotation : float ->
     unit -> t
 
-  (** Draws a shape. *)
-  val draw : window:Window.t -> shape:t -> unit
+  (** Draws a shape on a window using the given parameters.
+    *
+    * $parameters$ defaults to $DrawParameter.make ~depth_test:false ~blend_mode:DrawParameter.BlendMode.alpha$ 
+    *
+    * @see:OgamlGraphics.DrawParameter
+    * @see:OgamlGraphics.Window *)
+  val draw : ?parameters:DrawParameter.t -> window:Window.t -> shape:t -> unit -> unit
 
   (** Sets the position of the origin in the window. *)
   val set_position : t -> OgamlMath.Vector2i.t -> unit
@@ -1121,8 +1139,13 @@ module Sprite : sig
     ?rotation : float ->
     unit -> t
 
-  (** Draws a sprite. *)
-  val draw : window:Window.t -> sprite:t -> unit
+  (** Draws a sprite on a window using the given parameters.
+    *
+    * $parameters$ defaults to $DrawParameter.make ~depth_test:false ~blend_mode:DrawParameter.BlendMode.alpha$ 
+    *
+    * @see:OgamlGraphics.DrawParameter
+    * @see:OgamlGraphics.Window *)
+  val draw : ?parameters:DrawParameter.t -> window:Window.t -> sprite:t -> unit -> unit
 
   (** Sets the position of the origin of the sprite in the window. *)
   val set_position : t -> OgamlMath.Vector2i.t -> unit

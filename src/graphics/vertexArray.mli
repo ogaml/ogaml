@@ -66,8 +66,8 @@ val draw :
   window     : Window.t ->
   ?indices   : 'b IndexArray.t ->
   program    : Program.t ->
-  uniform    : Uniform.t ->
-  parameters : DrawParameter.t ->
+  ?uniform    : Uniform.t ->
+  ?parameters : DrawParameter.t ->
   mode       : DrawMode.t ->
   unit -> unit
 

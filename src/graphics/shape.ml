@@ -367,11 +367,11 @@ let color shape = shape.shape_vals.color
 
 let border_color shape = shape.shape_vals.out_color
 
-let draw ~window ~shape =
+let draw ?parameters:(parameters = DrawParameter.make
+                                    ~depth_test:false 
+                                    ~blend_mode:DrawParameter.BlendMode.alpha ())
+         ~window ~shape () =
   let program = Window.LL.program window in
-  let parameters =
-    DrawParameter.make ~blend_mode:DrawParameter.BlendMode.alpha ()
-  in
   let size = Window.size window in
   let uniform =
     Uniform.empty

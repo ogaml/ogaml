@@ -53,17 +53,17 @@ uniform.cmo : texture.cmi state.cmi program.cmi ../math/ogamlMath.cmi \
 uniform.cmx : texture.cmx state.cmx program.cmx ../math/ogamlMath.cmi \
     GLTypes.cmi GL.cmx color.cmx uniform.cmi
 vertexArray.cmo : window.cmi uniform.cmi state.cmi program.cmi \
-    ../math/ogamlMath.cmi indexArray.cmi GLTypes.cmi GL.cmi color.cmi \
-    vertexArray.cmi
+    ../math/ogamlMath.cmi indexArray.cmi GLTypes.cmi GL.cmi drawParameter.cmi \
+    color.cmi vertexArray.cmi
 vertexArray.cmx : window.cmx uniform.cmx state.cmx program.cmx \
-    ../math/ogamlMath.cmi indexArray.cmx GLTypes.cmi GL.cmx color.cmx \
-    vertexArray.cmi
+    ../math/ogamlMath.cmi indexArray.cmx GLTypes.cmi GL.cmx drawParameter.cmx \
+    color.cmx vertexArray.cmi
 vertexMap.cmo : window.cmi uniform.cmi state.cmi program.cmi \
-    ../math/ogamlMath.cmi indexArray.cmi GLTypes.cmi GL.cmi color.cmi \
-    vertexMap.cmi
+    ../math/ogamlMath.cmi indexArray.cmi GLTypes.cmi GL.cmi drawParameter.cmi \
+    color.cmi vertexMap.cmi
 vertexMap.cmx : window.cmx uniform.cmx state.cmx program.cmx \
-    ../math/ogamlMath.cmi indexArray.cmx GLTypes.cmi GL.cmx color.cmx \
-    vertexMap.cmi
+    ../math/ogamlMath.cmi indexArray.cmx GLTypes.cmi GL.cmx drawParameter.cmx \
+    color.cmx vertexMap.cmi
 window.cmo : ../math/vector2i.cmi ../math/vector2f.cmi state.cmi program.cmi \
     ../math/ogamlMath.cmi ../core/ogamlCore.cmi ../core/LL.cmi \
     ../math/intRect.cmi GL.cmi ../math/floatRect.cmi drawParameter.cmi \
@@ -86,8 +86,8 @@ mouse.cmi : window.cmi ../math/ogamlMath.cmi ../core/ogamlCore.cmi
 ogamlGraphics.cmi : ../math/ogamlMath.cmi ../core/ogamlCore.cmi
 poly.cmi : vertexArray.cmi ../math/ogamlMath.cmi
 program.cmi : state.cmi GLTypes.cmi GL.cmi
-shape.cmi : window.cmi ../math/ogamlMath.cmi color.cmi
-sprite.cmi : window.cmi texture.cmi ../math/ogamlMath.cmi
+shape.cmi : window.cmi ../math/ogamlMath.cmi drawParameter.cmi color.cmi
+sprite.cmi : window.cmi texture.cmi ../math/ogamlMath.cmi drawParameter.cmi
 state.cmi : ../math/ogamlMath.cmi GLTypes.cmi GL.cmi drawParameter.cmi \
     color.cmi
 texture.cmi : state.cmi ../math/ogamlMath.cmi image.cmi

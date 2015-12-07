@@ -82,9 +82,11 @@ let create ~texture
     scale    = scale
   }
 
-let draw ~window ~sprite =
+let draw ?parameters:(parameters = DrawParameter.make
+                                    ~depth_test:false 
+                                    ~blend_mode:DrawParameter.BlendMode.alpha ())
+         ~window ~sprite () =
   let program = Window.LL.sprite_program window in
-  let parameters = DrawParameter.make ~blend_mode:DrawParameter.BlendMode.alpha () in
   let sizei = Window.size window in
   let size = Vector2f.from_int sizei in
   let uniform =
