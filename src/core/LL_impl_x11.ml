@@ -71,6 +71,11 @@ module Window = struct
     let (x,y) = X11.Window.size win.display win.window in
     OgamlMath.Vector2i.({x;y})
 
+  let rect win = 
+    let (width,height) = X11.Window.size win.display win.window in
+    let (x,y) = X11.Window.position win.display win.window in
+    OgamlMath.IntRect.({x; y; width; height})
+
   let is_open win =
     not win.closed
 

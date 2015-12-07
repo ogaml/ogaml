@@ -81,6 +81,8 @@ module Window : sig
 
   val destroy : Display.t -> t -> unit
 
+  val position : Display.t -> t -> (int * int)
+
   val size : Display.t -> t -> (int * int)
 
   val resize : Display.t -> t -> int -> int -> unit

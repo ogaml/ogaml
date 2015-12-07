@@ -272,6 +272,10 @@ module LL : sig
     (** Destroys and frees the window from the memory *)
     val destroy : t -> unit
 
+    (** Returns the rectangle associated to a window, in screen coordinates 
+      * @see:OgamlMath.IntRect *)
+    val rect : t -> OgamlMath.IntRect.t
+
     (** Returns the size of a window
       * @see:OgamlMath.Vector2i *)
     val size : t -> OgamlMath.Vector2i.t

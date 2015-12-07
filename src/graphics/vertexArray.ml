@@ -274,7 +274,7 @@ let bind state t prog =
 
 let draw ~vertices ~window ?indices ~program ~uniform ~parameters ~mode () =
   let state = Window.state window in
-  State.LL.bind_draw_parameters state parameters;
+  Window.LL.bind_draw_parameters window parameters;
   Program.LL.use state (Some program);
   Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind state uniform unif);
   bind state vertices program;

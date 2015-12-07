@@ -42,6 +42,9 @@ module Window : sig
   (** Return the size of a window *)
   val size : t -> OgamlMath.Vector2i.t
 
+  (** Returns the rectangle of a window *)
+  val rect : t -> OgamlMath.IntRect.t
+
   (** Resize a window *)
   val resize : t -> OgamlMath.Vector2i.t -> unit
 

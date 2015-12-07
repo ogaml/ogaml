@@ -125,6 +125,8 @@ module Window = struct
 
   external destroy : Display.t -> t -> unit = "caml_xdestroy_window"
 
+  external position : Display.t -> t -> (int * int) = "caml_xwindow_position"
+
   external size : Display.t -> t -> (int * int) = "caml_size_window"
 
   external resize : Display.t -> t -> int -> int -> unit = "caml_resize_window"

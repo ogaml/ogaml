@@ -149,6 +149,7 @@ let fragment_shader_source_tex_110 = "
 let create ~width ~height ~title ~settings =
   let internal = LL.Window.create ~width ~height ~title ~settings:(ContextSettings.to_ll settings) in
   let state = State.LL.create () in
+  State.LL.set_viewport state OgamlMath.IntRect.({x = 0; y = 0; width; height});
   let program2D =
     if State.is_glsl_version_supported state 130 then
       Program.from_source_pp state
@@ -185,8 +186,7 @@ let set_title win title = LL.Window.set_title win.internal title
 
 let close win = LL.Window.close win.internal
 
-let viewport win ~width ~height ~left ~top =
-  GL.Pervasives.viewport left (-top) width height
+let rect win = LL.Window.rect win.internal
 
 let destroy win = LL.Window.destroy win.internal
 
@@ -204,7 +204,7 @@ let display win = LL.Window.display win.internal
 
 let clear win =
   let cc = ContextSettings.clearing_color win.settings in
-  if State.clear_color win.state <> cc then begin
+  if State.LL.clear_color win.state <> cc then begin
     let crgb = Color.rgb cc in
     State.LL.set_clear_color win.state cc;
     Color.RGB.(GL.Pervasives.color crgb.r crgb.g crgb.b crgb.a)
@@ -223,5 +223,86 @@ module LL = struct
   let program win = win.program2D
 
   let sprite_program win = win.programTex
+
+  let bind_draw_parameters win parameters = 
+    let state = win.state in
+    let cull_mode = DrawParameter.culling parameters in
+    if State.LL.culling_mode state <> cull_mode then begin
+      State.LL.set_culling_mode state cull_mode;
+      GL.Pervasives.culling cull_mode
+    end;
+    let poly_mode = DrawParameter.polygon parameters in
+    if State.LL.polygon_mode state <> poly_mode then begin
+      State.LL.set_polygon_mode state poly_mode;
+      GL.Pervasives.polygon poly_mode
+    end;
+    let depth_testing = DrawParameter.depth_test parameters in
+    if State.LL.depth_test state <> depth_testing then begin
+      State.LL.set_depth_test state depth_testing;
+      GL.Pervasives.depthtest depth_testing
+    end;
+    let viewport = 
+      DrawParameter.Viewport.(
+        let open OgamlMath in
+        let sizei = size win in
+        let sizef = Vector2f.from_int sizei in
+        match DrawParameter.viewport parameters with
+        |Full -> 
+          IntRect.({x = 0; y = 0; 
+                    width  = sizei.Vector2i.x; 
+                    height = sizei.Vector2i.y})
+        |Relative r -> 
+          FloatRect.(floor 
+            {x = sizef.Vector2f.x *. r.x; 
+             y = sizef.Vector2f.y *. r.y;
+             width  = sizef.Vector2f.x *. r.width;
+             height = sizef.Vector2f.y *. r.height})
+        |Absolute r -> r
+      )
+    in
+    if State.LL.viewport state <> viewport then begin
+      let open OgamlMath.IntRect in
+      State.LL.set_viewport state viewport;
+      GL.Pervasives.viewport viewport.x viewport.y viewport.width viewport.height;
+    end;
+    let blend_mode = DrawParameter.blend_mode parameters in
+    DrawParameter.BlendMode.(
+      let blending = (blend_mode.alpha <> Equation.None) || (blend_mode.color <> Equation.None) in
+      if State.LL.blending state <> blending then begin
+        State.LL.set_blending state blending;
+        GL.Blending.enable blending
+      end;
+      let blend_alpha = 
+        match blend_mode.alpha with
+        |Equation.None -> Equation.Add (Factor.One, Factor.Zero)
+        | eq -> eq
+      in
+      let blend_color = 
+        match blend_mode.color with
+        |Equation.None -> Equation.Add (Factor.One, Factor.Zero)
+        | eq -> eq
+      in
+      let tag_alpha = Obj.tag (Obj.repr (State.LL.blend_equation state).alpha) in
+      let tag_color = Obj.tag (Obj.repr (State.LL.blend_equation state).color) in
+      let extract_sd = function
+        |Equation.Add (s,d) -> (s,d)
+        |Equation.Sub (s,d) -> (s,d)
+        | _ -> assert false
+      in
+      if (extract_sd blend_alpha <> extract_sd (State.LL.blend_equation state).alpha)
+      || (extract_sd blend_color <> extract_sd (State.LL.blend_equation state).color)
+      then begin
+        let (s_rgb, d_rgb), (s_alp, d_alp) = extract_sd blend_color, extract_sd blend_alpha in
+        State.LL.set_blend_equation state {alpha = blend_alpha; color = blend_color};
+        GL.Blending.blend_func_separate s_rgb d_rgb s_alp d_alp;
+      end;
+      if ((Obj.tag (Obj.repr blend_color)) <> tag_alpha)
+      || ((Obj.tag (Obj.repr blend_alpha)) <> tag_color)
+      then begin
+        State.LL.set_blend_equation state {alpha = blend_alpha; color = blend_color};
+        GL.Blending.blend_equation_separate blend_color blend_alpha
+      end
+    )
+
 
 end

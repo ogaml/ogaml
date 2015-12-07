@@ -98,6 +98,13 @@ module Window = struct
       OgamlMath.Vector2i.({x = i w; y = i h})
     )
 
+  let rect win = 
+    let i = int_of_float in
+    Cocoa.(
+      let (x,y,w,h) = NSRect.get (OGWindowController.content_frame win) in
+      OgamlMath.IntRect.({x = i x; y = i y; width = i w; height = i h})
+    )
+
   let resize win size =
     let open Cocoa in
     let (x,y,oldw,oldh) = NSRect.get (OGWindowController.frame win) in

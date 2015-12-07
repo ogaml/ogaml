@@ -163,6 +163,20 @@ module DrawParameter : sig
 
   end
 
+  (** Viewports enumeration *)
+  module Viewport : sig
+
+    (** This module consists of only one type enumerating different ways of
+      * providing a viewport *)
+
+    (** Type of a viewport *)
+    type t = 
+      | Full (* Full window viewport *)
+      | Relative of OgamlMath.FloatRect.t (* Viewport given as a fraction of the window's size *)
+      | Absolute of OgamlMath.IntRect.t (* Viewport given in pixels *)
+
+  end
+
   (** Blending modes manipulation *)
   module BlendMode : sig
 
@@ -225,11 +239,13 @@ module DrawParameter : sig
   (** Creates a set of draw parameters
     * @see:OgamlGraphics.DrawParameter.CullingMode
     * @see:OgamlGraphics.DrawParameter.PolygonMode
+    * @see:OgamlGraphics.DrawParameter.Viewport
     * @see:OgamlGraphics.DrawParameter.BlendMode *)
   val make : ?culling:CullingMode.t ->
              ?polygon:PolygonMode.t ->
              ?depth_test:bool ->
              ?blend_mode:BlendMode.t ->
+             ?viewport:Viewport.t ->
              unit -> t
 
 end
@@ -472,15 +488,16 @@ module Window : sig
     * This should prevent segfaults when calling functions on this window. *)
   val close : t -> unit
 
-  (** Sets the viewport of a window *)
-  val viewport : t -> width:int -> height:int -> left:int -> top:int -> unit
-
   (** Frees the window and the memory *)
   val destroy : t -> unit
 
   (** Resizes the window.
     * @see:OgamlMath.Vector2i *)
   val resize : t -> OgamlMath.Vector2i.t -> unit
+
+  (** Returns the rectangle associated to a window, in screen coordinates
+    * @see:OgamlMath.IntRect *)
+  val rect : t -> OgamlMath.IntRect.t
 
   (*** Information About Windows *)
   (** Returns in pixel the width and height of the window

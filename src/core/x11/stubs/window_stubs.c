@@ -128,6 +128,18 @@ caml_size_window(value disp, value win)
 }
 
 
+// INPUT   display, window
+// OUTPUT  position of the window (in pixel)
+CAMLprim value
+caml_xwindow_position(value disp, value win)
+{
+  CAMLparam2(disp, win);
+  XWindowAttributes att;
+  XGetWindowAttributes((Display*) disp, (Window) win, &att);
+  CAMLreturn(Int_pair(att.x, att.y));
+}
+
+
 // INPUT   display, window, x, y
 // OUTPUT  resizes the window
 CAMLprim value

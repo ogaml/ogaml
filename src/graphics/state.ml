@@ -18,7 +18,8 @@ type t = {
   mutable bound_ebo : GL.EBO.t option;
   mutable color : Color.t;
   mutable blending : bool;
-  mutable blend_equation : DrawParameter.BlendMode.t
+  mutable blend_equation : DrawParameter.BlendMode.t;
+  mutable viewport : OgamlMath.IntRect.t
 }
 
 let version s = 
@@ -35,19 +36,6 @@ let glsl_version s =
 
 let is_glsl_version_supported s v = 
   v <= s.glsl
-
-let culling_mode s =
-  s.culling_mode
-
-let polygon_mode s =
-  s.polygon_mode
-
-
-let depth_test s = 
-  s.depth_test
-
-let clear_color s = 
-  s.color
 
 
 module LL = struct
@@ -84,8 +72,21 @@ module LL = struct
       blending = false;
       blend_equation = DrawParameter.BlendMode.(
         {color = Equation.Add (Factor.One, Factor.Zero);
-         alpha = Equation.Add (Factor.One, Factor.Zero)})
+         alpha = Equation.Add (Factor.One, Factor.Zero)});
+      viewport = OgamlMath.IntRect.({x = 0; y = 0; width = 0; height = 0}) 
     }
+
+  let culling_mode s =
+    s.culling_mode
+
+  let polygon_mode s =
+    s.polygon_mode
+
+  let depth_test s = 
+    s.depth_test
+
+  let clear_color s = 
+    s.color
 
   let set_culling_mode s m =
     s.culling_mode <- m
@@ -154,60 +155,8 @@ module LL = struct
 
   let set_blend_equation s eq = s.blend_equation <- eq
 
+  let viewport s = s.viewport
 
-  let bind_draw_parameters state parameters = 
-    let cull_mode = DrawParameter.culling parameters in
-    if state.culling_mode <> cull_mode then begin
-      set_culling_mode state cull_mode;
-      GL.Pervasives.culling cull_mode
-    end;
-    let poly_mode = DrawParameter.polygon parameters in
-    if state.polygon_mode <> poly_mode then begin
-      set_polygon_mode state poly_mode;
-      GL.Pervasives.polygon poly_mode
-    end;
-    let depth_testing = DrawParameter.depth_test parameters in
-    if state.depth_test <> depth_testing then begin
-      set_depth_test state depth_testing;
-      GL.Pervasives.depthtest depth_testing
-    end;
-    let blend_mode = DrawParameter.blend_mode parameters in
-    DrawParameter.BlendMode.(
-      let blending = (blend_mode.alpha <> Equation.None) || (blend_mode.color <> Equation.None) in
-      if state.blending <> blending then begin
-        set_blending state blending;
-        GL.Blending.enable blending
-      end;
-      let blend_alpha = 
-        match blend_mode.alpha with
-        |Equation.None -> Equation.Add (Factor.One, Factor.Zero)
-        | eq -> eq
-      in
-      let blend_color = 
-        match blend_mode.color with
-        |Equation.None -> Equation.Add (Factor.One, Factor.Zero)
-        | eq -> eq
-      in
-      let tag_alpha = Obj.tag (Obj.repr state.blend_equation.alpha) in
-      let tag_color = Obj.tag (Obj.repr state.blend_equation.color) in
-      let extract_sd = function
-        |Equation.Add (s,d) -> (s,d)
-        |Equation.Sub (s,d) -> (s,d)
-        | _ -> assert false
-      in
-      if (extract_sd blend_alpha <> extract_sd state.blend_equation.alpha)
-      || (extract_sd blend_color <> extract_sd state.blend_equation.color)
-      then begin
-        let (s_rgb, d_rgb), (s_alp, d_alp) = extract_sd blend_color, extract_sd blend_alpha in
-        set_blend_equation state {alpha = blend_alpha; color = blend_color};
-        GL.Blending.blend_func_separate s_rgb d_rgb s_alp d_alp;
-      end;
-      if ((Obj.tag (Obj.repr blend_color)) <> tag_alpha)
-      || ((Obj.tag (Obj.repr blend_alpha)) <> tag_color)
-      then begin
-        set_blend_equation state {alpha = blend_alpha; color = blend_color};
-        GL.Blending.blend_equation_separate blend_color blend_alpha
-      end
-    )
+  let set_viewport s v = s.viewport <- v
 
 end

@@ -130,11 +130,6 @@ let rec handle_events () =
   match Window.poll_event window with
   | Some e -> Event.(
       match e with
-      | Resized -> Window.viewport window 
-                          ~left:0
-                          ~top:0
-                          ~width:(Window.size window).Vector2i.x
-                          ~height:(Window.size window).Vector2i.y 
       | Closed -> Window.close window
       | Event.KeyPressed k -> Keycode.(
         match k.Event.KeyEvent.key with

@@ -25,6 +25,15 @@ module PolygonMode : sig
 
 end
 
+module Viewport : sig
+
+  type t = 
+    | Full
+    | Relative of OgamlMath.FloatRect.t
+    | Absolute of OgamlMath.IntRect.t
+
+end
+
 (** Blend mode *)
 module BlendMode : sig
 
@@ -76,6 +85,7 @@ val make : ?culling:CullingMode.t ->
            ?polygon:PolygonMode.t ->
            ?depth_test:bool ->
            ?blend_mode:BlendMode.t -> 
+           ?viewport:Viewport.t ->
            unit -> t
 
 (** Returns the value of the culling parameter *)
@@ -89,3 +99,4 @@ val depth_test : t -> bool
 
 val blend_mode : t -> BlendMode.t
 
+val viewport : t -> Viewport.t

@@ -15,14 +15,14 @@ val set_title : t -> string -> unit
   * This should prevent segfaults when calling functions on this window. *)
 val close : t -> unit
 
-(** Sets the viewport of a window *)
-val viewport : t -> width:int -> height:int -> left:int -> top:int -> unit
-
 (** Free the window and the memory *)
 val destroy : t -> unit
 
 (** Resize the window *)
 val resize : t -> OgamlMath.Vector2i.t -> unit
+
+(** Returns the rectangle associated to a window, in screen coordinates *)
+val rect : t -> OgamlMath.IntRect.t
 
 (** Return the size of a window *)
 val size : t -> OgamlMath.Vector2i.t
@@ -58,5 +58,7 @@ module LL : sig
 
   (** Returns the 2D drawing program for sprites *)
   val sprite_program : t -> Program.t
+
+  val bind_draw_parameters : t -> DrawParameter.t -> unit
 
 end
