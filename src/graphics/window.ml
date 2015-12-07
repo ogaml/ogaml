@@ -170,10 +170,6 @@ let create ~width ~height ~title ~settings =
         ~vertex_source:(`String vertex_shader_source_tex_110)
         ~fragment_source:(`String fragment_shader_source_tex_110)
   in
-  if ContextSettings.aa_level settings > 0 then begin
-    State.LL.set_msaa state true;
-    GL.Pervasives.msaa true;
-  end;
   {
     state;
     internal;
@@ -241,6 +237,20 @@ module LL = struct
     if State.LL.depth_test state <> depth_testing then begin
       State.LL.set_depth_test state depth_testing;
       GL.Pervasives.depthtest depth_testing
+    end;
+    let antialiasing = DrawParameter.antialiasing parameters in
+    if ContextSettings.aa_level win.settings > 0 
+      && antialiasing 
+      && State.LL.msaa state = false
+    then begin
+      State.LL.set_msaa state true;
+      GL.Pervasives.msaa true;
+    end
+    else if State.LL.msaa state = true
+      && antialiasing = false
+    then begin
+      State.LL.set_msaa state false;
+      GL.Pervasives.msaa false
     end;
     let viewport =
       DrawParameter.Viewport.(

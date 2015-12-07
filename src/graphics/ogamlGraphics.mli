@@ -236,10 +236,20 @@ module DrawParameter : sig
 
   end
 
-  (** Creates a set of draw parameters. 
+  (** Creates a set of draw parameters with the following options : 
     *
-    * $depth_test$ defaults to true. 
-    * See the corresponding modules for the default values of the other parameters.
+    * $culling$ specifies which face should be culled (defaults to $CullNone$)
+    *
+    * $polygon$ specifies how to render polygons (defaults to $DrawFill$)
+    *
+    * $depth_test$ specifies whether depth should be tested when rendering vertices (defaults to $true$)
+    *
+    * $blend_mode$ specifies the blending equation (defaults to $BlendingMode.default$)
+    *
+    * $viewport$ specifies the viewport (defaults to $Full$)
+    *
+    * $antialiasing$ specifies whether to activate AA or not (ignored if AA is not supported by the context, defaults to $true$)
+    *
     * @see:OgamlGraphics.DrawParameter.CullingMode
     * @see:OgamlGraphics.DrawParameter.PolygonMode
     * @see:OgamlGraphics.DrawParameter.Viewport
@@ -249,6 +259,7 @@ module DrawParameter : sig
              ?depth_test:bool ->
              ?blend_mode:BlendMode.t ->
              ?viewport:Viewport.t ->
+             ?antialiasing:bool ->
              unit -> t
 
 end

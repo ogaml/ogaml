@@ -86,6 +86,7 @@ val make : ?culling:CullingMode.t ->
            ?depth_test:bool ->
            ?blend_mode:BlendMode.t -> 
            ?viewport:Viewport.t ->
+           ?antialiasing:bool ->
            unit -> t
 
 (** Returns the value of the culling parameter *)
@@ -100,3 +101,5 @@ val depth_test : t -> bool
 val blend_mode : t -> BlendMode.t
 
 val viewport : t -> Viewport.t
+
+val antialiasing : t -> bool

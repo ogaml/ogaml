@@ -52,6 +52,8 @@ let view_theta = ref 0.
 
 let view_phi = ref 0.
 
+let msaa = ref true
+
 let display () =
   (* Compute model matrix *)
   let t = Unix.gettimeofday () in
@@ -64,7 +66,8 @@ let display () =
   rot_angle := !rot_angle +. (abs_float (cos t /. 10.)) /. 3.;
   let parameters =
     DrawParameter.(make
-      ~culling:CullingMode.CullClockwise ())
+      ~culling:CullingMode.CullClockwise
+      ~antialiasing:!msaa ())
   in
   let uniform =
     Uniform.empty
@@ -145,6 +148,7 @@ let rec event_loop () =
       match k.Event.KeyEvent.key with
       | Escape -> Window.close window
       | Q when k.Event.KeyEvent.control -> Window.close window
+      | A -> msaa := (not !msaa)
       | _ -> ()
     )
     | _ -> ()
