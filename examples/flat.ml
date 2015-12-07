@@ -1,7 +1,7 @@
 open OgamlGraphics
 open OgamlMath
 
-let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ~msaa:8 ~resizable:true ()
+let settings = OgamlCore.ContextSettings.create ~msaa:8 ~resizable:true ()
 let window =
   Window.create ~width:900 ~height:600 ~settings ~title:"Flat Example"
 
@@ -160,7 +160,7 @@ let rec handle_events () =
 
 let rec each_frame () =
   if Window.is_open window then begin
-    Window.clear window ;
+    Window.clear ~color:(`RGB Color.RGB.white) window ;
     draw () ;
     Window.display window ;
     handle_events () ;

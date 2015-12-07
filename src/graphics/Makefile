@@ -14,7 +14,7 @@ STUBS_TARGET = $(STUBS_SRC:.c=.o)
 
 STUBS_OBJS = $(GRAPHICS_STUBS:.c=.o)
 
-MLSOURCES = color.ml drawParameter.ml GL.ml state.ml contextSettings.ml\
+MLSOURCES = color.ml drawParameter.ml GL.ml state.ml\
 	    image.ml texture.ml program.ml uniform.ml window.ml indexArray.ml\
 	    vertexArray.ml vertexMap.ml model.ml poly.ml shape.ml sprite.ml mouse.ml keyboard.ml
 

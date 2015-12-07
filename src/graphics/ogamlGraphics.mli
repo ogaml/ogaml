@@ -251,36 +251,6 @@ module DrawParameter : sig
 end
 
 
-(** Encapsulates data for context creation *)
-module ContextSettings : sig
-
-  (** This module encapsulates the settings used to create a GL context *)
-
-  (** Type of the settings structure *)
-  type t
-
-  (** Creates new settings using the following parameters :
-    *
-    *   $color$ - background color used when clearing (defaults to opaque black)
-    *
-    *   $depth$ - bits allocated to the depth buffer (defaults to 24)
-    *
-    *   $stencil$ - bits allocated to the stencil buffer (defaults to 0)
-    *
-    *   $msaa$ - MSAA level (defaults to 0)
-    *
-    * @see:OgamlGraphics.Color
-    *)
-  val create : ?color:Color.t ->
-               ?depth:int ->
-               ?stencil:int ->
-               ?msaa:int ->
-               ?resizable:bool ->
-               unit -> t
-
-end
-
-
 (** Encapsulates data about an OpenGL internal state *)
 module State : sig
 
@@ -474,12 +444,12 @@ module Window : sig
 
   (** Creates a window of size $width$ x $height$.
     * This window will create its openGL context following the specified settings.
-    * @see:OgamlGraphics.ContextSettings *)
+    * @see:OgamlCore.ContextSettings *)
   val create :
     width:int ->
     height:int ->
     title:string ->
-    settings:ContextSettings.t -> t
+    settings:OgamlCore.ContextSettings.t -> t
 
   (** Changes the title of the window. *)
   val set_title : t -> string -> unit
@@ -521,7 +491,7 @@ module Window : sig
   val display : t -> unit
 
   (** Clears the window *)
-  val clear : t -> unit
+  val clear : ?color:Color.t -> t -> unit
 
   (** Returns the internal GL state of the window
     * @see:OgamlGraphics.State *)

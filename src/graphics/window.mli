@@ -6,7 +6,7 @@ val create :
   width:int ->
   height:int ->
   title:string ->
-  settings:ContextSettings.t -> t
+  settings:OgamlCore.ContextSettings.t -> t
 
 (** Changes the title of the window. *)
 val set_title : t -> string -> unit
@@ -42,7 +42,7 @@ val poll_event : t -> OgamlCore.Event.t option
 val display : t -> unit
 
 (** Clears the window *)
-val clear : t -> unit
+val clear : ?color:Color.t -> t -> unit
 
 (** Returns the internal GL state of the window *)
 val state : t -> State.t

@@ -1,7 +1,8 @@
 open OgamlGraphics
 open OgamlMath
 
-let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
+let settings = OgamlCore.ContextSettings.create ()
+
 let window =
   Window.create ~width:900 ~height:600 ~settings ~title:"Sprite Example"
 
@@ -50,7 +51,7 @@ let rec handle_events () =
 
 let rec each_frame () =
   if Window.is_open window then begin
-    Window.clear window ;
+    Window.clear ~color:(`RGB Color.RGB.white) window ;
     draw () ;
     Window.display window ;
     handle_events () ;

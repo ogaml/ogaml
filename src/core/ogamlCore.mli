@@ -206,6 +206,46 @@ module Event : sig
 end
 
 
+(** Encapsulates data for context creation *)
+module ContextSettings : sig
+
+  (** This module encapsulates the settings used to create a GL context *)
+
+  (** Type of the settings structure *)
+  type t
+
+  (** Creates new settings using the following parameters :
+    *
+    *   $depth$ - bits allocated to the depth buffer (defaults to 24)
+    *
+    *   $stencil$ - bits allocated to the stencil buffer (defaults to 0)
+    *
+    *   $msaa$ - MSAA level (defaults to 0)
+    *
+    *   $resizable$ - requests a resizable context (defaults to true)
+    *
+    *)
+  val create : ?depth:int ->
+               ?stencil:int ->
+               ?msaa:int ->
+               ?resizable:bool ->
+               unit -> t
+
+  (** Returns the requested AA level *)
+  val aa_level : t -> int
+
+  (** Returns the requested number of depth buffer bits *)
+  val depth_bits : t -> int
+
+  (** Returns the requested number of stencil buffer bits *)
+  val stencil_bits : t -> int
+
+  (** Returns true iff the settings require a resizable window *)
+  val resizable : t -> bool
+
+end
+
+
 (** Low-level access to the window system *)
 module LL : sig
 
@@ -213,43 +253,7 @@ module LL : sig
     * You should probably use the wrappers defined in OgamlGraphics
     * rather than this module. *)
 
-  (** Parameters to customize the GL context *)
-  module ContextSettings : sig
-
-    (** This module provides a way to customise the GL context
-      * when creating a window *)
-
-    (** Contains all the context settings *)
-    type t
-
-    (** Creates the settings associated to those parameters :
-      *
-      * - antialiasing : AA level (defaults to 0)
-      *
-      * - depth_bits : depth buffer bits (defaults to 0)
-      *
-      * - stencil_bits : stencil buffer bits (defaults to 0)
-      *)
-    val create :
-      ?antialiasing:int ->
-      ?depth_bits:int   ->
-      ?stencil_bits:int ->
-      ?resizable:bool   ->
-      unit -> t
-
-    (** Returns the requested AA level *)
-    val aa_level : t -> int
-
-    (** Returns the requested number of depth buffer bits *)
-    val depth_bits : t -> int
-
-    (** Returns the requested number of stencil buffer bits *)
-    val stencil_bits : t -> int
-
-  end
-
-
-  (** Window management *)
+    (** Window management *)
   module Window : sig
 
     (** This module provides a low-level interface to create and

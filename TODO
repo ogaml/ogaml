@@ -27,10 +27,10 @@ OgamlMath:
   ✔ Interface @done(2015-12-01 17:29) @project(OgamlMath)
 
 OgamlGraphics:
-  ☐ Add Rects to Window, Texture, Image, Sprite
+  ✘ Add Rects to Window, Texture, Image, Sprite @cancelled(2015-12-07 10:04) @project(OgamlGraphics)
   ✔ Add viewport to DrawParameter @done(2015-12-07 09:59) @project(OgamlGraphics)
-  ☐ Remove clear_color from settings
-  ☐ Unify Core.settings and Graphics.settings ?
+  ✔ Remove clear_color from settings @done(2015-12-07 10:16) @project(OgamlGraphics)
+  ✔ Unify Core.settings and Graphics.settings ? @done(2015-12-07 10:16) @project(OgamlGraphics)
   ✔ Better normal computations in Model @done(2015-11-15 23:22) @project(OgamlGraphics)
   ✔ Indexing in Model @done(2015-11-16 22:55) @project(OgamlGraphics)
   ✔ Clean unused data in Models @done(2015-11-16 22:55) @project(OgamlGraphics)

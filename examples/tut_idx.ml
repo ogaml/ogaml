@@ -2,7 +2,7 @@
 open OgamlGraphics
 open OgamlMath
 
-let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
+let settings = OgamlCore.ContextSettings.create ()
 
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Indexing Tutorial"
@@ -126,7 +126,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear window;
+    Window.clear ~color:(`RGB Color.RGB.white) window;
     display ();
     Window.display window;
     event_loop ();

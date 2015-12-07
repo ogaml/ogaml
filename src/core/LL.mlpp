@@ -1,33 +1,3 @@
-
-module ContextSettings = struct
-
-  type t = {
-    aa_level : int;
-    depth_bits : int;
-    stencil_bits : int;
-    resizable : bool
-  }
-
-  let create ?antialiasing:(antialiasing = 0)
-             ?depth_bits:(depth_bits = 0)
-             ?stencil_bits:(stencil_bits = 0)
-             ?resizable:(resizable = true) () =
-    {aa_level = antialiasing;
-     depth_bits;
-     stencil_bits;
-     resizable}
-
-  let aa_level t = t.aa_level
-
-  let depth_bits t = t.depth_bits
-
-  let stencil_bits t = t.stencil_bits
-
-  let resizable t = t.resizable
-
-end
-
-
 #ifdef __LINUX__
   #include "LL_impl_x11.ml"
 #elif defined __OSX__

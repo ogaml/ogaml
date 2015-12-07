@@ -147,7 +147,7 @@ let fragment_shader_source_tex_110 = "
 "
 
 let create ~width ~height ~title ~settings =
-  let internal = LL.Window.create ~width ~height ~title ~settings:(ContextSettings.to_ll settings) in
+  let internal = LL.Window.create ~width ~height ~title ~settings in
   let state = State.LL.create () in
   State.LL.set_viewport state OgamlMath.IntRect.({x = 0; y = 0; width; height});
   let program2D =
@@ -170,7 +170,7 @@ let create ~width ~height ~title ~settings =
         ~vertex_source:(`String vertex_shader_source_tex_110)
         ~fragment_source:(`String fragment_shader_source_tex_110)
   in
-  if ContextSettings.msaa settings > 0 then begin
+  if ContextSettings.aa_level settings > 0 then begin
     State.LL.set_msaa state true;
     GL.Pervasives.msaa true;
   end;
@@ -202,11 +202,10 @@ let poll_event win = LL.Window.poll_event win.internal
 
 let display win = LL.Window.display win.internal
 
-let clear win =
-  let cc = ContextSettings.clearing_color win.settings in
-  if State.LL.clear_color win.state <> cc then begin
-    let crgb = Color.rgb cc in
-    State.LL.set_clear_color win.state cc;
+let clear ?color:(color=`RGB Color.RGB.black) win =
+  if State.LL.clear_color win.state <> color then begin
+    let crgb = Color.rgb color in
+    State.LL.set_clear_color win.state color;
     Color.RGB.(GL.Pervasives.color crgb.r crgb.g crgb.b crgb.a)
   end;
   let depth = ContextSettings.depth_bits win.settings > 0 in
