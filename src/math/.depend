@@ -1,9 +1,13 @@
 constants.cmo : constants.cmi
 constants.cmx : constants.cmi
+floatBox.cmo : vector3f.cmi intBox.cmi floatBox.cmi
+floatBox.cmx : vector3f.cmx intBox.cmx floatBox.cmi
 floatRect.cmo : vector2f.cmi intRect.cmi floatRect.cmi
 floatRect.cmx : vector2f.cmx intRect.cmx floatRect.cmi
-intRect.cmo : vector2i.cmi intRect.cmi
-intRect.cmx : vector2i.cmx intRect.cmi
+intBox.cmo : vector3i.cmi vector3f.cmi intBox.cmi
+intBox.cmx : vector3i.cmx vector3f.cmx intBox.cmi
+intRect.cmo : vector2i.cmi vector2f.cmi intRect.cmi
+intRect.cmx : vector2i.cmx vector2f.cmx intRect.cmi
 matrix3D.cmo : vector3f.cmi quaternion.cmi matrix3D.cmi
 matrix3D.cmx : vector3f.cmx quaternion.cmx matrix3D.cmi
 poly.cmo : vector3fs.cmi vector3f.cmi poly.cmi
@@ -21,8 +25,10 @@ vector3fs.cmx : vector3f.cmx constants.cmx vector3fs.cmi
 vector3i.cmo : vector2i.cmi vector3i.cmi
 vector3i.cmx : vector2i.cmx vector3i.cmi
 constants.cmi :
+floatBox.cmi : vector3f.cmi intBox.cmi
 floatRect.cmi : vector2f.cmi intRect.cmi
-intRect.cmi : vector2i.cmi
+intBox.cmi : vector3i.cmi vector3f.cmi
+intRect.cmi : vector2i.cmi vector2f.cmi
 matrix3D.cmi : vector3f.cmi quaternion.cmi
 ogamlMath.cmi :
 poly.cmi : vector3f.cmi

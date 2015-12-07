@@ -18,8 +18,8 @@ let size t =
    Vector2i.y = t.height}
 
 let center t = 
-  {Vector2i.x = (t.x + t.width ) / 2; 
-   Vector2i.y = (t.y + t.height) / 2}
+  {Vector2f.x = (float_of_int (t.x + t.width )) /. 2.; 
+   Vector2f.y = (float_of_int (t.y + t.height)) /. 2.}
 
 let area t = t.width * t.height
 

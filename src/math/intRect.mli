@@ -9,7 +9,7 @@ val position : t -> Vector2i.t
 
 val size : t -> Vector2i.t
 
-val center : t -> Vector2i.t
+val center : t -> Vector2f.t
 
 val area : t -> int
 

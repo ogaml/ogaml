@@ -422,7 +422,7 @@ module IntRect : sig
   val size : t -> Vector2i.t
 
   (** Returns the center of a rectangle *)
-  val center : t -> Vector2i.t
+  val center : t -> Vector2f.t
 
   (** Returns the area of a rectangle *)
   val area : t -> int
@@ -486,6 +486,102 @@ module FloatRect : sig
 
   (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
   val contains : t -> Vector2f.t -> bool
+
+end
+
+
+(** Operations on integer boxes *)
+module IntBox : sig
+
+  (** This module defines the IntBox type and various operations on it. *)
+
+  (** Type of immutable boxes of integers *)
+  type t = {x : int; y : int; z : int; width : int; height : int; depth : int}
+
+  (** $create position size$ creates a box at position $position$ and
+    * of size $size$ *)
+  val create : Vector3i.t -> Vector3i.t -> t
+
+  (** Unit box *)
+  val one : t
+
+  (** Returns the position of a box *)
+  val corner : t -> Vector3i.t
+
+  (** Alias for corner *)
+  val position : t -> Vector3i.t
+
+  (** Returns the size of a box *)
+  val size : t -> Vector3i.t
+
+  (** Returns the center of a box *)
+  val center : t -> Vector3f.t
+
+  (** Returns the volume of a box *)
+  val volume : t -> int
+
+  (** Scales a box *)
+  val scale : t -> Vector3i.t -> t
+
+  (** Translates a box *)
+  val translate : t -> Vector3i.t -> t
+
+  (** $intersect t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
+  val intersect : t -> t -> bool
+
+  (** $contains t p$ returns $true$ iff the box $t$ contains $p$ *)
+  val contains : t -> Vector3i.t -> bool
+
+end
+
+
+(** Operations on float boxes *)
+module FloatBox : sig
+
+  (** This module defines the FloatBox type and various operations on it. *)
+
+  (** Type of immutable boxes of floats *)
+  type t = {x : float; y : float; z : float; width : float; height : float; depth : float}
+
+  (** $create position size$ creates a box at position $position$ and
+    * of size $size$ *)
+  val create : Vector3f.t -> Vector3f.t -> t
+
+  (** Unit box *)
+  val one : t
+
+  (** Returns the position of a box *)
+  val corner : t -> Vector3f.t
+
+  (** Alias for corner *)
+  val position : t -> Vector3f.t
+
+  (** Returns the size of a box *)
+  val size : t -> Vector3f.t
+
+  (** Returns the center of a box *)
+  val center : t -> Vector3f.t
+
+  (** Returns the volume of a box *)
+  val volume : t -> float
+
+  (** Scales a box *)
+  val scale : t -> Vector3f.t -> t
+
+  (** Translates a box *)
+  val translate : t -> Vector3f.t -> t
+
+  (** Converts an integer box to a float box *)
+  val from_int : IntBox.t -> t
+
+  (** Converts a float box to an integer box *)
+  val floor : t -> IntBox.t
+
+  (** $intersect t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
+  val intersect : t -> t -> bool
+
+  (** $contains t p$ returns $true$ iff the box $t$ contains $p$ *)
+  val contains : t -> Vector3f.t -> bool
 
 end
 
