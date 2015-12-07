@@ -2,6 +2,8 @@
 (** Log system *)
 module Log : sig
 
+  (** This module provides a very simple log system to use with Ogaml *)
+
   (** Enumeration of log message levels *)
   type level = Debug | Warn | Error | Info | Fatal
 
@@ -192,7 +194,8 @@ module Event : sig
 
   end
 
-  (** A variant type describing the possible events @see:OgamlCore.Event.KeyEvent
+  (** A variant type describing the possible events 
+    * @see:OgamlCore.Event.KeyEvent
     * @see:OgamlCore.Event.ButtonEvent @see:OgamlCore.Event.MouseEvent *)
   type t =
     | Closed (* The window sending the event has been closed *)
