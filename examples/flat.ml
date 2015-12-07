@@ -1,7 +1,12 @@
 open OgamlGraphics
 open OgamlMath
 
-let settings = OgamlCore.ContextSettings.create ~msaa:8 ~resizable:true ()
+let settings =
+  OgamlCore.ContextSettings.create
+    ~msaa:8
+    ~resizable:true
+    ~fullscreen:true
+    ()
 let window =
   Window.create ~width:900 ~height:600 ~settings ~title:"Flat Example"
 
