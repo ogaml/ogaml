@@ -21,6 +21,9 @@ val destroy : t -> unit
 (** Resize the window *)
 val resize : t -> OgamlMath.Vector2i.t -> unit
 
+(** Toggles the full screen mode of a window. *)
+val toggle_fullscreen : t -> unit
+
 (** Returns the rectangle associated to a window, in screen coordinates *)
 val rect : t -> OgamlMath.IntRect.t
 

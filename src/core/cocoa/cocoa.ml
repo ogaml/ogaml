@@ -402,4 +402,7 @@ module OGWindowController = struct
 
   external resize : t -> NSRect.t -> unit = "caml_cocoa_controller_resize"
 
+  external toggle_fullscreen : t -> unit
+    = "caml_cocoa_controller_toggle_fullscreen"
+
 end

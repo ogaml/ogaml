@@ -152,6 +152,7 @@ let rec handle_events () =
         | B -> do_all gothicker true
         (* Resizing the window *)
         | M -> Window.resize window Vector2i.({ x = 500 ; y = 400 })
+        | L -> Window.toggle_fullscreen window
         | _ -> ()
       )
       | _      -> ()

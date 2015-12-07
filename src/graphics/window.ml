@@ -192,6 +192,8 @@ let destroy win = LL.Window.destroy win.internal
 
 let resize win size = LL.Window.resize win.internal size
 
+let toggle_fullscreen win = LL.Window.toggle_fullscreen win.internal
+
 let is_open win = LL.Window.is_open win.internal
 
 let has_focus win = LL.Window.has_focus win.internal
@@ -223,7 +225,7 @@ module LL = struct
 
   let sprite_program win = win.programTex
 
-  let bind_draw_parameters win parameters = 
+  let bind_draw_parameters win parameters =
     let state = win.state in
     let cull_mode = DrawParameter.culling parameters in
     if State.LL.culling_mode state <> cull_mode then begin
@@ -240,19 +242,19 @@ module LL = struct
       State.LL.set_depth_test state depth_testing;
       GL.Pervasives.depthtest depth_testing
     end;
-    let viewport = 
+    let viewport =
       DrawParameter.Viewport.(
         let open OgamlMath in
         let sizei = size win in
         let sizef = Vector2f.from_int sizei in
         match DrawParameter.viewport parameters with
-        |Full -> 
-          IntRect.({x = 0; y = 0; 
-                    width  = sizei.Vector2i.x; 
+        |Full ->
+          IntRect.({x = 0; y = 0;
+                    width  = sizei.Vector2i.x;
                     height = sizei.Vector2i.y})
-        |Relative r -> 
-          FloatRect.(floor 
-            {x = sizef.Vector2f.x *. r.x; 
+        |Relative r ->
+          FloatRect.(floor
+            {x = sizef.Vector2f.x *. r.x;
              y = sizef.Vector2f.y *. r.y;
              width  = sizef.Vector2f.x *. r.width;
              height = sizef.Vector2f.y *. r.height})
@@ -271,12 +273,12 @@ module LL = struct
         State.LL.set_blending state blending;
         GL.Blending.enable blending
       end;
-      let blend_alpha = 
+      let blend_alpha =
         match blend_mode.alpha with
         |Equation.None -> Equation.Add (Factor.One, Factor.Zero)
         | eq -> eq
       in
-      let blend_color = 
+      let blend_color =
         match blend_mode.color with
         |Equation.None -> Equation.Add (Factor.One, Factor.Zero)
         | eq -> eq
