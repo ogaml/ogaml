@@ -229,6 +229,7 @@ module ContextSettings : sig
                ?stencil:int ->
                ?msaa:int ->
                ?resizable:bool ->
+               ?fullscreen:bool ->
                unit -> t
 
   (** Returns the requested AA level *)
@@ -242,6 +243,9 @@ module ContextSettings : sig
 
   (** Returns true iff the settings require a resizable window *)
   val resizable : t -> bool
+
+  (** Returns true iff the settings require fullscreen mode *)
+  val fullscreen : t -> bool
 
 end
 

@@ -54,6 +54,10 @@ module Window = struct
     (* Adding a title to the window *)
     Cocoa.OGWindowController.set_title win_ctrl (Cocoa.NSString.create title) ;
 
+    (* Putting the window in fullscreen if asked *)
+    if ContextSettings.fullscreen settings then
+      Cocoa.OGWindowController.toggle_fullscreen win_ctrl ;
+
     (* But first we create and apply a new openGL context *)
     let attr = Cocoa.NSOpenGLPixelFormat.(
       [
