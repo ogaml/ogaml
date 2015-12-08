@@ -232,11 +232,6 @@ let load s =
   }
 
 
-let load_glyph t c s b = 
-  load_glyph_return t s (code_to_int c) b 
-  |> ignore
-
-
 let glyph (t : t) c size bold =
   let glyphs =
     if bold then (get_size t size).glyph_b
@@ -245,6 +240,10 @@ let glyph (t : t) c size bold =
   try IntMap.find (code_to_int c) glyphs
   with Not_found ->
     load_glyph_return t size (code_to_int c) bold
+
+
+let load_glyph (t : t) c s b = 
+  glyph t c s b |> ignore
 
 
 let kerning t c1 c2 s =
