@@ -104,3 +104,38 @@ caml_stb_box(value info, value code)
   CAMLreturn(res);
 }
 
+
+CAMLprim value
+caml_stb_bitmap(value info, value code, value scale)
+{
+  CAMLparam3(info, code, scale);
+  CAMLlocal2(res, bmp);
+
+  int width, height, xoff, yoff;
+
+  unsigned char* bitmap = stbtt_GetCodepointBitmap((stbtt_fontinfo*)info, 
+                                                       Double_val(scale), 
+                                                       Double_val(scale), 
+                                                           Int_val(code),
+                                                                  &width,
+                                                                 &height,
+                                                                   &xoff,
+                                                                   &yoff);
+
+  res = caml_alloc(3,0);
+  
+  bmp = caml_alloc_string(width * height);
+  memcpy(String_val(bmp), bitmap, width * height);
+
+
+  Store_field(res, 0, bmp);
+  Store_field(res, 1, Val_int(width));
+  Store_field(res, 2, Val_int(height));
+
+  stbtt_FreeBitmap(bitmap, NULL);
+
+  CAMLreturn(res);
+}
+
+
+

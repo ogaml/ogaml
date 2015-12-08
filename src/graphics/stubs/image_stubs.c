@@ -11,7 +11,6 @@ caml_image_load_from_file(value filename)
 
   int x,y,chan;
 
-  stbi_set_flip_vertically_on_load(1);
   char* pixels = stbi_load(String_val(filename), &x, &y, &chan, STBI_rgb_alpha);
 
   if(pixels && x && y) {

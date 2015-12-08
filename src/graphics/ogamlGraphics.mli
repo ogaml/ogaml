@@ -427,6 +427,12 @@ module Text : sig
       * (equals ascent + linegap - descent) *)
     val spacing : t -> int -> int
 
+    (** TEMPORARY Returns the texture of a given font size *)
+    val texture : t -> int -> Texture.Texture2D.t
+
+    (** TEMPORARY Updates the texture for a size, not exposed *)
+    val update : t -> int -> unit
+
   end
 
 end

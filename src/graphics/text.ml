@@ -114,6 +114,19 @@ module Font = struct
 
     external char_box : t -> int -> IntRect.t = "caml_stb_box"
 
+    external bitmap : t -> int -> float -> (Bytes.t * int * int) = "caml_stb_bitmap"
+
+    let convert_1chan_bitmap bmp = 
+      let s = Bytes.length bmp in
+      let bts = Bytes.create (s * 4) in
+      for i = 0 to s - 1 do
+        Bytes.set bts (4*i+0) '\255';
+        Bytes.set bts (4*i+1) '\255';
+        Bytes.set bts (4*i+2) '\255';
+        Bytes.set bts (4*i+3) bmp.[i]
+      done;
+      bts
+
   end
 
 
@@ -174,10 +187,13 @@ module Font = struct
 
 
   let load_glyph (t : t) s c b = 
-    let page  = load_size t s in 
+    let page  = get_size t s in 
     let glyph = 
       let (advance, lbear) = Internal.char_h_metrics t.internal c in
       let rect = Internal.char_box t.internal c in
+      let (bmp,w,h) = Internal.bitmap t.internal c page.scale in
+      let bmp = Internal.convert_1chan_bitmap bmp in
+      let uv = Shelf.add page.shelf (Image.create (`Data (w,h,bmp))) in
       {
         Glyph.advance = scale_int advance page.scale;
         Glyph.bearing = Vector2i.({x = scale_int lbear page.scale; 
@@ -187,7 +203,7 @@ module Font = struct
                                width  = scale_int rect.IntRect.width  page.scale;
                                height = scale_int rect.IntRect.height page.scale;
                              });
-        Glyph.uv = rect (* TODO *)
+        Glyph.uv = uv
       }
     in
     if b then 
@@ -199,7 +215,7 @@ module Font = struct
 
 
   let load_kerning t s (c1, c2) = 
-    let page = load_size t s in
+    let page = get_size t s in
     let kern = scale_int (Internal.kern t.internal c1 c2) page.scale in
     page.kerning <- IIMap.add (c1, c2) kern page.kerning;
     kern

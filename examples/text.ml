@@ -4,9 +4,9 @@ open OgamlMath
 let settings = OgamlCore.ContextSettings.create ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°02"
+  Window.create ~width:800 ~height:600 ~settings ~title:"Text sets tests"
 
-let font = Text.Font.load "examples/font2.ttf"
+let font = Text.Font.load "examples/font1.ttf"
 
 let font_info size = 
   Printf.printf "------- Font data for size %i -------\n%!" size;
@@ -30,11 +30,28 @@ let print_glyph c size =
       ((Text.Glyph.rect glyph).OgamlMath.IntRect.height);
   Printf.printf "\n%!"
 
-
-
 let print_kerning c1 c2 size = 
   let kern = Text.Font.kerning font (`Char c1) (`Char c2) size in
   Printf.printf "Kerning %c%c : %i\n\n%!" c1 c2 kern
+
+let () = 
+  print_endline "";
+  font_info 25;
+  print_glyph 'a' 25;
+  print_glyph 'g' 25;
+  print_glyph 'V' 25;
+  print_kerning 'A' 'V' 25;
+  print_kerning 'A' 'B' 25;
+  print_endline "";
+  for i = 0 to 255 do
+    Text.Font.glyph font (`Code i) 25 false |> ignore
+  done;
+  Text.Font.update font 25 
+
+let draw () = 
+  let texture = Text.Font.texture font 25 in
+  let sprite = Sprite.create ~texture () in
+  Sprite.draw ~sprite ~window ()
 
 let rec event_loop () =
   match Window.poll_event window with
@@ -47,25 +64,12 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(`RGB Color.RGB.white) window;
+    Window.clear ~color:(`RGB Color.RGB.black) window;
+    draw ();
     Window.display window;
     event_loop ();
     main_loop ();
   end
 
 let () = 
-  print_endline "";
-  font_info 12;
-  print_glyph 'a' 12;
-  print_glyph 'g' 12;
-  print_glyph 'V' 12;
-  print_kerning 'A' 'V' 12;
-  print_kerning 'A' 'B' 12;
-  print_endline "";
-  font_info 30;
-  print_glyph 'a' 30;
-  print_glyph 'g' 30;
-  print_glyph 'V' 30;
-  print_kerning 'A' 'V' 30;
-  print_kerning 'A' 'B' 30;
-
+  main_loop ()

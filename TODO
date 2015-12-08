@@ -23,7 +23,7 @@ Future work on Model:
 
 OgamlGraphics:
   ☐ GC textures
-  ☐ Error checking in Font and Image
+  ☐ Error checking in Font, Image (loading), Image.blit
 
 Add to interface:
   ✔ IntBox.iter @done(2015-12-08 10:38) @project(Add to interface)
