@@ -91,7 +91,7 @@ let vertex_shader_source_tex_130 = "
     gl_Position.z = 0.0;
     gl_Position.w = 1.0;
 
-    frag_uv = vec2(uv.x, 1 - uv.y);
+    frag_uv = vec2(uv.x, 1.0 - uv.y);
 
   }
 "
@@ -127,7 +127,7 @@ let vertex_shader_source_tex_110 = "
     gl_Position.z = 0.0;
     gl_Position.w = 1.0;
 
-    frag_uv = vec2(uv.x, 1 - uv.y);
+    frag_uv = vec2(uv.x, 1.0 - uv.y);
 
   }
 "
