@@ -60,29 +60,29 @@ module Shelf = struct
   let add s glyph =
     let size = Image.size glyph in
     let w,h  = size.Vector2i.x, size.Vector2i.y in
-    if s.row_width + w <= s.width then begin
+    if s.row_width + w + 1 <= s.width then begin
       let new_height = max s.row_height h in
-      let new_row = Image.create (`Empty (s.row_width + w, new_height,`RGB Color.RGB.transparent)) in
+      let new_row = Image.create (`Empty (s.row_width + w + 1, new_height,`RGB Color.RGB.transparent)) in
       Image.blit s.row new_row Vector2i.({x = 0; y = 0});
-      Image.blit glyph new_row Vector2i.({x = s.row_width; y = 0});
+      Image.blit glyph new_row Vector2i.({x = s.row_width + 1; y = 0});
       s.row <- new_row;
       s.row_height <- new_height;
-      s.row_width <- s.row_width + w;
-      IntRect.({x = s.row_width - w;
+      s.row_width <- s.row_width + w + 1;
+      IntRect.({x = s.row_width - w + 1;
                 y = s.height;
                 width  = w;
                 height = h})
     end else begin
-      let new_full = Image.create (`Empty (s.width,(s.height + s.row_height),(`RGB Color.RGB.transparent))) in
+      let new_full = Image.create (`Empty (s.width,(s.height + s.row_height + 1),(`RGB Color.RGB.transparent))) in
       Image.blit s.full new_full Vector2i.({x = 0; y = 0});
-      Image.blit s.row new_full Vector2i.({x = 0; y = s.height});
+      Image.blit s.row new_full Vector2i.({x = 0; y = s.height + 1});
       s.full <- new_full;
       s.row  <- glyph;
-      s.height <- (s.height + s.row_height);
+      s.height <- (s.height + s.row_height + 1);
       s.row_width <- w;
       s.row_height <- h;
       IntRect.({x = 0;
-                y = s.height;
+                y = s.height + 1;
                 width  = w;
                 height = h})
     end
