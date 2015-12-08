@@ -2,7 +2,8 @@ open OgamlMath
 
 type t = {
   chars    : (Font.code * Font.Glyph.t) list ;
-  vertices : VertexArray.static VertexArray.t
+  vertices : VertexArray.static VertexArray.t ;
+  texture  : Texture.Texture2D.t
 }
 
 let create ~text ~position ~font ~size ~bold =
@@ -16,6 +17,9 @@ let create ~text ~position ~font ~size ~bold =
     end
   in
   let chars = iter 0 in
+  (* First we preload all glyves to make sure they are in the texture *)
+  List.iter (fun (c,_) -> Font.load_glyph font c size bold) chars ;
+  let texture = Font.texture font size in
   let vertices,advance =
     let lift v = Vector3f.lift (Vector2f.from_int v) in
     List.fold_left
@@ -36,8 +40,9 @@ let create ~text ~position ~font ~size ~bold =
         let (uvx,uvy,uvw,uvh) =
           let open IntRect in
           let f = float_of_int in
-          (* TODO Normalize *)
-          f uv.x , f uv.y , f uv.width , f uv.height
+          let size = Texture.Texture2D.size texture in
+          let w,h = Vector2i.(f size.x , f size.y) in
+          (f uv.x) /. w , (f uv.y) /. h , (f uv.width) /. w , (f uv.height) /. h
         in
         let v1 =
           VertexArray.Vertex.create
@@ -82,4 +87,5 @@ let create ~text ~position ~font ~size ~bold =
   {
     chars ;
     vertices ;
+    texture
   }
