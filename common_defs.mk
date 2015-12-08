@@ -48,6 +48,10 @@ CLANG = clang
 
 OCAMLFIND = ocamlfind
 
+MENHIR = menhir
+
+LEX = ocamllex
+
 
 
 # Constants
@@ -65,7 +69,7 @@ OCAML_C_FLAGS = -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT -fPIC -I '$(OCAML_DIR)
 
 PPCOMMAND = cppo -D '$(strip $(PP_DEFINE))'
 
-DEPCOMMAND = $(OCAMLDEP) -pp "$(PPCOMMAND)" $(INCLUDE_DIRS)
+DEPCOMMAND = $(OCAMLDEP) -ml-synonym .mly -ml-synonym .mll -mli-synonym .mly -pp "$(PPCOMMAND)" $(INCLUDE_DIRS)
 
 
 # Suffixes
