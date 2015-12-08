@@ -424,15 +424,6 @@ module Font : sig
 end
 
 
-(** Text rendering *)
-module Text : sig
-
-  (** This module provides an efficient way to render
-    * text using openGL primitives *)
-
-end
-
-
 (** High-level wrapper around GL shader programs *)
 module Program : sig
 
@@ -1283,6 +1274,26 @@ module Sprite : sig
 
 end
 
+
+(** Text rendering *)
+module Text : sig
+
+  (** This module provides an efficient way to render
+    * text using openGL primitives *)
+
+  type t
+
+  val create :
+    text : string ->
+    position : OgamlMath.Vector2i.t ->
+    font : Font.t ->
+    size : int ->
+    bold : bool ->
+    t
+
+  val draw : ?parameters:DrawParameter.t -> text:t -> window:Window.t -> unit -> unit
+
+end
 
 
 (** Getting real-time mouse information *)

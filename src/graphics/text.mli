@@ -7,3 +7,5 @@ val create :
   size : int ->
   bold : bool ->
   t
+
+val draw : ?parameters:DrawParameter.t -> text:t -> window:Window.t -> unit -> unit

@@ -62,6 +62,8 @@ module LL : sig
   (** Returns the 2D drawing program for sprites *)
   val sprite_program : t -> Program.t
 
+  val text_program : t -> Program.t
+
   val bind_draw_parameters : t -> DrawParameter.t -> unit
 
 end

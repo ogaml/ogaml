@@ -93,7 +93,12 @@ caml_stb_box(value info, value code)
   CAMLlocal1(res);
 
   int x0, y0, x1, y1;
-  stbtt_GetCodepointBox((stbtt_fontinfo*)info, Int_val(code), &x0, &y0, &x1, &y1);
+  if(!stbtt_GetCodepointBox((stbtt_fontinfo*)info, Int_val(code), &x0, &y0, &x1, &y1)) {
+    x0 = 0;
+    y0 = 0;
+    x1 = 0;
+    y1 = 0;
+  }
 
   res = caml_alloc(4,0);
   Store_field(res, 0, Val_int(x0));
@@ -121,6 +126,11 @@ caml_stb_bitmap(value info, value code, value scale)
                                                                  &height,
                                                                    &xoff,
                                                                    &yoff);
+
+  if(!bitmap) {
+    width = 0;
+    height = 0;
+  }
 
   res = caml_alloc(3,0);
   

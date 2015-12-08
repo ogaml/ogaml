@@ -1,9 +1,10 @@
 open OgamlMath
 
 type t = {
+  font     : Font.t;
+  size     : int;
   chars    : (Font.code * Font.Glyph.t) list ;
-  vertices : VertexArray.static VertexArray.t ;
-  texture  : Texture.Texture2D.t
+  vertices : VertexArray.static VertexArray.t 
 }
 
 let create ~text ~position ~font ~size ~bold =
@@ -17,13 +18,10 @@ let create ~text ~position ~font ~size ~bold =
     end
   in
   let chars = iter 0 in
-  (* First we preload all glyves to make sure they are in the texture *)
-  List.iter (fun (c,_) -> Font.load_glyph font c size bold) chars ;
-  let texture = Font.texture font size in
   let vertices,advance =
     let lift v = Vector3f.lift (Vector2f.from_int v) in
     List.fold_left
-      (fun (source, advance_vec) (_,glyph) ->
+      (fun (source, advance_vec) (code,glyph) ->
         let bearing = Font.Glyph.bearing glyph in
         let bearingX = Vector2i.({ x = bearing.x ; y = 0 })
         and bearingY = Vector2i.({ x = 0 ; y = bearing.y }) in
@@ -40,9 +38,7 @@ let create ~text ~position ~font ~size ~bold =
         let (uvx,uvy,uvw,uvh) =
           let open IntRect in
           let f = float_of_int in
-          let size = Texture.Texture2D.size texture in
-          let w,h = Vector2i.(f size.x , f size.y) in
-          (f uv.x) /. w , (f uv.y) /. h , (f uv.width) /. w , (f uv.height) /. h
+          f uv.x, f uv.y, f uv.width, f uv.height
         in
         let v1 =
           VertexArray.Vertex.create
@@ -85,7 +81,34 @@ let create ~text ~position ~font ~size ~bold =
     |> fun (source, advance) -> VertexArray.static source, advance
   in
   {
+    font  ;
+    size  ;
     chars ;
-    vertices ;
-    texture
+    vertices
   }
+
+
+let draw ?parameters:(parameters = DrawParameter.make
+                                    ~depth_test:false 
+                                    ~blend_mode:DrawParameter.BlendMode.alpha ())
+         ~text ~window () = 
+  let program = Window.LL.text_program window in
+  let texture = Font.texture text.font text.size in
+  let size = Vector2f.from_int (Window.size window) in
+  let tsize = Vector2f.from_int (Texture.Texture2D.size texture) in
+  let uniform =
+    Uniform.empty
+    |> Uniform.vector2f "window_size" size
+    |> Uniform.vector2f "atlas_size" tsize
+    |> Uniform.texture2D "atlas" texture
+  in
+  let vertices = text.vertices in
+  VertexArray.draw
+        ~window
+        ~vertices
+        ~program
+        ~parameters
+        ~uniform
+        ~mode:DrawMode.TriangleStrip ()
+
+
