@@ -47,59 +47,6 @@ let () =
     Font.glyph font (`Code i) 25 false |> ignore
   done
 
-(* let vertex_shader_source_tex_130 = "
-  uniform vec2 size;
-
-  in vec3 position;
-  in vec2 uv;
-
-  out vec2 frag_uv;
-
-  void main() {
-
-    gl_Position.x = 2.0 * position.x / size.x - 1.0;
-    gl_Position.y = 2.0 * (size.y - position.y) / size.y - 1.0;
-    gl_Position.z = 0.0;
-    gl_Position.w = 1.0;
-
-    frag_uv = vec2(uv.x, 1.0 - uv.y);
-
-  }
-"
-
-let fragment_shader_source_tex_130 = "
-  uniform sampler2D my_texture;
-
-  in vec2 frag_uv;
-
-  out vec4 out_color;
-
-  void main() {
-
-    out_color = texture(my_texture, frag_uv);
-
-  }
-"
-
-let program =
-  Program.from_source_pp (Window.state window)
-    ~vertex_source:(`String vertex_shader_source_tex_130)
-    ~fragment_source:(`String fragment_shader_source_tex_130) *)
-
-(* let hello =
-  let source = ref
-    VertexArray.Source.(empty ~position:"position" ~texcoord:"uv" ~size:12 ())
-  in
-  String.iteri (fun i c ->
-    let glyph = Font.Font.glyph font (`Char c) 25 false in
-    let v = VertexArray.Vertex.create
-     ~position:Vector3f.({ x = 250. +. (float_of_int i) *. 25. ; y = 250. ; z = 0. })
-     ~texcoord:(Vector2f.from_int (Font.Glyph.bearing glyph))
-     ()
-    in source := VertexArray.Source.((!source) << v)
-  ) "Hello, world" ;
-  VertexArray.static (!source) *)
-
 let draw () =
   let texture = Font.texture font 25 in
   let sprite = Sprite.create ~texture () in

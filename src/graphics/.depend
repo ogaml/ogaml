@@ -50,8 +50,12 @@ state.cmo : ../math/ogamlMath.cmi GL.cmi drawParameter.cmi color.cmi \
     state.cmi
 state.cmx : ../math/ogamlMath.cmi GL.cmx drawParameter.cmx color.cmx \
     state.cmi
-text.cmo : font.cmi text.cmi
-text.cmx : font.cmx text.cmi
+text.cmo : vertexArray.cmi ../math/vector3f.cmi ../math/vector2i.cmi \
+    ../math/vector2f.cmi ../math/ogamlMath.cmi ../math/intRect.cmi font.cmi \
+    text.cmi
+text.cmx : vertexArray.cmx ../math/vector3f.cmx ../math/vector2i.cmx \
+    ../math/vector2f.cmx ../math/ogamlMath.cmi ../math/intRect.cmx font.cmx \
+    text.cmi
 texture.cmo : state.cmi ../math/ogamlMath.cmi image.cmi GLTypes.cmi GL.cmi \
     texture.cmi
 texture.cmx : state.cmx ../math/ogamlMath.cmi image.cmx GLTypes.cmi GL.cmx \
@@ -92,7 +96,6 @@ indexArray.cmi : state.cmi
 keyboard.cmi : ../core/ogamlCore.cmi
 model.cmi : vertexArray.cmi ../math/ogamlMath.cmi indexArray.cmi color.cmi
 mouse.cmi : window.cmi ../math/ogamlMath.cmi ../core/ogamlCore.cmi
-objAST.cmi : ../math/ogamlMath.cmi
 ogamlGraphics.cmi : ../math/ogamlMath.cmi ../core/ogamlCore.cmi
 poly.cmi : vertexArray.cmi ../math/ogamlMath.cmi
 program.cmi : state.cmi GLTypes.cmi GL.cmi
