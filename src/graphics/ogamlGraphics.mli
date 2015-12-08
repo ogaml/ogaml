@@ -362,21 +362,24 @@ module Text : sig
   (** Representation of a character *)
   module Glyph : sig
 
-    (** This module encapsulates the data
-      * associated to a character's glyph *)
+    (** This module encapsulates the data associated to a character's glyph. 
+      *
+      * All coordinates are given relatively to the 
+      * glyph's origin, and with an up-increasing Y coordinate *)
 
     (** Type of a glyph *)
     type t
 
-    (** Space between the origin of this glyph
-      * and the origin of the next glyph *)
+    (** Space between the origin of this glyph and the origin of the next glyph *)
     val advance : t -> int 
 
-    (** Returns the offset between the origin
-      * and the beginning of the glyph *)
+    (** Returns the offset between the origin and the beginning of the glyph.
+      *
+      * $bearing.y < 0$ means that the glyph should
+      * be rendered $-bearing.y$ pixels below the baseline *)
     val bearing : t -> OgamlMath.Vector2i.t
 
-    (** Returns the bouding rectangle of the glyph,
+    (** Returns the bouding rectangle of the glyph
       * relatively to the origin *)
     val rect : t -> OgamlMath.IntRect.t
 
@@ -387,8 +390,7 @@ module Text : sig
   module Font : sig
 
     (** This module stores a font and dynamically
-      * loads sizes and glyphs as requested by the
-      * user *)
+      * loads sizes and glyphs as requested by the user *)
 
     (** Type of a font *)
     type t 

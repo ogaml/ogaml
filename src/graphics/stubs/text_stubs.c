@@ -97,9 +97,9 @@ caml_stb_box(value info, value code)
 
   res = caml_alloc(4,0);
   Store_field(res, 0, Val_int(x0));
-  Store_field(res, 0, Val_int(y0));
-  Store_field(res, 0, Val_int(x1));
-  Store_field(res, 0, Val_int(y1));
+  Store_field(res, 1, Val_int(y0));
+  Store_field(res, 2, Val_int(x1 - x0));
+  Store_field(res, 3, Val_int(y1 - y0));
 
   CAMLreturn(res);
 }

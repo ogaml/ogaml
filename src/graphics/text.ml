@@ -200,7 +200,7 @@ module Font = struct
 
   let load_kerning t s (c1, c2) = 
     let page = load_size t s in
-    let kern = Internal.kern t.internal c1 c2 in
+    let kern = scale_int (Internal.kern t.internal c1 c2) page.scale in
     page.kerning <- IIMap.add (c1, c2) kern page.kerning;
     kern
 

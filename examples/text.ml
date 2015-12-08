@@ -6,7 +6,7 @@ let settings = OgamlCore.ContextSettings.create ()
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°02"
 
-let font = Text.Font.load "examples/example.ttf"
+let font = Text.Font.load "examples/font2.ttf"
 
 let font_info size = 
   Printf.printf "------- Font data for size %i -------\n%!" size;
@@ -62,10 +62,10 @@ let () =
   print_kerning 'A' 'V' 12;
   print_kerning 'A' 'B' 12;
   print_endline "";
-  font_info 16;
-  print_glyph 'a' 16;
-  print_glyph 'g' 16;
-  print_glyph 'V' 16;
-  print_kerning 'A' 'V' 16;
-  print_kerning 'A' 'B' 16;
+  font_info 30;
+  print_glyph 'a' 30;
+  print_glyph 'g' 30;
+  print_glyph 'V' 30;
+  print_kerning 'A' 'V' 30;
+  print_kerning 'A' 'B' 30;
 
