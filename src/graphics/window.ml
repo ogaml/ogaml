@@ -183,6 +183,45 @@ let fragment_shader_source_text_130 = "
   }
 "
 
+
+let vertex_shader_source_text_110 = "
+  #version 110
+
+  uniform vec2 window_size;
+  uniform vec2 atlas_size;
+
+  attribute vec3 position;
+  attribute vec2 uv;
+
+  varying vec2 frag_uv;
+
+  void main() {
+
+    gl_Position.x = 2.0 * position.x / window_size.x - 1.0;
+    gl_Position.y = 2.0 * (window_size.y - position.y) / window_size.y - 1.0;
+    gl_Position.z = 0.0;
+    gl_Position.w = 1.0;
+
+    frag_uv.x = uv.x / atlas_size.x;
+    frag_uv.y = uv.y / atlas_size.y;
+
+  }
+"
+
+let fragment_shader_source_text_110 = "
+  #version 110
+
+  uniform sampler2D atlas;
+
+  varying vec2 frag_uv;
+
+  void main() {
+
+    gl_FragColor = texture2D(atlas, frag_uv);
+
+  }
+"
+
 let create ~width ~height ~title ~settings =
   let internal = LL.Window.create ~width ~height ~title ~settings in
   let state = State.LL.create () in
@@ -214,8 +253,8 @@ let create ~width ~height ~title ~settings =
         ~fragment_source:(`String fragment_shader_source_text_130)
     else
       Program.from_source
-        ~vertex_source:(`String vertex_shader_source_text_130)
-        ~fragment_source:(`String fragment_shader_source_text_130)
+        ~vertex_source:(`String vertex_shader_source_text_110)
+        ~fragment_source:(`String fragment_shader_source_text_110)
   in
   {
     state;

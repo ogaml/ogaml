@@ -9,7 +9,7 @@ let window =
 let font = Font.load "examples/font1.ttf"
 
 let txt = Text.create 
-  ~text:"Hello world !" 
+  ~text:"Hello" 
   ~position:Vector2i.({x = 50; y = 50})
   ~font
   ~size:50
