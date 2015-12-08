@@ -14,12 +14,17 @@ STUBS_TARGET = $(STUBS_SRC:.c=.o)
 
 STUBS_OBJS = $(GRAPHICS_STUBS:.c=.o)
 
+LEXER_FILES = objLexer.mll
+
+PARSER_FILES = objParser.mly
+
 MLSOURCES = color.ml drawParameter.ml GL.ml state.ml\
 	    image.ml texture.ml program.ml uniform.ml window.ml indexArray.ml\
-	    vertexArray.ml vertexMap.ml font.ml text.ml model.ml poly.ml shape.ml\
-	    sprite.ml mouse.ml keyboard.ml
+	    vertexArray.ml vertexMap.ml font.ml text.ml\
+	    $(PARSER_FILES:.mly=.ml) $(LEXER_FILES:.mll=.ml)\
+	    model.ml poly.ml shape.ml sprite.ml mouse.ml keyboard.ml 
 
-MLINTERFACES = drawMode.mli GLTypes.mli
+MLINTERFACES = drawMode.mli GLTypes.mli objAST.mli
 
 MLOBJS = $(MLSOURCES:.ml=.cmo)
 
@@ -31,6 +36,8 @@ COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast -Wno-pointer-sign
 
 
 # Compilation
+
+.INTERMEDIATE: $(LEXER_FILES:.mll=.ml) $(PARSER_FILES:.mly=.ml) $(PARSER_FILES:.mly=.mli)
 
 default: .depend graphics_lib
 
@@ -56,6 +63,15 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) ogamlGraphics.cmi
 %.cmo:%.ml
 	$(OCAMLFIND) $(OCAMLC) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../core/ogamlCore.cma ../math/ogamlMath.cma -c $< -o $@
 
+%.ml:%.mll
+	$(LEX) $<
+
+%.ml:%.mly
+	$(MENHIR) $<
+
+%.mli:%.mly
+	$(MENHIR) $<
+
 %.ml:%.mlpp %.cmi
 	$(PPCOMMAND) -o $@ $<
 
@@ -74,7 +90,8 @@ clean:
 # Dependencies
 
 .depend:
-	$(DEPCOMMAND) *.ml *.mli > .depend
+	$(DEPCOMMAND) *.ml *.mli > .depend;
+	$(MENHIR) --depend *.mly >> .depend
 
 include .depend
 

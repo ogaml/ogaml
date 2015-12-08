@@ -184,7 +184,7 @@ let get_size (t : t) s =
     load_size t s
 
 
-let load_glyph (t : t) s c b =
+let load_glyph_return (t : t) s c b =
   let page  = get_size t s in
   let glyph =
     let (advance, lbear) = Internal.char_h_metrics t.internal c in
@@ -239,7 +239,11 @@ let glyph (t : t) c size bold =
   in
   try IntMap.find (code_to_int c) glyphs
   with Not_found ->
-    load_glyph t size (code_to_int c) bold
+    load_glyph_return t size (code_to_int c) bold
+
+
+let load_glyph (t : t) c s b = 
+  glyph t c s b |> ignore
 
 
 let kerning t c1 c2 s =

@@ -96,6 +96,7 @@ indexArray.cmi : state.cmi
 keyboard.cmi : ../core/ogamlCore.cmi
 model.cmi : vertexArray.cmi ../math/ogamlMath.cmi indexArray.cmi color.cmi
 mouse.cmi : window.cmi ../math/ogamlMath.cmi ../core/ogamlCore.cmi
+objAST.cmi : ../math/ogamlMath.cmi
 ogamlGraphics.cmi : ../math/ogamlMath.cmi ../core/ogamlCore.cmi
 poly.cmi : vertexArray.cmi ../math/ogamlMath.cmi
 program.cmi : state.cmi GLTypes.cmi GL.cmi
@@ -113,3 +114,7 @@ vertexMap.cmi : window.cmi uniform.cmi program.cmi ../math/ogamlMath.cmi \
     indexArray.cmi drawParameter.cmi drawMode.cmi color.cmi
 window.cmi : state.cmi program.cmi ../math/ogamlMath.cmi \
     ../core/ogamlCore.cmi drawParameter.cmi color.cmi
+objParser.cmo : objAST.cmi objParser.cmi
+objParser.cmx : objAST.cmi objParser.cmi
+objParser.cmi : objAST.cmi
+objParser.ml objParser.mli: objAST.cmi

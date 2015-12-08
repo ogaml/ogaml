@@ -24,6 +24,9 @@ type code = [`Char of char | `Code of int]
 (** Loads a font from a file *)
 val load : string -> t
 
+(** Preloads a glyph *)
+val load_glyph : t -> code -> int -> bool -> unit
+
 (** Usage : glyph font char size bold *)
 val glyph : t -> code -> int -> bool -> Glyph.t
 

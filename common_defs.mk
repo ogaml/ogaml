@@ -48,6 +48,10 @@ CLANG = clang
 
 OCAMLFIND = ocamlfind
 
+MENHIR = menhir
+
+LEX = ocamllex
+
 
 
 # Constants

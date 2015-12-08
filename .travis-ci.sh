@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OPAM_DEPEND="cppo"
+OPAM_DEPEND="cppo menhir"
 
 export DISPLAY=:99.0
 sh -e /etc/init.d/xvfb start
