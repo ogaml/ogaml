@@ -9,20 +9,14 @@ let window =
 let font = Font.load "examples/font1.ttf"
 
 let txt = Text.create 
-  ~text:"Hello World !" 
+  ~text:"Hello World !"
   ~position:Vector2i.({x = 50; y = 50})
   ~font
   ~size:50
   ~bold:false 
-
-let sprite = Sprite.create
-  ~position:Vector2i.({x = 50; y = 300})
-  ~texture:(Font.texture font 50)
-  ()
-
+ 
 let draw () =
-  Text.draw ~window ~text:txt ();
-  Sprite.draw ~window ~sprite ()
+  Text.draw ~window ~text:txt ()
 
 let rec event_loop () =
   match Window.poll_event window with

@@ -116,7 +116,7 @@ module Internal = struct
 
   let convert_1chan_bitmap bmp =
     let s = Bytes.length bmp in
-    let bts = Bytes.create (s * 4) in
+    let bts = Bytes.make (s * 4) '\000' in
     for i = 0 to s - 1 do
       Bytes.set bts (4*i+0) '\255';
       Bytes.set bts (4*i+1) '\255';

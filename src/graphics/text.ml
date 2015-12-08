@@ -63,7 +63,7 @@ let create ~text ~position ~font ~size ~bold =
         in
         VertexArray.Source.(
           source << v1 << v2 << v3
-                 << v3 << v4 << v1
+                 << v3 << v1 << v4
         ),
         Vector2i.(add advance_vec { x = Font.Glyph.advance glyph ; y = 0 })
       )
@@ -109,6 +109,6 @@ let draw ?parameters:(parameters = DrawParameter.make
         ~program
         ~parameters
         ~uniform
-        ~mode:DrawMode.TriangleStrip ()
+        ~mode:DrawMode.Triangles ()
 
 
