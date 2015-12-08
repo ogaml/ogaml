@@ -4,7 +4,7 @@ module Glyph : sig
   type t
 
   (** Space after the glyph *)
-  val advance : t -> int 
+  val advance : t -> int
 
   val bearing : t -> OgamlMath.Vector2i.t
 
@@ -19,7 +19,7 @@ end
 
 module Font : sig
 
-  type t 
+  type t
 
   type code = [`Char of char | `Code of int]
 
@@ -35,7 +35,7 @@ module Font : sig
   (** Returns the coordinate above the baseline the font extends *)
   val ascent : t -> int -> int
 
-  (** Returns the coordinate below the baseline the font 
+  (** Returns the coordinate below the baseline the font
     * extends (usually negative) *)
   val descent : t -> int -> int
 
@@ -55,6 +55,12 @@ module Font : sig
 end
 
 
-(* type t *)
+type t
 
-(* create : position -> text -> color -> ... -> t *)
+val create :
+  text : string ->
+  position : OgamlMath.Vector2i.t ->
+  font : Font.t ->
+  size : int ->
+  bold : bool ->
+  t
