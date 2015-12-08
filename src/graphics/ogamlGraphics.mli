@@ -353,6 +353,83 @@ module Texture : sig
 end
 
 
+(** Text rendering *)
+module Text : sig
+
+  (** This module provides an efficient way to render
+    * text using openGL primitives *)
+
+  (** Representation of a character *)
+  module Glyph : sig
+
+    (** This module encapsulates the data
+      * associated to a character's glyph *)
+
+    (** Type of a glyph *)
+    type t
+
+    (** Space between the origin of this glyph
+      * and the origin of the next glyph *)
+    val advance : t -> int 
+
+    (** Returns the offset between the origin
+      * and the beginning of the glyph *)
+    val bearing : t -> OgamlMath.Vector2i.t
+
+    (** Returns the bouding rectangle of the glyph,
+      * relatively to the origin *)
+    val rect : t -> OgamlMath.IntRect.t
+
+  end
+
+
+  (** Information about a font *)
+  module Font : sig
+
+    (** This module stores a font and dynamically
+      * loads sizes and glyphs as requested by the
+      * user *)
+
+    (** Type of a font *)
+    type t 
+
+    (** Type alias for a character given in ASCII or UTF-8 *)
+    type code = [`Char of char | `Code of int]
+
+    (** Loads a font from a file *)
+    val load : string -> t
+
+    (** $glyph font code size bold$ returns the glyph 
+      * representing the character $code$ in $font$
+      * of size $size$ and with the modifier $bold$ *)
+    val glyph : t -> code -> int -> bool -> Glyph.t
+
+    (** Returns the kerning between two chars of 
+      * a given size, that is the horizontal offset 
+      * that must be applied between the two glyphs
+      * (usually negative) *)
+    val kerning : t -> code -> code -> int -> int
+
+    (** Returns the coordinate above the baseline the font extends *)
+    val ascent : t -> int -> int
+
+    (** Returns the coordinate below the baseline the font 
+      * extends (usually negative) *)
+    val descent : t -> int -> int
+
+    (** Returns the distance between the descent of a line
+      * and the ascent of the next line *)
+    val linegap : t -> int -> int
+
+    (** Returns the space between the baseline of two lines 
+      * (equals ascent + linegap - descent) *)
+    val spacing : t -> int -> int
+
+  end
+
+end
+
+
 (** High-level wrapper around GL shader programs *)
 module Program : sig
 

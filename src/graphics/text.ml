@@ -98,6 +98,25 @@ module Font = struct
   end
 
 
+  module Internal = struct
+
+    type t
+
+    external load : string -> t = "caml_stb_load_font"
+
+    external kern : t -> int -> int -> int = "caml_stb_kern_advance"
+
+    external scale : t -> int -> float = "caml_stb_scale"
+
+    external metrics : t -> (int * int * int) = "caml_stb_metrics"
+
+    external char_h_metrics : t -> int -> (int * int) = "caml_stb_hmetrics"
+
+    external char_box : t -> int -> IntRect.t = "caml_stb_box"
+
+  end
+
+
   type page = {
     mutable glyph   : Glyph.t IntMap.t;
     mutable glyph_b : Glyph.t IntMap.t;
@@ -105,25 +124,72 @@ module Font = struct
     mutable texture : Texture.Texture2D.t;
     mutable modified: bool;
     shelf   : Shelf.t;
+    scale   : float;
     spacing : int;
+    ascent  : int;
+    descent : int
   }
 
-  type t = (page IntMap.t) ref
+
+  type t = {
+    mutable pages : page IntMap.t;
+         internal : Internal.t
+  }
+
 
   type code = [`Char of char | `Code of int]
 
 
   (** Internal functions *)
-  let load_size t s = Obj.magic ()
 
-  let get_size t s = 
-    try IntMap.find s !t
+  let scale_int i f = int_of_float (float_of_int i *. f)
+
+  let load_size (t : t) s = 
+    let scale = Internal.scale t.internal s in
+    let (ascent, descent, linegap) = Internal.metrics t.internal in
+    let new_page = 
+      {
+        glyph    = IntMap.empty;
+        glyph_b  = IntMap.empty;
+        kerning  = IIMap.empty;
+        texture  = Texture.Texture2D.create (`Image 
+                      (Image.create (`Empty (0,0,`RGB Color.RGB.transparent)))
+                   );
+        modified = false;
+        shelf    = Shelf.create 1024;
+        spacing  = scale_int linegap scale;
+        ascent   = scale_int ascent  scale;
+        descent  = scale_int descent scale;
+        scale;
+      }
+    in
+    t.pages <- IntMap.add s new_page t.pages;
+    new_page
+
+
+  let get_size (t : t) s = 
+    try IntMap.find s t.pages
     with Not_found -> 
       load_size t s
 
-  let load_glyph t s c b = 
+
+  let load_glyph (t : t) s c b = 
     let page  = load_size t s in 
-    let glyph = Obj.magic () in
+    let glyph = 
+      let (advance, lbear) = Internal.char_h_metrics t.internal c in
+      let rect = Internal.char_box t.internal c in
+      {
+        Glyph.advance = scale_int advance page.scale;
+        Glyph.bearing = Vector2i.({x = scale_int lbear page.scale; 
+                                   y = scale_int rect.IntRect.y page.scale});
+        Glyph.rect = IntRect.({x = scale_int rect.IntRect.x page.scale;
+                               y = scale_int rect.IntRect.y page.scale;
+                               width  = scale_int rect.IntRect.width  page.scale;
+                               height = scale_int rect.IntRect.height page.scale;
+                             });
+        Glyph.uv = rect (* TODO *)
+      }
+    in
     if b then 
       page.glyph_b <- IntMap.add c glyph page.glyph_b
     else
@@ -131,11 +197,13 @@ module Font = struct
     page.modified <- true;
     glyph
 
+
   let load_kerning t s (c1, c2) = 
     let page = load_size t s in
-    let kern = 0 in
+    let kern = Internal.kern t.internal c1 c2 in
     page.kerning <- IIMap.add (c1, c2) kern page.kerning;
     kern
+
 
   let code_to_int = function
     |`Char c -> Char.code c
@@ -143,9 +211,14 @@ module Font = struct
 
 
   (** Exposed functions *)
-  let load s = ()
+  let load s = 
+    { 
+      pages  = IntMap.empty;
+      internal = Internal.load s
+    }
 
-  let glyph t c size bold = 
+
+  let glyph (t : t) c size bold = 
     let glyphs = 
       if bold then (get_size t size).glyph_b
       else (get_size t size).glyph
@@ -154,17 +227,33 @@ module Font = struct
     with Not_found -> 
       load_glyph t size (code_to_int c) bold
 
+
   let kerning t c1 c2 s = 
     let k = (get_size t s).kerning in
     try IIMap.find (code_to_int c1, code_to_int c2) k
     with Not_found -> 
       load_kerning t s (code_to_int c1, code_to_int c2)
 
-  let spacing t i =
+
+  let ascent t i = 
+    (get_size t i).ascent
+
+
+  let descent t i = 
+    (get_size t i).descent
+
+
+  let linegap t i = 
     (get_size t i).spacing
+
+
+  let spacing t i =
+    (ascent t i) - (descent t i) + (linegap t i)
+
 
   let texture t i = 
     (get_size t i).texture
+
 
   let update t s = 
     let page = get_size t s in

@@ -32,7 +32,18 @@ module Font : sig
   (** Returns the kerning between two chars *)
   val kerning : t -> code -> code -> int -> int
 
-  (** Returns the line spacing *)
+  (** Returns the coordinate above the baseline the font extends *)
+  val ascent : t -> int -> int
+
+  (** Returns the coordinate below the baseline the font 
+    * extends (usually negative) *)
+  val descent : t -> int -> int
+
+  (** Returns the distance between the descent of a line
+    * and the ascent of the next line *)
+  val linegap : t -> int -> int
+
+  (** Returns the space between the baseline of two lines *)
   val spacing : t -> int -> int
 
   (** Returns the texture of a given font size *)

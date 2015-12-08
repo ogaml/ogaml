@@ -5,7 +5,7 @@ include ../../common_defs.mk
 INCLUDE_DIRS = -I ../math/ -I ../core/
 
 GRAPHICS_STUBS = shader_stubs.c program_stubs.c texture_stubs.c\
-	         vao_stubs.c vbo_stubs.c uniform_stubs.c\
+	         vao_stubs.c vbo_stubs.c uniform_stubs.c text_stubs.c\
 		 render_stubs.c ebo_stubs.c image_stubs.c blending_stubs.c utils.c
 
 STUBS_SRC = $(addprefix $(STUBS_DIR)/, $(GRAPHICS_STUBS))
@@ -16,7 +16,8 @@ STUBS_OBJS = $(GRAPHICS_STUBS:.c=.o)
 
 MLSOURCES = color.ml drawParameter.ml GL.ml state.ml\
 	    image.ml texture.ml program.ml uniform.ml window.ml indexArray.ml\
-	    vertexArray.ml vertexMap.ml model.ml poly.ml shape.ml sprite.ml mouse.ml keyboard.ml
+	    vertexArray.ml vertexMap.ml text.ml model.ml poly.ml shape.ml\
+	    sprite.ml mouse.ml keyboard.ml
 
 MLINTERFACES = drawMode.mli GLTypes.mli
 
