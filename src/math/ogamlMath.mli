@@ -439,6 +439,9 @@ module IntRect : sig
   (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
   val contains : t -> Vector2i.t -> bool
 
+  (** $loop t f$ iterates through all points of the rectangle *)
+  val loop : t -> (int -> int -> unit) -> unit
+
 end
 
 
@@ -531,6 +534,9 @@ module IntBox : sig
 
   (** $contains t p$ returns $true$ iff the box $t$ contains $p$ *)
   val contains : t -> Vector3i.t -> bool
+
+  (** $loop t f$ iterates through all points of the box *)
+  val loop : t -> (int -> int -> int -> unit) -> unit
 
 end
 

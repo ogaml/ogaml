@@ -65,3 +65,11 @@ let contains t pt =
   pt.Vector3i.y <= t.y + t.height &&
   pt.Vector3i.z <= t.z + t.depth
 
+let loop t f = 
+  for i = t.x to t.x + t.width - 1 do
+    for j = t.y to t.y + t.height - 1 do
+      for k = t.z to t.z + t.depth - 1 do
+        f i j k
+      done;
+    done;
+  done

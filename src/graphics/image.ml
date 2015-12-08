@@ -49,6 +49,8 @@ let create = function
       else
         Bytes.set img.data i a
     done; img
+  |`Data (width, height, data) -> 
+    {width; height; data}
 
 let size img = 
   OgamlMath.Vector2i.({x = img.width; y = img.height})
@@ -74,4 +76,19 @@ let get img x y =
      a = inverse img.data.[x * 4 * img.height + y * 4 + 3]})
 
 let data img = img.data
+
+let blit src ?rect dest pos = 
+  let rect = 
+    match rect with
+    |None   -> OgamlMath.(IntRect.create Vector2i.zero (size src))
+    |Some r -> r
+  in
+  let offi, offj =
+    pos.OgamlMath.Vector2i.x - rect.OgamlMath.IntRect.x,
+    pos.OgamlMath.Vector2i.y - rect.OgamlMath.IntRect.y
+  in
+  OgamlMath.IntRect.loop rect 
+    (fun i j -> set dest (i + offi) (j + offj) (`RGB (get src i j)))
+
+
 

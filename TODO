@@ -20,6 +20,16 @@ Future work on Model:
   ☐ Rewrite Model to add iterators, simplify the interface, and only index ad-hoc (when requested by source)
   ☐ Poly export to Model.t
   ☐ Model merging
+
+OgamlGraphics:
+  ☐ GC textures
+
+Add to interface:
+  ✔ IntBox.iter @done(2015-12-08 10:38) @project(Add to interface)
+  ✔ IntRect.iter @done(2015-12-08 10:38) @project(Add to interface)
+  ✔ Image.create `Data @done(2015-12-08 10:38) @project(Add to interface)
+  ✔ Image.blit @done(2015-12-08 10:35) @project(Add to interface)
+
   
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:

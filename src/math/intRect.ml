@@ -43,3 +43,9 @@ let contains t pt =
   pt.Vector2i.x <= t.x + t.width &&
   pt.Vector2i.y <= t.y + t.height
 
+let loop t f = 
+  for i = t.x to t.x + t.width - 1 do
+    for j = t.y to t.y + t.height - 1 do
+      f i j
+    done;
+  done

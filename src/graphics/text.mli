@@ -1,9 +1,12 @@
+
 module Glyph : sig
 
   type t
 
   (** Space after the glyph *)
   val advance : t -> int 
+
+  val bearing : t -> OgamlMath.Vector2i.t
 
   (** Bounding rectangle *)
   val rect : t -> OgamlMath.IntRect.t
@@ -32,12 +35,15 @@ module Font : sig
   (** Returns the line spacing *)
   val spacing : t -> int -> int
 
-  (** Returns the texture of a given size *)
+  (** Returns the texture of a given font size *)
   val texture : t -> int -> Texture.Texture2D.t
+
+  (** Updates the texture for a size, not exposed *)
+  val update : t -> int -> unit
 
 end
 
 
-type t
+(* type t *)
 
 (* create : position -> text -> color -> ... -> t *)

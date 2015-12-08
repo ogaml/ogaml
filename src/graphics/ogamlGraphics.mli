@@ -300,9 +300,10 @@ module Image : sig
   (** Type of an image stored in the RAM *)
   type t
 
-  (** Creates an image from a file, or an empty image with a given size filled with a default color
+  (** Creates an image from a file, some RGBA-formatted data, or an empty one
+    * filled with a default color
     * @see:OgamlGraphics.Color *)
-  val create : [`File of string | `Empty of int * int * Color.t] -> t
+  val create : [`File of string | `Empty of int * int * Color.t | `Data of int * int * Bytes.t] -> t
 
   (** Return the size of an image *)
   val size : t -> OgamlMath.Vector2i.t
@@ -314,6 +315,13 @@ module Image : sig
   (** Gets the color of a pixel of an image
     * @see:OgamlGraphics.Color.RGB *)
   val get : t -> int -> int -> Color.RGB.t
+
+  (** $blit src ~rect dest offset$ blits the subimage of $src$ defined by $rect$
+    * on the image $dest$ at position $offset$ (relative to the top-left pixel).
+    *
+    * If $rect$ is not provided then the whole image $src$ is used.
+    * @see:OgamlMath.IntRect @see:OgamlMath.Vector2i *)
+  val blit : t -> ?rect:OgamlMath.IntRect.t -> t -> OgamlMath.Vector2i.t -> unit
 
 end
 

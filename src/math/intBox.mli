@@ -23,3 +23,4 @@ val intersect : t -> t -> bool
 
 val contains : t -> Vector3i.t -> bool
 
+val loop : t -> (int -> int -> int -> unit) -> unit
