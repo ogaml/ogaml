@@ -37,6 +37,8 @@ COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast -Wno-pointer-sign
 
 # Compilation
 
+.INTERMEDIATE: $(LEXER_FILES:.mll=.ml) $(PARSER_FILES:.mly=.ml) $(PARSER_FILES:.mly=.mli)
+
 default: .depend graphics_lib
 
 
@@ -82,10 +84,7 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) ogamlGraphics.cmi
 # Cleaning
 
 clean:
-	rm -rf $(CLEAN_EXTENSIONS);
-	rm -rf $(LEXER_FILES:.mll=.ml);
-	rm -rf $(PARSER_FILES:.mly=.ml);
-	rm -rf $(PARSER_FILES:.mly=.mli)
+	rm -rf $(CLEAN_EXTENSIONS)
 
 
 # Dependencies
