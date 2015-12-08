@@ -4,15 +4,15 @@ module Glyph : sig
   type t
 
   (** Space after the glyph *)
-  val advance : t -> int
+  val advance : t -> float
 
-  val bearing : t -> OgamlMath.Vector2i.t
+  val bearing : t -> OgamlMath.Vector2f.t
 
   (** Bounding rectangle *)
-  val rect : t -> OgamlMath.IntRect.t
+  val rect : t -> OgamlMath.FloatRect.t
 
   (** Coordinates of the glyph in the font's texture *)
-  val uv : t -> OgamlMath.IntRect.t
+  val uv : t -> OgamlMath.FloatRect.t
 
 end
 
@@ -31,21 +31,21 @@ val load_glyph : t -> code -> int -> bool -> unit
 val glyph : t -> code -> int -> bool -> Glyph.t
 
 (** Returns the kerning between two chars *)
-val kerning : t -> code -> code -> int -> int
+val kerning : t -> code -> code -> int -> float
 
 (** Returns the coordinate above the baseline the font extends *)
-val ascent : t -> int -> int
+val ascent : t -> int -> float
 
 (** Returns the coordinate below the baseline the font
   * extends (usually negative) *)
-val descent : t -> int -> int
+val descent : t -> int -> float
 
 (** Returns the distance between the descent of a line
   * and the ascent of the next line *)
-val linegap : t -> int -> int
+val linegap : t -> int -> float
 
 (** Returns the space between the baseline of two lines *)
-val spacing : t -> int -> int
+val spacing : t -> int -> float
 
 (** Returns the texture of a given font size *)
 val texture : t -> int -> Texture.Texture2D.t

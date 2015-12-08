@@ -21,10 +21,10 @@ end)
 
 module Glyph = struct
 
-  type t = {advance : int;
-            bearing : OgamlMath.Vector2i.t;
-               rect : OgamlMath.IntRect.t;
-                 uv : OgamlMath.IntRect.t}
+  type t = {advance : float;
+            bearing : OgamlMath.Vector2f.t;
+               rect : OgamlMath.FloatRect.t;
+                 uv : OgamlMath.FloatRect.t}
 
   let advance t = t.advance
 
@@ -131,14 +131,14 @@ end
 type page = {
   mutable glyph   : Glyph.t IntMap.t;
   mutable glyph_b : Glyph.t IntMap.t;
-  mutable kerning : int IIMap.t;
+  mutable kerning : float IIMap.t;
   mutable texture : Texture.Texture2D.t;
   mutable modified: bool;
   shelf   : Shelf.t;
   scale   : float;
-  spacing : int;
-  ascent  : int;
-  descent : int
+  spacing : float;
+  ascent  : float;
+  descent : float
 }
 
 
@@ -153,7 +153,7 @@ type code = [`Char of char | `Code of int]
 
 (** Internal functions *)
 
-let scale_int i f = int_of_float (float_of_int i *. f)
+let scale_int i f = (float_of_int i *. f)
 
 let load_size (t : t) s =
   let scale = Internal.scale t.internal s in
@@ -194,14 +194,14 @@ let load_glyph_return (t : t) s c b =
     let uv = Shelf.add page.shelf (Image.create (`Data (w,h,bmp))) in
     {
       Glyph.advance = scale_int advance page.scale;
-      Glyph.bearing = Vector2i.({x = scale_int lbear page.scale;
+      Glyph.bearing = Vector2f.({x = scale_int lbear page.scale;
                                  y = scale_int (rect.IntRect.y + rect.IntRect.height) page.scale});
-      Glyph.rect = IntRect.({x = scale_int rect.IntRect.x page.scale;
-                             y = scale_int rect.IntRect.y page.scale;
-                             width  = scale_int rect.IntRect.width  page.scale;
-                             height = scale_int rect.IntRect.height page.scale;
-                            });
-      Glyph.uv = uv
+      Glyph.rect = FloatRect.({x = scale_int rect.IntRect.x page.scale;
+                               y = scale_int rect.IntRect.y page.scale;
+                               width  = scale_int rect.IntRect.width  page.scale;
+                               height = scale_int rect.IntRect.height page.scale;
+                             });
+      Glyph.uv = FloatRect.from_int uv
     }
   in
   if b then
@@ -266,7 +266,7 @@ let linegap t i =
 
 
 let spacing t i =
-  (ascent t i) - (descent t i) + (linegap t i)
+  (ascent t i) -. (descent t i) +. (linegap t i)
 
 
 let texture t s =

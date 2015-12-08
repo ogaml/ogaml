@@ -368,14 +368,14 @@ module Font : sig
     type t
 
     (** Space between the origin of this glyph and the origin of the next glyph *)
-    val advance : t -> int 
+    val advance : t -> float
 
     (** Returns the offset between the origin and the top-left corner of the glyph *)
-    val bearing : t -> OgamlMath.Vector2i.t
+    val bearing : t -> OgamlMath.Vector2f.t
 
     (** Returns the bouding rectangle of the glyph
       * relatively to the origin *)
-    val rect : t -> OgamlMath.IntRect.t
+    val rect : t -> OgamlMath.FloatRect.t
 
   end
 
@@ -401,22 +401,22 @@ module Font : sig
     * a given size, that is the horizontal offset 
     * that must be applied between the two glyphs
     * (usually negative) *)
-  val kerning : t -> code -> code -> int -> int
+  val kerning : t -> code -> code -> int -> float
 
   (** Returns the coordinate above the baseline the font extends *)
-  val ascent : t -> int -> int
+  val ascent : t -> int -> float
 
   (** Returns the coordinate below the baseline the font 
     * extends (usually negative) *)
-  val descent : t -> int -> int
+  val descent : t -> int -> float
 
   (** Returns the distance between the descent of a line
     * and the ascent of the next line *)
-  val linegap : t -> int -> int
+  val linegap : t -> int -> float
 
   (** Returns the space between the baseline of two lines 
     * (equals ascent + linegap - descent) *)
-  val spacing : t -> int -> int
+  val spacing : t -> int -> float
 
   (** TEMPORARY *)
   val texture : t -> int -> Texture.Texture2D.t
