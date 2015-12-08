@@ -353,11 +353,8 @@ module Texture : sig
 end
 
 
-(** Text rendering *)
-module Text : sig
-
-  (** This module provides an efficient way to render
-    * text using openGL primitives *)
+(** Information about a font *)
+module Font : sig
 
   (** Representation of a character *)
   module Glyph : sig
@@ -373,10 +370,7 @@ module Text : sig
     (** Space between the origin of this glyph and the origin of the next glyph *)
     val advance : t -> int 
 
-    (** Returns the offset between the origin and the beginning of the glyph.
-      *
-      * $bearing.y < 0$ means that the glyph should
-      * be rendered $-bearing.y$ pixels below the baseline *)
+    (** Returns the offset between the origin and the top-left corner of the glyph *)
     val bearing : t -> OgamlMath.Vector2i.t
 
     (** Returns the bouding rectangle of the glyph
@@ -386,54 +380,55 @@ module Text : sig
   end
 
 
-  (** Information about a font *)
-  module Font : sig
+  (** This module stores a font and dynamically
+    * loads sizes and glyphs as requested by the user *)
 
-    (** This module stores a font and dynamically
-      * loads sizes and glyphs as requested by the user *)
+  (** Type of a font *)
+  type t 
 
-    (** Type of a font *)
-    type t 
+  (** Type alias for a character given in ASCII or UTF-8 *)
+  type code = [`Char of char | `Code of int]
 
-    (** Type alias for a character given in ASCII or UTF-8 *)
-    type code = [`Char of char | `Code of int]
+  (** Loads a font from a file *)
+  val load : string -> t
 
-    (** Loads a font from a file *)
-    val load : string -> t
+  (** $glyph font code size bold$ returns the glyph 
+    * representing the character $code$ in $font$
+    * of size $size$ and with the modifier $bold$ *)
+  val glyph : t -> code -> int -> bool -> Glyph.t
 
-    (** $glyph font code size bold$ returns the glyph 
-      * representing the character $code$ in $font$
-      * of size $size$ and with the modifier $bold$ *)
-    val glyph : t -> code -> int -> bool -> Glyph.t
+  (** Returns the kerning between two chars of 
+    * a given size, that is the horizontal offset 
+    * that must be applied between the two glyphs
+    * (usually negative) *)
+  val kerning : t -> code -> code -> int -> int
 
-    (** Returns the kerning between two chars of 
-      * a given size, that is the horizontal offset 
-      * that must be applied between the two glyphs
-      * (usually negative) *)
-    val kerning : t -> code -> code -> int -> int
+  (** Returns the coordinate above the baseline the font extends *)
+  val ascent : t -> int -> int
 
-    (** Returns the coordinate above the baseline the font extends *)
-    val ascent : t -> int -> int
+  (** Returns the coordinate below the baseline the font 
+    * extends (usually negative) *)
+  val descent : t -> int -> int
 
-    (** Returns the coordinate below the baseline the font 
-      * extends (usually negative) *)
-    val descent : t -> int -> int
+  (** Returns the distance between the descent of a line
+    * and the ascent of the next line *)
+  val linegap : t -> int -> int
 
-    (** Returns the distance between the descent of a line
-      * and the ascent of the next line *)
-    val linegap : t -> int -> int
+  (** Returns the space between the baseline of two lines 
+    * (equals ascent + linegap - descent) *)
+  val spacing : t -> int -> int
 
-    (** Returns the space between the baseline of two lines 
-      * (equals ascent + linegap - descent) *)
-    val spacing : t -> int -> int
+  (** TEMPORARY *)
+  val texture : t -> int -> Texture.Texture2D.t
 
-    (** TEMPORARY Returns the texture of a given font size *)
-    val texture : t -> int -> Texture.Texture2D.t
+end
 
-    (** TEMPORARY Updates the texture for a size, not exposed *)
-    val update : t -> int -> unit
 
-  end
+(** Text rendering *)
+module Text : sig
+
+  (** This module provides an efficient way to render
+    * text using openGL primitives *)
 
 end
 

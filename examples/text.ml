@@ -4,34 +4,34 @@ open OgamlMath
 let settings = OgamlCore.ContextSettings.create ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~settings ~title:"Text sets tests"
+  Window.create ~width:800 ~height:600 ~settings ~title:"Font sets tests"
 
-let font = Text.Font.load "examples/font1.ttf"
+let font = Font.load "examples/font1.ttf"
 
 let font_info size =
   Printf.printf "------- Font data for size %i -------\n%!" size;
-  Printf.printf "\t Ascent   : %i\n%!" (Text.Font.ascent  font size);
-  Printf.printf "\t Descent  : %i\n%!" (Text.Font.descent font size);
-  Printf.printf "\t Line gap : %i\n%!" (Text.Font.linegap font size);
-  Printf.printf "\t Spacing  : %i\n%!" (Text.Font.spacing font size);
+  Printf.printf "\t Ascent   : %i\n%!" (Font.ascent  font size);
+  Printf.printf "\t Descent  : %i\n%!" (Font.descent font size);
+  Printf.printf "\t Line gap : %i\n%!" (Font.linegap font size);
+  Printf.printf "\t Spacing  : %i\n%!" (Font.spacing font size);
   Printf.printf "-------------------------------------\n\n%!"
 
 let print_glyph c size =
-  let glyph = Text.Font.glyph font (`Char c) size false in
+  let glyph = Font.glyph font (`Char c) size false in
   Printf.printf "Character '%c' \n%!" c;
-  Printf.printf "\t Advance : %i\n%!" (Text.Glyph.advance glyph);
+  Printf.printf "\t Advance : %i\n%!" (Font.Glyph.advance glyph);
   Printf.printf "\t Bearing : X = %i, Y = %i\n%!"
-      ((Text.Glyph.bearing glyph).OgamlMath.Vector2i.x)
-      ((Text.Glyph.bearing glyph).OgamlMath.Vector2i.y);
+      ((Font.Glyph.bearing glyph).OgamlMath.Vector2i.x)
+      ((Font.Glyph.bearing glyph).OgamlMath.Vector2i.y);
   Printf.printf "\t Bounds  : X = %i, Y = %i, W = %i, H = %i\n%!"
-      ((Text.Glyph.rect glyph).OgamlMath.IntRect.x)
-      ((Text.Glyph.rect glyph).OgamlMath.IntRect.y)
-      ((Text.Glyph.rect glyph).OgamlMath.IntRect.width)
-      ((Text.Glyph.rect glyph).OgamlMath.IntRect.height);
+      ((Font.Glyph.rect glyph).OgamlMath.IntRect.x)
+      ((Font.Glyph.rect glyph).OgamlMath.IntRect.y)
+      ((Font.Glyph.rect glyph).OgamlMath.IntRect.width)
+      ((Font.Glyph.rect glyph).OgamlMath.IntRect.height);
   Printf.printf "\n%!"
 
 let print_kerning c1 c2 size =
-  let kern = Text.Font.kerning font (`Char c1) (`Char c2) size in
+  let kern = Font.kerning font (`Char c1) (`Char c2) size in
   Printf.printf "Kerning %c%c : %i\n\n%!" c1 c2 kern
 
 let () =
@@ -44,9 +44,8 @@ let () =
   print_kerning 'A' 'B' 25;
   print_endline "";
   for i = 0 to 255 do
-    Text.Font.glyph font (`Code i) 25 false |> ignore
-  done;
-  Text.Font.update font 25
+    Font.glyph font (`Code i) 25 false |> ignore
+  done
 
 (* let vertex_shader_source_tex_130 = "
   uniform vec2 size;
@@ -92,17 +91,17 @@ let program =
     VertexArray.Source.(empty ~position:"position" ~texcoord:"uv" ~size:12 ())
   in
   String.iteri (fun i c ->
-    let glyph = Text.Font.glyph font (`Char c) 25 false in
+    let glyph = Font.Font.glyph font (`Char c) 25 false in
     let v = VertexArray.Vertex.create
      ~position:Vector3f.({ x = 250. +. (float_of_int i) *. 25. ; y = 250. ; z = 0. })
-     ~texcoord:(Vector2f.from_int (Text.Glyph.bearing glyph))
+     ~texcoord:(Vector2f.from_int (Font.Glyph.bearing glyph))
      ()
     in source := VertexArray.Source.((!source) << v)
   ) "Hello, world" ;
   VertexArray.static (!source) *)
 
 let draw () =
-  let texture = Text.Font.texture font 25 in
+  let texture = Font.texture font 25 in
   let sprite = Sprite.create ~texture () in
   Sprite.draw ~sprite ~window ()
   (* let size = Window.size window in
