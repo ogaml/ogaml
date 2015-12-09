@@ -9,8 +9,15 @@ let window =
 let font = Font.load "examples/font2.ttf"
 
 let txt = Text.create 
-  ~text:"Hello World ! Coucou ! gAV@#"
+  ~text:"Hello, World ! Coucou ! gAV@#"
   ~position:Vector2i.({x = 50; y = 50 + (int_of_float (Font.ascent font 50))})
+  ~font
+  ~size:50
+  ~bold:false 
+
+let txt2 = Text.create 
+  ~text:"Essayons de rajouter plein de caractères à la texture pour voir &é\"'(-è_çà)="
+  ~position:Vector2i.({x = 50; y = 350 + (int_of_float (Font.ascent font 50))})
   ~font
   ~size:50
   ~bold:false 
@@ -33,6 +40,7 @@ let draw () =
                       ()
   in
   Text.draw ~parameters ~window ~text:txt ();
+  Text.draw ~parameters ~window ~text:txt2 ();
   Shape.draw ~parameters ~window ~shape:border ()
 
 let rec event_loop () =

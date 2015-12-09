@@ -25,12 +25,11 @@ let apply_transformations position origin rotation scale point =
   })
   |> fun point ->
   (* Rotation *)
-  let theta = rotation *. Constants.pi /. 180. in
   Vector2f.({
-    x = cos(theta) *. (point.x-.position.x) -.
-        sin(theta) *. (point.y-.position.y) +. position.x ;
-    y = sin(theta) *. (point.x-.position.x) +.
-        cos(theta) *. (point.y-.position.y) +. position.y
+    x = cos(rotation) *. (point.x-.position.x) -.
+        sin(rotation) *. (point.y-.position.y) +. position.x ;
+    y = sin(rotation) *. (point.x-.position.x) +.
+        cos(rotation) *. (point.y-.position.y) +. position.y
   })
 
 let get_vertices size position origin rotation scale =
@@ -135,7 +134,7 @@ let translate sprite delta =
   update sprite
 
 let rotate sprite delta =
-  mod_float (sprite.rotation +. delta) 360.
+  mod_float (sprite.rotation +. delta) (2. *. Constants.pi)
   |> set_rotation sprite
 
 let scale sprite scale =

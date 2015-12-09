@@ -67,9 +67,9 @@ module Texture2D = struct
       data;
     (* Set the parameters *)
     GL.Texture.parameter2D 
-      (`Magnify GLTypes.MagnifyFilter.Nearest);
+      (`Magnify GLTypes.MagnifyFilter.Linear);
     GL.Texture.parameter2D
-      (`Minify  GLTypes.MinifyFilter.Nearest);
+      (`Minify  GLTypes.MinifyFilter.Linear);
     (* Unbind and return the texture *)
     GL.Texture.bind GLTypes.TextureTarget.Texture2D None;
     tex
