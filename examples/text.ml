@@ -10,14 +10,14 @@ let font = Font.load "examples/font2.ttf"
 
 let txt = Text.create 
   ~text:"Hello World ! Coucou ! gAV@#"
-  ~position:Vector2i.({x = 50; y = 50})
+  ~position:Vector2i.({x = 50; y = 50 + (int_of_float (Font.ascent font 50))})
   ~font
-  ~size:20
+  ~size:50
   ~bold:false 
 
 let border = Shape.create_rectangle
   ~position:Vector2i.({x = 50; y = 50})
-  ~size:Vector2i.({x = 300; y = 20})
+  ~size:Vector2i.({x = 600; y = 50})
   ~color:(`RGB Color.RGB.transparent)
   ~border_color:(`RGB Color.RGB.red)
   ~thickness:2.

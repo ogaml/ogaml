@@ -69,9 +69,9 @@ module Shelf = struct
       s.row_height <- new_height;
       s.row_width <- s.row_width + w + 2;
       IntRect.({x = s.row_width - w - 1;
-                y = s.height;
-                width  = w + 1;
-                height = h + 1})
+                y = s.height + 1;
+                width  = w;
+                height = h})
     end else begin
       let new_full = Image.create (`Empty (s.width,(s.height + s.row_height + 1),(`RGB Color.RGB.transparent))) in
       Image.blit s.full new_full Vector2i.({x = 0; y = 0});
@@ -83,8 +83,8 @@ module Shelf = struct
       s.row_height <- h;
       IntRect.({x = 0;
                 y = s.height;
-                width  = w + 1;
-                height = h + 1})
+                width  = w;
+                height = h})
     end
 
   let texture s =
@@ -184,12 +184,12 @@ let get_size (t : t) s =
     load_size t s
 
 
-let load_glyph_return (t : t) s c b =
+let load_glyph_return (t : t) s c b oversampling =
   let page  = get_size t s in
   let glyph =
     let (advance, lbear) = Internal.char_h_metrics t.internal c in
     let rect = Internal.char_box t.internal c in
-    let (bmp,w,h) = Internal.bitmap t.internal c page.scale in
+    let (bmp,w,h) = Internal.bitmap t.internal c (float_of_int oversampling *. page.scale) in
     let bmp = Internal.convert_1chan_bitmap bmp in
     let uv = Shelf.add page.shelf (Image.create (`Data (w,h,bmp))) in
     {
@@ -239,7 +239,7 @@ let glyph (t : t) c size bold =
   in
   try IntMap.find (code_to_int c) glyphs
   with Not_found ->
-    load_glyph_return t size (code_to_int c) bold
+    load_glyph_return t size (code_to_int c) bold 4
 
 
 let load_glyph (t : t) c s b = 
