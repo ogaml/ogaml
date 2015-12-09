@@ -12,11 +12,19 @@ let txt = Text.create
   ~text:"Hello World ! Coucou ! gAV@#"
   ~position:Vector2i.({x = 50; y = 50})
   ~font
-  ~size:50
+  ~size:20
   ~bold:false 
 
+let border = Shape.create_rectangle
+  ~position:Vector2i.({x = 50; y = 50})
+  ~size:Vector2i.({x = 300; y = 20})
+  ~color:(`RGB Color.RGB.transparent)
+  ~border_color:(`RGB Color.RGB.red)
+  ~thickness:2.
+  ()
+
 let aa = ref true
- 
+
 let draw () =
   let parameters = DrawParameter.make 
                       ~depth_test:false 
@@ -24,7 +32,8 @@ let draw () =
                       ~blend_mode:(DrawParameter.BlendMode.alpha)
                       ()
   in
-  Text.draw ~parameters ~window ~text:txt ()
+  Text.draw ~parameters ~window ~text:txt ();
+  Shape.draw ~parameters ~window ~shape:border ()
 
 let rec event_loop () =
   match Window.poll_event window with

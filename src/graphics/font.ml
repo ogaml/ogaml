@@ -69,9 +69,9 @@ module Shelf = struct
       s.row_height <- new_height;
       s.row_width <- s.row_width + w + 2;
       IntRect.({x = s.row_width - w - 1;
-                y = s.height + 1;
-                width  = w;
-                height = h})
+                y = s.height;
+                width  = w + 1;
+                height = h + 1})
     end else begin
       let new_full = Image.create (`Empty (s.width,(s.height + s.row_height + 1),(`RGB Color.RGB.transparent))) in
       Image.blit s.full new_full Vector2i.({x = 0; y = 0});
@@ -82,9 +82,9 @@ module Shelf = struct
       s.row_width <- w;
       s.row_height <- h;
       IntRect.({x = 0;
-                y = s.height + 1;
-                width  = w;
-                height = h})
+                y = s.height;
+                width  = w + 1;
+                height = h + 1})
     end
 
   let texture s =

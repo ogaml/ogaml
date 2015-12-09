@@ -8,7 +8,7 @@ type t = {
 }
 
 let create ~text ~position ~font ~size ~bold =
-  let position = Vector2f.from_int position in
+  let position = Vector2f.(add (from_int position) {x = 0.; y = Font.ascent font size}) in
   let length = String.length text in
   let rec iter i =
     if i >= length then []
