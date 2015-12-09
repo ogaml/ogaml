@@ -178,7 +178,7 @@ let fragment_shader_source_text_130 = "
 
   void main() {
 
-    color = texture2D(atlas, frag_uv);
+    color = texture(atlas, frag_uv);
 
   }
 "
@@ -328,8 +328,8 @@ module LL = struct
       GL.Pervasives.depthtest depth_testing
     end;
     let antialiasing = DrawParameter.antialiasing parameters in
-    if ContextSettings.aa_level win.settings > 0 
-      && antialiasing 
+    if ContextSettings.aa_level win.settings > 0
+      && antialiasing
       && State.LL.msaa state = false
     then begin
       State.LL.set_msaa state true;
