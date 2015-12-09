@@ -67,9 +67,9 @@ module Shelf = struct
       Image.blit glyph new_row Vector2i.({x = s.row_width + 1; y = 0});
       s.row <- new_row;
       s.row_height <- new_height;
-      s.row_width <- s.row_width + w + 1;
-      IntRect.({x = s.row_width - w + 1;
-                y = s.height;
+      s.row_width <- s.row_width + w + 2;
+      IntRect.({x = s.row_width - w - 1;
+                y = s.height + 1;
                 width  = w;
                 height = h})
     end else begin
@@ -78,7 +78,7 @@ module Shelf = struct
       Image.blit s.row new_full Vector2i.({x = 0; y = s.height + 1});
       s.full <- new_full;
       s.row  <- glyph;
-      s.height <- (s.height + s.row_height + 1);
+      s.height <- (s.height + s.row_height + 2);
       s.row_width <- w;
       s.row_height <- h;
       IntRect.({x = 0;
@@ -88,9 +88,9 @@ module Shelf = struct
     end
 
   let texture s =
-    let global = Image.create (`Empty (s.width, s.height + s.row_height, `RGB Color.RGB.transparent)) in
+    let global = Image.create (`Empty (s.width, s.height + s.row_height + 1, `RGB Color.RGB.transparent)) in
     Image.blit s.full global Vector2i.zero;
-    Image.blit s.row global Vector2i.({x = 0; y = s.height});
+    Image.blit s.row global Vector2i.({x = 0; y = s.height + 1});
     Texture.Texture2D.create (`Image global)
 
 end

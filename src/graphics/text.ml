@@ -3,7 +3,7 @@ open OgamlMath
 type t = {
   font     : Font.t;
   size     : int;
-  chars    : (Font.code * Font.Glyph.t) list ;
+  chars    : (float * Font.code * Font.Glyph.t) list ;
   vertices : VertexArray.static VertexArray.t 
 }
 
@@ -12,17 +12,24 @@ let create ~text ~position ~font ~size ~bold =
   let length = String.length text in
   let rec iter i =
     if i >= length then []
-    else begin
+    else if i >= length - 1 then begin
       let code = (`Char text.[i]) in
       let glyph = Font.glyph font code size bold in
-      (code,glyph) :: (iter (i+1))
+      [0.,code,glyph]
+    end
+    else begin
+      let code = (`Char text.[i]) in
+      let code' = (`Char text.[i+1]) in
+      let glyph = Font.glyph font code size bold in
+      let kern = Font.kerning font code code' size in
+      (kern,code,glyph) :: (iter (i+1))
     end
   in
   let chars = iter 0 in
   let vertices,advance =
     let lift v = Vector3f.lift v in
     List.fold_left
-      (fun (source, advance_vec) (code,glyph) ->
+      (fun (source, advance_vec) (kern,code,glyph) ->
         let bearing = Font.Glyph.bearing glyph in
         let bearingX = Vector2f.({ x = bearing.x ; y = 0. })
         and bearingY = Vector2f.({ x = 0. ; y = bearing.y }) in
@@ -65,7 +72,7 @@ let create ~text ~position ~font ~size ~bold =
           source << v1 << v2 << v3
                  << v3 << v1 << v4
         ),
-        Vector2f.(add advance_vec { x = Font.Glyph.advance glyph ; y = 0. })
+        Vector2f.(add advance_vec { x = Font.Glyph.advance glyph +. kern ; y = 0. })
       )
       (
         VertexArray.Source.(

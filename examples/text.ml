@@ -1,30 +1,43 @@
 open OgamlGraphics
 open OgamlMath
 
-let settings = OgamlCore.ContextSettings.create ()
+let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Font sets tests"
 
-let font = Font.load "examples/font1.ttf"
+let font = Font.load "examples/font2.ttf"
 
 let txt = Text.create 
-  ~text:"Hello World ! Coucou !"
+  ~text:"Hello World ! Coucou ! gAV@#"
   ~position:Vector2i.({x = 50; y = 50})
   ~font
   ~size:50
   ~bold:false 
+
+let aa = ref true
  
 let draw () =
-  Text.draw ~window ~text:txt ()
+  let parameters = DrawParameter.make 
+                      ~depth_test:false 
+                      ~antialiasing:!aa 
+                      ~blend_mode:(DrawParameter.BlendMode.alpha)
+                      ()
+  in
+  Text.draw ~parameters ~window ~text:txt ()
 
 let rec event_loop () =
   match Window.poll_event window with
-  |Some e -> OgamlCore.Event.(
+  |Some e -> OgamlCore.(Event.(
     match e with
     |Closed -> Window.close window
+    |KeyPressed ev -> begin
+      match ev.KeyEvent.key with
+      |Keycode.A -> aa := not !aa
+      | _ -> ()
+    end; event_loop ()
     | _     -> event_loop ()
-  )
+  ))
   |None -> ()
 
 let rec main_loop () =

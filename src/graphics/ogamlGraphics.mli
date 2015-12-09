@@ -418,9 +418,6 @@ module Font : sig
     * (equals ascent + linegap - descent) *)
   val spacing : t -> int -> float
 
-  (** TEMPORARY *)
-  val texture : t -> int -> Texture.Texture2D.t
-
 end
 
 
