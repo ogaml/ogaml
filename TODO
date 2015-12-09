@@ -31,6 +31,15 @@ OgamlGraphics:
   ☐ Floats in sprite, text and shape
   ☐ Size in sprite and shape ?
 
+Text:
+  ☐ Support newlines
+  ✔ Boundaries @done(2015-12-10 00:37) @project(Text)
+  ✔ Global advance @done(2015-12-10 00:09) @project(Text)
+  ☐ Colors
+  ☐ Letter transformations
+  ☐ Global transformations
+  ☐ Unicode handling
+
 Advanced features:
   ☐ More Image and Texture types:
     ☐ Single-channeled images
@@ -47,7 +56,7 @@ Add to interface:
   ✔ Image.create `Data @done(2015-12-08 10:38) @project(Add to interface)
   ✔ Image.blit @done(2015-12-08 10:35) @project(Add to interface)
 
-  
+
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
   ✔ Log system @done(2015-12-01 20:44) @project(OgamlCore)
