@@ -30,8 +30,12 @@ OgamlGraphics:
   ☐ Size-dependant oversampling in Font
   ☐ Floats in sprite, text and shape
   ☐ Size in sprite and shape ?
+  ☐ Matrix2D ?
+  ☐ Transformations as matrices in uniforms for sprite, shape and text
+  ☐ Vertex array (and map) slices (needed for batching)
 
 Advanced features:
+  ☐ UTF-8 Strings and conversions
   ☐ More Image and Texture types:
     ☐ Single-channeled images
     ☐ Texture3D
