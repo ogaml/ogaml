@@ -26,8 +26,6 @@ model.cmx : vertexArray.cmx ../math/vector3f.cmx ../math/vector2f.cmx \
     ../math/ogamlMath.cmi indexArray.cmx color.cmx model.cmi
 mouse.cmo : window.cmi ../core/ogamlCore.cmi ../core/LL.cmi mouse.cmi
 mouse.cmx : window.cmx ../core/ogamlCore.cmi ../core/LL.cmi mouse.cmi
-objParser.cmo : ../math/ogamlMath.cmi objAST.cmi objParser.cmi
-objParser.cmx : ../math/ogamlMath.cmi objAST.cmi objParser.cmi
 poly.cmo : vertexArray.cmi ../math/vector3f.cmi ../math/vector2f.cmi \
     ../math/ogamlMath.cmi color.cmi poly.cmi
 poly.cmx : vertexArray.cmx ../math/vector3f.cmx ../math/vector2f.cmx \
@@ -103,7 +101,6 @@ keyboard.cmi : ../core/ogamlCore.cmi
 model.cmi : vertexArray.cmi ../math/ogamlMath.cmi indexArray.cmi color.cmi
 mouse.cmi : window.cmi ../math/ogamlMath.cmi ../core/ogamlCore.cmi
 objAST.cmi : ../math/ogamlMath.cmi
-objParser.cmi : objAST.cmi
 ogamlGraphics.cmi : ../math/ogamlMath.cmi ../core/ogamlCore.cmi
 poly.cmi : vertexArray.cmi ../math/ogamlMath.cmi
 program.cmi : state.cmi GLTypes.cmi GL.cmi

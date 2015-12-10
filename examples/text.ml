@@ -32,14 +32,14 @@ let txt2' = Text.create
 let txt3pos = Vector2i.({ x = 50 ; y = 500 })
 
 let txt3 = Text.create
-  ~text:"Trying to see if advance......"
+  ~text:"Trying to see if\nadvance......"
   ~position:txt3pos
   ~font
   ~size:50
   ~bold:false
 
 let txt4 = Text.create
-  ~text:"and boundaries are working."
+  ~text:"and boundaries\nare working."
   ~position:(Vector2i.add (Vector2f.floor (Text.advance txt3)) txt3pos)
   ~font
   ~size:50
