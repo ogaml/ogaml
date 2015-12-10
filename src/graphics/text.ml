@@ -1,4 +1,5 @@
 open OgamlMath
+open OgamlCore
 
 type t = {
   font       : Font.t;
@@ -11,17 +12,18 @@ type t = {
 
 let create ~text ~position ~font ~size ~bold =
   let position = Vector2f.from_int position in
-  let length = String.length text in
+  let utf8 = UTF8String.from_string text in
+  let length = UTF8String.length utf8 in
   let rec iter i =
     if i >= length then []
     else if i >= length - 1 then begin
-      let code = (`Char text.[i]) in
+      let code = (`Code (UTF8String.get utf8 i)) in
       let glyph = Font.glyph font code size bold in
       [0.,code,glyph]
     end
     else begin
-      let code = (`Char text.[i]) in
-      let code' = (`Char text.[i+1]) in
+      let code = (`Code (UTF8String.get utf8 i)) in
+      let code' = (`Code (UTF8String.get utf8 (i+1))) in
       let glyph = Font.glyph font code size bold in
       let kern = Font.kerning font code code' size in
       (kern,code,glyph) :: (iter (i+1))
@@ -84,7 +86,7 @@ let create ~text ~position ~font ~size ~bold =
           empty
             ~position:"position"
             ~texcoord:"uv"
-            ~size:(String.length text)
+            ~size:((UTF8String.length utf8) * 6)
             ()
         ),
         Vector2f.zero,

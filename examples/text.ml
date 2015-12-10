@@ -6,7 +6,7 @@ let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Font sets tests"
 
-let font = Font.load "examples/font2.ttf"
+let font = Font.load "examples/font1.ttf"
 
 let txt = Text.create
   ~text:"Hello, World ! Coucou ! gAV@#"
@@ -16,8 +16,15 @@ let txt = Text.create
   ~bold:false
 
 let txt2 = Text.create
-  ~text:"Essayons de rajouter plein de caractères à la texture pour voir &é\"'(-è_çà)="
-  ~position:Vector2i.({x = 50; y = 350 + (int_of_float (Font.ascent font 50))})
+  ~text:"Unicode is working, YEAAH !!! "
+  ~position:Vector2i.({x = 50; y = 150 + (int_of_float (Font.ascent font 50))})
+  ~font
+  ~size:50
+  ~bold:false
+
+let txt2' = Text.create
+  ~text:"(•_•)  ( •_•)>⌐■-■  (⌐■_■)"
+  ~position:Vector2i.({x = 50; y = 250 + (int_of_float (Font.ascent font 50))})
   ~font
   ~size:50
   ~bold:false
@@ -67,6 +74,7 @@ let draw () =
   in
   Text.draw ~parameters ~window ~text:txt ();
   Text.draw ~parameters ~window ~text:txt2 ();
+  Text.draw ~parameters ~window ~text:txt2' ();
   Text.draw ~parameters ~window ~text:txt3 ();
   Text.draw ~parameters ~window ~text:txt4 ();
   Shape.draw ~parameters ~window ~shape:border ();

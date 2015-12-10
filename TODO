@@ -33,6 +33,9 @@ OgamlGraphics:
   ☐ Matrix2D ?
   ☐ Transformations as matrices in uniforms for sprite, shape and text
   ☐ Vertex array (and map) slices (needed for batching)
+  ☐ Vector and color maps 
+  ☐ Window coordinate conversions
+  ☐ Move UTF8String in Utils
 
 Text:
   ☐ Support newlines
@@ -44,7 +47,7 @@ Text:
   ☐ Unicode handling
 
 Advanced features:
-  ☐ UTF-8 Strings and conversions
+  ✔ UTF-8 Strings and conversions @done(2015-12-10 10:11) @project(Advanced features)
   ☐ More Image and Texture types:
     ☐ Single-channeled images
     ☐ Texture3D

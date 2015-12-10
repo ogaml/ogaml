@@ -42,6 +42,66 @@ module Log : sig
 end
 
 
+(** UTF-8 String representation and manipulation *)
+module UTF8String : sig
+
+  (** Type of a UTF-8 character code *)
+  type code = int
+
+  (** Type of a UTF-8 encoded string *)
+  type t
+
+  (** Raised when a string is not correctly encoded *)
+  exception UTF8_error of string
+
+  (** Raised when an operation violates the bounds of the string *)
+  exception Out_of_bounds of string
+
+  (** Empty UTF-8 string *)
+  val empty : unit -> t
+
+  (** Makes a UTF-8 string filled with one character
+    * 
+    * Raises UTF8_error if the code is not a valid UTF-8 character code *)
+  val make : int -> code -> t
+
+  (** Returns the ith character of a UTF-8 string *)
+  val get : t -> int -> code
+
+  (** Sets the ith character of a UTF-8 string.
+    *
+    * Raises UTF8_error if the code is not a valid UTF-8 character code *)
+  val set : t -> int -> code -> unit
+
+  (** Returns the length of a UTF-8 string *)
+  val length : t -> int
+
+  (** Returns the byte length of a UTF-8 string
+    * (the number of bytes required to encode it) *)
+  val byte_length : t -> int
+
+  (** Returns a UTF-8 encoded string from a string.
+    * 
+    * Raises UTF8_error if the string is not a valid UTF-8 encoding *)
+  val from_string : string -> t
+
+  (** Returns a string from a UTF-8 encoded string *)
+  val to_string : t -> string
+
+  (** Iterates through a UTF-8 string *)
+  val iter : t -> (code -> unit) -> unit
+
+  (** Folds a UTF-8 string *)
+  val fold : t -> (code -> 'a -> 'a) -> 'a -> 'a
+
+  (** Maps a UTF-8 string
+    *
+    * Raises UTF8_error if the function returns an invalid UTF-8 code *)
+  val map : t -> (code -> code) -> t
+
+end
+
+
 (** Mouse buttons *)
 module Button : sig
 

@@ -26,6 +26,8 @@ model.cmx : vertexArray.cmx ../math/vector3f.cmx ../math/vector2f.cmx \
     ../math/ogamlMath.cmi indexArray.cmx color.cmx model.cmi
 mouse.cmo : window.cmi ../core/ogamlCore.cmi ../core/LL.cmi mouse.cmi
 mouse.cmx : window.cmx ../core/ogamlCore.cmi ../core/LL.cmi mouse.cmi
+objParser.cmo : ../math/ogamlMath.cmi objAST.cmi objParser.cmi
+objParser.cmx : ../math/ogamlMath.cmi objAST.cmi objParser.cmi
 poly.cmo : vertexArray.cmi ../math/vector3f.cmi ../math/vector2f.cmi \
     ../math/ogamlMath.cmi color.cmi poly.cmi
 poly.cmx : vertexArray.cmx ../math/vector3f.cmx ../math/vector2f.cmx \
@@ -53,11 +55,13 @@ state.cmo : ../math/ogamlMath.cmi GL.cmi drawParameter.cmi color.cmi \
 state.cmx : ../math/ogamlMath.cmi GL.cmx drawParameter.cmx color.cmx \
     state.cmi
 text.cmo : window.cmi vertexArray.cmi ../math/vector3f.cmi \
-    ../math/vector2f.cmi uniform.cmi texture.cmi ../math/ogamlMath.cmi \
-    font.cmi ../math/floatRect.cmi drawParameter.cmi drawMode.cmi text.cmi
+    ../math/vector2f.cmi uniform.cmi ../core/UTF8String.cmi texture.cmi \
+    ../math/ogamlMath.cmi ../core/ogamlCore.cmi font.cmi \
+    ../math/floatRect.cmi drawParameter.cmi drawMode.cmi text.cmi
 text.cmx : window.cmx vertexArray.cmx ../math/vector3f.cmx \
-    ../math/vector2f.cmx uniform.cmx texture.cmx ../math/ogamlMath.cmi \
-    font.cmx ../math/floatRect.cmx drawParameter.cmx drawMode.cmi text.cmi
+    ../math/vector2f.cmx uniform.cmx ../core/UTF8String.cmx texture.cmx \
+    ../math/ogamlMath.cmi ../core/ogamlCore.cmi font.cmx \
+    ../math/floatRect.cmx drawParameter.cmx drawMode.cmi text.cmi
 texture.cmo : state.cmi ../math/ogamlMath.cmi image.cmi GLTypes.cmi GL.cmi \
     texture.cmi
 texture.cmx : state.cmx ../math/ogamlMath.cmi image.cmx GLTypes.cmi GL.cmx \
@@ -99,6 +103,7 @@ keyboard.cmi : ../core/ogamlCore.cmi
 model.cmi : vertexArray.cmi ../math/ogamlMath.cmi indexArray.cmi color.cmi
 mouse.cmi : window.cmi ../math/ogamlMath.cmi ../core/ogamlCore.cmi
 objAST.cmi : ../math/ogamlMath.cmi
+objParser.cmi : objAST.cmi
 ogamlGraphics.cmi : ../math/ogamlMath.cmi ../core/ogamlCore.cmi
 poly.cmi : vertexArray.cmi ../math/ogamlMath.cmi
 program.cmi : state.cmi GLTypes.cmi GL.cmi
