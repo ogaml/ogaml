@@ -1,10 +1,12 @@
 open OgamlMath
 
 type t = {
-  font     : Font.t;
-  size     : int;
-  chars    : (float * Font.code * Font.Glyph.t) list ;
-  vertices : VertexArray.static VertexArray.t 
+  font       : Font.t;
+  size       : int;
+  chars      : (float * Font.code * Font.Glyph.t) list ;
+  vertices   : VertexArray.static VertexArray.t ;
+  advance    : Vector2f.t ;
+  boundaries : FloatRect.t
 }
 
 let create ~text ~position ~font ~size ~bold =
@@ -26,10 +28,10 @@ let create ~text ~position ~font ~size ~bold =
     end
   in
   let chars = iter 0 in
-  let vertices,advance =
+  let vertices,advance,width =
     let lift v = Vector3f.lift v in
     List.fold_left
-      (fun (source, advance_vec) (kern,code,glyph) ->
+      (fun (source, advance_vec, line_width) (kern,code,glyph) ->
         let bearing = Font.Glyph.bearing glyph in
         let bearingX = Vector2f.({ x = bearing.x ; y = 0. })
         and bearingY = Vector2f.({ x = 0. ; y = bearing.y }) in
@@ -72,7 +74,10 @@ let create ~text ~position ~font ~size ~bold =
           source << v1 << v2 << v3
                  << v3 << v1 << v4
         ),
-        Vector2f.(add advance_vec { x = Font.Glyph.advance glyph +. kern ; y = 0. })
+        Vector2f.(
+          add advance_vec { x = Font.Glyph.advance glyph +. kern ; y = 0. }
+        ),
+        line_width
       )
       (
         VertexArray.Source.(
@@ -82,23 +87,37 @@ let create ~text ~position ~font ~size ~bold =
             ~size:(String.length text)
             ()
         ),
-        Vector2f.zero
+        Vector2f.zero,
+        0.
       )
       chars
-    |> fun (source, advance) -> VertexArray.static source, advance
+    |> fun (source, advance, line_width) -> VertexArray.static source,
+                                       advance,
+                                       max advance.Vector2f.x line_width
   in
+  let boundaries = {
+    FloatRect.x      = position.Vector2f.x ;
+    FloatRect.y      = position.Vector2f.y
+                     -. (Font.ascent font size) ;
+    FloatRect.width  = width ;
+    FloatRect.height = advance.Vector2f.y
+                     +. (Font.ascent font size)
+                     -. (Font.descent font size)
+  } in
   {
-    font  ;
-    size  ;
-    chars ;
-    vertices
+    font     ;
+    size     ;
+    chars    ;
+    vertices ;
+    advance  ;
+    boundaries
   }
 
 
 let draw ?parameters:(parameters = DrawParameter.make
-                                    ~depth_test:false 
+                                    ~depth_test:false
                                     ~blend_mode:DrawParameter.BlendMode.alpha ())
-         ~text ~window () = 
+         ~text ~window () =
   let program = Window.LL.text_program window in
   let texture = Font.texture text.font text.size in
   let size = Vector2f.from_int (Window.size window) in
@@ -118,4 +137,6 @@ let draw ?parameters:(parameters = DrawParameter.make
         ~uniform
         ~mode:DrawMode.Triangles ()
 
+let advance text = text.advance
 
+let boundaries text = text.boundaries

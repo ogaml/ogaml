@@ -236,7 +236,7 @@ module DrawParameter : sig
 
   end
 
-  (** Creates a set of draw parameters with the following options : 
+  (** Creates a set of draw parameters with the following options :
     *
     * $culling$ specifies which face should be culled (defaults to $CullNone$)
     *
@@ -359,9 +359,9 @@ module Font : sig
   (** Representation of a character *)
   module Glyph : sig
 
-    (** This module encapsulates the data associated to a character's glyph. 
+    (** This module encapsulates the data associated to a character's glyph.
       *
-      * All coordinates are given relatively to the 
+      * All coordinates are given relatively to the
       * glyph's origin, and with an up-increasing Y coordinate *)
 
     (** Type of a glyph *)
@@ -384,7 +384,7 @@ module Font : sig
     * loads sizes and glyphs as requested by the user *)
 
   (** Type of a font *)
-  type t 
+  type t
 
   (** Type alias for a character given in ASCII or UTF-8 *)
   type code = [`Char of char | `Code of int]
@@ -392,13 +392,13 @@ module Font : sig
   (** Loads a font from a file *)
   val load : string -> t
 
-  (** $glyph font code size bold$ returns the glyph 
+  (** $glyph font code size bold$ returns the glyph
     * representing the character $code$ in $font$
     * of size $size$ and with the modifier $bold$ *)
   val glyph : t -> code -> int -> bool -> Glyph.t
 
-  (** Returns the kerning between two chars of 
-    * a given size, that is the horizontal offset 
+  (** Returns the kerning between two chars of
+    * a given size, that is the horizontal offset
     * that must be applied between the two glyphs
     * (usually negative) *)
   val kerning : t -> code -> code -> int -> float
@@ -406,7 +406,7 @@ module Font : sig
   (** Returns the coordinate above the baseline the font extends *)
   val ascent : t -> int -> float
 
-  (** Returns the coordinate below the baseline the font 
+  (** Returns the coordinate below the baseline the font
     * extends (usually negative) *)
   val descent : t -> int -> float
 
@@ -414,7 +414,7 @@ module Font : sig
     * and the ascent of the next line *)
   val linegap : t -> int -> float
 
-  (** Returns the space between the baseline of two lines 
+  (** Returns the space between the baseline of two lines
     * (equals ascent + linegap - descent) *)
   val spacing : t -> int -> float
 
@@ -793,7 +793,7 @@ module VertexArray : sig
   val length : 'a t -> int
 
   (** Draws a vertex array on a window using the given parameters.
-    * 
+    *
     * $uniform$ should provide the uniforms required by $program$ (defaults to empty)
     *
     * $parameters$ defaults to $DrawParameter.make ()$
@@ -954,7 +954,7 @@ module VertexMap : sig
   val length : 'a t -> int
 
   (** Draws a vertex map on a window using the given parameters.
-    * 
+    *
     * $uniform$ should provide the uniforms required by $program$ (defaults to empty)
     *
     * $parameters$ defaults to $DrawParameter.make ()$
@@ -1156,7 +1156,7 @@ module Shape : sig
 
   (** Draws a shape on a window using the given parameters.
     *
-    * $parameters$ defaults to $DrawParameter.make ~depth_test:false ~blend_mode:DrawParameter.BlendMode.alpha$ 
+    * $parameters$ defaults to $DrawParameter.make ~depth_test:false ~blend_mode:DrawParameter.BlendMode.alpha$
     *
     * @see:OgamlGraphics.DrawParameter
     * @see:OgamlGraphics.Window *)
@@ -1228,7 +1228,7 @@ module Sprite : sig
 
   (** Draws a sprite on a window using the given parameters.
     *
-    * $parameters$ defaults to $DrawParameter.make ~depth_test:false ~blend_mode:DrawParameter.BlendMode.alpha$ 
+    * $parameters$ defaults to $DrawParameter.make ~depth_test:false ~blend_mode:DrawParameter.BlendMode.alpha$
     *
     * @see:OgamlGraphics.DrawParameter
     * @see:OgamlGraphics.Window *)
@@ -1276,10 +1276,12 @@ end
 module Text : sig
 
   (** This module provides an efficient way to render
-    * text using openGL primitives *)
+    * text using openGL primitives. *)
 
+  (** The type of pre-rendered texts. *)
   type t
 
+  (** Creates a drawable text from the given string. *)
   val create :
     text : string ->
     position : OgamlMath.Vector2i.t ->
@@ -1288,7 +1290,20 @@ module Text : sig
     bold : bool ->
     t
 
-  val draw : ?parameters:DrawParameter.t -> text:t -> window:Window.t -> unit -> unit
+  (** Draws text on the screen. *)
+  val draw :
+    ?parameters : DrawParameter.t ->
+    text : t ->
+    window : Window.t ->
+    unit -> unit
+
+  (** The global advance of the text.
+    * Basically it is a vector such that if you add it to the position of
+    * text object, you get the position of the next character you would draw. *)
+  val advance : t -> OgamlMath.Vector2f.t
+
+  (** Returns a rectangle containing all the text. *)
+  val boundaries : t -> OgamlMath.FloatRect.t
 
 end
 

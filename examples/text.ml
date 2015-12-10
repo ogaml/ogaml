@@ -8,19 +8,45 @@ let window =
 
 let font = Font.load "examples/font2.ttf"
 
-let txt = Text.create 
+let txt = Text.create
   ~text:"Hello, World ! Coucou ! gAV@#"
   ~position:Vector2i.({x = 50; y = 50 + (int_of_float (Font.ascent font 50))})
   ~font
   ~size:50
-  ~bold:false 
+  ~bold:false
 
-let txt2 = Text.create 
+let txt2 = Text.create
   ~text:"Essayons de rajouter plein de caractères à la texture pour voir &é\"'(-è_çà)="
   ~position:Vector2i.({x = 50; y = 350 + (int_of_float (Font.ascent font 50))})
   ~font
   ~size:50
-  ~bold:false 
+  ~bold:false
+
+let txt3pos = Vector2i.({ x = 50 ; y = 500 })
+
+let txt3 = Text.create
+  ~text:"Trying to see if advance......"
+  ~position:txt3pos
+  ~font
+  ~size:50
+  ~bold:false
+
+let txt4 = Text.create
+  ~text:"and boundaries are working."
+  ~position:(Vector2i.add (Vector2f.floor (Text.advance txt3)) txt3pos)
+  ~font
+  ~size:50
+  ~bold:false
+
+let boundaries4 = Text.boundaries txt4
+
+let border4 = Shape.create_rectangle
+  ~position:(Vector2f.floor (FloatRect.position boundaries4))
+  ~size:(Vector2f.floor (FloatRect.size boundaries4))
+  ~color:(`RGB Color.RGB.transparent)
+  ~border_color:(`RGB Color.RGB.blue)
+  ~thickness:2.
+  ()
 
 let border = Shape.create_rectangle
   ~position:Vector2i.({x = 50; y = 50})
@@ -33,15 +59,18 @@ let border = Shape.create_rectangle
 let aa = ref true
 
 let draw () =
-  let parameters = DrawParameter.make 
-                      ~depth_test:false 
-                      ~antialiasing:!aa 
+  let parameters = DrawParameter.make
+                      ~depth_test:false
+                      ~antialiasing:!aa
                       ~blend_mode:(DrawParameter.BlendMode.alpha)
                       ()
   in
   Text.draw ~parameters ~window ~text:txt ();
   Text.draw ~parameters ~window ~text:txt2 ();
-  Shape.draw ~parameters ~window ~shape:border ()
+  Text.draw ~parameters ~window ~text:txt3 ();
+  Text.draw ~parameters ~window ~text:txt4 ();
+  Shape.draw ~parameters ~window ~shape:border ();
+  Shape.draw ~parameters ~window ~shape:border4 ()
 
 let rec event_loop () =
   match Window.poll_event window with
