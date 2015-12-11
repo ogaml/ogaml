@@ -153,8 +153,10 @@ let vertex_shader_source_text_130 = "
 
   in vec3 position;
   in vec2 uv;
+  in vec4 color;
 
   out vec2 frag_uv;
+  out vec4 frag_color;
 
   void main() {
 
@@ -166,6 +168,8 @@ let vertex_shader_source_text_130 = "
     frag_uv.x = uv.x / atlas_size.x;
     frag_uv.y = uv.y / atlas_size.y;
 
+    frag_color = color;
+
   }
 "
 
@@ -173,12 +177,13 @@ let fragment_shader_source_text_130 = "
   uniform sampler2D atlas;
 
   in vec2 frag_uv;
+  in vec4 frag_color;
 
   out vec4 color;
 
   void main() {
 
-    color = texture(atlas, frag_uv);
+    color = texture(atlas, frag_uv) * frag_color;
 
   }
 "

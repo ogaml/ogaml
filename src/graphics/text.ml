@@ -30,6 +30,8 @@ let create ~text ~position ~font ~size ~bold =
     end
   in
   let chars = iter 0 in
+  (* Then we need to change it or get one per glyph *)
+  let color = `RGB (Color.RGB.magenta) in
   let vertices,advance,width =
     let lift v = Vector3f.lift v in
     List.fold_left
@@ -64,21 +66,25 @@ let create ~text ~position ~font ~size ~bold =
            VertexArray.Vertex.create
              ~position:(lift corner)
              ~texcoord:Vector2f.({ x = uvx ; y = uvy })
+             ~color
              ()
          and v2 =
            VertexArray.Vertex.create
              ~position:(lift Vector2f.(add corner width))
              ~texcoord:Vector2f.({ x = uvx +. uvw ; y = uvy })
+             ~color
              ()
          and v3 =
            VertexArray.Vertex.create
              ~position:(lift Vector2f.(add corner (add width height)))
              ~texcoord:Vector2f.({ x = uvx +. uvw ; y = uvy +. uvh })
+             ~color
              ()
          and v4 =
            VertexArray.Vertex.create
              ~position:(lift Vector2f.(add corner height))
              ~texcoord:Vector2f.({ x = uvx ; y = uvy +. uvh })
+             ~color
              ()
          in
          VertexArray.Source.(
@@ -95,6 +101,7 @@ let create ~text ~position ~font ~size ~bold =
           empty
             ~position:"position"
             ~texcoord:"uv"
+            ~color:"color"
             ~size:((UTF8String.length utf8) * 6)
             ()
         ),

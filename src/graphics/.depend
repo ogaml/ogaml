@@ -55,11 +55,11 @@ state.cmx : ../math/ogamlMath.cmi GL.cmx drawParameter.cmx color.cmx \
 text.cmo : window.cmi vertexArray.cmi ../math/vector3f.cmi \
     ../math/vector2f.cmi uniform.cmi ../core/UTF8String.cmi texture.cmi \
     ../math/ogamlMath.cmi ../core/ogamlCore.cmi font.cmi \
-    ../math/floatRect.cmi drawParameter.cmi drawMode.cmi text.cmi
+    ../math/floatRect.cmi drawParameter.cmi drawMode.cmi color.cmi text.cmi
 text.cmx : window.cmx vertexArray.cmx ../math/vector3f.cmx \
     ../math/vector2f.cmx uniform.cmx ../core/UTF8String.cmx texture.cmx \
     ../math/ogamlMath.cmi ../core/ogamlCore.cmi font.cmx \
-    ../math/floatRect.cmx drawParameter.cmx drawMode.cmi text.cmi
+    ../math/floatRect.cmx drawParameter.cmx drawMode.cmi color.cmx text.cmi
 texture.cmo : state.cmi ../math/ogamlMath.cmi image.cmi GLTypes.cmi GL.cmi \
     texture.cmi
 texture.cmx : state.cmx ../math/ogamlMath.cmi image.cmx GLTypes.cmi GL.cmx \
