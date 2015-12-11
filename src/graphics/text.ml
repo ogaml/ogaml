@@ -10,7 +10,7 @@ type t = {
   boundaries : FloatRect.t
 }
 
-let create ~text ~position ~font ~size ~bold =
+let create ~text ~position ~font ?color:(color=(`RGB Color.RGB.black)) ~size ~bold () =
   let position = Vector2f.from_int position in
   let utf8 = UTF8String.from_string text in
   let length = UTF8String.length utf8 in
@@ -30,8 +30,6 @@ let create ~text ~position ~font ~size ~bold =
     end
   in
   let chars = iter 0 in
-  (* Then we need to change it or get one per glyph *)
-  let color = `RGB (Color.RGB.magenta) in
   let vertices,advance,width =
     let lift v = Vector3f.lift v in
     List.fold_left

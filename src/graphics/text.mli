@@ -4,9 +4,10 @@ val create :
   text : string ->
   position : OgamlMath.Vector2i.t ->
   font : Font.t ->
+  ?color : Color.t ->
   size : int ->
   bold : bool ->
-  t
+  unit -> t
 
 val draw :
   ?parameters : DrawParameter.t ->

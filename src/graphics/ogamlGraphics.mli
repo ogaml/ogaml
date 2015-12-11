@@ -1286,9 +1286,10 @@ module Text : sig
     text : string ->
     position : OgamlMath.Vector2i.t ->
     font : Font.t ->
+    ?color : Color.t ->
     size : int ->
     bold : bool ->
-    t
+    unit -> t
 
   (** Draws text on the screen. *)
   val draw :

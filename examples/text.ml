@@ -14,6 +14,7 @@ let txt = Text.create
   ~font
   ~size:50
   ~bold:false
+  ()
 
 let txt2 = Text.create
   ~text:"Unicode is working, YEAAH !!! "
@@ -21,6 +22,7 @@ let txt2 = Text.create
   ~font
   ~size:50
   ~bold:false
+  ()
 
 let txt2' = Text.create
   ~text:"(•_•)  ( •_•)>⌐■-■  (⌐■_■)"
@@ -28,6 +30,7 @@ let txt2' = Text.create
   ~font
   ~size:50
   ~bold:false
+  ()
 
 let txt3pos = Vector2i.({ x = 50 ; y = 500 })
 
@@ -37,6 +40,7 @@ let txt3 = Text.create
   ~font
   ~size:50
   ~bold:false
+  ()
 
 let txt4 = Text.create
   ~text:"and boundaries\nare working."
@@ -44,6 +48,7 @@ let txt4 = Text.create
   ~font
   ~size:50
   ~bold:false
+  ()
 
 let boundaries4 = Text.boundaries txt4
 
@@ -96,7 +101,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(`RGB Color.RGB.black) window;
+    Window.clear ~color:(`RGB Color.RGB.magenta) window;
     draw ();
     Window.display window;
     event_loop ();

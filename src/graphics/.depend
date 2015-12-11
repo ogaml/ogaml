@@ -108,7 +108,8 @@ shape.cmi : window.cmi ../math/ogamlMath.cmi drawParameter.cmi color.cmi
 sprite.cmi : window.cmi texture.cmi ../math/ogamlMath.cmi drawParameter.cmi
 state.cmi : ../math/ogamlMath.cmi GLTypes.cmi GL.cmi drawParameter.cmi \
     color.cmi
-text.cmi : window.cmi ../math/ogamlMath.cmi font.cmi drawParameter.cmi
+text.cmi : window.cmi ../math/ogamlMath.cmi font.cmi drawParameter.cmi \
+    color.cmi
 texture.cmi : state.cmi ../math/ogamlMath.cmi image.cmi
 uniform.cmi : texture.cmi state.cmi program.cmi ../math/ogamlMath.cmi \
     color.cmi
