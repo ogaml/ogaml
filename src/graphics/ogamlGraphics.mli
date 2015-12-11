@@ -686,6 +686,10 @@ module VertexArray : sig
     * attribute that has not been declared in the GLSL program *)
   exception Missing_attribute of string
 
+  (** Raised when trying to draw an invalid slice of a vertex array *)
+  exception Out_of_bounds of string
+
+
   (** Represents a vertex *)
   module Vertex : sig
 
@@ -792,7 +796,12 @@ module VertexArray : sig
   (** Returns the length of a vertex array *)
   val length : 'a t -> int
 
-  (** Draws a vertex array on a window using the given parameters.
+  (** Draws the slice starting at $start$ of length $length$ of a vertex array on a 
+    * window using the given parameters. 
+    *
+    * $start$ defaults to 0
+    *
+    * if $length$ is not provided, then the whole vertex array (starting from $start$) is drawn
     *
     * $uniform$ should provide the uniforms required by $program$ (defaults to empty)
     *
@@ -808,6 +817,8 @@ module VertexArray : sig
     program    : Program.t ->
     ?uniform    : Uniform.t ->
     ?parameters : DrawParameter.t ->
+    ?start     : int ->
+    ?length    : int ->
     mode       : DrawMode.t ->
     unit -> unit
 
@@ -836,6 +847,10 @@ module VertexMap : sig
   (** Raised when trying to draw with a vertex map containing an
     * attribute that has not been declared in the GLSL program *)
   exception Missing_attribute of string
+
+  (** Raised when trying to draw an invalid slice of a vertex map *)
+  exception Out_of_bounds of string
+
 
   (** Represents a vertex *)
   module Vertex : sig

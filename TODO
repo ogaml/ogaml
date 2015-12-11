@@ -36,6 +36,7 @@ OgamlGraphics:
   ☐ Vector and color maps 
   ☐ Window coordinate conversions
   ☐ Move UTF8String in Utils
+  ☐ Fix fullscreen mashing
 
 Text:
   ☐ Support newlines

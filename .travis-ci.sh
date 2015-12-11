@@ -30,4 +30,4 @@ make install
 make clean
 make examples
 make uninstall
-
+glxinfo
