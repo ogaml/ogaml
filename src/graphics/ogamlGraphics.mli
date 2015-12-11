@@ -968,7 +968,12 @@ module VertexMap : sig
   (** Returns the length of a vertex map *)
   val length : 'a t -> int
 
-  (** Draws a vertex map on a window using the given parameters.
+  (** Draws the slice starting at $start$ of length $length$ of a vertex map on a 
+    * window using the given parameters. 
+    *
+    * $start$ defaults to 0
+    *
+    * if $length$ is not provided, then the whole vertex map (starting from $start$) is drawn
     *
     * $uniform$ should provide the uniforms required by $program$ (defaults to empty)
     *
@@ -984,6 +989,8 @@ module VertexMap : sig
     program    : Program.t ->
     ?uniform    : Uniform.t ->
     ?parameters : DrawParameter.t ->
+    ?start     : int ->
+    ?length    : int ->
     mode       : DrawMode.t ->
     unit -> unit
 
