@@ -8,12 +8,12 @@ Cocoa specific:
   ☐ Add some option to switch between Ctrl and Cmd @question
   ☐ Add some function to handle keyRepeatDelay and keyRepeatInterval for NSEvent
   ☐ Consider converting every event to OGEvent before pushing (instead of having both NSEvent and OGEvent) @unsure
-  ☐ Update the view (and probably other things) when resizing
+  ✔ Update the view (and probably other things) when resizing @done(2015-12-11 11:13) @project(Cocoa specific)
   ☐ Handle left/right modifiers for keycodes
   ☐ Apparently modifiers do not raise keyDown at all so we have to deal with it
   ☐ Discuss the possibility to dissociate mouse and cursor to get delta events @source(https://developer.apple.com/library/mac/documentation/GraphicsImaging/Reference/Quartz_Services_Ref/#//apple_ref/c/func/CGAssociateMouseAndMouseCursorPosition)
   ☐ Differentiate between Middle and Other for mouse
-  ☐ Check if window size is in points instead of pixels
+  ✔ Check if window size is in points instead of pixels @done(2015-12-11 11:14) @project(Cocoa specific)
   ☐ Window doesn't resign being key on mission control
 
 Future work on Model:
@@ -32,16 +32,18 @@ OgamlGraphics:
   ☐ Size in sprite and shape ?
   ☐ Matrix2D ?
   ☐ Transformations as matrices in uniforms for sprite, shape and text
-  ☐ Vertex array (and map) slices (needed for batching)
-  ☐ Vector and color maps
+  ✔ Vertex array (and map) slices (needed for batching) @done(2015-12-11 10:29) @project(OgamlGraphics)
+  ✔ Test VAO slices @done(2015-12-11 11:13) @project(OgamlGraphics)
+  ☐ Vector and color maps 
   ☐ Window coordinate conversions
   ☐ Move UTF8String in Utils
+  ☐ Fix fullscreen mashing
 
 Text:
   ✔ Support newlines @done(2015-12-10 15:47) @project(Text)
   ✔ Boundaries @done(2015-12-10 00:37) @project(Text)
   ✔ Global advance @done(2015-12-10 00:09) @project(Text)
-  ☐ Colors
+  ✔ Colors @done(2015-12-11 11:14) @project(Text)
   ☐ Letter transformations
   ☐ Global transformations
   ✔ Unicode handling @done(2015-12-10 15:47) @project(Text)

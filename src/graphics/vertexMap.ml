@@ -7,6 +7,8 @@ exception Invalid_attribute of string
 
 exception Missing_attribute of string
 
+exception Out_of_bounds of string
+
 
 module StringMap = Map.Make (struct
 
@@ -289,17 +291,36 @@ let bind state t prog =
 let draw ~vertices ~window ?indices ~program
          ?uniform:(uniform = Uniform.empty) 
          ?parameters:(parameters = DrawParameter.make ()) 
+         ?start ?length
          ~mode () =
   let state = Window.state window in
+  let start = 
+    match start with
+    |None -> 0
+    |Some i -> i
+  in
+  let length = 
+    match length, indices with
+    |None, None     -> vertices.length - start
+    |None, Some ebo -> IndexArray.length ebo - start
+    |Some l, _ -> l
+  in
   Window.LL.bind_draw_parameters window parameters;
   Program.LL.use state (Some program);
   Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind state uniform unif);
   bind state vertices program;
   match indices with
-  |None -> GL.VAO.draw mode 0 (length vertices)
+  |None -> 
+    if start < 0 || start + length > vertices.length then
+      raise (Out_of_bounds "Invalid vertex array bounds")
+    else GL.VAO.draw mode start length
   |Some ebo ->
-    IndexArray.LL.bind state ebo;
-    GL.VAO.draw_elements mode (IndexArray.length ebo)
+    if start < 0 || start + length > (IndexArray.length ebo) then
+      raise (Out_of_bounds "Invalid index array bounds")
+    else begin
+      IndexArray.LL.bind state ebo;
+      GL.VAO.draw_elements mode start length 
+    end
 
 
 

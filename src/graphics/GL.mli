@@ -328,7 +328,7 @@ module VAO : sig
   val draw : DrawMode.t -> int -> int -> unit
 
   (** Draws an element array using the currently bound VAO and EBO *)
-  val draw_elements : DrawMode.t -> int -> unit
+  val draw_elements : DrawMode.t -> int -> int -> unit
 
 end
 

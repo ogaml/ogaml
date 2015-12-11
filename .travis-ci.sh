@@ -16,7 +16,7 @@ esac
 
 sudo add-apt-repository -y ppa:$ppa
 sudo apt-get update -qq
-sudo apt-get install libX11-dev xorg-dev libgl1-mesa-dev libX11-xcb-dev
+sudo apt-get install libX11-dev xorg-dev libgl1-mesa-dev libX11-xcb-dev libosmesa6-dev mesa-utils freeglut3-dev 
 sudo apt-get install -qq ocaml ocaml-native-compilers camlp4-extra opam
 
 export OPAMYES=1
@@ -30,4 +30,4 @@ make install
 make clean
 make examples
 make uninstall
-
+glxinfo

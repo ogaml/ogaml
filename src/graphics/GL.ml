@@ -317,7 +317,7 @@ module VAO = struct
 
   external draw : DrawMode.t -> int -> int -> unit = "caml_draw_arrays"
 
-  external draw_elements : DrawMode.t -> int -> unit = "caml_draw_elements"
+  external draw_elements : DrawMode.t -> int -> int -> unit = "caml_draw_elements"
 
 end
 

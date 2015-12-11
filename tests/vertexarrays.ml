@@ -186,4 +186,4 @@ let () =
   test_vao7 ();
   Printf.printf "\tTest 7 passed\n%!";
   test_vao8 ();
-  Printf.printf "\tTest 8 passed\n%!";
+  Printf.printf "\tTest 8 passed\n%!"
