@@ -286,9 +286,10 @@ let draw ~vertices ~window ?indices ~program
     |Some i -> i
   in
   let length = 
-    match length with
-    |None -> vertices.length
-    |Some l -> l
+    match length, indices with
+    |None, None     -> vertices.length - start
+    |None, Some ebo -> IndexArray.length ebo - start
+    |Some l, _ -> l
   in
   Window.LL.bind_draw_parameters window parameters;
   Program.LL.use state (Some program);
@@ -296,11 +297,11 @@ let draw ~vertices ~window ?indices ~program
   bind state vertices program;
   match indices with
   |None -> 
-    if start < 0 || start + length >= vertices.length then
+    if start < 0 || start + length > vertices.length then
       raise (Out_of_bounds "Invalid vertex array bounds")
     else GL.VAO.draw mode start length
   |Some ebo ->
-    if start < 0 || start + length >= (IndexArray.length ebo) then
+    if start < 0 || start + length > (IndexArray.length ebo) then
       raise (Out_of_bounds "Invalid index array bounds")
     else begin
       IndexArray.LL.bind state ebo;

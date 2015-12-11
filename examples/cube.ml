@@ -25,7 +25,8 @@ let cube_source =
     ~normal:"in_normal"
     ~size:36 ()
   in
-  Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
+  Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) |> ignore;
+  Poly.cube src Vector3f.({x = 0.5; y = 1.5; z = -2.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
 
 let axis = VertexArray.static axis_source
 
@@ -75,7 +76,7 @@ let display () =
     |> Uniform.matrix3D "MVMatrix" mv
     |> Uniform.matrix3D "VMatrix" view
   in
-  VertexArray.draw ~window ~vertices:cube ~uniform ~program:normal_program ~parameters ~mode:DrawMode.Triangles ();
+  VertexArray.draw ~window ~vertices:cube ~uniform ~program:normal_program ~parameters ~start:36 ~mode:DrawMode.Triangles ();
   let uniform =
     Uniform.empty
     |> Uniform.matrix3D "MVPMatrix" vp
