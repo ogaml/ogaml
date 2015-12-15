@@ -16,6 +16,11 @@ module Fx = struct
 
   type ('a,'b,'c) full_it = ('a,'b) it * 'b * ('b -> 'c)
 
+  let forall c =
+    (fun _ v k -> k (c :: v)),
+    [],
+    (fun x -> x)
+
   (* This function has type ('a,'b) it -> 'b -> 'a list -> 'b *)
   let rec iter f v = function
     | e :: r -> f e v (fun v -> iter f v r)

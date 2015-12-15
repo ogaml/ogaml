@@ -1310,6 +1310,8 @@ module Text : sig
     (* The type of pre-rendered customised texts. *)
     type t
 
+    (*** Iterators *)
+
     (** The type of an iterator.
       * The idea behind it is that $'a$ is the type of objects that we
       * manipulate (eg. $Font.code$) while $'b$ is the type of the value
@@ -1322,6 +1324,10 @@ module Text : sig
       * post-treatment function, typically to forget information that was useful
       * to the computation but is irrelevant as a value. *)
     type ('a,'b,'c) full_it = ('a,'b) it * 'b * ('b -> 'c)
+
+    (** This creates a simple iterator that will return a constant for each
+      * value in the iterated list. *)
+    val forall : 'c -> ('a,'c list,'c list) full_it
 
     (** Creates a drawable text with strongly customisable parameters. *)
     val create :

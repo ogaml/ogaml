@@ -6,6 +6,8 @@ module Fx : sig
 
   type ('a,'b,'c) full_it = ('a,'b) it * 'b * ('b -> 'c)
 
+  val forall : 'c -> ('a,'c list,'c list) full_it
+
   (* TODO: Exception when the iterator doesn't return list of right size *)
   val create :
     text : string ->

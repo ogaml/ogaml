@@ -73,8 +73,8 @@ let fxtxt = Text.Fx.create
   ~position:Vector2f.({ x = 700. ; y = 700. })
   ~font
   ~size:25
-  (* Probably some rev problems *)
-  ~colors:(
+  ~colors:(Text.Fx.forall (`RGB Color.RGB.yellow))
+  (* ~colors:(
     (fun code v k ->
       match code with
       | `Code i when i = Char.code 's' || i = Char.code 't' ->
@@ -83,7 +83,7 @@ let fxtxt = Text.Fx.create
     ),
     [],
     (fun x -> List.rev x)
-  )
+  ) *)
   ()
 
 let aa = ref false
