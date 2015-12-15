@@ -68,7 +68,25 @@ let border = Shape.create_rectangle
   ~thickness:2.
   ()
 
-let aa = ref true
+let fxtxt = Text.Fx.create
+  ~text:"Awesome text!"
+  ~position:Vector2f.({ x = 700. ; y = 700. })
+  ~font
+  ~size:25
+  (* Probably some rev problems *)
+  ~colors:(
+    (fun code v k ->
+      match code with
+      | `Code i when i = Char.code 's' || i = Char.code 't' ->
+        k ((`RGB Color.RGB.red) :: v)
+      | _ -> k ((`RGB Color.RGB.black) :: v)
+    ),
+    [],
+    (fun x -> List.rev x)
+  )
+  ()
+
+let aa = ref false
 
 let draw () =
   let parameters = DrawParameter.make
@@ -82,6 +100,7 @@ let draw () =
   Text.draw ~parameters ~window ~text:txt2' ();
   Text.draw ~parameters ~window ~text:txt3 ();
   Text.draw ~parameters ~window ~text:txt4 ();
+  Text.Fx.draw ~parameters ~window ~text:fxtxt ();
   Shape.draw ~parameters ~window ~shape:border ();
   Shape.draw ~parameters ~window ~shape:border4 ()
 

@@ -30,7 +30,10 @@ ifeq ($(UNAME), Darwin)
   OS_NAME = OSX
   OS_WIN_LIB = cocoa
   GLOBAL_OBJCOPTS = -fconstant-string-class=NSConstantString
+	# Without the following line, I don't get the warnings, but then it fails
+	# when compiling the examples...
   GLOBAL_CLIBS = -framework Foundation -framework Cocoa -framework Carbon -lobjc -framework openGL
+	# GLOBAL_CLIBS =
 endif
 
 

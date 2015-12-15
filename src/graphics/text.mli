@@ -1,18 +1,27 @@
-(* module Fx : sig
+module Fx : sig
 
   type t
 
-  type ('a,'b) iterator = 'a -> 'b -> ('b -> 'b) -> 'b
+  type ('a,'b) it = 'a -> 'b -> ('b -> 'b) -> 'b
 
-  type ('a,'b,'c) full_iter = ('a,'b) iterator * 'b * ('b -> 'c)
+  type ('a,'b,'c) full_it = ('a,'b) it * 'b * ('b -> 'c)
 
+  (* TODO: Exception when the iterator doesn't return list of right size *)
   val create :
     text : string ->
     position : OgamlMath.Vector2f.t ->
     font : Font.t ->
-    ?color :
+    colors : (Font.code,'b,Color.t list) full_it ->
+    size : int ->
+    unit -> t
 
-end *)
+  val draw :
+    ?parameters : DrawParameter.t ->
+    text : t ->
+    window : Window.t ->
+    unit -> unit
+
+end
 
 type t
 

@@ -45,9 +45,11 @@ Text:
   ✔ Global advance @done(2015-12-10 00:09) @project(Text)
   ✔ Colors @done(2015-12-11 11:14) @project(Text)
   ✔ Unicode handling @done(2015-12-10 15:47) @project(Text)
+  ☐ Factorize two modules
   Fx module for text with advanced features:
+    ☐ Add filters
     ☐ Filtered transformations
-    ☐ Filtered colours
+    ✔ Filtered colours @done(2015-12-15 19:06) @project(Text / Fx module for text with advanced features)
 
 Advanced features:
   ✔ UTF-8 Strings and conversions @done(2015-12-10 10:11) @project(Advanced features)

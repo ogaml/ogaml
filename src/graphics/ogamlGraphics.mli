@@ -796,8 +796,8 @@ module VertexArray : sig
   (** Returns the length of a vertex array *)
   val length : 'a t -> int
 
-  (** Draws the slice starting at $start$ of length $length$ of a vertex array on a 
-    * window using the given parameters. 
+  (** Draws the slice starting at $start$ of length $length$ of a vertex array on a
+    * window using the given parameters.
     *
     * $start$ defaults to 0
     *
@@ -968,8 +968,8 @@ module VertexMap : sig
   (** Returns the length of a vertex map *)
   val length : 'a t -> int
 
-  (** Draws the slice starting at $start$ of length $length$ of a vertex map on a 
-    * window using the given parameters. 
+  (** Draws the slice starting at $start$ of length $length$ of a vertex map on a
+    * window using the given parameters.
     *
     * $start$ defaults to 0
     *
@@ -1299,6 +1299,47 @@ module Text : sig
 
   (** This module provides an efficient way to render
     * text using openGL primitives. *)
+
+  (* Advanced text rendering *)
+  module Fx : sig
+
+  (** This module provides a more customisable way to render text through the
+    * use of iterators. This might prove more costly and also harder to use than
+    * the simple Text.t but it is much more powerful. *)
+
+    (* The type of pre-rendered customised texts. *)
+    type t
+
+    (** The type of an iterator.
+      * The idea behind it is that $'a$ is the type of objects that we
+      * manipulate (eg. $Font.code$) while $'b$ is the type of the value
+      * computed by the iterator.
+      * We rely here on continuation passing style to deal with this vaue at
+      * each step. *)
+    type ('a,'b) it = 'a -> 'b -> ('b -> 'b) -> 'b
+
+    (** The type of a full iterator also containing its initial value and a
+      * post-treatment function, typically to forget information that was useful
+      * to the computation but is irrelevant as a value. *)
+    type ('a,'b,'c) full_it = ('a,'b) it * 'b * ('b -> 'c)
+
+    (** Creates a drawable text with strongly customisable parameters. *)
+    val create :
+      text : string ->
+      position : OgamlMath.Vector2f.t ->
+      font : Font.t ->
+      colors : (Font.code,'b,Color.t list) full_it ->
+      size : int ->
+      unit -> t
+
+    (** Draws a Fx.t. *)
+    val draw :
+      ?parameters : DrawParameter.t ->
+      text : t ->
+      window : Window.t ->
+      unit -> unit
+
+  end
 
   (** The type of pre-rendered texts. *)
   type t
