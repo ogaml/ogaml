@@ -8,6 +8,8 @@ let window =
 
 let font = Font.load "examples/font1.ttf"
 
+let size = 25
+
 let txt = Text.create
   ~text:"Hello, World ! Coucou ! gAV@#"
   ~position:Vector2i.({x = 50; y = 50 + (int_of_float (Font.ascent font 50))})
@@ -38,7 +40,7 @@ let txt3 = Text.create
   ~text:"Trying to see if\nadvance......"
   ~position:txt3pos
   ~font
-  ~size:50
+  ~size
   ~bold:false
   ()
 
@@ -46,7 +48,7 @@ let txt4 = Text.create
   ~text:"and boundaries\nare working."
   ~position:(Vector2i.add (Vector2f.floor (Text.advance txt3)) txt3pos)
   ~font
-  ~size:50
+  ~size
   ~bold:false
   ()
 
@@ -70,9 +72,9 @@ let border = Shape.create_rectangle
 
 let fxtxt = Text.Fx.create
   ~text:"Awesome text!"
-  ~position:Vector2f.({ x = 700. ; y = 700. })
+  ~position:Vector2f.({ x = 350. ; y = 350. })
   ~font
-  ~size:25
+  ~size
   ~colors:(Text.Fx.forall (`RGB Color.RGB.yellow))
   (* ~colors:(
     (fun code v k ->

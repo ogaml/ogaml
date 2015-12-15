@@ -45,6 +45,9 @@ Text:
   ✔ Global advance @done(2015-12-10 00:09) @project(Text)
   ✔ Colors @done(2015-12-11 11:14) @project(Text)
   ✔ Unicode handling @done(2015-12-10 15:47) @project(Text)
+  ☐ Alinea parameter @unsure
+  ☐ Text align
+  ☐ Text width
   ☐ Factorize two modules
   Fx module for text with advanced features:
     ☐ Add filters
