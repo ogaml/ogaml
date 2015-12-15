@@ -1,3 +1,19 @@
+(* module Fx : sig
+
+  type t
+
+  type ('a,'b) iterator = 'a -> 'b -> ('b -> 'b) -> 'b
+
+  type ('a,'b,'c) full_iter = ('a,'b) iterator * 'b * ('b -> 'c)
+
+  val create :
+    text : string ->
+    position : OgamlMath.Vector2f.t ->
+    font : Font.t ->
+    ?color :
+
+end *)
+
 type t
 
 val create :
