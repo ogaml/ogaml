@@ -50,9 +50,10 @@ Text:
   ☐ Text width
   ☐ Factorize two modules
   Fx module for text with advanced features:
-    ☐ Add filters
+    ✔ Add filters @done(2015-12-16 00:44) @project(Text / Fx module for text with advanced features)
     ☐ Filtered transformations
     ✔ Filtered colours @done(2015-12-15 19:06) @project(Text / Fx module for text with advanced features)
+    ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
 
 Advanced features:
   ✔ UTF-8 Strings and conversions @done(2015-12-10 10:11) @project(Advanced features)

@@ -4,9 +4,17 @@ module Fx : sig
 
   type ('a,'b) it = 'a -> 'b -> ('b -> 'b) -> 'b
 
-  type ('a,'b,'c) full_it = ('a,'b) it * 'b * ('b -> 'c)
+  type ('a,'b,'c) full_it = ('a, 'b) it * 'b * ('b -> 'c)
 
-  val forall : 'c -> ('a,'c list,'c list) full_it
+  val forall : 'c -> ('a, 'c list, 'c list) full_it
+
+  val foreach : ('a -> 'b) -> ('a, 'b list, 'b list) full_it
+
+  val foreachi : ('a -> int -> 'b) -> ('a, 'b list * int, 'b list) full_it
+
+  val foreachword :
+    (Font.code list -> 'a) -> 'a ->
+    (Font.code, 'a list * Font.code list, 'a list) full_it
 
   (* TODO: Exception when the iterator doesn't return list of right size *)
   val create :
@@ -22,6 +30,10 @@ module Fx : sig
     text : t ->
     window : Window.t ->
     unit -> unit
+
+  val advance : t -> OgamlMath.Vector2f.t
+
+  val boundaries : t -> OgamlMath.FloatRect.t
 
 end
 

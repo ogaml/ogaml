@@ -70,22 +70,47 @@ let border = Shape.create_rectangle
   ~thickness:2.
   ()
 
-let fxtxt = Text.Fx.create
+let random_color =
+  Random.self_init () ;
+  fun () ->
+    `RGB Color.RGB.({
+      r = Random.float 1. ;
+      g = Random.float 1. ;
+      b = Random.float 1. ;
+      a = 1.
+    })
+
+let fxpos = Vector2f.({ x = 10. ; y = 350. })
+
+let fxtxt1 = Text.Fx.create
   ~text:"Awesome text!"
-  ~position:Vector2f.({ x = 350. ; y = 350. })
+  ~position:fxpos
   ~font
   ~size
-  ~colors:(Text.Fx.forall (`RGB Color.RGB.yellow))
-  (* ~colors:(
-    (fun code v k ->
-      match code with
-      | `Code i when i = Char.code 's' || i = Char.code 't' ->
-        k ((`RGB Color.RGB.red) :: v)
-      | _ -> k ((`RGB Color.RGB.black) :: v)
-    ),
-    [],
-    (fun x -> List.rev x)
-  ) *)
+  ~colors:(Text.Fx.forall (random_color ()))
+  ()
+
+let fxpos2 = Vector2f.add (Text.Fx.advance fxtxt1) fxpos
+
+let fxtxt2 = Text.Fx.create
+  ~text:"Success!!!"
+  ~position:fxpos2
+  ~font
+  ~size
+  ~colors:(let sc = random_color () and dc = random_color () in
+    Text.Fx.foreach
+      (function `Code i when i = Char.code 's' -> sc | _ -> dc)
+    )
+  ()
+
+let fxpos3 = Vector2f.add (Text.Fx.advance fxtxt2) fxpos2
+
+let fxtxt3 = Text.Fx.create
+  ~text:"This time we separate words a bit to check everything works."
+  ~position:fxpos3
+  ~font
+  ~size
+  ~colors:(Text.Fx.foreachword (fun w -> random_color ()) (random_color ()))
   ()
 
 let aa = ref false
@@ -102,7 +127,9 @@ let draw () =
   Text.draw ~parameters ~window ~text:txt2' ();
   Text.draw ~parameters ~window ~text:txt3 ();
   Text.draw ~parameters ~window ~text:txt4 ();
-  Text.Fx.draw ~parameters ~window ~text:fxtxt ();
+  Text.Fx.draw ~parameters ~window ~text:fxtxt1 ();
+  Text.Fx.draw ~parameters ~window ~text:fxtxt2 ();
+  Text.Fx.draw ~parameters ~window ~text:fxtxt3 ();
   Shape.draw ~parameters ~window ~shape:border ();
   Shape.draw ~parameters ~window ~shape:border4 ()
 

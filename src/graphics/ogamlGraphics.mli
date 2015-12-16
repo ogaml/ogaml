@@ -1323,11 +1323,26 @@ module Text : sig
     (** The type of a full iterator also containing its initial value and a
       * post-treatment function, typically to forget information that was useful
       * to the computation but is irrelevant as a value. *)
-    type ('a,'b,'c) full_it = ('a,'b) it * 'b * ('b -> 'c)
+    type ('a,'b,'c) full_it = ('a, 'b) it * 'b * ('b -> 'c)
 
     (** This creates a simple iterator that will return a constant for each
       * value in the iterated list. *)
-    val forall : 'c -> ('a,'c list,'c list) full_it
+    val forall : 'c -> ('a, 'c list, 'c list) full_it
+
+    (** Lifts a function as map would do. *)
+    val foreach : ('a -> 'b) -> ('a, 'b list, 'b list) full_it
+
+    (** Lifts a function as mapi would do: it adds a parameter counting the
+      * number of times it has been called starting at 0. *)
+    val foreachi : ('a -> int -> 'b) -> ('a, 'b list * int, 'b list) full_it
+
+    (** This iterator is specific to Font.code and allows the user to lift a
+      * function taking words instead of characters.
+      * It splits strings on blank spaces, hence the requirement for their value
+      * as second argument. *)
+    val foreachword :
+      (Font.code list -> 'a) -> 'a ->
+      (Font.code, 'a list * Font.code list, 'a list) full_it
 
     (** Creates a drawable text with strongly customisable parameters. *)
     val create :
@@ -1344,6 +1359,15 @@ module Text : sig
       text : t ->
       window : Window.t ->
       unit -> unit
+
+    (** The global advance of the text.
+      * Basically it is a vector such that if you add it to the position of
+      * text object, you get the position of the next character you would
+      * draw. *)
+    val advance : t -> OgamlMath.Vector2f.t
+
+    (** Returns a rectangle containing all the text. *)
+    val boundaries : t -> OgamlMath.FloatRect.t
 
   end
 

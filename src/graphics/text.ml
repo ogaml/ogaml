@@ -21,6 +21,54 @@ module Fx = struct
     [],
     (fun x -> x)
 
+  let foreach f =
+    (fun e v k ->
+      k ((f e) :: v)),
+    [],
+    List.rev
+
+  (* Keeps the first component of a pair list while reversing it. *)
+  (* let rec revpi1 l k =
+    match l with
+    | (e,_) :: r -> revpi1 r (e :: k)
+    | [] -> k *)
+
+  let foreachi f =
+    (fun e (v,i) k ->
+      k ((f e i) :: v, i+1)),
+    ([],0),
+    (fun (l,_) -> List.rev l)
+
+  (* Checks if i is code for blank space. *)
+  let isblankspace i = Char.(
+       i = code ' '
+    || i = code '\t'
+    || i = code '\n'
+  )
+
+  (* Cons the value as many times as there are elements in the first list *)
+  let rec guarded_cons v w l =
+    match w with
+    | _ :: wr -> guarded_cons v wr (v :: l)
+    | [] -> l
+
+  let foreachword f default =
+    (fun e (v,h) k ->
+      match e with
+      | `Code i when isblankspace i ->
+        begin match h with
+          | [] -> k (default :: v, [])
+          | h  -> k (default :: (guarded_cons (f (List.rev h)) h v), [])
+        end
+      | _ -> k (v, e :: h)),
+    ([],[]),
+    (fun (v,h) ->
+      List.rev
+        (begin match h with
+          | [] -> v
+          | h  -> guarded_cons (f (List.rev h)) h v
+        end))
+
   (* This function has type ('a,'b) it -> 'b -> 'a list -> 'b *)
   let rec iter f v = function
     | e :: r -> f e v (fun v -> iter f v r)
@@ -184,6 +232,10 @@ module Fx = struct
           ~parameters
           ~uniform
           ~mode:DrawMode.Triangles ()
+
+  let advance text = text.advance
+
+  let boundaries text = text.boundaries
 
 end
 
