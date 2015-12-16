@@ -22,6 +22,7 @@ Future work on Model:
   ☐ Model merging
 
 OgamlGraphics:
+  ✘ Fix fullscreen in Xlib !!  - Xlib bug @cancelled(2015-12-16 14:09) @project(OgamlGraphics)
   ☐ GC textures
   ☐ Non exposed InternalUtils for binding draw parameters for example
   ☐ Error checking in Font, Image (loading), Image.blit
@@ -30,14 +31,14 @@ OgamlGraphics:
   ☐ Size-dependant oversampling in Font
   ☐ Floats in sprite, text and shape
   ☐ Size in sprite and shape ?
-  ☐ Matrix2D ?
+  ✔ Matrix2D ? @done(2015-12-16 16:15) @project(OgamlGraphics)
   ☐ Transformations as matrices in uniforms for sprite, shape and text
   ✔ Vertex array (and map) slices (needed for batching) @done(2015-12-11 10:29) @project(OgamlGraphics)
   ✔ Test VAO slices @done(2015-12-11 11:13) @project(OgamlGraphics)
   ☐ Vector and color maps
   ☐ Window coordinate conversions
   ☐ Move UTF8String in Utils
-  ☐ Fix fullscreen mashing
+  ✘ Fix fullscreen mashing  - Xlib problem @cancelled(2015-12-16 14:22) @project(OgamlGraphics)
 
 Text:
   ✔ Support newlines @done(2015-12-10 15:47) @project(Text)

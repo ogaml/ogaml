@@ -56,7 +56,7 @@ module Data : sig
   val add_int32 : (int32, int_32) t -> int32 -> unit
 
   (** Returns the data associated to a matrix *)
-  val of_matrix : OgamlMath.Matrix3D.t -> (float, float_32) t
+  val of_bigarray : (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t -> (float, float_32) t
 
   (** Returns the length of some data*)
   val length : ('a, 'b) t -> int

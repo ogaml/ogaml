@@ -105,11 +105,11 @@ module Data = struct
   let add_int t i = 
     add_int32 t (Int32.of_int i)
 
-  let of_matrix m = {
-    data = OgamlMath.Matrix3D.to_bigarray m;
+  let of_bigarray m = {
+    data = m;
     kind = Bigarray.float32;
-    size = 16;
-    length = 16
+    size = Bigarray.Array1.dim m;
+    length = Bigarray.Array1.dim m
   }
 
   let length t = t.length

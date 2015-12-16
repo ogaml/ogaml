@@ -113,9 +113,9 @@ let rotate v t m = product (rotation v t) m
 let times m v = 
   let open Vector3f in
   {
-    x = v.x *. m.{0} +. v.y *. m.{4} +. v.z *. m.{8} +. m.{12};
-    y = v.x *. m.{1} +. v.y *. m.{5} +. v.z *. m.{9} +. m.{12};
-    z = v.x *. m.{2} +. v.y *. m.{6} +. v.z *. m.{10} +. m.{12}
+    x = v.x *. m.{0} +. v.y *. m.{4} +. v.z *. m.{8}  +. m.{12};
+    y = v.x *. m.{1} +. v.y *. m.{5} +. v.z *. m.{9}  +. m.{13};
+    z = v.x *. m.{2} +. v.y *. m.{6} +. v.z *. m.{10} +. m.{14}
   }
 
 let from_quaternion q = 

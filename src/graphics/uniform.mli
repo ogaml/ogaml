@@ -36,6 +36,9 @@ val float : string -> float -> t -> t
 (** Adds a matrix3D to a uniform structure *)
 val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> t
 
+(** Adds a matrix2D to a uniform structure *)
+val matrix2D : string -> OgamlMath.Matrix2D.t -> t -> t
+
 (** Adds a color to a uniform structure *)
 val color : string -> Color.t -> t -> t
 

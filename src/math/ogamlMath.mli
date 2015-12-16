@@ -753,3 +753,75 @@ module Matrix3D : sig
 end
 
 
+
+(** Provides easy creation and manipulation of 2D rendering matrices *)
+module Matrix2D : sig
+
+  (** Optimized operations on 2D (3x3) float matrices *)
+
+  (** Raised when an error occurs (usually a division by zero) *)
+  exception Matrix2D_exception of string
+
+
+  (*** Simple Matrices *)
+
+  (** Type of 3x3 matrices stored in a flat, column-major array *)
+  type t
+
+  (** Zero matrix *)
+  val zero : unit -> t
+
+  (** Identity matrix *)
+  val identity : unit -> t
+
+  (** Builds a translation matrix from a vector @see:OgamlMath.Vector2f *)
+  val translation : Vector2f.t -> t
+
+  (** Builds a scaling matrix from a vector @see:OgamlMath.Vector2f *)
+  val scaling : Vector2f.t -> t
+
+  (** Builds a rotation matrix from an angle *)
+  val rotation : float -> t
+
+
+  (*** Matrix Operations *)
+
+  (** Computes the product of two matrices *)
+  val product : t -> t -> t
+
+  (** Transposes a matrix. The original is not modified. *)
+  val transpose : t -> t
+
+  (** Translates a matrix by a vector. The original matrix is not modified. 
+    * @see:OgamlMath.Vector2f *)
+  val translate : Vector2f.t -> t -> t
+
+  (** Scales a matrix by a vector. The original matrix is not modified. 
+    * @see:OgamlMath.Vector2f *)
+  val scale : Vector2f.t -> t -> t
+
+  (** Rotates a matrix by an angle. The original matrix is not modified. *)
+  val rotate : float -> t -> t
+
+  (** Computes the (right-)product of a matrix with a column vector *)
+  val times : t -> Vector2f.t -> Vector2f.t
+
+  (** Returns a pretty-printed string (not for serialization) *)
+  val print : t -> string
+
+
+  (*** Rendering Matrices Creation *)
+
+  (** Builds an orthographic projection matrix englobing a screen *)
+  val projection : size:Vector2f.t -> t
+
+  (** Builds the inverse of an orthographic projection matrix *)
+  val iprojection : size:Vector2f.t -> t
+
+  (*** Other functions *)
+
+  (** Returns a matrix as a flat bigarray. Used internally by OGAML, it should not be necessary for your programs. *)
+  val to_bigarray : t -> (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t
+
+
+end

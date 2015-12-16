@@ -510,6 +510,9 @@ module Uniform : sig
   (** See vector3f @see:OgamlMath.Matrix3D *)
   val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> t
 
+  (** See vector3f @see:OgamlMath.Matrix2D *)
+  val matrix2D : string -> OgamlMath.Matrix2D.t -> t -> t
+
   (** See vector3f @see:OgamlGraphics.Color *)
   val color : string -> Color.t -> t -> t
 
