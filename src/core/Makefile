@@ -76,7 +76,7 @@ ml_stubs:
 	$(PPCOMMAND) -o $@ $<
 
 %.o:%.m
-	$(CLANG) -c -o ./$(notdir $@) $(OCAML_C_FLAGS) $(GLOBAL_OBJCOPTS) $(GLOBAL_CLIBS) $<
+	$(CLANG) -c -o ./$(notdir $@) $(OCAML_C_FLAGS) $(GLOBAL_OBJCOPTS) $<
 
 %.o:%.c
 	$(OCAMLC) -c -o ./$(notdir $@) -cclib "$(GLOBAL_CLIBS)" $<
