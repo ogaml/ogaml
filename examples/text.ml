@@ -1,6 +1,10 @@
 open OgamlGraphics
 open OgamlMath
 
+(* FPS counting *)
+let initial_time = ref 0.
+let frame_count  = ref 0
+
 let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 
 let window =
@@ -105,17 +109,26 @@ let fxtxt2 = Text.Fx.create
 
 let fxpos3 = Vector2f.add (Text.Fx.advance fxtxt2) fxpos2
 
-let fxtxt3 = Text.Fx.create
+(* let fxtxt3 = Text.Fx.create
   ~text:"This time we separate words a bit to check everything works."
   ~position:fxpos3
   ~font
   ~size
   ~colors:(Text.Fx.foreachword (fun w -> random_color ()) (random_color ()))
-  ()
+  () *)
 
 let aa = ref false
 
 let draw () =
+  (* Trying computing each frame *)
+  let fxtxt3 = Text.Fx.create
+    ~text:"This time we separate words a bit to check everything works."
+    ~position:fxpos3
+    ~font
+    ~size
+    ~colors:(Text.Fx.foreachword (fun w -> random_color ()) (random_color ()))
+    ()
+  in
   let parameters = DrawParameter.make
                       ~depth_test:false
                       ~antialiasing:!aa
@@ -135,26 +148,32 @@ let draw () =
 
 let rec event_loop () =
   match Window.poll_event window with
-  |Some e -> OgamlCore.(Event.(
+  | Some e -> OgamlCore.(Event.(
     match e with
-    |Closed -> Window.close window
-    |KeyPressed ev -> begin
+    | Closed -> Window.close window
+    | KeyPressed ev -> begin
       match ev.KeyEvent.key with
-      |Keycode.A -> aa := not !aa
+      | Keycode.A -> aa := not !aa
       | _ -> ()
-    end; event_loop ()
+    end ; event_loop ()
     | _     -> event_loop ()
   ))
-  |None -> ()
+  | None -> ()
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(`RGB Color.RGB.magenta) window;
-    draw ();
-    Window.display window;
-    event_loop ();
-    main_loop ();
+    Window.clear ~color:(`RGB Color.RGB.magenta) window ;
+    draw () ;
+    Window.display window ;
+    event_loop () ;
+    incr frame_count ;
+    main_loop ()
   end
 
 let () =
-  main_loop ()
+  initial_time := Unix.gettimeofday () ;
+  main_loop () ;
+  Printf.printf
+    "Avg FPS: %f\n%!"
+    (float_of_int (!frame_count) /. (Unix.gettimeofday () -. !initial_time)) ;
+  Window.destroy window
