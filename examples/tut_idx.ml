@@ -2,7 +2,7 @@
 open OgamlGraphics
 open OgamlMath
 
-let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
+let settings = OgamlCore.ContextSettings.create ()
 
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Indexing Tutorial"
@@ -107,11 +107,11 @@ let display () =
   let model = Matrix3D.rotation rot_vector !rot_angle in
   let matrixMVP = Matrix3D.product matrixVP model in
   (* Cube *)
-  let parameters = DrawParameter.(make ~culling:CullingMode.CullCounterClockwise ~depth_test:true ()) in
+  let parameters = DrawParameter.(make ~culling:CullingMode.CullCounterClockwise ()) in
   let uniform = Uniform.(empty |> matrix3D "MVP" matrixMVP |> color "color" (`RGB Color.RGB.red)) in
   VertexArray.draw ~window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ();
   (* Edges *)
-  let parameters = DrawParameter.(make ~polygon:PolygonMode.DrawLines ~depth_test:true ()) in
+  let parameters = DrawParameter.(make ~polygon:PolygonMode.DrawLines ()) in
   let uniform = Uniform.(empty |> matrix3D "MVP" matrixMVP |> color "color" (`RGB Color.RGB.black)) in
   VertexArray.draw ~window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ()
 
@@ -126,7 +126,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear window;
+    Window.clear ~color:(`RGB Color.RGB.white) window;
     display ();
     Window.display window;
     event_loop ();

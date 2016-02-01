@@ -8,7 +8,7 @@
 
 open OgamlGraphics
 
-let settings = ContextSettings.create ()
+let settings = OgamlCore.ContextSettings.create ()
 
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°01"

@@ -9,7 +9,7 @@
 open OgamlGraphics
 open OgamlMath
 
-let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
+let settings = OgamlCore.ContextSettings.create ()
 
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°02"
@@ -61,10 +61,6 @@ let vertex_source = VertexArray.Source.(
 
 let vertices = VertexArray.static vertex_source
 
-let parameters = DrawParameter.make ()
-
-let uniform = Uniform.empty
-
 let rec event_loop () =
   match Window.poll_event window with
   |Some e -> OgamlCore.Event.(
@@ -76,8 +72,8 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear window;
-    VertexArray.draw ~window ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ();
+    Window.clear ~color:(`RGB Color.RGB.white) window;
+    VertexArray.draw ~window ~vertices ~program ~mode:DrawMode.Triangles ();
     Window.display window;
     event_loop ();
     main_loop ();

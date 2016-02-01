@@ -144,6 +144,27 @@
   return [m_window isKeyWindow];
 }
 
+// Handling resizing of a window
+-(void)windowDidResize:(NSNotification *)notification
+{
+  (void)notification;
+
+  OGEvent* ogevent = [[OGEvent alloc] initWithResizedWindow];
+  [m_view pushEvent:ogevent];
+}
+
+-(void)resize:(NSRect)frame
+{
+  [m_window setFrame:[m_window frameRectForContentRect:frame]
+             display:YES
+             animate:[m_window isVisible]];
+}
+
+-(void)toggleFullScreen
+{
+  [m_window toggleFullScreen:nil];
+}
+
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -348,4 +369,27 @@ caml_cocoa_controller_has_focus(value mlcontroller)
   BOOL res = [controller hasFocus];
 
   CAMLreturn(Val_bool(res));
+}
+
+CAMLprim value
+caml_cocoa_controller_resize(value mlcontroller, value mlframe)
+{
+  CAMLparam2(mlcontroller,mlframe);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+  NSRect* frame = (NSRect*) Data_custom_val(mlframe);
+  [controller resize:*frame];
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_controller_toggle_fullscreen(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+  [controller toggleFullScreen];
+
+  CAMLreturn(Val_unit);
 }

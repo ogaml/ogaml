@@ -424,6 +424,198 @@ module Vector3fs : sig
 end
 
 
+(** Operations on integer rectangles *)
+module IntRect : sig
+
+  (** This module defines the IntRect type and various operations on it. *)
+
+  (** Type of immutable rectangles of integers *)
+  type t = {x : int; y : int; width : int; height : int}
+
+  (** $create position size$ creates a rectangle at position $position$ and
+    * of size $size$ *)
+  val create : Vector2i.t -> Vector2i.t -> t
+
+  (** Returns the position of a rectangle *)
+  val corner : t -> Vector2i.t
+
+  (** Alias for corner *)
+  val position : t -> Vector2i.t
+
+  (** Returns the size of a rectangle *)
+  val size : t -> Vector2i.t
+
+  (** Returns the center of a rectangle *)
+  val center : t -> Vector2f.t
+
+  (** Returns the area of a rectangle *)
+  val area : t -> int
+
+  (** Scales a rectangle *)
+  val scale : t -> Vector2i.t -> t
+
+  (** Translates a rectangle *)
+  val translate : t -> Vector2i.t -> t
+
+  (** $intersect t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
+  val intersect : t -> t -> bool
+
+  (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
+  val contains : t -> Vector2i.t -> bool
+
+  (** $loop t f$ iterates through all points of the rectangle *)
+  val loop : t -> (int -> int -> unit) -> unit
+
+end
+
+
+(** Operations on float rectangles *)
+module FloatRect : sig
+
+  (** This module defines the FloatRect type and various operations on it. *)
+
+  (** Type of immutable rectangles of floats *)
+  type t = {x : float; y : float; width : float; height : float}
+
+  (** $create position size$ creates a rectangle at position $position$ and
+    * of size $size$ *)
+  val create : Vector2f.t -> Vector2f.t -> t
+
+  (** Returns the position of a rectangle *)
+  val corner : t -> Vector2f.t
+
+  (** Alias for corner *)
+  val position : t -> Vector2f.t
+
+  (** Returns the size of a rectangle *)
+  val size : t -> Vector2f.t
+
+  (** Returns the center of a rectangle *)
+  val center : t -> Vector2f.t
+
+  (** Returns the area of a rectangle *)
+  val area : t -> float
+
+  (** Scales a rectangle *)
+  val scale : t -> Vector2f.t -> t
+
+  (** Translates a rectangle *)
+  val translate : t -> Vector2f.t -> t
+
+  (** Converts an integer rectangle to a float rectangle *)
+  val from_int : IntRect.t -> t
+
+  (** Converts a float rectangle to an integer rectangle *)
+  val floor : t -> IntRect.t
+
+  (** $intersect t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
+  val intersect : t -> t -> bool
+
+  (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
+  val contains : t -> Vector2f.t -> bool
+
+end
+
+
+(** Operations on integer boxes *)
+module IntBox : sig
+
+  (** This module defines the IntBox type and various operations on it. *)
+
+  (** Type of immutable boxes of integers *)
+  type t = {x : int; y : int; z : int; width : int; height : int; depth : int}
+
+  (** $create position size$ creates a box at position $position$ and
+    * of size $size$ *)
+  val create : Vector3i.t -> Vector3i.t -> t
+
+  (** Unit box *)
+  val one : t
+
+  (** Returns the position of a box *)
+  val corner : t -> Vector3i.t
+
+  (** Alias for corner *)
+  val position : t -> Vector3i.t
+
+  (** Returns the size of a box *)
+  val size : t -> Vector3i.t
+
+  (** Returns the center of a box *)
+  val center : t -> Vector3f.t
+
+  (** Returns the volume of a box *)
+  val volume : t -> int
+
+  (** Scales a box *)
+  val scale : t -> Vector3i.t -> t
+
+  (** Translates a box *)
+  val translate : t -> Vector3i.t -> t
+
+  (** $intersect t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
+  val intersect : t -> t -> bool
+
+  (** $contains t p$ returns $true$ iff the box $t$ contains $p$ *)
+  val contains : t -> Vector3i.t -> bool
+
+  (** $loop t f$ iterates through all points of the box *)
+  val loop : t -> (int -> int -> int -> unit) -> unit
+
+end
+
+
+(** Operations on float boxes *)
+module FloatBox : sig
+
+  (** This module defines the FloatBox type and various operations on it. *)
+
+  (** Type of immutable boxes of floats *)
+  type t = {x : float; y : float; z : float; width : float; height : float; depth : float}
+
+  (** $create position size$ creates a box at position $position$ and
+    * of size $size$ *)
+  val create : Vector3f.t -> Vector3f.t -> t
+
+  (** Unit box *)
+  val one : t
+
+  (** Returns the position of a box *)
+  val corner : t -> Vector3f.t
+
+  (** Alias for corner *)
+  val position : t -> Vector3f.t
+
+  (** Returns the size of a box *)
+  val size : t -> Vector3f.t
+
+  (** Returns the center of a box *)
+  val center : t -> Vector3f.t
+
+  (** Returns the volume of a box *)
+  val volume : t -> float
+
+  (** Scales a box *)
+  val scale : t -> Vector3f.t -> t
+
+  (** Translates a box *)
+  val translate : t -> Vector3f.t -> t
+
+  (** Converts an integer box to a float box *)
+  val from_int : IntBox.t -> t
+
+  (** Converts a float box to an integer box *)
+  val floor : t -> IntBox.t
+
+  (** $intersect t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
+  val intersect : t -> t -> bool
+
+  (** $contains t p$ returns $true$ iff the box $t$ contains $p$ *)
+  val contains : t -> Vector3f.t -> bool
+
+end
+
+
 (** Operations on immutable quaternions *)
 module Quaternion : sig
 
@@ -585,3 +777,75 @@ module Matrix3D : sig
 end
 
 
+
+(** Provides easy creation and manipulation of 2D rendering matrices *)
+module Matrix2D : sig
+
+  (** Optimized operations on 2D (3x3) float matrices *)
+
+  (** Raised when an error occurs (usually a division by zero) *)
+  exception Matrix2D_exception of string
+
+
+  (*** Simple Matrices *)
+
+  (** Type of 3x3 matrices stored in a flat, column-major array *)
+  type t
+
+  (** Zero matrix *)
+  val zero : unit -> t
+
+  (** Identity matrix *)
+  val identity : unit -> t
+
+  (** Builds a translation matrix from a vector @see:OgamlMath.Vector2f *)
+  val translation : Vector2f.t -> t
+
+  (** Builds a scaling matrix from a vector @see:OgamlMath.Vector2f *)
+  val scaling : Vector2f.t -> t
+
+  (** Builds a rotation matrix from an angle *)
+  val rotation : float -> t
+
+
+  (*** Matrix Operations *)
+
+  (** Computes the product of two matrices *)
+  val product : t -> t -> t
+
+  (** Transposes a matrix. The original is not modified. *)
+  val transpose : t -> t
+
+  (** Translates a matrix by a vector. The original matrix is not modified. 
+    * @see:OgamlMath.Vector2f *)
+  val translate : Vector2f.t -> t -> t
+
+  (** Scales a matrix by a vector. The original matrix is not modified. 
+    * @see:OgamlMath.Vector2f *)
+  val scale : Vector2f.t -> t -> t
+
+  (** Rotates a matrix by an angle. The original matrix is not modified. *)
+  val rotate : float -> t -> t
+
+  (** Computes the (right-)product of a matrix with a column vector *)
+  val times : t -> Vector2f.t -> Vector2f.t
+
+  (** Returns a pretty-printed string (not for serialization) *)
+  val print : t -> string
+
+
+  (*** Rendering Matrices Creation *)
+
+  (** Builds an orthographic projection matrix englobing a screen *)
+  val projection : size:Vector2f.t -> t
+
+  (** Builds the inverse of an orthographic projection matrix *)
+  val iprojection : size:Vector2f.t -> t
+
+  (*** Other functions *)
+
+  (** Returns a matrix as a flat bigarray. Used internally by OGAML, it should not be necessary for your programs. *)
+  val to_bigarray : t -> (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t
+
+
+end

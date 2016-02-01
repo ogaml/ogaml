@@ -8,25 +8,93 @@ Cocoa specific:
   ☐ Add some option to switch between Ctrl and Cmd @question
   ☐ Add some function to handle keyRepeatDelay and keyRepeatInterval for NSEvent
   ☐ Consider converting every event to OGEvent before pushing (instead of having both NSEvent and OGEvent) @unsure
-  ☐ Update the view (and probably other things) when resizing
+  ✔ Update the view (and probably other things) when resizing @done(2015-12-11 11:13) @project(Cocoa specific)
   ☐ Handle left/right modifiers for keycodes
   ☐ Apparently modifiers do not raise keyDown at all so we have to deal with it
   ☐ Discuss the possibility to dissociate mouse and cursor to get delta events @source(https://developer.apple.com/library/mac/documentation/GraphicsImaging/Reference/Quartz_Services_Ref/#//apple_ref/c/func/CGAssociateMouseAndMouseCursorPosition)
   ☐ Differentiate between Middle and Other for mouse
-  ☐ Check if window size is in points instead of pixels
+  ✔ Check if window size is in points instead of pixels @done(2015-12-11 11:14) @project(Cocoa specific)
   ☐ Window doesn't resign being key on mission control
 
-OgamlCore:
+Future work on Model:
+  ☐ Rewrite Model to add iterators, simplify the interface, and only index ad-hoc (when requested by source)
+  ☐ Poly export to Model.t
+  ☐ Model merging
+
+OgamlGraphics:
+  ✘ Fix fullscreen in Xlib !!  - Xlib bug @cancelled(2015-12-16 14:09) @project(OgamlGraphics)
+  ☐ GC textures
+  ☐ Non exposed InternalUtils for binding draw parameters for example
+  ☐ Error checking in Font, Image (loading), Image.blit
+  ☐ Default Parameters to aa:false for Text
+  ☐ Move programs to State (+ organize)
+  ☐ Size-dependant oversampling in Font
+  ☐ Floats in sprite, text and shape
+  ☐ Size in sprite and shape ?
+  ✔ Matrix2D ? @done(2015-12-16 16:15) @project(OgamlGraphics)
+  ☐ Transformations as matrices in uniforms for sprite, shape and text
+  ✔ Vertex array (and map) slices (needed for batching) @done(2015-12-11 10:29) @project(OgamlGraphics)
+  ✔ Test VAO slices @done(2015-12-11 11:13) @project(OgamlGraphics)
+  ☐ Vector and color maps
+  ☐ Window coordinate conversions
+  ☐ Move UTF8String in Utils
+  ✘ Fix fullscreen mashing  - Xlib problem @cancelled(2015-12-16 14:22) @project(OgamlGraphics)
+
+Math:
+  ☐ Create absolute/relative
+  ☐ Fix box width/height to be always positive
+  ☐ Maybe corner = position + size
+  ☐ Update doc for box
+
+Text:
+  ✔ Support newlines @done(2015-12-10 15:47) @project(Text)
+  ✔ Boundaries @done(2015-12-10 00:37) @project(Text)
+  ✔ Global advance @done(2015-12-10 00:09) @project(Text)
+  ✔ Colors @done(2015-12-11 11:14) @project(Text)
+  ✔ Unicode handling @done(2015-12-10 15:47) @project(Text)
+  ☐ Alinea parameter @unsure
+  ☐ Text align
+  ☐ Text width
+  ☐ Factorize two modules
+  Fx module for text with advanced features:
+    ✔ Add filters @done(2015-12-16 00:44) @project(Text / Fx module for text with advanced features)
+    ☐ Filtered transformations
+    ✔ Filtered colours @done(2015-12-15 19:06) @project(Text / Fx module for text with advanced features)
+    ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
+
+Advanced features:
+  ✔ UTF-8 Strings and conversions @done(2015-12-10 10:11) @project(Advanced features)
+  More Image and Texture types:
+    ☐ Single-channeled images
+    ☐ Texture3D
+    ☐ TextureCube
+  Batch drawing 2D:
+    ☐ Batcher module
+    ☐ Tilesets
+  ☐ Render textures
+
+Add to interface:
+  ✔ IntBox.iter @done(2015-12-08 10:38) @project(Add to interface)
+  ✔ IntRect.iter @done(2015-12-08 10:38) @project(Add to interface)
+  ✔ Image.create `Data @done(2015-12-08 10:38) @project(Add to interface)
+  ✔ Image.blit @done(2015-12-08 10:35) @project(Add to interface)
+
+
+＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
+Archive:
   ✔ Log system @done(2015-12-01 20:44) @project(OgamlCore)
   ✔ Window titles @done(2015-12-02 15:01) @project(OgamlCore)
   ✔ Context customisation @done(2015-12-02 20:58) @project(OgamlCore)
   ✔ Encapsulate parameters (title, depth buffer size, etc..) @done(2015-12-02 20:58) @project(OgamlCore)
-
-OgamlMath:
   ✔ Matrices, quaternions and vector exceptions @done(2015-11-30 21:58) @project(OgamlMath)
   ✔ Interface @done(2015-12-01 17:29) @project(OgamlMath)
-
-OgamlGraphics:
+  ✔ Optionalize all parameters @done(2015-12-07 16:20) @project(OgamlGraphics)
+  ✔ Add MSAA to DrawParameter (and state) @done(2015-12-07 16:40) @project(OgamlGraphics)
+  ✔ Fullscreen for X11 @done(2015-12-07 17:44) @project(OgamlGraphics)
+  ✘ Add Rects to Window, Texture, Image, Sprite @cancelled(2015-12-07 10:04) @project(OgamlGraphics)
+  ✔ Add viewport to DrawParameter @done(2015-12-07 09:59) @project(OgamlGraphics)
+  ✔ Remove clear_color from settings @done(2015-12-07 10:16) @project(OgamlGraphics)
+  ✔ Unify Core.settings and Graphics.settings ? @done(2015-12-07 10:16) @project(OgamlGraphics)
   ✔ Better normal computations in Model @done(2015-11-15 23:22) @project(OgamlGraphics)
   ✔ Indexing in Model @done(2015-11-16 22:55) @project(OgamlGraphics)
   ✔ Clean unused data in Models @done(2015-11-16 22:55) @project(OgamlGraphics)
@@ -41,13 +109,6 @@ OgamlGraphics:
   ✔ Alpha ! @done(2015-11-30 11:16) @project(OgamlGraphics)
   ✔ Destroy VAOs, VBOs, EBOs, programs in Gc.finalize @done(2015-11-26 23:17) @project(OgamlGraphics)
   ✔ Remove state from Texture.create ? @done(2015-11-30 20:41) @project(OgamlGraphics)
-
-Future work on Model:
-  ☐ Rewrite Model to add iterators, simplify the interface, and only index ad-hoc (when requested by source)
-  ☐ Poly export to Model.t
-  ☐ Model merging
-  
-Shape:
   ✔ Change the notion of corner of a Shape (it wouldn't work for circles for instance) @done(2015-11-25 21:51) @project(Shape)
   ✔ Add circles (as regular polygons) @done(2015-11-25 21:51) @project(Shape)
   ✔ Add scale @done(2015-11-22 20:33) @project(Shape)
@@ -58,9 +119,6 @@ Shape:
   ✔ Add color for outline @done(2015-11-27 01:02) @project(Shape)
   ✔ Fix scaling for outline @done(2015-11-27 16:55) @project(Shape)
   ✔ Add lines @done(2015-11-27 18:13) @project(Shape)
-
-＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
-Archive:
   ✔ Move init_arp in cocoa/utils_stubs @done(2015-10-31 00:30) @project(Objective-C formatting)
   ✔ Remove application t type @unsure @done(2015-10-20 21:59) @project(Cocoa specific)
   ✔ Separate functions for all window methods @done(2015-10-20 20:16) @project(Cocoa specific)

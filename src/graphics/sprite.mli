@@ -13,7 +13,7 @@ val create :
   unit -> t
 
 (** Draws a sprite. *)
-val draw : window:Window.t -> sprite:t -> unit
+val draw : ?parameters:DrawParameter.t -> window:Window.t -> sprite:t -> unit -> unit
 
 (** Sets the position of the origin of the sprite in the window. *)
 val set_position : t -> OgamlMath.Vector2i.t -> unit

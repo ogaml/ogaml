@@ -7,6 +7,8 @@ exception Invalid_attribute of string
 
 exception Missing_attribute of string
 
+exception Out_of_bounds of string
+
 
 module Vertex : sig
 
@@ -67,8 +69,10 @@ val draw :
   window     : Window.t ->
   ?indices   : 'b IndexArray.t ->
   program    : Program.t ->
-  uniform    : Uniform.t ->
-  parameters : DrawParameter.t ->
+  ?uniform    : Uniform.t ->
+  ?parameters : DrawParameter.t ->
+  ?start     : int ->
+  ?length    : int ->
   mode       : DrawMode.t ->
   unit -> unit
 

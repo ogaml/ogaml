@@ -25,26 +25,26 @@ val glsl_version : t -> int
 (** Returns true iff the GLSL version passed as parameter is supported *)
 val is_glsl_version_supported : t -> int -> bool
 
-(** Returns the current culling mode *)
-val culling_mode : t -> DrawParameter.CullingMode.t
-
-(** Returns the current polygon drawing mode *)
-val polygon_mode : t -> DrawParameter.PolygonMode.t
-
-(** Returns if depth testing is currently activated or not *)
-val depth_test : t -> bool
-
-(** Returns the clear color *)
-val clear_color : t -> Color.t
-
-(** Asserts that no GL error occured *)
-val assert_no_error : t -> unit
-
 
 module LL : sig
 
   (** Creates a new, default-initialized GL state *)
   val create : unit -> t
+
+  (** Returns the current culling mode *)
+  val culling_mode : t -> DrawParameter.CullingMode.t
+
+  (** Asserts that no GL error occured *)
+  val assert_no_error : t -> unit
+
+  (** Returns the current polygon drawing mode *)
+  val polygon_mode : t -> DrawParameter.PolygonMode.t
+
+  (** Returns if depth testing is currently activated or not *)
+  val depth_test : t -> bool
+
+  (** Returns the clear color *)
+  val clear_color : t -> Color.t
 
   (** Sets the current culling mode *)
   val set_culling_mode : t -> DrawParameter.CullingMode.t -> unit
@@ -115,8 +115,11 @@ module LL : sig
   (** Sets the current blending mode *)
   val set_blend_equation : t -> DrawParameter.BlendMode.t -> unit
 
+  (** Returns the current viewport *)
+  val viewport : t -> OgamlMath.IntRect.t
 
-  val bind_draw_parameters : t -> DrawParameter.t -> unit
+  (** Sets the current viewport *)
+  val set_viewport : t -> OgamlMath.IntRect.t -> unit
 
 end
 

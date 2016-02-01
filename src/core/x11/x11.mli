@@ -71,6 +71,8 @@ module Window : sig
 
   val set_title : Display.t -> t -> string -> unit
 
+  val set_size_hints : Display.t -> t -> (int * int) -> (int * int) -> unit
+
   val title : Display.t -> t -> string
 
   val map : Display.t -> t -> unit
@@ -79,7 +81,11 @@ module Window : sig
 
   val destroy : Display.t -> t -> unit
 
+  val position : Display.t -> t -> (int * int)
+
   val size : Display.t -> t -> (int * int)
+
+  val resize : Display.t -> t -> int -> int -> unit
 
   val swap : Display.t -> t -> unit
 
@@ -94,7 +100,17 @@ module Atom : sig
 
   val intern : Display.t -> string -> bool -> t option
 
+  val wm_add : t
+
+  val wm_remove : t
+
+  val wm_toggle : t
+
   val set_wm_protocols : Display.t -> Window.t -> t list -> unit
+
+  val change_property : Display.t -> Window.t -> t -> t list -> unit
+
+  val send_event : Display.t -> Window.t -> t -> t list -> unit
 
 end
 

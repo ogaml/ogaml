@@ -58,7 +58,7 @@ val create_line :
   unit -> t
 
 (** Draws a shape. *)
-val draw : window:Window.t -> shape:t -> unit
+val draw : ?parameters:DrawParameter.t -> window:Window.t -> shape:t -> unit -> unit
 
 (** Sets the position of the origin in the window. *)
 val set_position : t -> OgamlMath.Vector2i.t -> unit

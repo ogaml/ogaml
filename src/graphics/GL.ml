@@ -105,11 +105,11 @@ module Data = struct
   let add_int t i = 
     add_int32 t (Int32.of_int i)
 
-  let of_matrix m = {
-    data = OgamlMath.Matrix3D.to_bigarray m;
+  let of_bigarray m = {
+    data = m;
     kind = Bigarray.float32;
-    size = 16;
-    length = 16
+    size = Bigarray.Array1.dim m;
+    length = Bigarray.Array1.dim m
   }
 
   let length t = t.length
@@ -126,6 +126,8 @@ module Pervasives = struct
   external error : unit -> GLTypes.GlError.t option = "caml_gl_error"
 
   external color : float -> float -> float -> float -> unit = "caml_clear_color"
+
+  external viewport : int -> int -> int -> int -> unit = "caml_viewport"
 
   external culling : DrawParameter.CullingMode.t -> unit = "caml_culling_mode"
 
@@ -317,7 +319,7 @@ module VAO = struct
 
   external draw : DrawMode.t -> int -> int -> unit = "caml_draw_arrays"
 
-  external draw_elements : DrawMode.t -> int -> unit = "caml_draw_elements"
+  external draw_elements : DrawMode.t -> int -> int -> unit = "caml_draw_elements"
 
 end
 

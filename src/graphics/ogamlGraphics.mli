@@ -144,7 +144,7 @@ module DrawParameter : sig
 
     (** Backface culling modes *)
     type t =
-      | CullNone (* Culls no face *)
+      | CullNone (* Culls no face (default) *)
       | CullClockwise (* Culls all faces displayed in CW order from the camera POV *)
       | CullCounterClockwise (* Same with CCW *)
 
@@ -159,7 +159,21 @@ module DrawParameter : sig
     type t =
       | DrawVertices (* Draws only vertices *)
       | DrawLines (* Draws only lines *)
-      | DrawFill (* Draws full polygons *)
+      | DrawFill (* Draws full polygons (default) *)
+
+  end
+
+  (** Viewports enumeration *)
+  module Viewport : sig
+
+    (** This module consists of only one type enumerating different ways of
+      * providing a viewport *)
+
+    (** Type of a viewport *)
+    type t =
+      | Full (* Full window viewport (default) *)
+      | Relative of OgamlMath.FloatRect.t (* Viewport given as a fraction of the window's size *)
+      | Absolute of OgamlMath.IntRect.t (* Viewport given in pixels *)
 
   end
 
@@ -222,43 +236,31 @@ module DrawParameter : sig
 
   end
 
-  (** Creates a set of draw parameters
+  (** Creates a set of draw parameters with the following options :
+    *
+    * $culling$ specifies which face should be culled (defaults to $CullNone$)
+    *
+    * $polygon$ specifies how to render polygons (defaults to $DrawFill$)
+    *
+    * $depth_test$ specifies whether depth should be tested when rendering vertices (defaults to $true$)
+    *
+    * $blend_mode$ specifies the blending equation (defaults to $BlendingMode.default$)
+    *
+    * $viewport$ specifies the viewport (defaults to $Full$)
+    *
+    * $antialiasing$ specifies whether to activate AA or not (ignored if AA is not supported by the context, defaults to $true$)
+    *
     * @see:OgamlGraphics.DrawParameter.CullingMode
     * @see:OgamlGraphics.DrawParameter.PolygonMode
+    * @see:OgamlGraphics.DrawParameter.Viewport
     * @see:OgamlGraphics.DrawParameter.BlendMode *)
   val make : ?culling:CullingMode.t ->
              ?polygon:PolygonMode.t ->
              ?depth_test:bool ->
              ?blend_mode:BlendMode.t ->
+             ?viewport:Viewport.t ->
+             ?antialiasing:bool ->
              unit -> t
-
-end
-
-
-(** Encapsulates data for context creation *)
-module ContextSettings : sig
-
-  (** This module encapsulates the settings used to create a GL context *)
-
-  (** Type of the settings structure *)
-  type t
-
-  (** Creates new settings using the following parameters :
-    *
-    *   $color$ - background color used when clearing (defaults to opaque black)
-    *
-    *   $depth$ - bits allocated to the depth buffer (defaults to 24)
-    *
-    *   $stencil$ - bits allocated to the stencil buffer (defaults to 0)
-    *
-    *   $msaa$ - MSAA level (defaults to 0)
-    *
-    * @see:OgamlGraphics.Color
-    *)
-  val create : ?color:Color.t -> 
-               ?depth:int -> 
-               ?stencil:int -> 
-               ?msaa:int -> unit -> t
 
 end
 
@@ -301,9 +303,10 @@ module Image : sig
   (** Type of an image stored in the RAM *)
   type t
 
-  (** Creates an image from a file, or an empty image with a given size filled with a default color
+  (** Creates an image from a file, some RGBA-formatted data, or an empty one
+    * filled with a default color
     * @see:OgamlGraphics.Color *)
-  val create : [`File of string | `Empty of int * int * Color.t] -> t
+  val create : [`File of string | `Empty of int * int * Color.t | `Data of int * int * Bytes.t] -> t
 
   (** Return the size of an image *)
   val size : t -> OgamlMath.Vector2i.t
@@ -315,6 +318,13 @@ module Image : sig
   (** Gets the color of a pixel of an image
     * @see:OgamlGraphics.Color.RGB *)
   val get : t -> int -> int -> Color.RGB.t
+
+  (** $blit src ~rect dest offset$ blits the subimage of $src$ defined by $rect$
+    * on the image $dest$ at position $offset$ (relative to the top-left pixel).
+    *
+    * If $rect$ is not provided then the whole image $src$ is used.
+    * @see:OgamlMath.IntRect @see:OgamlMath.Vector2i *)
+  val blit : t -> ?rect:OgamlMath.IntRect.t -> t -> OgamlMath.Vector2i.t -> unit
 
 end
 
@@ -342,6 +352,74 @@ module Texture : sig
     val size : t -> OgamlMath.Vector2i.t
 
   end
+
+end
+
+
+(** Information about a font *)
+module Font : sig
+
+  (** Representation of a character *)
+  module Glyph : sig
+
+    (** This module encapsulates the data associated to a character's glyph.
+      *
+      * All coordinates are given relatively to the
+      * glyph's origin, and with an up-increasing Y coordinate *)
+
+    (** Type of a glyph *)
+    type t
+
+    (** Space between the origin of this glyph and the origin of the next glyph *)
+    val advance : t -> float
+
+    (** Returns the offset between the origin and the top-left corner of the glyph *)
+    val bearing : t -> OgamlMath.Vector2f.t
+
+    (** Returns the bouding rectangle of the glyph
+      * relatively to the origin *)
+    val rect : t -> OgamlMath.FloatRect.t
+
+  end
+
+
+  (** This module stores a font and dynamically
+    * loads sizes and glyphs as requested by the user *)
+
+  (** Type of a font *)
+  type t
+
+  (** Type alias for a character given in ASCII or UTF-8 *)
+  type code = [`Char of char | `Code of int]
+
+  (** Loads a font from a file *)
+  val load : string -> t
+
+  (** $glyph font code size bold$ returns the glyph
+    * representing the character $code$ in $font$
+    * of size $size$ and with the modifier $bold$ *)
+  val glyph : t -> code -> int -> bool -> Glyph.t
+
+  (** Returns the kerning between two chars of
+    * a given size, that is the horizontal offset
+    * that must be applied between the two glyphs
+    * (usually negative) *)
+  val kerning : t -> code -> code -> int -> float
+
+  (** Returns the coordinate above the baseline the font extends *)
+  val ascent : t -> int -> float
+
+  (** Returns the coordinate below the baseline the font
+    * extends (usually negative) *)
+  val descent : t -> int -> float
+
+  (** Returns the distance between the descent of a line
+    * and the ascent of the next line *)
+  val linegap : t -> int -> float
+
+  (** Returns the space between the baseline of two lines
+    * (equals ascent + linegap - descent) *)
+  val spacing : t -> int -> float
 
 end
 
@@ -435,6 +513,9 @@ module Uniform : sig
   (** See vector3f @see:OgamlMath.Matrix3D *)
   val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> t
 
+  (** See vector3f @see:OgamlMath.Matrix2D *)
+  val matrix2D : string -> OgamlMath.Matrix2D.t -> t -> t
+
   (** See vector3f @see:OgamlGraphics.Color *)
   val color : string -> Color.t -> t -> t
 
@@ -459,12 +540,12 @@ module Window : sig
 
   (** Creates a window of size $width$ x $height$.
     * This window will create its openGL context following the specified settings.
-    * @see:OgamlGraphics.ContextSettings *)
+    * @see:OgamlCore.ContextSettings *)
   val create :
     width:int ->
     height:int ->
     title:string ->
-    settings:ContextSettings.t -> t
+    settings:OgamlCore.ContextSettings.t -> t
 
   (** Changes the title of the window. *)
   val set_title : t -> string -> unit
@@ -475,6 +556,17 @@ module Window : sig
 
   (** Frees the window and the memory *)
   val destroy : t -> unit
+
+  (** Resizes the window.
+    * @see:OgamlMath.Vector2i *)
+  val resize : t -> OgamlMath.Vector2i.t -> unit
+
+  (** Toggles the full screen mode of a window. *)
+  val toggle_fullscreen : t -> unit
+
+  (** Returns the rectangle associated to a window, in screen coordinates
+    * @see:OgamlMath.IntRect *)
+  val rect : t -> OgamlMath.IntRect.t
 
   (*** Information About Windows *)
   (** Returns in pixel the width and height of the window
@@ -498,7 +590,7 @@ module Window : sig
   val display : t -> unit
 
   (** Clears the window *)
-  val clear : t -> unit
+  val clear : ?color:Color.t -> t -> unit
 
   (** Returns the internal GL state of the window
     * @see:OgamlGraphics.State *)
@@ -599,6 +691,10 @@ module VertexArray : sig
   (** Raised when trying to draw with a vertex array containing an
     * attribute that has not been declared in the GLSL program *)
   exception Missing_attribute of string
+
+  (** Raised when trying to draw an invalid slice of a vertex array *)
+  exception Out_of_bounds of string
+
 
   (** Represents a vertex *)
   module Vertex : sig
@@ -706,7 +802,17 @@ module VertexArray : sig
   (** Returns the length of a vertex array *)
   val length : 'a t -> int
 
-  (** Draws a vertex array using the given program, uniforms, draw parameters, and an optional index array.
+  (** Draws the slice starting at $start$ of length $length$ of a vertex array on a
+    * window using the given parameters.
+    *
+    * $start$ defaults to 0
+    *
+    * if $length$ is not provided, then the whole vertex array (starting from $start$) is drawn
+    *
+    * $uniform$ should provide the uniforms required by $program$ (defaults to empty)
+    *
+    * $parameters$ defaults to $DrawParameter.make ()$
+    *
     * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.Window
     * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
@@ -715,8 +821,10 @@ module VertexArray : sig
     window     : Window.t ->
     ?indices   : 'b IndexArray.t ->
     program    : Program.t ->
-    uniform    : Uniform.t ->
-    parameters : DrawParameter.t ->
+    ?uniform    : Uniform.t ->
+    ?parameters : DrawParameter.t ->
+    ?start     : int ->
+    ?length    : int ->
     mode       : DrawMode.t ->
     unit -> unit
 
@@ -745,6 +853,10 @@ module VertexMap : sig
   (** Raised when trying to draw with a vertex map containing an
     * attribute that has not been declared in the GLSL program *)
   exception Missing_attribute of string
+
+  (** Raised when trying to draw an invalid slice of a vertex map *)
+  exception Out_of_bounds of string
+
 
   (** Represents a vertex *)
   module Vertex : sig
@@ -862,7 +974,17 @@ module VertexMap : sig
   (** Returns the length of a vertex map *)
   val length : 'a t -> int
 
-  (** Draws a vertex map using the given program, uniforms, draw parameters, and an optional index array.
+  (** Draws the slice starting at $start$ of length $length$ of a vertex map on a
+    * window using the given parameters.
+    *
+    * $start$ defaults to 0
+    *
+    * if $length$ is not provided, then the whole vertex map (starting from $start$) is drawn
+    *
+    * $uniform$ should provide the uniforms required by $program$ (defaults to empty)
+    *
+    * $parameters$ defaults to $DrawParameter.make ()$
+    *
     * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.Window
     * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
@@ -871,8 +993,10 @@ module VertexMap : sig
     window     : Window.t ->
     ?indices   : 'b IndexArray.t ->
     program    : Program.t ->
-    uniform    : Uniform.t ->
-    parameters : DrawParameter.t ->
+    ?uniform    : Uniform.t ->
+    ?parameters : DrawParameter.t ->
+    ?start     : int ->
+    ?length    : int ->
     mode       : DrawMode.t ->
     unit -> unit
 
@@ -1058,8 +1182,13 @@ module Shape : sig
     ?rotation : float ->
     unit -> t
 
-  (** Draws a shape. *)
-  val draw : window:Window.t -> shape:t -> unit
+  (** Draws a shape on a window using the given parameters.
+    *
+    * $parameters$ defaults to $DrawParameter.make ~depth_test:false ~blend_mode:DrawParameter.BlendMode.alpha$
+    *
+    * @see:OgamlGraphics.DrawParameter
+    * @see:OgamlGraphics.Window *)
+  val draw : ?parameters:DrawParameter.t -> window:Window.t -> shape:t -> unit -> unit
 
   (** Sets the position of the origin in the window. *)
   val set_position : t -> OgamlMath.Vector2i.t -> unit
@@ -1125,8 +1254,13 @@ module Sprite : sig
     ?rotation : float ->
     unit -> t
 
-  (** Draws a sprite. *)
-  val draw : window:Window.t -> sprite:t -> unit
+  (** Draws a sprite on a window using the given parameters.
+    *
+    * $parameters$ defaults to $DrawParameter.make ~depth_test:false ~blend_mode:DrawParameter.BlendMode.alpha$
+    *
+    * @see:OgamlGraphics.DrawParameter
+    * @see:OgamlGraphics.Window *)
+  val draw : ?parameters:DrawParameter.t -> window:Window.t -> sprite:t -> unit -> unit
 
   (** Sets the position of the origin of the sprite in the window. *)
   val set_position : t -> OgamlMath.Vector2i.t -> unit
@@ -1165,6 +1299,113 @@ module Sprite : sig
 
 end
 
+
+(** Text rendering *)
+module Text : sig
+
+  (** This module provides an efficient way to render
+    * text using openGL primitives. *)
+
+  (* Advanced text rendering *)
+  module Fx : sig
+
+  (** This module provides a more customisable way to render text through the
+    * use of iterators. This might prove more costly and also harder to use than
+    * the simple Text.t but it is much more powerful. *)
+
+    (* The type of pre-rendered customised texts. *)
+    type t
+
+    (*** Iterators *)
+
+    (** The type of an iterator.
+      * The idea behind it is that $'a$ is the type of objects that we
+      * manipulate (eg. $Font.code$) while $'b$ is the type of the value
+      * computed by the iterator.
+      * We rely here on continuation passing style to deal with this vaue at
+      * each step. *)
+    type ('a,'b) it = 'a -> 'b -> ('b -> 'b) -> 'b
+
+    (** The type of a full iterator also containing its initial value and a
+      * post-treatment function, typically to forget information that was useful
+      * to the computation but is irrelevant as a value. *)
+    type ('a,'b,'c) full_it = ('a, 'b) it * 'b * ('b -> 'c)
+
+    (** This creates a simple iterator that will return a constant for each
+      * value in the iterated list. *)
+    val forall : 'c -> ('a, 'c list, 'c list) full_it
+
+    (** Lifts a function as map would do. *)
+    val foreach : ('a -> 'b) -> ('a, 'b list, 'b list) full_it
+
+    (** Lifts a function as mapi would do: it adds a parameter counting the
+      * number of times it has been called starting at 0. *)
+    val foreachi : ('a -> int -> 'b) -> ('a, 'b list * int, 'b list) full_it
+
+    (** This iterator is specific to Font.code and allows the user to lift a
+      * function taking words instead of characters.
+      * It splits strings on blank spaces, hence the requirement for their value
+      * as second argument. *)
+    val foreachword :
+      (Font.code list -> 'a) -> 'a ->
+      (Font.code, 'a list * Font.code list, 'a list) full_it
+
+    (** Creates a drawable text with strongly customisable parameters. *)
+    val create :
+      text : string ->
+      position : OgamlMath.Vector2f.t ->
+      font : Font.t ->
+      colors : (Font.code,'b,Color.t list) full_it ->
+      size : int ->
+      unit -> t
+
+    (** Draws a Fx.t. *)
+    val draw :
+      ?parameters : DrawParameter.t ->
+      text : t ->
+      window : Window.t ->
+      unit -> unit
+
+    (** The global advance of the text.
+      * Basically it is a vector such that if you add it to the position of
+      * text object, you get the position of the next character you would
+      * draw. *)
+    val advance : t -> OgamlMath.Vector2f.t
+
+    (** Returns a rectangle containing all the text. *)
+    val boundaries : t -> OgamlMath.FloatRect.t
+
+  end
+
+  (** The type of pre-rendered texts. *)
+  type t
+
+  (** Creates a drawable text from the given string. *)
+  val create :
+    text : string ->
+    position : OgamlMath.Vector2i.t ->
+    font : Font.t ->
+    ?color : Color.t ->
+    size : int ->
+    bold : bool ->
+    unit -> t
+
+  (** Draws text on the screen. *)
+  val draw :
+    ?parameters : DrawParameter.t ->
+    text : t ->
+    window : Window.t ->
+    unit -> unit
+
+  (** The global advance of the text.
+    * Basically it is a vector such that if you add it to the position of
+    * text object, you get the position of the next character you would draw. *)
+  val advance : t -> OgamlMath.Vector2f.t
+
+  (** Returns a rectangle containing all the text. *)
+  val boundaries : t -> OgamlMath.FloatRect.t
+
+end
 
 
 (** Getting real-time mouse information *)

@@ -4,7 +4,7 @@ open OgamlMath
 let () =
   Printf.printf "Beginning vertex array tests...\n%!"
 
-let settings = ContextSettings.create ()
+let settings = OgamlCore.ContextSettings.create ()
 
 let window = Window.create ~width:100 ~height:100 ~settings ~title:""
 
@@ -186,4 +186,4 @@ let () =
   test_vao7 ();
   Printf.printf "\tTest 7 passed\n%!";
   test_vao8 ();
-  Printf.printf "\tTest 8 passed\n%!";
+  Printf.printf "\tTest 8 passed\n%!"

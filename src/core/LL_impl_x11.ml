@@ -5,7 +5,8 @@ module Window = struct
     display : X11.Display.t;
     window  : X11.Window.t;
     context : X11.GLContext.t;
-    mutable closed : bool
+    mutable closed : bool;
+    mutable size : OgamlMath.Vector2i.t
   }
 
   let create ~width ~height ~title ~settings =
@@ -13,9 +14,9 @@ module Window = struct
     let display = X11.Display.create () in
     let vi = X11.VisualInfo.choose display (
       [X11.VisualInfo.DoubleBuffer;
-       X11.VisualInfo.DepthSize (ContextSettings.depth_bits settings); 
+       X11.VisualInfo.DepthSize (ContextSettings.depth_bits settings);
        X11.VisualInfo.StencilSize (ContextSettings.stencil_bits settings)]
-      |> fun l -> 
+      |> fun l ->
           if ContextSettings.aa_level settings > 0 then
             X11.VisualInfo.SampleBuffers 1 ::
             X11.VisualInfo.Samples (ContextSettings.aa_level settings) :: l
@@ -35,21 +36,32 @@ module Window = struct
       |None -> assert false
       |Some(a) -> X11.Atom.set_wm_protocols display window [a]
     end;
+    if ContextSettings.resizable settings = false then
+      X11.Window.set_size_hints display window (width,height) (width,height);
     X11.Event.set_mask display window
       [X11.Event.ExposureMask;
+       X11.Event.StructureNotifyMask;
+       X11.Event.SubstructureNotifyMask;
        X11.Event.KeyPressMask;
        X11.Event.KeyReleaseMask;
        X11.Event.ButtonPressMask;
        X11.Event.ButtonReleaseMask;
        X11.Event.PointerMotionMask];
     X11.Window.map display window;
+    if ContextSettings.fullscreen settings then begin
+      let prop = X11.Atom.intern display "_NET_WM_STATE" true in
+      let atom_fs = X11.Atom.intern display "_NET_WM_STATE_FULLSCREEN" true in
+      match prop, atom_fs with
+      |None, _ |_, None -> failwith "fullscreen not supported"
+      |Some prop, Some atom -> X11.Atom.send_event display window prop [X11.Atom.wm_toggle;atom]
+    end;
     X11.Display.flush display;
     let context = X11.GLContext.create display vi in
     X11.Window.attach display window context;
     X11.Window.set_title display window title;
-    {display; window; context; closed = false}
+    {display; window; context; closed = false; size = OgamlMath.Vector2i.({x = width; y = height})}
 
-  let set_title win title = 
+  let set_title win title =
     X11.Window.set_title win.display win.window title
 
   let close win =
@@ -60,9 +72,24 @@ module Window = struct
     X11.Window.destroy win.display win.window;
     win.closed <- true
 
+  let resize win size =
+    X11.Window.resize win.display win.window size.OgamlMath.Vector2i.x size.OgamlMath.Vector2i.y
+
+  let toggle_fullscreen win = 
+    let prop = X11.Atom.intern win.display "_NET_WM_STATE" true in
+    let atom_fs = X11.Atom.intern win.display "_NET_WM_STATE_FULLSCREEN" true in
+    match prop, atom_fs with
+    |None, _ |_, None -> failwith "fullscreen not supported"
+    |Some prop, Some atom -> X11.Atom.send_event win.display win.window prop [X11.Atom.wm_toggle;atom]
+
   let size win =
     let (x,y) = X11.Window.size win.display win.window in
     OgamlMath.Vector2i.({x;y})
+
+  let rect win =
+    let (width,height) = X11.Window.size win.display win.window in
+    let (x,y) = X11.Window.position win.display win.window in
+    OgamlMath.IntRect.({x; y; width; height})
 
   let is_open win =
     not win.closed
@@ -214,6 +241,9 @@ module Window = struct
               MouseEvent.x = pos.X11.Event.x;
               MouseEvent.y = pos.X11.Event.y
           })
+      | X11.Event.ConfigureNotify when size win <> win.size ->
+          win.size <- size win;
+          Some Event.Resized
       | _ -> None
     end
     | None -> None

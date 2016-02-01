@@ -63,7 +63,8 @@ let rec parse_related s =
       else Str.string_after s (i + 6 + (String.length related)) 
     in
     let (lrel, sleft) = parse_related s_end in
-    (related::lrel, s_begin ^ sleft)
+    let s' = String.trim (s_begin ^ sleft) in
+    (related::lrel, s')
   with
     Not_found -> ([], s)
 
@@ -73,13 +74,18 @@ let parse_comment s =
     |[t] -> t
     |h::t -> Printf.sprintf "%s%s%s" h sep (implode_sep sep t)
   in
-  let related, s_left = parse_related s in
-  Str.split_delim (Str.regexp "\r*\n") s_left
+  Str.split_delim (Str.regexp "\r*\n") s
   |> List.map remove_spaces_star
-  |> implode_sep "\n"
-  |> inline_code
-  |> process_line_jumps
-  |> fun s -> (related,s)
+  |> List.map parse_related
+  |> List.split
+  |> (fun (lr,sl) -> 
+      List.flatten lr, 
+      sl
+      |> implode_sep "\n"
+      |> inline_code
+      |> String.trim
+      |> process_line_jumps
+     )
 
 let begin_module () = 
   Printf.printf "Documenting module %s\n%!" !curr_module;
@@ -93,10 +99,14 @@ abstract: %s
 
 let make_field s (values, vtype) = 
   let related, com = parse_comment (get_doc ()) in
+  let rec implode_sep sep = function
+    |[] -> ""
+    |[t] -> t
+    |h::t -> Printf.sprintf "%s%s%s" h sep (implode_sep sep t)
+  in
   let related_str = 
-    List.fold_left (fun s r ->
-      Printf.sprintf "%s related=\"%s\"" s r
-    ) "" related
+    if List.length related = 0 then ""
+    else Printf.sprintf "related = \"%s\"" (implode_sep "," related)
   in
   Printf.fprintf (get_chan ())
 "{%% capture listing %%}
@@ -106,7 +116,7 @@ let make_field s (values, vtype) =
 %s
 {%% endcapture %%}
 %s
-{%% include docelem.html listing=listing description=description %s%s %%}\n\n"
+{%% include docelem.html listing=listing description=description %s %s %%}\n\n"
   s com values vtype related_str
 
 

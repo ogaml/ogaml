@@ -56,7 +56,7 @@ module Data : sig
   val add_int32 : (int32, int_32) t -> int32 -> unit
 
   (** Returns the data associated to a matrix *)
-  val of_matrix : OgamlMath.Matrix3D.t -> (float, float_32) t
+  val of_bigarray : (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t -> (float, float_32) t
 
   (** Returns the length of some data*)
   val length : ('a, 'b) t -> int
@@ -78,6 +78,9 @@ module Pervasives : sig
 
   (** Sets the clear color *)
   val color : float -> float -> float -> float -> unit
+
+  (** Sets the viewport *)
+  val viewport : int -> int -> int -> int -> unit
 
   (** Sets the current culling mode *)
   val culling : DrawParameter.CullingMode.t -> unit
@@ -328,7 +331,7 @@ module VAO : sig
   val draw : DrawMode.t -> int -> int -> unit
 
   (** Draws an element array using the currently bound VAO and EBO *)
-  val draw_elements : DrawMode.t -> int -> unit
+  val draw_elements : DrawMode.t -> int -> int -> unit
 
 end
 

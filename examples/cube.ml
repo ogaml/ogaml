@@ -1,7 +1,7 @@
 open OgamlGraphics
 open OgamlMath
 
-let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ~msaa:8 ()
+let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 
 let window =
   Window.create ~width:800 ~height:600 ~title:"Cube Example" ~settings
@@ -25,7 +25,8 @@ let cube_source =
     ~normal:"in_normal"
     ~size:36 ()
   in
-  Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
+  Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) |> ignore;
+  Poly.cube src Vector3f.({x = 0.5; y = 1.5; z = -2.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
 
 let axis = VertexArray.static axis_source
 
@@ -52,6 +53,8 @@ let view_theta = ref 0.
 
 let view_phi = ref 0.
 
+let msaa = ref true
+
 let display () =
   (* Compute model matrix *)
   let t = Unix.gettimeofday () in
@@ -64,8 +67,8 @@ let display () =
   rot_angle := !rot_angle +. (abs_float (cos t /. 10.)) /. 3.;
   let parameters =
     DrawParameter.(make
-      ~depth_test:true
-      ~culling:CullingMode.CullClockwise ())
+      ~culling:CullingMode.CullClockwise
+      ~antialiasing:!msaa ())
   in
   let uniform =
     Uniform.empty
@@ -73,7 +76,7 @@ let display () =
     |> Uniform.matrix3D "MVMatrix" mv
     |> Uniform.matrix3D "VMatrix" view
   in
-  VertexArray.draw ~window ~vertices:cube ~uniform ~program:normal_program ~parameters ~mode:DrawMode.Triangles ();
+  VertexArray.draw ~window ~vertices:cube ~uniform ~program:normal_program ~parameters ~start:36 ~mode:DrawMode.Triangles ();
   let uniform =
     Uniform.empty
     |> Uniform.matrix3D "MVPMatrix" vp
@@ -146,6 +149,7 @@ let rec event_loop () =
       match k.Event.KeyEvent.key with
       | Escape -> Window.close window
       | Q when k.Event.KeyEvent.control -> Window.close window
+      | A -> msaa := (not !msaa)
       | _ -> ()
     )
     | _ -> ()
@@ -156,7 +160,7 @@ let rec event_loop () =
 (* Main loop *)
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear window;
+    Window.clear ~color:(`RGB Color.RGB.white) window;
     display ();
     Window.display window;
     (* We only capture the mouse and listen to the keyboard when focused *)

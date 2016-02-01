@@ -33,7 +33,7 @@ void main() {
 "
 
 
-let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
+let settings = OgamlCore.ContextSettings.create ()
 
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"VertexMap Example"
@@ -138,7 +138,6 @@ let display () =
   rot_angle := !rot_angle +. (abs_float (cos t /. 10.)) /. 3.;
   let parameters =
     DrawParameter.(make
-      ~depth_test:true
       ~culling:CullingMode.CullClockwise ())
   in
   let uniform =
@@ -229,7 +228,7 @@ let rec event_loop () =
 (* Main loop *)
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear window;
+    Window.clear ~color:(`RGB Color.RGB.white) window;
     display ();
     Window.display window;
     (* We only capture the mouse and listen to the keyboard when focused *)

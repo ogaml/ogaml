@@ -30,3 +30,8 @@ setup.log
 
 # OS X files
 .DS_Store
+
+# parser and lexer files
+src/graphics/objLexer.ml
+src/graphics/objParser.ml
+src/graphics/objParser.mli

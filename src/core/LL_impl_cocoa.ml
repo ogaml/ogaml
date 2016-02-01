@@ -21,13 +21,19 @@ module Window = struct
     init_app () ;
 
     (* Rect for setting the size -- offset is ignored we will center *)
-    let rect = Cocoa.NSRect.create 0 0 width height in
+    let f = float_of_int in
+    let rect = Cocoa.NSRect.create 0. 0. (f width) (f height) in
 
     (* Now creating an NSWindow *)
     let window = Cocoa.NSWindow.(
       create ~frame:rect
-              (* Might good to be modifiable later *)
-              ~style_mask:[Titled;Closable;Miniaturizable;Resizable]
+              ~style_mask:(
+                  [Titled;Closable;Miniaturizable]
+                  |> fun m ->
+                    if ContextSettings.resizable settings
+                    then Resizable :: m
+                    else m
+                )
               ~backing:Buffered
               ~defer:false ()
     ) in
@@ -47,6 +53,10 @@ module Window = struct
 
     (* Adding a title to the window *)
     Cocoa.OGWindowController.set_title win_ctrl (Cocoa.NSString.create title) ;
+
+    (* Putting the window in fullscreen if asked *)
+    if ContextSettings.fullscreen settings then
+      Cocoa.OGWindowController.toggle_fullscreen win_ctrl ;
 
     (* But first we create and apply a new openGL context *)
     let attr = Cocoa.NSOpenGLPixelFormat.(
@@ -88,10 +98,29 @@ module Window = struct
   let size win =
     let i = int_of_float in
     Cocoa.(
-      let (_,_,w,h) = NSRect.get (Cocoa.OGWindowController.content_frame win)
-      in
+      let (_,_,w,h) = NSRect.get (OGWindowController.content_frame win) in
       OgamlMath.Vector2i.({x = i w; y = i h})
     )
+
+  let rect win =
+    let i = int_of_float in
+    Cocoa.(
+      let (x,y,w,h) = NSRect.get (OGWindowController.content_frame win) in
+      OgamlMath.IntRect.({x = i x; y = i y; width = i w; height = i h})
+    )
+
+  let resize win size =
+    let open Cocoa in
+    let (x,y,oldw,oldh) = NSRect.get (OGWindowController.frame win) in
+    let (w,h) = OgamlMath.Vector2i.(
+      size.x , size.y
+    ) in
+    let (w,h) = float_of_int w, float_of_int h in
+    let frame = NSRect.create (x+.(oldw-.w)/.2.) (y+.(oldh-.h)/.2.) w h in
+    OGWindowController.resize win frame
+
+    let toggle_fullscreen win =
+      Cocoa.OGWindowController.toggle_fullscreen win
 
   let is_open win =
     Cocoa.OGWindowController.is_window_open win
@@ -248,9 +277,10 @@ module Window = struct
                 | MouseMoved     -> Some (Event.MouseMoved (mouse_loc win))
                 | _              -> None
               )
-          | OGEvent.CloseWindow  -> Some Event.Closed
-          | OGEvent.KeyUp   info -> Some (Event.KeyPressed  (mk_key_event info))
-          | OGEvent.KeyDown info -> Some (Event.KeyReleased (mk_key_event info))
+          | OGEvent.CloseWindow   -> Some Event.Closed
+          | OGEvent.KeyUp   inf   -> Some (Event.KeyPressed  (mk_key_event inf))
+          | OGEvent.KeyDown inf   -> Some (Event.KeyReleased (mk_key_event inf))
+          | OGEvent.ResizedWindow -> Some Event.Resized
         )
     | None -> None
 

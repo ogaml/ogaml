@@ -17,7 +17,7 @@ module NSRect : sig
 
   type t
 
-  val create : int -> int -> int -> int -> t
+  val create : float -> float -> float -> float -> t
 
   val get : t -> float * float * float * float
 
@@ -151,6 +151,7 @@ module OGEvent : sig
     | CloseWindow
     | KeyUp       of key_info
     | KeyDown     of key_info
+    | ResizedWindow
 
   val get_content : t -> content
 
@@ -318,5 +319,9 @@ module OGWindowController : sig
   val set_proper_relative_mouse_location : t -> float -> float -> unit
 
   val has_focus : t -> bool
+
+  val resize : t -> NSRect.t -> unit
+
+  val toggle_fullscreen : t -> unit
 
 end

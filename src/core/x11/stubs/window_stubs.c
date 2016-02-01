@@ -128,6 +128,47 @@ caml_size_window(value disp, value win)
 }
 
 
+// INPUT   display, window
+// OUTPUT  position of the window (in pixel)
+CAMLprim value
+caml_xwindow_position(value disp, value win)
+{
+  CAMLparam2(disp, win);
+  XWindowAttributes att;
+  XGetWindowAttributes((Display*) disp, (Window) win, &att);
+  CAMLreturn(Int_pair(att.x, att.y));
+}
+
+
+// INPUT   display, window, x, y
+// OUTPUT  resizes the window
+CAMLprim value
+caml_resize_window(value disp, value win, value w, value h)
+{
+  CAMLparam4(disp, win, w, h);
+  XResizeWindow((Display*) disp, (Window) win, Int_val(w), Int_val(h));
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   display, window, min size, max size
+// OUTPUT  nothing, sets the wm size hints
+CAMLprim value
+caml_set_wm_size_hints(value disp, value win, value minsize, value maxsize)
+{
+  CAMLparam4(disp, win, minsize, maxsize);
+  XSizeHints* hints = XAllocSizeHints();
+  hints->flags      = PMinSize | PMaxSize;
+  hints->min_width  = Int_val(Field(minsize,0));
+  hints->min_height = Int_val(Field(minsize,1));
+  hints->max_width  = Int_val(Field(maxsize,0));
+  hints->max_height = Int_val(Field(maxsize,1));
+  XSetWMNormalHints((Display*) disp, (Window) win, hints);
+  XFree(hints);
+  CAMLreturn(Val_unit);
+}
+
+
 // INPUT   a display, a window
 // OUTPUT  true iff the window has focus
 CAMLprim value

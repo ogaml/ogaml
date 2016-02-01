@@ -39,7 +39,7 @@ endif
 
 # ML constants
 
-ML_SOURCES = LL.ml log.ml
+ML_SOURCES = contextSettings.ml LL.ml log.ml UTF8String.ml
 
 ML_INTERFACES = button.mli keycode.mli event.mli 
 
@@ -76,7 +76,7 @@ ml_stubs:
 	$(PPCOMMAND) -o $@ $<
 
 %.o:%.m
-	$(CLANG) -c -o ./$(notdir $@) $(OCAML_C_FLAGS) $(GLOBAL_OBJCOPTS) $(GLOBAL_CLIBS) $<
+	$(CLANG) -c -o ./$(notdir $@) $(OCAML_C_FLAGS) $(GLOBAL_OBJCOPTS) $<
 
 %.o:%.c
 	$(OCAMLC) -c -o ./$(notdir $@) -cclib "$(GLOBAL_CLIBS)" $<

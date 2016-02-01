@@ -49,6 +49,8 @@ let create = function
       else
         Bytes.set img.data i a
     done; img
+  |`Data (width, height, data) -> 
+    {width; height; data}
 
 let size img = 
   OgamlMath.Vector2i.({x = img.width; y = img.height})
@@ -61,17 +63,33 @@ let set img x y c =
     convert c.Color.RGB.b,
     convert c.Color.RGB.a
   in
-  Bytes.set img.data (x * 4 * img.height + y * 4    ) r;
-  Bytes.set img.data (x * 4 * img.height + y * 4 + 1) g;
-  Bytes.set img.data (x * 4 * img.height + y * 4 + 2) b;
-  Bytes.set img.data (x * 4 * img.height + y * 4 + 3) a
+  Bytes.set img.data (y * 4 * img.width + x * 4    ) r;
+  Bytes.set img.data (y * 4 * img.width + x * 4 + 1) g;
+  Bytes.set img.data (y * 4 * img.width + x * 4 + 2) b;
+  Bytes.set img.data (y * 4 * img.width + x * 4 + 3) a
 
 let get img x y =
   Color.RGB.(
-    {r = inverse img.data.[x * 4 * img.height + y * 4 + 0];
-     g = inverse img.data.[x * 4 * img.height + y * 4 + 1];
-     b = inverse img.data.[x * 4 * img.height + y * 4 + 2];
-     a = inverse img.data.[x * 4 * img.height + y * 4 + 3]})
+    {r = inverse img.data.[y * 4 * img.width + x * 4 + 0];
+     g = inverse img.data.[y * 4 * img.width + x * 4 + 1];
+     b = inverse img.data.[y * 4 * img.width + x * 4 + 2];
+     a = inverse img.data.[y * 4 * img.width + x * 4 + 3]})
 
 let data img = img.data
+
+let blit src ?rect dest pos = 
+  let rect = 
+    match rect with
+    |None   -> OgamlMath.(IntRect.create Vector2i.zero (size src))
+    |Some r -> r
+  in
+  let offi, offj =
+    pos.OgamlMath.Vector2i.x - rect.OgamlMath.IntRect.x,
+    pos.OgamlMath.Vector2i.y - rect.OgamlMath.IntRect.y
+  in
+  OgamlMath.IntRect.loop rect 
+    (fun i j -> 
+      set dest (i + offi) (j + offj) (`RGB (get src i j)))
+
+
 

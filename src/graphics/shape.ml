@@ -51,12 +51,11 @@ let apply_transformations position origin rotation scale point =
   })
   |> fun point ->
   (* Rotation *)
-  let theta = rotation *. Constants.pi /. 180. in
   Vector2f.({
-    x = cos(theta) *. (point.x-.position.x) -.
-        sin(theta) *. (point.y-.position.y) +. position.x ;
-    y = sin(theta) *. (point.x-.position.x) +.
-        cos(theta) *. (point.y-.position.y) +. position.y
+    x = cos(rotation) *. (point.x-.position.x) -.
+        sin(rotation) *. (point.y-.position.y) +. position.x ;
+    y = sin(rotation) *. (point.x-.position.x) +.
+        cos(rotation) *. (point.y-.position.y) +. position.y
   })
 
 (* Computes the actual points of a shape from its vals *)
@@ -341,7 +340,7 @@ let translate shape delta =
   update shape
 
 let rotate shape delta =
-  mod_float (shape.shape_vals.rotation +. delta) 360.
+  mod_float (shape.shape_vals.rotation +. delta) (2. *. Constants.pi)
   |> set_rotation shape
 
 let scale shape scale =
@@ -367,11 +366,11 @@ let color shape = shape.shape_vals.color
 
 let border_color shape = shape.shape_vals.out_color
 
-let draw ~window ~shape =
+let draw ?parameters:(parameters = DrawParameter.make
+                                    ~depth_test:false 
+                                    ~blend_mode:DrawParameter.BlendMode.alpha ())
+         ~window ~shape () =
   let program = Window.LL.program window in
-  let parameters =
-    DrawParameter.make ~blend_mode:DrawParameter.BlendMode.alpha ()
-  in
   let size = Window.size window in
   let uniform =
     Uniform.empty

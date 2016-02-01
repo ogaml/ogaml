@@ -2,6 +2,8 @@
 (** Log system *)
 module Log : sig
 
+  (** This module provides a very simple log system to use with Ogaml *)
+
   (** Enumeration of log message levels *)
   type level = Debug | Warn | Error | Info | Fatal
 
@@ -36,6 +38,66 @@ module Log : sig
 
   (** Logs a fatal error message *)
   val fatal : t -> ('a, out_channel, unit) format -> 'a
+
+end
+
+
+(** UTF-8 String representation and manipulation *)
+module UTF8String : sig
+
+  (** Type of a UTF-8 character code *)
+  type code = int
+
+  (** Type of a UTF-8 encoded string *)
+  type t
+
+  (** Raised when a string is not correctly encoded *)
+  exception UTF8_error of string
+
+  (** Raised when an operation violates the bounds of the string *)
+  exception Out_of_bounds of string
+
+  (** Empty UTF-8 string *)
+  val empty : unit -> t
+
+  (** Makes a UTF-8 string filled with one character
+    * 
+    * Raises UTF8_error if the code is not a valid UTF-8 character code *)
+  val make : int -> code -> t
+
+  (** Returns the ith character of a UTF-8 string *)
+  val get : t -> int -> code
+
+  (** Sets the ith character of a UTF-8 string.
+    *
+    * Raises UTF8_error if the code is not a valid UTF-8 character code *)
+  val set : t -> int -> code -> unit
+
+  (** Returns the length of a UTF-8 string *)
+  val length : t -> int
+
+  (** Returns the byte length of a UTF-8 string
+    * (the number of bytes required to encode it) *)
+  val byte_length : t -> int
+
+  (** Returns a UTF-8 encoded string from a string.
+    * 
+    * Raises UTF8_error if the string is not a valid UTF-8 encoding *)
+  val from_string : string -> t
+
+  (** Returns a string from a UTF-8 encoded string *)
+  val to_string : t -> string
+
+  (** Iterates through a UTF-8 string *)
+  val iter : t -> (code -> unit) -> unit
+
+  (** Folds a UTF-8 string *)
+  val fold : t -> (code -> 'a -> 'a) -> 'a -> 'a
+
+  (** Maps a UTF-8 string
+    *
+    * Raises UTF8_error if the function returns an invalid UTF-8 code *)
+  val map : t -> (code -> code) -> t
 
 end
 
@@ -192,15 +254,61 @@ module Event : sig
 
   end
 
-  (** A variant type describing the possible events @see:OgamlCore.Event.KeyEvent
+  (** A variant type describing the possible events 
+    * @see:OgamlCore.Event.KeyEvent
     * @see:OgamlCore.Event.ButtonEvent @see:OgamlCore.Event.MouseEvent *)
   type t =
     | Closed (* The window sending the event has been closed *)
+    | Resized (* The window has been resized by the user *)
     | KeyPressed     of KeyEvent.t  (* A key has been pressed *)
     | KeyReleased    of KeyEvent.t  (* A key has been released *)
     | ButtonPressed  of ButtonEvent.t (* A mouse button has been pressed *)
     | ButtonReleased of ButtonEvent.t (* A mouse button has been released *)
     | MouseMoved     of MouseEvent.t (* The mouse has been moved *)
+
+end
+
+
+(** Encapsulates data for context creation *)
+module ContextSettings : sig
+
+  (** This module encapsulates the settings used to create a GL context *)
+
+  (** Type of the settings structure *)
+  type t
+
+  (** Creates new settings using the following parameters :
+    *
+    *   $depth$ - bits allocated to the depth buffer (defaults to 24)
+    *
+    *   $stencil$ - bits allocated to the stencil buffer (defaults to 0)
+    *
+    *   $msaa$ - MSAA level (defaults to 0)
+    *
+    *   $resizable$ - requests a resizable context (defaults to true)
+    *
+    *)
+  val create : ?depth:int ->
+               ?stencil:int ->
+               ?msaa:int ->
+               ?resizable:bool ->
+               ?fullscreen:bool ->
+               unit -> t
+
+  (** Returns the requested AA level *)
+  val aa_level : t -> int
+
+  (** Returns the requested number of depth buffer bits *)
+  val depth_bits : t -> int
+
+  (** Returns the requested number of stencil buffer bits *)
+  val stencil_bits : t -> int
+
+  (** Returns true iff the settings require a resizable window *)
+  val resizable : t -> bool
+
+  (** Returns true iff the settings require fullscreen mode *)
+  val fullscreen : t -> bool
 
 end
 
@@ -212,41 +320,7 @@ module LL : sig
     * You should probably use the wrappers defined in OgamlGraphics
     * rather than this module. *)
 
-  (** Parameters to customize the GL context *)
-  module ContextSettings : sig
-
-    (** This module provides a way to customise the GL context
-      * when creating a window *)
-
-    (** Contains all the context settings *)
-    type t
-
-    (** Creates the settings associated to those parameters :
-      *
-      * - antialiasing : AA level (defaults to 0) 
-      *
-      * - depth_bits : depth buffer bits (defaults to 0)
-      *
-      * - stencil_bits : stencil buffer bits (defaults to 0)
-      *)
-    val create : 
-      ?antialiasing:int ->
-      ?depth_bits:int   ->
-      ?stencil_bits:int -> unit -> t
-
-    (** Returns the requested AA level *)
-    val aa_level : t -> int
-
-    (** Returns the requested number of depth buffer bits *)
-    val depth_bits : t -> int
-
-    (** Returns the requested number of stencil buffer bits *)
-    val stencil_bits : t -> int
-
-  end
-
-
-  (** Window management *)
+    (** Window management *)
   module Window : sig
 
     (** This module provides a low-level interface to create and
@@ -269,9 +343,20 @@ module LL : sig
     (** Destroys and frees the window from the memory *)
     val destroy : t -> unit
 
+    (** Returns the rectangle associated to a window, in screen coordinates
+      * @see:OgamlMath.IntRect *)
+    val rect : t -> OgamlMath.IntRect.t
+
     (** Returns the size of a window
       * @see:OgamlMath.Vector2i *)
     val size : t -> OgamlMath.Vector2i.t
+
+    (** Resize a window
+      * @see:OgamlMath.Vector2i *)
+    val resize : t -> OgamlMath.Vector2i.t -> unit
+
+    (** Toggle the full screen mode of a window *)
+    val toggle_fullscreen : t -> unit
 
     (** Returns $true$ iff the window is open *)
     val is_open : t -> bool

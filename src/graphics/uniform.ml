@@ -9,6 +9,7 @@ type uniform =
   | Vector3i  of OgamlMath.Vector3i.t
   | Vector2i  of OgamlMath.Vector2i.t
   | Matrix3D  of OgamlMath.Matrix3D.t
+  | Matrix2D  of OgamlMath.Matrix2D.t
   | Color     of Color.RGB.t
   | Texture2D of Texture.Texture2D.t
   | Float     of float
@@ -35,6 +36,8 @@ let vector3i s v m = UniformMap.add s (Vector3i v) m
 let vector2i s v m = UniformMap.add s (Vector2i v) m
 
 let matrix3D s mat m = UniformMap.add s (Matrix3D mat) m
+
+let matrix2D s mat m = UniformMap.add s (Matrix2D mat) m
 
 let color s c m = UniformMap.add s (Color (Color.rgb c)) m
 
@@ -76,7 +79,11 @@ module LL = struct
         )
     | Matrix3D m, GLTypes.GlslType.Float4x4 -> 
         OgamlMath.Matrix3D.(
-          GL.Uniform.mat4 location (GL.Data.of_matrix m)
+          GL.Uniform.mat4 location (GL.Data.of_bigarray (to_bigarray m))
+        )
+    | Matrix2D m, GLTypes.GlslType.Float3x3 -> 
+        OgamlMath.Matrix2D.(
+          GL.Uniform.mat4 location (GL.Data.of_bigarray (to_bigarray m))
         )
     | Color    c, GLTypes.GlslType.Float4   -> 
         Color.RGB.(

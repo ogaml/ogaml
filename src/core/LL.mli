@@ -1,22 +1,3 @@
-
-module ContextSettings : sig
-
-  type t
-
-  val create : 
-    ?antialiasing:int ->
-    ?depth_bits:int   ->
-    ?stencil_bits:int -> unit -> t
-
-  val aa_level : t -> int
-
-  val depth_bits : t -> int
-
-  val stencil_bits : t -> int
-
-end
-
-
 (** Window creation and manipulation *)
 module Window : sig
 
@@ -37,6 +18,15 @@ module Window : sig
 
   (** Return the size of a window *)
   val size : t -> OgamlMath.Vector2i.t
+
+  (** Returns the rectangle of a window *)
+  val rect : t -> OgamlMath.IntRect.t
+
+  (** Resize a window *)
+  val resize : t -> OgamlMath.Vector2i.t -> unit
+
+  (** Toggle FullScreen mode *)
+  val toggle_fullscreen : t -> unit
 
   (** Return true iff the window is open *)
   val is_open : t -> bool

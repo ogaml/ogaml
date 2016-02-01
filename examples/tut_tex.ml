@@ -1,7 +1,7 @@
 open OgamlGraphics
 open OgamlMath
 
-let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ()
+let settings = OgamlCore.ContextSettings.create ()
 
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Texture Tutorial"
@@ -75,8 +75,6 @@ let vertices = VertexArray.static vertex_source
 
 let texture = Texture.Texture2D.create (`File "examples/mario-block.bmp")
 
-let parameters = DrawParameter.make ()
-
 let uniform =
   Uniform.empty
   |> Uniform.texture2D "my_texture" texture
@@ -92,8 +90,8 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear window;
-    VertexArray.draw ~window ~vertices ~program ~parameters ~uniform ~mode:DrawMode.TriangleStrip ();
+    Window.clear ~color:(`RGB Color.RGB.white) window;
+    VertexArray.draw ~window ~vertices ~program ~uniform ~mode:DrawMode.TriangleStrip ();
     Window.display window;
     event_loop ();
     main_loop ();

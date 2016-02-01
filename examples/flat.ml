@@ -1,7 +1,12 @@
 open OgamlGraphics
 open OgamlMath
 
-let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ~msaa:8 ()
+let settings =
+  OgamlCore.ContextSettings.create
+    ~msaa:8
+    ~resizable:true
+    ~fullscreen:true
+    ()
 let window =
   Window.create ~width:900 ~height:600 ~settings ~title:"Flat Example"
 
@@ -99,15 +104,15 @@ let circle =
     ()
 
 let draw () =
-  Shape.draw ~window ~shape:rectangle1 ;
-  Shape.draw ~window ~shape:rectangle2 ;
-  Shape.draw ~window ~shape:polygon1 ;
-  Shape.draw ~window ~shape:polygon2 ;
-  Shape.draw ~window ~shape:regular1 ;
-  Shape.draw ~window ~shape:regular2 ;
-  Shape.draw ~window ~shape:line1 ;
-  Shape.draw ~window ~shape:line2 ;
-  Shape.draw ~window ~shape:circle
+  Shape.draw ~window ~shape:rectangle1 ();
+  Shape.draw ~window ~shape:rectangle2 ();
+  Shape.draw ~window ~shape:polygon1 ();
+  Shape.draw ~window ~shape:polygon2 ();
+  Shape.draw ~window ~shape:regular1 ();
+  Shape.draw ~window ~shape:regular2 ();
+  Shape.draw ~window ~shape:line1 ();
+  Shape.draw ~window ~shape:line2 ();
+  Shape.draw ~window ~shape:circle ()
 
 let do_all action param =
   action rectangle1 param ;
@@ -150,6 +155,9 @@ let rec handle_events () =
         (* This is thick! *)
         | V -> do_all gothicker false
         | B -> do_all gothicker true
+        (* Resizing the window *)
+        | M -> Window.resize window Vector2i.({ x = 500 ; y = 400 })
+        | L -> Window.toggle_fullscreen window
         | _ -> ()
       )
       | _      -> ()
@@ -158,7 +166,7 @@ let rec handle_events () =
 
 let rec each_frame () =
   if Window.is_open window then begin
-    Window.clear window ;
+    Window.clear ~color:(`RGB Color.RGB.white) window ;
     draw () ;
     Window.display window ;
     handle_events () ;

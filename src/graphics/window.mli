@@ -6,7 +6,7 @@ val create :
   width:int ->
   height:int ->
   title:string ->
-  settings:ContextSettings.t -> t
+  settings:OgamlCore.ContextSettings.t -> t
 
 (** Changes the title of the window. *)
 val set_title : t -> string -> unit
@@ -17,6 +17,15 @@ val close : t -> unit
 
 (** Free the window and the memory *)
 val destroy : t -> unit
+
+(** Resize the window *)
+val resize : t -> OgamlMath.Vector2i.t -> unit
+
+(** Toggles the full screen mode of a window. *)
+val toggle_fullscreen : t -> unit
+
+(** Returns the rectangle associated to a window, in screen coordinates *)
+val rect : t -> OgamlMath.IntRect.t
 
 (** Return the size of a window *)
 val size : t -> OgamlMath.Vector2i.t
@@ -36,7 +45,7 @@ val poll_event : t -> OgamlCore.Event.t option
 val display : t -> unit
 
 (** Clears the window *)
-val clear : t -> unit
+val clear : ?color:Color.t -> t -> unit
 
 (** Returns the internal GL state of the window *)
 val state : t -> State.t
@@ -52,5 +61,9 @@ module LL : sig
 
   (** Returns the 2D drawing program for sprites *)
   val sprite_program : t -> Program.t
+
+  val text_program : t -> Program.t
+
+  val bind_draw_parameters : t -> DrawParameter.t -> unit
 
 end
