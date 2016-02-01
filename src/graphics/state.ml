@@ -37,21 +37,9 @@ let glsl_version s =
 let is_glsl_version_supported s v = 
   v <= s.glsl
 
-let culling_mode s =
-  s.culling_mode
-
-let polygon_mode s =
-  s.polygon_mode
-
-
-let depth_test s = 
-  s.depth_test
-
-let clear_color s = 
-  s.color
-
 let assert_no_error s = 
   assert (GL.Pervasives.error () = None)
+
 
 module LL = struct
   

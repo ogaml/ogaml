@@ -1,8 +1,9 @@
 open OgamlMath
 open OgamlUtils
+open OgamlCore
 open OgamlGraphics
 
-let settings = ContextSettings.create ~color:(`RGB Color.RGB.white) ~msaa:8 ()
+let settings = ContextSettings.create ~msaa:8 ()
 
 let window = Window.create ~width:800 ~height:600 ~title:"Interpolators" ~settings
 
@@ -20,7 +21,7 @@ let rec draw_curve color = function
                 ~top:Vector2i.({x = x1'; y = y1'}) 
                 ~tip:Vector2i.({x = x2'; y = y2'}) ()
     in
-    Shape.draw window l;
+    Shape.draw ~window ~shape:l ();
     draw_curve color ((x2,y2)::t)
   | _ -> ()
 
@@ -62,10 +63,10 @@ let draw_grid () =
                 ~tip:Vector2i.({x = 205; y = 100})
                 ()
   in
-  Shape.draw window abs;
-  Shape.draw window ord;
-  Shape.draw window onex;
-  Shape.draw window oney
+  Shape.draw ~window ~shape:abs ();
+  Shape.draw ~window ~shape:ord ();
+  Shape.draw ~window ~shape:onex ();
+  Shape.draw ~window ~shape:oney ()
 
 let ip1 = Interpolator.linear 0.5 [] 0.7 
 
@@ -100,7 +101,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear window ;
+    Window.clear ~color:(`RGB Color.RGB.white) window ;
     draw ();
     Window.display window ;
     event_loop () ;
