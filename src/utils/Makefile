@@ -23,11 +23,11 @@ PACKNAME = OgamlUtils
 
 default: .depend compile_utils_nat compile_utils_byte
 
-compile_utils_nat: .depend $(MLCMIS) $(MLNATOBJS)
+compile_utils_nat: .depend $(MLCMIS) $(MLNATOBJS) ogamlUtils.cmi
 	$(OCAMLFIND) $(OCAMLOPT) -pack -o $(MLLIB).cmx $(MLCMIS) $(MLNATOBJS);
 	$(OCAMLFIND) $(OCAMLOPT) -a -o $(MLLIB).cmxa $(INCLUDE_DIRS) $(MLLIB).cmx
 
-compile_utils_byte: .depend $(MLCMIS) $(MLOBJS)
+compile_utils_byte: .depend $(MLCMIS) $(MLOBJS) ogamlUtils.cmi
 	$(OCAMLFIND) $(OCAMLC) -pack -o $(MLLIB).cmo $(MLCMIS) $(MLOBJS);
 	$(OCAMLFIND) $(OCAMLC) -a -o $(MLLIB).cma $(INCLUDE_DIRS) $(MLLIB).cmo
 

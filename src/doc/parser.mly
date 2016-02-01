@@ -9,7 +9,7 @@
 %token STAR COLON SEMICOLON EQUALS
 %token LBRACE RBRACE LBRACK RBRACK
 %token PIPE DOT ARROW COMMA
-%token MODULE VAL TYPE END SIG EXN OF
+%token MODULE VAL TYPE END SIG EXN OF FUNCTOR WITH AND
 %token LOWER GREATER
 
 %start <AST.module_field list> file
@@ -42,6 +42,11 @@ module_field:
     {AST.Exn (t, Some e)}
   |MODULE; t = UIDENT; COLON; SIG; m = module_content; END
     {AST.Module (t, m)}
+  |MODULE; TYPE; t = UIDENT; EQUALS; SIG; m = module_content; END
+    {AST.Signature (t, m)}
+  |MODULE; t = UIDENT; COLON; FUNCTOR; m = functor_params; 
+   ARROW; u = UIDENT; topt = type_constraints
+    {AST.(Functor {name = t; args = m; sign = u; constr = topt})}
   ;
 
 module_content:
@@ -76,13 +81,28 @@ value_type:
   ;
 
 value_type_params:
-  | s = value_type; COMMA; t = value_type {[s;t]}
-  | s = value_type; COMMA; t = value_type_params {s::t}
+  | s = delim_value_type; COMMA; t = delim_value_type {[s;t]}
+  | s = delim_value_type; COMMA; t = value_type_params {s::t}
   ;
 
 value_type_param:
   | s = value_type {[s]}
   | LPAREN; l = value_type_params; RPAREN {l}
+  ;
+
+functor_params:
+  | LPAREN; u = UIDENT; COLON; v = UIDENT; RPAREN {[u,v]}
+  | LPAREN; u = UIDENT; COLON; v = UIDENT; RPAREN; l = functor_params {(u,v)::l}
+  ;
+
+opt_constraints:
+  | {[]}
+  | AND; TYPE; l = LIDENT; EQUALS; t = value_type; o = opt_constraints {(l,t)::o}
+  ;
+
+type_constraints:
+  | {[]}
+  | WITH; TYPE; l = LIDENT; EQUALS; t = value_type; o = opt_constraints {(l,t)::o}
   ;
 
 delim_value_type:

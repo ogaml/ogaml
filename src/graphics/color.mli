@@ -23,6 +23,8 @@ module RGB : sig
 
   val clamp : t -> t
 
+  val map : t -> (float -> float) -> t
+
 end
 
 
@@ -50,6 +52,8 @@ module HSV : sig
 
   val clamp : t -> t
 
+  val map : t -> (float -> float) -> t
+
 end
 
 
@@ -65,3 +69,5 @@ val hsv : t -> HSV.t
 val rgb : t -> RGB.t
 
 val clamp : t -> t
+
+val map : t -> (float -> float) -> t

@@ -43,6 +43,9 @@ module Color : sig
     (** Clamps all the values of a color between 0 and 1 *)
     val clamp : t -> t
 
+    (** Maps each value of a color *)
+    val map : t -> (float -> float) -> t
+
   end
 
   (** Manipulation of HSVA colors *)
@@ -82,6 +85,9 @@ module Color : sig
       * and h between 0 and 2*pi *)
     val clamp : t -> t
 
+    (** Maps each value of a color *)
+    val map : t -> (float -> float) -> t
+
   end
 
 
@@ -110,6 +116,9 @@ module Color : sig
 
   (** Clamps a color w.r.t RGB.clamp and HSV.clamp *)
   val clamp : t -> t
+
+  (** Maps each value of a color *)
+  val map : t -> (float -> float) -> t
 
 end
 
@@ -1306,14 +1315,14 @@ module Text : sig
   (** This module provides an efficient way to render
     * text using openGL primitives. *)
 
-  (* Advanced text rendering *)
+  (** Advanced text rendering *)
   module Fx : sig
 
   (** This module provides a more customisable way to render text through the
     * use of iterators. This might prove more costly and also harder to use than
     * the simple Text.t but it is much more powerful. *)
 
-    (* The type of pre-rendered customised texts. *)
+    (** The type of pre-rendered customised texts. *)
     type t
 
     (*** Iterators *)

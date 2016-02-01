@@ -14,4 +14,5 @@ bounding.cmi : ../math/ogamlMath.cmi
 dequeue.cmi :
 graph.cmi :
 interpolator.cmi : ../math/ogamlMath.cmi
+ogamlUtils.cmi : ../math/ogamlMath.cmi
 priorityQueue.cmi :

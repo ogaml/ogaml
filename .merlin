@@ -1,4 +1,5 @@
 S src
+S src/doc
 S src/core
 S src/core/x11
 S src/core/cocoa
@@ -10,6 +11,7 @@ S tests
 S examples
 
 B src
+B src/doc
 B src/core
 B src/core/x11
 B src/core/cocoa

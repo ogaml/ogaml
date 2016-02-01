@@ -35,9 +35,8 @@ OgamlGraphics:
   ☐ Transformations as matrices in uniforms for sprite, shape and text
   ✔ Vertex array (and map) slices (needed for batching) @done(2015-12-11 10:29) @project(OgamlGraphics)
   ✔ Test VAO slices @done(2015-12-11 11:13) @project(OgamlGraphics)
-  ☐ Vector and color maps
+  ✔ Vector and color maps @done(2016-02-01 18:11) @project(OgamlGraphics)
   ☐ Window coordinate conversions
-  ☐ Move UTF8String in Utils
   ✘ Fix fullscreen mashing  - Xlib problem @cancelled(2015-12-16 14:22) @project(OgamlGraphics)
 
 Math:
@@ -46,6 +45,17 @@ Math:
   ✔ Maybe corner = position + size @done(2016-02-01 17:24) @project(Math)
   ✔ Update doc for box @done(2016-02-01 17:24) @project(Math)
   ☐ Bresenham's line algorithm (2D and 3D)
+
+Utils:
+  ✔ Add functors to doc parsing @done(2016-02-01 23:17) @project(Utils)
+  ✔ Add an interface @done(2016-02-01 22:21) @project(Utils)
+  ☐ Move UTF8String from Graphics to Utils
+  ☐ Bounding module :
+    ☐ Split module (bounding3D / bounding2D)
+    ☐ Rework architecture (submodules to avoid record names clashes)
+    ☐ Normalization of boxes (reuse box module ?)
+    ☐ Tests
+
 
 Text:
   ✔ Support newlines @done(2015-12-10 15:47) @project(Text)

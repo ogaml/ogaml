@@ -172,7 +172,7 @@ module B3D = struct
 
   let rec maximal_point = function
     | Mesh l ->
-      let lmap = List.map minimal_point l in
+      let lmap = List.map maximal_point l in
       List.fold_left (fun v pt -> Vector3f.map2 v pt max) 
                      Vector3f.({x = neg_infinity; y = neg_infinity; z = neg_infinity})
                      lmap
