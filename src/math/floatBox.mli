@@ -3,15 +3,21 @@ type t = {x : float; y : float; z : float; width : float; height : float; depth 
 
 val create : Vector3f.t -> Vector3f.t -> t
 
+val create_from_points : Vector3f.t -> Vector3f.t -> t
+
+val zero : t
+
 val one : t
 
-val corner : t -> Vector3f.t
-
 val position : t -> Vector3f.t
+
+val corner : t -> Vector3f.t
 
 val size : t -> Vector3f.t
 
 val center : t -> Vector3f.t
+
+val normalize : t -> t
 
 val volume : t -> float
 

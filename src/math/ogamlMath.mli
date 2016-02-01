@@ -433,14 +433,26 @@ module IntRect : sig
   type t = {x : int; y : int; width : int; height : int}
 
   (** $create position size$ creates a rectangle at position $position$ and
-    * of size $size$ *)
+    * of size $size$
+    *
+    * The rectangle is created such that $width$ and $height$ are $>= 0$ *)
   val create : Vector2i.t -> Vector2i.t -> t
 
-  (** Returns the position of a rectangle *)
-  val corner : t -> Vector2i.t
+  (** $create_from_points p1 p2$ creates a rectangle going from $p1$ to $p2$ 
+    * such that $width$ and $height$ are $>= 0$ *)
+  val create_from_points : Vector2i.t -> Vector2i.t -> t
 
-  (** Alias for corner *)
+  (** Zero rectangle *)
+  val zero : t
+
+  (** Unit rectangle *)
+  val one : t
+
+  (** Returns the position of a rectangle *)
   val position : t -> Vector2i.t
+
+  (** Returns the top corner (aka position + size) of a rectangle *)
+  val corner : t -> Vector2i.t
 
   (** Returns the size of a rectangle *)
   val size : t -> Vector2i.t
@@ -448,10 +460,14 @@ module IntRect : sig
   (** Returns the center of a rectangle *)
   val center : t -> Vector2f.t
 
+  (** $normalize rect$ returns a rectangle equivalent to $rect$ but with
+      positive $width$ and $height$ *)
+  val normalize : t -> t
+
   (** Returns the area of a rectangle *)
   val area : t -> int
 
-  (** Scales a rectangle *)
+  (** Scales a rectangle (the result is normalized) *)
   val scale : t -> Vector2i.t -> t
 
   (** Translates a rectangle *)
@@ -463,8 +479,8 @@ module IntRect : sig
   (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
   val contains : t -> Vector2i.t -> bool
 
-  (** $loop t f$ iterates through all points of the rectangle *)
-  val loop : t -> (int -> int -> unit) -> unit
+  (** $iter t f$ iterates through all points of the rectangle *)
+  val iter : t -> (int -> int -> unit) -> unit
 
 end
 
@@ -478,14 +494,26 @@ module FloatRect : sig
   type t = {x : float; y : float; width : float; height : float}
 
   (** $create position size$ creates a rectangle at position $position$ and
-    * of size $size$ *)
+    * of size $size$
+    *
+    * The rectangle is created such that $width$ and $height$ are $>= 0$ *)
   val create : Vector2f.t -> Vector2f.t -> t
 
-  (** Returns the position of a rectangle *)
-  val corner : t -> Vector2f.t
+  (** $create_from_points p1 p2$ creates a rectangle going from $p1$ to $p2$ 
+    * such that $width$ and $height$ are $>= 0$ *)
+  val create_from_points : Vector2f.t -> Vector2f.t -> t
 
-  (** Alias for corner *)
+  (** Zero rectangle *)
+  val zero : t
+
+  (** Unit rectangle *)
+  val one : t
+
+  (** Returns the position of a rectangle *)
   val position : t -> Vector2f.t
+
+  (** Returns the top corner (aka position + size) of a rectangle *)
+  val corner : t -> Vector2f.t
 
   (** Returns the size of a rectangle *)
   val size : t -> Vector2f.t
@@ -493,10 +521,14 @@ module FloatRect : sig
   (** Returns the center of a rectangle *)
   val center : t -> Vector2f.t
 
+  (** $normalize rect$ returns a rectangle equivalent to $rect$ but with
+      positive $width$ and $height$ *)
+  val normalize : t -> t
+
   (** Returns the area of a rectangle *)
   val area : t -> float
 
-  (** Scales a rectangle *)
+  (** Scales a rectangle (the result is normalized) *)
   val scale : t -> Vector2f.t -> t
 
   (** Translates a rectangle *)
@@ -526,17 +558,30 @@ module IntBox : sig
   type t = {x : int; y : int; z : int; width : int; height : int; depth : int}
 
   (** $create position size$ creates a box at position $position$ and
-    * of size $size$ *)
+    * of size $size$
+    *
+    * The box is created such that $width$, $height$ and $depth$ are $>= 0$ *)
   val create : Vector3i.t -> Vector3i.t -> t
+
+  (** $create_from_points p1 p2$ creates a box going from $p1$ to $p2$ 
+    * such that $width$, $height$ and $depth$ are $>= 0$ *)
+  val create_from_points : Vector3i.t -> Vector3i.t -> t
+
+  (** Zero box *)
+  val zero : t
 
   (** Unit box *)
   val one : t
 
   (** Returns the position of a box *)
+  val position : t -> Vector3i.t
+
+  (** Returns the top corner (aka position + size) of a box *)
   val corner : t -> Vector3i.t
 
-  (** Alias for corner *)
-  val position : t -> Vector3i.t
+  (** $normalize box$ returns a box equivalent to $box$ but with
+      positive $width$, $height$ and $depth$ *)
+  val normalize : t -> t
 
   (** Returns the size of a box *)
   val size : t -> Vector3i.t
@@ -547,7 +592,7 @@ module IntBox : sig
   (** Returns the volume of a box *)
   val volume : t -> int
 
-  (** Scales a box *)
+  (** Scales a box (the result is normalized) *)
   val scale : t -> Vector3i.t -> t
 
   (** Translates a box *)
@@ -559,8 +604,8 @@ module IntBox : sig
   (** $contains t p$ returns $true$ iff the box $t$ contains $p$ *)
   val contains : t -> Vector3i.t -> bool
 
-  (** $loop t f$ iterates through all points of the box *)
-  val loop : t -> (int -> int -> int -> unit) -> unit
+  (** $iter t f$ iterates through all points of the box *)
+  val iter : t -> (int -> int -> int -> unit) -> unit
 
 end
 
@@ -574,17 +619,26 @@ module FloatBox : sig
   type t = {x : float; y : float; z : float; width : float; height : float; depth : float}
 
   (** $create position size$ creates a box at position $position$ and
-    * of size $size$ *)
+    * of size $size$
+    *
+    * The box is created such that $width$, $height$ and $depth$ are $>= 0$ *)
   val create : Vector3f.t -> Vector3f.t -> t
+
+  (** $create_from_points p1 p2$ creates a box going from $p1$ to $p2$ 
+    * such that $width$, $height$ and $depth$ are $>= 0$ *)
+  val create_from_points : Vector3f.t -> Vector3f.t -> t
+
+  (** Zero box *)
+  val zero : t
 
   (** Unit box *)
   val one : t
 
   (** Returns the position of a box *)
-  val corner : t -> Vector3f.t
-
-  (** Alias for corner *)
   val position : t -> Vector3f.t
+
+  (** Returns the top corner (aka position + size) of a box *)
+  val corner : t -> Vector3f.t
 
   (** Returns the size of a box *)
   val size : t -> Vector3f.t
@@ -592,10 +646,14 @@ module FloatBox : sig
   (** Returns the center of a box *)
   val center : t -> Vector3f.t
 
+  (** $normalize box$ returns a box equivalent to $box$ but with
+      positive $width$, $height$ and $depth$ *)
+  val normalize : t -> t
+
   (** Returns the volume of a box *)
   val volume : t -> float
 
-  (** Scales a box *)
+  (** Scales a box (the result is normalized) *)
   val scale : t -> Vector3f.t -> t
 
   (** Translates a box *)

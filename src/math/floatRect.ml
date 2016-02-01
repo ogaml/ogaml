@@ -1,17 +1,30 @@
 
 type t = {x : float; y : float; width : float; height : float}
 
-let create pos size = 
-  {x = pos.Vector2f.x; 
-   y = pos.Vector2f.y;
-   width  = size.Vector2f.x; 
-   height = size.Vector2f.y}
+let create v1 v2 = 
+  let open Vector2f in
+  let x = if v2.x >= 0. then v1.x else v1.x +. v2.x in
+  let y = if v2.y >= 0. then v1.y else v1.y +. v2.y in
+  let width  = if v2.x >= 0. then v2.x else -. v2.x in
+  let height = if v2.y >= 0. then v2.y else -. v2.y in
+  { x; y; width; height }
 
-let corner t =
+let create_from_points v1 v2 = 
+  create v1 (Vector2f.sub v2 v1)
+
+let zero = 
+  { x = 0.; y = 0.; width = 0.; height = 0. }
+
+let one = 
+  { x = 0.; y = 0.; width = 1.; height = 1. }
+
+let position t =
   {Vector2f.x = t.x;
    Vector2f.y = t.y}
 
-let position = corner
+let corner t = 
+  {Vector2f.x = t.x +. t.width;
+   Vector2f.y = t.y +. t.height}
 
 let size t =
   {Vector2f.x = t.width;
@@ -21,11 +34,15 @@ let center t =
   {Vector2f.x = (t.x +. t.width ) /. 2.; 
    Vector2f.y = (t.y +. t.height) /. 2.}
 
+let normalize t = 
+  create (position t) (size t)
+
 let area t = t.width *. t.height
 
 let scale t s = 
   {t with width  = s.Vector2f.x *. t.width;
           height = s.Vector2f.y *. t.height}
+  |> normalize
 
 let translate t v = 
   {t with x = v.Vector2f.x +. t.x;

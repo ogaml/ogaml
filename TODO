@@ -41,10 +41,11 @@ OgamlGraphics:
   ✘ Fix fullscreen mashing  - Xlib problem @cancelled(2015-12-16 14:22) @project(OgamlGraphics)
 
 Math:
-  ☐ Create box absolute/relative
-  ☐ Fix box width/height to be always positive
-  ☐ Maybe corner = position + size
-  ☐ Update doc for box
+  ✔ Create box absolute/relative @done(2016-02-01 17:24) @project(Math)
+  ✔ Fix box width/height to be always positive @done(2016-02-01 17:24) @project(Math)
+  ✔ Maybe corner = position + size @done(2016-02-01 17:24) @project(Math)
+  ✔ Update doc for box @done(2016-02-01 17:24) @project(Math)
+  ☐ Bresenham's line algorithm (2D and 3D)
 
 Text:
   ✔ Support newlines @done(2015-12-10 15:47) @project(Text)

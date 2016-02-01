@@ -1,27 +1,40 @@
 
 type t = {x : int; y : int; z : int; width : int; height : int; depth : int}
 
-let create v1 v2 = {
-  x = v1.Vector3i.x;
-  y = v1.Vector3i.y;
-  z = v1.Vector3i.z;
-  width  = v2.Vector3i.x;
-  height = v2.Vector3i.y;
-  depth  = v2.Vector3i.z
-}
+let create v1 v2 = 
+  let open Vector3i in
+  let x = if v2.x >= 0 then v1.x else v1.x + v2.x in
+  let y = if v2.y >= 0 then v1.y else v1.y + v2.y in
+  let z = if v2.z >= 0 then v1.z else v1.z + v2.z in
+  let width  = if v2.x >= 0 then v2.x else - v2.x in
+  let height = if v2.y >= 0 then v2.y else - v2.y in
+  let depth  = if v2.z >= 0 then v2.z else - v2.z in
+  { x; y; z; width; height; depth }
 
-let one = {
+let create_from_points v1 v2 = 
+  create v1 (Vector3i.sub v2 v1)
+
+let zero = {
   x = 0; y = 0; z = 0;
   width = 0; height = 0; depth = 0
 }
 
-let corner t = {
+let one = {
+  x = 0; y = 0; z = 0;
+  width = 1; height = 1; depth = 1
+}
+
+let position t = {
   Vector3i.x = t.x;
   Vector3i.y = t.y;
   Vector3i.z = t.z;
 }
 
-let position = corner
+let corner t = {
+  Vector3i.x = t.x + t.width;
+  Vector3i.y = t.y + t.height;
+  Vector3i.z = t.z + t.depth;
+}
 
 let size t = {
   Vector3i.x = t.width;
@@ -35,13 +48,17 @@ let center t = {
   Vector3f.z = (float_of_int (t.z + t.depth))  /. 2.
 }
 
+let normalize t = 
+  create (position t) (size t)
+
 let volume t = t.width * t.height * t.depth
 
-let scale t v = {t with
-  width  = t.width  * v.Vector3i.x;
-  height = t.height * v.Vector3i.y;
-  depth  = t.depth  * v.Vector3i.z;
-}
+let scale t v = 
+  {t with
+    width  = t.width  * v.Vector3i.x;
+    height = t.height * v.Vector3i.y;
+    depth  = t.depth  * v.Vector3i.z;
+  } |> normalize
 
 let translate t v = {t with
   x = t.x + v.Vector3i.x;
@@ -65,7 +82,8 @@ let contains t pt =
   pt.Vector3i.y <= t.y + t.height &&
   pt.Vector3i.z <= t.z + t.depth
 
-let loop t f = 
+let iter t f = 
+  let t = normalize t in
   for i = t.x to t.x + t.width - 1 do
     for j = t.y to t.y + t.height - 1 do
       for k = t.z to t.z + t.depth - 1 do

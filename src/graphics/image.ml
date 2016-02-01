@@ -87,7 +87,7 @@ let blit src ?rect dest pos =
     pos.OgamlMath.Vector2i.x - rect.OgamlMath.IntRect.x,
     pos.OgamlMath.Vector2i.y - rect.OgamlMath.IntRect.y
   in
-  OgamlMath.IntRect.loop rect 
+  OgamlMath.IntRect.iter rect 
     (fun i j -> 
       set dest (i + offi) (j + offj) (`RGB (get src i j)))
 
