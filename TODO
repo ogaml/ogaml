@@ -40,6 +40,12 @@ OgamlGraphics:
   ☐ Move UTF8String in Utils
   ✘ Fix fullscreen mashing  - Xlib problem @cancelled(2015-12-16 14:22) @project(OgamlGraphics)
 
+Math:
+  ☐ Create absolute/relative
+  ☐ Fix box width/height to be always positive
+  ☐ Maybe corner = position + size
+  ☐ Update doc for box
+
 Text:
   ✔ Support newlines @done(2015-12-10 15:47) @project(Text)
   ✔ Boundaries @done(2015-12-10 00:37) @project(Text)
