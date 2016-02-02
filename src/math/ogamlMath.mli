@@ -101,6 +101,12 @@ module Vector2i : sig
   (** Returns the minimal coordinate of a vector *)
   val min : t -> int
 
+  (** $raster p1 p2$ applies the Bresenham's line algorithm between the points
+    * $p1$ and $p2$ and returns the list of points constituting the line
+    *
+    * Note : should not be used for precise raytracing as it may miss points *)
+  val raster : t -> t -> t list
+
   (** Returns a pretty-printed string (not for serialization) *)
   val print : t -> string
 
@@ -191,6 +197,23 @@ module Vector2f : sig
   (** $endpoint a v t$ returns the point $a + tv$ *)
   val endpoint : t -> t -> float -> t
 
+  (** $raytrace_points p1 p2$ returns the list of integer-valued points (squares) on 
+    * the line from $p1$ to $p2$  
+    * 
+    * Each point is a triplet of the form $(t, p, f)$ such that :
+    *  
+    *  $t$ is the time at the intersection between the line and the point
+    *
+    *  $p$ are the (integer) coordinates of the point
+    *
+    *  $f$ is a unit vector indicating which face of the square has been intersected 
+    *)
+  val raytrace_points : t -> t -> (float * t * t) list
+
+  (** $raytrace p v t$ applies $raytrace_points$ between the points 
+    * $p$ and $p + tv$. The intersection times are comprised between 0 and t *)
+  val raytrace : t -> t -> float -> (float * t * t) list
+
 end
 
 
@@ -267,6 +290,12 @@ module Vector3i : sig
 
   (** Returns the minimal coordinate of a vector *)
   val min : t -> int
+
+  (** $raster p1 p2$ applies the Bresenham's line algorithm between the points
+    * $p1$ and $p2$ and returns the list of points constituting the line 
+    *
+    * Note : should not be used for precise raytracing as it may miss points *)
+  val raster : t -> t -> t list
 
   (** Returns a pretty-printed string (not for serialization) *)
   val print : t -> string
@@ -366,6 +395,24 @@ module Vector3f : sig
 
   (** $endpoint a v t$ returns the point $a + tv$ *)
   val endpoint : t -> t -> float -> t
+
+  (** $raytrace_points p1 p2$ returns the list of integer-valued points (cubes) on 
+    * the line from $p1$ to $p2$  
+    * 
+    * Each point is a triplet of the form $(t, p, f)$ such that :
+    *  
+    *  $t$ is the time at the intersection between the line and the point
+    *
+    *  $p$ are the (integer) coordinates of the point
+    *
+    *  $f$ is a unit vector indicating which face of the cube has been intersected 
+    *)
+  val raytrace_points : t -> t -> (float * t * t) list
+
+  (** $raytrace p v t$ applies $raytrace_points$ between the points 
+    * $p$ and $p + tv$. The intersection times are comprised between 0 and t *)
+  val raytrace : t -> t -> float -> (float * t * t) list
+
 
 end
 

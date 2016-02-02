@@ -44,7 +44,7 @@ Math:
   ✔ Fix box width/height to be always positive @done(2016-02-01 17:24) @project(Math)
   ✔ Maybe corner = position + size @done(2016-02-01 17:24) @project(Math)
   ✔ Update doc for box @done(2016-02-01 17:24) @project(Math)
-  ☐ Bresenham's line algorithm (2D and 3D)
+  ✔ Bresenham's line algorithm (2D and 3D) @done(2016-02-02 15:20) @project(Math)
 
 Utils:
   ✔ Add functors to doc parsing @done(2016-02-01 23:17) @project(Utils)

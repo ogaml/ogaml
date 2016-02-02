@@ -61,3 +61,7 @@ val direction : t -> t -> t
 (* Returns the point u + tv *)
 val endpoint : t -> t -> float -> t
 
+val raytrace_points : t -> t -> (float * t * t) list
+
+val raytrace : t -> t -> float -> (float * t * t) list
+

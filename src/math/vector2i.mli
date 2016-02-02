@@ -40,5 +40,7 @@ val max : t -> int
 
 val min : t -> int
 
+val raster : t -> t -> t list
+
 val print : t -> string
 

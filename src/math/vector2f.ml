@@ -100,3 +100,46 @@ let endpoint u v t =
   prop t v
   |> add u
 
+let raytrace_points p1 p2 = 
+  let intersects a b mark = 
+    let s   = if a < b then 1. else -1. in
+    let fst = if a < b then ceil a  else Pervasives.floor a in
+    let lst = if a < b then Pervasives.floor b else ceil  b in
+    let idx = 1. /. (b -. a) in
+    let rec aux v = 
+      if (a  < b && v > lst +. 0.00001) 
+      || (a >= b && v < lst -. 0.00001) then []
+      else begin
+        let t = (v -. a) *. idx in
+        (t, prop (-.s) mark)::(aux (v +. s))
+      end
+    in
+    aux fst
+  in
+  let rebuild l = 
+    let fst = {x = Pervasives.floor p1.x; y = Pervasives.floor p1.y} in
+    let fstface = 
+      if abs_float (p2.x -. p1.x) >= abs_float (p2.y -. p1.y) then begin
+        if p2.x >= p1.x then {x = -1.; y = 0.}
+        else {x = 1.; y = 0.}
+      end else begin
+        if p2.y >= p1.y then {x = 0.; y = -1.}
+        else {x = 0.; y = 1.}
+      end
+    in
+    let rec aux p = function
+      |[] -> []
+      |(t,face)::tail -> 
+          let v = sub p face in 
+          (t,v,face)::(aux v tail)
+    in
+    (0., fst, fstface)::(aux fst l)
+  in
+  let inters_x = intersects p1.x p2.x {x = 1.; y = 0.} in
+  let inters_y = intersects p1.y p2.y {x = 0.; y = 1.} in
+  let inters   = List.merge (fun (t,_) (t',_) -> compare t t') inters_x inters_y in
+  rebuild inters
+
+let raytrace p v t = 
+  raytrace_points p (endpoint p v t)
+  |> List.map (fun (t',a,b) -> (t'*.t,a,b))

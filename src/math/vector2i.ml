@@ -74,4 +74,36 @@ let min u =
 let print u = 
   Printf.sprintf "(x = %i; y = %i)" u.x u.y
 
-
+let raster v1 v2 = 
+  let d = sub v2 v1 in 
+  let a = prop 2 (map d abs) in
+  let s = map d (fun x -> if x < 0 then -1 else 1) in
+  let rec aux_x x y yd = 
+    if x = v2.x then [{x;y}]
+    else begin
+      let y', yd' = 
+        if yd >= 0 then (y + s.y, yd - a.x) else y, yd
+      in
+      let x', yd'' = 
+        x + s.x, yd' + a.y
+      in
+      {x;y}::(aux_x x' y' yd'')
+    end
+  in
+  let rec aux_y x y xd = 
+    if y = v2.y then [{x;y}]
+    else begin
+      let x', xd' = 
+        if xd >= 0 then (x + s.x, xd - a.y) else x, xd
+      in
+      let y', xd'' =
+        y + s.y, xd' + a.x
+      in
+      {x;y}::(aux_y x' y' xd'')
+    end
+  in
+  if a.x >= a.y then
+    aux_x v1.x v1.y (a.y - a.x/2)
+  else 
+    aux_y v1.x v1.y (a.x - a.y/2)
+  
