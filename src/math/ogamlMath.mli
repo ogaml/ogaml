@@ -199,14 +199,14 @@ module Vector2f : sig
 
   (** $raytrace_points p1 p2$ returns the list of integer-valued points (squares) on 
     * the line from $p1$ to $p2$  
-    * 
+    *
     * Each point is a triplet of the form $(t, p, f)$ such that :
-    *  
-    *  $t$ is the time at the intersection between the line and the point
     *
-    *  $p$ are the (integer) coordinates of the point
+    * $t$ is the time at the intersection between the line and the point
     *
-    *  $f$ is a unit vector indicating which face of the square has been intersected 
+    * $p$ stores the (integer) coordinates of the point
+    *
+    * $f$ is a unit vector indicating which face of the square has been intersected 
     *)
   val raytrace_points : t -> t -> (float * t * t) list
 
@@ -398,14 +398,14 @@ module Vector3f : sig
 
   (** $raytrace_points p1 p2$ returns the list of integer-valued points (cubes) on 
     * the line from $p1$ to $p2$  
-    * 
-    * Each point is a triplet of the form $(t, p, f)$ such that :
-    *  
-    *  $t$ is the time at the intersection between the line and the point
     *
-    *  $p$ are the (integer) coordinates of the point
+    * Each point is a triple of the form $(t, p, f)$ such that :
     *
-    *  $f$ is a unit vector indicating which face of the cube has been intersected 
+    * $t$ is the time at the intersection between the line and the point
+    *
+    * $p$ stores the (integer) coordinates of the point
+    *
+    * $f$ is a unit vector indicating which face of the cube has been intersected 
     *)
   val raytrace_points : t -> t -> (float * t * t) list
 
