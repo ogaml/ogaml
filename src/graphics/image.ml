@@ -1,3 +1,4 @@
+open OgamlMath
 
 exception Load_error of string
 
@@ -55,7 +56,8 @@ let create = function
 let size img = 
   OgamlMath.Vector2i.({x = img.width; y = img.height})
 
-let set img x y c = 
+let set img v c = 
+  let open Vector2i in
   let r,g,b,a =
     let c = Color.rgb c in
     convert c.Color.RGB.r, 
@@ -63,17 +65,18 @@ let set img x y c =
     convert c.Color.RGB.b,
     convert c.Color.RGB.a
   in
-  Bytes.set img.data (y * 4 * img.width + x * 4    ) r;
-  Bytes.set img.data (y * 4 * img.width + x * 4 + 1) g;
-  Bytes.set img.data (y * 4 * img.width + x * 4 + 2) b;
-  Bytes.set img.data (y * 4 * img.width + x * 4 + 3) a
+  Bytes.set img.data (v.y * 4 * img.width + v.x * 4    ) r;
+  Bytes.set img.data (v.y * 4 * img.width + v.x * 4 + 1) g;
+  Bytes.set img.data (v.y * 4 * img.width + v.x * 4 + 2) b;
+  Bytes.set img.data (v.y * 4 * img.width + v.x * 4 + 3) a
 
-let get img x y =
+let get img v =
+  let open Vector2i in
   Color.RGB.(
-    {r = inverse img.data.[y * 4 * img.width + x * 4 + 0];
-     g = inverse img.data.[y * 4 * img.width + x * 4 + 1];
-     b = inverse img.data.[y * 4 * img.width + x * 4 + 2];
-     a = inverse img.data.[y * 4 * img.width + x * 4 + 3]})
+    {r = inverse img.data.[v.y * 4 * img.width + v.x * 4 + 0];
+     g = inverse img.data.[v.y * 4 * img.width + v.x * 4 + 1];
+     b = inverse img.data.[v.y * 4 * img.width + v.x * 4 + 2];
+     a = inverse img.data.[v.y * 4 * img.width + v.x * 4 + 3]})
 
 let data img = img.data
 
@@ -83,13 +86,9 @@ let blit src ?rect dest pos =
     |None   -> OgamlMath.(IntRect.create Vector2i.zero (size src))
     |Some r -> r
   in
-  let offi, offj =
-    pos.OgamlMath.Vector2i.x - rect.OgamlMath.IntRect.x,
-    pos.OgamlMath.Vector2i.y - rect.OgamlMath.IntRect.y
-  in
+  let off = Vector2i.sub pos (IntRect.position rect) in
   OgamlMath.IntRect.iter rect 
-    (fun i j -> 
-      set dest (i + offi) (j + offj) (`RGB (get src i j)))
+    (fun v -> set dest (Vector2i.add v off) (`RGB (get src v)))
 
 
 

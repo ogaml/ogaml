@@ -64,6 +64,19 @@ let iter t f =
   let t = normalize t in 
   for i = t.x to t.x + t.width - 1 do
     for j = t.y to t.y + t.height - 1 do
-      f i j
+      f Vector2i.({x = i; y = j})
     done;
   done
+
+let fold t f u = 
+  let t = normalize t in 
+  let r = ref u in
+  for i = t.x to t.x + t.width - 1 do
+    for j = t.y to t.y + t.height - 1 do
+      r := f Vector2i.({x = i; y = j}) !r
+    done;
+  done;
+  !r
+
+
+

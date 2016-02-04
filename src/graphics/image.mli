@@ -9,9 +9,9 @@ val create : [`File of string |
 
 val size : t -> OgamlMath.Vector2i.t
 
-val set : t -> int -> int -> Color.t -> unit
+val set : t -> OgamlMath.Vector2i.t -> Color.t -> unit
 
-val get : t -> int -> int -> Color.RGB.t
+val get : t -> OgamlMath.Vector2i.t -> Color.RGB.t
 
 val data : t -> Bytes.t
 

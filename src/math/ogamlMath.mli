@@ -85,6 +85,12 @@ module Vector2i : sig
   (** Computes the norm of a vector *)
   val norm : t -> float
 
+  (** Computes the squared distance between two points *)
+  val squared_dist : t -> t -> int
+
+  (** Computes the distance between two points *)
+  val dist : t -> t -> float
+
   (** $clamp v a b$ returns the vector whose coordinates are the coordinates of $v$
     * clamped between the coordinates of $a$ and $b$ *)
   val clamp : t -> t -> t -> t
@@ -167,6 +173,12 @@ module Vector2f : sig
 
   (** Computes the norm of a vector *)
   val norm : t -> float
+
+  (** Computes the squared distance between two points *)
+  val squared_dist : t -> t -> float 
+
+  (** Computes the distance between two points *)
+  val dist : t -> t -> float
 
   (** Normalizes a vector. Raises Vector2f_exception if the vector is zero. *)
   val normalize : t -> t
@@ -275,6 +287,12 @@ module Vector3i : sig
   (** Computes the norm of a vector *)
   val norm : t -> float
 
+  (** Computes the squared distance between two points *)
+  val squared_dist : t -> t -> int
+
+  (** Computes the distance between two points *)
+  val dist : t -> t -> float
+
   (** $clamp v a b$ returns the vector whose coordinates are the coordinates of $v$
     * clamped between the coordinates of $a$ and $b$ *)
   val clamp : t -> t -> t -> t
@@ -366,6 +384,12 @@ module Vector3f : sig
 
   (** Computes the norm of a vector *)
   val norm : t -> float
+
+  (** Computes the squared distance between two points *)
+  val squared_dist : t -> t -> float
+
+  (** Computes the distance between two points *)
+  val dist : t -> t -> float
 
   (** Normalizes a vector. Raises Vector3f_exception if the vector is zero. *)
   val normalize : t -> t
@@ -526,8 +550,11 @@ module IntRect : sig
   (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
   val contains : t -> Vector2i.t -> bool
 
-  (** $iter t f$ iterates through all points of the rectangle *)
-  val iter : t -> (int -> int -> unit) -> unit
+  (** $iter t f$ iterates through all points of the rectangle $t$ *)
+  val iter : t -> (Vector2i.t -> unit) -> unit
+
+  (** $fold t f u$ folds through all points of the rectangle $t$ *)
+  val fold : t -> (Vector2i.t -> 'a -> 'a) -> 'a -> 'a
 
 end
 
@@ -651,8 +678,11 @@ module IntBox : sig
   (** $contains t p$ returns $true$ iff the box $t$ contains $p$ *)
   val contains : t -> Vector3i.t -> bool
 
-  (** $iter t f$ iterates through all points of the box *)
-  val iter : t -> (int -> int -> int -> unit) -> unit
+  (** $iter t f$ iterates through all points of the box $t$ *)
+  val iter : t -> (Vector3i.t -> unit) -> unit
+
+  (** $fold t f$ folds through all points of the box $t$ *)
+  val fold : t -> (Vector3i.t -> 'a -> 'a) -> 'a -> 'a
 
 end
 

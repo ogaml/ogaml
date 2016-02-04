@@ -87,7 +87,20 @@ let iter t f =
   for i = t.x to t.x + t.width - 1 do
     for j = t.y to t.y + t.height - 1 do
       for k = t.z to t.z + t.depth - 1 do
-        f i j k
+        f Vector3i.({x = i; y = j; z = k})
       done;
     done;
   done
+
+let fold t f u = 
+  let t = normalize t in
+  let r = ref u in
+  for i = t.x to t.x + t.width - 1 do
+    for j = t.y to t.y + t.height - 1 do
+      for k = t.z to t.z + t.depth - 1 do
+        r := f Vector3i.({x = i; y = j; z = k}) !r
+      done;
+    done;
+  done;
+  !r
+

@@ -30,6 +30,10 @@ val squared_norm : t -> int
 
 val norm : t -> float
 
+val squared_dist : t -> t -> int
+
+val dist : t -> t -> float
+
 val clamp : t -> t -> t -> t
 
 val map : t -> (int -> int) -> t

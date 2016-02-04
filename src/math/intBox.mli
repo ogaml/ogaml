@@ -29,4 +29,6 @@ val intersect : t -> t -> bool
 
 val contains : t -> Vector3i.t -> bool
 
-val iter : t -> (int -> int -> int -> unit) -> unit
+val iter : t -> (Vector3i.t -> unit) -> unit
+
+val fold : t -> (Vector3i.t -> 'a -> 'a) -> 'a -> 'a

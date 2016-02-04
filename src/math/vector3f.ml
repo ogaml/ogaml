@@ -85,6 +85,10 @@ let squared_norm v =
 let norm v = 
   sqrt (dot v v)
 
+let squared_dist v1 v2 = squared_norm (sub v2 v1)
+
+let dist v1 v2 = norm (sub v2 v1)
+
 let normalize v = 
   let n = norm v in
   if n = 0. then

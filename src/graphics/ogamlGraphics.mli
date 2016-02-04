@@ -322,11 +322,11 @@ module Image : sig
 
   (** Sets a pixel of an image
     * @see:OgamlGraphics.Color *)
-  val set : t -> int -> int -> Color.t -> unit
+  val set : t -> OgamlMath.Vector2i.t -> Color.t -> unit
 
   (** Gets the color of a pixel of an image
     * @see:OgamlGraphics.Color.RGB *)
-  val get : t -> int -> int -> Color.RGB.t
+  val get : t -> OgamlMath.Vector2i.t -> Color.RGB.t
 
   (** $blit src ~rect dest offset$ blits the subimage of $src$ defined by $rect$
     * on the image $dest$ at position $offset$ (relative to the top-left pixel).

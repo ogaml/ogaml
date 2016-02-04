@@ -51,6 +51,10 @@ let squared_norm v =
 let norm v = 
   sqrt (float_of_int (dot v v))
 
+let squared_dist v1 v2 = squared_norm (sub v2 v1)
+
+let dist v1 v2 = norm (sub v2 v1)
+
 let angle u v =
   atan2 (float_of_int (det u v)) (float_of_int (dot u v))
 

@@ -30,7 +30,7 @@ OgamlGraphics:
   ☐ Move programs to State (+ organize)
   ☐ Size-dependant oversampling in Font
   ☐ Floats in sprite, text and shape
-  ☐ Vector2i in image
+  ✔ Vector2i in image @done(2016-02-04 11:03) @project(OgamlGraphics)
   ☐ Size in sprite and shape ?
   ✔ Matrix2D ? @done(2015-12-16 16:15) @project(OgamlGraphics)
   ☐ Transformations as matrices in uniforms for sprite, shape and text

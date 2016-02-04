@@ -29,5 +29,7 @@ val intersect : t -> t -> bool
 
 val contains : t -> Vector2i.t -> bool
 
-val iter : t -> (int -> int -> unit) -> unit
+val iter : t -> (Vector2i.t -> unit) -> unit
+
+val fold : t -> (Vector2i.t -> 'a -> 'a) -> 'a -> 'a
 
