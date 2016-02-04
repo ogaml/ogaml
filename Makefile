@@ -48,7 +48,8 @@ examples:
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/vertexmaps.ml -o vertexmaps.out;
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/sprites.ml -o sprites.out;
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics,ogaml.utils examples/ip.ml -o ip.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/text.ml -o text.out
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/text.ml -o text.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics,ogaml.utils examples/noise.ml -o noise.out
 
 tests: math_lib core_lib graphics_lib utils_lib
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/programs.ml -o main.out && ./main.out &&\

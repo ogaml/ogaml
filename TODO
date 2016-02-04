@@ -30,6 +30,7 @@ OgamlGraphics:
   ☐ Move programs to State (+ organize)
   ☐ Size-dependant oversampling in Font
   ☐ Floats in sprite, text and shape
+  ☐ Vector2i in image
   ☐ Size in sprite and shape ?
   ✔ Matrix2D ? @done(2015-12-16 16:15) @project(OgamlGraphics)
   ☐ Transformations as matrices in uniforms for sprite, shape and text
@@ -50,12 +51,18 @@ Utils:
   ✔ Add functors to doc parsing @done(2016-02-01 23:17) @project(Utils)
   ✔ Add an interface @done(2016-02-01 22:21) @project(Utils)
   ☐ Move UTF8String from Graphics to Utils
+  ✔ PerlinNoise : @done(2016-02-04 10:48) @project(Utils)
+    ✔ 2D @done(2016-02-04 10:48) @project(Utils)
+    ✔ 3D @done(2016-02-04 10:48) @project(Utils)
   ☐ Bounding module :
     ☐ Split module (bounding3D / bounding2D)
     ☐ Rework architecture (submodules to avoid record names clashes)
     ☐ Normalization of boxes (reuse box module ?)
     ☐ Tests
-
+  ☐ Segment trees :
+    ☐ Functorized for use with various coordinate systems
+    ☐ Quadtree 
+    ☐ Octree 
 
 Text:
   ✔ Support newlines @done(2015-12-10 15:47) @project(Text)

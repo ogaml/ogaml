@@ -156,6 +156,49 @@ module Interpolator : sig
 end
 
 
+(** Various noises *)
+module Noise : sig 
+
+  (** This module provides various 2D and 3D noises *)
+
+  (** 2D Perlin noise *)
+  module Perlin2D : sig
+
+    (** Type of a 2D Perlin noise *)
+    type t
+
+    (** Creates a 2D Perlin noise with the current random state *)
+    val create : unit -> t
+
+    (** Creates a 2D Perlin noise with a custom random state *)
+    val create_with_seed : Random.State.t -> t
+
+    (** Gets the value of a 2D noise at a given point *)
+    val get : t -> OgamlMath.Vector2f.t -> float
+
+  end
+
+
+  (** 3D Perlin noise *)
+  module Perlin3D : sig
+
+    (** Type of a 3D Perlin noise *)
+    type t
+
+    (** Creates a 3D Perlin noise with the current random state *)
+    val create : unit -> t
+
+    (** Creates a 3D Perlin noise with a custom random state *)
+    val create_with_seed : Random.State.t -> t
+
+    (** Gets the value of a 3D noise at a given point *)
+    val get : t -> OgamlMath.Vector3f.t -> float
+
+  end
+
+end
+
+
 (** Priority queue data structure *)
 module PriorityQueue : sig
 
