@@ -74,30 +74,33 @@ let intersect t1 t2 =
        (t1.z + t1.depth  < t2.z) ||
        (t2.z + t2.depth  < t1.z))
 
-let contains t pt = 
+let contains ?strict:(strict=false) t pt = 
+  let s = if strict then -1 else 0 in
   pt.Vector3i.x >= t.x &&
   pt.Vector3i.y >= t.y &&
   pt.Vector3i.z >= t.z &&
-  pt.Vector3i.x <= t.x + t.width  &&
-  pt.Vector3i.y <= t.y + t.height &&
-  pt.Vector3i.z <= t.z + t.depth
+  pt.Vector3i.x <= t.x + t.width  + s &&
+  pt.Vector3i.y <= t.y + t.height + s &&
+  pt.Vector3i.z <= t.z + t.depth  + s
 
-let iter t f = 
+let iter ?strict:(strict=true) t f = 
+  let s = if strict then -1 else 0 in
   let t = normalize t in
-  for i = t.x to t.x + t.width - 1 do
-    for j = t.y to t.y + t.height - 1 do
-      for k = t.z to t.z + t.depth - 1 do
+  for i = t.x to t.x + t.width + s do
+    for j = t.y to t.y + t.height + s do
+      for k = t.z to t.z + t.depth + s do
         f Vector3i.({x = i; y = j; z = k})
       done;
     done;
   done
 
-let fold t f u = 
+let fold ?strict:(strict=true) t f u = 
+  let s = if strict then -1 else 0 in
   let t = normalize t in
   let r = ref u in
-  for i = t.x to t.x + t.width - 1 do
-    for j = t.y to t.y + t.height - 1 do
-      for k = t.z to t.z + t.depth - 1 do
+  for i = t.x to t.x + t.width + s do
+    for j = t.y to t.y + t.height + s do
+      for k = t.z to t.z + t.depth + s do
         r := f Vector3i.({x = i; y = j; z = k}) !r
       done;
     done;

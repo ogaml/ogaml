@@ -547,14 +547,20 @@ module IntRect : sig
   (** $intersect t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
   val intersect : t -> t -> bool
 
-  (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
-  val contains : t -> Vector2i.t -> bool
+  (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ 
+    *
+    * if $strict$ is set to $true$ then upper bounds are not included ($false$ by default) *)
+  val contains : ?strict:bool -> t -> Vector2i.t -> bool
 
-  (** $iter t f$ iterates through all points of the rectangle $t$ *)
-  val iter : t -> (Vector2i.t -> unit) -> unit
+  (** $iter t f$ iterates through all points of the rectangle $t$
+    * 
+    * if $strict$ is set to $false$ then upper bounds are included ($true$ by default) *)
+  val iter : ?strict:bool -> t -> (Vector2i.t -> unit) -> unit
 
-  (** $fold t f u$ folds through all points of the rectangle $t$ *)
-  val fold : t -> (Vector2i.t -> 'a -> 'a) -> 'a -> 'a
+  (** $fold t f u$ folds through all points of the rectangle $t$ 
+    * 
+    * if $strict$ is set to $false$ then upper bounds are included ($true$ by default) *)
+  val fold : ?strict:bool -> t -> (Vector2i.t -> 'a -> 'a) -> 'a -> 'a
 
 end
 
@@ -675,14 +681,20 @@ module IntBox : sig
   (** $intersect t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
   val intersect : t -> t -> bool
 
-  (** $contains t p$ returns $true$ iff the box $t$ contains $p$ *)
-  val contains : t -> Vector3i.t -> bool
+  (** $contains t p$ returns $true$ iff the box $t$ contains $p$ 
+    *
+    * if $strict$ is set to $true$ then upper bounds are not included ($false$ by default) *)
+  val contains : ?strict:bool -> t -> Vector3i.t -> bool
 
-  (** $iter t f$ iterates through all points of the box $t$ *)
-  val iter : t -> (Vector3i.t -> unit) -> unit
+  (** $iter t f$ iterates through all points of the box $t$
+    * 
+    * if $strict$ is set to $false$ then upper bounds are included ($true$ by default) *)
+  val iter : ?strict:bool -> t -> (Vector3i.t -> unit) -> unit
 
-  (** $fold t f$ folds through all points of the box $t$ *)
-  val fold : t -> (Vector3i.t -> 'a -> 'a) -> 'a -> 'a
+  (** $fold t f u$ folds through all points of the box $t$ 
+    * 
+    * if $strict$ is set to $false$ then upper bounds are included ($true$ by default) *)
+  val fold : ?strict:bool -> t -> (Vector3i.t -> 'a -> 'a) -> 'a -> 'a
 
 end
 

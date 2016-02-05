@@ -51,6 +51,7 @@ Utils:
   ✔ Add functors to doc parsing @done(2016-02-01 23:17) @project(Utils)
   ✔ Add an interface @done(2016-02-01 22:21) @project(Utils)
   ☐ Move UTF8String from Graphics to Utils
+  ☐ Add optional parameter to IPs for endtime
   ✔ PerlinNoise : @done(2016-02-04 10:48) @project(Utils)
     ✔ 2D @done(2016-02-04 10:48) @project(Utils)
     ✔ 3D @done(2016-02-04 10:48) @project(Utils)

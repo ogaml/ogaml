@@ -54,25 +54,28 @@ let intersect t1 t2 =
        (t1.y + t1.height < t2.y) ||
        (t2.y + t2.height < t1.y))
 
-let contains t pt = 
+let contains ?strict:(strict=false) t pt = 
+  let s = if strict then -1 else 0 in
   pt.Vector2i.x >= t.x &&
   pt.Vector2i.y >= t.y &&
-  pt.Vector2i.x <= t.x + t.width &&
-  pt.Vector2i.y <= t.y + t.height
+  pt.Vector2i.x <= t.x + t.width + s &&
+  pt.Vector2i.y <= t.y + t.height + s
 
-let iter t f = 
+let iter ?strict:(strict=true) t f = 
   let t = normalize t in 
-  for i = t.x to t.x + t.width - 1 do
-    for j = t.y to t.y + t.height - 1 do
+  let s = if strict then -1 else 0 in
+  for i = t.x to t.x + t.width + s do
+    for j = t.y to t.y + t.height + s do
       f Vector2i.({x = i; y = j})
     done;
   done
 
-let fold t f u = 
+let fold ?strict:(strict=false) t f u = 
   let t = normalize t in 
   let r = ref u in
-  for i = t.x to t.x + t.width - 1 do
-    for j = t.y to t.y + t.height - 1 do
+  let s = if strict then -1 else 0 in
+  for i = t.x to t.x + t.width + s do
+    for j = t.y to t.y + t.height + s do
       r := f Vector2i.({x = i; y = j}) !r
     done;
   done;

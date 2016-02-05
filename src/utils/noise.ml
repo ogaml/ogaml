@@ -56,6 +56,7 @@ module Perlin2D = struct
 
   let get p vec = 
     let open Vector2f in
+    let vec = Vector2f.map vec abs_float in
     let x1 = (int_of_float vec.x) land 255 and
         y1 = (int_of_float vec.y) land 255 and
         xi = vec.x -. (float (int_of_float vec.x)) and
@@ -95,6 +96,7 @@ module Perlin3D = struct
 
   let get p vec = 
     let open Vector3f in
+    let vec = Vector3f.map vec abs_float in
     let x1 = (int_of_float vec.x) land 255 and
         y1 = (int_of_float vec.y) land 255 and
         z1 = (int_of_float vec.z) land 255 and

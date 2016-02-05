@@ -25,14 +25,14 @@ let () =
     for j = 0 to 599 do
       let v = Noise.Perlin2D.get perlin 
         Vector2f.{
-          x = float_of_int i /. 100.;
-          y = float_of_int j /. 100.;
+          x = float_of_int i /. 100. -. 4.;
+          y = float_of_int j /. 100. -. 3.;
         }
       in
       mini := min !mini v;
       maxi := max !maxi v;
       let v = (v +. 1.) /. 2. in
-      Image.set img i j (`RGB Color.RGB.({r = v; g = v; b = v; a = 1.}))
+      Image.set img Vector2i.({x = i; y = j}) (`RGB Color.RGB.({r = v; g = v; b = v; a = 1.}))
     done;
   done;
   Printf.printf "Noise min : %f, noise max : %f\n%!" !mini !maxi

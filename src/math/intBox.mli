@@ -27,8 +27,8 @@ val translate : t -> Vector3i.t -> t
 
 val intersect : t -> t -> bool
 
-val contains : t -> Vector3i.t -> bool
+val contains : ?strict:bool -> t -> Vector3i.t -> bool
 
-val iter : t -> (Vector3i.t -> unit) -> unit
+val iter : ?strict:bool -> t -> (Vector3i.t -> unit) -> unit
 
-val fold : t -> (Vector3i.t -> 'a -> 'a) -> 'a -> 'a
+val fold : ?strict:bool -> t -> (Vector3i.t -> 'a -> 'a) -> 'a -> 'a
