@@ -4,13 +4,13 @@
 
 [![Build Status](https://travis-ci.org/ogaml/ogaml.svg?branch=master)](https://travis-ci.org/ogaml/ogaml)
 
-DISCLAIMER : This library is only in early stages and some features will probably
+DISCLAIMER: This library is only in early stages and some features will probably
 change or be removed.
 
-## Presentation :
+## Presentation:
 
 OGAML is a fast and cross-platform multimedia library for OCaml. It provides
-the following modules :
+the following modules:
 
   * OgamlMath - provides mathematical functions and structures such as 
     vectors, matrices, quaternion and polygons. This module is particularly
@@ -36,7 +36,7 @@ the following modules :
 You can find some examples in the corresponding directory as well as on the 
 documentation http://ogaml.github.io (broken for now).
 
-Upcoming features :
+Upcoming features:
 
   * Render textures
 
@@ -51,9 +51,9 @@ Upcoming features :
 Our ultimate goal is to add access to music, network, and to implement more 
 helpers to make games (like physics, lighting, etc...).
 
-## Why use OGAML (rather than raw OpenGL for example) ?
+## Why use OGAML (rather than raw OpenGL for example)?
 
-OGAML is safe and easy to use : 
+OGAML is safe and easy to use: 
 
   * The functions are high-level and the API tries to be as functional as 
   possible. This should help to avoid bugs due to mutable values, pointers, or
@@ -82,10 +82,10 @@ OGAML is safe and easy to use :
   exception before it happens. This means that you don't need to call 
   `glGetError` (which is quite costly). 
 
-OGAML provides advanced functionalities :
+OGAML provides advanced functionalities:
 
   * The module VertexArray provides a high-level and easy to use wrapper around
-  OpenGL's vertex arrays. Unfortunately, this comes at a cost : those arrays 
+  OpenGL's vertex arrays. Unfortunately, this comes at a cost: those arrays 
   cannot contain custom data. But you can use the module VertexMap that provides
   the same functionnality for custom data.
 
@@ -98,9 +98,9 @@ OGAML provides advanced functionalities :
   etc...) in a modular and functional way.
 
 
-## Building and installing OGAML (OSX/Linux only) : 
+## Building and installing OGAML (OSX/Linux only): 
   
-You will need the following dependancies : 
+You will need the following dependancies: 
 
   * cppo (preprocessor)
 
