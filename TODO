@@ -27,6 +27,7 @@ OgamlGraphics:
   ☐ Non exposed InternalUtils for binding draw parameters for example
   ☐ Error checking in Font, Image (loading), Image.blit
   ☐ Default Parameters to aa:false for Text
+  ☐ Default settings for window
   ☐ Move programs to State (+ organize)
   ☐ Size-dependant oversampling in Font
   ☐ Floats in sprite, text and shape
