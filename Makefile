@@ -5,7 +5,7 @@ include common_defs.mk
 
 INCLUDES = -I src/core -I src/math -I src/graphics -I src/utils
 
-MODULES = ogamlMath.cmxa ogamlCore.cmxa ogamlGraphics.cmxa ogamlUtils.cmxa
+MODULES = ogamlMath.cmxa ogamlCore.cmxa ogamlUtils.cmxa ogamlGraphics.cmxa
 
 PACKAGES = -package bigarray,unix,str
 
