@@ -6,7 +6,7 @@ let () =
 
 let settings = OgamlCore.ContextSettings.create ()
 
-let window = Window.create ~width:100 ~height:100 ~settings ~title:""
+let window = Window.create ~width:100 ~height:100 ~settings ~title:"" ()
 
 let state = Window.state window
 

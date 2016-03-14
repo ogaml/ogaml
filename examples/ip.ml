@@ -5,21 +5,21 @@ open OgamlGraphics
 
 let settings = ContextSettings.create ~msaa:8 ()
 
-let window = Window.create ~width:800 ~height:600 ~title:"Interpolators" ~settings
+let window = Window.create ~width:800 ~height:600 ~title:"Interpolators" ~settings ()
 
 let rec draw_curve color = function
   |(x1,y1)::(x2,y2)::t -> 
     let x1', y1', x2', y2' = 
-      int_of_float (x1 *. 400. +. 200.  ),
-      int_of_float (500. -. (y1 *. 400.)),
-      int_of_float (x2 *. 400. +. 200.  ),
-      int_of_float (500. -. (y2 *. 400.))
+      (x1 *. 400. +. 200.  ),
+      (500. -. (y1 *. 400.)),
+      (x2 *. 400. +. 200.  ),
+      (500. -. (y2 *. 400.))
     in
     let l = Shape.create_line 
                 ~thickness:1.5 
                 ~color 
-                ~top:Vector2i.({x = x1'; y = y1'}) 
-                ~tip:Vector2i.({x = x2'; y = y2'}) ()
+                ~top:Vector2f.({x = x1'; y = y1'}) 
+                ~tip:Vector2f.({x = x2'; y = y2'}) ()
     in
     Shape.draw ~window ~shape:l ();
     draw_curve color ((x2,y2)::t)
@@ -38,29 +38,29 @@ let draw_grid () =
   let abs = Shape.create_line
                 ~thickness:1.5
                 ~color:(`RGB Color.RGB.black)
-                ~top:Vector2i.({x = 40; y = 500})
-                ~tip:Vector2i.({x = 760; y = 500})
+                ~top:Vector2f.({x = 40.; y = 500.})
+                ~tip:Vector2f.({x = 760.; y = 500.})
                 ()
   in
   let ord = Shape.create_line
                 ~thickness:1.5
                 ~color:(`RGB Color.RGB.black)
-                ~top:Vector2i.({x = 200; y = 40})
-                ~tip:Vector2i.({x = 200; y = 560})
+                ~top:Vector2f.({x = 200.; y = 40.})
+                ~tip:Vector2f.({x = 200.; y = 560.})
                 ()
   in
   let onex = Shape.create_line
                 ~thickness:1.5
                 ~color:(`RGB Color.RGB.black)
-                ~top:Vector2i.({x = 600; y = 505})
-                ~tip:Vector2i.({x = 600; y = 495})
+                ~top:Vector2f.({x = 600.; y = 505.})
+                ~tip:Vector2f.({x = 600.; y = 495.})
                 ()
   in
   let oney = Shape.create_line
                 ~thickness:1.5
                 ~color:(`RGB Color.RGB.black)
-                ~top:Vector2i.({x = 195; y = 100})
-                ~tip:Vector2i.({x = 205; y = 100})
+                ~top:Vector2f.({x = 195.; y = 100.})
+                ~tip:Vector2f.({x = 205.; y = 100.})
                 ()
   in
   Shape.draw ~window ~shape:abs ();

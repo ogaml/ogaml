@@ -79,7 +79,7 @@ module Interpolator : sig
     * such that the created interpolator will take the value $v$
     * at time $dt$.
     *
-    * The $cst_*$ variants create constant-speed iterators 
+    * The $cst_*$ variants create constant-speed interpolators 
     * so the $dt$ parameter is not required. *)
 
   (** $custom f$ returns a custom interpolator that coincides with  
@@ -140,17 +140,17 @@ module Interpolator : sig
 
   (** Returns a list-interpolator from a list of interpolators.
     *
-    * The new iterator will not have any modifiers. *)
+    * The new interpolator will not have any modifiers. *)
   val collapse : ('a t) list -> ('a list) t
 
   (** Returns a vector3f interpolator from three float interpolators. 
     *
-    * The new iterator will not have any modifiers. *)
+    * The new interpolator will not have any modifiers. *)
   val vector3f : float t -> float t -> float t -> OgamlMath.Vector3f.t t
 
   (** Returns a vector2f interpolator from two float interpolators. 
     *
-    * The new iterator will not have any modifiers. *)
+    * The new interpolator will not have any modifiers. *)
   val vector2f : float t -> float t -> OgamlMath.Vector2f.t t
 
 end

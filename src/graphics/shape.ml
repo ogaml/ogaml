@@ -168,15 +168,14 @@ let outline_of_points points thickness color =
       |> fun x -> Some (VertexArray.static x)
     end
 
-let make_polygon ~points
-                 ~color
-                 ?origin:(origin=Vector2f.zero)
-                 ?position:(position=Vector2i.zero)
-                 ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
-                 ?rotation:(rotation=0.)
-                 ?thickness:(thickness=0.)
-                 ?border_color:(out_color=(`RGB Color.RGB.black)) () =
-  let position = Vector2f.from_int position in
+let create_polygon ~points
+                   ~color
+                   ?origin:(origin=Vector2f.zero)
+                   ?position:(position=Vector2f.zero)
+                   ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
+                   ?rotation:(rotation=0.)
+                   ?thickness:(thickness=0.)
+                   ?border_color:(out_color=(`RGB Color.RGB.black)) () =
   let vals = {
    points    = points ;
    position  = position ;
@@ -188,32 +187,12 @@ let make_polygon ~points
    out_color = out_color
   }
   in
-  let points    = actual_points vals in
+  let points = actual_points vals in
   {
    vertices   = vertices_of_points points color ;
    outline    = outline_of_points points thickness out_color ;
    shape_vals = vals
   }
-
-let create_polygon ~points
-                   ~color
-                   ?origin:(origin=Vector2f.zero)
-                   ?position:(position=Vector2i.zero)
-                   ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
-                   ?rotation:(rotation=0.)
-                   ?thickness:(thickness=0.)
-                   ?border_color:(border_color=(`RGB Color.RGB.black)) () =
-  let points = List.map Vector2f.from_int points in
-  make_polygon
-    ~points
-    ~color
-    ~origin
-    ~position
-    ~scale
-    ~rotation
-    ~thickness
-    ~border_color
-    ()
 
 let create_rectangle ~position
                      ~size
@@ -223,9 +202,9 @@ let create_rectangle ~position
                      ?rotation:(rotation=0.)
                      ?thickness:(thickness=0.)
                      ?border_color:(border_color=(`RGB Color.RGB.black)) () =
-  let w = Vector2i.({ x = size.x ; y = 0 })
-  and h = Vector2i.({ x = 0 ; y = size.y }) in
-  create_polygon ~points:Vector2i.([zero ; w ; size ; h])
+  let w = Vector2f.({ x = size.x ; y = 0. })
+  and h = Vector2f.({ x = 0. ; y = size.y }) in
+  create_polygon ~points:Vector2f.([zero ; w ; size ; h])
                  ~color
                  ~origin
                  ~position
@@ -255,7 +234,7 @@ let create_regular ~position
       |> vertices (k+1)
     end
   in
-  make_polygon ~points:(List.rev (vertices 0 []))
+  create_polygon ~points:(List.rev (vertices 0 []))
                ~color
                ~origin
                ~position
@@ -266,15 +245,13 @@ let create_regular ~position
 
 let create_line ~thickness
                 ~color
-                ?top:(top=Vector2i.zero)
+                ?top:(top=Vector2f.zero)
                 ~tip
-                ?position:(position=Vector2i.zero)
+                ?position:(position=Vector2f.zero)
                 ?origin:(origin=Vector2f.zero)
                 ?rotation:(rotation=0.) () =
-  let a = Vector2f.from_int top
-  and b = Vector2f.from_int tip in
-  let a3 = Vector3f.lift a
-  and b3 = Vector3f.lift b in
+  let a3 = Vector3f.lift top 
+  and b3 = Vector3f.lift tip in
   let n = Vector3f.(
     let u = direction a3 b3 in
     let v = { x = 0. ; y = 0. ; z = 1. } in
@@ -284,13 +261,13 @@ let create_line ~thickness
   let points = Vector2f.(
     let delta = prop (thickness /. 2.) n in
     [
-      add a delta ;
-      add b delta ;
-      sub b delta ;
-      sub a delta
+      add top delta ;
+      add tip delta ;
+      sub tip delta ;
+      sub top delta
     ]
   ) in
-  make_polygon ~points
+  create_polygon ~points
                ~color
                ~origin
                ~position
@@ -307,7 +284,7 @@ let update shape =
   shape.outline  <- outline_of_points points thickness out_color
 
 let set_position shape position =
-  shape.shape_vals.position <- Vector2f.from_int position ;
+  shape.shape_vals.position <- position ;
   update shape
 
 let set_origin shape origin =
@@ -336,7 +313,7 @@ let set_border_color shape color =
 
 let translate shape delta =
   shape.shape_vals.position
-    <- Vector2f.(add (from_int delta) shape.shape_vals.position) ;
+    <- Vector2f.(add delta shape.shape_vals.position) ;
   update shape
 
 let rotate shape delta =
@@ -352,7 +329,7 @@ let scale shape scale =
   in
   set_scale shape (mul scale shape.shape_vals.scale)
 
-let position shape = Vector2f.floor shape.shape_vals.position
+let position shape = shape.shape_vals.position
 
 let origin shape = shape.shape_vals.origin
 
@@ -374,9 +351,7 @@ let draw ?parameters:(parameters = DrawParameter.make
   let size = Window.size window in
   let uniform =
     Uniform.empty
-    |> Uniform.vector2f "size" OgamlMath.(
-         Vector2f.from_int Vector2i.({ x = size.x ; y = size.y })
-       )
+    |> Uniform.vector2f "size" (Vector2f.from_int size)
   in
   let vertices = shape.vertices in
   VertexArray.draw

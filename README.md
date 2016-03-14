@@ -33,8 +33,69 @@ the following modules :
     game development, such as interpolators, graphs or UTF8-encoded strings 
     (still in OgamlCore for now).
     
+You can find some examples in the corresponding directory as well as on the 
+documentation http://ogaml.github.io (broken for now).
+
+Upcoming features :
+
+  * Render textures
+
+  * Batch drawing optimisation
+
+  * More image and textures types
+
+  * Tilesets
+
+  * Windows support
+    
 Our ultimate goal is to add access to music, network, and to implement more 
 helpers to make games (like physics, lighting, etc...).
+
+## Why use OGAML (rather than raw OpenGL for example) ?
+
+OGAML is safe and easy to use : 
+
+  * The functions are high-level and the API tries to be as functional as 
+  possible. This should help to avoid bugs due to mutable values, pointers, or
+  untyped enumerations.
+
+  * OGAML provides everything necessary to do 2D/3D rendering from window 
+  management to text rendering and vertex arrays.
+
+  * OpenGL structures such as vertex arrays are hidden behind functional and
+  easy to understand types that are easier to manipulate. Structures such as
+  vertex buffers and samplers are hidden and don't have to be allocated 
+  manually.
+
+  * OpenGL enumerations (GLenum) are binded to variant types (rather then simple
+  integers) to provide more type safety. You should not be able to pass invalid
+  enumerations to OpenGL functions.
+
+  * The OpenGL state is hidden and does not have to be modified manually (no
+  `glEnable`). Everything is done via function parameters such that calling
+  the same function twice with the same parameters should give the same 
+  result (independently of what has been executed between the two calls).
+  Moreover, all state changes are optimised such that no redundant changes are
+  performed.
+
+  * OGAML should detect any error or undefined behavior and at least raise an
+  exception before it happens. This means that you don't need to call 
+  `glGetError` (which is quite costly). 
+
+OGAML provides advanced functionalities :
+
+  * The module VertexArray provides a high-level and easy to use wrapper around
+  OpenGL's vertex arrays. Unfortunately, this comes at a cost : those arrays 
+  cannot contain custom data. But you can use the module VertexMap that provides
+  the same functionnality for custom data.
+
+  * The module Shape provides easy manipulation of 2D shapes such as rectangles,
+  circles or regular polygons. The module Sprite provides functions to render
+  2D sprites and apply various transformations to them.
+
+  * It is easy to render 2D text of any color and size using the module Text. 
+  It also provides a way to add effects (such as moving letters, changing color,
+  etc...) in a modular and functional way.
 
 
 ## Building and installing OGAML (OSX/Linux only) : 

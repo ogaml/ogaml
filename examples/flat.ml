@@ -8,20 +8,20 @@ let settings =
     ~fullscreen:true
     ()
 let window =
-  Window.create ~width:900 ~height:600 ~settings ~title:"Flat Example"
+  Window.create ~width:900 ~height:600 ~settings ~title:"Flat Example" ()
 
 let rectangle1 =
   Shape.create_rectangle
-    ~position:Vector2i.({ x = 50 ; y = 75 })
-    ~size:Vector2i.({ x = 200 ; y = 150 })
+    ~position:Vector2f.({ x = 50. ; y = 75. })
+    ~size:Vector2f.({ x = 200. ; y = 150. })
     ~color:(`RGB Color.RGB.blue)
     ~border_color:(`RGB Color.RGB.red)
     ()
 
 let rectangle2 =
   Shape.create_rectangle
-    ~position:Vector2i.({ x = 150 ; y = 450 })
-    ~size:Vector2i.({ x = 200 ; y = 150 })
+    ~position:Vector2f.({ x = 150. ; y = 450. })
+    ~size:Vector2f.({ x = 200. ; y = 150. })
     ~origin:Vector2f.({ x = 100. ; y = 75. })
     ~color:(`RGB Color.RGB.red)
     ~border_color:(`RGB Color.RGB.blue)
@@ -29,36 +29,36 @@ let rectangle2 =
 
 let polygon1 =
   Shape.create_polygon
-    ~points:Vector2i.([
-      { x =   0 ; y =  80 } ;
-      { x =  40 ; y =   0 } ;
-      { x = 120 ; y =   0 } ;
-      { x = 160 ; y =  80 } ;
-      { x =  80 ; y = 160 }
+    ~points:Vector2f.([
+      { x =   0. ; y =  80. } ;
+      { x =  40. ; y =   0. } ;
+      { x = 120. ; y =   0. } ;
+      { x = 160. ; y =  80. } ;
+      { x =  80. ; y = 160. }
     ])
     ~color:(`RGB Color.RGB.green)
     ~border_color:(`RGB Color.RGB.magenta)
-    ~position:Vector2i.({ x = 370 ; y = 70 })
+    ~position:Vector2f.({ x = 370. ; y = 70. })
     ()
 
 let polygon2 =
   Shape.create_polygon
-    ~points:Vector2i.([
-      { x =   0 ; y =  80 } ;
-      { x =  40 ; y =   0 } ;
-      { x = 120 ; y =   0 } ;
-      { x = 160 ; y =  80 } ;
-      { x =  80 ; y = 160 }
+    ~points:Vector2f.([
+      { x =   0. ; y =  80. } ;
+      { x =  40. ; y =   0. } ;
+      { x = 120. ; y =   0. } ;
+      { x = 160. ; y =  80. } ;
+      { x =  80. ; y = 160. }
     ])
     ~color:(`RGB Color.RGB.magenta)
     ~border_color:(`RGB Color.RGB.green)
     ~origin:Vector2f.({ x = 80. ; y = 80. })
-    ~position:Vector2i.({ x = 450 ; y = 450 })
+    ~position:Vector2f.({ x = 450. ; y = 450. })
     ()
 
 let regular1 =
   Shape.create_regular
-    ~position:Vector2i.({ x = 650 ; y = 50 })
+    ~position:Vector2f.({ x = 650. ; y = 50. })
     ~radius:100.
     ~amount:10
     ~color:(`RGB Color.RGB.cyan)
@@ -67,7 +67,7 @@ let regular1 =
 
 let regular2 =
   Shape.create_regular
-    ~position:Vector2i.({ x = 750 ; y = 450 })
+    ~position:Vector2f.({ x = 750. ; y = 450. })
     ~radius:100.
     ~origin:Vector2f.({ x = 100. ; y = 100. })
     ~amount:10
@@ -78,23 +78,23 @@ let regular2 =
 let line1 =
   Shape.create_line
     ~thickness:3.
-    ~tip:Vector2i.({ x = 300 ; y = 0 })
-    ~position:Vector2i.({ x = 50 ; y = 300 })
+    ~tip:Vector2f.({ x = 300. ; y = 0. })
+    ~position:Vector2f.({ x = 50. ; y = 300. })
     ~color:(`RGB Color.RGB.({ r = 0.21 ; g = 0.2 ; b = 0.23 ; a = 1. }))
     ()
 
 let line2 =
   Shape.create_line
     ~thickness:3.
-    ~tip:Vector2i.({ x = 300 ; y = 0 })
-    ~position:Vector2i.({ x = 700 ; y = 300 })
+    ~tip:Vector2f.({ x = 300. ; y = 0. })
+    ~position:Vector2f.({ x = 700. ; y = 300. })
     ~origin:Vector2f.({ x = 150. ; y = 0. })
     ~color:(`RGB Color.RGB.({ r = 0.21 ; g = 0.2 ; b = 0.23 ; a = 1. }))
     ()
 
 let circle =
   Shape.create_regular
-    ~position:Vector2i.({ x = 450 ; y = 300 })
+    ~position:Vector2f.({ x = 450. ; y = 300. })
     ~radius:10.
     ~origin:Vector2f.({ x = 10. ; y = 10. })
     ~amount:20
@@ -140,10 +140,10 @@ let rec handle_events () =
         match k.Event.KeyEvent.key with
         | Q when k.Event.KeyEvent.control -> Window.close window
         (* Moving around all shapes *)
-        | Z -> do_all Shape.translate Vector2i.({ x =  0 ; y = -5 })
-        | Q -> do_all Shape.translate Vector2i.({ x = -5 ; y =  0 })
-        | S -> do_all Shape.translate Vector2i.({ x =  0 ; y =  5 })
-        | D -> do_all Shape.translate Vector2i.({ x =  5 ; y =  0 })
+        | Z -> do_all Shape.translate Vector2f.({ x =  0. ; y = -5. })
+        | Q -> do_all Shape.translate Vector2f.({ x = -5. ; y =  0. })
+        | S -> do_all Shape.translate Vector2f.({ x =  0. ; y =  5. })
+        | D -> do_all Shape.translate Vector2f.({ x =  5. ; y =  0. })
         (* Do a slow barrel roll *)
         | O -> do_all Shape.rotate (-5.)
         | P -> do_all Shape.rotate 5.

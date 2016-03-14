@@ -227,7 +227,8 @@ let fragment_shader_source_text_110 = "
   }
 "
 
-let create ~width ~height ~title ~settings =
+let create ?width:(width=800) ?height:(height=600) ?title:(title="") 
+           ?settings:(settings=OgamlCore.ContextSettings.create ()) () =
   let internal = LL.Window.create ~width ~height ~title ~settings in
   let state = State.LL.create () in
   State.LL.set_viewport state OgamlMath.IntRect.({x = 0; y = 0; width; height});

@@ -8,7 +8,7 @@ let frame_count  = ref 0
 let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~settings ~title:"Font sets tests"
+  Window.create ~width:800 ~height:600 ~settings ~title:"Font sets tests" ()
 
 let font = Font.load "examples/font1.ttf"
 
@@ -16,7 +16,7 @@ let size = 25
 
 let txt = Text.create
   ~text:"Hello, World ! Coucou ! gAV@#"
-  ~position:Vector2i.({x = 50; y = 50 + (int_of_float (Font.ascent font 50))})
+  ~position:Vector2f.({x = 50.; y = 50. +. (Font.ascent font 50)})
   ~font
   ~size:50
   ~bold:false
@@ -24,7 +24,7 @@ let txt = Text.create
 
 let txt2 = Text.create
   ~text:"Unicode is working, YEAAH !!! "
-  ~position:Vector2i.({x = 50; y = 150 + (int_of_float (Font.ascent font 50))})
+  ~position:Vector2f.({x = 50.; y = 150. +. (Font.ascent font 50)})
   ~font
   ~size:50
   ~bold:false
@@ -32,13 +32,13 @@ let txt2 = Text.create
 
 let txt2' = Text.create
   ~text:"(•_•)  ( •_•)>⌐■-■  (⌐■_■)"
-  ~position:Vector2i.({x = 50; y = 250 + (int_of_float (Font.ascent font 50))})
+  ~position:Vector2f.({x = 50.; y = 250. +. (Font.ascent font 50)})
   ~font
   ~size:50
   ~bold:false
   ()
 
-let txt3pos = Vector2i.({ x = 50 ; y = 500 })
+let txt3pos = Vector2f.({ x = 50. ; y = 500. })
 
 let txt3 = Text.create
   ~text:"Trying to see if\nadvance......"
@@ -50,7 +50,7 @@ let txt3 = Text.create
 
 let txt4 = Text.create
   ~text:"and boundaries\nare working."
-  ~position:(Vector2i.add (Vector2f.floor (Text.advance txt3)) txt3pos)
+  ~position:(Vector2f.add (Text.advance txt3) txt3pos)
   ~font
   ~size
   ~bold:false
@@ -59,16 +59,16 @@ let txt4 = Text.create
 let boundaries4 = Text.boundaries txt4
 
 let border4 = Shape.create_rectangle
-  ~position:(Vector2f.floor (FloatRect.position boundaries4))
-  ~size:(Vector2f.floor (FloatRect.size boundaries4))
+  ~position:(FloatRect.position boundaries4)
+  ~size:(FloatRect.size boundaries4)
   ~color:(`RGB Color.RGB.transparent)
   ~border_color:(`RGB Color.RGB.blue)
   ~thickness:2.
   ()
 
 let border = Shape.create_rectangle
-  ~position:Vector2i.({x = 50; y = 50})
-  ~size:Vector2i.({x = 600; y = 50})
+  ~position:Vector2f.({x = 50.; y = 50.})
+  ~size:Vector2f.({x = 600.; y = 50.})
   ~color:(`RGB Color.RGB.transparent)
   ~border_color:(`RGB Color.RGB.red)
   ~thickness:2.

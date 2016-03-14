@@ -3,10 +3,10 @@ type t
 
 (** Creates a window of size width x height *)
 val create :
-  width:int ->
-  height:int ->
-  title:string ->
-  settings:OgamlCore.ContextSettings.t -> t
+  ?width:int ->
+  ?height:int ->
+  ?title:string ->
+  ?settings:OgamlCore.ContextSettings.t -> unit -> t
 
 (** Changes the title of the window. *)
 val set_title : t -> string -> unit

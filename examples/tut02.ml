@@ -12,7 +12,7 @@ open OgamlMath
 let settings = OgamlCore.ContextSettings.create ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°02"
+  Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°02" ()
 
 let vertex_shader_source = "
   in vec3 position;

@@ -26,10 +26,11 @@ OgamlGraphics:
   ☐ GC textures
   ☐ Non exposed InternalUtils for binding draw parameters for example
   ☐ Error checking in Font, Image (loading), Image.blit
-  ☐ Default Parameters to aa:false for Text
+  ✔ Default Parameters to aa:false for Text @done(2016-03-14 15:02) @project(OgamlGraphics)
+  ✔ Default settings for window @done(2016-03-14 15:00) @project(OgamlGraphics)
   ☐ Move programs to State (+ organize)
-  ☐ Size-dependant oversampling in Font
-  ☐ Floats in sprite, text and shape
+  ✔ Size-dependant oversampling in Font @done(2016-03-14 15:56) @project(OgamlGraphics)
+  ✔ Floats in sprite, text and shape @done(2016-03-14 15:22) @project(OgamlGraphics)
   ✔ Vector2i in image @done(2016-02-04 11:03) @project(OgamlGraphics)
   ☐ Size in sprite and shape ?
   ✔ Matrix2D ? @done(2015-12-16 16:15) @project(OgamlGraphics)
@@ -52,6 +53,7 @@ Utils:
   ✔ Add functors to doc parsing @done(2016-02-01 23:17) @project(Utils)
   ✔ Add an interface @done(2016-02-01 22:21) @project(Utils)
   ☐ Move UTF8String from Graphics to Utils
+  ☐ Move Logging from Core to Utils
   ☐ Add optional parameter to IPs for endtime
   ✔ PerlinNoise : @done(2016-02-04 10:48) @project(Utils)
     ✔ 2D @done(2016-02-04 10:48) @project(Utils)

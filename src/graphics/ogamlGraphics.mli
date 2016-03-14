@@ -549,12 +549,21 @@ module Window : sig
 
   (** Creates a window of size $width$ x $height$.
     * This window will create its openGL context following the specified settings.
+    *
+    * $width$ defaults to 800
+    *
+    * $height$ defaults to 600
+    *
+    * $title$ defaults to ""
+    *
+    * $settings$ defaults to the default context settings
+    *
     * @see:OgamlCore.ContextSettings *)
   val create :
-    width:int ->
-    height:int ->
-    title:string ->
-    settings:OgamlCore.ContextSettings.t -> t
+    ?width:int ->
+    ?height:int ->
+    ?title:string ->
+    ?settings:OgamlCore.ContextSettings.t -> unit -> t
 
   (** Changes the title of the window. *)
   val set_title : t -> string -> unit
@@ -1143,10 +1152,10 @@ module Shape : sig
     * All coordinates are taken with respect to the top-left corner of the
     * shape. *)
   val create_polygon :
-    points        : OgamlMath.Vector2i.t list ->
+    points        : OgamlMath.Vector2f.t list ->
     color         : Color.t ->
     ?origin       : OgamlMath.Vector2f.t ->
-    ?position     : OgamlMath.Vector2i.t ->
+    ?position     : OgamlMath.Vector2f.t ->
     ?scale        : OgamlMath.Vector2f.t ->
     ?rotation     : float ->
     ?thickness    : float ->
@@ -1156,8 +1165,8 @@ module Shape : sig
   (** Creates a rectangle.
     * Its origin is positioned with respect to the top-left corner. *)
   val create_rectangle :
-    position      : OgamlMath.Vector2i.t ->
-    size          : OgamlMath.Vector2i.t ->
+    position      : OgamlMath.Vector2f.t ->
+    size          : OgamlMath.Vector2f.t ->
     color         : Color.t ->
     ?origin       : OgamlMath.Vector2f.t ->
     ?scale        : OgamlMath.Vector2f.t ->
@@ -1169,7 +1178,7 @@ module Shape : sig
   (** Creates a regular polygon with a given number of vertices.
     * When this number is high, one can expect a circle. *)
   val create_regular :
-    position      : OgamlMath.Vector2i.t ->
+    position      : OgamlMath.Vector2f.t ->
     radius        : float ->
     amount        : int ->
     color         : Color.t ->
@@ -1184,9 +1193,9 @@ module Shape : sig
   val create_line :
     thickness : float ->
     color     : Color.t ->
-    ?top      : OgamlMath.Vector2i.t ->
-    tip       : OgamlMath.Vector2i.t ->
-    ?position : OgamlMath.Vector2i.t ->
+    ?top      : OgamlMath.Vector2f.t ->
+    tip       : OgamlMath.Vector2f.t ->
+    ?position : OgamlMath.Vector2f.t ->
     ?origin   : OgamlMath.Vector2f.t ->
     ?rotation : float ->
     unit -> t
@@ -1200,7 +1209,7 @@ module Shape : sig
   val draw : ?parameters:DrawParameter.t -> window:Window.t -> shape:t -> unit -> unit
 
   (** Sets the position of the origin in the window. *)
-  val set_position : t -> OgamlMath.Vector2i.t -> unit
+  val set_position : t -> OgamlMath.Vector2f.t -> unit
 
   (** Sets the position of the origin with respect to the top-left corner of the
     * shape. *)
@@ -1219,7 +1228,7 @@ module Shape : sig
   val set_color : t -> Color.t -> unit
 
   (** Translates the shape by the given vector. *)
-  val translate : t -> OgamlMath.Vector2i.t -> unit
+  val translate : t -> OgamlMath.Vector2f.t -> unit
 
   (** Rotates the shape by the given angle. *)
   val rotate : t -> float -> unit
@@ -1228,7 +1237,7 @@ module Shape : sig
   val scale : t -> OgamlMath.Vector2f.t -> unit
 
   (** Returns the position of the origin in window coordinates. *)
-  val position : t -> OgamlMath.Vector2i.t
+  val position : t -> OgamlMath.Vector2f.t
 
   (** Returns the position of the origin with respect to the first point of the
     * shape. *)
@@ -1258,7 +1267,7 @@ module Sprite : sig
   val create :
     texture   : Texture.Texture2D.t ->
     ?origin   : OgamlMath.Vector2f.t ->
-    ?position : OgamlMath.Vector2i.t ->
+    ?position : OgamlMath.Vector2f.t ->
     ?scale    : OgamlMath.Vector2f.t ->
     ?rotation : float ->
     unit -> t
@@ -1272,7 +1281,7 @@ module Sprite : sig
   val draw : ?parameters:DrawParameter.t -> window:Window.t -> sprite:t -> unit -> unit
 
   (** Sets the position of the origin of the sprite in the window. *)
-  val set_position : t -> OgamlMath.Vector2i.t -> unit
+  val set_position : t -> OgamlMath.Vector2f.t -> unit
 
   (** Sets the position of the origin with respect to the top-left corner of the
     * sprite. The origin is the center of all transformations. *)
@@ -1285,7 +1294,7 @@ module Sprite : sig
   val set_scale : t -> OgamlMath.Vector2f.t -> unit
 
   (** Translates the sprite by the given vector. *)
-  val translate : t -> OgamlMath.Vector2i.t -> unit
+  val translate : t -> OgamlMath.Vector2f.t -> unit
 
   (** Rotates the sprite by the given angle. *)
   val rotate : t -> float -> unit
@@ -1294,7 +1303,7 @@ module Sprite : sig
   val scale : t -> OgamlMath.Vector2f.t -> unit
 
   (** Returns the position of the origin in window coordinates. *)
-  val position : t -> OgamlMath.Vector2i.t
+  val position : t -> OgamlMath.Vector2f.t
 
   (** Returns the position of the origin with respect to the first point of the
     * sprite. *)
@@ -1392,7 +1401,7 @@ module Text : sig
   (** Creates a drawable text from the given string. *)
   val create :
     text : string ->
-    position : OgamlMath.Vector2i.t ->
+    position : OgamlMath.Vector2f.t ->
     font : Font.t ->
     ?color : Color.t ->
     size : int ->

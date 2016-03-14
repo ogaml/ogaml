@@ -35,21 +35,17 @@ poly.cmx : vertexArray.cmx ../math/vector3f.cmx ../math/vector2f.cmx \
 program.cmo : state.cmi GLTypes.cmi GL.cmi program.cmi
 program.cmx : state.cmx GLTypes.cmi GL.cmx program.cmi
 shape.cmo : window.cmi vertexArray.cmi ../math/vector3f.cmi \
-    ../math/vector2i.cmi ../math/vector2f.cmi uniform.cmi \
-    ../math/ogamlMath.cmi drawParameter.cmi drawMode.cmi \
-    ../math/constants.cmi color.cmi shape.cmi
+    ../math/vector2f.cmi uniform.cmi ../math/ogamlMath.cmi drawParameter.cmi \
+    drawMode.cmi ../math/constants.cmi color.cmi shape.cmi
 shape.cmx : window.cmx vertexArray.cmx ../math/vector3f.cmx \
-    ../math/vector2i.cmx ../math/vector2f.cmx uniform.cmx \
-    ../math/ogamlMath.cmi drawParameter.cmx drawMode.cmi \
-    ../math/constants.cmx color.cmx shape.cmi
+    ../math/vector2f.cmx uniform.cmx ../math/ogamlMath.cmi drawParameter.cmx \
+    drawMode.cmi ../math/constants.cmx color.cmx shape.cmi
 sprite.cmo : window.cmi vertexArray.cmi ../math/vector3f.cmi \
-    ../math/vector2i.cmi ../math/vector2f.cmi uniform.cmi texture.cmi \
-    ../math/ogamlMath.cmi drawParameter.cmi drawMode.cmi \
-    ../math/constants.cmi sprite.cmi
+    ../math/vector2f.cmi uniform.cmi texture.cmi ../math/ogamlMath.cmi \
+    drawParameter.cmi drawMode.cmi ../math/constants.cmi sprite.cmi
 sprite.cmx : window.cmx vertexArray.cmx ../math/vector3f.cmx \
-    ../math/vector2i.cmx ../math/vector2f.cmx uniform.cmx texture.cmx \
-    ../math/ogamlMath.cmi drawParameter.cmx drawMode.cmi \
-    ../math/constants.cmx sprite.cmi
+    ../math/vector2f.cmx uniform.cmx texture.cmx ../math/ogamlMath.cmi \
+    drawParameter.cmx drawMode.cmi ../math/constants.cmx sprite.cmi
 state.cmo : ../math/ogamlMath.cmi GL.cmi drawParameter.cmi color.cmi \
     state.cmi
 state.cmx : ../math/ogamlMath.cmi GL.cmx drawParameter.cmx color.cmx \

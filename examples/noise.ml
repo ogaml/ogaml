@@ -9,7 +9,7 @@ let settings =
     ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~settings ~title:"Noise Example"
+  Window.create ~width:800 ~height:600 ~settings ~title:"Noise Example" ()
 
 let img = 
   Image.create (`Empty (800, 600, `RGB Color.RGB.white))

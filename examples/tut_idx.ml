@@ -5,7 +5,7 @@ open OgamlMath
 let settings = OgamlCore.ContextSettings.create ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~settings ~title:"Indexing Tutorial"
+  Window.create ~width:800 ~height:600 ~settings ~title:"Indexing Tutorial" ()
 
 let vertex_shader_source = "
 
