@@ -9,7 +9,7 @@ package "core" (
 )
 
 package "graphics" (
-  requires = "ogaml.core,ogaml.math,str"
+  requires = "ogaml.core,ogaml.math,str,ogaml.utils"
   archive(byte) = "ogamlGraphics.cma"
   archive(native) = "ogamlGraphics.cmxa"
 )

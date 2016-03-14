@@ -24,7 +24,7 @@ DOC_FILES = src/graphics/ogamlGraphics.mli src/core/ogamlCore.mli src/math/ogaml
 
 # Compilation
 
-default: math_lib core_lib graphics_lib utils_lib
+default: math_lib core_lib utils_lib graphics_lib 
 
 utils_lib:
 	cd src/utils/ && make
@@ -35,7 +35,7 @@ math_lib:
 core_lib:
 	cd src/core/ && make
 
-graphics_lib: core_lib math_lib
+graphics_lib: core_lib math_lib utils_lib
 	cd src/graphics/ && make
 
 examples:
