@@ -1,4 +1,12 @@
-type module_field = 
+type mfunctor = 
+  { 
+    name :  string;
+    args : (string * string) list;
+    sign :  string;
+    constr : (string * type_expr) list
+  }
+
+and module_field = 
   | Comment of string
   | Documentation of string
   | Title of string
@@ -7,6 +15,8 @@ type module_field =
   | Value of string * type_expr
   | Exn of string * (type_expr option)
   | Module of string * (module_field list)
+  | Functor of mfunctor
+  | Signature of string * (module_field list)
 
 and variance = 
   | Lower 

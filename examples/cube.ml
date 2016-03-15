@@ -4,7 +4,7 @@ open OgamlMath
 let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~title:"Cube Example" ~settings
+  Window.create ~width:800 ~height:600 ~title:"Cube Example" ~settings ()
 
 let initial_time = ref 0.
 

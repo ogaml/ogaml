@@ -14,6 +14,9 @@
     |> h_add "sig"      SIG
     |> h_add "exception"EXN
     |> h_add "of"       OF
+    |> h_add "with"     WITH
+    |> h_add "functor"  FUNCTOR
+    |> h_add "and"      AND
 
 }
 

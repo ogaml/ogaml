@@ -6,20 +6,14 @@ LL_impl_x11.cmo : ../math/ogamlMath.cmi keycode.cmi event.cmi \
     contextSettings.cmi button.cmi
 LL_impl_x11.cmx : ../math/ogamlMath.cmi keycode.cmi event.cmi \
     contextSettings.cmx button.cmi
-UTF8String.cmo : UTF8String.cmi
-UTF8String.cmx : UTF8String.cmi
 contextSettings.cmo : contextSettings.cmi
 contextSettings.cmx : contextSettings.cmi
-log.cmo : log.cmi
-log.cmx : log.cmi
 LL.cmi : ../math/ogamlMath.cmi keycode.cmi event.cmi contextSettings.cmi \
     button.cmi
-UTF8String.cmi :
 button.cmi :
 contextSettings.cmi :
 event.cmi : keycode.cmi button.cmi
 keycode.cmi :
-log.cmi :
 ogamlCore.cmi : ../math/ogamlMath.cmi
 cocoa/cocoa.cmo : cocoa/cocoa.cmi
 cocoa/cocoa.cmx : cocoa/cocoa.cmi

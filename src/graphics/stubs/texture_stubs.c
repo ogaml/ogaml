@@ -14,6 +14,7 @@
   #include <GL/gl.h>
 #endif
 #include <caml/bigarray.h>
+#include <string.h>
 #include "utils.h"
 
 
@@ -135,17 +136,54 @@ GLenum PixelFormat_val(value fmt)
 }
 
 
+void finalise_tex(value v)
+{
+  GLuint tmp = (GLuint)v;
+  glDeleteTextures(1,&tmp);
+}
+
+
+int compare_tex(value v1, value v2)
+{
+  GLuint i1 = (GLuint)v1;
+  GLuint i2 = (GLuint)v2;
+  if(i1 < i2) return -1;
+  else if(i1 == i2) return 0;
+  else return 1;
+}
+
+intnat hash_tex(value v)
+{
+  GLuint i = (GLuint)v;
+  return i;
+}
+
+static struct custom_operations tex_custom_ops = {
+  .identifier  = "tex gc handling",
+  .finalize    =  finalise_tex,
+  .compare     =  compare_tex,
+  .hash        =  hash_tex,
+  .serialize   =  custom_serialize_default,
+  .deserialize =  custom_deserialize_default
+};
+
+
+
+
 // INPUT   nothing
 // OUTPUT  a fresh texture id
 CAMLprim value
 caml_create_texture(value unit)
 {
   CAMLparam0();
+  CAMLlocal1(v);
 
-  GLuint textureID;
-  glGenTextures(1, &textureID);
+  GLuint buf[1];
+  glGenTextures(1, buf);
+  v = caml_alloc_custom( &tex_custom_ops, sizeof(GLuint), 0, 1);
+  memcpy( Data_custom_val(v), buf, sizeof(GLuint) );
 
-  CAMLreturn((value)textureID);
+  CAMLreturn(v);
 }
 
 

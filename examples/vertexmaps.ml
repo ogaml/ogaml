@@ -36,7 +36,7 @@ void main() {
 let settings = OgamlCore.ContextSettings.create ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~settings ~title:"VertexMap Example"
+  Window.create ~width:800 ~height:600 ~settings ~title:"VertexMap Example" ()
 
 let initial_time = ref 0.
 

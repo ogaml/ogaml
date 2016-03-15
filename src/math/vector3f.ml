@@ -67,6 +67,12 @@ let dot u v =
   u.y *. v.y +.
   u.z *. v.z
 
+let product u v = {
+  x = u.x *. v.x;
+  y = u.y *. v.y;
+  z = u.z *. v.z
+}
+
 let cross u v = {
   x = u.y *. v.z -. u.z *. v.y;
   y = u.z *. v.x -. u.x *. v.z;
@@ -78,6 +84,10 @@ let squared_norm v =
 
 let norm v = 
   sqrt (dot v v)
+
+let squared_dist v1 v2 = squared_norm (sub v2 v1)
+
+let dist v1 v2 = norm (sub v2 v1)
 
 let normalize v = 
   let n = norm v in
@@ -91,6 +101,12 @@ let clamp u a b = {
   y = min b.y (max u.y a.y);
   z = min b.z (max u.z a.z)
 }
+
+let map v f = 
+  {x = f v.x; y = f v.y; z = f v.z}
+
+let map2 v w f = 
+  {x = f v.x w.x; y = f v.y w.y; z = f v.z w.z}
 
 let max v = 
   max (max v.x v.y) v.z
@@ -128,3 +144,63 @@ let convert_array t =
 let triangle_normal a b c = 
   let u,v = sub b a, sub c a in
   normalize (cross u v)
+
+let raytrace_points p1 p2 = 
+  let intersects a b mark = 
+    let s   = if a < b then 1. else -1. in
+    let fst = if a < b then ceil a  else Pervasives.floor a in
+    let lst = if a < b then Pervasives.floor b else ceil  b in
+    let idx = 1. /. (b -. a) in
+    let rec aux v = 
+      if (a  < b && v > lst +. 0.00001) 
+      || (a >= b && v < lst -. 0.00001) then []
+      else begin
+        let t = (v -. a) *. idx in
+        (t, prop (-.s) mark)::(aux (v +. s))
+      end
+    in
+    aux fst
+  in
+  let rebuild l = 
+    let fst = {x = Pervasives.floor p1.x; 
+               y = Pervasives.floor p1.y; 
+               z = Pervasives.floor p1.z} 
+    in
+    let fstface = 
+      if abs_float (p2.x -. p1.x) >= abs_float (p2.y -. p1.y)
+      && abs_float (p2.x -. p1.x) >= abs_float (p2.z -. p1.z)
+      then begin
+        if p2.x >= p1.x then {x = -1.; y = 0.; z = 0.}
+        else {x = 1.; y = 0.; z = 0.}
+      end else if 
+         abs_float (p2.y -. p1.y) >= abs_float (p2.x -. p1.x)
+      && abs_float (p2.y -. p1.y) >= abs_float (p2.z -. p1.z)
+      then begin
+        if p2.y >= p1.y then {x = 0.; y = -1.; z = 0.}
+        else {x = 0.; y = 1.; z = 0.}
+      end else begin
+        if p2.z >= p1.z then {x = 0.; y = 0.; z = -1.}
+        else {x = 0.; y = 0.; z = 1.}
+      end
+    in
+    let rec aux p = function
+      |[] -> []
+      |(t,face)::tail -> 
+          let v = sub p face in 
+          (t,v,face)::(aux v tail)
+    in
+    (0., fst, fstface)::(aux fst l)
+  in
+  let inters_x = intersects p1.x p2.x {x = 1.; y = 0.; z = 0.} in
+  let inters_y = intersects p1.y p2.y {x = 0.; y = 1.; z = 0.} in
+  let inters_z = intersects p1.z p2.z {x = 0.; y = 0.; z = 1.} in
+  let inters   = 
+    List.merge (fun (t,_) (t',_) -> compare t t') inters_x inters_y
+    |> List.merge (fun (t,_) (t',_) -> compare t t') inters_z
+  in
+  rebuild inters
+
+let raytrace p v t = 
+  raytrace_points p (endpoint p v t)
+  |> List.map (fun (t',a,b) -> (t'*.t,a,b))
+

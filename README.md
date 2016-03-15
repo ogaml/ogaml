@@ -32,7 +32,7 @@ the following modules:
   * OgamlUtils (WIP) - provides several useful functions and data structures for 
     game development, such as interpolators, graphs or UTF8-encoded strings 
     (still in OgamlCore for now).
-
+    
 You can find some examples in the corresponding directory as well as on the 
 documentation http://ogaml.github.io (broken for now).
 

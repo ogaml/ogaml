@@ -223,6 +223,11 @@ let code_to_int = function
   |`Char c -> Char.code c
   |`Code i -> i
 
+let oversampling_of_size s = 
+  if s < 20 then 4 
+  else if s < 42 then 3
+  else if s < 72 then 2
+  else 1
 
 (** Exposed functions *)
 let load s =
@@ -239,7 +244,7 @@ let glyph (t : t) c size bold =
   in
   try IntMap.find (code_to_int c) glyphs
   with Not_found ->
-    load_glyph_return t size (code_to_int c) bold 4
+    load_glyph_return t size (code_to_int c) bold (oversampling_of_size size)
 
 
 let load_glyph (t : t) c s b = 

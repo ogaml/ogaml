@@ -30,6 +30,13 @@ module RGB = struct
     a = clamp c.a 0. 1.
   }
 
+  let map c f = {
+    r = f c.r;
+    g = f c.g;
+    b = f c.b;
+    a = f c.a
+  }
+
 end
 
 let rad60 = 60. *. OgamlMath.Constants.pi /. 180.
@@ -61,6 +68,13 @@ module HSV = struct
     s = clamp c.s 0. 1.;
     v = clamp c.v 0. 1.;
     a = clamp c.a 0. 1.
+  }
+  
+  let map c f = {
+    h = f c.h;
+    s = f c.s;
+    v = f c.v;
+    a = f c.a
   }
 
 end
@@ -124,3 +138,7 @@ let clamp = function
   |`HSV c -> `HSV (HSV.clamp c)
   |`RGB c -> `RGB (RGB.clamp c)
 
+let map c f = 
+  match c with
+  |`HSV c -> `HSV (HSV.map c f)
+  |`RGB c -> `RGB (RGB.map c f)

@@ -9,6 +9,8 @@ caml_image_load_from_file(value filename)
 
   CAMLlocal2(result, px);
 
+  stbi_set_flip_vertically_on_load(1);
+
   int x,y,chan;
 
   char* pixels = stbi_load(String_val(filename), &x, &y, &chan, STBI_rgb_alpha);

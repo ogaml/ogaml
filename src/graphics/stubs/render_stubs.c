@@ -55,6 +55,23 @@ GLenum Polygon_val(value mode)
 }
 
 
+value Val_error(GLenum err)
+{
+  switch(err)
+  {
+    case GL_NO_ERROR: return Val_none;
+    case GL_INVALID_ENUM      : return Val_some(Val_int(0));
+    case GL_INVALID_VALUE     : return Val_some(Val_int(1));
+    case GL_INVALID_OPERATION : return Val_some(Val_int(2));
+    case GL_INVALID_FRAMEBUFFER_OPERATION : return Val_some(Val_int(3));
+    case GL_OUT_OF_MEMORY   : return Val_some(Val_int(4));
+    case GL_STACK_UNDERFLOW : return Val_some(Val_int(5));
+    case GL_STACK_OVERFLOW  : return Val_some(Val_int(6));
+    default : return Val_none;
+  }
+}
+
+
 // INPUT   three booleans (color, depth, stencil)
 // OUTPUT  nothing, clears the corresponding buffers
 CAMLprim value
@@ -70,6 +87,17 @@ caml_gl_clear(value c, value d, value s)
   glClear(mask);
 
   CAMLreturn(Val_unit);
+}
+
+
+// INPUT   nothing
+// OUTPUT  returns a GL error (option)
+CAMLprim value
+caml_gl_error(value unit)
+{
+  CAMLparam0();
+
+  CAMLreturn(Val_error(glGetError()));
 }
 
 

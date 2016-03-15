@@ -198,6 +198,21 @@ let rec field_to_string = function
     |None -> Printf.sprintf "exception %s" s
     |Some o -> Printf.sprintf "exception %s of %s" s (type_expr_to_string o)
   end
+  |Functor func ->
+    let args = 
+      List.map (fun (s1, s2) -> Printf.sprintf "(%s : %s)" s1 s2) func.AST.args
+      |> String.concat " " 
+    in
+    let constrs = 
+      if List.length func.AST.constr = 0 then ""
+      else begin
+        List.map (fun (s,t) -> Printf.sprintf "%s = %s" s (type_expr_to_string t)) func.AST.constr
+        |> String.concat " and type "
+        |> Printf.sprintf " with type %s"
+      end
+    in
+    Printf.sprintf "module %s : functor %s -> %s%s"
+      func.AST.name args func.AST.sign constrs
   | _ -> assert false
 
 let rec field_info = function
@@ -245,7 +260,8 @@ let rec document_ast = function
                          Printf.fprintf c "### %s\n\n" (snd (parse_comment s))
     end;
     document_ast t
-  |Module (s,l) :: t -> 
+  |Module (s,l) :: t 
+  |Signature (s,l) :: t ->
     let backup_dir = !curr_subdir in
     let backup_prefix = !curr_prefix in
     let backup_module = !curr_module in

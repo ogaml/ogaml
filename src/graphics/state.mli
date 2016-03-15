@@ -25,6 +25,9 @@ val glsl_version : t -> int
 (** Returns true iff the GLSL version passed as parameter is supported *)
 val is_glsl_version_supported : t -> int -> bool
 
+(** Asserts that no GL error occured *)
+val assert_no_error : t -> unit
+
 
 module LL : sig
 
@@ -34,7 +37,7 @@ module LL : sig
   (** Returns the current culling mode *)
   val culling_mode : t -> DrawParameter.CullingMode.t
 
-  (** Returns the current polygon drawing mode *)
+   (** Returns the current polygon drawing mode *)
   val polygon_mode : t -> DrawParameter.PolygonMode.t
 
   (** Returns if depth testing is currently activated or not *)

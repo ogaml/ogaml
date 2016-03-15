@@ -123,6 +123,8 @@ module Pervasives = struct
 
   external clear : bool -> bool -> bool -> unit = "caml_gl_clear"
 
+  external error : unit -> GLTypes.GlError.t option = "caml_gl_error"
+
   external color : float -> float -> float -> float -> unit = "caml_clear_color"
 
   external viewport : int -> int -> int -> int -> unit = "caml_viewport"

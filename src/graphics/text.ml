@@ -1,5 +1,6 @@
 open OgamlMath
 open OgamlCore
+open OgamlUtils
 
 module Fx = struct
 
@@ -211,6 +212,7 @@ module Fx = struct
     }
 
   let draw ?parameters:(parameters = DrawParameter.make
+                                      ~antialiasing:false
                                       ~depth_test:false
                                       ~blend_mode:DrawParameter.BlendMode.alpha ())
            ~text ~window () =
@@ -249,7 +251,6 @@ type t = {
 }
 
 let create ~text ~position ~font ?color:(color=(`RGB Color.RGB.black)) ~size ~bold () =
-  let position = Vector2f.from_int position in
   let utf8 = UTF8String.from_string text in
   let length = UTF8String.length utf8 in
   let rec iter i =
@@ -369,6 +370,7 @@ let create ~text ~position ~font ?color:(color=(`RGB Color.RGB.black)) ~size ~bo
 
 
 let draw ?parameters:(parameters = DrawParameter.make
+                                    ~antialiasing:false
                                     ~depth_test:false
                                     ~blend_mode:DrawParameter.BlendMode.alpha ())
          ~text ~window () =

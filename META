@@ -9,7 +9,7 @@ package "core" (
 )
 
 package "graphics" (
-  requires = "ogaml.core,ogaml.math,str"
+  requires = "ogaml.core,ogaml.math,str,ogaml.utils"
   archive(byte) = "ogamlGraphics.cma"
   archive(native) = "ogamlGraphics.cmxa"
 )
@@ -18,4 +18,10 @@ package "math" (
   requires = "bigarray,unix"
   archive(byte) = "ogamlMath.cma"
   archive(native) = "ogamlMath.cmxa"
+)
+
+package "utils" (
+  requires = "bigarray,unix"
+  archive(byte) = "ogamlUtils.cma"
+  archive(native) = "ogamlUtils.cmxa"
 )

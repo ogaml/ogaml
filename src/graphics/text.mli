@@ -41,7 +41,7 @@ type t
 
 val create :
   text : string ->
-  position : OgamlMath.Vector2i.t ->
+  position : OgamlMath.Vector2f.t ->
   font : Font.t ->
   ?color : Color.t ->
   size : int ->

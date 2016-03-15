@@ -85,15 +85,33 @@ module Vector2i : sig
   (** Computes the norm of a vector *)
   val norm : t -> float
 
+  (** Computes the squared distance between two points *)
+  val squared_dist : t -> t -> int
+
+  (** Computes the distance between two points *)
+  val dist : t -> t -> float
+
   (** $clamp v a b$ returns the vector whose coordinates are the coordinates of $v$
     * clamped between the coordinates of $a$ and $b$ *)
   val clamp : t -> t -> t -> t
+
+  (** Maps each coordinate of a vector *)
+  val map : t -> (int -> int) -> t
+
+  (** Maps each pair of coordinates of two vectors *)
+  val map2 : t -> t -> (int -> int -> int) -> t
 
   (** Returns the maximal coordinate of a vector *)
   val max : t -> int
 
   (** Returns the minimal coordinate of a vector *)
   val min : t -> int
+
+  (** $raster p1 p2$ applies the Bresenham's line algorithm between the points
+    * $p1$ and $p2$ and returns the list of points constituting the line
+    *
+    * Note : should not be used for precise raytracing as it may miss points *)
+  val raster : t -> t -> t list
 
   (** Returns a pretty-printed string (not for serialization) *)
   val print : t -> string
@@ -156,12 +174,24 @@ module Vector2f : sig
   (** Computes the norm of a vector *)
   val norm : t -> float
 
+  (** Computes the squared distance between two points *)
+  val squared_dist : t -> t -> float 
+
+  (** Computes the distance between two points *)
+  val dist : t -> t -> float
+
   (** Normalizes a vector. Raises Vector2f_exception if the vector is zero. *)
   val normalize : t -> t
 
   (** $clamp v a b$ returns the vector whose coordinates are the coordinates of $v$
     * clamped between the coordinates of $a$ and $b$ *)
   val clamp : t -> t -> t -> t
+
+  (** Maps each coordinate of a vector *)
+  val map : t -> (float -> float) -> t
+
+  (** Maps each pair of coordinates of two vectors *)
+  val map2 : t -> t -> (float -> float -> float) -> t
 
   (** Returns the maximal coordinate of a vector *)
   val max : t -> float
@@ -178,6 +208,23 @@ module Vector2f : sig
 
   (** $endpoint a v t$ returns the point $a + tv$ *)
   val endpoint : t -> t -> float -> t
+
+  (** $raytrace_points p1 p2$ returns the list of integer-valued points (squares) on 
+    * the line from $p1$ to $p2$  
+    *
+    * Each point is a triplet of the form $(t, p, f)$ such that :
+    *
+    * $t$ is the time at the intersection between the line and the point
+    *
+    * $p$ stores the (integer) coordinates of the point
+    *
+    * $f$ is a unit vector indicating which face of the square has been intersected 
+    *)
+  val raytrace_points : t -> t -> (float * t * t) list
+
+  (** $raytrace p v t$ applies $raytrace_points$ between the points 
+    * $p$ and $p + tv$. The intersection times are comprised between 0 and t *)
+  val raytrace : t -> t -> float -> (float * t * t) list
 
 end
 
@@ -240,15 +287,33 @@ module Vector3i : sig
   (** Computes the norm of a vector *)
   val norm : t -> float
 
+  (** Computes the squared distance between two points *)
+  val squared_dist : t -> t -> int
+
+  (** Computes the distance between two points *)
+  val dist : t -> t -> float
+
   (** $clamp v a b$ returns the vector whose coordinates are the coordinates of $v$
     * clamped between the coordinates of $a$ and $b$ *)
   val clamp : t -> t -> t -> t
+
+  (** Maps each coordinate of a vector *)
+  val map : t -> (int -> int) -> t
+
+  (** Maps each pair of coordinates of two vectors *)
+  val map2 : t -> t -> (int -> int -> int) -> t
 
   (** Returns the maximal coordinate of a vector *)
   val max : t -> int
 
   (** Returns the minimal coordinate of a vector *)
   val min : t -> int
+
+  (** $raster p1 p2$ applies the Bresenham's line algorithm between the points
+    * $p1$ and $p2$ and returns the list of points constituting the line 
+    *
+    * Note : should not be used for precise raytracing as it may miss points *)
+  val raster : t -> t -> t list
 
   (** Returns a pretty-printed string (not for serialization) *)
   val print : t -> string
@@ -320,12 +385,24 @@ module Vector3f : sig
   (** Computes the norm of a vector *)
   val norm : t -> float
 
+  (** Computes the squared distance between two points *)
+  val squared_dist : t -> t -> float
+
+  (** Computes the distance between two points *)
+  val dist : t -> t -> float
+
   (** Normalizes a vector. Raises Vector3f_exception if the vector is zero. *)
   val normalize : t -> t
 
   (** $clamp v a b$ returns the vector whose coordinates are the coordinates of $v$
     * clamped between the coordinates of $a$ and $b$ *)
   val clamp : t -> t -> t -> t
+
+  (** Maps each coordinate of a vector *)
+  val map : t -> (float -> float) -> t
+
+  (** Maps each pair of coordinates of two vectors *)
+  val map2 : t -> t -> (float -> float -> float) -> t
 
   (** Returns the maximal coordinate of a vector *)
   val max : t -> float
@@ -342,6 +419,24 @@ module Vector3f : sig
 
   (** $endpoint a v t$ returns the point $a + tv$ *)
   val endpoint : t -> t -> float -> t
+
+  (** $raytrace_points p1 p2$ returns the list of integer-valued points (cubes) on 
+    * the line from $p1$ to $p2$  
+    *
+    * Each point is a triple of the form $(t, p, f)$ such that :
+    *
+    * $t$ is the time at the intersection between the line and the point
+    *
+    * $p$ stores the (integer) coordinates of the point
+    *
+    * $f$ is a unit vector indicating which face of the cube has been intersected 
+    *)
+  val raytrace_points : t -> t -> (float * t * t) list
+
+  (** $raytrace p v t$ applies $raytrace_points$ between the points 
+    * $p$ and $p + tv$. The intersection times are comprised between 0 and t *)
+  val raytrace : t -> t -> float -> (float * t * t) list
+
 
 end
 
@@ -412,35 +507,64 @@ module IntRect : sig
     * of size $size$ *)
   val create : Vector2i.t -> Vector2i.t -> t
 
-  (** Returns the position of a rectangle *)
-  val corner : t -> Vector2i.t
+  (** $create_from_points p1 p2$ creates a rectangle going from $p1$ to $p2$ *)
+  val create_from_points : Vector2i.t -> Vector2i.t -> t
 
-  (** Alias for corner *)
+  (** Zero rectangle *)
+  val zero : t
+
+  (** Unit rectangle *)
+  val one : t
+
+  (** Returns the position of a rectangle *)
   val position : t -> Vector2i.t
+
+  (** Returns the absolute position of a rectangle, that is the 
+    * point of minimal coordinates *)
+  val abs_position : t -> Vector2i.t
+
+  (** Returns the top corner (aka position + size) of a rectangle *)
+  val corner : t -> Vector2i.t
 
   (** Returns the size of a rectangle *)
   val size : t -> Vector2i.t
 
+  (** Returns the absolute size of a rectangle *)
+  val abs_size : t -> Vector2i.t
+
   (** Returns the center of a rectangle *)
   val center : t -> Vector2f.t
+
+  (** $normalize rect$ returns a rectangle equivalent to $rect$ but with
+      positive size *)
+  val normalize : t -> t
 
   (** Returns the area of a rectangle *)
   val area : t -> int
 
-  (** Scales a rectangle *)
+  (** Scales a rectangle (the result is normalized) *)
   val scale : t -> Vector2i.t -> t
 
   (** Translates a rectangle *)
   val translate : t -> Vector2i.t -> t
 
-  (** $intersect t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
-  val intersect : t -> t -> bool
+  (** $intersects t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
+  val intersects : t -> t -> bool
 
-  (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
-  val contains : t -> Vector2i.t -> bool
+  (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ 
+    *
+    * if $strict$ is set to $true$ then upper bounds are not included ($false$ by default) *)
+  val contains : ?strict:bool -> t -> Vector2i.t -> bool
 
-  (** $loop t f$ iterates through all points of the rectangle *)
-  val loop : t -> (int -> int -> unit) -> unit
+  (** $iter t f$ iterates through all points of the rectangle $t$
+    * 
+    * if $strict$ is set to $false$ then upper bounds are included ($true$ by default) *)
+  val iter : ?strict:bool -> t -> (Vector2i.t -> unit) -> unit
+
+  (** $fold t f u$ folds through all points of the rectangle $t$ 
+    * 
+    * if $strict$ is set to $false$ then upper bounds are included ($true$ by default) *)
+  val fold : ?strict:bool -> t -> (Vector2i.t -> 'a -> 'a) -> 'a -> 'a
 
 end
 
@@ -457,22 +581,42 @@ module FloatRect : sig
     * of size $size$ *)
   val create : Vector2f.t -> Vector2f.t -> t
 
-  (** Returns the position of a rectangle *)
-  val corner : t -> Vector2f.t
+  (** $create_from_points p1 p2$ creates a rectangle going from $p1$ to $p2$ *)
+  val create_from_points : Vector2f.t -> Vector2f.t -> t
 
-  (** Alias for corner *)
+  (** Zero rectangle *)
+  val zero : t
+
+  (** Unit rectangle *)
+  val one : t
+
+  (** Returns the position of a rectangle *)
   val position : t -> Vector2f.t
+
+  (** Returns the absolute position of a rectangle, that is the point of
+    * minimal coordinates *)
+  val abs_position : t -> Vector2f.t
+
+  (** Returns the top corner (aka position + size) of a rectangle *)
+  val corner : t -> Vector2f.t
 
   (** Returns the size of a rectangle *)
   val size : t -> Vector2f.t
 
+  (** Returns the absolute size of a rectangle *)
+  val abs_size : t -> Vector2f.t
+
   (** Returns the center of a rectangle *)
   val center : t -> Vector2f.t
+
+  (** $normalize rect$ returns a rectangle equivalent to $rect$ but with
+      positive size *)
+  val normalize : t -> t
 
   (** Returns the area of a rectangle *)
   val area : t -> float
 
-  (** Scales a rectangle *)
+  (** Scales a rectangle (the result is normalized) *)
   val scale : t -> Vector2f.t -> t
 
   (** Translates a rectangle *)
@@ -484,8 +628,8 @@ module FloatRect : sig
   (** Converts a float rectangle to an integer rectangle *)
   val floor : t -> IntRect.t
 
-  (** $intersect t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
-  val intersect : t -> t -> bool
+  (** $intersects t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
+  val intersects : t -> t -> bool
 
   (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
   val contains : t -> Vector2f.t -> bool
@@ -505,17 +649,34 @@ module IntBox : sig
     * of size $size$ *)
   val create : Vector3i.t -> Vector3i.t -> t
 
+  (** $create_from_points p1 p2$ creates a box going from $p1$ to $p2$ *)
+  val create_from_points : Vector3i.t -> Vector3i.t -> t
+
+  (** Zero box *)
+  val zero : t
+
   (** Unit box *)
   val one : t
 
   (** Returns the position of a box *)
+  val position : t -> Vector3i.t
+
+  (** Returns the absolute position of a box, that is the point of minimal
+    * coordinates *)
+  val abs_position : t -> Vector3i.t
+
+  (** Returns the top corner (aka position + size) of a box *)
   val corner : t -> Vector3i.t
 
-  (** Alias for corner *)
-  val position : t -> Vector3i.t
+  (** $normalize box$ returns a box equivalent to $box$ but with
+      positive size *)
+  val normalize : t -> t
 
   (** Returns the size of a box *)
   val size : t -> Vector3i.t
+
+  (** Returns the absolute size of a box *)
+  val abs_size : t -> Vector3i.t
 
   (** Returns the center of a box *)
   val center : t -> Vector3f.t
@@ -523,20 +684,29 @@ module IntBox : sig
   (** Returns the volume of a box *)
   val volume : t -> int
 
-  (** Scales a box *)
+  (** Scales a box (the result is normalized) *)
   val scale : t -> Vector3i.t -> t
 
   (** Translates a box *)
   val translate : t -> Vector3i.t -> t
 
-  (** $intersect t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
-  val intersect : t -> t -> bool
+  (** $intersects t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
+  val intersects : t -> t -> bool
 
-  (** $contains t p$ returns $true$ iff the box $t$ contains $p$ *)
-  val contains : t -> Vector3i.t -> bool
+  (** $contains t p$ returns $true$ iff the box $t$ contains $p$ 
+    *
+    * if $strict$ is set to $true$ then upper bounds are not included ($false$ by default) *)
+  val contains : ?strict:bool -> t -> Vector3i.t -> bool
 
-  (** $loop t f$ iterates through all points of the box *)
-  val loop : t -> (int -> int -> int -> unit) -> unit
+  (** $iter t f$ iterates through all points of the box $t$
+    * 
+    * if $strict$ is set to $false$ then upper bounds are included ($true$ by default) *)
+  val iter : ?strict:bool -> t -> (Vector3i.t -> unit) -> unit
+
+  (** $fold t f u$ folds through all points of the box $t$ 
+    * 
+    * if $strict$ is set to $false$ then upper bounds are included ($true$ by default) *)
+  val fold : ?strict:bool -> t -> (Vector3i.t -> 'a -> 'a) -> 'a -> 'a
 
 end
 
@@ -553,25 +723,42 @@ module FloatBox : sig
     * of size $size$ *)
   val create : Vector3f.t -> Vector3f.t -> t
 
+  (** $create_from_points p1 p2$ creates a box going from $p1$ to $p2$ *)
+  val create_from_points : Vector3f.t -> Vector3f.t -> t
+
+  (** Zero box *)
+  val zero : t
+
   (** Unit box *)
   val one : t
 
   (** Returns the position of a box *)
-  val corner : t -> Vector3f.t
-
-  (** Alias for corner *)
   val position : t -> Vector3f.t
+
+  (** Returns the absolute position of a box, that is the point of minimal
+    * coordinates *)
+  val abs_position : t -> Vector3f.t
+
+  (** Returns the top corner (aka position + size) of a box *)
+  val corner : t -> Vector3f.t
 
   (** Returns the size of a box *)
   val size : t -> Vector3f.t
 
+  (** Returnrs the absolute size of a box *)
+  val abs_size : t -> Vector3f.t
+
   (** Returns the center of a box *)
   val center : t -> Vector3f.t
+
+  (** $normalize box$ returns a box equivalent to $box$ but with
+      positive size *)
+  val normalize : t -> t
 
   (** Returns the volume of a box *)
   val volume : t -> float
 
-  (** Scales a box *)
+  (** Scales a box (the result is normalized) *)
   val scale : t -> Vector3f.t -> t
 
   (** Translates a box *)
@@ -583,8 +770,8 @@ module FloatBox : sig
   (** Converts a float box to an integer box *)
   val floor : t -> IntBox.t
 
-  (** $intersect t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
-  val intersect : t -> t -> bool
+  (** $intersects t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
+  val intersects : t -> t -> bool
 
   (** $contains t p$ returns $true$ iff the box $t$ contains $p$ *)
   val contains : t -> Vector3f.t -> bool

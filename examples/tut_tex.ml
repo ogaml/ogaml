@@ -4,7 +4,7 @@ open OgamlMath
 let settings = OgamlCore.ContextSettings.create ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~settings ~title:"Texture Tutorial"
+  Window.create ~width:800 ~height:600 ~settings ~title:"Texture Tutorial" ()
 
 let vertex_shader_source = "
   in vec3 position;

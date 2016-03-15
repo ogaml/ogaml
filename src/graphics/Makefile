@@ -2,7 +2,7 @@ include ../../common_defs.mk
 
 # Override
 
-INCLUDE_DIRS = -I ../math/ -I ../core/
+INCLUDE_DIRS = -I ../math/ -I ../core/ -I ../utils/
 
 GRAPHICS_STUBS = shader_stubs.c program_stubs.c texture_stubs.c\
 	         vao_stubs.c vbo_stubs.c uniform_stubs.c text_stubs.c\
@@ -34,6 +34,9 @@ MLCMIS = $(MLINTERFACES:.mli=.cmi)
 
 COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast -Wno-pointer-sign
 
+CMA_DEPS = ../core/ogamlCore.cma ../math/ogamlMath.cma ../utils/ogamlUtils.cma
+CMXA_DEPS = ../core/ogamlCore.cmxa ../math/ogamlMath.cmxa ../utils/ogamlUtils.cmxa
+
 
 # Compilation
 
@@ -55,13 +58,13 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) ogamlGraphics.cmi
 	$(OCAMLFIND) $(OCAMLOPT) -a -o $@ $(INCLUDE_DIRS) $<
 
 %.cmi:%.mli
-	$(OCAMLFIND) $(OCAMLC) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../core/ogamlCore.cma ../math/ogamlMath.cma -c $< -o $@
+	$(OCAMLFIND) $(OCAMLC) -for-pack OgamlGraphics $(INCLUDE_DIRS) $(CMA_DEPS) -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLFIND) $(OCAMLOPT) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../core/ogamlCore.cmxa ../math/ogamlMath.cmxa -c $< -o $@
+	$(OCAMLFIND) $(OCAMLOPT) -for-pack OgamlGraphics $(INCLUDE_DIRS) $(CMXA_DEPS) -c $< -o $@
 
 %.cmo:%.ml
-	$(OCAMLFIND) $(OCAMLC) -for-pack OgamlGraphics $(INCLUDE_DIRS) ../core/ogamlCore.cma ../math/ogamlMath.cma -c $< -o $@
+	$(OCAMLFIND) $(OCAMLC) -for-pack OgamlGraphics $(INCLUDE_DIRS) $(CMA_DEPS) -c $< -o $@
 
 %.ml:%.mll
 	$(LEX) $<

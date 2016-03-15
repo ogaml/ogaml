@@ -37,6 +37,9 @@ let glsl_version s =
 let is_glsl_version_supported s v = 
   v <= s.glsl
 
+let assert_no_error s = 
+  assert (GL.Pervasives.error () = None)
+
 
 module LL = struct
   
