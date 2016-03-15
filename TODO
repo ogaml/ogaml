@@ -29,7 +29,7 @@ OgamlGraphics:
   ☐ Window coordinate conversions
 
 Math:
-  ☐ Box.iter strict is buggy (ie. when size is < 0) , remove it, or remove always >0 size
+  ✔ Box.iter strict is buggy (ie. when size is < 0) , remove it, or remove always >0 size @done(2016-03-15 11:09) @project(Math)
 
 Utils:
   ✔ Move UTF8String from Graphics to Utils @done(2016-03-14 17:05) @project(Utils)

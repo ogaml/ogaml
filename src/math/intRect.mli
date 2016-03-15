@@ -11,9 +11,13 @@ val one : t
 
 val position : t -> Vector2i.t
 
+val abs_position : t -> Vector2i.t
+
 val corner : t -> Vector2i.t
 
 val size : t -> Vector2i.t
+
+val abs_size : t -> Vector2i.t
 
 val center : t -> Vector2f.t
 
@@ -25,7 +29,7 @@ val scale : t -> Vector2i.t -> t
 
 val translate : t -> Vector2i.t -> t
 
-val intersect : t -> t -> bool
+val intersects : t -> t -> bool
 
 val contains : ?strict:bool -> t -> Vector2i.t -> bool
 

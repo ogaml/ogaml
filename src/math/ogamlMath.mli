@@ -504,13 +504,10 @@ module IntRect : sig
   type t = {x : int; y : int; width : int; height : int}
 
   (** $create position size$ creates a rectangle at position $position$ and
-    * of size $size$
-    *
-    * The rectangle is created such that $width$ and $height$ are $>= 0$ *)
+    * of size $size$ *)
   val create : Vector2i.t -> Vector2i.t -> t
 
-  (** $create_from_points p1 p2$ creates a rectangle going from $p1$ to $p2$ 
-    * such that $width$ and $height$ are $>= 0$ *)
+  (** $create_from_points p1 p2$ creates a rectangle going from $p1$ to $p2$ *)
   val create_from_points : Vector2i.t -> Vector2i.t -> t
 
   (** Zero rectangle *)
@@ -522,17 +519,24 @@ module IntRect : sig
   (** Returns the position of a rectangle *)
   val position : t -> Vector2i.t
 
+  (** Returns the absolute position of a rectangle, that is the 
+    * point of minimal coordinates *)
+  val abs_position : t -> Vector2i.t
+
   (** Returns the top corner (aka position + size) of a rectangle *)
   val corner : t -> Vector2i.t
 
   (** Returns the size of a rectangle *)
   val size : t -> Vector2i.t
 
+  (** Returns the absolute size of a rectangle *)
+  val abs_size : t -> Vector2i.t
+
   (** Returns the center of a rectangle *)
   val center : t -> Vector2f.t
 
   (** $normalize rect$ returns a rectangle equivalent to $rect$ but with
-      positive $width$ and $height$ *)
+      positive size *)
   val normalize : t -> t
 
   (** Returns the area of a rectangle *)
@@ -544,8 +548,8 @@ module IntRect : sig
   (** Translates a rectangle *)
   val translate : t -> Vector2i.t -> t
 
-  (** $intersect t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
-  val intersect : t -> t -> bool
+  (** $intersects t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
+  val intersects : t -> t -> bool
 
   (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ 
     *
@@ -574,13 +578,10 @@ module FloatRect : sig
   type t = {x : float; y : float; width : float; height : float}
 
   (** $create position size$ creates a rectangle at position $position$ and
-    * of size $size$
-    *
-    * The rectangle is created such that $width$ and $height$ are $>= 0$ *)
+    * of size $size$ *)
   val create : Vector2f.t -> Vector2f.t -> t
 
-  (** $create_from_points p1 p2$ creates a rectangle going from $p1$ to $p2$ 
-    * such that $width$ and $height$ are $>= 0$ *)
+  (** $create_from_points p1 p2$ creates a rectangle going from $p1$ to $p2$ *)
   val create_from_points : Vector2f.t -> Vector2f.t -> t
 
   (** Zero rectangle *)
@@ -592,17 +593,24 @@ module FloatRect : sig
   (** Returns the position of a rectangle *)
   val position : t -> Vector2f.t
 
+  (** Returns the absolute position of a rectangle, that is the point of
+    * minimal coordinates *)
+  val abs_position : t -> Vector2f.t
+
   (** Returns the top corner (aka position + size) of a rectangle *)
   val corner : t -> Vector2f.t
 
   (** Returns the size of a rectangle *)
   val size : t -> Vector2f.t
 
+  (** Returns the absolute size of a rectangle *)
+  val abs_size : t -> Vector2f.t
+
   (** Returns the center of a rectangle *)
   val center : t -> Vector2f.t
 
   (** $normalize rect$ returns a rectangle equivalent to $rect$ but with
-      positive $width$ and $height$ *)
+      positive size *)
   val normalize : t -> t
 
   (** Returns the area of a rectangle *)
@@ -620,8 +628,8 @@ module FloatRect : sig
   (** Converts a float rectangle to an integer rectangle *)
   val floor : t -> IntRect.t
 
-  (** $intersect t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
-  val intersect : t -> t -> bool
+  (** $intersects t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
+  val intersects : t -> t -> bool
 
   (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
   val contains : t -> Vector2f.t -> bool
@@ -638,13 +646,10 @@ module IntBox : sig
   type t = {x : int; y : int; z : int; width : int; height : int; depth : int}
 
   (** $create position size$ creates a box at position $position$ and
-    * of size $size$
-    *
-    * The box is created such that $width$, $height$ and $depth$ are $>= 0$ *)
+    * of size $size$ *)
   val create : Vector3i.t -> Vector3i.t -> t
 
-  (** $create_from_points p1 p2$ creates a box going from $p1$ to $p2$ 
-    * such that $width$, $height$ and $depth$ are $>= 0$ *)
+  (** $create_from_points p1 p2$ creates a box going from $p1$ to $p2$ *)
   val create_from_points : Vector3i.t -> Vector3i.t -> t
 
   (** Zero box *)
@@ -656,15 +661,22 @@ module IntBox : sig
   (** Returns the position of a box *)
   val position : t -> Vector3i.t
 
+  (** Returns the absolute position of a box, that is the point of minimal
+    * coordinates *)
+  val abs_position : t -> Vector3i.t
+
   (** Returns the top corner (aka position + size) of a box *)
   val corner : t -> Vector3i.t
 
   (** $normalize box$ returns a box equivalent to $box$ but with
-      positive $width$, $height$ and $depth$ *)
+      positive size *)
   val normalize : t -> t
 
   (** Returns the size of a box *)
   val size : t -> Vector3i.t
+
+  (** Returns the absolute size of a box *)
+  val abs_size : t -> Vector3i.t
 
   (** Returns the center of a box *)
   val center : t -> Vector3f.t
@@ -678,8 +690,8 @@ module IntBox : sig
   (** Translates a box *)
   val translate : t -> Vector3i.t -> t
 
-  (** $intersect t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
-  val intersect : t -> t -> bool
+  (** $intersects t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
+  val intersects : t -> t -> bool
 
   (** $contains t p$ returns $true$ iff the box $t$ contains $p$ 
     *
@@ -708,13 +720,10 @@ module FloatBox : sig
   type t = {x : float; y : float; z : float; width : float; height : float; depth : float}
 
   (** $create position size$ creates a box at position $position$ and
-    * of size $size$
-    *
-    * The box is created such that $width$, $height$ and $depth$ are $>= 0$ *)
+    * of size $size$ *)
   val create : Vector3f.t -> Vector3f.t -> t
 
-  (** $create_from_points p1 p2$ creates a box going from $p1$ to $p2$ 
-    * such that $width$, $height$ and $depth$ are $>= 0$ *)
+  (** $create_from_points p1 p2$ creates a box going from $p1$ to $p2$ *)
   val create_from_points : Vector3f.t -> Vector3f.t -> t
 
   (** Zero box *)
@@ -726,17 +735,24 @@ module FloatBox : sig
   (** Returns the position of a box *)
   val position : t -> Vector3f.t
 
+  (** Returns the absolute position of a box, that is the point of minimal
+    * coordinates *)
+  val abs_position : t -> Vector3f.t
+
   (** Returns the top corner (aka position + size) of a box *)
   val corner : t -> Vector3f.t
 
   (** Returns the size of a box *)
   val size : t -> Vector3f.t
 
+  (** Returnrs the absolute size of a box *)
+  val abs_size : t -> Vector3f.t
+
   (** Returns the center of a box *)
   val center : t -> Vector3f.t
 
   (** $normalize box$ returns a box equivalent to $box$ but with
-      positive $width$, $height$ and $depth$ *)
+      positive size *)
   val normalize : t -> t
 
   (** Returns the volume of a box *)
@@ -754,8 +770,8 @@ module FloatBox : sig
   (** Converts a float box to an integer box *)
   val floor : t -> IntBox.t
 
-  (** $intersect t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
-  val intersect : t -> t -> bool
+  (** $intersects t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
+  val intersects : t -> t -> bool
 
   (** $contains t p$ returns $true$ iff the box $t$ contains $p$ *)
   val contains : t -> Vector3f.t -> bool

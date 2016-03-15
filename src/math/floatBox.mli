@@ -11,9 +11,13 @@ val one : t
 
 val position : t -> Vector3f.t
 
+val abs_position : t -> Vector3f.t
+
 val corner : t -> Vector3f.t
 
 val size : t -> Vector3f.t
+
+val abs_size : t -> Vector3f.t
 
 val center : t -> Vector3f.t
 
@@ -29,7 +33,7 @@ val from_int : IntBox.t -> t
 
 val floor : t -> IntBox.t
 
-val intersect : t -> t -> bool
+val intersects : t -> t -> bool
 
 val contains : t -> Vector3f.t -> bool
 

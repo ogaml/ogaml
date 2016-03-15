@@ -3,13 +3,8 @@ type t = {x : int; y : int; z : int; width : int; height : int; depth : int}
 
 let create v1 v2 = 
   let open Vector3i in
-  let x = if v2.x >= 0 then v1.x else v1.x + v2.x in
-  let y = if v2.y >= 0 then v1.y else v1.y + v2.y in
-  let z = if v2.z >= 0 then v1.z else v1.z + v2.z in
-  let width  = if v2.x >= 0 then v2.x else - v2.x in
-  let height = if v2.y >= 0 then v2.y else - v2.y in
-  let depth  = if v2.z >= 0 then v2.z else - v2.z in
-  { x; y; z; width; height; depth }
+  { x = v1.x; y = v1.y; z = v1.z; 
+    width = v2.x; height = v2.y; depth = v2.z }
 
 let create_from_points v1 v2 = 
   create v1 (Vector3i.sub v2 v1)
@@ -36,10 +31,22 @@ let corner t = {
   Vector3i.z = t.z + t.depth;
 }
 
+let abs_position t = {
+  Vector3i.x = min t.x (t.x + t.width);
+  Vector3i.y = min t.y (t.y + t.height);
+  Vector3i.z = min t.z (t.z + t.depth);
+}
+
 let size t = {
   Vector3i.x = t.width;
   Vector3i.y = t.height;
   Vector3i.z = t.depth;
+}
+
+let abs_size t = {
+  Vector3i.x = abs t.width;
+  Vector3i.y = abs t.height;
+  Vector3i.z = abs t.depth;
 }
 
 let center t = {
@@ -49,16 +56,19 @@ let center t = {
 }
 
 let normalize t = 
-  create (position t) (size t)
+  create (abs_position t) (abs_size t)
 
-let volume t = t.width * t.height * t.depth
+let volume t = 
+  let s = abs_size t in 
+  let open Vector3i in
+  s.x * s.y * s.z
 
 let scale t v = 
   {t with
     width  = t.width  * v.Vector3i.x;
     height = t.height * v.Vector3i.y;
     depth  = t.depth  * v.Vector3i.z;
-  } |> normalize
+  } 
 
 let translate t v = {t with
   x = t.x + v.Vector3i.x;
@@ -66,7 +76,9 @@ let translate t v = {t with
   z = t.z + v.Vector3i.z;
 }
 
-let intersect t1 t2 = 
+let intersects t1 t2 = 
+  let t1 = normalize t1 in
+  let t2 = normalize t2 in
   not ((t1.x + t1.width  < t2.x) ||
        (t2.x + t2.width  < t1.x) ||
        (t1.y + t1.height < t2.y) ||
@@ -74,36 +86,51 @@ let intersect t1 t2 =
        (t1.z + t1.depth  < t2.z) ||
        (t2.z + t2.depth  < t1.z))
 
+let contains1D x posx sizex strict = 
+  if sizex >= 0 then begin
+    if strict then x >= posx && x < posx + sizex
+    else x >= posx && x <= posx + sizex
+  end else begin
+    if strict then x <= posx && x > posx + sizex
+    else x <= posx && x >= posx + sizex
+  end
+
 let contains ?strict:(strict=false) t pt = 
-  let s = if strict then -1 else 0 in
-  pt.Vector3i.x >= t.x &&
-  pt.Vector3i.y >= t.y &&
-  pt.Vector3i.z >= t.z &&
-  pt.Vector3i.x <= t.x + t.width  + s &&
-  pt.Vector3i.y <= t.y + t.height + s &&
-  pt.Vector3i.z <= t.z + t.depth  + s
+  contains1D pt.Vector3i.x t.x t.width  strict &&
+  contains1D pt.Vector3i.y t.y t.height strict &&
+  contains1D pt.Vector3i.z t.z t.depth  strict 
+
+let iter1D posx sizex strict f = 
+  let s = if strict then 1 else 0 in
+  if sizex >= 0 then 
+    for i = posx to posx + sizex - s do 
+      f i
+    done
+  else
+    for i = posx downto posx + sizex + s do
+      f i
+    done
 
 let iter ?strict:(strict=true) t f = 
-  let s = if strict then -1 else 0 in
-  let t = normalize t in
-  for i = t.x to t.x + t.width + s do
-    for j = t.y to t.y + t.height + s do
-      for k = t.z to t.z + t.depth + s do
-        f Vector3i.({x = i; y = j; z = k})
-      done;
-    done;
-  done
+  iter1D t.x t.width strict 
+    (fun i ->
+      iter1D t.y t.height strict 
+        (fun j ->
+          iter1D t.z t.height strict 
+            (fun k -> f Vector3i.({x = i; y = j; z = k}))
+        )
+    )
 
 let fold ?strict:(strict=true) t f u = 
-  let s = if strict then -1 else 0 in
-  let t = normalize t in
   let r = ref u in
-  for i = t.x to t.x + t.width + s do
-    for j = t.y to t.y + t.height + s do
-      for k = t.z to t.z + t.depth + s do
-        r := f Vector3i.({x = i; y = j; z = k}) !r
-      done;
-    done;
-  done;
+  iter1D t.x t.width strict 
+    (fun i ->
+      iter1D t.y t.height strict 
+        (fun j ->
+          iter1D t.z t.height strict 
+            (fun k -> r := f Vector3i.({x = i; y = j; z = k}) !r)
+        )
+    );
   !r
+
 

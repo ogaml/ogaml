@@ -10,9 +10,13 @@ val one : t
 
 val position : t -> Vector2f.t
 
+val abs_position : t -> Vector2f.t
+
 val corner : t -> Vector2f.t
 
 val size : t -> Vector2f.t
+
+val abs_size : t -> Vector2f.t
 
 val center : t -> Vector2f.t
 
@@ -28,7 +32,7 @@ val from_int : IntRect.t -> t
 
 val floor : t -> IntRect.t
 
-val intersect : t -> t -> bool
+val intersects : t -> t -> bool
 
 val contains : t -> Vector2f.t -> bool
 
