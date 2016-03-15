@@ -20,7 +20,7 @@ Future work on Model:
   ☐ Model merging
 
 OgamlGraphics:
-  ☐ GC textures
+  ✔ GC textures @done(2016-03-15 10:30) @project(OgamlGraphics)
   ☐ Non exposed InternalUtils for binding draw parameters for example
   ☐ Error checking in Font, Image (loading), Image.blit
   ☐ Move programs to State (+ organize)
