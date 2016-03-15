@@ -10,7 +10,7 @@ let texture = Texture.Texture2D.create (`File "examples/mario-block.bmp")
 
 let texture_png = Texture.Texture2D.create (`File "examples/test.png")
 
-let sprite = Sprite.create ~texture ()
+let sprite = Sprite.create ~texture ~size:(Vector2f.({x = 50.; y = 50.})) ~origin:(Vector2f.({x=25.;y=25.})) ()
 
 let sprite2 = Sprite.create ~texture:texture_png ~position:(Vector2f.({x = 50.; y = 50.})) ()
 
@@ -36,8 +36,8 @@ let rec handle_events () =
         | S -> do_all Sprite.translate Vector2f.({ x =  0. ; y =  5. })
         | D -> do_all Sprite.translate Vector2f.({ x =  5. ; y =  0. })
         (* Do a slow barrel roll *)
-        | O -> do_all Sprite.rotate (-5.)
-        | P -> do_all Sprite.rotate 5.
+        | O -> do_all Sprite.rotate (-0.4)
+        | P -> do_all Sprite.rotate 0.4
         (* Resizing *)
         | F -> do_all Sprite.scale Vector2f.({ x = 0.8  ; y = 1.   })
         | H -> do_all Sprite.scale Vector2f.({ x = 1.25 ; y = 1.   })

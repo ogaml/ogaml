@@ -1269,6 +1269,7 @@ module Sprite : sig
     ?origin   : OgamlMath.Vector2f.t ->
     ?position : OgamlMath.Vector2f.t ->
     ?scale    : OgamlMath.Vector2f.t ->
+    ?size     : OgamlMath.Vector2f.t ->
     ?rotation : float ->
     unit -> t
 
@@ -1293,6 +1294,9 @@ module Sprite : sig
   (** Sets the scale of the sprite. *)
   val set_scale : t -> OgamlMath.Vector2f.t -> unit
 
+  (** Sets the base size of a sprite. *)
+  val set_size : t -> OgamlMath.Vector2f.t -> unit
+
   (** Translates the sprite by the given vector. *)
   val translate : t -> OgamlMath.Vector2f.t -> unit
 
@@ -1301,6 +1305,9 @@ module Sprite : sig
 
   (** Scales the sprite. *)
   val scale : t -> OgamlMath.Vector2f.t -> unit
+
+  (** Returns the base size of a sprite *)
+  val size : t -> OgamlMath.Vector2f.t
 
   (** Returns the position of the origin in window coordinates. *)
   val position : t -> OgamlMath.Vector2f.t

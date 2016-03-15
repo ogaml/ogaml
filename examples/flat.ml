@@ -145,8 +145,8 @@ let rec handle_events () =
         | S -> do_all Shape.translate Vector2f.({ x =  0. ; y =  5. })
         | D -> do_all Shape.translate Vector2f.({ x =  5. ; y =  0. })
         (* Do a slow barrel roll *)
-        | O -> do_all Shape.rotate (-5.)
-        | P -> do_all Shape.rotate 5.
+        | O -> do_all Shape.rotate (-0.4)
+        | P -> do_all Shape.rotate 0.4
         (* Resizing *)
         | F -> do_all Shape.scale Vector2f.({ x = 0.8  ; y = 1.   })
         | H -> do_all Shape.scale Vector2f.({ x = 1.25 ; y = 1.   })

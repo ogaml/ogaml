@@ -2,7 +2,7 @@ open OgamlMath
 
 type t = {
   texture : Texture.Texture2D.t ;
-  size    : Vector2f.t ;
+  mutable size    : Vector2f.t ;
   mutable vertices : VertexArray.static VertexArray.t ;
   mutable position : Vector2f.t ;
   mutable origin   : Vector2f.t ;
@@ -10,7 +10,7 @@ type t = {
   mutable scale    : Vector2f.t
 }
 
-(* Applys transformations to a point *)
+(* Applies transformations to a point *)
 let apply_transformations position origin rotation scale point =
   (* Position offset *)
   Vector2f.({
@@ -66,9 +66,15 @@ let create ~texture
            ?origin:(origin=Vector2f.zero)
            ?position:(position=Vector2f.zero)
            ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
+           ?size
            ?rotation:(rotation=0.) () =
   let sizei = Texture.Texture2D.size texture in
-  let size = Vector2f.from_int sizei in
+  let base_size = Vector2f.from_int sizei in
+  let size = 
+    match size with
+    | None   -> base_size
+    | Some s -> s
+  in
   let vertices = get_vertices size position origin rotation scale in
   {
     texture  = texture ;
@@ -124,6 +130,10 @@ let set_rotation sprite rotation =
   sprite.rotation <- rotation ;
   update sprite
 
+let set_size sprite size = 
+  sprite.size <- size;
+  update sprite
+
 let set_scale sprite scale =
   sprite.scale <- scale ;
   update sprite
@@ -150,5 +160,7 @@ let position sprite = sprite.position
 let origin sprite = sprite.origin
 
 let rotation sprite = sprite.rotation
+
+let size sprite = sprite.size
 
 let get_scale sprite = sprite.scale

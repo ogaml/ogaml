@@ -24,7 +24,7 @@ OgamlGraphics:
   ☐ Non exposed InternalUtils for binding draw parameters for example
   ☐ Error checking in Font, Image (loading), Image.blit
   ☐ Move programs to State (+ organize)
-  ☐ Size in sprite and shape ?
+  ✔ Size in sprite and shape ? - only sprite @done(2016-03-15 10:47) @project(OgamlGraphics)
   ☐ Transformations as matrices in uniforms for sprite, shape and text
   ☐ Window coordinate conversions
 
