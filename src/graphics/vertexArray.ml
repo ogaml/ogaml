@@ -74,8 +74,7 @@ module Source = struct
       match v.Vertex.position with
       |None when src.position <> None -> 
         raise (Invalid_vertex "Missing vertex position")
-      |Some _ when src.position = None ->
-        raise (Invalid_vertex "Vertex position not required by source")
+      |Some _ when src.position = None -> ()
       |Some vec -> GL.Data.add_3f src.data vec
       | _ -> ()
     end;
@@ -83,8 +82,7 @@ module Source = struct
       match v.Vertex.texcoord with
       |None when src.texcoord <> None -> 
         raise (Invalid_vertex "Missing texture coordinate")
-      |Some _ when src.texcoord = None ->
-        raise (Invalid_vertex "Texture coordinate not required by source")
+      |Some _ when src.texcoord = None -> ()
       |Some vec -> GL.Data.add_2f src.data vec
       | _ -> ()
     end;
@@ -92,8 +90,7 @@ module Source = struct
       match v.Vertex.normal with
       |None when src.normal <> None -> 
         raise (Invalid_vertex "Missing vertex normal")
-      |Some _ when src.normal = None ->
-        raise (Invalid_vertex "Vertex normal not required by source")
+      |Some _ when src.normal = None -> ()
       |Some vec -> GL.Data.add_3f src.data vec
       | _ -> ()
     end;
@@ -101,8 +98,7 @@ module Source = struct
       match v.Vertex.color with
       |None when src.color <> None -> 
         raise (Invalid_vertex "Missing vertex color")
-      |Some _ when src.color = None ->
-        raise (Invalid_vertex "Vertex color not required by source")
+      |Some _ when src.color = None -> ()
       |Some vec -> GL.Data.add_color src.data vec
       | _ -> ()
     end;

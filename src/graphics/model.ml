@@ -60,8 +60,11 @@ module Face = struct
       Vertex.position v2,
       Vertex.position v3
     in
-    Vector3f.cross (Vector3f.sub v2 v1) (Vector3f.sub v3 v1)
-    |> Vector3f.normalize
+    try 
+      Vector3f.cross (Vector3f.sub v2 v1) (Vector3f.sub v3 v1)
+      |> Vector3f.normalize
+    with
+      Vector3f.Vector3f_exception _ -> Vector3f.zero
 
   let transform (v1,v2,v3) mat = 
     (Vertex.transform v1 mat, Vertex.transform v2 mat, Vertex.transform v3 mat)
@@ -279,7 +282,7 @@ let cube corner size =
     let v4 = Vertex.create ~position:p4 ~normal:n ~color:c ~uv:uv4 () in
     let f1, f2 = Face.quad v1 v4 v3 v2 in
     add_face model f1
-    |> fun m -> add_face model f2
+    |> fun m -> add_face m f2
   in
   make_face fdl ful fur fdr nz cz empty
   |> make_face ful bul bur fur ny cy

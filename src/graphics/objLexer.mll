@@ -25,6 +25,7 @@ let newline = ('\013'* '\010')
 let blank = [' ' '\009' '\012']
 let lowercase = ['a'-'z' '_']
 let uppercase = ['A'-'Z']
+let firstchar = ['A'-'Z' 'a'-'z' '_' '\'']
 let identchar = ['A'-'Z' 'a'-'z' '_' '\'' '0'-'9' '.']
 let lowercase_latin1 = ['a'-'z' '\223'-'\246' '\248'-'\255' '_']
 let uppercase_latin1 = ['A'-'Z' '\192'-'\214' '\216'-'\222']
@@ -33,7 +34,7 @@ let identchar_latin1 =
 let symbolchar =
   ['!' '$' '%' '&' '*' '+' '-' '.' '/' ':' '<' '=' '>' '?' '@' '^' '|' '~']
 let decimal_literal =
-  ['0'-'9'] ['0'-'9' '_']*
+  ['-']? ['0'-'9'] ['0'-'9' '_']*
 let hex_literal =
   '0' ['x' 'X'] ['0'-'9' 'A'-'F' 'a'-'f']['0'-'9' 'A'-'F' 'a'-'f' '_']*
 let oct_literal =
@@ -43,7 +44,7 @@ let bin_literal =
 let int_literal =
   decimal_literal | hex_literal | oct_literal | bin_literal
 let float_literal =
-  ['0'-'9'] ['0'-'9' '_']*
+  ['-']? ['0'-'9'] ['0'-'9' '_']*
   ('.' ['0'-'9' '_']* )?
   (['e' 'E'] ['+' '-']? ['0'-'9'] ['0'-'9' '_']* )?
 
@@ -54,7 +55,7 @@ rule token = parse
     {Lexing.new_line lexbuf; token lexbuf}
   | eof
     {EOF}
-  | identchar *
+  | firstchar identchar *
     {try Hashtbl.find keywords_table (Lexing.lexeme lexbuf)
      with Not_found -> STRING (Lexing.lexeme lexbuf)}
   | int_literal 
