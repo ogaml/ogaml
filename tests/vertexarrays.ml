@@ -115,10 +115,9 @@ let test_vao4 () =
       empty ~position:"pos" ~size:4 ()
       << Vertex.create ~position:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
     )) in
-    ignore vsource;
-    assert false
+    ignore vsource
   with
-    |VertexArray.Invalid_vertex _ -> ()
+    |VertexArray.Invalid_vertex _ -> assert false
 
 let test_vao5 () =
   let vsource = VertexArray.(Source.(
