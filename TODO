@@ -14,45 +14,41 @@ Cocoa specific:
   ☐ Differentiate between Middle and Other for mouse
   ☐ Window doesn't resign being key on mission control
 
-Future work on Model:
-  ☐ Rewrite Model to add iterators, simplify the interface, and only index ad-hoc (when requested by source)
-  ☐ Poly export to Model.t
-  ☐ Model merging
+Interface changes:
+  Model:
+    ☐ Rewrite Model to add iterators, simplify the interface, and only index ad-hoc (when requested by source)
+    ☐ Poly export to Model.t
+    ☐ Model merging
+  Window:
+    ☐ Coordinate conversions
+  Interpolators:
+    ☐ Add begin and end time
+  Text:
+    ☐ Alinea parameter @unsure
+    ☐ Text align
+    ☐ Text width
+    ☐ Factorize two modules
+    Fx module for text with advanced features:
+      ☐ Filtered transformations
+      ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
 
-OgamlGraphics:
-  ✔ GC textures @done(2016-03-15 10:30) @project(OgamlGraphics)
-  ☐ Non exposed InternalUtils for binding draw parameters for example
-  ☐ Error checking in Font, Image (loading), Image.blit
-  ☐ Move programs to State (+ organize)
-  ✔ Size in sprite and shape ? - only sprite @done(2016-03-15 10:47) @project(OgamlGraphics)
-  ☐ Transformations as matrices in uniforms for sprite, shape and text
-  ☐ Window coordinate conversions
+Code refactoring:
+  OgamlGraphics:
+    ☐ Non exposed InternalUtils for binding draw parameters for example
+    ☐ Error checking in Font, Image (loading), Image.blit
+    ☐ Move programs to State (+ organize)
+    ☐ Transformations as matrices in uniforms for sprite, shape and text
 
-Math:
-  ✔ Box.iter strict is buggy (ie. when size is < 0) , remove it, or remove always >0 size @done(2016-03-15 11:09) @project(Math)
-
-Utils:
-  ✔ Move UTF8String from Graphics to Utils @done(2016-03-14 17:05) @project(Utils)
-  ✔ Move Logging from Core to Utils @done(2016-03-14 17:05) @project(Utils)
-  ☐ Add optional parameter to IPs for endtime
-  ☐ Bounding module :
+New modules:
+  Bounding module:
     ☐ Split module (bounding3D / bounding2D)
     ☐ Rework architecture (submodules to avoid record names clashes)
     ☐ Normalization of boxes (reuse box module ?)
     ☐ Tests
-  ☐ Segment trees :
-    ☐ Functorized for use with various coordinate systems
+  Segment trees:
+    ☐ Functorized for use with various coordinate systems @unsure
     ☐ Quadtree 
     ☐ Octree 
-
-Text:
-  ☐ Alinea parameter @unsure
-  ☐ Text align
-  ☐ Text width
-  ☐ Factorize two modules
-  Fx module for text with advanced features:
-    ☐ Filtered transformations
-    ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
 
 Advanced features:
   More Image and Texture types:
@@ -67,6 +63,11 @@ Advanced features:
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+  ✔ GC textures @done(2016-03-15 10:30) @project(OgamlGraphics)
+  ✔ Size in sprite and shape ? - only sprite @done(2016-03-15 10:47) @project(OgamlGraphics)
+  ✔ Box.iter strict is buggy (ie. when size is < 0) , remove it, or remove always >0 size @done(2016-03-15 11:09) @project(Math)
+  ✔ Move UTF8String from Graphics to Utils @done(2016-03-14 17:05) @project(Utils)
+  ✔ Move Logging from Core to Utils @done(2016-03-14 17:05) @project(Utils)
   ✔ Update the view (and probably other things) when resizing @done(2015-12-11 11:13) @project(Cocoa specific)
   ✔ Check if window size is in points instead of pixels @done(2015-12-11 11:14) @project(Cocoa specific)
   ✘ Fix fullscreen in Xlib !!  - Xlib bug @cancelled(2015-12-16 14:09) @project(OgamlGraphics)
