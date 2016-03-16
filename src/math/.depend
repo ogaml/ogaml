@@ -12,8 +12,6 @@ matrix2D.cmo : vector2f.cmi matrix2D.cmi
 matrix2D.cmx : vector2f.cmx matrix2D.cmi
 matrix3D.cmo : vector3f.cmi quaternion.cmi matrix3D.cmi
 matrix3D.cmx : vector3f.cmx quaternion.cmx matrix3D.cmi
-poly.cmo : vector3fs.cmi vector3f.cmi poly.cmi
-poly.cmx : vector3fs.cmx vector3f.cmx poly.cmi
 quaternion.cmo : vector3f.cmi quaternion.cmi
 quaternion.cmx : vector3f.cmx quaternion.cmi
 vector2f.cmo : vector2i.cmi vector2f.cmi
@@ -34,7 +32,6 @@ intRect.cmi : vector2i.cmi vector2f.cmi
 matrix2D.cmi : vector2f.cmi
 matrix3D.cmi : vector3f.cmi quaternion.cmi
 ogamlMath.cmi :
-poly.cmi : vector3f.cmi
 quaternion.cmi : vector3f.cmi
 vector2f.cmi : vector2i.cmi
 vector2i.cmi :

@@ -60,7 +60,9 @@ triple:
 
 face:
   |FACE; t1 = triple; t2 = triple; t3 = triple 
-    {ObjAST.Face (t1,t2,t3)}
+    {ObjAST.Tri (t1,t2,t3)}
+  |FACE; t1 = triple; t2 = triple; t3 = triple; t4 = triple
+    {ObjAST.Quad (t1,t2,t3,t4)}
   ;
 
 mtllib:
