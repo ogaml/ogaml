@@ -16,11 +16,13 @@ Cocoa specific:
 
 Interface changes:
   Model:
-    ☐ Rewrite Model to add iterators, simplify the interface, and only index ad-hoc (when requested by source)
-    ☐ Poly export to Model.t
-    ☐ Model merging
+    ✔ Rewrite Model to add iterators, simplify the interface, and only index ad-hoc (when requested by source) @done(2016-03-16 15:42) @project(Interface changes / Model)
+    ✔ Poly export to Model.t @done(2016-03-16 16:07) @project(Interface changes / Model)
+    ✔ Remove Poly from Math @done(2016-03-16 16:07) @project(Interface changes / Model)
+    ✔ Model merging @done(2016-03-16 15:42) @project(Interface changes / Model)
   Window:
     ☐ Coordinate conversions
+    ☐ Add open (dual of close)
   Interpolators:
     ☐ Add begin and end time
   Text:

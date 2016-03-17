@@ -10,14 +10,6 @@ let initial_time = ref 0.
 
 let frame_count  = ref 0
 
-let axis_source =
-  let src = VertexArray.Source.empty
-    ~position:"in_position"
-    ~color:"in_color"
-    ~size:6 ()
-  in
-  Poly.axis src Vector3f.({x = -1.; y = -1.; z = -1.}) Vector3f.({x = 5.; y = 5.; z = 5.})
-
 let cube_source =
   let src = VertexArray.Source.empty
     ~position:"in_position"
@@ -25,17 +17,11 @@ let cube_source =
     ~normal:"in_normal"
     ~size:36 ()
   in
-  Poly.cube src Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) |> ignore;
-  Poly.cube src Vector3f.({x = 0.5; y = 1.5; z = -2.5}) Vector3f.({x = 1.; y = 1.; z = 1.})
-
-let axis = VertexArray.static axis_source
+  let cmod = Model.cube Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) in
+  Model.source cmod ~vertex_source:src ();
+  src
 
 let cube = VertexArray.static cube_source
-
-let default_program =
-  Program.from_source_pp (Window.state window)
-    ~vertex_source:(`File "examples/default_shader.vert")
-    ~fragment_source:(`File "examples/default_shader.frag")
 
 let normal_program =
   Program.from_source_pp (Window.state window)
@@ -76,12 +62,7 @@ let display () =
     |> Uniform.matrix3D "MVMatrix" mv
     |> Uniform.matrix3D "VMatrix" view
   in
-  VertexArray.draw ~window ~vertices:cube ~uniform ~program:normal_program ~parameters ~start:36 ~mode:DrawMode.Triangles ();
-  let uniform =
-    Uniform.empty
-    |> Uniform.matrix3D "MVPMatrix" vp
-  in
-  VertexArray.draw ~window ~vertices:axis ~uniform ~program:default_program ~parameters ~mode:DrawMode.Lines ()
+  VertexArray.draw ~window ~vertices:cube ~uniform ~program:normal_program ~parameters ~mode:DrawMode.Triangles ()
 
 
 (* Camera *)

@@ -42,14 +42,6 @@ let initial_time = ref 0.
 
 let frame_count  = ref 0
 
-let axis_source =
-  let src = VertexArray.Source.empty
-    ~position:"in_position"
-    ~color:"in_color"
-    ~size:6 ()
-  in
-  Poly.axis src Vector3f.({x = -1.; y = -1.; z = -1.}) Vector3f.({x = 5.; y = 5.; z = 5.})
-
 let color_bitmask (r,g,b) =
   (r lsl 16) lor (g lsl 8) lor b
 
@@ -99,16 +91,9 @@ let cube_indices =
     << 20 << 21 << 23 << 21 << 22 << 23
   )
 
-let axis = VertexArray.static axis_source
-
 let cube = VertexMap.static cube_source
 
 let indices = IndexArray.static cube_indices
-
-let default_program =
-  Program.from_source_pp (Window.state window)
-    ~vertex_source:(`File "examples/default_shader.vert")
-    ~fragment_source:(`File "examples/default_shader.frag")
 
 let cube_program =
   Program.from_source_pp (Window.state window)
@@ -146,12 +131,7 @@ let display () =
     |> Uniform.matrix3D "MVMatrix" mv
     |> Uniform.matrix3D "VMatrix" view
   in
-  VertexMap.draw ~window ~vertices:cube ~indices ~uniform ~program:cube_program ~parameters ~mode:DrawMode.Triangles ();
-  let uniform =
-    Uniform.empty
-    |> Uniform.matrix3D "MVPMatrix" vp
-  in
-  VertexArray.draw ~window ~vertices:axis ~uniform ~program:default_program ~parameters ~mode:DrawMode.Lines ()
+  VertexMap.draw ~window ~vertices:cube ~indices ~uniform ~program:cube_program ~parameters ~mode:DrawMode.Triangles ()
 
 
 (* Camera *)

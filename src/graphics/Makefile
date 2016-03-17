@@ -22,7 +22,7 @@ MLSOURCES = color.ml drawParameter.ml GL.ml state.ml\
 	    image.ml texture.ml program.ml uniform.ml window.ml indexArray.ml\
 	    vertexArray.ml vertexMap.ml font.ml text.ml\
 	    $(PARSER_FILES:.mly=.ml) $(LEXER_FILES:.mll=.ml)\
-	    model.ml poly.ml shape.ml sprite.ml mouse.ml keyboard.ml 
+	    model.ml shape.ml sprite.ml mouse.ml keyboard.ml 
 
 MLINTERFACES = drawMode.mli GLTypes.mli objAST.mli
 

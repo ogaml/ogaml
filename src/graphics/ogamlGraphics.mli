@@ -1025,85 +1025,116 @@ end
 module Model : sig
 
   (** This module provides helpers to manipulate and load
-    * 3D models in the RAM.
+    * immutable 3D models in the RAM.
+    *
+    * Moreover, the operations provided in this module are generally costly
+    * and should not be used in performance-sensitive code.
     *
     * Models stored in that form are not RAM-friendly, and
     * should not be stored in large numbers. Use vertex arrays
     * instead. *)
 
-  (** Raised when trying to put a model in a vertex source
-    * and the model is missing an attribute required by the source *)
-  exception Invalid_model of string
+  (** Represents a particular vertex of a model *)
+  module Vertex : sig
 
-  (** Raised when trying to parse an invalid obj file *)
-  exception Bad_format of string
+    (** Type of a model vertex *)
+    type t
+
+    (** Creates a model vertex *)
+    val create : position:OgamlMath.Vector3f.t ->
+                ?normal:OgamlMath.Vector3f.t   ->
+                ?uv:OgamlMath.Vector2f.t       ->
+                ?color:Color.t -> unit -> t
+
+    (** Returns the position of a model vertex *)
+    val position : t -> OgamlMath.Vector3f.t
+
+    (** Returns the normal of a model vertex *)
+    val normal : t -> OgamlMath.Vector3f.t option
+
+    (** Returns the UV coordinates associated to a model vertex *)
+    val uv : t -> OgamlMath.Vector2f.t option
+
+    (** Returns the color of a model vertex *)
+    val color : t -> Color.t option
+
+  end
+
+
+  (** Represents a face of a model *)
+  module Face : sig
+
+    (** Type of a face *)
+    type t
+
+    (** Creates a face from 3 vertices *)
+    val create : Vertex.t -> Vertex.t -> Vertex.t -> t
+
+    (** Returns the two triangles associated to 4 vertices *)
+    val quad : Vertex.t -> Vertex.t -> Vertex.t -> Vertex.t -> (t * t)
+
+    (** Returns the 3 vertices of a face *)
+    val vertices : t -> (Vertex.t * Vertex.t * Vertex.t)
+
+    (** Returns a new face painted with a given color *)
+    val paint : t -> Color.t -> t
+
+    (** Returns the normal of a face *)
+    val normal : t -> OgamlMath.Vector3f.t
+
+  end
+
+
+  (** Raised if an OBJ file is ill-formed or if a model has a wrong type *)
+  exception Error of string
 
   (** Type of a model *)
   type t
 
-  (** Type of a vertex location in a model *)
-  type vertex
+  (*** Model creation *)
 
-  (** Type of a normal location in a model *)
-  type normal
+  (** Empty model *)
+  val empty : t
 
-  (** Type of an uv location in a model *)
-  type uv
+  (** Returns the model associated to an OBJ file *)
+  val from_obj : string -> t
 
-  (** Type of a point location in a model *)
-  type point
+  (** Creates a cube from two endpoints *)
+  val cube : OgamlMath.Vector3f.t -> OgamlMath.Vector3f.t -> t
 
-  (** Type of a color location in a model *)
-  type color
 
-  (** Creates an empty model *)
-  val empty : unit -> t
+  (*** Transformations *)
 
-  (** Creates a model from an OBJ file or string *)
-  val from_obj : [`File of string | `String of string] -> t
+  (** Applies a transformation to a 3D model *)
+  val transform : t -> OgamlMath.Matrix3D.t -> t
 
-  (** Scales a model (in place) *)
-  val scale : t -> float -> unit
+  (** Scales a 3D model *)
+  val scale : t -> OgamlMath.Vector3f.t -> t
 
-  (** Translates a model @see:OgamlMath.Vector3f *)
-  val translate : t -> OgamlMath.Vector3f.t -> unit
+  (** Translates a 3D model *)
+  val translate : t -> OgamlMath.Vector3f.t -> t
 
-  (** Adds a vertex to a model @see:OgamlMath.Vector3f
-    * and returns its location *)
-  val add_vertex : t -> OgamlMath.Vector3f.t -> vertex
+  (** Rotates a 3D model *)
+  val rotate : t -> OgamlMath.Quaternion.t -> t
 
-  (** Adds a normal to a model @see:OgamlMath.Vector3f
-    * and returns its location *)
-  val add_normal : t -> OgamlMath.Vector3f.t -> normal
 
-  (** Adds some UV coordinates to a model @see:OgamlMath.Vector2f
-    * and returns its location *)
-  val add_uv : t -> OgamlMath.Vector2f.t -> uv
+  (*** Model modification *)
 
-  (** Adds a color to a model @see:OgamlGraphics.Color
-    * and returns its location *)
-  val add_color : t -> Color.t -> color
+  (** Adds a face to a model *)
+  val add_face : t -> Face.t -> t
 
-  (** Adds a point formed by a position location and optional parameters
-    * to a model and returns its location *)
-  val make_point : t -> vertex -> normal option -> uv option -> color option -> point
+  (** Paints the whole model with a given color *)
+  val paint : t -> Color.t -> t
 
-  (** Similar to make_point but also adds the corresponding
-    * parameters to the model, and returns the point location
-    * @see:OgamlMath.Vector3f
-    * @see:OgamlMath.Vector2f
-    * @see:OgamlGraphics.Color *)
-  val add_point : t -> vertex:OgamlMath.Vector3f.t ->
-                      ?normal:OgamlMath.Vector3f.t ->
-                      ?uv:OgamlMath.Vector2f.t ->
-                      ?color:Color.t -> unit -> point
-
-  (** Constructs a face from three point locations *)
-  val make_face : t -> (point * point * point) -> unit
+  (** Merges two models *)
+  val merge : t -> t -> t
 
   (** (Re-)computes the normals of a model. If $smooth$ is $true$,
     * then the normals are computed per-vertex instead of per-face *)
-  val compute_normals : ?smooth:bool -> t -> unit
+  val compute_normals : ?smooth:bool -> t -> t
+
+  (** Simpifies a model (removes all redundant faces) *)
+  val simplify : t -> t
 
   (** Appends a model to a vertex source. Uses indexing if an index source is provided.
     * Use Triangles as DrawMode with this source.
@@ -1112,30 +1143,17 @@ module Model : sig
   val source : t -> ?index_source:IndexArray.Source.t ->
                     vertex_source:VertexArray.Source.t -> unit -> unit
 
-end
 
+  (*** Iterators *)
 
-(** Creation of basic polygons and polyhedra *)
-module Poly : sig
+  (** Iterates through all faces of a model *)
+  val iter : t -> (Face.t -> unit) -> unit
 
-  (** This module provides helper functions that construct
-    * various polygons and polyhedra *)
+  (** Folds through all faces of a model *)
+  val fold : t -> ('a -> Face.t -> 'a) -> 'a -> 'a
 
-  (** $cube source corner size$ appends to $source$ some CCW-oriented
-    * triangles forming a cube whose bottom-left-back vertex is $corner$ and of
-    * a given $size$. Use Triangles as DrawMode with this source.
-    * @see:OgamlGraphics.VertexArray.Source
-    * @see:OgamlMath.Vector3f *)
-  val cube : VertexArray.Source.t -> OgamlMath.Vector3f.t ->
-             OgamlMath.Vector3f.t -> VertexArray.Source.t
-
-  (** $axis source min max$ appends to $source$ 3 axis going
-    * from $min.x$ to $max.x$, $min.y$ to $max.y$ and $min.z$ to $max.z$.
-    * Use Lines as DrawMode with this source.
-    * @see:OgamlGraphics.VertexArray.Source
-    * @see:OgamlMath.Vector3f *)
-  val axis : VertexArray.Source.t -> OgamlMath.Vector3f.t ->
-             OgamlMath.Vector3f.t -> VertexArray.Source.t
+  (** Maps a model face by face *)
+  val map : t -> (Face.t -> Face.t) -> t
 
 end
 

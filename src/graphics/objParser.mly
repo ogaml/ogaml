@@ -47,7 +47,7 @@ param:
     {ObjAST.Param}
   ;
 
-triple:
+%inline triple:
   |x = INT
     {OgamlMath.Vector3i.({x; y = 0; z = 0})}
   |x = INT; SLASH; y = INT 
@@ -60,26 +60,32 @@ triple:
 
 face:
   |FACE; t1 = triple; t2 = triple; t3 = triple 
-    {ObjAST.Face (t1,t2,t3)}
+    {ObjAST.Tri (t1,t2,t3)}
+  |FACE; t1 = triple; t2 = triple; t3 = triple; t4 = triple
+    {ObjAST.Quad (t1,t2,t3,t4)}
   ;
 
 mtllib:
   |MATLIB; LEFTBRACKET; s = STRING; RIGHTBRACKET
+  |MATLIB; s = STRING 
     {ObjAST.Mtllib s}
   ;
 
 usemtl:
   |USEMTL; LEFTBRACKET; s = STRING; RIGHTBRACKET
+  |USEMTL; s = STRING 
     {ObjAST.Usemtl s}
   ;
 
 objct:
   |OBJECT; LEFTBRACKET; s = STRING; RIGHTBRACKET
+  |OBJECT; s = STRING 
     {ObjAST.Object s}
   ;
 
 group:
   |GROUP; LEFTBRACKET; s = STRING; RIGHTBRACKET
+  |GROUP; s = STRING 
     {ObjAST.Group s}
   ;
 

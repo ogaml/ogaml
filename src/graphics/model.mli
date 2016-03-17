@@ -1,47 +1,88 @@
 
-exception Invalid_model of string
 
-exception Bad_format of string
+module Vertex : sig
+
+  type t
+
+  val create : position:OgamlMath.Vector3f.t ->
+              ?normal:OgamlMath.Vector3f.t   ->
+              ?uv:OgamlMath.Vector2f.t       ->
+              ?color:Color.t -> unit -> t
+
+  val position : t -> OgamlMath.Vector3f.t
+
+  val normal : t -> OgamlMath.Vector3f.t option
+
+  val uv : t -> OgamlMath.Vector2f.t option
+
+  val color : t -> Color.t option
+
+end
+
+
+module Face : sig
+
+  type t
+
+  val create : Vertex.t -> Vertex.t -> Vertex.t -> t
+
+  val quad : Vertex.t -> Vertex.t -> Vertex.t -> Vertex.t -> (t * t)
+
+  val vertices : t -> (Vertex.t * Vertex.t * Vertex.t)
+
+  val paint : t -> Color.t -> t
+
+  val normal : t -> OgamlMath.Vector3f.t
+
+end
+
+
+exception Error of string
+
 
 type t
 
-type vertex
+(* Creation *)
 
-type normal
+val empty : t
 
-type uv
+val from_obj : string -> t
 
-type point
+val cube : OgamlMath.Vector3f.t -> OgamlMath.Vector3f.t -> t
 
-type color
 
-val empty : unit -> t
+(* Transformation *)
 
-val from_obj : [`File of string | `String of string] -> t
+val transform : t -> OgamlMath.Matrix3D.t -> t
 
-val scale : t -> float -> unit
+val scale : t -> OgamlMath.Vector3f.t -> t
 
-val translate : t -> OgamlMath.Vector3f.t -> unit
+val translate : t -> OgamlMath.Vector3f.t -> t
 
-val add_vertex : t -> OgamlMath.Vector3f.t -> vertex
+val rotate : t -> OgamlMath.Quaternion.t -> t
 
-val add_normal : t -> OgamlMath.Vector3f.t -> normal
 
-val add_uv : t -> OgamlMath.Vector2f.t -> uv
+(* Model modification *)
 
-val add_color : t -> Color.t -> color
+val add_face : t -> Face.t -> t
 
-val make_point : t -> vertex -> normal option -> uv option -> color option -> point
+val paint : t -> Color.t -> t
 
-val add_point : t -> vertex:OgamlMath.Vector3f.t ->
-                    ?normal:OgamlMath.Vector3f.t ->
-                    ?uv:OgamlMath.Vector2f.t -> 
-                    ?color:Color.t -> unit -> point
+val merge : t -> t -> t
 
-val make_face : t -> (point * point * point) -> unit
+val compute_normals : ?smooth:bool -> t -> t
 
-val compute_normals : ?smooth:bool -> t -> unit
+val simplify : t -> t
 
 val source : t -> ?index_source:IndexArray.Source.t ->
                    vertex_source:VertexArray.Source.t -> unit -> unit
+
+
+(* Iterators *)
+
+val iter : t -> (Face.t -> unit) -> unit
+
+val fold : t -> ('a -> Face.t -> 'a) -> 'a -> 'a
+
+val map : t -> (Face.t -> Face.t) -> t
 
