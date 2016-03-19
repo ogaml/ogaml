@@ -4,271 +4,20 @@ type t = {
   state : State.t;
   internal : LL.Window.t;
   settings : ContextSettings.t;
-  program2D : Program.t;
-  programTex : Program.t;
-  programText : Program.t
+  programs : ProgramLibrary.t
 }
-
-(** 2D drawing program *)
-let vertex_shader_source_130 = "
-  uniform vec2 size;
-
-  in vec3 position;
-  in vec4 color;
-
-  out vec4 frag_color;
-
-  void main() {
-
-    gl_Position.x = 2.0 * position.x / size.x - 1.0;
-    gl_Position.y = 2.0 * (size.y - position.y) / size.y - 1.0;
-    gl_Position.z = 0.0;
-    gl_Position.w = 1.0;
-
-    frag_color = color;
-
-  }
-"
-
-let fragment_shader_source_130 = "
-  in vec4 frag_color;
-
-  out vec4 pixel_color;
-
-  void main() {
-
-    pixel_color = frag_color;
-
-  }
-"
-
-let vertex_shader_source_110 = "
-  #version 110
-
-  uniform vec2 size;
-
-  attribute vec3 position;
-  attribute vec4 color;
-
-  varying vec4 frag_color;
-
-  void main() {
-
-    gl_Position.x = 2.0 * position.x / size.x - 1.0;
-    gl_Position.y = 2.0 * (size.y - position.y) / size.y - 1.0;
-    gl_Position.z = 0.0;
-    gl_Position.w = 1.0;
-
-    frag_color = color;
-
-  }
-"
-
-let fragment_shader_source_110 = "
-  #version 110
-
-  varying vec4 frag_color;
-
-  void main() {
-
-    gl_FragColor = frag_color;
-
-  }
-"
-
-(* Sprite drawing program *)
-let vertex_shader_source_tex_130 = "
-  uniform vec2 size;
-
-  in vec3 position;
-  in vec2 uv;
-
-  out vec2 frag_uv;
-
-  void main() {
-
-    gl_Position.x = 2.0 * position.x / size.x - 1.0;
-    gl_Position.y = 2.0 * (size.y - position.y) / size.y - 1.0;
-    gl_Position.z = 0.0;
-    gl_Position.w = 1.0;
-
-    frag_uv = vec2(uv.x, 1.0 - uv.y);
-
-  }
-"
-
-let fragment_shader_source_tex_130 = "
-  uniform sampler2D my_texture;
-
-  in vec2 frag_uv;
-
-  out vec4 out_color;
-
-  void main() {
-
-    out_color = texture(my_texture, frag_uv);
-
-  }
-"
-
-let vertex_shader_source_tex_110 = "
-  #version 110
-
-  uniform vec2 size;
-
-  attribute vec3 position;
-  attribute vec2 uv;
-
-  varying vec2 frag_uv;
-
-  void main() {
-
-    gl_Position.x = 2.0 * position.x / size.x - 1.0;
-    gl_Position.y = 2.0 * (size.y - position.y) / size.y - 1.0;
-    gl_Position.z = 0.0;
-    gl_Position.w = 1.0;
-
-    frag_uv = vec2(uv.x, 1.0 - uv.y);
-
-  }
-"
-
-let fragment_shader_source_tex_110 = "
-  #version 110
-
-  uniform sampler2D my_texture;
-
-  varying vec2 frag_uv;
-
-  void main() {
-
-    gl_FragColor = texture2D(my_texture, frag_uv);
-
-  }
-"
-
-let vertex_shader_source_text_130 = "
-  uniform vec2 window_size;
-  uniform vec2 atlas_size;
-
-  in vec3 position;
-  in vec2 uv;
-  in vec4 color;
-
-  out vec2 frag_uv;
-  out vec4 frag_color;
-
-  void main() {
-
-    gl_Position.x = 2.0 * position.x / window_size.x - 1.0;
-    gl_Position.y = 2.0 * (window_size.y - position.y) / window_size.y - 1.0;
-    gl_Position.z = 0.0;
-    gl_Position.w = 1.0;
-
-    frag_uv.x = uv.x / atlas_size.x;
-    frag_uv.y = uv.y / atlas_size.y;
-
-    frag_color = color;
-
-  }
-"
-
-let fragment_shader_source_text_130 = "
-  uniform sampler2D atlas;
-
-  in vec2 frag_uv;
-  in vec4 frag_color;
-
-  out vec4 color;
-
-  void main() {
-
-    color = texture(atlas, frag_uv) * frag_color;
-
-  }
-"
-
-
-let vertex_shader_source_text_110 = "
-  #version 110
-
-  uniform vec2 window_size;
-  uniform vec2 atlas_size;
-
-  attribute vec3 position;
-  attribute vec2 uv;
-
-  varying vec2 frag_uv;
-
-  void main() {
-
-    gl_Position.x = 2.0 * position.x / window_size.x - 1.0;
-    gl_Position.y = 2.0 * (window_size.y - position.y) / window_size.y - 1.0;
-    gl_Position.z = 0.0;
-    gl_Position.w = 1.0;
-
-    frag_uv.x = uv.x / atlas_size.x;
-    frag_uv.y = uv.y / atlas_size.y;
-
-  }
-"
-
-let fragment_shader_source_text_110 = "
-  #version 110
-
-  uniform sampler2D atlas;
-
-  varying vec2 frag_uv;
-
-  void main() {
-
-    gl_FragColor = texture2D(atlas, frag_uv);
-
-  }
-"
 
 let create ?width:(width=800) ?height:(height=600) ?title:(title="") 
            ?settings:(settings=OgamlCore.ContextSettings.create ()) () =
   let internal = LL.Window.create ~width ~height ~title ~settings in
   let state = State.LL.create () in
   State.LL.set_viewport state OgamlMath.IntRect.({x = 0; y = 0; width; height});
-  let program2D =
-    if State.is_glsl_version_supported state 130 then
-      Program.from_source_pp state
-        ~vertex_source:(`String vertex_shader_source_130)
-        ~fragment_source:(`String fragment_shader_source_130)
-    else
-      Program.from_source
-        ~vertex_source:(`String vertex_shader_source_110)
-        ~fragment_source:(`String fragment_shader_source_110)
-  in
-  let programTex =
-    if State.is_glsl_version_supported state 130 then
-      Program.from_source_pp state
-        ~vertex_source:(`String vertex_shader_source_tex_130)
-        ~fragment_source:(`String fragment_shader_source_tex_130)
-    else
-      Program.from_source
-        ~vertex_source:(`String vertex_shader_source_tex_110)
-        ~fragment_source:(`String fragment_shader_source_tex_110)
-  in
-  let programText =
-    if State.is_glsl_version_supported state 130 then
-      Program.from_source_pp state
-        ~vertex_source:(`String vertex_shader_source_text_130)
-        ~fragment_source:(`String fragment_shader_source_text_130)
-    else
-      Program.from_source
-        ~vertex_source:(`String vertex_shader_source_text_110)
-        ~fragment_source:(`String fragment_shader_source_text_110)
-  in
+  let programs = ProgramLibrary.create state in
   {
     state;
     internal;
     settings;
-    program2D;
-    programTex;
-    programText
+    programs;
   }
 
 let set_title win title = LL.Window.set_title win.internal title
@@ -310,11 +59,11 @@ module LL = struct
 
   let internal win = win.internal
 
-  let program win = win.program2D
+  let program win = ProgramLibrary.shape_drawing win.programs
 
-  let sprite_program win = win.programTex
+  let sprite_program win = ProgramLibrary.sprite_drawing win.programs
 
-  let text_program win = win.programText
+  let text_program win = ProgramLibrary.atlas_drawing win.programs
 
   let bind_draw_parameters win parameters =
     let state = win.state in

@@ -534,6 +534,54 @@ module Uniform : sig
 end
 
 
+(** Library of useful predefined programs *)
+module ProgramLibrary : sig
+  
+  (** This module provides several predefined programs 
+    * that are used internally by Ogaml.
+    * Those programs are compatible with the types used by the module VertexArray *)
+
+  (** Type of a library *)
+  type t
+
+  (** Creates a library from a GL state. 
+    * The library will compile the programs using the best
+    * version supported by the state. *)
+  val create : State.t -> t
+
+  (** Returns a shape drawing program from a library.
+    * This program requires the following attributes :
+    *
+    *   - position : as a Vector3f.t, in pixels, relative to the top-left corner
+    * (the 3rd coordinate is there for compatibility with VertexArray and is ignored)
+    *
+    *   - color : as a Color.t
+    *
+    * It also requires the following uniforms :
+    *   
+    *   - size : the size of the window, in pixels, as a Vector2f.t
+    *)
+  val shape_drawing : t -> Program.t
+
+  (** Returns a sprite drawing program from a library.
+    * This program requires the following attributes :
+    *
+    *   - position : as a Vector3f.t, in pixels, relative to the top-left corner
+    * (the 3rd coordinate is there for compatibility with VertexArray and is ignored)
+    *
+    *   - uv : as a Vector2f.t, in relative coordinates (between 0 and 1)
+    *
+    * It also requires the following uniforms :
+    *   
+    *   - size : the size of the window, in pixels, as a Vector2f.t
+    *
+    *   - my_texture : as a Texture.t
+    *)
+  val sprite_drawing : t -> Program.t
+
+end
+
+
 (** High-level window wrapper for rendering and event management *)
 module Window : sig
 
