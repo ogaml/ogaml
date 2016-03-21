@@ -26,7 +26,7 @@ Interface changes:
   Interpolators:
     ☐ Add begin and end time
   Shape:
-    ☐ Source shapes ?
+    ☐ Source shapes ? VertexShapes ?
   Programs:
     ✔ Defaults programs (like 2D drawing) exposed ? @done(2016-03-19 16:54) @project(Interface changes / Model / Window / Interpolators / Shape / Programs)
   VertexArrays:
