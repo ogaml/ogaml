@@ -43,7 +43,7 @@ val matrix2D : string -> OgamlMath.Matrix2D.t -> t -> t
 val color : string -> Color.t -> t -> t
 
 (** Adds a 2D texture to a uniform structure *)
-val texture2D : string -> Texture.Texture2D.t -> t -> t
+val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
 
 
 module LL : sig

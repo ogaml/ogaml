@@ -11,27 +11,34 @@ module Texture2D = struct
 
   module LL = struct
 
-    let bind st tex = 
+    let set_unit st uid = 
+      let bound_unit = State.LL.texture_unit st in
+      if bound_unit <> uid then begin
+        State.LL.set_texture_unit st uid;
+        GL.Texture.activate uid
+      end
+
+    let bind st uid tex = 
+      set_unit st uid;
       let bound_tex = 
-        State.LL.bound_texture 
-          st (State.LL.texture_unit st) 
-          GLTypes.TextureTarget.Texture2D 
+        State.LL.bound_texture st uid
+      in
+      let bound_target = 
+        State.LL.bound_target st uid
       in
       match tex with
-      |None when bound_tex <> None -> begin
+      |None when bound_tex <> None 
+              && bound_target = Some GLTypes.TextureTarget.Texture2D -> begin
         State.LL.set_bound_texture
-          st (State.LL.texture_unit st)
-          GLTypes.TextureTarget.Texture2D
+          st uid
           None;
         GL.Texture.bind 
           GLTypes.TextureTarget.Texture2D
           None
       end
       |Some(t) when bound_tex <> Some t.internal -> begin
-        State.LL.set_bound_texture
-          st (State.LL.texture_unit st)
-          GLTypes.TextureTarget.Texture2D
-          (Some t.internal);
+        State.LL.set_bound_texture st uid
+          (Some (t.internal, GLTypes.TextureTarget.Texture2D));
         GL.Texture.bind 
           GLTypes.TextureTarget.Texture2D
           (Some t.internal)

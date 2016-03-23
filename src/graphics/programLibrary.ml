@@ -95,7 +95,7 @@ let vertex_shader_source_tex_130 = "
 "
 
 let fragment_shader_source_tex_130 = "
-  uniform sampler2D my_texture;
+  uniform sampler2D utexture;
 
   in vec2 frag_uv;
 
@@ -103,7 +103,7 @@ let fragment_shader_source_tex_130 = "
 
   void main() {
 
-    out_color = texture(my_texture, frag_uv);
+    out_color = texture(utexture, frag_uv);
 
   }
 "
@@ -133,13 +133,13 @@ let vertex_shader_source_tex_110 = "
 let fragment_shader_source_tex_110 = "
   #version 110
 
-  uniform sampler2D my_texture;
+  uniform sampler2D utexture;
 
   varying vec2 frag_uv;
 
   void main() {
 
-    gl_FragColor = texture2D(my_texture, frag_uv);
+    gl_FragColor = texture2D(utexture, frag_uv);
 
   }
 "

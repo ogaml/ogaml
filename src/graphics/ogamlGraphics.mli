@@ -280,6 +280,10 @@ module State : sig
   (** This module encapsulates a copy of the internal GL state.
     * This allows efficient optimizations of state changes *)
 
+  (** Raised when trying to perform an invalid state change 
+    * (for example, binding a texture to an invalid texture unit) *)
+  exception Invalid_state of string
+
   (** Type of a GL state *)
   type t
 
@@ -298,6 +302,9 @@ module State : sig
 
   (** Asserts that no openGL error occured internally. Used for debugging and testing. *)
   val assert_no_error : t -> unit
+
+  (** Returns the number of available texture units *)
+  val max_textures : t -> int
 
 end
 
@@ -500,36 +507,42 @@ module Uniform : sig
   val empty : t
 
   (** $vector3f name vec set$ adds the uniform $vec$ to $set$.
-    * The uniform should be refered to as $name$ in a GLSL program.
+    * the uniform should be refered to as $name$ in a glsl program.
+    * Type : vec3.
     * @see:OgamlMath.Vector3f *)
   val vector3f : string -> OgamlMath.Vector3f.t -> t -> t
 
-  (** See vector3f @see:OgamlMath.Vector2f *)
+  (** See vector3f. Type : vec2. @see:OgamlMath.Vector2f *)
   val vector2f : string -> OgamlMath.Vector2f.t -> t -> t
 
-  (** See vector3f @see:OgamlMath.Vector3i *)
+  (** See vector3f. Type : vec3i. @see:OgamlMath.Vector3i *)
   val vector3i : string -> OgamlMath.Vector3i.t -> t -> t
 
-  (** See vector3f @see:OgamlMath.Vector2i *)
+  (** See vector3f. Type : vec2i. @see:OgamlMath.Vector2i *)
   val vector2i : string -> OgamlMath.Vector2i.t -> t -> t
 
-  (** See vector3f *)
+  (** See vector3f. Type : int. *)
   val int : string -> int -> t -> t
 
-  (** See vector3f *)
+  (** See vector3f. Type : float. *)
   val float : string -> float -> t -> t
 
-  (** See vector3f @see:OgamlMath.Matrix3D *)
+  (** See vector3f. Type : mat3. @see:OgamlMath.Matrix3D *)
   val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> t
 
-  (** See vector3f @see:OgamlMath.Matrix2D *)
+  (** See vector3f. Type : mat2. @see:OgamlMath.Matrix2D *)
   val matrix2D : string -> OgamlMath.Matrix2D.t -> t -> t
 
-  (** See vector3f @see:OgamlGraphics.Color *)
+  (** See vector3f. Type : vec4. @see:OgamlGraphics.Color *)
   val color : string -> Color.t -> t -> t
 
-  (** See vector3f @see:OgamlGraphics.Texture.Texture2D *)
-  val texture2D : string -> Texture.Texture2D.t -> t -> t
+  (** See vector3f. Type : sampler2D.
+   *
+    * The optional parameter $tex_unit$ corresponds to the texture
+    * unit that is used to bind this texture and defaults to $0$.
+    * See $State.max_textures$ for the number of available units.
+    * @see:OgamlGraphics.Texture.Texture2D *)
+  val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
 
 end
 
@@ -575,7 +588,7 @@ module ProgramLibrary : sig
     *   
     *   - size : the size of the window, in pixels, as a Vector2f.t
     *
-    *   - my_texture : as a Texture.t
+    *   - utexture : as a Texture.t
     *)
   val sprite_drawing : t -> Program.t
 

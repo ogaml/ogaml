@@ -10,7 +10,7 @@ module Texture2D : sig
 
   module LL : sig
 
-    val bind : State.t -> t option -> unit
+    val bind : State.t -> int -> t option -> unit
 
   end
 

@@ -7,8 +7,8 @@
   * NOTE : setters are intended for internal use only
 **)
 
-(** GL state exceptions *)
-exception Invalid_texture_unit of int
+(** GL state exception *)
+exception Invalid_state of string
 
 (** Type of the GL state *)
 type t
@@ -24,6 +24,9 @@ val glsl_version : t -> int
 
 (** Returns true iff the GLSL version passed as parameter is supported *)
 val is_glsl_version_supported : t -> int -> bool
+
+(** Returns the maximal number of textures *)
+val max_textures : t -> int
 
 (** Asserts that no GL error occured *)
 val assert_no_error : t -> unit
@@ -71,10 +74,13 @@ module LL : sig
   val texture_unit : t -> int
 
   (** Sets the currently bound texture to a texture unit and a target *)
-  val set_bound_texture : t -> int -> GLTypes.TextureTarget.t -> GL.Texture.t option -> unit
+  val set_bound_texture : t -> int -> (GL.Texture.t * GLTypes.TextureTarget.t) option -> unit
 
-  (** Returns the texture currently bound to a texture unit and a target *)
-  val bound_texture : t -> int -> GLTypes.TextureTarget.t -> GL.Texture.t option
+  (** Returns the texture currently bound to a texture unit *)
+  val bound_texture : t -> int -> GL.Texture.t option
+
+  (** Returns the target currently bound to a texture unit *)
+  val bound_target : t -> int -> GLTypes.TextureTarget.t option
 
   (** Sets the currently linked program *)
   val set_linked_program : t -> GL.Program.t option -> unit

@@ -11,7 +11,7 @@ type uniform =
   | Matrix3D  of OgamlMath.Matrix3D.t
   | Matrix2D  of OgamlMath.Matrix2D.t
   | Color     of Color.RGB.t
-  | Texture2D of Texture.Texture2D.t
+  | Texture2D of (int * Texture.Texture2D.t)
   | Float     of float
   | Int       of int
 
@@ -41,7 +41,7 @@ let matrix2D s mat m = UniformMap.add s (Matrix2D mat) m
 
 let color s c m = UniformMap.add s (Color (Color.rgb c)) m
 
-let texture2D s t m = UniformMap.add s (Texture2D t) m
+let texture2D s ?tex_unit:(u=0) t m = UniformMap.add s (Texture2D (u,t)) m
 
 let int s i m = UniformMap.add s (Int i) m
 
@@ -89,8 +89,8 @@ module LL = struct
         Color.RGB.(
           GL.Uniform.float4 location c.r c.g c.b c.a
         )
-    | Texture2D t, GLTypes.GlslType.Sampler2D ->
-        Texture.Texture2D.LL.bind state (Some t);
+    | Texture2D (u,t), GLTypes.GlslType.Sampler2D ->
+        Texture.Texture2D.LL.bind state u (Some t);
         GL.Uniform.int1 location (State.LL.texture_unit state)
     | _ -> raise (Invalid_uniform (Printf.sprintf "Uniform %s has wrong type" name))
 
