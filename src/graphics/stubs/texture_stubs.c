@@ -18,6 +18,8 @@
 #include "utils.h"
 
 
+#define TEX(_a) (*(GLuint*) Data_custom_val(_a))
+
 #define MLvar_Minify  (254173077)
 
 #define MLvar_Magnify (-1011094397)
@@ -138,15 +140,14 @@ GLenum PixelFormat_val(value fmt)
 
 void finalise_tex(value v)
 {
-  GLuint tmp = (GLuint)v;
-  glDeleteTextures(1,&tmp);
+  glDeleteTextures(1,&TEX(v));
 }
 
 
 int compare_tex(value v1, value v2)
 {
-  GLuint i1 = (GLuint)v1;
-  GLuint i2 = (GLuint)v2;
+  GLuint i1 = TEX(v1);
+  GLuint i2 = TEX(v2);
   if(i1 < i2) return -1;
   else if(i1 == i2) return 0;
   else return 1;
@@ -154,12 +155,12 @@ int compare_tex(value v1, value v2)
 
 intnat hash_tex(value v)
 {
-  GLuint i = (GLuint)v;
+  GLuint i = TEX(v);
   return i;
 }
 
 static struct custom_operations tex_custom_ops = {
-  .identifier  = "tex gc handling",
+  .identifier  = "texture GC handling",
   .finalize    =  finalise_tex,
   .compare     =  compare_tex,
   .hash        =  hash_tex,
@@ -197,7 +198,7 @@ caml_bind_texture(value point, value tex_opt)
   if(tex_opt == Val_none)
     glBindTexture(Target_val(point), 0);
   else
-    glBindTexture(Target_val(point), (GLuint)Some_val(tex_opt));
+    glBindTexture(Target_val(point), TEX(Some_val(tex_opt)));
 
   CAMLreturn(Val_unit);
 }
@@ -262,8 +263,7 @@ caml_destroy_texture(value id)
 {
   CAMLparam1(id);
 
-  GLuint tmp = (GLuint)id;
-  glDeleteTextures(1, &tmp);
+  glDeleteTextures(1, &TEX(id));
 
   CAMLreturn(Val_unit);
 }

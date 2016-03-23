@@ -21,7 +21,7 @@ Interface changes:
     ✔ Remove Poly from Math @done(2016-03-16 16:07) @project(Interface changes / Model)
     ✔ Model merging @done(2016-03-16 15:42) @project(Interface changes / Model)
   Window:
-    ☐ Coordinate conversions
+    ☐ Coordinate conversions @note(WTF did I mean by that ?)
     ☐ Add open (dual of close)
   Interpolators:
     ☐ Add begin and end time
@@ -41,6 +41,16 @@ Interface changes:
     Fx module for text with advanced features:
       ☐ Filtered transformations
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
+  Shape and text:
+    ☐ Find a way to export shapes and text to VertexSources @unsure
+    ☐ Get Font texture (to use with vertex sources) in Font.LL
+  VertexSource/Map:
+    ☐ More operations on sources : iter,map
+    ☐ Also, map from VertexArray to VertexMap sources and reciprocally (in module VertexMap)
+  Uniform:
+    ☐ Parameterize sampler2D with mounting point (optional, defaults to 0)
+    ☐ Find a way to get the number of locations and check against that
+    ☐ Font uniform (binds the corresponding texture), also takes a mounting point
 
 Code refactoring:
   OgamlGraphics:
@@ -66,8 +76,8 @@ Advanced features:
     ☐ Texture3D
     ☐ TextureCube
   Batch drawing 2D:
-    ☐ Batcher module
-    ☐ Tilesets
+    ☐ Batcher module (stored in Window.t and stores a current VAO that accumulates drawing calls)
+    ☐ Tilesets with XML or in-code configuration
   ☐ Render textures
 
 
