@@ -88,9 +88,13 @@ UTILS_PACK = $(shell echo $(UTILS_LIB) | sed -e 's/^./\U&/')
 
 # Commands
 
-PPCOMMAND = cppo -D '$(strip $(PP_DEFINE))'
+PPCOMMAND = -pp "cppo -D '$(strip $(PP_DEFINE))'"
 
-DEPCOMMAND = $(OCAMLDEP) -pp "$(PPCOMMAND)" $(INCLUDE_DIRS)
+DEPCOMMAND = $(OCAMLDEP) $(PPCOMMAND) $(INCLUDE_DIRS)
+
+OCAMLOPT_CMD = $(OCAMLOPT) $(PPCOMMAND)
+
+OCAMLC_CMD = $(OCAMLC) $(PPCOMMAND)
 
 
 # Suffixes

@@ -47,28 +47,30 @@ default: .depend graphics_lib
 
 
 graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).cmi
-	$(OCAMLFIND) $(OCAMLC) -pack -o $(GRAPHICS_LIB).cmo $(MLCMIS) $(MLOBJS);
-	$(OCAMLFIND) $(OCAMLOPT) -pack -o $(GRAPHICS_LIB).cmx $(MLCMIS) $(MLNATOBJS);
+	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(GRAPHICS_LIB).cmo $(MLCMIS) $(MLOBJS);
+	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(GRAPHICS_LIB).cmx $(MLCMIS) $(MLNATOBJS);
 	$(OCAMLFIND) $(OCAMLMKLIB) -o $(GRAPHICS_LIB) $(STUBS_OBJS) $(GRAPHICS_LIB).cmo $(GRAPHICS_LIB).cmx\
 	  $(MLOBJS) $(MLNATOBJS) $(GLOBAL_CLIBS)
 
 %.cma:%.cmo
-	$(OCAMLFIND) $(OCAMLC) -a -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLFIND) $(OCAMLC_CMD) -a -o $@ $(INCLUDE_DIRS) $<
 
 %.cmxa:%.cmx
-	$(OCAMLFIND) $(OCAMLOPT) -a -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLFIND) $(OCAMLOPT_CMD) -a -o $@ $(INCLUDE_DIRS) $<
 
 %.cmi:%.mli
-	$(OCAMLFIND) $(OCAMLC) -for-pack $(GRAPHICS_PACK) $(INCLUDE_DIRS) $(CMA_DEPS) -c $< -o $@
+	$(OCAMLFIND) $(OCAMLC_CMD) -for-pack $(GRAPHICS_PACK) $(INCLUDE_DIRS) $(CMA_DEPS) -c $< -o $@
 
-%.cmx:%.ml
-	$(OCAMLFIND) $(OCAMLOPT) -for-pack $(GRAPHICS_PACK) $(INCLUDE_DIRS) $(CMXA_DEPS) -c $< -o $@
+%.cmx:%.ml $(wildcard %.cmi)
+	$(OCAMLFIND) $(OCAMLOPT_CMD) -for-pack $(GRAPHICS_PACK) $(INCLUDE_DIRS) $(CMXA_DEPS) -c $< -o $@
 
-%.cmo:%.ml
-	$(OCAMLFIND) $(OCAMLC) -for-pack $(GRAPHICS_PACK) $(INCLUDE_DIRS) $(CMA_DEPS) -c $< -o $@
+%.cmo:%.ml $(wildcard %.cmi)
+	$(OCAMLFIND) $(OCAMLC_CMD) -for-pack $(GRAPHICS_PACK) $(INCLUDE_DIRS) $(CMA_DEPS) -c $< -o $@
 
 %.ml:%.mll
 	$(LEX) $<
+
+%.mli:%.mll
 
 %.ml:%.mly
 	$(MENHIR) $<
@@ -76,11 +78,8 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).c
 %.mli:%.mly
 	$(MENHIR) $<
 
-%.ml:%.mlpp %.cmi
-	$(PPCOMMAND) -o $@ $<
-
 %.o:%.c
-	$(OCAMLFIND) $(OCAMLC) -o ./$(notdir $@) -c $< -ccopt '$(COPTS)' -cclib "$(GLOBAL_CLIBS)"
+	$(OCAMLFIND) $(OCAMLC_CMD) -o ./$(notdir $@) -c $< -ccopt '$(COPTS)' -cclib "$(GLOBAL_CLIBS)"
 
 
 
