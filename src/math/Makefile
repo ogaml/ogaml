@@ -16,31 +16,27 @@ MLNATOBJS = $(MLSOURCES:.ml=.cmx)
 
 MLCMIS = $(MLINTERFACES:.mli=.cmi)
 
-MLLIB = ogamlMath
-
-PACKNAME = OgamlMath
-
 
 # Compilation
 
 default: .depend compile_math_nat compile_math_byte
 
 compile_math_nat: .depend $(MLCMIS) $(MLNATOBJS) ogamlMath.cmi
-	$(OCAMLFIND) $(OCAMLOPT) -pack -o $(MLLIB).cmx $(MLCMIS) $(MLNATOBJS);
-	$(OCAMLFIND) $(OCAMLOPT) -a -o $(MLLIB).cmxa $(INCLUDE_DIRS) $(MLLIB).cmx
+	$(OCAMLFIND) $(OCAMLOPT) -pack -o $(MATH_LIB).cmx $(MLCMIS) $(MLNATOBJS);
+	$(OCAMLFIND) $(OCAMLOPT) -a -o $(MATH_LIB).cmxa $(INCLUDE_DIRS) $(MATH_LIB).cmx
 
 compile_math_byte: .depend $(MLCMIS) $(MLOBJS) ogamlMath.cmi
-	$(OCAMLFIND) $(OCAMLC) -pack -o $(MLLIB).cmo $(MLCMIS) $(MLOBJS);
-	$(OCAMLFIND) $(OCAMLC) -a -o $(MLLIB).cma $(INCLUDE_DIRS) $(MLLIB).cmo
+	$(OCAMLFIND) $(OCAMLC) -pack -o $(MATH_LIB).cmo $(MLCMIS) $(MLOBJS);
+	$(OCAMLFIND) $(OCAMLC) -a -o $(MATH_LIB).cma $(INCLUDE_DIRS) $(MATH_LIB).cmo
 
 %.cmi:%.mli
 	$(OCAMLFIND) $(OCAMLC) -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLFIND) $(OCAMLOPT) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLFIND) $(OCAMLOPT) -c -for-pack $(MATH_PACK) -o $@ $(INCLUDE_DIRS) $<
 
 %.cmo:%.ml
-	$(OCAMLFIND) $(OCAMLC) -c -for-pack $(PACKNAME) -o $@ $(INCLUDE_DIRS) $<
+	$(OCAMLFIND) $(OCAMLC) -c -for-pack $(MATH_PACK) -o $@ $(INCLUDE_DIRS) $<
 
 %.ml:%.mlpp %.cmi
 	$(PPCOMMAND) -o $@ $<

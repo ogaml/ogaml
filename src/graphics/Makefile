@@ -35,8 +35,8 @@ MLCMIS = $(MLINTERFACES:.mli=.cmi)
 
 COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast -Wno-pointer-sign
 
-CMA_DEPS = ../core/ogamlCore.cma ../math/ogamlMath.cma ../utils/ogamlUtils.cma
-CMXA_DEPS = ../core/ogamlCore.cmxa ../math/ogamlMath.cmxa ../utils/ogamlUtils.cmxa
+CMA_DEPS = ../core/$(CORE_LIB).cma ../math/$(MATH_LIB).cma ../utils/$(UTILS_LIB).cma
+CMXA_DEPS = ../core/$(CORE_LIB).cmxa ../math/$(MATH_LIB).cmxa ../utils/$(UTILS_LIB).cmxa
 
 
 # Compilation
@@ -46,10 +46,10 @@ CMXA_DEPS = ../core/ogamlCore.cmxa ../math/ogamlMath.cmxa ../utils/ogamlUtils.cm
 default: .depend graphics_lib
 
 
-graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) ogamlGraphics.cmi
-	$(OCAMLFIND) $(OCAMLC) -pack -o ogamlGraphics.cmo $(MLCMIS) $(MLOBJS);
-	$(OCAMLFIND) $(OCAMLOPT) -pack -o ogamlGraphics.cmx $(MLCMIS) $(MLNATOBJS);
-	$(OCAMLFIND) $(OCAMLMKLIB) -o ogamlGraphics $(STUBS_OBJS) ogamlGraphics.cmo ogamlGraphics.cmx\
+graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).cmi
+	$(OCAMLFIND) $(OCAMLC) -pack -o $(GRAPHICS_LIB).cmo $(MLCMIS) $(MLOBJS);
+	$(OCAMLFIND) $(OCAMLOPT) -pack -o $(GRAPHICS_LIB).cmx $(MLCMIS) $(MLNATOBJS);
+	$(OCAMLFIND) $(OCAMLMKLIB) -o $(GRAPHICS_LIB) $(STUBS_OBJS) $(GRAPHICS_LIB).cmo $(GRAPHICS_LIB).cmx\
 	  $(MLOBJS) $(MLNATOBJS) $(GLOBAL_CLIBS)
 
 %.cma:%.cmo
@@ -59,13 +59,13 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) ogamlGraphics.cmi
 	$(OCAMLFIND) $(OCAMLOPT) -a -o $@ $(INCLUDE_DIRS) $<
 
 %.cmi:%.mli
-	$(OCAMLFIND) $(OCAMLC) -for-pack OgamlGraphics $(INCLUDE_DIRS) $(CMA_DEPS) -c $< -o $@
+	$(OCAMLFIND) $(OCAMLC) -for-pack $(GRAPHICS_PACK) $(INCLUDE_DIRS) $(CMA_DEPS) -c $< -o $@
 
 %.cmx:%.ml
-	$(OCAMLFIND) $(OCAMLOPT) -for-pack OgamlGraphics $(INCLUDE_DIRS) $(CMXA_DEPS) -c $< -o $@
+	$(OCAMLFIND) $(OCAMLOPT) -for-pack $(GRAPHICS_PACK) $(INCLUDE_DIRS) $(CMXA_DEPS) -c $< -o $@
 
 %.cmo:%.ml
-	$(OCAMLFIND) $(OCAMLC) -for-pack OgamlGraphics $(INCLUDE_DIRS) $(CMA_DEPS) -c $< -o $@
+	$(OCAMLFIND) $(OCAMLC) -for-pack $(GRAPHICS_PACK) $(INCLUDE_DIRS) $(CMA_DEPS) -c $< -o $@
 
 %.ml:%.mll
 	$(LEX) $<

@@ -17,10 +17,10 @@ default: .depend $(ML_OBJS) $(ML_NATS)
 	$(OCAMLC) -c -o $@ $<
 
 %.cmx:%.ml
-	$(OCAMLOPT) -c -o $@ -for-pack OgamlCore $<
+	$(OCAMLOPT) -c -o $@ -for-pack $(CORE_PACK) $<
 
 %.cmo:%.ml
-	$(OCAMLC) -c -o $@ -for-pack OgamlCore $<
+	$(OCAMLC) -c -o $@ -for-pack $(CORE_PACK) $<
 
 
 # Cleaning

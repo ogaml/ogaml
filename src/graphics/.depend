@@ -24,12 +24,10 @@ model.cmo : vertexArray.cmi ../math/vector3i.cmi ../math/vector3f.cmi \
     ../math/vector2f.cmi ../math/ogamlMath.cmi objParser.cmi objAST.cmi \
     ../math/matrix3D.cmi indexArray.cmi color.cmi model.cmi
 model.cmx : vertexArray.cmx ../math/vector3i.cmx ../math/vector3f.cmx \
-    ../math/vector2f.cmx ../math/ogamlMath.cmi objParser.cmx objAST.cmi \
+    ../math/vector2f.cmx ../math/ogamlMath.cmi objParser.cmi objAST.cmi \
     ../math/matrix3D.cmx indexArray.cmx color.cmx model.cmi
 mouse.cmo : window.cmi ../core/ogamlCore.cmi ../core/LL.cmi mouse.cmi
 mouse.cmx : window.cmx ../core/ogamlCore.cmi ../core/LL.cmi mouse.cmi
-objParser.cmo : ../math/ogamlMath.cmi objAST.cmi objParser.cmi
-objParser.cmx : ../math/ogamlMath.cmi objAST.cmi objParser.cmi
 program.cmo : state.cmi GLTypes.cmi GL.cmi program.cmi
 program.cmx : state.cmx GLTypes.cmi GL.cmx program.cmi
 programLibrary.cmo : state.cmi program.cmi programLibrary.cmi
