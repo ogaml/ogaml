@@ -30,7 +30,7 @@ Interface changes:
   Programs:
     ✔ Defaults programs (like 2D drawing) exposed ? @done(2016-03-19 16:54) @project(Interface changes / Model / Window / Interpolators / Shape / Programs)
   VertexArrays:
-    ☐ Sources seems to be inverted (wrong drawing order)
+    ✘ Sources seems to be inverted (wrong drawing order) -- depth testing was enabled @cancelled(2016-03-28 23:53) @project(Interface changes / Model / Window / Interpolators / Shape / Programs / VertexArrays)
   MouseEvents:
     ☐ Vectors rather than pairs 
   Text:
