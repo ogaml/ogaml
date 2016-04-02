@@ -63,8 +63,16 @@ module HSV = struct
 
   let transparent = {h = 0.; s = 0.; v = 0.; a = 0.}
 
-  let clamp c = {
-    h = clamp c.h 0. (2. *. OgamlMath.Constants.pi);
+  let clamp c = 
+  let h = 
+    if c.h < 0. then 
+      (mod_float c.h (2. *. OgamlMath.Constants.pi))
+        +. (2. *. OgamlMath.Constants.pi)
+    else if c.h < 2. *. OgamlMath.Constants.pi then c.h
+    else mod_float c.h (2. *. OgamlMath.Constants.pi)
+  in
+  {
+    h;
     s = clamp c.s 0. 1.;
     v = clamp c.v 0. 1.;
     a = clamp c.a 0. 1.
