@@ -110,6 +110,7 @@ let hsv_to_rgb color =
   let open HSV in 
   let c = color.s *. color.v in
   let h = mod_float color.h (2. *. OgamlMath.Constants.pi) in
+  let h = if h < 0. then h +. (2. *. OgamlMath.Constants.pi) else h in
   let x = c *. (1. -. (abs_float (mod_float (h /. rad60) 2. -. 1.))) in
   let m = color.v -. c in
   let (r',g',b') =

@@ -54,6 +54,9 @@ Interface changes:
     ☐ Font uniform (binds the corresponding texture), also takes a mounting point
   Drawing:
     ☐ Default DrawMode to Triangles
+  Math:
+    ☐ Add Vector2fs
+
 
 Code refactoring:
   OgamlGraphics:
