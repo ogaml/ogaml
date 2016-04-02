@@ -31,8 +31,9 @@ Interface changes:
     ✔ Defaults programs (like 2D drawing) exposed ? @done(2016-03-19 16:54) @project(Interface changes / Model / Window / Interpolators / Shape / Programs)
   VertexArrays:
     ✘ Sources seems to be inverted (wrong drawing order) -- depth testing was enabled @cancelled(2016-03-28 23:53) @project(Interface changes / Model / Window / Interpolators / Shape / Programs / VertexArrays)
-  MouseEvents:
+  Events:
     ☐ Vectors rather than pairs 
+    ☐ Parametrize Resized with a Vector2i
   Text:
     ☐ Alinea parameter @unsure
     ☐ Text align
@@ -51,6 +52,8 @@ Interface changes:
     ✔ Parameterize sampler2D with mounting point (optional, defaults to 0) @done(2016-03-23 16:22) @project(Interface changes / Model / Window / Interpolators / Shape / Programs / VertexArrays / MouseEvents / Text / Fx module for text with advanced features / Shape and text / VertexSource/Map / Uniform)
     ✔ Find a way to get the number of locations and check against that @done(2016-03-23 16:22) @project(Interface changes / Model / Window / Interpolators / Shape / Programs / VertexArrays / MouseEvents / Text / Fx module for text with advanced features / Shape and text / VertexSource/Map / Uniform)
     ☐ Font uniform (binds the corresponding texture), also takes a mounting point
+  Drawing:
+    ☐ Default DrawMode to Triangles
 
 Code refactoring:
   OgamlGraphics:

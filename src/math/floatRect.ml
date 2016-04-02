@@ -45,8 +45,8 @@ let abs_size t = {
 }
 
 let center t = {
-  Vector2f.x = (t.x +. t.width)  /. 2.;
-  Vector2f.y = (t.y +. t.height) /. 2.;
+  Vector2f.x = t.x +. t.width  /. 2.;
+  Vector2f.y = t.y +. t.height /. 2.;
 }
 
 let normalize t = 
