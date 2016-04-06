@@ -50,9 +50,9 @@ let abs_size t = {
 }
 
 let center t = {
-  Vector3f.x = (float_of_int (t.x + t.width))  /. 2.;
-  Vector3f.y = (float_of_int (t.y + t.height)) /. 2.;
-  Vector3f.z = (float_of_int (t.z + t.depth))  /. 2.
+  Vector3f.x = float_of_int t.x +. float_of_int t.width  /. 2.;
+  Vector3f.y = float_of_int t.y +. float_of_int t.height /. 2.;
+  Vector3f.z = float_of_int t.z +. float_of_int t.depth  /. 2.
 }
 
 let normalize t = 

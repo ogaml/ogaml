@@ -1,3 +1,7 @@
+LL.cmo : ../math/ogamlMath.cmi keycode.cmi event.cmi contextSettings.cmi \
+    button.cmi LL.cmi
+LL.cmx : ../math/ogamlMath.cmi keycode.cmi event.cmi contextSettings.cmx \
+    button.cmi LL.cmi
 LL_impl_cocoa.cmo : ../math/ogamlMath.cmi keycode.cmi event.cmi \
     contextSettings.cmi button.cmi
 LL_impl_cocoa.cmx : ../math/ogamlMath.cmi keycode.cmi event.cmi \

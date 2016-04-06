@@ -54,32 +54,29 @@ ML_CMIS = $(ML_INTERFACES:.mli=.cmi)
 
 default: .depend core_lib
 
-core_lib: ml_stubs $(STUBS_TARGETS) $(ML_CMIS) $(ML_OBJ) $(ML_NAT) ogamlCore.cmi
-	$(OCAMLFIND) $(OCAMLOPT) -pack -o ogamlCore.cmx $(OS_WIN_LIB)/$(OS_WIN_LIB).cmx $(ML_CMIS) $(ML_NAT);
-	$(OCAMLFIND) $(OCAMLC) -pack -o ogamlCore.cmo $(OS_WIN_LIB)/$(OS_WIN_LIB).cmo $(ML_CMIS) $(ML_OBJ);
-	$(OCAMLFIND) $(OCAMLMKLIB) -o ogamlCore ogamlCore.cmx ogamlCore.cmo\
+core_lib: ml_stubs $(STUBS_TARGETS) $(ML_CMIS) $(ML_OBJ) $(ML_NAT) $(CORE_LIB).cmi
+	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(CORE_LIB).cmx $(OS_WIN_LIB)/$(OS_WIN_LIB).cmx $(ML_CMIS) $(ML_NAT);
+	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(CORE_LIB).cmo $(OS_WIN_LIB)/$(OS_WIN_LIB).cmo $(ML_CMIS) $(ML_OBJ);
+	$(OCAMLFIND) $(OCAMLMKLIB) -o $(CORE_LIB) $(CORE_LIB).cmx $(CORE_LIB).cmo\
 	  $(STUBS_OBJECTS) $(MKLIB_LIBS) $(GLOBAL_CLIBS)
 
 ml_stubs: 
 	cd $(OS_WIN_LIB) && make
 
 %.cmi:%.mli
-	$(OCAMLFIND) $(OCAMLC) -c $(INCLUDE_DIRS) ../core/ogamlCore.cma ../math/ogamlMath.cma -o $@ $<
+	$(OCAMLFIND) $(OCAMLC_CMD) -c $(INCLUDE_DIRS) ../core/$(CORE_LIB).cma ../math/$(MATH_LIB).cma -o $@ $<
 
-%.cmx:%.ml
-	$(OCAMLFIND) $(OCAMLOPT) -c -for-pack OgamlCore $(INCLUDE_DIRS) ../core/ogamlCore.cmxa ../math/ogamlMath.cmxa -I $(OS_WIN_LIB)/ -o $@ $<
+%.cmx:%.ml $(wildcard %.cmi)
+	$(OCAMLFIND) $(OCAMLOPT_CMD) -c -for-pack $(CORE_PACK) $(INCLUDE_DIRS) ../core/$(CORE_LIB).cmxa ../math/$(MATH_LIB).cmxa -I $(OS_WIN_LIB)/ -o $@ $<
 
-%.cmo:%.ml
-	$(OCAMLFIND) $(OCAMLC) -c -for-pack OgamlCore $(INCLUDE_DIRS) ../core/ogamlCore.cma ../math/ogamlMath.cma -I $(OS_WIN_LIB)/ -o $@ $<
-
-%.ml:%.mlpp %.cmi
-	$(PPCOMMAND) -o $@ $<
+%.cmo:%.ml $(wildcard %.cmi)
+	$(OCAMLFIND) $(OCAMLC_CMD) -c -for-pack $(CORE_PACK) $(INCLUDE_DIRS) ../core/$(CORE_LIB).cma ../math/$(MATH_LIB).cma -I $(OS_WIN_LIB)/ -o $@ $<
 
 %.o:%.m
 	$(CLANG) -c -o ./$(notdir $@) $(OCAML_C_FLAGS) $(GLOBAL_OBJCOPTS) $<
 
 %.o:%.c
-	$(OCAMLC) -c -o ./$(notdir $@) -cclib "$(GLOBAL_CLIBS)" $<
+	$(OCAMLC_CMD) -c -o ./$(notdir $@) -cclib "$(GLOBAL_CLIBS)" $<
 
 
 # Cleaning

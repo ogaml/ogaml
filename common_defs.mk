@@ -68,11 +68,33 @@ OCAML_DIR = $(shell $(OCAMLC) -where)
 OCAML_C_FLAGS = -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT -fPIC -I '$(OCAML_DIR)'
 
 
+# Built libraries
+CORE_LIB = ogamlCore
+
+GRAPHICS_LIB = ogamlGraphics
+
+MATH_LIB = ogamlMath
+
+UTILS_LIB = ogamlUtils
+
+CORE_PACK = $(shell echo $(CORE_LIB) | sed -e 's/^./\U&/')
+
+GRAPHICS_PACK = $(shell echo $(GRAPHICS_LIB) | sed -e 's/^./\U&/')
+
+MATH_PACK = $(shell echo $(MATH_LIB) | sed -e 's/^./\U&/')
+
+UTILS_PACK = $(shell echo $(UTILS_LIB) | sed -e 's/^./\U&/')
+
+
 # Commands
 
-PPCOMMAND = cppo -D '$(strip $(PP_DEFINE))'
+PPCOMMAND = -pp "cppo -D '$(strip $(PP_DEFINE))'"
 
-DEPCOMMAND = $(OCAMLDEP) -pp "$(PPCOMMAND)" $(INCLUDE_DIRS)
+DEPCOMMAND = $(OCAMLDEP) $(PPCOMMAND) $(INCLUDE_DIRS)
+
+OCAMLOPT_CMD = $(OCAMLOPT) $(PPCOMMAND)
+
+OCAMLC_CMD = $(OCAMLC) $(PPCOMMAND)
 
 
 # Suffixes

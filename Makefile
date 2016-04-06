@@ -5,22 +5,28 @@ include common_defs.mk
 
 INCLUDES = -I src/core -I src/math -I src/graphics -I src/utils
 
-MODULES = ogamlMath.cmxa ogamlCore.cmxa ogamlUtils.cmxa ogamlGraphics.cmxa
+MODULES = $(MATH_LIB).cmxa $(CORE_LIB).cmxa $(UTILS_LIB).cmxa $(GRAPHICS_LIB).cmxa
 
 PACKAGES = -package bigarray,unix,str
 
 
 # Install constants
 
-CORE_FILES = src/core/*ogamlCore.*
+CORE_FILES = src/core/*$(CORE_LIB).*
 
-MATH_FILES = src/math/*ogamlMath.*
+MATH_FILES = src/math/*$(MATH_LIB).*
 
-GRAPH_FILES = src/graphics/*ogamlGraphics.*
+GRAPH_FILES = src/graphics/*$(GRAPHICS_LIB).*
 
-UTILS_FILES = src/utils/*ogamlUtils.*
+UTILS_FILES = src/utils/*$(UTILS_LIB).*
 
-DOC_FILES = src/graphics/ogamlGraphics.mli src/core/ogamlCore.mli src/math/ogamlMath.mli src/utils/ogamlUtils.mli
+DOC_FILES = src/graphics/$(GRAPHICS_LIB).mli src/core/$(CORE_LIB).mli src/math/$(MATH_LIB).mli src/utils/$(UTILS_LIB).mli
+
+
+# Examples constants
+
+EXAMPLE_PKG = ogaml.graphics,ogaml.utils
+
 
 # Compilation
 
@@ -39,17 +45,17 @@ graphics_lib: core_lib math_lib utils_lib
 	cd src/graphics/ && make
 
 examples:
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/cube.ml -o cube.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/tut01.ml -o tut01.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/tut02.ml -o tut02.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/tut_tex.ml -o tut_tex.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/tut_idx.ml -o tut_idx.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/flat.ml -o flat.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/vertexmaps.ml -o vertexmaps.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/sprites.ml -o sprites.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics,ogaml.utils examples/ip.ml -o ip.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics examples/text.ml -o text.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package ogaml.graphics,ogaml.utils examples/noise.ml -o noise.out
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/cube.ml -o cube.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut01.ml -o tut01.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut02.ml -o tut02.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut_tex.ml -o tut_tex.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut_idx.ml -o tut_idx.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/flat.ml -o flat.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/vertexmaps.ml -o vertexmaps.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/sprites.ml -o sprites.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/ip.ml -o ip.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/text.ml -o text.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/noise.ml -o noise.out
 
 tests: math_lib core_lib graphics_lib utils_lib
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/programs.ml -o main.out && ./main.out &&\

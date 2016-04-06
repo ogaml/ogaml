@@ -19,17 +19,15 @@ image.cmx : ../math/vector2i.cmx ../math/ogamlMath.cmi ../math/intRect.cmx \
 indexArray.cmo : state.cmi GLTypes.cmi GL.cmi indexArray.cmi
 indexArray.cmx : state.cmx GLTypes.cmi GL.cmx indexArray.cmi
 keyboard.cmo : ../core/ogamlCore.cmi ../core/LL.cmi keyboard.cmi
-keyboard.cmx : ../core/ogamlCore.cmi ../core/LL.cmi keyboard.cmi
+keyboard.cmx : ../core/ogamlCore.cmi ../core/LL.cmx keyboard.cmi
 model.cmo : vertexArray.cmi ../math/vector3i.cmi ../math/vector3f.cmi \
     ../math/vector2f.cmi ../math/ogamlMath.cmi objParser.cmi objAST.cmi \
     ../math/matrix3D.cmi indexArray.cmi color.cmi model.cmi
 model.cmx : vertexArray.cmx ../math/vector3i.cmx ../math/vector3f.cmx \
-    ../math/vector2f.cmx ../math/ogamlMath.cmi objParser.cmx objAST.cmi \
+    ../math/vector2f.cmx ../math/ogamlMath.cmi objParser.cmi objAST.cmi \
     ../math/matrix3D.cmx indexArray.cmx color.cmx model.cmi
 mouse.cmo : window.cmi ../core/ogamlCore.cmi ../core/LL.cmi mouse.cmi
-mouse.cmx : window.cmx ../core/ogamlCore.cmi ../core/LL.cmi mouse.cmi
-objParser.cmo : ../math/ogamlMath.cmi objAST.cmi objParser.cmi
-objParser.cmx : ../math/ogamlMath.cmi objAST.cmi objParser.cmi
+mouse.cmx : window.cmx ../core/ogamlCore.cmi ../core/LL.cmx mouse.cmi
 program.cmo : state.cmi GLTypes.cmi GL.cmi program.cmi
 program.cmx : state.cmx GLTypes.cmi GL.cmx program.cmi
 programLibrary.cmo : state.cmi program.cmi programLibrary.cmi
@@ -86,7 +84,7 @@ window.cmo : ../math/vector2i.cmi ../math/vector2f.cmi state.cmi \
     drawParameter.cmi ../core/contextSettings.cmi color.cmi window.cmi
 window.cmx : ../math/vector2i.cmx ../math/vector2f.cmx state.cmx \
     programLibrary.cmx ../math/ogamlMath.cmi ../core/ogamlCore.cmi \
-    ../core/LL.cmi ../math/intRect.cmx GL.cmx ../math/floatRect.cmx \
+    ../core/LL.cmx ../math/intRect.cmx GL.cmx ../math/floatRect.cmx \
     drawParameter.cmx ../core/contextSettings.cmx color.cmx window.cmi
 GL.cmi : ../math/ogamlMath.cmi GLTypes.cmi drawParameter.cmi drawMode.cmi \
     color.cmi

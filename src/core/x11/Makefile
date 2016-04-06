@@ -14,13 +14,13 @@ ML_NATS = $(ML_SOURCES:.ml=.cmx)
 default: .depend $(ML_OBJS) $(ML_NATS)
 
 %.cmi:%.mli
-	$(OCAMLC) -c -o $@ $<
+	$(OCAMLC_CMD) -c -o $@ $<
 
-%.cmx:%.ml
-	$(OCAMLOPT) -c -o $@ -for-pack OgamlCore $<
+%.cmx:%.ml $(wildcard %.cmi)
+	$(OCAMLOPT_CMD) -c -o $@ -for-pack $(CORE_PACK) $<
 
-%.cmo:%.ml
-	$(OCAMLC) -c -o $@ -for-pack OgamlCore $<
+%.cmo:%.ml $(wildcard %.cmi)
+	$(OCAMLC_CMD) -c -o $@ -for-pack $(CORE_PACK) $<
 
 
 # Cleaning
