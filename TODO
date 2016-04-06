@@ -25,6 +25,14 @@ Interface changes:
     ☐ Add open (dual of close)
   Interpolators:
     ☐ Add begin and end time
+  Shape:
+    ☐ Source shapes ? VertexShapes ?
+  Programs:
+    ✔ Defaults programs (like 2D drawing) exposed ? @done(2016-03-19 16:54) @project(Interface changes / Model / Window / Interpolators / Shape / Programs)
+  VertexArrays:
+    ☐ Sources seems to be inverted (wrong drawing order)
+  MouseEvents:
+    ☐ Vectors rather than pairs 
   Text:
     ☐ Alinea parameter @unsure
     ☐ Text align
@@ -40,15 +48,15 @@ Interface changes:
     ☐ More operations on sources : iter,map
     ☐ Also, map from VertexArray to VertexMap sources and reciprocally (in module VertexMap)
   Uniform:
-    ☐ Parameterize sampler2D with mounting point (optional, defaults to 0)
-    ☐ Find a way to get the number of locations and check against that
+    ✔ Parameterize sampler2D with mounting point (optional, defaults to 0) @done(2016-03-23 16:22) @project(Interface changes / Model / Window / Interpolators / Shape / Programs / VertexArrays / MouseEvents / Text / Fx module for text with advanced features / Shape and text / VertexSource/Map / Uniform)
+    ✔ Find a way to get the number of locations and check against that @done(2016-03-23 16:22) @project(Interface changes / Model / Window / Interpolators / Shape / Programs / VertexArrays / MouseEvents / Text / Fx module for text with advanced features / Shape and text / VertexSource/Map / Uniform)
     ☐ Font uniform (binds the corresponding texture), also takes a mounting point
 
 Code refactoring:
   OgamlGraphics:
     ☐ Non exposed InternalUtils for binding draw parameters for example
     ☐ Error checking in Font, Image (loading), Image.blit
-    ☐ Move programs to State (+ organize)
+    ✔ Move programs to State (+ organize) @done(2016-03-19 10:52) @project(Code refactoring / OgamlGraphics)
     ☐ Transformations as matrices in uniforms for sprite, shape and text
 
 New modules:

@@ -96,7 +96,7 @@ let draw ?parameters:(parameters = DrawParameter.make
   let uniform =
     Uniform.empty
     |> Uniform.vector2f "size" size
-    |> Uniform.texture2D "my_texture" sprite.texture
+    |> Uniform.texture2D "utexture" sprite.texture
   in
   let vertices = sprite.vertices in
   VertexArray.draw

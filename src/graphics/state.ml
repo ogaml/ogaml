@@ -1,5 +1,5 @@
 
-exception Invalid_texture_unit of int
+exception Invalid_state of string
 
 type t = {
   major : int;
@@ -11,7 +11,7 @@ type t = {
   mutable polygon_mode  : DrawParameter.PolygonMode.t;
   mutable depth_test    : bool;
   mutable texture_unit  : int;
-  mutable bound_texture : (GL.Texture.t option) array array;
+  mutable bound_texture : (GL.Texture.t * GLTypes.TextureTarget.t) option array;
   mutable linked_program : GL.Program.t option;
   mutable bound_vbo : GL.VBO.t option;
   mutable bound_vao : GL.VAO.t option;
@@ -21,6 +21,8 @@ type t = {
   mutable blend_equation : DrawParameter.BlendMode.t;
   mutable viewport : OgamlMath.IntRect.t
 }
+
+let error msg = raise (Invalid_state msg)
 
 let version s = 
   (s.major, s.minor)
@@ -36,6 +38,9 @@ let glsl_version s =
 
 let is_glsl_version_supported s v = 
   v <= s.glsl
+
+let max_textures s = 
+  GL.Pervasives.max_textures ()
 
 let assert_no_error s = 
   assert (GL.Pervasives.error () = None)
@@ -66,7 +71,7 @@ module LL = struct
       polygon_mode = DrawParameter.PolygonMode.DrawFill;
       depth_test   = false;
       texture_unit = 0;
-      bound_texture = Array.make_matrix textures 3 None;
+      bound_texture = Array.make textures None;
       linked_program = None;
       bound_vbo = None;
       bound_vao = None;
@@ -113,15 +118,24 @@ module LL = struct
   let set_texture_unit s i = 
     s.texture_unit <- i
 
-  let bound_texture s i targ = 
-    if i >= s.textures then
-      raise (Invalid_texture_unit i);
-    s.bound_texture.(i).(Obj.magic targ)
+  let bound_texture s i = 
+    if i >= s.textures || i < 0 then
+      Printf.ksprintf error "Invalid texture unit %i" i;
+    match s.bound_texture.(i) with
+    | None       -> None
+    | Some (t,_) -> Some t
 
-  let set_bound_texture s i targ t = 
-    if i >= s.textures then
-      raise (Invalid_texture_unit i);
-    s.bound_texture.(i).(Obj.magic targ) <- t
+  let bound_target s i = 
+    if i >= s.textures || i < 0 then
+      Printf.ksprintf error "Invalid texture unit %i" i;
+    match s.bound_texture.(i) with
+    | None       -> None
+    | Some (_,t) -> Some t
+
+  let set_bound_texture s i t = 
+    if i >= s.textures || i < 0 then
+      Printf.ksprintf error "Invalid texture unit %i" i;
+    s.bound_texture.(i) <- t
 
   let linked_program s = 
     s.linked_program
