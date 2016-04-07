@@ -1345,6 +1345,7 @@ module Sprite : sig
   (** Creates a sprite. *)
   val create :
     texture   : Texture.Texture2D.t ->
+    ?subrect  : OgamlMath.IntRect.t ->
     ?origin   : OgamlMath.Vector2f.t ->
     ?position : OgamlMath.Vector2f.t ->
     ?scale    : OgamlMath.Vector2f.t ->

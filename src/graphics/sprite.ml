@@ -1,7 +1,10 @@
 open OgamlMath
 
+exception Sprite_error of string
+
 type t = {
   texture : Texture.Texture2D.t ;
+  subrect : OgamlMath.FloatRect.t ;
   mutable size    : Vector2f.t ;
   mutable vertices : VertexArray.static VertexArray.t ;
   mutable position : Vector2f.t ;
@@ -9,6 +12,8 @@ type t = {
   mutable rotation : float ;
   mutable scale    : Vector2f.t
 }
+
+let error msg = raise (Sprite_error msg)
 
 (* Applies transformations to a point *)
 let apply_transformations position origin rotation scale point =
@@ -32,18 +37,19 @@ let apply_transformations position origin rotation scale point =
         cos(rotation) *. (point.y-.position.y) +. position.y
   })
 
-let get_vertices size position origin rotation scale =
+let get_vertices size position origin rotation scale subrect =
   let (w,h) = Vector2f.(
     { x = size.x ; y = 0.     },
     { x = 0.     ; y = size.y }
   ) in
+  let {FloatRect.x = uvx; y = uvy; width = uvw; height = uvh} = subrect in
   Vector2f.([ zero ; w ; h ; add w h ])
   |> List.map (apply_transformations position origin rotation scale)
   |> List.combine Vector2f.([
-    { x = 0. ; y = 0. } ;
-    { x = 1. ; y = 0. } ;
-    { x = 0. ; y = 1. } ;
-    { x = 1. ; y = 1. } ;
+    { x = uvx        ; y = uvy        } ;
+    { x = uvx +. uvw ; y = uvy        } ;
+    { x = uvx        ; y = uvy +. uvh } ;
+    { x = uvx +. uvw ; y = uvy +. uvh } ;
   ])
   |> List.map (fun (coord,pos) ->
     VertexArray.Vertex.create
@@ -63,6 +69,7 @@ let get_vertices size position origin rotation scale =
   | _ -> assert false
 
 let create ~texture
+           ?subrect
            ?origin:(origin=Vector2f.zero)
            ?position:(position=Vector2f.zero)
            ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
@@ -75,9 +82,27 @@ let create ~texture
     | None   -> base_size
     | Some s -> s
   in
-  let vertices = get_vertices size position origin rotation scale in
+  let subrect = 
+    match subrect with
+    | None -> FloatRect.one
+    | Some {IntRect.x; y; width; height} -> 
+        let {Vector2f.x = sx; y = sy} = base_size in
+        let fr = FloatRect.({x = float_of_int x /. sx;
+                             y = float_of_int y /. sy;
+                             width  = float_of_int width /. sx;
+                             height = float_of_int height /. sy}) 
+        in
+        let open FloatRect in
+        if fr.x >= 0. && fr.x <= 1. 
+        && fr.y >= 0. && fr.y <= 1.
+        && fr.x +. fr.width  >= 0. && fr.x +. fr.width  <= 1.
+        && fr.y +. fr.height >= 0. && fr.x +. fr.height <= 1. then fr
+        else raise (Sprite_error "invalid texture sub-rectangle")
+  in
+  let vertices = get_vertices size position origin rotation scale subrect in
   {
     texture  = texture ;
+    subrect  = subrect ;
     size     = size ;
     vertices = vertices ;
     position = position ;
@@ -115,6 +140,7 @@ let update sprite =
       sprite.origin
       sprite.rotation
       sprite.scale
+      sprite.subrect
   in
   sprite.vertices <- vertices
 

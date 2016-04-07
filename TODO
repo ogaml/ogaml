@@ -56,6 +56,9 @@ Interface changes:
     ☐ Default DrawMode to Triangles
   Math:
     ☐ Add Vector2fs
+    ☐ abs_corner to rects and boxes
+  Sprite:
+    ✔ Add texture subrect @done(2016-04-07 16:42) @project(Interface changes / Model / Window / Interpolators / Shape / Programs / VertexArrays / Events / Text / Fx module for text with advanced features / Shape and text / VertexSource/Map / Uniform / Drawing / Math / Sprite)
 
 
 Code refactoring:

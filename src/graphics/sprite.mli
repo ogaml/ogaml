@@ -1,11 +1,14 @@
 (** Creation and manipulation of 2D sprites *)
 
+exception Sprite_error of string
+
 (** Type of sprites *)
 type t
 
 (** Creates a sprite. *)
 val create :
   texture   : Texture.Texture2D.t ->
+  ?subrect  : OgamlMath.IntRect.t ->
   ?origin   : OgamlMath.Vector2f.t ->
   ?position : OgamlMath.Vector2f.t ->
   ?scale    : OgamlMath.Vector2f.t ->

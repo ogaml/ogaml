@@ -40,10 +40,12 @@ shape.cmx : window.cmx vertexArray.cmx ../math/vector3f.cmx \
     drawMode.cmi ../math/constants.cmx color.cmx shape.cmi
 sprite.cmo : window.cmi vertexArray.cmi ../math/vector3f.cmi \
     ../math/vector2f.cmi uniform.cmi texture.cmi ../math/ogamlMath.cmi \
-    drawParameter.cmi drawMode.cmi ../math/constants.cmi sprite.cmi
+    ../math/intRect.cmi ../math/floatRect.cmi drawParameter.cmi drawMode.cmi \
+    ../math/constants.cmi sprite.cmi
 sprite.cmx : window.cmx vertexArray.cmx ../math/vector3f.cmx \
     ../math/vector2f.cmx uniform.cmx texture.cmx ../math/ogamlMath.cmi \
-    drawParameter.cmx drawMode.cmi ../math/constants.cmx sprite.cmi
+    ../math/intRect.cmx ../math/floatRect.cmx drawParameter.cmx drawMode.cmi \
+    ../math/constants.cmx sprite.cmi
 state.cmo : ../math/ogamlMath.cmi GLTypes.cmi GL.cmi drawParameter.cmi \
     color.cmi state.cmi
 state.cmx : ../math/ogamlMath.cmi GLTypes.cmi GL.cmx drawParameter.cmx \
