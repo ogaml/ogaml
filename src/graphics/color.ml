@@ -37,6 +37,10 @@ module RGB = struct
     a = f c.a
   }
 
+  let print c = 
+    Printf.sprintf "{r = %f; g = %f; b = %f; a = %f}"
+      c.r c.g c.b c.a
+
 end
 
 let rad60 = 60. *. OgamlMath.Constants.pi /. 180.
@@ -77,14 +81,11 @@ module HSV = struct
     v = clamp c.v 0. 1.;
     a = clamp c.a 0. 1.
   }
-  
-  let map c f = {
-    h = f c.h;
-    s = f c.s;
-    v = f c.v;
-    a = f c.a
-  }
 
+  let print c = 
+    Printf.sprintf "{h = %f; s = %f; v = %f; a = %f}"
+      c.h c.s c.v c.a
+  
 end
 
 
@@ -148,6 +149,9 @@ let clamp = function
   |`RGB c -> `RGB (RGB.clamp c)
 
 let map c f = 
+  `RGB (RGB.map (rgb c) f)
+
+let print c =
   match c with
-  |`HSV c -> `HSV (HSV.map c f)
-  |`RGB c -> `RGB (RGB.map c f)
+  |`HSV c -> HSV.print c
+  |`RGB c -> RGB.print c

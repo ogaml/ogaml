@@ -1,3 +1,4 @@
+open OgamlMath
 
 exception Invalid_source of string
 
@@ -13,9 +14,9 @@ exception Out_of_bounds of string
 module Vertex = struct
 
   type t = {
-    position : OgamlMath.Vector3f.t option;
-    texcoord : OgamlMath.Vector2f.t option;
-    normal   : OgamlMath.Vector3f.t option;
+    position : Vector3f.t option;
+    texcoord : Vector2f.t option;
+    normal   : Vector3f.t option;
     color    : Color.t option
   }
 
@@ -26,6 +27,15 @@ module Vertex = struct
       normal  ;
       color
     }
+
+  let position v = v.position
+
+  let texcoord v = v.texcoord
+
+  let normal v = v.normal
+
+  let color v = v.color
+
 end
 
 
@@ -68,6 +78,14 @@ module Source = struct
   let requires_uv s = s.texcoord <> None
 
   let requires_color s = s.color <> None
+
+  let attrib_position s = s.position
+
+  let attrib_normal s = s.normal
+
+  let attrib_uv s = s.texcoord
+
+  let attrib_color s = s.color
 
   let add src v = 
     begin 
@@ -127,9 +145,9 @@ module Source = struct
 
   let type_of_attrib = function
     |Position -> GLTypes.GlslType.Float3
-    |Color    -> GLTypes.GlslType.Float4
-    |Normal   -> GLTypes.GlslType.Float3
     |Texcoord -> GLTypes.GlslType.Float2
+    |Normal   -> GLTypes.GlslType.Float3
+    |Color    -> GLTypes.GlslType.Float4
 
   let stride src = 
     List.fold_left (fun v (t,_,_) -> v + size_of_attrib t) 0 (attribs src)
@@ -146,7 +164,80 @@ module Source = struct
     end else 
       raise (Invalid_source "Cannot append a source at the end of another source of different type")
 
+  let get s i = 
+    let stride = stride s in
+    let offset = ref (stride * i) in
+    let position =      
+      match s.position with
+      | None   -> None
+      | Some _ -> 
+        let vec = (Vector3f.{x = GL.Data.get s.data (!offset+0);
+                             y = GL.Data.get s.data (!offset+1);
+                             z = GL.Data.get s.data (!offset+2);})
+        in
+        offset := !offset + 3;
+        Some vec
+    in
+    let texcoord =      
+      match s.texcoord with
+      | None   -> None
+      | Some _ -> 
+        let vec = (Vector2f.{x = GL.Data.get s.data (!offset+0);
+                             y = GL.Data.get s.data (!offset+1)})
+        in
+        offset := !offset + 2;
+        Some vec
+    in
+   let normal =      
+      match s.normal with
+      | None   -> None
+      | Some _ -> 
+        let vec = (Vector3f.{x = GL.Data.get s.data (!offset+0);
+                             y = GL.Data.get s.data (!offset+1);
+                             z = GL.Data.get s.data (!offset+2);})
+        in
+        offset := !offset + 3;
+        Some vec
+    in
+    let color =      
+      match s.color with
+      | None   -> None
+      | Some _ -> 
+        let vec = (Color.RGB.{r = GL.Data.get s.data (!offset+0);
+                              g = GL.Data.get s.data (!offset+1);
+                              b = GL.Data.get s.data (!offset+2);
+                              a = GL.Data.get s.data (!offset+3);})
+        in
+        offset := !offset + 4;
+        Some (`RGB vec)
+    in
+    Vertex.create ?position ?texcoord ?normal ?color ()
+
+  let iter s f = 
+    for i = 0 to s.length - 1 do
+      f (get s i)
+    done
+
+  let map s f = 
+    let newsrc = 
+      empty ?position:s.position
+            ?texcoord:s.texcoord
+            ?normal:s.normal
+            ?color:s.color
+            ~size:s.length ()
+    in
+    for i = 0 to s.length - 1 do
+      add newsrc (f (get s i))
+    done;
+    newsrc
+
+  let mapto s f d = 
+    for i = 0 to s.length - 1 do
+      add d (f (get s i))
+    done
+
 end
+
 
 type static
 
@@ -274,7 +365,7 @@ let draw ~vertices ~window ?indices ~program
          ?uniform:(uniform = Uniform.empty) 
          ?parameters:(parameters = DrawParameter.make ()) 
          ?start ?length
-         ~mode () =
+         ?mode:(mode = DrawMode.Triangles) () =
   let state = Window.state window in
   let start = 
     match start with

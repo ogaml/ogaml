@@ -115,6 +115,26 @@ module Data = struct
   let length t = t.length
 
   let get t i = t.data.{i}
+  
+  let iter t f = 
+    for i = 0 to t.length - 1 do
+      f t.data.{i}
+    done
+
+  let map t f = 
+    let data = 
+      Bigarray.Array1.create 
+        t.kind
+        Bigarray.c_layout
+        t.size
+    in
+    let newt = 
+      {data; kind = t.kind; size = t.size; length = t.length}
+    in
+    for i = 0 to t.length - 1 do
+      newt.data.{i} <- (f t.data.{i})
+    done;
+    newt
 
 end
 

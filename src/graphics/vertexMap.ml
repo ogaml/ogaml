@@ -1,3 +1,4 @@
+open OgamlMath
 
 exception Invalid_source of string
 
@@ -48,6 +49,13 @@ module Vertex = struct
 
   let color s c t = StringMap.add s (Color c) t
 
+  let data s d t = StringMap.add s d t
+
+  let attribute t s = 
+    try StringMap.find s t
+    with Not_found -> 
+      raise (Invalid_attribute (Printf.sprintf "Unbound attribute %s" s))
+
 end
 
 
@@ -55,7 +63,7 @@ module Source = struct
 
   type t = {
     mutable length : int;
-    mutable types : GLTypes.GlslType.t StringMap.t;
+    mutable types  : GLTypes.GlslType.t StringMap.t;
     fdata : (float, GL.Data.float_32) GL.Data.t;
     idata : (int32, GL.Data.int_32  ) GL.Data.t;
   }
@@ -141,6 +149,116 @@ module Source = struct
       s1
     end else 
       raise (Invalid_source "Cannot append a source at the end of another source of different type")
+
+  let get s i = 
+    let stride_i,stride_f = 
+      StringMap.fold (fun _ att (i,f) ->
+        let satt = get_size att in
+        if is_integer att then (i+satt,f)
+        else (i,f+satt)
+      ) s.types (0,0)
+    in
+    let offset_i = stride_i * i in
+    let offset_f = stride_f * i in
+    StringMap.fold (fun name att (vtx,offi,offf) ->
+      match att with
+      |GLTypes.GlslType.Float4  -> 
+        let col = `RGB Color.RGB.{r = GL.Data.get s.fdata (offf+0);
+                                  g = GL.Data.get s.fdata (offf+1);
+                                  b = GL.Data.get s.fdata (offf+2);
+                                  a = GL.Data.get s.fdata (offf+3)}
+        in
+        (Vertex.color name col vtx, offi, offf+4)
+      |GLTypes.GlslType.Float3  ->
+        let vec = Vector3f.{x = GL.Data.get s.fdata (offf+0);
+                            y = GL.Data.get s.fdata (offf+1);
+                            z = GL.Data.get s.fdata (offf+2)}
+        in
+        (Vertex.vector3f name vec vtx, offi, offf+3)
+      |GLTypes.GlslType.Int3    -> 
+        let vec = Vector3i.{x = GL.Data.get s.idata (offf+0) |> Int32.to_int;
+                            y = GL.Data.get s.idata (offf+1) |> Int32.to_int;
+                            z = GL.Data.get s.idata (offf+2) |> Int32.to_int}
+        in
+        (Vertex.vector3i name vec vtx, offi+3, offf)
+      |GLTypes.GlslType.Float2  ->
+        let vec = Vector2f.{x = GL.Data.get s.fdata (offf+0);
+                            y = GL.Data.get s.fdata (offf+1)}
+        in
+        (Vertex.vector2f name vec vtx, offi, offf+2)
+      |GLTypes.GlslType.Int2    -> 
+        let vec = Vector2i.{x = GL.Data.get s.idata (offf+0) |> Int32.to_int;
+                            y = GL.Data.get s.idata (offf+1) |> Int32.to_int}
+        in
+        (Vertex.vector2i name vec vtx, offi+2, offf)
+      |GLTypes.GlslType.Float   ->
+        (Vertex.float name (GL.Data.get s.fdata offf) vtx, offi, offf+1)
+      |GLTypes.GlslType.Int      -> 
+        (Vertex.int name (GL.Data.get s.idata offf |> Int32.to_int) vtx, offi+1, offf)
+      | _ -> assert false
+    ) s.types (Vertex.empty, offset_i, offset_f)
+    |> fun (vtx,_,_) -> vtx
+
+  let iter s f =
+    for i = 0 to s.length - 1 do
+      f (get s i)
+    done
+
+  let map s f = 
+    let newsrc = empty () in
+    for i = 0 to s.length - 1 do
+      add newsrc (f (get s i))
+    done;
+    newsrc
+
+  let mapto s f d = 
+    for i = 0 to s.length - 1 do
+      add d (f (get s i))
+    done
+
+  let from_array_to src dest = 
+    let att_pos = VertexArray.Source.attrib_position src in
+    let att_nml = VertexArray.Source.attrib_normal   src in
+    let att_col = VertexArray.Source.attrib_color    src in
+    let att_tex = VertexArray.Source.attrib_uv       src in
+    VertexArray.Source.iter src (fun v ->
+      let new_vtx = ref Vertex.empty in
+      begin match att_pos, VertexArray.Vertex.position v with
+      | None, _ | _, None -> ()
+      | Some att, Some vl -> new_vtx := Vertex.vector3f att vl !new_vtx
+      end;
+      begin match att_nml, VertexArray.Vertex.normal v with
+      | None, _ | _, None -> ()
+      | Some att, Some vl -> new_vtx := Vertex.vector3f att vl !new_vtx
+      end;
+      begin match att_col, VertexArray.Vertex.color v with
+      | None, _ | _, None -> ()
+      | Some att, Some vl -> new_vtx := Vertex.color att vl !new_vtx
+      end;
+      begin match att_tex, VertexArray.Vertex.texcoord v with
+      | None, _ | _, None -> ()
+      | Some att, Some vl -> new_vtx := Vertex.vector2f att vl !new_vtx
+      end;
+      add dest !new_vtx
+    )
+
+  let from_array src = 
+    let newsrc = empty () in
+    from_array_to src newsrc;
+    newsrc
+
+  let map_array src f = 
+    let newsrc = empty () in
+    for i = 0 to VertexArray.Source.length src - 1 do
+      add newsrc (f (VertexArray.Source.get src i))
+    done;
+    newsrc
+
+  let map_array_to src f dest = 
+    for i = 0 to VertexArray.Source.length src - 1 do
+      add dest (f (VertexArray.Source.get src i))
+    done
+
 end
 
 
@@ -292,7 +410,7 @@ let draw ~vertices ~window ?indices ~program
          ?uniform:(uniform = Uniform.empty) 
          ?parameters:(parameters = DrawParameter.make ()) 
          ?start ?length
-         ~mode () =
+         ?mode:(mode = DrawMode.Triangles) () =
   let state = Window.state window in
   let start = 
     match start with

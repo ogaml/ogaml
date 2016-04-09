@@ -47,6 +47,9 @@ let int s i m = UniformMap.add s (Int i) m
 
 let float s f m = UniformMap.add s (Float f) m
 
+let font s ?tex_unit:(u=1) f size m = 
+  UniformMap.add s (Texture2D (u,Font.texture f size)) m
+
 
 module LL = struct
 

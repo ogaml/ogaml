@@ -46,6 +46,9 @@ module Color : sig
     (** Maps each value of a color *)
     val map : t -> (float -> float) -> t
 
+    (** Pretty-prints a color to a string *)
+    val print : t -> string
+
   end
 
   (** Manipulation of HSVA colors *)
@@ -85,8 +88,8 @@ module Color : sig
       * and h between 0 and 2*pi *)
     val clamp : t -> t
 
-    (** Maps each value of a color *)
-    val map : t -> (float -> float) -> t
+    (** Pretty-prints a color to a string *)
+    val print : t -> string
 
   end
 
@@ -117,8 +120,11 @@ module Color : sig
   (** Clamps a color w.r.t RGB.clamp and HSV.clamp *)
   val clamp : t -> t
 
-  (** Maps each value of a color *)
+  (** Maps each value of a color (assumed in RGB format) *)
   val map : t -> (float -> float) -> t
+
+  (** Pretty-prints a color to a string *)
+  val print : t -> string
 
 end
 
@@ -544,6 +550,17 @@ module Uniform : sig
     * @see:OgamlGraphics.Texture.Texture2D *)
   val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
 
+  (** $font name ~tex_unit font size set$ adds a sampler2D storing
+    * the texture of [font] for the character size [size] to the
+    * uniform set [set].
+    *
+    * The optional parameter $tex_unit$ corresponds to the texture
+    * unit that is used to bind this texture and defaults to $1$.
+    * See $State.max_textures$ for the number of available units.
+    *
+    * @see:OgamlGraphics.Font *)
+  val font : string -> ?tex_unit:int -> Font.t -> int -> t -> t
+
 end
 
 
@@ -793,6 +810,18 @@ module VertexArray : sig
                 ?normal:OgamlMath.Vector3f.t   ->
                 ?color:Color.t -> unit -> t
 
+    (** Returns the (optional) position of a vertex *)
+    val position : t -> OgamlMath.Vector3f.t option
+
+    (** Returns the (optional) texture coordinates of a vertex *)
+    val texcoord : t -> OgamlMath.Vector2f.t option
+
+    (** Returns the (optional) normal of a vertex *)
+    val normal : t -> OgamlMath.Vector3f.t option
+
+    (** Returns the (optional) color of a vertex *)
+    val color : t -> Color.t option
+
   end
 
   (** Represents a source of vertices *)
@@ -852,6 +881,20 @@ module VertexArray : sig
       * Raises Invalid_source if types are incompatible. *)
     val append : t -> t -> t
 
+    (** $iter src f$ iterates through all the vertices of $src$ *)
+    val iter : t -> (Vertex.t -> unit) -> unit
+
+    (** $map src f$ returns the source obtained by the mapping of all the
+      * vertices of $src$ by $f$.
+      *
+      * The resulting source is assumed to have the same attributes as
+      * $src$. Use $iter$ or $mapto$ to use different attributes *)
+    val map : t -> (Vertex.t -> Vertex.t) -> t
+
+    (** $mapto src f dest$ appends the mapping of the vetices of $src$
+      * by $f$ to $dest$ *)
+    val mapto : t -> (Vertex.t -> Vertex.t) -> t -> unit
+
   end
 
   (** Phantom type for static arrays *)
@@ -892,6 +935,8 @@ module VertexArray : sig
     *
     * $parameters$ defaults to $DrawParameter.make ()$
     *
+    * $mode$ defaults to $DrawMode.Triangles$
+    *
     * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.Window
     * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
@@ -904,7 +949,7 @@ module VertexArray : sig
     ?parameters : DrawParameter.t ->
     ?start     : int ->
     ?length    : int ->
-    mode       : DrawMode.t ->
+    ?mode      : DrawMode.t ->
     unit -> unit
 
 end
@@ -944,6 +989,16 @@ module VertexMap : sig
       * a source. A vertex is an immutable collection of
       * attributes. *)
 
+    (** Type of a vertex attribute *)
+    type data = 
+      | Vector3f of OgamlMath.Vector3f.t
+      | Vector2f of OgamlMath.Vector2f.t
+      | Vector3i of OgamlMath.Vector3i.t
+      | Vector2i of OgamlMath.Vector2i.t
+      | Int   of int
+      | Float of float
+      | Color of Color.t
+
     (** Type of a vertex *)
     type t
 
@@ -982,6 +1037,15 @@ module VertexMap : sig
       * the name of the vec4 attribute in the GLSL program
       * @see:OgamlGraphics.Color *)
     val color : string -> Color.t -> t -> t
+
+    (** Adds any data to a vertex. The given name must match
+      * the name of the corresponding attribute in the GLSL
+      * program *)
+    val data : string -> data -> t -> t
+
+    (** Returns the value of a vertex attribute.
+      * Raises $Invalid_attribute$ if the attribute is unbound *)
+    val attribute : t -> string -> data
 
   end
 
@@ -1024,7 +1088,35 @@ module VertexMap : sig
       * Raises Invalid_source if types are incompatible. *)
     val append : t -> t -> t
 
+    (** $iter src f$ iterates through all the vertices of $src$ *)
+    val iter : t -> (Vertex.t -> unit) -> unit
+
+    (** $map src f$ returns the source obtained by the mapping of all the
+      * vertices of $src$ by $f$. *)
+    val map : t -> (Vertex.t -> Vertex.t) -> t
+
+    (** $mapto src f dest$ appends the mapping of the vetices of $src$
+      * by $f$ to $dest$ *)
+    val mapto : t -> (Vertex.t -> Vertex.t) -> t -> unit
+
+    (** $from_array src$ creates a vertex map source equivalent to the
+      * vertex array source $src$ *)
+    val from_array : VertexArray.Source.t -> t
+
+    (** $from_array src dest$ appends the vertex array source $src$ to the
+      * vertex map source $dest$ *)
+    val from_array_to : VertexArray.Source.t -> t -> unit
+
+    (** $map_array src f$ creates a new vertex map source by mapping all the
+      * vertices of the vertex array source $src$ by $f$ *)
+    val map_array : VertexArray.Source.t -> (VertexArray.Vertex.t -> Vertex.t) -> t
+
+    (** $map_array_to src f dest$ maps by $f$ and appends all the
+      * vertices of the vertex array source $src$ to the vertex map source $dest$ *)
+    val map_array_to : VertexArray.Source.t -> (VertexArray.Vertex.t -> Vertex.t) -> t -> unit
+
   end
+
 
   (** Phantom type for static maps *)
   type static
@@ -1064,6 +1156,8 @@ module VertexMap : sig
     *
     * $parameters$ defaults to $DrawParameter.make ()$
     *
+    * $mode$ defaults to $DrawMode.Triangles$
+    *
     * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.Window
     * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
@@ -1074,9 +1168,9 @@ module VertexMap : sig
     program    : Program.t ->
     ?uniform    : Uniform.t ->
     ?parameters : DrawParameter.t ->
-    ?start     : int ->
-    ?length    : int ->
-    mode       : DrawMode.t ->
+    ?start      : int ->
+    ?length     : int ->
+    ?mode       : DrawMode.t ->
     unit -> unit
 
 end

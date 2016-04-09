@@ -28,9 +28,9 @@ Interface changes:
   Shape:
     ☐ Source shapes ? VertexShapes ?
   Programs:
-    ✔ Defaults programs (like 2D drawing) exposed ? @done(2016-03-19 16:54) @project(Interface changes / Model / Window / Interpolators / Shape / Programs)
+    ✔ Defaults programs (like 2D drawing) exposed ? @done(2016-04-09 15:22) @project(Interface changes / Programs)
   VertexArrays:
-    ✘ Sources seems to be inverted (wrong drawing order) -- depth testing was enabled @cancelled(2016-03-28 23:53) @project(Interface changes / Model / Window / Interpolators / Shape / Programs / VertexArrays)
+    ✘ Sources seems to be inverted (wrong drawing order) -- depth testing was enabled @cancelled(2016-04-09 15:22) @project(Interface changes / VertexArrays)
   Events:
     ☐ Vectors rather than pairs 
     ☐ Parametrize Resized with a Vector2i
@@ -44,21 +44,21 @@ Interface changes:
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
   Shape and text:
     ☐ Find a way to export shapes and text to VertexSources @unsure
-    ☐ Get Font texture (to use with vertex sources) in Font.LL
+    ✔ Get Font texture (to use with vertex sources) in Font.LL @done(2016-04-09 12:38) @project(Interface changes / Shape and text)
   VertexSource/Map:
-    ☐ More operations on sources : iter,map
-    ☐ Also, map from VertexArray to VertexMap sources and reciprocally (in module VertexMap)
+    ✔ More operations on sources : iter,map @done(2016-04-09 15:22) @project(Interface changes / VertexSource/Map)
+    ✔ Also, map from VertexArray to VertexMap sources and reciprocally (in module VertexMap) -- Note : reciprocally makes no sense actually @done(2016-04-09 15:22) @project(Interface changes / VertexSource/Map)
   Uniform:
-    ✔ Parameterize sampler2D with mounting point (optional, defaults to 0) @done(2016-03-23 16:22) @project(Interface changes / Model / Window / Interpolators / Shape / Programs / VertexArrays / MouseEvents / Text / Fx module for text with advanced features / Shape and text / VertexSource/Map / Uniform)
-    ✔ Find a way to get the number of locations and check against that @done(2016-03-23 16:22) @project(Interface changes / Model / Window / Interpolators / Shape / Programs / VertexArrays / MouseEvents / Text / Fx module for text with advanced features / Shape and text / VertexSource/Map / Uniform)
-    ☐ Font uniform (binds the corresponding texture), also takes a mounting point
+    ✔ Parameterize sampler2D with mounting point (optional, defaults to 0) @done(2016-04-09 15:22) @project(Interface changes / Uniform)
+    ✔ Find a way to get the number of locations and check against that @done(2016-03-23 16:22) @project(Interface changes / Uniform)
+    ✔ Font uniform (binds the corresponding texture), also takes a mounting point @done(2016-04-09 12:25) @project(Interface changes / Uniform)
   Drawing:
-    ☐ Default DrawMode to Triangles
+    ✔ Default DrawMode to Triangles @done(2016-04-09 15:22) @project(Interface changes / Drawing)
   Math:
     ☐ Add Vector2fs
     ☐ abs_corner to rects and boxes
   Sprite:
-    ✔ Add texture subrect @done(2016-04-07 16:42) @project(Interface changes / Model / Window / Interpolators / Shape / Programs / VertexArrays / Events / Text / Fx module for text with advanced features / Shape and text / VertexSource/Map / Uniform / Drawing / Math / Sprite)
+    ✔ Add texture subrect @done(2016-04-09 15:22) @project(Interface changes / Sprite)
 
 
 Code refactoring:
@@ -86,7 +86,7 @@ Advanced features:
     ☐ TextureCube
   Batch drawing 2D:
     ☐ Batcher module (stored in Window.t and stores a current VAO that accumulates drawing calls)
-    ☐ Tilesets with XML or in-code configuration
+    ✘ Tilesets with XML or in-code configuration -- useless @cancelled(2016-04-07 17:15) @project(Advanced features / More Image and Texture types / Batch drawing 2D)
   ☐ Render textures
 
 

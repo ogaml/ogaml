@@ -12,6 +12,15 @@ exception Out_of_bounds of string
 
 module Vertex : sig
 
+  type data = 
+    | Vector3f of OgamlMath.Vector3f.t
+    | Vector2f of OgamlMath.Vector2f.t
+    | Vector3i of OgamlMath.Vector3i.t
+    | Vector2i of OgamlMath.Vector2i.t
+    | Int   of int
+    | Float of float
+    | Color of Color.t
+
   type t
 
   val empty : t
@@ -30,6 +39,10 @@ module Vertex : sig
 
   val color : string -> Color.t -> t -> t
 
+  val data : string -> data -> t -> t
+
+  val attribute : t -> string -> data
+
 end
 
 
@@ -46,6 +59,20 @@ module Source : sig
   val length : t -> int
 
   val append : t -> t -> t
+
+  val iter : t -> (Vertex.t -> unit) -> unit
+
+  val map : t -> (Vertex.t -> Vertex.t) -> t
+
+  val mapto : t -> (Vertex.t -> Vertex.t) -> t -> unit
+
+  val from_array : VertexArray.Source.t -> t
+
+  val from_array_to : VertexArray.Source.t -> t -> unit
+
+  val map_array : VertexArray.Source.t -> (VertexArray.Vertex.t -> Vertex.t) -> t
+
+  val map_array_to : VertexArray.Source.t -> (VertexArray.Vertex.t -> Vertex.t) -> t -> unit
 
 end
 
@@ -73,7 +100,7 @@ val draw :
   ?parameters : DrawParameter.t ->
   ?start     : int ->
   ?length    : int ->
-  mode       : DrawMode.t ->
+  ?mode      : DrawMode.t ->
   unit -> unit
 
 

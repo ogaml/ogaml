@@ -18,6 +18,14 @@ module Vertex : sig
                ?texcoord:OgamlMath.Vector2f.t ->
                ?normal:OgamlMath.Vector3f.t   ->
                ?color:Color.t -> unit -> t
+  
+  val position : t -> OgamlMath.Vector3f.t option
+
+  val texcoord : t -> OgamlMath.Vector2f.t option
+
+  val normal : t -> OgamlMath.Vector3f.t option
+
+  val color : t -> Color.t option
 
 end
 
@@ -40,6 +48,14 @@ module Source : sig
 
   val requires_color : t -> bool
 
+  val attrib_position : t -> string option
+
+  val attrib_normal : t -> string option
+
+  val attrib_uv : t -> string option
+
+  val attrib_color : t -> string option
+
   val add : t -> Vertex.t -> unit
 
   val (<<) : t -> Vertex.t -> t
@@ -48,7 +64,16 @@ module Source : sig
 
   val append : t -> t -> t
 
+  val get : t -> int -> Vertex.t
+
+  val iter : t -> (Vertex.t -> unit) -> unit
+
+  val map : t -> (Vertex.t -> Vertex.t) -> t
+
+  val mapto : t -> (Vertex.t -> Vertex.t) -> t -> unit
+
 end
+
 
 type static
 
@@ -73,6 +98,6 @@ val draw :
   ?parameters : DrawParameter.t ->
   ?start     : int ->
   ?length    : int ->
-  mode       : DrawMode.t ->
+  ?mode      : DrawMode.t ->
   unit -> unit
 

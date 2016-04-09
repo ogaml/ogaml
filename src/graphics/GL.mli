@@ -64,6 +64,12 @@ module Data : sig
   (** Returns the data at position i (debug only) *)
   val get : ('a, 'b) t -> int -> 'a 
 
+  (** Iters through data *)
+  val iter : ('a, 'b) t -> ('a -> unit) -> unit
+
+  (** Maps through data (without changing its type) *)
+  val map : ('a, 'b) t -> ('a -> 'a) -> ('a, 'b) t
+
 end
 
 
