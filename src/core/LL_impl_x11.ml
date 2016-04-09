@@ -221,8 +221,9 @@ module Window = struct
         | X11.Event.ButtonPress   (but,pos,modif) ->
             Some Event.(ButtonPressed {
                 ButtonEvent.button = value_to_button but;
-                ButtonEvent.x = pos.X11.Event.x;
-                ButtonEvent.y = pos.X11.Event.y;
+                ButtonEvent.position = 
+                  OgamlMath.Vector2i.{x = pos.X11.Event.x;
+                                      y = pos.X11.Event.y};
                 ButtonEvent.shift = modif.X11.Event.shift || modif.X11.Event.lock;
                 ButtonEvent.control = modif.X11.Event.ctrl;
                 ButtonEvent.alt = modif.X11.Event.alt
@@ -230,20 +231,19 @@ module Window = struct
         | X11.Event.ButtonRelease (but,pos,modif) ->
           Some Event.(ButtonReleased {
                 ButtonEvent.button = value_to_button but;
-                ButtonEvent.x = pos.X11.Event.x;
-              ButtonEvent.y = pos.X11.Event.y;
-              ButtonEvent.shift = modif.X11.Event.shift || modif.X11.Event.lock;
-              ButtonEvent.control = modif.X11.Event.ctrl;
-              ButtonEvent.alt = modif.X11.Event.alt
+                ButtonEvent.position = 
+                  OgamlMath.Vector2i.{x = pos.X11.Event.x;
+                                      y = pos.X11.Event.y};
+                ButtonEvent.shift = modif.X11.Event.shift || modif.X11.Event.lock;
+                ButtonEvent.control = modif.X11.Event.ctrl;
+                ButtonEvent.alt = modif.X11.Event.alt
           })
       | X11.Event.MotionNotify  pos ->
-         Some Event.(MouseMoved {
-              MouseEvent.x = pos.X11.Event.x;
-              MouseEvent.y = pos.X11.Event.y
-          })
+         Some (Event.MouseMoved 
+            (OgamlMath.Vector2i.({x = pos.X11.Event.x; y = pos.X11.Event.y})))
       | X11.Event.ConfigureNotify when size win <> win.size ->
           win.size <- size win;
-          Some Event.Resized
+          Some (Event.Resized win.size)
       | _ -> None
     end
     | None -> None

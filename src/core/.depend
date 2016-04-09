@@ -16,7 +16,7 @@ LL.cmi : ../math/ogamlMath.cmi keycode.cmi event.cmi contextSettings.cmi \
     button.cmi
 button.cmi :
 contextSettings.cmi :
-event.cmi : keycode.cmi button.cmi
+event.cmi : ../math/ogamlMath.cmi keycode.cmi button.cmi
 keycode.cmi :
 ogamlCore.cmi : ../math/ogamlMath.cmi
 cocoa/cocoa.cmo : cocoa/cocoa.cmi

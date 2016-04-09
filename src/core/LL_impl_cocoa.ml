@@ -235,8 +235,7 @@ module Window = struct
     let i = int_of_float in
     Event.ButtonEvent.({
       button = button ;
-      x = i x ;
-      y = i y ;
+      position = OgamlMath.Vector2i.({x = i x ; y = i y});
       shift = shift ;
       control = control ;
       alt = alt
@@ -245,7 +244,7 @@ module Window = struct
   let mouse_loc win =
     let (x,y) = Cocoa.OGWindowController.proper_relative_mouse_location win in
     let i = int_of_float in
-    Event.MouseEvent.({ x = i x ; y = i y })
+    OgamlMath.Vector2i.({ x = i x ; y = i y })
 
   let poll_event win =
     Cocoa.OGWindowController.process_event win ;
@@ -280,7 +279,7 @@ module Window = struct
           | OGEvent.CloseWindow   -> Some Event.Closed
           | OGEvent.KeyUp   inf   -> Some (Event.KeyPressed  (mk_key_event inf))
           | OGEvent.KeyDown inf   -> Some (Event.KeyReleased (mk_key_event inf))
-          | OGEvent.ResizedWindow -> Some Event.Resized
+          | OGEvent.ResizedWindow -> Some (Event.Resized (size win))
         )
     | None -> None
 

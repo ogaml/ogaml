@@ -30,8 +30,8 @@ Interface changes:
   VertexArrays:
     ✘ Sources seems to be inverted (wrong drawing order) -- depth testing was enabled @cancelled(2016-04-09 15:22) @project(Interface changes / VertexArrays)
   Events:
-    ☐ Vectors rather than pairs 
-    ☐ Parametrize Resized with a Vector2i
+    ✔ Vectors rather than pairs  @done(2016-04-09 20:28) @project(Interface changes / Events)
+    ✔ Parametrize Resized with a Vector2i @done(2016-04-09 20:28) @project(Interface changes / Events)
   Text:
     ☐ Alinea parameter @unsure
     ☐ Text align
