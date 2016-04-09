@@ -16,6 +16,7 @@ module Glyph : sig
 
 end
 
+exception Font_error of string
 
 type t
 

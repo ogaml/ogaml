@@ -36,6 +36,7 @@ module Glyph = struct
 
 end
 
+exception Font_error of string
 
 module Shelf = struct
 
@@ -72,6 +73,8 @@ module Shelf = struct
                 y = s.height + 1;
                 width  = w;
                 height = h})
+    end else if s.height + s.row_height + 1 >= 2048 then begin
+      raise (Font_error "Font texture overflow")
     end else begin
       let new_full = Image.create (`Empty (s.width,(s.height + s.row_height + 1),(`RGB Color.RGB.transparent))) in
       Image.blit s.full new_full Vector2i.({x = 0; y = 0});
@@ -101,6 +104,8 @@ module Internal = struct
   type t
 
   external load : string -> t = "caml_stb_load_font"
+
+  external is_valid : t -> bool = "caml_stb_isvalid"
 
   external kern : t -> int -> int -> int = "caml_stb_kern_advance"
 
@@ -231,9 +236,14 @@ let oversampling_of_size s =
 
 (** Exposed functions *)
 let load s =
+  if not (Sys.file_exists s) then
+    raise (Font_error (Printf.sprintf "File not found : %s" s));
+  let internal = Internal.load s in
+  if not (Internal.is_valid internal) then
+    raise (Font_error (Printf.sprintf "Invalid font file : %s" s));
   {
     pages  = IntMap.empty;
-    internal = Internal.load s
+    internal
   }
 
 

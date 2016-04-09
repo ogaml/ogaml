@@ -3,6 +3,7 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 
+
 CAMLprim value
 caml_stb_load_font(value filename)
 {
@@ -23,9 +24,18 @@ caml_stb_load_font(value filename)
 
   stbtt_fontinfo* info;
   info = malloc(sizeof(stbtt_fontinfo));
-  stbtt_InitFont(info, fontBuffer, 0);
+  if (stbtt_InitFont(info, fontBuffer, 0) == 0)
+    info = NULL;
 
   CAMLreturn((value)info);
+}
+
+
+CAMLprim value
+caml_stb_isvalid(value info)
+{
+  CAMLparam1(info);
+  CAMLreturn(Val_bool((stbtt_fontinfo*)info != NULL));
 }
 
 

@@ -25,8 +25,6 @@ Interface changes:
     ☐ Add open (dual of close)
   Interpolators:
     ☐ Add begin and end time
-  Shape:
-    ☐ Source shapes ? VertexShapes ?
   Programs:
     ✔ Defaults programs (like 2D drawing) exposed ? @done(2016-04-09 15:22) @project(Interface changes / Programs)
   VertexArrays:
@@ -43,7 +41,7 @@ Interface changes:
       ☐ Filtered transformations
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
   Shape and text:
-    ☐ Find a way to export shapes and text to VertexSources @unsure
+    ☐ Find a way to export shapes, sprites and text to VertexSources 
     ✔ Get Font texture (to use with vertex sources) in Font.LL @done(2016-04-09 12:38) @project(Interface changes / Shape and text)
   VertexSource/Map:
     ✔ More operations on sources : iter,map @done(2016-04-09 15:22) @project(Interface changes / VertexSource/Map)
@@ -64,7 +62,7 @@ Interface changes:
 Code refactoring:
   OgamlGraphics:
     ☐ Non exposed InternalUtils for binding draw parameters for example
-    ☐ Error checking in Font, Image (loading), Image.blit
+    ✔ Error checking in Font, Image (loading), Image.blit @done(2016-04-09 20:14) @project(Code refactoring / OgamlGraphics)
     ✔ Move programs to State (+ organize) @done(2016-03-19 10:52) @project(Code refactoring / OgamlGraphics)
     ☐ Transformations as matrices in uniforms for sprite, shape and text
 

@@ -322,11 +322,16 @@ module Image : sig
     * Images stored this way are uncompressed arrays of bytes and are therefore
     * not meant to be stored in large quantities. *)
 
+  (** Raised when an error occur in this module *)
+  exception Image_error of string
+
   (** Type of an image stored in the RAM *)
   type t
 
   (** Creates an image from a file, some RGBA-formatted data, or an empty one
     * filled with a default color
+    *
+    * Raises $Image_error$ if the loading fails 
     * @see:OgamlGraphics.Color *)
   val create : [`File of string | `Empty of int * int * Color.t | `Data of int * int * Bytes.t] -> t
 
@@ -408,6 +413,9 @@ module Font : sig
   (** This module stores a font and dynamically
     * loads sizes and glyphs as requested by the user *)
 
+  (** Raised when an error occur in this module *)
+  exception Font_error of string
+
   (** Type of a font *)
   type t
 
@@ -442,6 +450,9 @@ module Font : sig
   (** Returns the space between the baseline of two lines
     * (equals ascent + linegap - descent) *)
   val spacing : t -> int -> float
+
+  (** Returns the texture associated to a given font size *)
+  val texture : t -> int -> Texture.Texture2D.t
 
 end
 

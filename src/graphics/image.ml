@@ -1,6 +1,6 @@
 open OgamlMath
 
-exception Load_error of string
+exception Image_error of string
 
 type t = {width : int; height : int; data : Bytes.t}
 
@@ -20,7 +20,7 @@ let create = function
     |None -> 
       let msg = Printf.sprintf "Failed to load image file %s. Reason : %s" 
                                s (stbi_load_error()) 
-      in raise (Load_error msg)
+      in raise (Image_error msg)
     |Some (s,x,y) -> begin
       {width = x; height = y; data = s}
     end
@@ -65,18 +65,24 @@ let set img v c =
     convert c.Color.RGB.b,
     convert c.Color.RGB.a
   in
-  Bytes.set img.data (v.y * 4 * img.width + v.x * 4    ) r;
-  Bytes.set img.data (v.y * 4 * img.width + v.x * 4 + 1) g;
-  Bytes.set img.data (v.y * 4 * img.width + v.x * 4 + 2) b;
-  Bytes.set img.data (v.y * 4 * img.width + v.x * 4 + 3) a
+  try 
+    Bytes.set img.data (v.y * 4 * img.width + v.x * 4    ) r;
+    Bytes.set img.data (v.y * 4 * img.width + v.x * 4 + 1) g;
+    Bytes.set img.data (v.y * 4 * img.width + v.x * 4 + 2) b;
+    Bytes.set img.data (v.y * 4 * img.width + v.x * 4 + 3) a;
+  with
+    Invalid_argument _ -> raise (Image_error "Set : index out of bounds")
 
 let get img v =
   let open Vector2i in
-  Color.RGB.(
+  try 
+    Color.RGB.(
     {r = inverse img.data.[v.y * 4 * img.width + v.x * 4 + 0];
      g = inverse img.data.[v.y * 4 * img.width + v.x * 4 + 1];
      b = inverse img.data.[v.y * 4 * img.width + v.x * 4 + 2];
      a = inverse img.data.[v.y * 4 * img.width + v.x * 4 + 3]})
+  with
+    Invalid_argument _ -> raise (Image_error "Get : index out of bounds")
 
 let data img = img.data
 
@@ -87,8 +93,10 @@ let blit src ?rect dest pos =
     |Some r -> r
   in
   let off = Vector2i.sub pos (IntRect.position rect) in
-  OgamlMath.IntRect.iter rect 
-    (fun v -> set dest (Vector2i.add v off) (`RGB (get src v)))
+  try 
+    OgamlMath.IntRect.iter rect 
+      (fun v -> set dest (Vector2i.add v off) (`RGB (get src v)))
+  with Image_error _ -> raise (Image_error "Blit : rectangle out of bounds")
 
 
 

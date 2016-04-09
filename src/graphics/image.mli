@@ -1,5 +1,5 @@
 
-exception Load_error of string
+exception Image_error of string
 
 type t
 
