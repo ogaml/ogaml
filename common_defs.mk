@@ -30,10 +30,7 @@ ifeq ($(UNAME), Darwin)
   OS_NAME = OSX
   OS_WIN_LIB = cocoa
   GLOBAL_OBJCOPTS = -fconstant-string-class=NSConstantString
-	# Without the following line, I don't get the warnings, but then it fails
-	# when compiling the examples...
   GLOBAL_CLIBS = -framework Foundation -framework Cocoa -framework Carbon -lobjc -framework openGL
-	# GLOBAL_CLIBS =
 endif
 
 
@@ -70,20 +67,16 @@ OCAML_C_FLAGS = -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT -fPIC -I '$(OCAML_DIR)
 
 # Built libraries
 CORE_LIB = ogamlCore
+CORE_PACK = OgamlCore
 
 GRAPHICS_LIB = ogamlGraphics
+GRAPHICS_PACK = OgamlGraphics
 
 MATH_LIB = ogamlMath
+MATH_PACK = OgamlMath
 
 UTILS_LIB = ogamlUtils
-
-CORE_PACK = $(shell echo $(CORE_LIB) | sed -e 's/^./\U&/')
-
-GRAPHICS_PACK = $(shell echo $(GRAPHICS_LIB) | sed -e 's/^./\U&/')
-
-MATH_PACK = $(shell echo $(MATH_LIB) | sed -e 's/^./\U&/')
-
-UTILS_PACK = $(shell echo $(UTILS_LIB) | sed -e 's/^./\U&/')
+UTILS_PACK = OgamlUtils
 
 
 # Commands
