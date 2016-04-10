@@ -245,7 +245,7 @@ type t = {
   font       : Font.t;
   size       : int;
   chars      : (float * Font.code * Font.Glyph.t) list ;
-  vertices   : VertexArray.static VertexArray.t ;
+  vertices   : VertexArray.Vertex.t list;
   advance    : Vector2f.t ;
   boundaries : FloatRect.t
 }
@@ -272,10 +272,10 @@ let create ~text ~position ~font ?color:(color=(`RGB Color.RGB.black)) ~size ~bo
   let vertices,advance,width =
     let lift v = Vector3f.lift v in
     List.fold_left
-      (fun (source, advance_vec, line_width) (kern,code,glyph) ->
+      (fun (lvtx, advance_vec, line_width) (kern,code,glyph) ->
        match code with
        | `Code i when i = Char.code '\n' ->
-         source,
+         lvtx,
          Vector2f.({
            x = 0. ;
            y = advance_vec.y +. (Font.spacing font size)
@@ -324,31 +324,21 @@ let create ~text ~position ~font ?color:(color=(`RGB Color.RGB.black)) ~size ~bo
              ~color
              ()
          in
-         VertexArray.Source.(
-           source << v1 << v2 << v3
-                  << v3 << v1 << v4
-         ),
+         v1 :: v2 :: v3 :: v3 :: v1 :: v4 :: lvtx,
          Vector2f.(
            add advance_vec { x = Font.Glyph.advance glyph +. kern ; y = 0. }
          ),
          line_width
       )
       (
-        VertexArray.Source.(
-          empty
-            ~position:"position"
-            ~texcoord:"uv"
-            ~color:"color"
-            ~size:((UTF8String.length utf8) * 6)
-            ()
-        ),
+        [],
         Vector2f.zero,
         0.
       )
       chars
-    |> fun (source, advance, line_width) -> VertexArray.static source,
-                                       advance,
-                                       max advance.Vector2f.x line_width
+    |> fun (lvtx, advance, line_width) -> lvtx,
+                                          advance,
+                                          max advance.Vector2f.x line_width
   in
   let boundaries = {
     FloatRect.x      = position.Vector2f.x ;
@@ -384,7 +374,17 @@ let draw ?parameters:(parameters = DrawParameter.make
     |> Uniform.vector2f "atlas_size" tsize
     |> Uniform.texture2D "atlas" texture
   in
-  let vertices = text.vertices in
+  let vertices = 
+    let vtx = text.vertices in
+    let src = VertexArray.Source.empty
+      ~position:"position"
+      ~texcoord:"uv"
+      ~color:"color"
+      ~size:32 () 
+    in
+    List.iter (VertexArray.Source.add src) vtx;
+    VertexArray.static src
+  in
   VertexArray.draw
         ~window
         ~vertices
@@ -392,6 +392,15 @@ let draw ?parameters:(parameters = DrawParameter.make
         ~parameters
         ~uniform
         ~mode:DrawMode.Triangles ()
+
+let map_to_source text f src = 
+  List.iter (fun v -> VertexArray.Source.add src (f v)) text.vertices
+
+let to_source text src = 
+  List.iter (VertexArray.Source.add src) text.vertices
+
+let map_to_custom_source text f src = 
+  List.iter (fun v -> VertexMap.Source.add src (f v)) text.vertices
 
 let advance text = text.advance
 

@@ -54,6 +54,16 @@ val draw :
   window : Window.t ->
   unit -> unit
 
+val map_to_source : t -> 
+                    (VertexArray.Vertex.t -> VertexArray.Vertex.t) -> 
+                    VertexArray.Source.t -> unit
+
+val to_source : t -> VertexArray.Source.t -> unit
+
+val map_to_custom_source : t -> 
+                    (VertexArray.Vertex.t -> VertexMap.Vertex.t) -> 
+                    VertexMap.Source.t -> unit
+
 val advance : t -> OgamlMath.Vector2f.t
 
 val boundaries : t -> OgamlMath.FloatRect.t

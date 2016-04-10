@@ -37,11 +37,12 @@ Interface changes:
     ☐ Text align
     ☐ Text width
     ☐ Factorize two modules
+    ☐ Constraint rectangle
     Fx module for text with advanced features:
       ☐ Filtered transformations
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
   Shape and text:
-    ☐ Find a way to export shapes, sprites and text to VertexSources 
+    ✔ Find a way to export shapes, sprites and text to VertexSources  @done(2016-04-10 19:00) @project(Interface changes / Shape and text)
     ✔ Get Font texture (to use with vertex sources) in Font.LL @done(2016-04-09 12:38) @project(Interface changes / Shape and text)
   VertexSource/Map:
     ✔ More operations on sources : iter,map @done(2016-04-09 15:22) @project(Interface changes / VertexSource/Map)

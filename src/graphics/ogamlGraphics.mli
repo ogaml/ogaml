@@ -1439,7 +1439,33 @@ module Shape : sig
   (** Returns the filling color of the shape. *)
   val color : t -> Color.t
 
+  (*** Vertex array access *)
+
+  (** Outputs a shape to a vertex array source.
+    * 
+    * This outputs triangles with position
+    * and color attributes.
+    *
+    * Use DrawMode.Triangles with this source. *)
+  val to_source : t -> VertexArray.Source.t -> unit
+
+  (** Outputs a shape to a vertex array source by mapping its vertices.
+    *
+    * See $to_source$ for more information. *)
+  val map_to_source : t -> 
+                      (VertexArray.Vertex.t -> VertexArray.Vertex.t) -> 
+                      VertexArray.Source.t -> unit
+
+  (** Outputs a shape to a vertex map source by mapping its vertices.
+    *
+    * See $to_source$ for more information. *)
+  val map_to_custom_source : t -> 
+                      (VertexArray.Vertex.t -> VertexMap.Vertex.t) -> 
+                      VertexMap.Source.t -> unit
+
+
 end
+
 
 (** Creation and manipulation of 2D sprites *)
 module Sprite : sig
@@ -1506,6 +1532,30 @@ module Sprite : sig
 
   (** Returns the scale of the sprite. *)
   val get_scale : t -> OgamlMath.Vector2f.t
+
+  (*** Vertex array access *)
+
+  (** Outputs a sprite to a vertex array source.
+    * 
+    * This outputs two triangles with UV coordinates
+    * and position attributes.
+    *
+    * Use DrawMode.Triangles with this source. *)
+  val to_source : t -> VertexArray.Source.t -> unit
+
+  (** Outputs a sprite to a vertex array source by mapping its vertices.
+    *
+    * See $to_source$ for more information. *)
+  val map_to_source : t -> 
+                      (VertexArray.Vertex.t -> VertexArray.Vertex.t) -> 
+                      VertexArray.Source.t -> unit
+
+  (** Outputs a sprite to a vertex map source by mapping its vertices.
+    *
+    * See $to_source$ for more information. *)
+  val map_to_custom_source : t -> 
+                      (VertexArray.Vertex.t -> VertexMap.Vertex.t) -> 
+                      VertexMap.Source.t -> unit
 
 end
 
@@ -1614,6 +1664,32 @@ module Text : sig
 
   (** Returns a rectangle containing all the text. *)
   val boundaries : t -> OgamlMath.FloatRect.t
+
+  (*** Vertex array access *)
+
+  (** Outputs text vertices to a vertex array source.
+    * 
+    * This outputs triangles with UV coordinates, color
+    * and position attributes.
+    *
+    * Use DrawMode.Triangles with this source and bind the
+    * correct font before use. *)
+  val to_source : t -> VertexArray.Source.t -> unit
+
+  (** Outputs text vertices to a vertex array source by mapping its vertices.
+    *
+    * See $to_source$ for more information. *)
+  val map_to_source : t -> 
+                      (VertexArray.Vertex.t -> VertexArray.Vertex.t) -> 
+                      VertexArray.Source.t -> unit
+
+  (** Outputs text vertices to a vertex map source by mapping its vertices.
+    *
+    * See $to_source$ for more information. *)
+  val map_to_custom_source : t -> 
+                      (VertexArray.Vertex.t -> VertexMap.Vertex.t) -> 
+                      VertexMap.Source.t -> unit
+
 
 end
 

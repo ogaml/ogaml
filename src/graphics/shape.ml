@@ -1,7 +1,7 @@
 open OgamlMath
 
 type shape_vals = {
-  mutable points    : Vector2f.t list ;
+  points    : Vector2f.t list ;
   mutable position  : Vector2f.t ;
   mutable origin    : Vector2f.t ;
   mutable rotation  : float ;
@@ -12,8 +12,8 @@ type shape_vals = {
 }
 
 type t = {
-  mutable vertices : VertexArray.static VertexArray.t ;
-  mutable outline  : (VertexArray.static VertexArray.t) option ;
+  mutable vertices : VertexArray.Vertex.t list option ;
+  mutable outline  : VertexArray.Vertex.t list option ;
   shape_vals       : shape_vals
 }
 
@@ -36,7 +36,7 @@ let foralltwo f res =
   | first :: r -> aux first res (first :: r)
 
 
-(* Applys transformations to a point *)
+(* Applies transformations to a point *)
 let apply_transformations position origin rotation scale point =
   (* Position offset *)
   Vector2f.({
@@ -66,24 +66,16 @@ let actual_points vals =
     vals.points
   |> List.map Vector3f.lift
 
-(* Turns actual points to a VertexArray for the shape *)
+(* Turns actual points to a vertices for the shape *)
 let vertices_of_points points color =
   List.map (fun v ->
     VertexArray.Vertex.create ~position:v ~color ()
   ) points
   |> function
-  | [] -> VertexArray.static
-            VertexArray.Source.(empty ~position:"position"
-                                      ~color:"color"
-                                      ~size:0 ())
+  | [] -> []
   | edge :: vertices ->
     foreachtwo
-      (fun source a b -> VertexArray.Source.(source << edge << a << b))
-      VertexArray.Source.(empty ~position:"position"
-                                ~color:"color"
-                                ~size:(3 * ((List.length vertices) - 1)) ())
-      vertices
-    |> VertexArray.static
+      (fun l a b -> edge :: a :: b :: l) [] vertices
 
 (* Producing bisectors out of actual points *)
 let bisectors_of_points points =
@@ -132,7 +124,7 @@ let outline_of_points points thickness color =
         (
           let open Vector3f in
           let v = { x = 0. ; y = 0. ; z = 1. } in
-          fun source (a,ba) (b,bb) ->
+          fun lst (a,ba) (b,bb) ->
             (* Normal to the direction (a b) *)
             let n =
               let u = direction a b in
@@ -149,24 +141,24 @@ let outline_of_points points thickness color =
             and v2 = tovtx (add b vxb)
             and v3 = tovtx b
             and v4 = tovtx a in
-            VertexArray.Source.(
-              (* Fist triangle *)
-              source << v1
-                     << v2
-                     << v3
-                     (* Then the second *)
-                     << v3
-                     << v4
-                     << v1
-            )
+            v1 :: v2 :: v3 :: v3 :: v4 :: v1 :: lst
         )
-        VertexArray.Source.(empty ~position:"position"
-                                  ~color:"color"
-                                  ~size:(6 * (List.length points)) ())
+        []
         (* It shouldn't raise Invalid_argument *)
         (List.combine points bisectors)
-      |> fun x -> Some (VertexArray.static x)
+      |> fun x -> Some (x)
     end
+
+let compute_vertices poly = 
+  match poly.vertices with
+  | None -> 
+    let points = actual_points poly.shape_vals in
+    let vertices = vertices_of_points points poly.shape_vals.color in
+    let outline = outline_of_points points poly.shape_vals.thickness poly.shape_vals.out_color in
+    poly.vertices <- Some vertices;
+    poly.outline  <- outline;
+    (vertices, outline)
+  | Some v -> (v, poly.outline)
 
 let create_polygon ~points
                    ~color
@@ -187,10 +179,9 @@ let create_polygon ~points
    out_color = out_color
   }
   in
-  let points = actual_points vals in
   {
-   vertices   = vertices_of_points points color ;
-   outline    = outline_of_points points thickness out_color ;
+   vertices   = None;
+   outline    = None;
    shape_vals = vals
   }
 
@@ -276,12 +267,8 @@ let create_line ~thickness
 
 (* Applies the modifications to shape_vals *)
 let update shape =
-  let color     = shape.shape_vals.color
-  and thickness = shape.shape_vals.thickness in
-  let points    = actual_points shape.shape_vals in
-  let out_color = shape.shape_vals.out_color in
-  shape.vertices <- vertices_of_points points color ;
-  shape.outline  <- outline_of_points points thickness out_color
+  shape.vertices <- None;
+  shape.outline  <- None
 
 let set_position shape position =
   shape.shape_vals.position <- position ;
@@ -353,22 +340,50 @@ let draw ?parameters:(parameters = DrawParameter.make
     Uniform.empty
     |> Uniform.vector2f "size" (Vector2f.from_int size)
   in
-  let vertices = shape.vertices in
+  let vertices = 
+    let src = VertexArray.Source.empty
+      ~position:"position"
+      ~color:"color"
+      ~size:8 ()
+    in
+    let vtcs, outline = compute_vertices shape in
+    List.iter (VertexArray.Source.add src) vtcs;
+    begin match outline with
+    | None -> ()
+    | Some vtcs -> List.iter (VertexArray.Source.add src) vtcs
+    end;
+    VertexArray.static src
+  in
   VertexArray.draw
         ~window
         ~vertices
         ~program
         ~parameters
         ~uniform
-        ~mode:DrawMode.Triangles () ;
-  (* Drawing the outline if necessary *)
-  match shape.outline with
+        ~mode:DrawMode.Triangles () 
+
+let map_to_source shape f src = 
+  let vtcs, outline = compute_vertices shape in
+  List.iter (fun v -> VertexArray.Source.add src (f v)) vtcs;
+  begin match outline with
   | None -> ()
-  | Some vertices ->
-    VertexArray.draw
-      ~window
-      ~vertices
-      ~program
-      ~parameters
-      ~uniform
-      ~mode:DrawMode.Triangles ()
+  | Some vtcs -> List.iter (fun v -> VertexArray.Source.add src (f v)) vtcs
+  end
+
+let to_source shape src = 
+  let vtcs, outline = compute_vertices shape in
+  List.iter (VertexArray.Source.add src) vtcs;
+  begin match outline with
+  | None -> ()
+  | Some vtcs -> List.iter (VertexArray.Source.add src) vtcs
+  end
+
+let map_to_custom_source shape f src = 
+  let vtcs, outline = compute_vertices shape in
+  List.iter (fun v -> VertexMap.Source.add src (f v)) vtcs;
+  begin match outline with
+  | None -> ()
+  | Some vtcs -> List.iter (fun v -> VertexMap.Source.add src (f v)) vtcs
+  end
+
+

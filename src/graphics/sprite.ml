@@ -6,11 +6,11 @@ type t = {
   texture : Texture.Texture2D.t ;
   subrect : OgamlMath.FloatRect.t ;
   mutable size    : Vector2f.t ;
-  mutable vertices : VertexArray.static VertexArray.t ;
   mutable position : Vector2f.t ;
   mutable origin   : Vector2f.t ;
   mutable rotation : float ;
-  mutable scale    : Vector2f.t
+  mutable scale    : Vector2f.t;
+  mutable vertices : VertexArray.Vertex.t list option
 }
 
 let error msg = raise (Sprite_error msg)
@@ -37,7 +37,7 @@ let apply_transformations position origin rotation scale point =
         cos(rotation) *. (point.y-.position.y) +. position.y
   })
 
-let get_vertices size position origin rotation scale subrect =
+let get_vertices_aux size position origin rotation scale subrect =
   let (w,h) = Vector2f.(
     { x = size.x ; y = 0.     },
     { x = 0.     ; y = size.y }
@@ -57,16 +57,24 @@ let get_vertices size position origin rotation scale subrect =
      ~texcoord:coord ()
   )
   |> function
-  | [ a ; b ; c ; d ] ->
-    VertexArray.Source.(
-        empty ~position:"position" ~texcoord:"uv" ~size:4 ()
-        << a
-        << b
-        << c
-        << d
-    )
-    |> VertexArray.static
+  | [ a ; b ; c ; d ] -> [a; b; c; c; b; d]
   | _ -> assert false
+
+let get_vertices sprite = 
+  match sprite.vertices with
+  | Some l -> l
+  | None   ->
+    let vertices =
+      get_vertices_aux
+        sprite.size
+        sprite.position
+        sprite.origin
+        sprite.rotation
+        sprite.scale
+        sprite.subrect
+    in
+    sprite.vertices <- Some vertices;
+    vertices
 
 let create ~texture
            ?subrect
@@ -99,17 +107,25 @@ let create ~texture
         && fr.y +. fr.height >= 0. && fr.x +. fr.height <= 1. then fr
         else raise (Sprite_error "invalid texture sub-rectangle")
   in
-  let vertices = get_vertices size position origin rotation scale subrect in
   {
     texture  = texture ;
     subrect  = subrect ;
     size     = size ;
-    vertices = vertices ;
+    vertices = None ;
     position = position ;
     origin   = origin ;
     rotation = rotation ;
     scale    = scale
   }
+
+let map_to_source sprite f src = 
+  List.iter (fun v -> VertexArray.Source.add src (f v)) (get_vertices sprite)
+
+let to_source sprite src = 
+  List.iter (VertexArray.Source.add src) (get_vertices sprite)
+
+let map_to_custom_source sprite f src = 
+  List.iter (fun v -> VertexMap.Source.add src (f v)) (get_vertices sprite)
 
 let draw ?parameters:(parameters = DrawParameter.make
                                     ~depth_test:false 
@@ -123,26 +139,25 @@ let draw ?parameters:(parameters = DrawParameter.make
     |> Uniform.vector2f "size" size
     |> Uniform.texture2D "utexture" sprite.texture
   in
-  let vertices = sprite.vertices in
+  let vertices = 
+    let src = VertexArray.Source.empty 
+      ~position:"position"
+      ~texcoord:"uv"
+      ~size:6 ()
+    in
+    List.iter (VertexArray.Source.add src) (get_vertices sprite);
+    VertexArray.static src
+  in
   VertexArray.draw
         ~window
         ~vertices
         ~program
         ~parameters
         ~uniform
-        ~mode:DrawMode.TriangleStrip ()
+        ~mode:DrawMode.Triangles ()
 
 let update sprite =
-  let vertices =
-    get_vertices
-      sprite.size
-      sprite.position
-      sprite.origin
-      sprite.rotation
-      sprite.scale
-      sprite.subrect
-  in
-  sprite.vertices <- vertices
+  sprite.vertices <- None
 
 let set_position sprite position =
   sprite.position <- position ;
