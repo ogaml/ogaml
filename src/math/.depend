@@ -16,6 +16,8 @@ quaternion.cmo : vector3f.cmi quaternion.cmi
 quaternion.cmx : vector3f.cmx quaternion.cmi
 vector2f.cmo : vector2i.cmi vector2f.cmi
 vector2f.cmx : vector2i.cmx vector2f.cmi
+vector2fs.cmo : vector2f.cmi constants.cmi vector2fs.cmi
+vector2fs.cmx : vector2f.cmx constants.cmx vector2fs.cmi
 vector2i.cmo : vector2i.cmi
 vector2i.cmx : vector2i.cmi
 vector3f.cmo : vector3i.cmi vector2f.cmi vector3f.cmi
@@ -34,6 +36,7 @@ matrix3D.cmi : vector3f.cmi quaternion.cmi
 ogamlMath.cmi :
 quaternion.cmi : vector3f.cmi
 vector2f.cmi : vector2i.cmi
+vector2fs.cmi : vector2f.cmi
 vector2i.cmi :
 vector3f.cmi : vector3i.cmi vector2f.cmi
 vector3fs.cmi : vector3f.cmi

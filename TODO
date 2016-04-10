@@ -53,8 +53,8 @@ Interface changes:
   Drawing:
     ✔ Default DrawMode to Triangles @done(2016-04-09 15:22) @project(Interface changes / Drawing)
   Math:
-    ☐ Add Vector2fs
-    ☐ abs_corner to rects and boxes
+    ✔ Add Vector2fs @done(2016-04-10 14:56) @project(Interface changes / Math)
+    ✔ abs_corner to rects and boxes @done(2016-04-10 14:53) @project(Interface changes / Math)
   Sprite:
     ✔ Add texture subrect @done(2016-04-09 15:22) @project(Interface changes / Sprite)
 

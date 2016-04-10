@@ -34,6 +34,11 @@ let abs_position t = {
   Vector2i.y = min t.y (t.y + t.height);
 }
 
+let abs_corner t = {
+  Vector2i.x = max t.x (t.x + t.width);
+  Vector2i.y = max t.y (t.y + t.height)
+}
+
 let size t = {
   Vector2i.x = t.width;
   Vector2i.y = t.height;

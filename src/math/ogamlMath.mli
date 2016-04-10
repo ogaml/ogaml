@@ -441,6 +441,56 @@ module Vector3f : sig
 end
 
 
+(** Operations on immutable vectors of 2 floats represented in polar coordinates *)
+module Vector2fs : sig
+
+  (** This module defines the vector2fs type and various operations on it. *)
+
+  (** Raised when an error occurs (usually a division by zero) *)
+  exception Vector2fs_exception of string
+
+  (*** Vector operations *)
+
+  (** Type of immutable vectors of 2 floats represented in polar coordinates *)
+  type t = {r : float; (* Signed radius *)
+            t : float; (* Theta angle. An angle of 0 corresponds to a vector pointing towards positive X. *)
+           }
+
+  (** Zero vector *)
+  val zero : t
+
+  (** Unit x vector *)
+  val unit_x : t
+
+  (** Unit y vector *)
+  val unit_y : t
+
+  (** Multiplies a vector by a scalar *)
+  val prop : float -> t -> t
+
+  (** Divides a vector by a scalar. Raises Vector2fs_exception if the scalar is zero. *)
+  val div : float -> t -> t
+
+  (** Converts a vector represented in polar coordinates to a vector represented in cartesian coordinates 
+    * @see:OgamlMath.Vector2f *)
+  val to_cartesian : t -> Vector2f.t
+
+  (** Converts a vector represented in cartesian coordinates to a vector represented in polar coordinates 
+    * @see:OgamlMath.Vector2f *)
+  val from_cartesian : Vector2f.t -> t
+
+  (** Computes the norm of a vector *)
+  val norm : t -> float
+
+  (** Normalizes a vector. Raises Vector2fs_exception if the vector is zero. *)
+  val normalize : t -> t
+
+  (** Returns a pretty-printed string (not for serialization) *)
+  val print : t -> string
+
+end
+
+
 (** Operations on immutable vectors of 3 floats represented in spherical coordinates *)
 module Vector3fs : sig
 
@@ -526,6 +576,10 @@ module IntRect : sig
   (** Returns the top corner (aka position + size) of a rectangle *)
   val corner : t -> Vector2i.t
 
+  (** Returns the absolute corner of a rectangle, that is the
+    * point of maximal coordinates *)
+  val abs_corner : t -> Vector2i.t
+
   (** Returns the size of a rectangle *)
   val size : t -> Vector2i.t
 
@@ -600,6 +654,10 @@ module FloatRect : sig
   (** Returns the top corner (aka position + size) of a rectangle *)
   val corner : t -> Vector2f.t
 
+  (** Returns the absolute corner of a rectangle, that is the
+    * point of maximal coordinates *)
+  val abs_corner : t -> Vector2f.t
+
   (** Returns the size of a rectangle *)
   val size : t -> Vector2f.t
 
@@ -667,6 +725,10 @@ module IntBox : sig
 
   (** Returns the top corner (aka position + size) of a box *)
   val corner : t -> Vector3i.t
+
+  (** Returns the absolute corner of a box, that is the
+    * point of maximal coordinates *)
+  val abs_corner : t -> Vector3i.t
 
   (** $normalize box$ returns a box equivalent to $box$ but with
       positive size *)
@@ -741,6 +803,10 @@ module FloatBox : sig
 
   (** Returns the top corner (aka position + size) of a box *)
   val corner : t -> Vector3f.t
+
+  (** Returns the absolute corner of a box, that is the
+    * point of maximal coordinates *)
+  val abs_corner : t -> Vector3f.t
 
   (** Returns the size of a box *)
   val size : t -> Vector3f.t
