@@ -65,8 +65,10 @@ value Val_error(GLenum err)
     case GL_INVALID_OPERATION : return Val_some(Val_int(2));
     case GL_INVALID_FRAMEBUFFER_OPERATION : return Val_some(Val_int(3));
     case GL_OUT_OF_MEMORY   : return Val_some(Val_int(4));
+  #ifndef __APPLE__
     case GL_STACK_UNDERFLOW : return Val_some(Val_int(5));
     case GL_STACK_OVERFLOW  : return Val_some(Val_int(6));
+  #endif
     default : return Val_none;
   }
 }
