@@ -31,6 +31,10 @@ Interface changes:
       ☐ Filtered transformations
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
 
+Bugs:
+  ☐ Use a custom ID system for textures as checking the equality of two textures
+    in State can be wrong (if an ID gets recycled)
+
 New modules:
   Bounding module:
     ☐ Split module (bounding3D / bounding2D)
