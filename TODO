@@ -15,57 +15,21 @@ Cocoa specific:
   ☐ Window doesn't resign being key on mission control
 
 Interface changes:
-  Model:
-    ✔ Rewrite Model to add iterators, simplify the interface, and only index ad-hoc (when requested by source) @done(2016-03-16 15:42) @project(Interface changes / Model)
-    ✔ Poly export to Model.t @done(2016-03-16 16:07) @project(Interface changes / Model)
-    ✔ Remove Poly from Math @done(2016-03-16 16:07) @project(Interface changes / Model)
-    ✔ Model merging @done(2016-03-16 15:42) @project(Interface changes / Model)
   Window:
     ☐ Coordinate conversions @note(WTF did I mean by that ?)
     ☐ Add open (dual of close)
   Interpolators:
     ☐ Add begin and end time
-  Programs:
-    ✔ Defaults programs (like 2D drawing) exposed ? @done(2016-04-09 15:22) @project(Interface changes / Programs)
-  VertexArrays:
-    ✘ Sources seems to be inverted (wrong drawing order) -- depth testing was enabled @cancelled(2016-04-09 15:22) @project(Interface changes / VertexArrays)
-  Events:
-    ✔ Vectors rather than pairs  @done(2016-04-09 20:28) @project(Interface changes / Events)
-    ✔ Parametrize Resized with a Vector2i @done(2016-04-09 20:28) @project(Interface changes / Events)
   Text:
     ☐ Alinea parameter @unsure
     ☐ Text align
     ☐ Text width
     ☐ Factorize two modules
     ☐ Constraint rectangle
+    ☐ Transformations ? (rotation/scale/etc...)
     Fx module for text with advanced features:
       ☐ Filtered transformations
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
-  Shape and text:
-    ✔ Find a way to export shapes, sprites and text to VertexSources  @done(2016-04-10 19:00) @project(Interface changes / Shape and text)
-    ✔ Get Font texture (to use with vertex sources) in Font.LL @done(2016-04-09 12:38) @project(Interface changes / Shape and text)
-  VertexSource/Map:
-    ✔ More operations on sources : iter,map @done(2016-04-09 15:22) @project(Interface changes / VertexSource/Map)
-    ✔ Also, map from VertexArray to VertexMap sources and reciprocally (in module VertexMap) -- Note : reciprocally makes no sense actually @done(2016-04-09 15:22) @project(Interface changes / VertexSource/Map)
-  Uniform:
-    ✔ Parameterize sampler2D with mounting point (optional, defaults to 0) @done(2016-04-09 15:22) @project(Interface changes / Uniform)
-    ✔ Find a way to get the number of locations and check against that @done(2016-03-23 16:22) @project(Interface changes / Uniform)
-    ✔ Font uniform (binds the corresponding texture), also takes a mounting point @done(2016-04-09 12:25) @project(Interface changes / Uniform)
-  Drawing:
-    ✔ Default DrawMode to Triangles @done(2016-04-09 15:22) @project(Interface changes / Drawing)
-  Math:
-    ✔ Add Vector2fs @done(2016-04-10 14:56) @project(Interface changes / Math)
-    ✔ abs_corner to rects and boxes @done(2016-04-10 14:53) @project(Interface changes / Math)
-  Sprite:
-    ✔ Add texture subrect @done(2016-04-09 15:22) @project(Interface changes / Sprite)
-
-
-Code refactoring:
-  OgamlGraphics:
-    ☐ Non exposed InternalUtils for binding draw parameters for example
-    ✔ Error checking in Font, Image (loading), Image.blit @done(2016-04-09 20:14) @project(Code refactoring / OgamlGraphics)
-    ✔ Move programs to State (+ organize) @done(2016-03-19 10:52) @project(Code refactoring / OgamlGraphics)
-    ☐ Transformations as matrices in uniforms for sprite, shape and text
 
 New modules:
   Bounding module:
@@ -84,13 +48,36 @@ Advanced features:
     ☐ Texture3D
     ☐ TextureCube
   Batch drawing 2D:
-    ☐ Batcher module (stored in Window.t and stores a current VAO that accumulates drawing calls)
-    ✘ Tilesets with XML or in-code configuration -- useless @cancelled(2016-04-07 17:15) @project(Advanced features / More Image and Texture types / Batch drawing 2D)
   ☐ Render textures
 
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+  ✔ Rewrite Model to add iterators, simplify the interface, and only index ad-hoc (when requested by source) @done(2016-03-16 15:42) @project(Interface changes / Model)
+  ✔ Poly export to Model.t @done(2016-03-16 16:07) @project(Interface changes / Model)
+  ✔ Remove Poly from Math @done(2016-03-16 16:07) @project(Interface changes / Model)
+  ✔ Model merging @done(2016-03-16 15:42) @project(Interface changes / Model)
+  ✔ Defaults programs (like 2D drawing) exposed ? @done(2016-04-09 15:22) @project(Interface changes / Programs)
+  ✘ Sources seems to be inverted (wrong drawing order) -- depth testing was enabled @cancelled(2016-04-09 15:22) @project(Interface changes / VertexArrays)
+  ✔ Vectors rather than pairs  @done(2016-04-09 20:28) @project(Interface changes / Events)
+  ✔ Parametrize Resized with a Vector2i @done(2016-04-09 20:28) @project(Interface changes / Events)
+  ✔ Find a way to export shapes, sprites and text to VertexSources  @done(2016-04-10 19:00) @project(Interface changes / Shape and text)
+  ✔ Get Font texture (to use with vertex sources) in Font.LL @done(2016-04-09 12:38) @project(Interface changes / Shape and text)
+  ✔ More operations on sources : iter,map @done(2016-04-09 15:22) @project(Interface changes / VertexSource/Map)
+  ✔ Also, map from VertexArray to VertexMap sources and reciprocally (in module VertexMap) -- Note : reciprocally makes no sense actually @done(2016-04-09 15:22) @project(Interface changes / VertexSource/Map)
+  ✔ Parameterize sampler2D with mounting point (optional, defaults to 0) @done(2016-04-09 15:22) @project(Interface changes / Uniform)
+  ✔ Find a way to get the number of locations and check against that @done(2016-03-23 16:22) @project(Interface changes / Uniform)
+  ✔ Font uniform (binds the corresponding texture), also takes a mounting point @done(2016-04-09 12:25) @project(Interface changes / Uniform)
+  ✔ Default DrawMode to Triangles @done(2016-04-09 15:22) @project(Interface changes / Drawing)
+  ✔ Add Vector2fs @done(2016-04-10 14:56) @project(Interface changes / Math)
+  ✔ abs_corner to rects and boxes @done(2016-04-10 14:53) @project(Interface changes / Math)
+  ✔ Add texture subrect @done(2016-04-09 15:22) @project(Interface changes / Sprite)
+  ✘ Non exposed InternalUtils for binding draw parameters for example -- useless @cancelled(2016-04-11 15:28) @project(Code refactoring / OgamlGraphics)
+  ✔ Error checking in Font, Image (loading), Image.blit @done(2016-04-09 20:14) @project(Code refactoring / OgamlGraphics)
+  ✔ Move programs to State (+ organize) @done(2016-03-19 10:52) @project(Code refactoring / OgamlGraphics)
+  ✘ Transformations as matrices in uniforms for sprite, shape and text -- counter productive @cancelled(2016-04-11 15:28) @project(Code refactoring / OgamlGraphics)
+  ✘ Batcher module (stored in Window.t and stores a current VAO that accumulates drawing calls) -- tested, not feasible @cancelled(2016-04-11 15:28) @project(Advanced features / Batch drawing 2D)
+  ✘ Tilesets with XML or in-code configuration -- useless @cancelled(2016-04-07 17:15) @project(Advanced features / More Image and Texture types / Batch drawing 2D)
   ✔ GC textures @done(2016-03-15 10:30) @project(OgamlGraphics)
   ✔ Size in sprite and shape ? - only sprite @done(2016-03-15 10:47) @project(OgamlGraphics)
   ✔ Box.iter strict is buggy (ie. when size is < 0) , remove it, or remove always >0 size @done(2016-03-15 11:09) @project(Math)
