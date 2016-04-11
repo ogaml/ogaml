@@ -38,6 +38,7 @@ Interface changes:
     ☐ Text width
     ☐ Factorize two modules
     ☐ Constraint rectangle
+    ☐ Transformations ? (rotation/scale/etc...)
     Fx module for text with advanced features:
       ☐ Filtered transformations
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
@@ -65,7 +66,7 @@ Code refactoring:
     ☐ Non exposed InternalUtils for binding draw parameters for example
     ✔ Error checking in Font, Image (loading), Image.blit @done(2016-04-09 20:14) @project(Code refactoring / OgamlGraphics)
     ✔ Move programs to State (+ organize) @done(2016-03-19 10:52) @project(Code refactoring / OgamlGraphics)
-    ☐ Transformations as matrices in uniforms for sprite, shape and text
+    ✘ Transformations as matrices in uniforms for sprite, shape and text -- counter productive @cancelled(2016-04-10 19:16) @project(Code refactoring / OgamlGraphics)
 
 New modules:
   Bounding module:

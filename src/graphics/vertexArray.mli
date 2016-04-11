@@ -12,7 +12,7 @@ exception Out_of_bounds of string
 
 module Vertex : sig
 
-  type t
+  type t = VASourceInternal.Vertex.t
 
   val create : ?position:OgamlMath.Vector3f.t ->
                ?texcoord:OgamlMath.Vector2f.t ->
@@ -32,7 +32,7 @@ end
 
 module Source : sig
 
-  type t
+  type t = VASourceInternal.Source.t
 
   val empty : ?position:string -> 
               ?normal  :string -> 

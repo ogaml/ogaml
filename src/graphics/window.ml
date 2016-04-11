@@ -4,7 +4,8 @@ type t = {
   state : State.t;
   internal : LL.Window.t;
   settings : ContextSettings.t;
-  programs : ProgramLibrary.t
+  programs : ProgramLibrary.t;
+  batch : DrawBatch.t
 }
 
 let create ?width:(width=800) ?height:(height=600) ?title:(title="") 
@@ -18,6 +19,7 @@ let create ?width:(width=800) ?height:(height=600) ?title:(title="")
     internal;
     settings;
     programs;
+    batch = DrawBatch.create ()
   }
 
 let set_title win title = LL.Window.set_title win.internal title
@@ -40,7 +42,8 @@ let size win = LL.Window.size win.internal
 
 let poll_event win = LL.Window.poll_event win.internal
 
-let display win = LL.Window.display win.internal
+let display win = 
+  DrawBatch.flush win.batch; LL.Window.display win.internal
 
 let clear ?color:(color=`RGB Color.RGB.black) win =
   if State.LL.clear_color win.state <> color then begin
@@ -58,6 +61,8 @@ let state win = win.state
 module LL = struct
 
   let internal win = win.internal
+
+  let batch win = win.batch
 
   let program win = ProgramLibrary.shape_drawing win.programs
 

@@ -56,6 +56,9 @@ module LL : sig
   (** Returns the internal window of this window, should only be used internally *)
   val internal : t -> OgamlCore.LL.Window.t
 
+  (** Returns the internal draw call batch of this window *)
+  val batch : t -> DrawBatch.t
+
   (** Returns the 2D drawing program associated to this window's context *)
   val program : t -> Program.t
 
