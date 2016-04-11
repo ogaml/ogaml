@@ -35,6 +35,9 @@ Bugs:
   ☐ Use a custom ID system for textures as checking the equality of two textures
     in State can be wrong (if an ID gets recycled)
 
+Before merge:
+  ☐ Remove debug type and functions in VertexArray and Sprite
+
 New modules:
   Bounding module:
     ☐ Split module (bounding3D / bounding2D)

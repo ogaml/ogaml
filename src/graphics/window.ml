@@ -109,9 +109,9 @@ module LL = struct
         |Relative r ->
           FloatRect.(floor
             {x = sizef.Vector2f.x *. r.x;
-             y = sizef.Vector2f.y *. r.y;
-             width  = sizef.Vector2f.x *. r.width;
-             height = sizef.Vector2f.y *. r.height})
+            y = sizef.Vector2f.y *. r.y;
+            width  = sizef.Vector2f.x *. r.width;
+            height = sizef.Vector2f.y *. r.height})
         |Absolute r -> r
       )
     in

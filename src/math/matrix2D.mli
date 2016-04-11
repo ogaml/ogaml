@@ -47,6 +47,13 @@ val projection : size:Vector2f.t -> t
 (* Inverse screen projection matrix *)
 val iprojection : size:Vector2f.t -> t
 
+(* Transformation matrix *)
+val transformation : 
+  translation:Vector2f.t ->
+  rotation:float ->
+  scale:Vector2f.t ->
+  origin:Vector2f.t -> t
+
 (* Returns the matrix as a bigarray *)
 val to_bigarray : t -> (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t
 

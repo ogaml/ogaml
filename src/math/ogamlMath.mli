@@ -1036,6 +1036,12 @@ module Matrix2D : sig
   (** Builds a rotation matrix from an angle *)
   val rotation : float -> t
 
+  (** Efficiently builds a transformation matrix *)
+  val transformation : 
+    translation:Vector2f.t ->
+    rotation:float ->
+    scale:Vector2f.t ->
+    origin:Vector2f.t -> t
 
   (*** Matrix Operations *)
 

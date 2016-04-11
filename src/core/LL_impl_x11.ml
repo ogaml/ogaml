@@ -6,7 +6,8 @@ module Window = struct
     window  : X11.Window.t;
     context : X11.GLContext.t;
     mutable closed : bool;
-    mutable size : OgamlMath.Vector2i.t
+    mutable size : OgamlMath.Vector2i.t;
+    mutable position : OgamlMath.Vector2i.t
   }
 
   let create ~width ~height ~title ~settings =
@@ -59,7 +60,9 @@ module Window = struct
     let context = X11.GLContext.create display vi in
     X11.Window.attach display window context;
     X11.Window.set_title display window title;
-    {display; window; context; closed = false; size = OgamlMath.Vector2i.({x = width; y = height})}
+    let (x,y) = X11.Window.position display window in
+    let (width, height) = X11.Window.size display window in
+    {display; window; context; closed = false; position = OgamlMath.Vector2i.{x;y}; size = OgamlMath.Vector2i.({x = width; y = height})}
 
   let set_title win title =
     X11.Window.set_title win.display win.window title
@@ -73,23 +76,23 @@ module Window = struct
     win.closed <- true
 
   let resize win size =
-    X11.Window.resize win.display win.window size.OgamlMath.Vector2i.x size.OgamlMath.Vector2i.y
+    X11.Window.resize win.display win.window size.OgamlMath.Vector2i.x size.OgamlMath.Vector2i.y;
+    win.size <- size
 
   let toggle_fullscreen win = 
     let prop = X11.Atom.intern win.display "_NET_WM_STATE" true in
     let atom_fs = X11.Atom.intern win.display "_NET_WM_STATE_FULLSCREEN" true in
+    let (width, height) = X11.Window.size win.display win.window in
+    win.size <- OgamlMath.Vector2i.({x = width; y = height});
     match prop, atom_fs with
     |None, _ |_, None -> failwith "fullscreen not supported"
     |Some prop, Some atom -> X11.Atom.send_event win.display win.window prop [X11.Atom.wm_toggle;atom]
 
   let size win =
-    let (x,y) = X11.Window.size win.display win.window in
-    OgamlMath.Vector2i.({x;y})
+    win.size
 
   let rect win =
-    let (width,height) = X11.Window.size win.display win.window in
-    let (x,y) = X11.Window.position win.display win.window in
-    OgamlMath.IntRect.({x; y; width; height})
+    OgamlMath.IntRect.create win.position win.size
 
   let is_open win =
     not win.closed
@@ -241,9 +244,19 @@ module Window = struct
       | X11.Event.MotionNotify  pos ->
          Some (Event.MouseMoved 
             (OgamlMath.Vector2i.({x = pos.X11.Event.x; y = pos.X11.Event.y})))
-      | X11.Event.ConfigureNotify when size win <> win.size ->
-          win.size <- size win;
-          Some (Event.Resized win.size)
+      | X11.Event.ConfigureNotify -> 
+          let newsizx, newsizy = X11.Window.size win.display win.window in 
+          let newsiz = OgamlMath.Vector2i.({x = newsizx; y = newsizy}) in
+          let newposx, newposy = X11.Window.position win.display win.window in
+          let newpos = OgamlMath.Vector2i.({x = newposx; y = newposy}) in
+          if win.size <> newsiz then begin
+            win.size <- newsiz;
+            Some (Event.Resized win.size)
+          end else if win.position <> newpos then begin
+            win.position <- newpos;
+            None
+          end else
+            None
       | _ -> None
     end
     | None -> None

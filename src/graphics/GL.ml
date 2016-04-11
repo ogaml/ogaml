@@ -20,7 +20,7 @@ module Data = struct
         Bigarray.c_layout
         (max i 1)
     in
-    {data = arr; kind = Bigarray.int32; size = (max i 1); length = 0}
+    {data = arr; kind = Bigarray.int32; size = (max i 4); length = 0}
 
   let create_float i = 
     let arr = 
@@ -29,7 +29,7 @@ module Data = struct
         Bigarray.c_layout
         (max i 1)
     in
-    {data = arr; kind = Bigarray.float32; size = (max i 1); length = 0}
+    {data = arr; kind = Bigarray.float32; size = (max i 4); length = 0}
 
   let double t = 
     let arr = 

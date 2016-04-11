@@ -360,6 +360,23 @@ let bind state t prog =
     State.LL.set_bound_vbo state (Some t.buffer);
   end
 
+type debug_times = {
+  mutable param_bind_t : float;
+  mutable program_bind_t : float;
+  mutable uniform_bind_t : float;
+  mutable vao_bind_t : float;
+  mutable draw_t : float
+}
+
+let debug_t = {
+  param_bind_t = 0.;
+  program_bind_t = 0.;
+  uniform_bind_t = 0.;
+  vao_bind_t = 0.;
+  draw_t = 0.
+}
+
+let tm = Unix.gettimeofday 
 
 let draw ~vertices ~window ?indices ~program 
          ?uniform:(uniform = Uniform.empty) 
@@ -378,15 +395,32 @@ let draw ~vertices ~window ?indices ~program
     |None, Some ebo -> IndexArray.length ebo - start
     |Some l, _ -> l
   in
+
+  let t = tm () in
   Window.LL.bind_draw_parameters window parameters;
+  debug_t.param_bind_t <- debug_t.param_bind_t +. (tm () -. t);
+
+  let t = tm () in
   Program.LL.use state (Some program);
+  debug_t.program_bind_t <- debug_t.program_bind_t +. (tm () -. t);
+
+  let t = tm () in
   Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind state uniform unif);
+  debug_t.uniform_bind_t <- debug_t.uniform_bind_t +. (tm () -. t);
+
+  let t = tm () in
   bind state vertices program;
+  debug_t.vao_bind_t <- debug_t.vao_bind_t +. (tm () -. t);
+
   match indices with
   |None -> 
     if start < 0 || start + length > vertices.length then
       raise (Out_of_bounds "Invalid vertex array bounds")
-    else GL.VAO.draw mode start length
+    else begin
+      let t = tm () in
+      GL.VAO.draw mode start length;
+      debug_t.draw_t <- debug_t.draw_t +. (tm () -. t);
+    end
   |Some ebo ->
     if start < 0 || start + length > (IndexArray.length ebo) then
       raise (Out_of_bounds "Invalid index array bounds")
