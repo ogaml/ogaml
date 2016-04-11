@@ -128,8 +128,8 @@ let map_to_custom_source sprite f src =
   List.iter (fun v -> VertexMap.Source.add src (f v)) (get_vertices sprite)
 
 let draw ?parameters:(parameters = DrawParameter.make
-         ~depth_test:false 
-         ~blend_mode:DrawParameter.BlendMode.alpha ())
+                                    ~depth_test:false 
+                                    ~blend_mode:DrawParameter.BlendMode.alpha ())
          ~window ~sprite () =
   let program = Window.LL.sprite_program window in
   let sizei = Window.size window in
@@ -146,14 +146,15 @@ let draw ?parameters:(parameters = DrawParameter.make
       ~size:6 ()
     in
     List.iter (VertexArray.Source.add src) (get_vertices sprite);
-    src
+    VertexArray.static src
   in
-  let batch = Window.LL.batch window in
-  DrawBatch.set_flush_function batch
-    (fun src ~program ~uniform ~parameters -> 
-      let vertices = VertexArray.static src in
-      VertexArray.draw ~window ~vertices ~program ~uniform ~parameters ());
-  DrawBatch.buffer batch ~program ~uniform ~parameters ~source:vertices
+  VertexArray.draw
+        ~window
+        ~vertices
+        ~program
+        ~parameters
+        ~uniform
+        ~mode:DrawMode.Triangles ()
 
 let update sprite =
   sprite.vertices <- None

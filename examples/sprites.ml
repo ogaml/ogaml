@@ -3,9 +3,6 @@ open OgamlMath
 
 let settings = OgamlCore.ContextSettings.create ()
 
-let () = 
-  Random.self_init ()
-
 let window =
   Window.create ~width:900 ~height:600 ~settings ~title:"Sprite Example" ()
 
@@ -13,21 +10,16 @@ let texture = Texture.Texture2D.create (`File "examples/mario-block.bmp")
 
 let texture_png = Texture.Texture2D.create (`File "examples/test.png")
 
-let frames = ref 0
+let sprite = Sprite.create ~texture ~size:(Vector2f.({x = 50.; y = 50.})) ~origin:(Vector2f.({x=25.;y=25.})) ()
 
-let sum_render = ref 0. 
+let sprite2 = Sprite.create ~texture:texture_png ~position:(Vector2f.({x = 50.; y = 50.})) ()
 
 let draw () =
-  let t = Unix.gettimeofday () in
-  for i = 0 to 1000 do
-    let sprite = Sprite.create ~texture ~position:(Vector2f.({x = Random.float 800.; y = Random.float 500.})) ~origin:(Vector2f.({x=25.;y=25.})) () in
-    Sprite.draw ~window ~sprite ()
-  done;
-  let dt = Unix.gettimeofday () -. t in
-  incr frames;
-  sum_render := dt +. !sum_render
+  Sprite.draw ~window ~sprite ();
+  Sprite.draw ~window ~sprite:sprite2 ()
 
-let do_all action param = ()
+let do_all action param =
+  action sprite param
 
 let rec handle_events () =
   let open OgamlCore in
@@ -66,6 +58,4 @@ let rec each_frame () =
     each_frame ()
   end
 
-let () = each_frame ();
-  Printf.printf "Avg. time per frame : %.5fs\n%!" (!sum_render /. (float_of_int !frames))
-
+let () = each_frame ()
