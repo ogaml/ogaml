@@ -59,47 +59,47 @@ module Data = struct
 
   let add_3f t vec = 
     alloc t 3;
-    t.data.{t.length+0} <- vec.OgamlMath.Vector3f.x;
-    t.data.{t.length+1} <- vec.OgamlMath.Vector3f.y;
-    t.data.{t.length+2} <- vec.OgamlMath.Vector3f.z;
+    Bigarray.Array1.unsafe_set t.data (t.length+0) vec.OgamlMath.Vector3f.x;
+    Bigarray.Array1.unsafe_set t.data (t.length+1) vec.OgamlMath.Vector3f.y;
+    Bigarray.Array1.unsafe_set t.data (t.length+2) vec.OgamlMath.Vector3f.z;
     t.length <- t.length+3
 
   let add_3i t vec = 
     alloc t 3;
-    t.data.{t.length+0} <- Int32.of_int vec.OgamlMath.Vector3i.x;
-    t.data.{t.length+1} <- Int32.of_int vec.OgamlMath.Vector3i.y;
-    t.data.{t.length+2} <- Int32.of_int vec.OgamlMath.Vector3i.z;
+    Bigarray.Array1.unsafe_set t.data (t.length+0) (Int32.of_int vec.OgamlMath.Vector3i.x);
+    Bigarray.Array1.unsafe_set t.data (t.length+1) (Int32.of_int vec.OgamlMath.Vector3i.y);
+    Bigarray.Array1.unsafe_set t.data (t.length+2) (Int32.of_int vec.OgamlMath.Vector3i.z);
     t.length <- t.length+3
 
   let add_color t col = 
     alloc t 4;
     let c = Color.rgb col in
-    t.data.{t.length+0} <- c.Color.RGB.r;
-    t.data.{t.length+1} <- c.Color.RGB.g;
-    t.data.{t.length+2} <- c.Color.RGB.b;
-    t.data.{t.length+3} <- c.Color.RGB.a;
+    Bigarray.Array1.unsafe_set t.data (t.length+0) c.Color.RGB.r;
+    Bigarray.Array1.unsafe_set t.data (t.length+1) c.Color.RGB.g;
+    Bigarray.Array1.unsafe_set t.data (t.length+2) c.Color.RGB.b;
+    Bigarray.Array1.unsafe_set t.data (t.length+3) c.Color.RGB.a;
     t.length <- t.length+4
 
   let add_2f t v = 
     alloc t 2;
-    t.data.{t.length+0} <- v.OgamlMath.Vector2f.x;
-    t.data.{t.length+1} <- v.OgamlMath.Vector2f.y;
+    Bigarray.Array1.unsafe_set t.data (t.length+0) v.OgamlMath.Vector2f.x;
+    Bigarray.Array1.unsafe_set t.data (t.length+1) v.OgamlMath.Vector2f.y;
     t.length <- t.length+2
 
   let add_2i t v = 
     alloc t 2;
-    t.data.{t.length+0} <- Int32.of_int v.OgamlMath.Vector2i.x;
-    t.data.{t.length+1} <- Int32.of_int v.OgamlMath.Vector2i.y;
+    Bigarray.Array1.unsafe_set t.data (t.length+0) (Int32.of_int v.OgamlMath.Vector2i.x);
+    Bigarray.Array1.unsafe_set t.data (t.length+1) (Int32.of_int v.OgamlMath.Vector2i.y);
     t.length <- t.length+2
 
   let add_int32 t i =
     alloc t 1;
-    t.data.{t.length} <- i;
+    Bigarray.Array1.unsafe_set t.data (t.length) i;
     t.length <- t.length+1
 
   let add_float t f = 
     alloc t 1;
-    t.data.{t.length} <- f;
+    Bigarray.Array1.unsafe_set t.data (t.length) f;
     t.length <- t.length+1
 
   let add_int t i = 
