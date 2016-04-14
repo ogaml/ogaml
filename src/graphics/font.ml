@@ -90,11 +90,11 @@ module Shelf = struct
                 height = h})
     end
 
-  let texture s =
+  let texture state s =
     let global = Image.create (`Empty (s.width, s.height + s.row_height + 1, `RGB Color.RGB.transparent)) in
     Image.blit s.full global Vector2i.zero;
     Image.blit s.row global Vector2i.({x = 0; y = s.height + 1});
-    Texture.Texture2D.create (`Image global)
+    Texture.Texture2D.create state (`Image global)
 
 end
 
@@ -137,7 +137,7 @@ type page = {
   mutable glyph   : Glyph.t IntMap.t;
   mutable glyph_b : Glyph.t IntMap.t;
   mutable kerning : float IIMap.t;
-  mutable texture : Texture.Texture2D.t;
+  mutable texture : Texture.Texture2D.t option;
   mutable modified: bool;
   shelf   : Shelf.t;
   scale   : float;
@@ -168,9 +168,7 @@ let load_size (t : t) s =
       glyph    = IntMap.empty;
       glyph_b  = IntMap.empty;
       kerning  = IIMap.empty;
-      texture  = Texture.Texture2D.create (`Image
-                    (Image.create (`Empty (0,0,`RGB Color.RGB.transparent)))
-                  );
+      texture  = None;
       modified = false;
       shelf    = Shelf.create 1024;
       spacing  = scale_int linegap scale;
@@ -228,11 +226,7 @@ let code_to_int = function
   |`Char c -> Char.code c
   |`Code i -> i
 
-let oversampling_of_size s = 
-  if s < 20 then 4 
-  else if s < 42 then 3
-  else if s < 72 then 2
-  else 1
+let oversampling_of_size s = min 4 ((80 + s - 1)/s)
 
 (** Exposed functions *)
 let load s =
@@ -284,12 +278,14 @@ let spacing t i =
   (ascent t i) -. (descent t i) +. (linegap t i)
 
 
-let texture t s =
+let texture state t s =
   let page = get_size t s in
-  if page.modified then begin
-    page.texture <- Shelf.texture page.shelf;
+  if page.modified || page.texture = None then begin
+    page.texture <- Some (Shelf.texture state page.shelf);
     page.modified <- false
   end;
-  page.texture
+  match page.texture with
+  | None -> assert false
+  | Some t -> t
 
 

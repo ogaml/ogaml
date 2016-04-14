@@ -11,6 +11,8 @@ let settings =
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Noise Example" ()
 
+let state = Window.state window
+
 let img = 
   Image.create (`Empty (800, 600, `RGB Color.RGB.white))
 
@@ -38,7 +40,7 @@ let () =
   Printf.printf "Noise min : %f, noise max : %f\n%!" !mini !maxi
 
 let tex = 
-  Texture.Texture2D.create (`Image img)
+  Texture.Texture2D.create state (`Image img)
 
 let draw = 
   let sprite = Sprite.create ~texture:tex () in

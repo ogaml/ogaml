@@ -10,8 +10,9 @@ type t = {
   mutable culling_mode  : DrawParameter.CullingMode.t;
   mutable polygon_mode  : DrawParameter.PolygonMode.t;
   mutable depth_test    : bool;
+  mutable texture_id : int;
   mutable texture_unit  : int;
-  mutable bound_texture : (GL.Texture.t * GLTypes.TextureTarget.t) option array;
+  mutable bound_texture : (int * GLTypes.TextureTarget.t) option array;
   mutable linked_program : GL.Program.t option;
   mutable bound_vbo : GL.VBO.t option;
   mutable bound_vao : GL.VAO.t option;
@@ -70,6 +71,7 @@ module LL = struct
       culling_mode = DrawParameter.CullingMode.CullNone;
       polygon_mode = DrawParameter.PolygonMode.DrawFill;
       depth_test   = false;
+      texture_id   = 0;
       texture_unit = 0;
       bound_texture = Array.make textures None;
       linked_program = None;
@@ -117,6 +119,10 @@ module LL = struct
 
   let set_texture_unit s i = 
     s.texture_unit <- i
+
+  let texture_id s = 
+    s.texture_id <- s.texture_id + 1;
+    s.texture_id - 1
 
   let bound_texture s i = 
     if i >= s.textures || i < 0 then

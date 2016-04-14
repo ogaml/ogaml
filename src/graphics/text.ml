@@ -217,7 +217,7 @@ module Fx = struct
                                       ~blend_mode:DrawParameter.BlendMode.alpha ())
            ~text ~window () =
     let program = Window.LL.text_program window in
-    let texture = Font.texture text.font text.size in
+    let texture = Font.texture (Window.state window) text.font text.size in
     let size = Vector2f.from_int (Window.size window) in
     let tsize = Vector2f.from_int (Texture.Texture2D.size texture) in
     let uniform =
@@ -365,7 +365,7 @@ let draw ?parameters:(parameters = DrawParameter.make
                                     ~blend_mode:DrawParameter.BlendMode.alpha ())
          ~text ~window () =
   let program = Window.LL.text_program window in
-  let texture = Font.texture text.font text.size in
+  let texture = Font.texture (Window.state window) text.font text.size in
   let size = Vector2f.from_int (Window.size window) in
   let tsize = Vector2f.from_int (Texture.Texture2D.size texture) in
   let uniform =

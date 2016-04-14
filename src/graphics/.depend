@@ -65,9 +65,9 @@ texture.cmo : state.cmi ../math/ogamlMath.cmi image.cmi GLTypes.cmi GL.cmi \
 texture.cmx : state.cmx ../math/ogamlMath.cmi image.cmx GLTypes.cmi GL.cmx \
     texture.cmi
 uniform.cmo : texture.cmi state.cmi program.cmi ../math/ogamlMath.cmi \
-    GLTypes.cmi GL.cmi font.cmi color.cmi uniform.cmi
+    GLTypes.cmi GL.cmi color.cmi uniform.cmi
 uniform.cmx : texture.cmx state.cmx program.cmx ../math/ogamlMath.cmi \
-    GLTypes.cmi GL.cmx font.cmx color.cmx uniform.cmi
+    GLTypes.cmi GL.cmx color.cmx uniform.cmi
 vertexArray.cmo : window.cmi ../math/vector3f.cmi ../math/vector2f.cmi \
     uniform.cmi state.cmi program.cmi ../math/ogamlMath.cmi indexArray.cmi \
     GLTypes.cmi GL.cmi drawParameter.cmi drawMode.cmi color.cmi \
@@ -98,7 +98,7 @@ GLTypes.cmi :
 color.cmi :
 drawMode.cmi :
 drawParameter.cmi : ../math/ogamlMath.cmi
-font.cmi : texture.cmi ../math/ogamlMath.cmi
+font.cmi : texture.cmi state.cmi ../math/ogamlMath.cmi
 image.cmi : ../math/ogamlMath.cmi color.cmi
 indexArray.cmi : state.cmi
 keyboard.cmi : ../core/ogamlCore.cmi
@@ -119,7 +119,7 @@ text.cmi : window.cmi vertexMap.cmi vertexArray.cmi ../math/ogamlMath.cmi \
     font.cmi drawParameter.cmi color.cmi
 texture.cmi : state.cmi ../math/ogamlMath.cmi image.cmi
 uniform.cmi : texture.cmi state.cmi program.cmi ../math/ogamlMath.cmi \
-    font.cmi color.cmi
+    color.cmi
 vertexArray.cmi : window.cmi uniform.cmi program.cmi ../math/ogamlMath.cmi \
     indexArray.cmi drawParameter.cmi drawMode.cmi color.cmi
 vertexMap.cmi : window.cmi vertexArray.cmi uniform.cmi program.cmi \

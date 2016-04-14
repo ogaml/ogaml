@@ -373,7 +373,7 @@ module Texture : sig
     type t
 
     (** Creates a texture from a source (a file or an image) *)
-    val create : [< `File of string | `Image of Image.t ] -> t
+    val create : State.t -> [< `File of string | `Image of Image.t ] -> t
 
     (** Returns the size of a texture *)
     val size : t -> OgamlMath.Vector2i.t
@@ -425,7 +425,7 @@ module Font : sig
   (** Loads a font from a file *)
   val load : string -> t
 
-  (** $glyph font code size bold$ returns the glyph
+  (** $glyph state font code size bold$ returns the glyph
     * representing the character $code$ in $font$
     * of size $size$ and with the modifier $bold$ *)
   val glyph : t -> code -> int -> bool -> Glyph.t
@@ -452,7 +452,7 @@ module Font : sig
   val spacing : t -> int -> float
 
   (** Returns the texture associated to a given font size *)
-  val texture : t -> int -> Texture.Texture2D.t
+  val texture : State.t -> t -> int -> Texture.Texture2D.t
 
 end
 
@@ -561,17 +561,6 @@ module Uniform : sig
     * @see:OgamlGraphics.Texture.Texture2D *)
   val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
 
-  (** $font name ~tex_unit font size set$ adds a sampler2D storing
-    * the texture of [font] for the character size [size] to the
-    * uniform set [set].
-    *
-    * The optional parameter $tex_unit$ corresponds to the texture
-    * unit that is used to bind this texture and defaults to $1$.
-    * See $State.max_textures$ for the number of available units.
-    *
-    * @see:OgamlGraphics.Font *)
-  val font : string -> ?tex_unit:int -> Font.t -> int -> t -> t
-
 end
 
 
@@ -654,6 +643,10 @@ module Window : sig
     ?title:string ->
     ?settings:OgamlCore.ContextSettings.t -> unit -> t
 
+  (** Returns the internal GL state of the window
+    * @see:OgamlGraphics.State *)
+  val state : t -> State.t
+
   (** Changes the title of the window. *)
   val set_title : t -> string -> unit
 
@@ -698,10 +691,6 @@ module Window : sig
 
   (** Clears the window *)
   val clear : ?color:Color.t -> t -> unit
-
-  (** Returns the internal GL state of the window
-    * @see:OgamlGraphics.State *)
-  val state : t -> State.t
 
 end
 

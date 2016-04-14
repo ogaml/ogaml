@@ -6,9 +6,11 @@ let settings = OgamlCore.ContextSettings.create ()
 let window =
   Window.create ~width:900 ~height:600 ~settings ~title:"Sprite Example" ()
 
-let texture = Texture.Texture2D.create (`File "examples/mario-block.bmp")
+let context = Window.state window
 
-let texture_png = Texture.Texture2D.create (`File "examples/test.png")
+let texture = Texture.Texture2D.create context (`File "examples/mario-block.bmp")
+
+let texture_png = Texture.Texture2D.create context (`File "examples/test.png")
 
 let sprite = Sprite.create ~texture ~size:(Vector2f.({x = 50.; y = 50.})) ~origin:(Vector2f.({x=25.;y=25.})) ()
 

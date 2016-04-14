@@ -2,9 +2,9 @@
 
 module Texture2D = struct
 
-
   type t = {
     internal  : GL.Texture.t;
+    id        : int;
     width     : int;
     height    : int;
   }
@@ -12,6 +12,7 @@ module Texture2D = struct
   module LL = struct
 
     let set_unit st uid = 
+      Printf.printf "Binding unit %i\n%!" uid;
       let bound_unit = State.LL.texture_unit st in
       if bound_unit <> uid then begin
         State.LL.set_texture_unit st uid;
@@ -19,7 +20,6 @@ module Texture2D = struct
       end
 
     let bind st uid tex = 
-      set_unit st uid;
       let bound_tex = 
         State.LL.bound_texture st uid
       in
@@ -29,6 +29,7 @@ module Texture2D = struct
       match tex with
       |None when bound_tex <> None 
               && bound_target = Some GLTypes.TextureTarget.Texture2D -> begin
+        set_unit st uid;
         State.LL.set_bound_texture
           st uid
           None;
@@ -36,9 +37,10 @@ module Texture2D = struct
           GLTypes.TextureTarget.Texture2D
           None
       end
-      |Some(t) when bound_tex <> Some t.internal -> begin
+      |Some(t) when bound_tex <> Some t.id -> begin
+        set_unit st uid;
         State.LL.set_bound_texture st uid
-          (Some (t.internal, GLTypes.TextureTarget.Texture2D));
+          (Some (t.id, GLTypes.TextureTarget.Texture2D));
         GL.Texture.bind 
           GLTypes.TextureTarget.Texture2D
           (Some t.internal)
@@ -48,7 +50,7 @@ module Texture2D = struct
   end
 
 
-  let create src = 
+  let create state src = 
     (* Extract the texture parameters *)
     let width, height, data = 
       match src with
@@ -62,9 +64,9 @@ module Texture2D = struct
     in
     (* Create the internal texture *)
     let internal = GL.Texture.create () in
-    let tex = {internal; width; height} in
+    let tex = {internal; id = State.LL.texture_id state; width; height} in
     (* Bind the texture *)
-    GL.Texture.bind GLTypes.TextureTarget.Texture2D (Some internal);
+    LL.bind state 0 (Some tex);
     (* Load the corresponding image *)
     GL.Texture.image
       GLTypes.TextureTarget.Texture2D
@@ -78,7 +80,6 @@ module Texture2D = struct
     GL.Texture.parameter2D
       (`Minify  GLTypes.MinifyFilter.Linear);
     (* Unbind and return the texture *)
-    GL.Texture.bind GLTypes.TextureTarget.Texture2D None;
     tex
 
 

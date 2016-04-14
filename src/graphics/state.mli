@@ -73,11 +73,14 @@ module LL : sig
   (** Returns the currently active texture unit *)
   val texture_unit : t -> int
 
-  (** Sets the currently bound texture to a texture unit and a target *)
-  val set_bound_texture : t -> int -> (GL.Texture.t * GLTypes.TextureTarget.t) option -> unit
+  (** Returns a new fresh texture id *)
+  val texture_id : t -> int
 
-  (** Returns the texture currently bound to a texture unit *)
-  val bound_texture : t -> int -> GL.Texture.t option
+  (** Sets the currently bound texture ID to a texture unit and a target *)
+  val set_bound_texture : t -> int -> (int * GLTypes.TextureTarget.t) option -> unit
+
+  (** Returns the texture ID currently bound to a texture unit *)
+  val bound_texture : t -> int -> int option
 
   (** Returns the target currently bound to a texture unit *)
   val bound_target : t -> int -> GLTypes.TextureTarget.t option

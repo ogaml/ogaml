@@ -98,7 +98,8 @@ let rgb_to_hsv color =
   let cmin = min (min color.r color.g) color.b in
   let d = cmax -. cmin in
   let h = 
-    if cmax = color.r then rad60 *. (mod_float ((color.g -. color.b) /. d) 6.)
+    if cmax = cmin then 0.
+    else if cmax = color.r then rad60 *. (mod_float ((color.g -. color.b) /. d) 6.)
     else if cmax = color.g then rad60 *. ((color.b -. color.r) /. d +. 2.)
     else rad60 *. ((color.r -. color.g) /. d +. 4.)
   in

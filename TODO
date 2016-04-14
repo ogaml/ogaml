@@ -27,13 +27,18 @@ Interface changes:
     ☐ Factorize two modules
     ☐ Constraint rectangle
     ☐ Transformations ? (rotation/scale/etc...)
+    ☐ Optional parameters
+    ☐ Scale parameter
+    ☐ Fix upside down texture ?!?
     Fx module for text with advanced features:
       ☐ Filtered transformations
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
+  Uniform:
+    ✘ Optional vec2 font_size parameter for uniform font -- font uniform was a bad idea @cancelled(2016-04-14 11:49) @project(Interface changes / Uniform)
+    
 
 Bugs:
-  ☐ Use a custom ID system for textures as checking the equality of two textures
-    in State can be wrong (if an ID gets recycled)
+  ✔ Use a custom ID system for textures as checking the equality of two textures in State can be wrong (if an ID gets recycled) @done(2016-04-14 12:00) @project(Bugs)
 
 Before merge:
   ☐ Remove debug type and functions in VertexArray and Sprite
