@@ -35,6 +35,9 @@ Interface changes:
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
   Uniform:
     ✘ Optional vec2 font_size parameter for uniform font -- font uniform was a bad idea @cancelled(2016-04-14 11:49) @project(Interface changes / Uniform)
+  Sprite & Text:
+    ☐ Local relative-space conversion (rather than uniforms)
+    ☐ Same for texture coordinates for fonts
     
 
 Bugs:
