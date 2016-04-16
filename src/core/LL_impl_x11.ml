@@ -221,7 +221,11 @@ module Window = struct
                 KeyEvent.control = modif.X11.Event.ctrl;
                 KeyEvent.alt = modif.X11.Event.alt
             })
-        | X11.Event.ButtonPress   (but,pos,modif) ->
+        | X11.Event.ButtonPress   (but,_,_) when but = 4 ->
+            Some Event.(MouseWheelMoved 1.0)
+        | X11.Event.ButtonPress   (but,_,_) when but = 5 ->
+            Some Event.(MouseWheelMoved (-1.0))
+        | X11.Event.ButtonPress   (but,pos,modif) when but <> 4 && but <> 5 ->
             Some Event.(ButtonPressed {
                 ButtonEvent.button = value_to_button but;
                 ButtonEvent.position = 
@@ -231,7 +235,7 @@ module Window = struct
                 ButtonEvent.control = modif.X11.Event.ctrl;
                 ButtonEvent.alt = modif.X11.Event.alt
             })
-        | X11.Event.ButtonRelease (but,pos,modif) ->
+        | X11.Event.ButtonRelease (but,pos,modif) when but <> 4 && but <> 5 ->
           Some Event.(ButtonReleased {
                 ButtonEvent.button = value_to_button but;
                 ButtonEvent.position = 
