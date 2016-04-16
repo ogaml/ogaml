@@ -140,15 +140,16 @@ module Event : sig
 
   (** A variant type describing the possible events 
     * @see:OgamlCore.Event.KeyEvent
-    * @see:OgamlCore.Event.ButtonEvent @see:OgamlCore.Event.MouseEvent *)
+    * @see:OgamlCore.Event.ButtonEvent *)
   type t =
     | Closed (* The window sending the event has been closed *)
-    | Resized        of OgamlMath.Vector2i.t (* The window has been resized by the user *)
-    | KeyPressed     of KeyEvent.t  (* A key has been pressed *)
-    | KeyReleased    of KeyEvent.t  (* A key has been released *)
-    | ButtonPressed  of ButtonEvent.t (* A mouse button has been pressed *)
-    | ButtonReleased of ButtonEvent.t (* A mouse button has been released *)
-    | MouseMoved     of OgamlMath.Vector2i.t (* The mouse has been moved *)
+    | Resized         of OgamlMath.Vector2i.t (* The window has been resized by the user *)
+    | KeyPressed      of KeyEvent.t  (* A key has been pressed *)
+    | KeyReleased     of KeyEvent.t  (* A key has been released *)
+    | ButtonPressed   of ButtonEvent.t (* A mouse button has been pressed *)
+    | ButtonReleased  of ButtonEvent.t (* A mouse button has been released *)
+    | MouseMoved      of OgamlMath.Vector2i.t (* The mouse has been moved *)
+    | MouseWheelMoved of int (* The mouse wheel has been moved of $delta$ *)
 
 end
 

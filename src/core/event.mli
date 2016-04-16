@@ -12,9 +12,10 @@ end
 
 type t =
   | Closed
-  | Resized        of OgamlMath.Vector2i.t
-  | KeyPressed     of KeyEvent.t
-  | KeyReleased    of KeyEvent.t
-  | ButtonPressed  of ButtonEvent.t
-  | ButtonReleased of ButtonEvent.t
-  | MouseMoved     of OgamlMath.Vector2i.t
+  | Resized         of OgamlMath.Vector2i.t
+  | KeyPressed      of KeyEvent.t
+  | KeyReleased     of KeyEvent.t
+  | ButtonPressed   of ButtonEvent.t
+  | ButtonReleased  of ButtonEvent.t
+  | MouseMoved      of OgamlMath.Vector2i.t
+  | MouseWheelMoved of int
