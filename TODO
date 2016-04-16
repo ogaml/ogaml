@@ -38,6 +38,8 @@ Interface changes:
   Sprite & Text:
     ☐ Local relative-space conversion (rather than uniforms)
     ☐ Same for texture coordinates for fonts
+  Textures:
+    ☐ Check for texture max size at creation
     
 
 Bugs:

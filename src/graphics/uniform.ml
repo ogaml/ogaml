@@ -89,6 +89,10 @@ module LL = struct
         Color.RGB.(
           GL.Uniform.float4 location c.r c.g c.b c.a
         )
+    | Float    f, GLTypes.GlslType.Float    ->
+        GL.Uniform.float1 location f
+    | Int      i, GLTypes.GlslType.Int      ->
+        GL.Uniform.int1 location i
     | Texture2D (u,t), GLTypes.GlslType.Sampler2D ->
         Texture.Texture2D.LL.bind state u (Some t);
         GL.Uniform.int1 location (State.LL.texture_unit state)
