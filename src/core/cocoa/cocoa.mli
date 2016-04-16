@@ -152,6 +152,7 @@ module OGEvent : sig
     | KeyUp       of key_info
     | KeyDown     of key_info
     | ResizedWindow
+    | ScrollWheel of float
 
   val get_content : t -> content
 

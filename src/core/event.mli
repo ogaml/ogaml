@@ -18,4 +18,4 @@ type t =
   | ButtonPressed   of ButtonEvent.t
   | ButtonReleased  of ButtonEvent.t
   | MouseMoved      of OgamlMath.Vector2i.t
-  | MouseWheelMoved of int
+  | MouseWheelMoved of float

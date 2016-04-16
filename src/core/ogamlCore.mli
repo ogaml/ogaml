@@ -138,7 +138,7 @@ module Event : sig
 
   end
 
-  (** A variant type describing the possible events 
+  (** A variant type describing the possible events
     * @see:OgamlCore.Event.KeyEvent
     * @see:OgamlCore.Event.ButtonEvent *)
   type t =
@@ -149,7 +149,7 @@ module Event : sig
     | ButtonPressed   of ButtonEvent.t (* A mouse button has been pressed *)
     | ButtonReleased  of ButtonEvent.t (* A mouse button has been released *)
     | MouseMoved      of OgamlMath.Vector2i.t (* The mouse has been moved *)
-    | MouseWheelMoved of int (* The mouse wheel has been moved of $delta$ *)
+    | MouseWheelMoved of float (* The mouse wheel has been moved of $delta$ *)
 
 end
 

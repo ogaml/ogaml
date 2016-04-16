@@ -257,7 +257,15 @@ caml_cocoa_event_pressed_mouse_buttons(value unit)
     .characters    = characters,
     .modifierFlags = modifierFlags
   };
- m_content.keyInformation = info;
+  m_content.keyInformation = info;
+
+  return self;
+}
+
+- (instancetype)initWithScrollingDeltaY:(CGFloat)deltaY
+{
+  m_type = OGScrollWheel;
+  m_content.scrollingDeltaY = deltaY;
 
   return self;
 }
@@ -325,6 +333,11 @@ caml_ogevent_get_content(value mlogevent)
 
     case OGResizedWindowEvent:
       result = Val_int(1);
+      break;
+
+    case OGScrollWheel:
+      result = caml_alloc(1,3); // 4th variant
+      Store_field(result, 0, caml_copy_double([ogevent content].scrollingDeltaY));
       break;
   };
 

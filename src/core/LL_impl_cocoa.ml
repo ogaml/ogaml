@@ -224,6 +224,12 @@ module Window = struct
       key = keycode ; shift = shift ; control = control ; alt = alt
     })
 
+  let mk_wheel deltaY =
+    (* let open Cocoa in
+    let (x,y,w,h) = NSRect.get (OGWindowController.frame win) in
+    let (w,h) = float_of_int w, float_of_int h in *)
+    deltaY
+
   let make_mouse_event button event win =
     let (x,y) = Cocoa.OGWindowController.proper_relative_mouse_location win in
     let modifiers = Cocoa.NSEvent.modifier_flags () in
@@ -280,6 +286,7 @@ module Window = struct
           | OGEvent.KeyUp   inf   -> Some (Event.KeyPressed  (mk_key_event inf))
           | OGEvent.KeyDown inf   -> Some (Event.KeyReleased (mk_key_event inf))
           | OGEvent.ResizedWindow -> Some (Event.Resized (size win))
+          | OGEvent.ScrollWheel f -> Some (Event.MouseWheelMoved (mk_wheel f))
         )
     | None -> None
 

@@ -21,7 +21,8 @@ typedef enum
   OGCloseWindowEvent,
   OGKeyDown,
   OGKeyUp,
-  OGResizedWindowEvent
+  OGResizedWindowEvent,
+  OGScrollWheel
 } OGEventType;
 
 typedef struct
@@ -35,6 +36,7 @@ typedef union
 {
   NSEvent*  nsevent;
   OGKeyInfo keyInformation;
+  CGFloat   scrollingDeltaY;
 } OGEventContent;
 
 @interface OGEvent : NSObject
@@ -56,6 +58,8 @@ typedef union
 - (instancetype)initWithKeyDown:(unsigned short)keyCode
                      characters:(NSString *)characters
                   modifierFlags:(NSEventModifierFlags)modifierFlags;
+
+- (instancetype)initWithScrollingDeltaY:(CGFloat)deltaY;
 
 - (OGEventType)type;
 

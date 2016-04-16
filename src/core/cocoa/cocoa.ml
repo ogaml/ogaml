@@ -153,6 +153,7 @@ module OGEvent = struct
     | KeyUp       of key_info
     | KeyDown     of key_info
     | ResizedWindow
+    | ScrollWheel of float
 
   external get_content : t -> content = "caml_ogevent_get_content"
 
