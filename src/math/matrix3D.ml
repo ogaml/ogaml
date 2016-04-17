@@ -153,10 +153,36 @@ let look_at ~from ~at ~up =
   set 2 0 m (-. dir.x);
   set 2 1 m (-. dir.y);
   set 2 2 m (-. dir.z);
-  set 0 3 m (dot from right);
-  set 1 3 m (dot from up );
+  set 0 3 m (-. dot from right);
+  set 1 3 m (-. dot from up);
   set 2 3 m (dot from dir);
   m
+
+let ilook_at ~from ~at ~up = 
+  let mat_prod = product in
+  let open Vector3f in
+  let dir = direction from at in
+  let up = 
+    try normalize up 
+    with Vector3f_exception _ -> raise (Matrix3D_exception "Cannot get look_at matrix : zero up direction")
+  in
+  let right = 
+    try normalize (cross dir up) 
+    with Vector3f_exception _ -> raise (Matrix3D_exception "Cannot get look_at matrix : from = at")
+  in
+  let up = cross right dir in
+  let trl = translation from in
+  let rot = identity () in
+  set 0 0 rot (right.x);
+  set 1 0 rot (right.y);
+  set 2 0 rot (right.z);
+  set 0 1 rot (up.x);
+  set 1 1 rot (up.y);
+  set 2 1 rot (up.z);
+  set 0 2 rot (-. dir.x);
+  set 1 2 rot (-. dir.y);
+  set 2 2 rot (-. dir.z);
+  mat_prod trl rot
 
 let look_at_eulerian ~from ~theta ~phi =
   translation (Vector3f.prop (-1.) from)
@@ -166,6 +192,13 @@ let look_at_eulerian ~from ~theta ~phi =
         (Quaternion.rotation Vector3f.unit_y theta)
         (Quaternion.rotation Vector3f.unit_x phi)
       ))
+
+let ilook_at_eulerian ~from ~theta ~phi =
+  from_quaternion
+    (Quaternion.times
+      (Quaternion.(inverse (rotation Vector3f.unit_x phi)))
+      (Quaternion.(inverse (rotation Vector3f.unit_y theta))))
+  |> product (translation from)
 
 let orthographic ~right ~left ~near ~far ~top ~bottom =
   let m = identity () in

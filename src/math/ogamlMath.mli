@@ -967,12 +967,22 @@ module Matrix3D : sig
     * @see:OgamlMath.Vector3f *)
   val look_at : from:Vector3f.t -> at:Vector3f.t -> up:Vector3f.t -> t
 
+  (** Builds the inverse of a "look-at" view matrix.
+    * Raises Matrix3D_exception if $up = zero$.
+    * @see:OgamlMath.Vector3f *)
+  val ilook_at : from:Vector3f.t -> at:Vector3f.t -> up:Vector3f.t -> t
+
   (** Builds a "look-at" view matrix from eulerian angles. 
     * Theta should be in [0;2pi] and phi in [-pi/2;pi/2]. 
     * If phi = pi/2, the camera is looking up (towards positive Y). 
     * If theta = 0, the camera is looking towards negative Z. 
     * @see:OgamlMath.Vector3f *)
   val look_at_eulerian : from:Vector3f.t -> theta:float -> phi:float -> t
+
+  (** Builds the inverse of a "look-at" view matrix from eulerian angles. 
+    * Theta should be in [0;2pi] and phi in [-pi/2;pi/2]. 
+    * @see:OgamlMath.Vector3f *)
+  val ilook_at_eulerian : from:Vector3f.t -> theta:float -> phi:float -> t
 
   (** Builds an orthographic projection matrix englobing a volume defined by six planes. 
     * Raises Matrix3D_exception if $right = left$ or $near = far$ or $top = bottom$ *)
