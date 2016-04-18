@@ -188,7 +188,7 @@ CAMLprim value
 caml_xshow_cursor(value disp, value win, value bl)
 {
   CAMLparam3(disp, win, bl);
-  if(Bool_val(bl)) {
+  if(!Bool_val(bl)) {
     Pixmap bm_no;
     Colormap cmap;
     Cursor no_ptr;
@@ -208,6 +208,7 @@ caml_xshow_cursor(value disp, value win, value bl)
   } else {
     XUndefineCursor((Display*) disp, (Window) win);
   }
+  CAMLreturn(Val_unit);
 }
  
 
