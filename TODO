@@ -13,6 +13,7 @@ Cocoa specific:
   ☐ Discuss the possibility to dissociate mouse and cursor to get delta events @source(https://developer.apple.com/library/mac/documentation/GraphicsImaging/Reference/Quartz_Services_Ref/#//apple_ref/c/func/CGAssociateMouseAndMouseCursorPosition)
   ☐ Differentiate between Middle and Other for mouse
   ☐ Window doesn't resign being key on mission control
+  ☐ Implement LL.show_cursor
 
 Interface changes:
   Window:

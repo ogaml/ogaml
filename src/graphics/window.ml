@@ -52,6 +52,8 @@ let clear ?color:(color=`RGB Color.RGB.black) win =
   let stencil = ContextSettings.stencil_bits win.settings > 0 in
   GL.Pervasives.clear true depth stencil
 
+let show_cursor win b = LL.Window.show_cursor win.internal b
+
 let state win = win.state
 
 

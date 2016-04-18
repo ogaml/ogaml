@@ -78,9 +78,10 @@ let create ~texture
   let sizei = Texture.Texture2D.size texture in
   let base_size = Vector2f.from_int sizei in
   let size = 
-    match size with
-    | None   -> base_size
-    | Some s -> s
+    match size, subrect with
+    | None  , None   -> base_size
+    | None  , Some r -> Vector2f.from_int (IntRect.abs_size r)
+    | Some s, _      -> s
   in
   let subrect = 
     match subrect with

@@ -256,6 +256,9 @@ module LL : sig
     (** Displays the window after all the GL calls *)
     val display : t -> unit
 
+    (** Show/hide the cursor *)
+    val show_cursor : t -> bool -> unit
+
   end
 
 

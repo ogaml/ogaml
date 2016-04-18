@@ -140,7 +140,7 @@ let look_at ~from ~at ~up =
   in
   let right = 
     try normalize (cross dir up) 
-    with Vector3f_exception _ -> raise (Matrix3D_exception "Cannot get look_at matrix : from = at")
+    with Vector3f_exception _ -> raise (Matrix3D_exception "Cannot get look_at matrix : up and (at - from) are parallel or zero")
   in
   let up = cross right dir in
   let m = identity () in
@@ -168,7 +168,7 @@ let ilook_at ~from ~at ~up =
   in
   let right = 
     try normalize (cross dir up) 
-    with Vector3f_exception _ -> raise (Matrix3D_exception "Cannot get look_at matrix : from = at")
+    with Vector3f_exception _ -> raise (Matrix3D_exception "Cannot get look_at matrix : up and (at - from) are parallel or zero")
   in
   let up = cross right dir in
   let trl = translation from in

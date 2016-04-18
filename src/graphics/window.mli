@@ -50,6 +50,9 @@ val clear : ?color:Color.t -> t -> unit
 (** Returns the internal GL state of the window *)
 val state : t -> State.t
 
+(** Show/hide the cursor *)
+val show_cursor : t -> bool -> unit
+
 
 module LL : sig
 

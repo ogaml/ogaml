@@ -180,3 +180,35 @@ caml_has_focus(value disp, value win)
   XGetInputFocus((Display*) disp, &result, &state);
   CAMLreturn(Val_bool(((Window)win) == result));
 }
+
+
+// INPUT   a display, a window, a boolean
+// OUTPUT  nothing, changes the visibility of the cursor
+CAMLprim value
+caml_xshow_cursor(value disp, value win, value bl)
+{
+  CAMLparam3(disp, win, bl);
+  if(Bool_val(bl)) {
+    Pixmap bm_no;
+    Colormap cmap;
+    Cursor no_ptr;
+    XColor black, dummy;
+    static char bm_no_data[] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+    cmap = DefaultColormap((Display*) disp, DefaultScreen((Display*) disp));
+    XAllocNamedColor((Display*) disp, cmap, "black", &black, &dummy);
+    bm_no = XCreateBitmapFromData((Display*) disp, (Window) win, bm_no_data, 8, 8);
+    no_ptr = XCreatePixmapCursor((Display*) disp, bm_no, bm_no, &black, &black, 0, 0);
+
+    XDefineCursor((Display*) disp, (Window) win, no_ptr);
+    XFreeCursor((Display*) disp, no_ptr);
+    if (bm_no != None)
+            XFreePixmap((Display*) disp, bm_no);
+    XFreeColors((Display*) disp, cmap, &black.pixel, 1, 0);
+  } else {
+    XUndefineCursor((Display*) disp, (Window) win);
+  }
+}
+ 
+
+

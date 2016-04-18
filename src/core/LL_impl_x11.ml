@@ -7,7 +7,8 @@ module Window = struct
     context : X11.GLContext.t;
     mutable closed : bool;
     mutable size : OgamlMath.Vector2i.t;
-    mutable position : OgamlMath.Vector2i.t
+    mutable position : OgamlMath.Vector2i.t;
+    mutable cursor_shown : bool
   }
 
   let create ~width ~height ~title ~settings =
@@ -62,7 +63,10 @@ module Window = struct
     X11.Window.set_title display window title;
     let (x,y) = X11.Window.position display window in
     let (width, height) = X11.Window.size display window in
-    {display; window; context; closed = false; position = OgamlMath.Vector2i.{x;y}; size = OgamlMath.Vector2i.({x = width; y = height})}
+    {display; window; context; closed = false; 
+     position = OgamlMath.Vector2i.{x;y}; 
+     size = OgamlMath.Vector2i.({x = width; y = height});
+     cursor_shown = true}
 
   let set_title win title =
     X11.Window.set_title win.display win.window title
@@ -268,6 +272,12 @@ module Window = struct
 
   let display win =
     X11.Window.swap win.display win.window
+
+  let show_cursor win b = 
+    if not (win.cursor_shown = b) then begin
+      win.cursor_shown <- b;
+      X11.Window.show_cursor win.display win.window b
+    end
 
 end
 

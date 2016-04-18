@@ -141,6 +141,8 @@ module Window = struct
 
   external title : Display.t -> t -> string = "caml_xwindow_get_title"
 
+  external show_cursor : Display.t -> t -> bool -> unit = "caml_xshow_cursor"
+
 
   (* Implementation of abstract functions *)
   let root_of ?screen display =

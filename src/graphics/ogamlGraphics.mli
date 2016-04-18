@@ -692,6 +692,9 @@ module Window : sig
   (** Clears the window *)
   val clear : ?color:Color.t -> t -> unit
 
+  (** Show or hide the cursor *)
+  val show_cursor : t -> bool -> unit
+
 end
 
 

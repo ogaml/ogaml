@@ -293,6 +293,8 @@ module Window = struct
   let display win =
     Cocoa.OGWindowController.flush_context win
 
+  let show_cursor win b = ()
+
 end
 
 
