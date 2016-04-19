@@ -28,6 +28,7 @@ Interface changes:
     ☐ Factorize two modules
     ☐ Constraint rectangle
     ☐ Transformations ? (rotation/scale/etc...)
+    ☐ Set position
     ☐ Optional parameters
     ☐ Scale parameter
     ☐ Fix upside down texture ?!?

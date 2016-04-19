@@ -80,10 +80,25 @@ module BlendMode : sig
 end
 
 
+module DepthTest : sig
+
+  type t = 
+    | None
+    | Never
+    | Less
+    | Greater
+    | Equal
+    | LEqual
+    | GEqual
+    | NEqual
+
+end
+
+
 (** Creates a set *)
 val make : ?culling:CullingMode.t -> 
            ?polygon:PolygonMode.t ->
-           ?depth_test:bool ->
+           ?depth_test:DepthTest.t ->
            ?blend_mode:BlendMode.t -> 
            ?viewport:Viewport.t ->
            ?antialiasing:bool ->
@@ -96,7 +111,7 @@ val culling : t -> CullingMode.t
 val polygon : t -> PolygonMode.t
 
 (** Returns the value of the depth test parameter *)
-val depth_test : t -> bool
+val depth_test : t -> DepthTest.t
 
 val blend_mode : t -> BlendMode.t
 

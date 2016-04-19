@@ -9,7 +9,8 @@ type t = {
   mutable msaa : bool;
   mutable culling_mode  : DrawParameter.CullingMode.t;
   mutable polygon_mode  : DrawParameter.PolygonMode.t;
-  mutable depth_test    : bool;
+  mutable depth_test : bool;
+  mutable depth_function : DrawParameter.DepthTest.t;
   mutable texture_id : int;
   mutable texture_unit  : int;
   mutable bound_texture : (int * GLTypes.TextureTarget.t) option array;
@@ -70,7 +71,8 @@ module LL = struct
       msaa = false;
       culling_mode = DrawParameter.CullingMode.CullNone;
       polygon_mode = DrawParameter.PolygonMode.DrawFill;
-      depth_test   = false;
+      depth_test = false;
+      depth_function = DrawParameter.DepthTest.Less;
       texture_id   = 0;
       texture_unit = 0;
       bound_texture = Array.make textures None;
@@ -95,6 +97,9 @@ module LL = struct
   let depth_test s = 
     s.depth_test
 
+  let depth_function s = 
+    s.depth_function
+
   let clear_color s = 
     s.color
 
@@ -106,6 +111,9 @@ module LL = struct
 
   let set_depth_test s v = 
     s.depth_test <- v
+
+  let set_depth_function s f = 
+    s.depth_function <- f
 
   let msaa s = s.msaa
 

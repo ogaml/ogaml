@@ -213,7 +213,7 @@ module Fx = struct
 
   let draw ?parameters:(parameters = DrawParameter.make
                                       ~antialiasing:false
-                                      ~depth_test:false
+                                      ~depth_test:DrawParameter.DepthTest.None
                                       ~blend_mode:DrawParameter.BlendMode.alpha ())
            ~text ~window () =
     let program = Window.LL.text_program window in
@@ -361,7 +361,7 @@ let create ~text ~position ~font ?color:(color=(`RGB Color.RGB.black)) ~size ~bo
 
 let draw ?parameters:(parameters = DrawParameter.make
                                     ~antialiasing:false
-                                    ~depth_test:false
+                                    ~depth_test:DrawParameter.DepthTest.None
                                     ~blend_mode:DrawParameter.BlendMode.alpha ())
          ~text ~window () =
   let program = Window.LL.text_program window in

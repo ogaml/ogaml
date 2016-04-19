@@ -85,10 +85,25 @@ module BlendMode = struct
 end
 
 
+module DepthTest = struct
+
+  type t = 
+    | None
+    | Never
+    | Less
+    | Greater
+    | Equal
+    | LEqual
+    | GEqual
+    | NEqual
+
+end
+
+
 type t = {
   culling : CullingMode.t;
   polygon : PolygonMode.t;
-  depth   : bool;
+  depth   : DepthTest.t;
   blend   : BlendMode.t;
   viewport: Viewport.t;
   aa      : bool
@@ -96,7 +111,7 @@ type t = {
 
 let make ?culling:(culling = CullingMode.CullNone)
          ?polygon:(polygon = PolygonMode.DrawFill) 
-         ?depth_test:(depth_test = true)
+         ?depth_test:(depth_test = DepthTest.Less)
          ?blend_mode:(blend_mode = BlendMode.default)
          ?viewport:(viewport = Viewport.Full)
          ?antialiasing:(antialiasing = true)

@@ -67,25 +67,42 @@ module LL = struct
 
   let text_program win = ProgramLibrary.atlas_drawing win.programs
 
-  let bind_draw_parameters win parameters =
-    let state = win.state in
+  let bind_culling_mode state parameters = 
     let cull_mode = DrawParameter.culling parameters in
     if State.LL.culling_mode state <> cull_mode then begin
       State.LL.set_culling_mode state cull_mode;
       GL.Pervasives.culling cull_mode
-    end;
+    end
+
+  let bind_polygon_mode state parameters = 
     let poly_mode = DrawParameter.polygon parameters in
     if State.LL.polygon_mode state <> poly_mode then begin
       State.LL.set_polygon_mode state poly_mode;
       GL.Pervasives.polygon poly_mode
-    end;
+    end
+
+  let bind_depth_testing state parameters =
     let depth_testing = DrawParameter.depth_test parameters in
-    if State.LL.depth_test state <> depth_testing then begin
-      State.LL.set_depth_test state depth_testing;
-      GL.Pervasives.depthtest depth_testing
-    end;
+    begin match depth_testing with 
+      | DrawParameter.DepthTest.None when State.LL.depth_test state ->
+        State.LL.set_depth_test state false;
+        GL.Pervasives.depthtest false
+      | DrawParameter.DepthTest.None -> ()
+      | depthfun -> begin
+        if State.LL.depth_test state = false then begin
+          State.LL.set_depth_test state true;
+          GL.Pervasives.depthtest true
+        end;
+        if State.LL.depth_function state <> depthfun then begin
+          State.LL.set_depth_function state depthfun;
+          GL.Pervasives.depthfunction depthfun
+        end;
+      end 
+    end
+
+  let bind_antialiasing state level parameters = 
     let antialiasing = DrawParameter.antialiasing parameters in
-    if ContextSettings.aa_level win.settings > 0
+    if level > 0
       && antialiasing
       && State.LL.msaa state = false
     then begin
@@ -97,11 +114,12 @@ module LL = struct
     then begin
       State.LL.set_msaa state false;
       GL.Pervasives.msaa false
-    end;
+    end
+
+  let bind_viewport state sizei parameters = 
     let viewport =
       DrawParameter.Viewport.(
         let open OgamlMath in
-        let sizei = size win in
         let sizef = Vector2f.from_int sizei in
         match DrawParameter.viewport parameters with
         |Full ->
@@ -121,7 +139,9 @@ module LL = struct
       let open OgamlMath.IntRect in
       State.LL.set_viewport state viewport;
       GL.Pervasives.viewport viewport.x viewport.y viewport.width viewport.height;
-    end;
+    end
+
+  let bind_blend_mode state parameters =
     let blend_mode = DrawParameter.blend_mode parameters in
     DrawParameter.BlendMode.(
       let blending = (blend_mode.alpha <> Equation.None) || (blend_mode.color <> Equation.None) in
@@ -160,5 +180,14 @@ module LL = struct
         GL.Blending.blend_equation_separate blend_color blend_alpha
       end
     )
+
+  let bind_draw_parameters win parameters =
+    let state = win.state in
+    bind_culling_mode state parameters;
+    bind_polygon_mode state parameters;
+    bind_depth_testing state parameters;
+    bind_antialiasing state (ContextSettings.aa_level win.settings) parameters;
+    bind_viewport state (size win) parameters;
+    bind_blend_mode state parameters
 
 end

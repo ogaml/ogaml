@@ -130,7 +130,6 @@ let draw () =
     ()
   in
   let parameters = DrawParameter.make
-                      ~depth_test:false
                       ~antialiasing:!aa
                       ~blend_mode:(DrawParameter.BlendMode.alpha)
                       ()

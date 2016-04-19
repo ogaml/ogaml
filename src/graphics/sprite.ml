@@ -140,7 +140,7 @@ let debug_t = {
 let tm = Unix.gettimeofday
 
 let draw ?parameters:(parameters = DrawParameter.make
-                                    ~depth_test:false 
+                                    ~depth_test:DrawParameter.DepthTest.None
                                     ~blend_mode:DrawParameter.BlendMode.alpha ())
          ~window ~sprite () =
   let program = Window.LL.sprite_program window in

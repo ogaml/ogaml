@@ -97,6 +97,9 @@ module Pervasives : sig
   (** Sets the current value of depth testing *)
   val depthtest : bool -> unit
 
+  (** Sets the current depth function *)
+  val depthfunction : DrawParameter.DepthTest.t -> unit
+
   (** Returns the current glsl version *)
   val glsl_version : unit -> string
 

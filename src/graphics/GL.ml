@@ -155,6 +155,8 @@ module Pervasives = struct
 
   external depthtest : bool -> unit = "caml_depth_test"
 
+  external depthfunction : DrawParameter.DepthTest.t -> unit = "caml_depth_fun"
+
   external glsl_version : unit -> string = "caml_glsl_version"
 
   external gl_version : unit -> string = "caml_gl_version"

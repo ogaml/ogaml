@@ -46,6 +46,9 @@ module LL : sig
   (** Returns if depth testing is currently activated or not *)
   val depth_test : t -> bool
 
+  (** Returns the current depth function *)
+  val depth_function : t -> DrawParameter.DepthTest.t
+
   (** Returns the clear color *)
   val clear_color : t -> Color.t
 
@@ -57,6 +60,9 @@ module LL : sig
 
   (** Sets the current value of depth testing *)
   val set_depth_test : t -> bool -> unit
+
+  (** Sets the current value of the depth function *)
+  val set_depth_function : t -> DrawParameter.DepthTest.t -> unit
 
   (** Get the current value of MSAA *)
   val msaa : t -> bool

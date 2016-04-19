@@ -55,6 +55,40 @@ GLenum Polygon_val(value mode)
 }
 
 
+GLenum Depthfun_val(value fun)
+{
+  switch(Int_val(fun))
+  {
+    case 0:
+      return GL_ALWAYS;
+
+    case 1:
+      return GL_NEVER;
+
+    case 2:
+      return GL_LESS;
+
+    case 3:
+      return GL_GREATER;
+
+    case 4:
+      return GL_EQUAL;
+
+    case 5:
+      return GL_LEQUAL;
+
+    case 6:
+      return GL_GEQUAL;
+
+    case 7:
+      return GL_NOTEQUAL;
+
+    default:
+      caml_failwith("Caml variant error in Depthfun_val(1)");
+  }
+}
+
+
 value Val_error(GLenum err)
 {
   switch(err)
@@ -179,6 +213,19 @@ caml_depth_test(value b)
     glEnable(GL_DEPTH_TEST);
   else
     glDisable(GL_DEPTH_TEST);
+
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   a depth function
+// OUTPUT  nothing, sets the current value of the depth function
+CAMLprim value
+caml_depth_fun(value f)
+{
+  CAMLparam1(f);
+
+  glDepthFunc(Depthfun_val(f));
 
   CAMLreturn(Val_unit);
 }

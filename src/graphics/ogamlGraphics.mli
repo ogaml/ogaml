@@ -251,13 +251,31 @@ module DrawParameter : sig
 
   end
 
+  (** Depth testing functions enumeration *)
+  module DepthTest : sig
+
+    (** This module consists of one enumeration of openGL depth functions *)
+
+    (** Depth testing functions *)
+    type t = 
+      | None (* No testing, test always passes *)
+      | Never (* Test never passes *)
+      | Less (* Test passes if the incoming value is less (object is closer) than the stored value. Default function *)
+      | Greater (* Test passes if the incoming value is greater *)
+      | Equal (* Test passes if the incoming value is equal *)
+      | LEqual (* Test passes if the incoming value is less than or equal *)
+      | GEqual (* Test passes if the incoming value is greater than or equal *)
+      | NEqual (* Test passes if the incoming value is different than the stored value *)
+
+  end
+
   (** Creates a set of draw parameters with the following options :
     *
     * $culling$ specifies which face should be culled (defaults to $CullNone$)
     *
     * $polygon$ specifies how to render polygons (defaults to $DrawFill$)
     *
-    * $depth_test$ specifies whether depth should be tested when rendering vertices (defaults to $true$)
+    * $depth_test$ specifies the depth function to be used when rendering vertices (defaults to $Less$)
     *
     * $blend_mode$ specifies the blending equation (defaults to $BlendingMode.default$)
     *
@@ -271,7 +289,7 @@ module DrawParameter : sig
     * @see:OgamlGraphics.DrawParameter.BlendMode *)
   val make : ?culling:CullingMode.t ->
              ?polygon:PolygonMode.t ->
-             ?depth_test:bool ->
+             ?depth_test:DepthTest.t ->
              ?blend_mode:BlendMode.t ->
              ?viewport:Viewport.t ->
              ?antialiasing:bool ->

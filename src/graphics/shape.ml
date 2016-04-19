@@ -331,7 +331,7 @@ let color shape = shape.shape_vals.color
 let border_color shape = shape.shape_vals.out_color
 
 let draw ?parameters:(parameters = DrawParameter.make
-                                    ~depth_test:false 
+                                    ~depth_test:DrawParameter.DepthTest.None
                                     ~blend_mode:DrawParameter.BlendMode.alpha ())
          ~window ~shape () =
   let program = Window.LL.program window in
