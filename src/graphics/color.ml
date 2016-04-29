@@ -91,6 +91,10 @@ end
 
 type t = [`HSV of HSV.t | `RGB of RGB.t]
 
+let alpha color = 
+  match color with
+  | `RGB rgb -> rgb.RGB.a
+  | `HSV hsv -> hsv.HSV.a
 
 let rgb_to_hsv color = 
   let open RGB in

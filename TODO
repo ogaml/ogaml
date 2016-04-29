@@ -16,11 +16,15 @@ Cocoa specific:
   ☐ Implement LL.show_cursor
 
 Interface changes:
+  Color:
+    ✔ Add Color.alpha @done(2016-04-29 15:19) @project(Interface changes / Color)
   Window:
     ☐ Coordinate conversions @note(WTF did I mean by that ?)
     ☐ Add open (dual of close)
   Interpolators:
     ☐ Add begin and end time
+  Font:
+    ☐ Switch to use texture2D array
   Text:
     ☐ Alinea parameter @unsure
     ☐ Text align
@@ -40,8 +44,14 @@ Interface changes:
   Sprite & Text:
     ☐ Local relative-space conversion (rather than uniforms)
     ☐ Same for texture coordinates for fonts
+    ☐ (+Shape) Centralize transformations
   Textures:
     ☐ Check for texture max size at creation
+  State:
+    ☐ Rename State in GLState
+    ☐ Add state to all functions that need it, even implicitly (ie. Program.create)
+  Parameters:
+    ☐ Add optional depth writing
     
 
 Bugs:
@@ -49,6 +59,7 @@ Bugs:
 
 Before merge:
   ☐ Remove debug type and functions in VertexArray and Sprite
+  ☐ Make a custom module to handle smaller VAOs faster
 
 New modules:
   Bounding module:
@@ -65,8 +76,8 @@ Advanced features:
   More Image and Texture types:
     ☐ Single-channeled images
     ☐ Texture3D
+    ☐ Texture2D array
     ☐ TextureCube
-  Batch drawing 2D:
   ☐ Render textures
 
 

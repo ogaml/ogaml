@@ -70,6 +70,8 @@ val hsv : t -> HSV.t
 
 val rgb : t -> RGB.t
 
+val alpha : t -> float
+
 val clamp : t -> t
 
 val map : t -> (float -> float) -> t

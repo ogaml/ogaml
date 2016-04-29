@@ -165,9 +165,8 @@ let test_vao8 () =
   let vao = VertexArray.dynamic vsource in
   try
     VertexArray.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ();
-    assert false
   with
-    VertexArray.Invalid_attribute _ -> ()
+    VertexArray.Invalid_attribute _ -> assert false
 
 let () =
   test_vao1 ();
@@ -185,4 +184,4 @@ let () =
   test_vao7 ();
   Printf.printf "\tTest 7 passed\n%!";
   test_vao8 ();
-  Printf.printf "\tTest 8 passed\n%!"
+  Printf.printf "\tTest 8 passed\n%!";

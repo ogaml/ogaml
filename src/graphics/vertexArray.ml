@@ -348,11 +348,9 @@ let bind state t prog =
           (offset   * 4)
           (t.stride * 4)
       );
-    if !attribs <> [] then
-      raise (Invalid_attribute
-        (Printf.sprintf "Attribute %s not required by program" 
-          (let (_,s,_) = List.hd !attribs in s)
-        ))
+    (*if !attribs <> [] then
+      Printf.eprintf "Warning : omitting attribute %s not required by program\n%!" 
+        (let (_,s,_) = List.hd !attribs in s)*)
   end
   else if State.LL.bound_vao state <> (Some t.vao) then begin
     GL.VAO.bind (Some t.vao);

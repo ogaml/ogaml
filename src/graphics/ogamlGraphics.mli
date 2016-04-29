@@ -117,6 +117,9 @@ module Color : sig
     * @see:OgamlGraphics.Color.RGB *)
   val rgb : t -> RGB.t
 
+  (** Returns the alpha value of a color *)
+  val alpha : t -> float
+
   (** Clamps a color w.r.t RGB.clamp and HSV.clamp *)
   val clamp : t -> t
 
