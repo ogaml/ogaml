@@ -334,7 +334,7 @@ let draw ?parameters:(parameters = DrawParameter.make
                                     ~depth_test:DrawParameter.DepthTest.None
                                     ~blend_mode:DrawParameter.BlendMode.alpha ())
          ~window ~shape () =
-  let program = Window.LL.program window in
+  let program = ProgramLibrary.shape_drawing (Window.LL.programs window) in
   let size = Window.size window in
   let uniform =
     Uniform.empty

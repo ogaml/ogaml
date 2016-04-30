@@ -59,13 +59,8 @@ module LL : sig
   (** Returns the internal window of this window, should only be used internally *)
   val internal : t -> OgamlCore.LL.Window.t
 
-  (** Returns the 2D drawing program associated to this window's context *)
-  val program : t -> Program.t
-
-  (** Returns the 2D drawing program for sprites *)
-  val sprite_program : t -> Program.t
-
-  val text_program : t -> Program.t
+  (** Returns the program library associated to the window *)
+  val programs : t -> ProgramLibrary.t
 
   val bind_draw_parameters : t -> DrawParameter.t -> unit
 

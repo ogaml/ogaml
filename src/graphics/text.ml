@@ -217,7 +217,7 @@ module Fx = struct
                                       ~depth_test:DrawParameter.DepthTest.None
                                       ~blend_mode:DrawParameter.BlendMode.alpha ())
            ~text ~window () =
-    let program = Window.LL.text_program window in
+    let program = ProgramLibrary.atlas_drawing (Window.LL.programs window) in
     let texture = Font.texture (Window.state window) text.font text.size in
     let size = Vector2f.from_int (Window.size window) in
     let tsize = Vector2f.from_int (Texture.Texture2D.size texture) in
@@ -365,7 +365,7 @@ let draw ?parameters:(parameters = DrawParameter.make
                                     ~depth_test:DrawParameter.DepthTest.None
                                     ~blend_mode:DrawParameter.BlendMode.alpha ())
          ~text ~window () =
-  let program = Window.LL.text_program window in
+  let program = ProgramLibrary.atlas_drawing (Window.LL.programs window) in
   let texture = Font.texture (Window.state window) text.font text.size in
   let size = Vector2f.from_int (Window.size window) in
   let tsize = Vector2f.from_int (Texture.Texture2D.size texture) in

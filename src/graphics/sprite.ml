@@ -143,7 +143,7 @@ let draw ?parameters:(parameters = DrawParameter.make
                                     ~depth_test:DrawParameter.DepthTest.None
                                     ~blend_mode:DrawParameter.BlendMode.alpha ())
          ~window ~sprite () =
-  let program = Window.LL.sprite_program window in
+  let program = ProgramLibrary.sprite_drawing (Window.LL.programs window) in
   let t = tm () in
   let sizei = Window.size window in
   debug_t.size_get_t <- debug_t.size_get_t +. (tm () -. t);

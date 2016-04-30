@@ -106,9 +106,6 @@ module LL : sig
   (** Returns the currently bound VBO *)
   val bound_vbo : t -> int option
 
-  (** Returns a new fresh vbo ID *)
-  val vbo_id : t -> int
-
   (** Sets the currently bound VAO *)
   val set_bound_vao : t -> int option -> unit
 
@@ -129,6 +126,15 @@ module LL : sig
 
   (** Returns a new fresh ebo ID *)
   val ebo_id : t -> int
+
+  (** Returns the currently bound FBO *)
+  val bound_fbo : t -> int
+
+  (** Sets the currently bound FBO *)
+  val set_bound_fbo : t -> int -> unit
+
+  (** Returns a new fresh fbo ID *)
+  val fbo_id : t -> int
 
   (** Returns whether alpha blending is currently enabled *)
   val blending : t -> bool
