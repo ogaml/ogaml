@@ -33,6 +33,7 @@ end
 
 
 type t = { 
+           id : int;
            program    : GL.Program.t; 
            uniforms   : Uniform.t   list;
            attributes : Attribute.t list
@@ -51,7 +52,7 @@ let to_source = function
   | `File   s -> read_file s
   | `String s -> s
 
-let from_source ~vertex_source ~fragment_source =
+let from_source st ~vertex_source ~fragment_source =
   let vertex_source   = to_source vertex_source   in
   let fragment_source = to_source fragment_source in
   let program = GL.Program.create () in
@@ -115,6 +116,7 @@ let from_source ~vertex_source ~fragment_source =
   in
   {
     program;
+    id = State.LL.program_id st;
     uniforms = uniforms (GL.Program.ucount program);
     attributes = attributes (GL.Program.acount program);
   }
@@ -136,7 +138,7 @@ let from_source_list st ~vertex_source ~fragment_source =
       List.find (fun (v,_) -> State.is_glsl_version_supported st v) list_fshader
       |> snd
     in
-    from_source ~vertex_source:best_vshader ~fragment_source:best_fshader
+    from_source st ~vertex_source:best_vshader ~fragment_source:best_fshader
   with Not_found -> raise (Invalid_version "No supported GLSL version provided")
 
 
@@ -146,7 +148,7 @@ let from_source_pp st ~vertex_source ~fragment_source =
   let version = State.glsl_version st in
   let vsource = Printf.sprintf "#version %i\n\n%s" version vertex_source in
   let fsource = Printf.sprintf "#version %i\n\n%s" version fragment_source in
-  from_source 
+  from_source st
     ~vertex_source:(`String vsource)
     ~fragment_source:(`String fsource)
 
@@ -159,8 +161,8 @@ module LL = struct
       State.LL.set_linked_program state None;
       GL.Program.use None
     end
-    |Some(p) when State.LL.linked_program state <> Some p.program -> begin
-      State.LL.set_linked_program state (Some p.program);
+    |Some(p) when State.LL.linked_program state <> Some p.id -> begin
+      State.LL.set_linked_program state (Some p.id);
       GL.Program.use (Some p.program);
     end
     | _ -> ()

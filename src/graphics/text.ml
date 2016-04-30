@@ -85,7 +85,8 @@ module Fx = struct
 
   let full_lift (it,init,conv) = (lift it, init, conv)
 
-  let create ~text
+  let create ~state
+             ~text
              ~position
              ~font
              ~(colors : (Font.code,'b,Color.t list) full_it)
@@ -189,7 +190,7 @@ module Fx = struct
           0.
         )
         chars
-      |> fun (source, advance, line_width) -> VertexArray.static source,
+      |> fun (source, advance, line_width) -> VertexArray.static state source,
                                          advance,
                                          max advance.Vector2f.x line_width
     in
@@ -383,7 +384,7 @@ let draw ?parameters:(parameters = DrawParameter.make
       ~size:32 () 
     in
     List.iter (VertexArray.Source.add src) vtx;
-    VertexArray.static src
+    VertexArray.static (Window.state window) src
   in
   VertexArray.draw
         ~window

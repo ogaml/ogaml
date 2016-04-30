@@ -14,11 +14,15 @@ type t = {
   mutable texture_id : int;
   mutable texture_unit  : int;
   mutable bound_texture : (int * GLTypes.TextureTarget.t) option array;
-  mutable linked_program : GL.Program.t option;
-  mutable bound_vbo : GL.VBO.t option;
-  mutable bound_vao : GL.VAO.t option;
-  mutable bound_ebo : GL.EBO.t option;
-  mutable color : Color.t;
+  mutable program_id    : int;
+  mutable linked_program : int option;
+  mutable vbo_id    : int;
+  mutable bound_vbo : int option;
+  mutable vao_id    : int;
+  mutable bound_vao : int option;
+  mutable ebo_id    : int;
+  mutable bound_ebo : int option;
+  mutable color    : Color.t;
   mutable blending : bool;
   mutable blend_equation : DrawParameter.BlendMode.t;
   mutable viewport : OgamlMath.IntRect.t
@@ -76,9 +80,13 @@ module LL = struct
       texture_id   = 0;
       texture_unit = 0;
       bound_texture = Array.make textures None;
+      program_id = 0;
       linked_program = None;
+      vbo_id = 0;
       bound_vbo = None;
+      vao_id = 0;
       bound_vao = None;
+      ebo_id = 0;
       bound_ebo = None;
       color = `RGB (Color.RGB.transparent);
       blending = false;
@@ -157,11 +165,19 @@ module LL = struct
   let set_linked_program s p =
     s.linked_program <- p
 
+  let program_id s = 
+    s.program_id <- s.program_id + 1;
+    s.program_id - 1
+
   let bound_vbo s = 
     s.bound_vbo
 
   let set_bound_vbo s v = 
     s.bound_vbo <- v
+
+  let vbo_id s = 
+    s.vbo_id <- s.vbo_id + 1;
+    s.vbo_id - 1
 
   let bound_vao s = 
     s.bound_vao
@@ -169,11 +185,19 @@ module LL = struct
   let set_bound_vao s v = 
     s.bound_vao <- v
 
+  let vao_id s = 
+    s.vao_id <- s.vao_id + 1;
+    s.vao_id - 1
+
   let bound_ebo s = 
     s.bound_ebo
 
   let set_bound_ebo s v = 
     s.bound_ebo <- v
+
+  let ebo_id s = 
+    s.ebo_id <- s.ebo_id + 1;
+    s.ebo_id - 1
 
   let set_clear_color s c = 
     s.color <- c

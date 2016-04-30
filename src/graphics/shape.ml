@@ -352,7 +352,7 @@ let draw ?parameters:(parameters = DrawParameter.make
     | None -> ()
     | Some vtcs -> List.iter (VertexArray.Source.add src) vtcs
     end;
-    VertexArray.static src
+    VertexArray.static (Window.state window) src
   in
   VertexArray.draw
         ~window

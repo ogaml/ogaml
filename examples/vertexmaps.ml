@@ -38,6 +38,9 @@ let settings = OgamlCore.ContextSettings.create ()
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"VertexMap Example" ()
 
+let glstate = 
+  Window.state window
+
 let initial_time = ref 0.
 
 let frame_count  = ref 0
@@ -91,9 +94,9 @@ let cube_indices =
     << 20 << 21 << 23 << 21 << 22 << 23
   )
 
-let cube = VertexMap.static cube_source
+let cube = VertexMap.static glstate cube_source
 
-let indices = IndexArray.static cube_indices
+let indices = IndexArray.static glstate cube_indices
 
 let cube_program =
   Program.from_source_pp (Window.state window)

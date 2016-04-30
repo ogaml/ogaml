@@ -113,16 +113,16 @@ shape.cmi : window.cmi vertexMap.cmi vertexArray.cmi ../math/ogamlMath.cmi \
     drawParameter.cmi color.cmi
 sprite.cmi : window.cmi vertexMap.cmi vertexArray.cmi texture.cmi \
     ../math/ogamlMath.cmi drawParameter.cmi
-state.cmi : ../math/ogamlMath.cmi GLTypes.cmi GL.cmi drawParameter.cmi \
-    color.cmi
-text.cmi : window.cmi vertexMap.cmi vertexArray.cmi ../math/ogamlMath.cmi \
-    font.cmi drawParameter.cmi color.cmi
+state.cmi : ../math/ogamlMath.cmi GLTypes.cmi drawParameter.cmi color.cmi
+text.cmi : window.cmi vertexMap.cmi vertexArray.cmi state.cmi \
+    ../math/ogamlMath.cmi font.cmi drawParameter.cmi color.cmi
 texture.cmi : state.cmi ../math/ogamlMath.cmi image.cmi
 uniform.cmi : texture.cmi state.cmi program.cmi ../math/ogamlMath.cmi \
     color.cmi
-vertexArray.cmi : window.cmi uniform.cmi program.cmi ../math/ogamlMath.cmi \
-    indexArray.cmi drawParameter.cmi drawMode.cmi color.cmi
-vertexMap.cmi : window.cmi vertexArray.cmi uniform.cmi program.cmi \
+vertexArray.cmi : window.cmi uniform.cmi state.cmi program.cmi \
+    ../math/ogamlMath.cmi indexArray.cmi drawParameter.cmi drawMode.cmi \
+    color.cmi
+vertexMap.cmi : window.cmi vertexArray.cmi uniform.cmi state.cmi program.cmi \
     ../math/ogamlMath.cmi indexArray.cmi drawParameter.cmi drawMode.cmi \
     color.cmi
 window.cmi : state.cmi program.cmi ../math/ogamlMath.cmi \

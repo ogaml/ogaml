@@ -6,7 +6,7 @@ let settings = OgamlCore.ContextSettings.create ()
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Texture Tutorial" ()
 
-let context = Window.state window
+let glstate = Window.state window
 
 let vertex_shader_source = "
   in vec3 position;
@@ -73,9 +73,9 @@ let vertex_source = VertexArray.Source.(
     << vertex4
 )
 
-let vertices = VertexArray.static vertex_source
+let vertices = VertexArray.static glstate vertex_source
 
-let texture = Texture.Texture2D.create context (`File "examples/mario-block.bmp")
+let texture = Texture.Texture2D.create glstate (`File "examples/mario-block.bmp")
 
 let uniform =
   Uniform.empty

@@ -63,6 +63,8 @@ end
 module TextureFormat : sig
 
   type t = 
+    | R
+    | RG
     | RGB
     | RGBA
     | Depth
@@ -138,6 +140,16 @@ module GlError : sig
     | Out_of_memory
     | Stack_underflow
     | Stack_overflow
+
+end
+
+(** Texture attachements *)
+module GlAttachement : sig
+
+  type t = 
+    | Color
+    | Depth
+    | Stencil
 
 end
 

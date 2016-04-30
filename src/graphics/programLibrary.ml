@@ -232,7 +232,7 @@ let create state =
         ~vertex_source:(`String vertex_shader_source_130)
         ~fragment_source:(`String fragment_shader_source_130)
     else
-      Program.from_source
+      Program.from_source state
         ~vertex_source:(`String vertex_shader_source_110)
         ~fragment_source:(`String fragment_shader_source_110)
   in
@@ -242,7 +242,7 @@ let create state =
         ~vertex_source:(`String vertex_shader_source_tex_130)
         ~fragment_source:(`String fragment_shader_source_tex_130)
     else
-      Program.from_source
+      Program.from_source state
         ~vertex_source:(`String vertex_shader_source_tex_110)
         ~fragment_source:(`String fragment_shader_source_tex_110)
   in
@@ -252,7 +252,7 @@ let create state =
         ~vertex_source:(`String vertex_shader_source_text_130)
         ~fragment_source:(`String fragment_shader_source_text_130)
     else
-      Program.from_source
+      Program.from_source state
         ~vertex_source:(`String vertex_shader_source_text_110)
         ~fragment_source:(`String fragment_shader_source_text_110)
   in

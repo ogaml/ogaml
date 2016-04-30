@@ -192,7 +192,7 @@ module Texture = struct
 
   (* Abstract functions *)
   external image2D : GLTypes.TextureTarget.t -> GLTypes.PixelFormat.t ->
-    (int * int) -> GLTypes.TextureFormat.t -> Bytes.t -> unit = "caml_tex_image_2D"
+    (int * int) -> GLTypes.TextureFormat.t -> Bytes.t option -> unit = "caml_tex_image_2D"
 
 
   (* Exposed functions *)
@@ -342,6 +342,38 @@ module VAO = struct
   external draw : DrawMode.t -> int -> int -> unit = "caml_draw_arrays"
 
   external draw_elements : DrawMode.t -> int -> int -> unit = "caml_draw_elements"
+
+end
+
+
+module RBO = struct
+
+  type t
+
+  external create : unit -> t = "caml_create_rbo"
+
+  external bind : t -> unit = "caml_bind_rbo"
+
+  external destroy : t -> unit = "caml_destroy_rbo"
+
+  external storage : GLTypes.TextureFormat.t -> int -> int -> unit = "caml_rbo_storage"
+
+end
+
+
+module FBO = struct
+
+  type t 
+
+  external create : unit -> t = "caml_create_fbo"
+
+  external bind : t option -> unit = "caml_bind_fbo"
+
+  external destroy : t -> unit = "caml_destroy_fbo"
+
+  external texture2D : GLTypes.GlAttachement.t -> Texture.t -> unit = "caml_fbo_texture2D"
+
+  external render : GLTypes.GlAttachement.t -> RBO.t -> unit = "caml_fbo_renderbuffer"
 
 end
 

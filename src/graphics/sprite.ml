@@ -167,7 +167,7 @@ let draw ?parameters:(parameters = DrawParameter.make
     List.iter (VertexArray.Source.add src) (get_vertices sprite);
     debug_t.vertices_create_t <- debug_t.vertices_create_t +. (tm () -. t);
     let t = tm () in
-    let vao = VertexArray.static src in
+    let vao = VertexArray.static (Window.state window) src in
     debug_t.vao_create_t <- debug_t.vao_create_t +. (tm () -. t);
     vao
   in

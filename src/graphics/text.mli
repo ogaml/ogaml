@@ -18,6 +18,7 @@ module Fx : sig
 
   (* TODO: Exception when the iterator doesn't return list of right size *)
   val create :
+    state : State.t ->
     text : string ->
     position : OgamlMath.Vector2f.t ->
     font : Font.t ->

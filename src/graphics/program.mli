@@ -59,7 +59,7 @@ type t
 type src = [`File of string | `String of string]
 
 (** Creates a program from two shader sources. *)
-val from_source : vertex_source:src -> fragment_source:src -> t
+val from_source : State.t -> vertex_source:src -> fragment_source:src -> t
 
 (** Creates a program from a list of shader sources
   * and version numbers. Choses the best source for 

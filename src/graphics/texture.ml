@@ -71,7 +71,7 @@ module Texture2D = struct
       GLTypes.PixelFormat.RGBA
       (width, height)
       GLTypes.TextureFormat.RGBA
-      data;
+      (Some data);
     (* Set the parameters *)
     GL.Texture.parameter2D 
       (`Magnify GLTypes.MagnifyFilter.Linear);

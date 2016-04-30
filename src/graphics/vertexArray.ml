@@ -251,9 +251,10 @@ type _ t = {
   attribs : (Source.attrib * string * int) list;
   stride  : int;
   mutable bound : Program.t option;
+  id : int
 }
 
-let dynamic src = 
+let dynamic state src = 
   let vao    = GL.VAO.create () in
   let buffer = GL.VBO.create () in
   let data = src.Source.data in
@@ -267,9 +268,10 @@ let dynamic src =
    attribs = Source.attribs src;
    stride = Source.stride src;
    bound = None;
+   id = State.LL.vao_id state;
   }
 
-let static src = 
+let static state src = 
   let vao    = GL.VAO.create () in
   let buffer = GL.VBO.create () in
   let data = src.Source.data in
@@ -283,6 +285,7 @@ let static src =
    attribs = Source.attribs src;
    stride = Source.stride src;
    bound = None;
+   id = State.LL.vao_id state
   }
 
 let rebuild t src start =
@@ -317,9 +320,9 @@ let bind state t prog =
   if t.bound <> Some prog then begin
     t.bound <- Some prog;
     GL.VAO.bind (Some t.vao);
-    State.LL.set_bound_vao state (Some t.vao);
+    State.LL.set_bound_vao state (Some t.id);
     GL.VBO.bind (Some t.buffer);
-    State.LL.set_bound_vbo state (Some t.buffer);
+    State.LL.set_bound_vbo state (Some t.id);
     let attribs = ref t.attribs in
     let rec find_remove s = function
       | [] -> 
@@ -352,10 +355,10 @@ let bind state t prog =
       Printf.eprintf "Warning : omitting attribute %s not required by program\n%!" 
         (let (_,s,_) = List.hd !attribs in s)*)
   end
-  else if State.LL.bound_vao state <> (Some t.vao) then begin
+  else if State.LL.bound_vao state <> (Some t.id) then begin
     GL.VAO.bind (Some t.vao);
-    State.LL.set_bound_vao state (Some t.vao);
-    State.LL.set_bound_vbo state (Some t.buffer);
+    State.LL.set_bound_vao state (Some t.id);
+    State.LL.set_bound_vbo state (Some t.id);
   end
 
 type debug_times = {

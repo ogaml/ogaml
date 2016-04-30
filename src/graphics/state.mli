@@ -92,31 +92,43 @@ module LL : sig
   val bound_target : t -> int -> GLTypes.TextureTarget.t option
 
   (** Sets the currently linked program *)
-  val set_linked_program : t -> GL.Program.t option -> unit
+  val set_linked_program : t -> int option -> unit
 
   (** Returns the currently linked program *)
-  val linked_program : t -> GL.Program.t option
+  val linked_program : t -> int option
+
+  (** Returns a new fresh program ID *)
+  val program_id : t -> int
 
   (** Sets the currently bound VBO *)
-  val set_bound_vbo : t -> GL.VBO.t option -> unit
+  val set_bound_vbo : t -> int option -> unit
 
   (** Returns the currently bound VBO *)
-  val bound_vbo : t -> GL.VBO.t option
+  val bound_vbo : t -> int option
+
+  (** Returns a new fresh vbo ID *)
+  val vbo_id : t -> int
 
   (** Sets the currently bound VAO *)
-  val set_bound_vao : t -> GL.VAO.t option -> unit
+  val set_bound_vao : t -> int option -> unit
 
   (** Returns the currently bound VAO *)
-  val bound_vao : t -> GL.VAO.t option
+  val bound_vao : t -> int option
+
+  (** Returns a new fresh vao ID *)
+  val vao_id : t -> int
 
   (** Sets the current clear color *)
   val set_clear_color : t -> Color.t -> unit
 
   (** Sets the currently bound EBO *)
-  val set_bound_ebo : t -> GL.EBO.t option -> unit
+  val set_bound_ebo : t -> int option -> unit
 
   (** Returns the currently bound EBO *)
-  val bound_ebo : t -> GL.EBO.t option
+  val bound_ebo : t -> int option
+
+  (** Returns a new fresh ebo ID *)
+  val ebo_id : t -> int
 
   (** Returns whether alpha blending is currently enabled *)
   val blending : t -> bool

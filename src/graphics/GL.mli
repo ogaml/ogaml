@@ -150,7 +150,7 @@ module Texture : sig
 
   (** Associates an image with the currently bound texture *)
   val image : GLTypes.TextureTarget.t -> GLTypes.PixelFormat.t -> (int * int) 
-           -> GLTypes.TextureFormat.t -> Bytes.t -> unit
+           -> GLTypes.TextureFormat.t -> Bytes.t option -> unit
 
   (** Sets the value of a parameter of the currently bound texture2D *)
   val parameter2D : [`Magnify of GLTypes.MagnifyFilter.t 
@@ -341,6 +341,50 @@ module VAO : sig
 
   (** Draws an element array using the currently bound VAO and EBO *)
   val draw_elements : DrawMode.t -> int -> int -> unit
+
+end
+
+(** Represents a render buffer object *)
+module RBO : sig
+
+  (** Type of an RBO *)
+  type t
+
+  (** Creates an RBO *)
+  val create : unit -> t
+
+  (** Binds an RBO *)
+  val bind : t -> unit
+
+  (** Destroys an RBO *)
+  val destroy : t -> unit
+
+  (** Initializes the storage of a bound RBO *)
+  val storage : GLTypes.TextureFormat.t -> int -> int -> unit
+
+end
+
+
+(** Represents a framebuffer object *)
+module FBO : sig
+  
+  (** Type of an FBO *)
+  type t
+
+  (** Creates an FBO *)
+  val create : unit -> t
+
+  (** Binds an FBO *)
+  val bind : t option -> unit
+
+  (** Destroys an FBO *)
+  val destroy : t -> unit
+
+  (** Attaches a 2D texture to an FBO *)
+  val texture2D : GLTypes.GlAttachement.t -> Texture.t -> unit
+
+  (** Attaches a render buffer to an FBO *)
+  val render : GLTypes.GlAttachement.t -> RBO.t -> unit
 
 end
 

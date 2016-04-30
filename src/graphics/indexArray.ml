@@ -38,9 +38,10 @@ type _ t = {
   mutable buffer  : GL.EBO.t;
   mutable size    : int;
   mutable length  : int;
+  id : int;
 }
 
-let dynamic src = 
+let dynamic state src = 
   let buffer = GL.EBO.create () in
   let data = src.Source.data in
   GL.EBO.bind (Some buffer);
@@ -50,9 +51,10 @@ let dynamic src =
     buffer;
     size = GL.Data.length data;
     length = Source.length src; 
+    id = State.LL.ebo_id state
   }
 
-let static src = 
+let static state src = 
   let buffer = GL.EBO.create () in
   let data = src.Source.data in
   GL.EBO.bind (Some buffer);
@@ -62,6 +64,7 @@ let static src =
     buffer;
     size = GL.Data.length data;
     length = Source.length src; 
+    id = State.LL.ebo_id state
   }
 
 let rebuild t src start =
@@ -92,9 +95,9 @@ let length t = t.length
 module LL = struct
 
   let bind state t = 
-    if State.LL.bound_ebo state <> (Some t.buffer) then begin
+    if State.LL.bound_ebo state <> (Some t.id) then begin
       GL.EBO.bind (Some t.buffer);
-      State.LL.set_bound_ebo state (Some t.buffer);
+      State.LL.set_bound_ebo state (Some t.id);
     end
 
 end

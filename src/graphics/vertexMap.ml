@@ -276,9 +276,10 @@ type _ t = {
   stride_i        : int;
   stride_f        : int;
   mutable bound   : Program.t option;
+  id : int
 }
 
-let create src kind = 
+let create state src kind = 
   let vao    = GL.VAO.create () in
   let buffer = GL.VBO.create () in
   let dataf = src.Source.fdata in
@@ -307,11 +308,12 @@ let create src kind =
    stride_f = (List.fold_left 
       (fun v (s,_,t) -> if Source.is_integer t then v else v+(Source.get_size t)) 0 attribs);
    bound = None;
+   id = State.LL.vao_id state
   }
 
-let dynamic src = create src GLTypes.VBOKind.DynamicDraw
+let dynamic state src = create state src GLTypes.VBOKind.DynamicDraw
 
-let static  src = create src GLTypes.VBOKind.StaticDraw
+let static  state src = create state src GLTypes.VBOKind.StaticDraw
 
 let length t = t.length
 
@@ -353,9 +355,9 @@ let bind state t prog =
   if t.bound <> Some prog then begin
     t.bound <- Some prog;
     GL.VAO.bind (Some t.vao);
-    State.LL.set_bound_vao state (Some t.vao);
+    State.LL.set_bound_vao state (Some t.id);
     GL.VBO.bind (Some t.buffer);
-    State.LL.set_bound_vbo state (Some t.buffer);
+    State.LL.set_bound_vbo state (Some t.id);
     let attribs = ref t.attribs in
     let rec find_remove s = function
       | [] -> 
@@ -397,10 +399,10 @@ let bind state t prog =
       Printf.eprintf "Warning : omitting attribute %s not required by program\n%!" 
         (let (_,s,_) = List.hd !attribs in s)*)
   end
-  else if State.LL.bound_vao state <> (Some t.vao) then begin
+  else if State.LL.bound_vao state <> (Some t.id) then begin
     GL.VAO.bind (Some t.vao);
-    State.LL.set_bound_vao state (Some t.vao);
-    State.LL.set_bound_vbo state (Some t.buffer);
+    State.LL.set_bound_vao state (Some t.id);
+    State.LL.set_bound_vbo state (Some t.id);
   end
 
 

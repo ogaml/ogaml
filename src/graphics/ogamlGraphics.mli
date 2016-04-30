@@ -305,7 +305,10 @@ end
 module State : sig
 
   (** This module encapsulates a copy of the internal GL state.
-    * This allows efficient optimizations of state changes *)
+    * This allows efficient optimizations of state changes.
+    *
+    * Most OpenGL functions require an instance of State.t. To get one,
+    * create a window and use Window.state. *)
 
   (** Raised when trying to perform an invalid state change 
     * (for example, binding a texture to an invalid texture unit) *)
@@ -500,9 +503,10 @@ module Program : sig
   (** Type of a source, from a file or from a string *)
   type src = [`File of string | `String of string]
 
-  (** Compiles a program from a vertex source and a fragment source.
+  (** Compiles a program from a state (gotten from a window), a vertex source 
+    * and a fragment source.
     * The source must begin with a version assigment $#version xxx$ *)
-  val from_source : vertex_source:src -> fragment_source:src -> t
+  val from_source : State.t -> vertex_source:src -> fragment_source:src -> t
 
   (** Compiles a program from a state (gotten from a window) and
     * a list of sources paired with their required GLSL version.
@@ -772,11 +776,11 @@ module IndexArray : sig
 
   (** Creates a static index array. A static array is faster but can not be modified after creation.
     * @see:OgamlGraphics.IndexArray.Source *)
-  val static : Source.t -> static t
+  val static : State.t -> Source.t -> static t
 
   (** Creates a dynamic index array that can be modified after creation.
     * @see:OgamlGraphics.IndexArray.Source *)
-  val dynamic : Source.t -> dynamic t
+  val dynamic : State.t -> Source.t -> dynamic t
 
   (** $rebuild array src offset$ rebuilds $array$ starting from
     * the index at position $offset$ using $src$.
@@ -942,11 +946,11 @@ module VertexArray : sig
 
   (** Creates a static array from a source. A static array is faster
     * but cannot be modified later. @see:OgamlGraphics.VertexArray.Source *)
-  val static : Source.t -> static t
+  val static : State.t -> Source.t -> static t
 
   (** Creates a dynamic vertex array that can be modified later.
     * @see:OgamlGraphics.VertexArray.Source *)
-  val dynamic : Source.t -> dynamic t
+  val dynamic : State.t -> Source.t -> dynamic t
 
   (** $rebuild array src offset$ rebuilds $array$ starting from
     * the vertex at position $offset$ using $src$.
@@ -1163,11 +1167,11 @@ module VertexMap : sig
 
   (** Creates a static map from a source. A static map is faster
     * but cannot be modified later. @see:OgamlGraphics.VertexMap.Source *)
-  val static : Source.t -> static t
+  val static : State.t -> Source.t -> static t
 
   (** Creates a dynamic vertex map that can be modified later.
     * @see:OgamlGraphics.VertexMap.Source *)
-  val dynamic : Source.t -> dynamic t
+  val dynamic : State.t -> Source.t -> dynamic t
 
   (** $rebuild map src offset$ rebuilds $map$ starting from
     * the vertex at position $offset$ using $src$.
@@ -1647,6 +1651,7 @@ module Text : sig
 
     (** Creates a drawable text with strongly customisable parameters. *)
     val create :
+      state : State.t ->
       text : string ->
       position : OgamlMath.Vector2f.t ->
       font : Font.t ->

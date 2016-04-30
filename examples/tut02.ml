@@ -14,6 +14,9 @@ let settings = OgamlCore.ContextSettings.create ()
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°02" ()
 
+let glstate = 
+  Window.state window
+
 let vertex_shader_source = "
   in vec3 position;
 
@@ -59,7 +62,7 @@ let vertex_source = VertexArray.Source.(
     << vertex3
 )
 
-let vertices = VertexArray.static vertex_source
+let vertices = VertexArray.static glstate vertex_source
 
 let rec event_loop () =
   match Window.poll_event window with

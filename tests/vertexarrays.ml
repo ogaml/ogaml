@@ -82,7 +82,7 @@ let test_vao1 () =
     << Vertex.create ~position:Vector3f.unit_y ()
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic state vsource in
   assert (VertexArray.length vao = 3)
 
 let test_vao2 () =
@@ -95,7 +95,7 @@ let test_vao2 () =
     << Vertex.create ~position:Vector3f.unit_x ()
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic state vsource in
   assert (VertexArray.length vao = 6)
 
 let test_vao3 () =
@@ -127,7 +127,7 @@ let test_vao5 () =
     << Vertex.create ~position:Vector3f.unit_x ~texcoord:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
     << Vertex.create ~position:Vector3f.unit_x ~texcoord:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic state vsource in
   assert (VertexArray.length vao = 4)
 
 let test_vao6 () =
@@ -137,7 +137,7 @@ let test_vao6 () =
     << Vertex.create ~position:Vector3f.unit_y ()
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic state vsource in
   VertexArray.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ()
 
 let test_vao7 () =
@@ -147,7 +147,7 @@ let test_vao7 () =
     << Vertex.create ~position:Vector3f.unit_y ()
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic state vsource in
   try
     VertexArray.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ();
     assert false
@@ -162,7 +162,7 @@ let test_vao8 () =
     << Vertex.create ~position:Vector3f.unit_y ~color:(`RGB Color.RGB.white) ()
     << Vertex.create ~position:Vector3f.unit_x ~color:(`RGB Color.RGB.white) ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic state vsource in
   try
     VertexArray.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ();
   with

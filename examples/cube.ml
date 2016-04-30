@@ -6,6 +6,9 @@ let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 let window =
   Window.create ~width:800 ~height:600 ~title:"Cube Example" ~settings ()
 
+let glstate = 
+  Window.state window
+
 let initial_time = ref 0.
 
 let frame_count  = ref 0
@@ -21,7 +24,7 @@ let cube_source =
   Model.source cmod ~vertex_source:src ();
   src
 
-let cube = VertexArray.static cube_source
+let cube = VertexArray.static glstate cube_source
 
 let normal_program =
   Program.from_source_pp (Window.state window)

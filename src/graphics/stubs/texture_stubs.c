@@ -16,6 +16,7 @@
 #include <caml/bigarray.h>
 #include <string.h>
 #include "utils.h"
+#include "types_stubs.h"
 
 
 #define TEX(_a) (*(GLuint*) Data_custom_val(_a))
@@ -23,120 +24,6 @@
 #define MLvar_Minify  (254173077)
 
 #define MLvar_Magnify (-1011094397)
-
-
-GLenum Target_val(value target)
-{
-  switch(Int_val(target))
-  {
-    case 0:
-      return GL_TEXTURE_1D;
-
-    case 1:
-      return GL_TEXTURE_2D;
-
-    case 2:
-      return GL_TEXTURE_3D;
-
-    default:
-      caml_failwith("Caml variant error in Target_val(1)");
-  }
-}
-
-
-GLenum Magnify_val(value mag)
-{
-  switch(Int_val(mag))
-  {
-    case 0:
-      return GL_NEAREST;
-
-    case 1:
-      return GL_LINEAR;
-
-    default:
-      caml_failwith("Caml variant error in Magnify_val(1)");
-  }
-}
-
-
-GLenum Minify_val(value min)
-{
-  switch(Int_val(min))
-  {
-    case 0:
-      return GL_NEAREST;
-
-    case 1:
-      return GL_LINEAR;
-
-    case 2:
-      return GL_NEAREST_MIPMAP_NEAREST;
-
-    case 3:
-      return GL_LINEAR_MIPMAP_NEAREST;
-
-    default:
-      caml_failwith("Caml variant error in Minify_val(1)");
-  }
-}
-
-
-GLenum TextureFormat_val(value fmt)
-{
-  switch(Int_val(fmt))
-  {
-    case 0:
-      return GL_RGB;
-
-    case 1:
-      return GL_RGBA;
-
-    case 2:
-      return GL_DEPTH_COMPONENT;
-
-    case 3:
-      return GL_DEPTH_STENCIL;
-
-    default:
-      caml_failwith("Caml variant error in TextureFormat_val(1)");
-  }
-}
-
-
-GLenum PixelFormat_val(value fmt)
-{
-  switch(Int_val(fmt))
-  {
-    case 0:
-      return GL_RED;
-
-    case 1:
-      return GL_RG;
-
-    case 2:
-      return GL_RGB;
-
-    case 3:
-      return GL_BGR;
-
-    case 4:
-      return GL_RGBA;
-
-    case 5:
-      return GL_BGRA;
-
-    case 6:
-      return GL_DEPTH_COMPONENT;
-
-    case 7:
-      return GL_DEPTH_STENCIL;
-
-    default:
-      caml_failwith("Caml variant error in TextureFormat_val(1)");
-  }
-}
-
 
 void finalise_tex(value v)
 {
@@ -232,7 +119,7 @@ caml_tex_image_2D(value target, value fmt, value size, value tfmt, value data)
                0,
                PixelFormat_val(fmt),
                GL_UNSIGNED_BYTE,
-               String_val(data));
+               (data == Val_none)? NULL : String_val(Some_val(data)));
 
   CAMLreturn(Val_unit);
 }

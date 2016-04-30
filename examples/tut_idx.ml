@@ -7,6 +7,9 @@ let settings = OgamlCore.ContextSettings.create ()
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Indexing Tutorial" ()
 
+let glstate = 
+  Window.state window
+
 let vertex_shader_source = "
 
   uniform mat4 MVP;
@@ -87,9 +90,9 @@ let index_source = IndexArray.Source.(
     << 4 << 6 << 2 << 4 << 2 << 0
 )
 
-let vertices = VertexArray.static vertex_source
+let vertices = VertexArray.static glstate vertex_source
 
-let indices  = IndexArray.static index_source
+let indices  = IndexArray.static glstate index_source
 
 (* Displaying *)
 let proj = Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)

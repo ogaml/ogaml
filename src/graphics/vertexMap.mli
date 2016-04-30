@@ -83,9 +83,9 @@ type dynamic
 
 type 'a t 
 
-val static : Source.t -> static t
+val static : State.t -> Source.t -> static t
 
-val dynamic : Source.t -> dynamic t
+val dynamic : State.t -> Source.t -> dynamic t
 
 val rebuild : dynamic t -> Source.t -> int -> unit
 
