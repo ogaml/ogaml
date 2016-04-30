@@ -4,8 +4,8 @@ exception Image_error of string
 type t
 
 val create : [`File of string | 
-              `Empty of int * int * Color.t | 
-              `Data of int * int * Bytes.t] -> t
+              `Empty of OgamlMath.Vector2i.t * Color.t | 
+              `Data of OgamlMath.Vector2i.t * Bytes.t] -> t
 
 val size : t -> OgamlMath.Vector2i.t
 

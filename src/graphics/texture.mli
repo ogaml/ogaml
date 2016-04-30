@@ -12,6 +12,8 @@ module Texture2D : sig
 
     val bind : State.t -> int -> t option -> unit
 
+    val internal : t -> GL.Texture.t
+
   end
 
 end

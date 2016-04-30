@@ -62,6 +62,7 @@ module LL = struct
   let programs win = win.programs
 
   let bind_draw_parameters win parameters = 
+    RenderFunctions.bind_fbo win.state 0 None;
     RenderFunctions.bind_draw_parameters 
       win.state (size win) 
       (OgamlCore.ContextSettings.aa_level win.settings)

@@ -45,6 +45,8 @@ module Texture2D = struct
       end
       | _ -> ()
 
+    let internal t = t.internal
+
   end
 
 

@@ -109,6 +109,9 @@ module Pervasives : sig
   (** Returns the maximal number of textures *)
   val max_textures : unit -> int
 
+  (** Flushes the current buffer *)
+  val flush : unit -> unit
+
   (** Sets the MSAA *)
   val msaa : bool -> unit
 
@@ -354,7 +357,7 @@ module RBO : sig
   val create : unit -> t
 
   (** Binds an RBO *)
-  val bind : t -> unit
+  val bind : t option -> unit
 
   (** Destroys an RBO *)
   val destroy : t -> unit

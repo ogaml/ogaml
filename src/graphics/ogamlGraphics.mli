@@ -357,7 +357,7 @@ module Image : sig
     *
     * Raises $Image_error$ if the loading fails 
     * @see:OgamlGraphics.Color *)
-  val create : [`File of string | `Empty of int * int * Color.t | `Data of int * int * Bytes.t] -> t
+  val create : [`File of string | `Empty of OgamlMath.Vector2i.t * Color.t | `Data of OgamlMath.Vector2i.t * Bytes.t] -> t
 
   (** Return the size of an image *)
   val size : t -> OgamlMath.Vector2i.t

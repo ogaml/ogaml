@@ -50,8 +50,8 @@ module Shelf = struct
   }
 
   let create width = {
-    full   = Image.create (`Empty (0,0,(`RGB Color.RGB.transparent)));
-    row    = Image.create (`Empty (0,0,(`RGB Color.RGB.transparent)));
+    full   = Image.create (`Empty (Vector2i.zero,(`RGB Color.RGB.transparent)));
+    row    = Image.create (`Empty (Vector2i.zero,(`RGB Color.RGB.transparent)));
     width;
     height = 0;
     row_width  = 0;
@@ -63,7 +63,7 @@ module Shelf = struct
     let w,h  = size.Vector2i.x, size.Vector2i.y in
     if s.row_width + w + 1 <= s.width then begin
       let new_height = max s.row_height h in
-      let new_row = Image.create (`Empty (s.row_width + w + 1, new_height,`RGB Color.RGB.transparent)) in
+      let new_row = Image.create (`Empty (Vector2i.({x = s.row_width + w + 1; y = new_height}),`RGB Color.RGB.transparent)) in
       Image.blit s.row new_row Vector2i.({x = 0; y = 0});
       Image.blit glyph new_row Vector2i.({x = s.row_width + 1; y = 0});
       s.row <- new_row;
@@ -76,7 +76,7 @@ module Shelf = struct
     end else if s.height + s.row_height + 1 >= 2048 then begin
       raise (Font_error "Font texture overflow")
     end else begin
-      let new_full = Image.create (`Empty (s.width,(s.height + s.row_height + 1),(`RGB Color.RGB.transparent))) in
+      let new_full = Image.create (`Empty (Vector2i.({x = s.width; y = s.height + s.row_height + 1}),(`RGB Color.RGB.transparent))) in
       Image.blit s.full new_full Vector2i.({x = 0; y = 0});
       Image.blit s.row new_full Vector2i.({x = 0; y = s.height + 1});
       s.full <- new_full;
@@ -91,7 +91,7 @@ module Shelf = struct
     end
 
   let texture state s =
-    let global = Image.create (`Empty (s.width, s.height + s.row_height + 1, `RGB Color.RGB.transparent)) in
+    let global = Image.create (`Empty (Vector2i.({x = s.width; y = s.height + s.row_height + 1}), `RGB Color.RGB.transparent)) in
     Image.blit s.full global Vector2i.zero;
     Image.blit s.row global Vector2i.({x = 0; y = s.height + 1});
     Texture.Texture2D.create state (`Image global)
@@ -194,7 +194,7 @@ let load_glyph_return (t : t) s c b oversampling =
     let rect = Internal.char_box t.internal c in
     let (bmp,w,h) = Internal.bitmap t.internal c (float_of_int oversampling *. page.scale) in
     let bmp = Internal.convert_1chan_bitmap bmp in
-    let uv = Shelf.add page.shelf (Image.create (`Data (w,h,bmp))) in
+    let uv = Shelf.add page.shelf (Image.create (`Data (Vector2i.({x = w; y = h}),bmp))) in
     {
       Glyph.advance = scale_int advance page.scale;
       Glyph.bearing = Vector2f.({x = scale_int lbear page.scale;

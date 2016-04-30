@@ -163,6 +163,8 @@ module Pervasives = struct
 
   external max_textures : unit -> int = "caml_max_textures"
 
+  external flush : unit -> unit = "caml_glflush"
+
   external msaa : bool -> unit = "caml_enable_msaa"
 
 end
@@ -352,7 +354,7 @@ module RBO = struct
 
   external create : unit -> t = "caml_create_rbo"
 
-  external bind : t -> unit = "caml_bind_rbo"
+  external bind : t option -> unit = "caml_bind_rbo"
 
   external destroy : t -> unit = "caml_destroy_rbo"
 

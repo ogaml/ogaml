@@ -25,7 +25,7 @@ let create = function
       {width = x; height = y; data = s}
     end
   end
-  |`Empty (width, height, color) ->
+  |`Empty ({Vector2i.x = width; y = height}, color) ->
     let img = 
       {
         width ; 
@@ -50,7 +50,7 @@ let create = function
       else
         Bytes.set img.data i a
     done; img
-  |`Data (width, height, data) -> 
+  |`Data ({Vector2i.x = width; y = height}, data) -> 
     {width; height; data}
 
 let size img = 

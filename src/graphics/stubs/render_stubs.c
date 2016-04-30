@@ -186,3 +186,12 @@ caml_max_textures(value unit)
 }
 
 
+// INPUT   nothing
+// OUTPUT  nothing, flushes the current buffer
+CAMLprim value
+caml_glflush(value unit)
+{
+  CAMLparam0();
+  glFlush();
+  CAMLreturn(Val_unit);
+}
