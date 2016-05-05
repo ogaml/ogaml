@@ -10,8 +10,6 @@ let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Font sets tests" ()
 
-let glstate = Window.state window
-
 let font = Font.load "examples/font1.ttf"
 
 let size = 25
@@ -89,7 +87,8 @@ let random_color =
 let fxpos = Vector2f.({ x = 10. ; y = 350. })
 
 let fxtxt1 = Text.Fx.create
-  ~state:glstate
+  (module Window)
+  ~target:window
   ~text:"Awesome text!"
   ~position:fxpos
   ~font
@@ -100,7 +99,8 @@ let fxtxt1 = Text.Fx.create
 let fxpos2 = Vector2f.add (Text.Fx.advance fxtxt1) fxpos
 
 let fxtxt2 = Text.Fx.create
-  ~state:glstate
+  (module Window)
+  ~target:window
   ~text:"Success!!!"
   ~position:fxpos2
   ~font
@@ -126,7 +126,8 @@ let aa = ref false
 let draw () =
   (* Trying computing each frame *)
   let fxtxt3 = Text.Fx.create
-    ~state:glstate
+    (module Window)
+    ~target:window
     ~text:"This time we separate words a bit to check everything works."
     ~position:fxpos3
     ~font
@@ -139,16 +140,16 @@ let draw () =
                       ~blend_mode:(DrawParameter.BlendMode.alpha)
                       ()
   in
-  Text.draw ~parameters ~window ~text:txt ();
-  Text.draw ~parameters ~window ~text:txt2 ();
-  Text.draw ~parameters ~window ~text:txt2' ();
-  Text.draw ~parameters ~window ~text:txt3 ();
-  Text.draw ~parameters ~window ~text:txt4 ();
-  Text.Fx.draw ~parameters ~window ~text:fxtxt1 ();
-  Text.Fx.draw ~parameters ~window ~text:fxtxt2 ();
-  Text.Fx.draw ~parameters ~window ~text:fxtxt3 ();
-  Shape.draw ~parameters ~window ~shape:border ();
-  Shape.draw ~parameters ~window ~shape:border4 ()
+  Text.draw (module Window) ~parameters ~target:window ~text:txt ();
+  Text.draw (module Window) ~parameters ~target:window ~text:txt2 ();
+  Text.draw (module Window) ~parameters ~target:window ~text:txt2' ();
+  Text.draw (module Window) ~parameters ~target:window ~text:txt3 ();
+  Text.draw (module Window) ~parameters ~target:window ~text:txt4 ();
+  Text.Fx.draw (module Window) ~parameters ~target:window ~text:fxtxt1 ();
+  Text.Fx.draw (module Window) ~parameters ~target:window ~text:fxtxt2 ();
+  Text.Fx.draw (module Window) ~parameters ~target:window ~text:fxtxt3 ();
+  Shape.draw (module Window) ~parameters ~target:window ~shape:border ();
+  Shape.draw (module Window) ~parameters ~target:window ~shape:border4 ()
 
 let rec event_loop () =
   match Window.poll_event window with

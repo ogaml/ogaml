@@ -6,6 +6,9 @@ type t = {
   minor : int;
   glsl  : int;
   textures : int;
+  sprite_program : ProgramInternal.t;
+  shape_program  : ProgramInternal.t;
+  text_program   : ProgramInternal.t;
   mutable msaa : bool;
   mutable culling_mode  : DrawParameter.CullingMode.t;
   mutable polygon_mode  : DrawParameter.PolygonMode.t;
@@ -73,6 +76,9 @@ module LL = struct
       minor   ;
       glsl    ;
       textures;
+      sprite_program = ProgramInternal.Sources.create_sprite (-3) glsl;
+      shape_program  = ProgramInternal.Sources.create_shape  (-2) glsl;
+      text_program   = ProgramInternal.Sources.create_text   (-1) glsl;
       msaa = false;
       culling_mode = DrawParameter.CullingMode.CullNone;
       polygon_mode = DrawParameter.PolygonMode.DrawFill;
@@ -97,6 +103,12 @@ module LL = struct
          alpha = Equation.Add (Factor.One, Factor.Zero)});
       viewport = OgamlMath.IntRect.({x = 0; y = 0; width = 0; height = 0}) 
     }
+
+  let sprite_drawing s = s.sprite_program
+
+  let shape_drawing s = s.shape_program
+
+  let text_drawing s = s.text_program
 
   let culling_mode s =
     s.culling_mode

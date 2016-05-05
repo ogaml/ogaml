@@ -6,40 +6,17 @@ exception Linking_error of string
 exception Invalid_version of string
 
 
-module Uniform = struct
-
-  type t = {name : string; kind : GLTypes.GlslType.t; location : GL.Program.u_location}
-
-  let name u = u.name
-
-  let kind u = u.kind
-
-  let location u = u.location
-
-end
+module Uniform = ProgramInternal.Uniform
 
 
-module Attribute = struct
-
-  type t = {name : string; kind : GLTypes.GlslType.t; location : GL.Program.a_location}
-
-  let name a = a.name
-
-  let kind a = a.kind
-
-  let location a = a.location
-
-end
+module Attribute = ProgramInternal.Attribute
 
 
-type t = { 
-           id : int;
-           program    : GL.Program.t; 
-           uniforms   : Uniform.t   list;
-           attributes : Attribute.t list
-         }
+type t = ProgramInternal.t
+
 
 type src = [`File of string | `String of string]
+
 
 let read_file filename =
   let chan = open_in filename in
@@ -48,110 +25,54 @@ let read_file filename =
   really_input chan str 0 len;
   close_in chan; str
 
+
 let to_source = function
   | `File   s -> read_file s
   | `String s -> s
 
-let from_source st ~vertex_source ~fragment_source =
-  let vertex_source   = to_source vertex_source   in
-  let fragment_source = to_source fragment_source in
-  let program = GL.Program.create () in
-  let vshader = GL.Shader.create GLTypes.ShaderType.Vertex   in
-  let fshader = GL.Shader.create GLTypes.ShaderType.Fragment in
-  if not (GL.Shader.valid vshader) ||
-     not (GL.Shader.valid fshader) ||
-     not (GL.Program.valid program) then
-    raise (Compilation_error "Failed to create a GLSL program , the GL context may not be initialized");
-  GL.Shader.source vshader vertex_source;
-  GL.Shader.source fshader fragment_source;
-  GL.Shader.compile vshader;
-  GL.Shader.compile fshader;
-  if GL.Shader.status vshader = false then begin
-    let log = GL.Shader.log vshader in
-    let msg = Printf.sprintf "Error while compiling vertex shader : %s" log in
-    raise (Compilation_error msg)
-  end;
-  if GL.Shader.status fshader = false then begin
-    let log = GL.Shader.log fshader in
-    let msg = Printf.sprintf "Error while compiling fragment shader : %s" log in
-    raise (Compilation_error msg)
-  end;
-  GL.Program.attach program vshader;
-  GL.Program.attach program fshader;
-  GL.Program.link program;
-  GL.Program.detach program vshader;
-  GL.Program.detach program fshader;
-  GL.Shader.delete vshader;
-  GL.Shader.delete fshader;
-  if GL.Program.status program = false then begin
-    let log = GL.Program.log program in
-    let msg = Printf.sprintf "Error while linking GLSL program : %s" log in
-    raise (Linking_error msg)
-  end;
-  let rec uniforms = function
-    |0 -> []
-    |n -> begin
-      let name = GL.Program.uname program (n - 1) in
-      let kind = GL.Program.utype program (n - 1) in
-      let location = GL.Program.uloc program name in
-      {
-        Uniform.name = name; 
-        Uniform.kind = kind; 
-        Uniform.location = location
-      } :: (uniforms (n-1))
-    end
-  in
-  let rec attributes = function
-    |0 -> []
-    |n -> begin
-      let name = GL.Program.aname program (n - 1) in
-      let kind = GL.Program.atype program (n - 1) in
-      let location = GL.Program.aloc program name in
-      {
-        Attribute.name = name; 
-        Attribute.kind = kind; 
-        Attribute.location = location
-      } :: (attributes (n-1))
-    end
-  in
-  {
-    program;
-    id = State.LL.program_id st;
-    uniforms = uniforms (GL.Program.ucount program);
-    attributes = attributes (GL.Program.acount program);
-  }
+
+let from_source (type s) (module M : RenderTarget.T with type t = s)
+  ~target ~vertex_source ~fragment_source =
+  let vertex = to_source vertex_source   in
+  let fragment = to_source fragment_source in
+  let state = M.state target in
+  try 
+    ProgramInternal.create ~vertex ~fragment ~id:(State.LL.program_id state)
+  with 
+  | ProgramInternal.Compilation_error s -> raise (Compilation_error s)
+  | ProgramInternal.Linking_error     s -> raise (Linking_error s)
+  | ProgramInternal.Invalid_version   s -> raise (Invalid_version s)
  
 
-let from_source_list st ~vertex_source ~fragment_source =
-  let list_vshader = 
-    List.sort (fun (v,_) (v',_) -> - (compare v v')) vertex_source
-  in
-  let list_fshader = 
-    List.sort (fun (v,_) (v',_) -> - (compare v v')) fragment_source
-  in
+let from_source_list (type s) (module M : RenderTarget.T with type t = s)
+  ~target ~vertex_source ~fragment_source =
+  let vertex = List.map (fun (v,s) -> (v, to_source s)) vertex_source in
+  let fragment = List.map (fun (v,s) -> (v, to_source s)) fragment_source in
+  let state = M.state target in
   try 
-    let best_vshader = 
-      List.find (fun (v,_) -> State.is_glsl_version_supported st v) list_vshader
-      |> snd
-    in
-    let best_fshader = 
-      List.find (fun (v,_) -> State.is_glsl_version_supported st v) list_fshader
-      |> snd
-    in
-    from_source st ~vertex_source:best_vshader ~fragment_source:best_fshader
-  with Not_found -> raise (Invalid_version "No supported GLSL version provided")
+    ProgramInternal.create_list
+      ~vertex ~fragment ~id:(State.LL.program_id state)
+      ~version:(State.glsl_version state)
+  with 
+  | ProgramInternal.Compilation_error s -> raise (Compilation_error s)
+  | ProgramInternal.Linking_error     s -> raise (Linking_error s)
+  | ProgramInternal.Invalid_version   s -> raise (Invalid_version s)
+ 
 
-
-let from_source_pp st ~vertex_source ~fragment_source =
-  let vertex_source   = to_source vertex_source   in
-  let fragment_source = to_source fragment_source in
-  let version = State.glsl_version st in
-  let vsource = Printf.sprintf "#version %i\n\n%s" version vertex_source in
-  let fsource = Printf.sprintf "#version %i\n\n%s" version fragment_source in
-  from_source st
-    ~vertex_source:(`String vsource)
-    ~fragment_source:(`String fsource)
-
+let from_source_pp (type s) (module M : RenderTarget.T with type t = s)
+  ~target ~vertex_source ~fragment_source =
+  let vertex   = to_source vertex_source   in
+  let fragment = to_source fragment_source in
+  let state = M.state target in
+  try 
+    ProgramInternal.create_pp
+      ~vertex ~fragment ~id:(State.LL.program_id state)
+      ~version:(State.glsl_version state)
+  with 
+  | ProgramInternal.Compilation_error s -> raise (Compilation_error s)
+  | ProgramInternal.Linking_error     s -> raise (Linking_error s)
+  | ProgramInternal.Invalid_version   s -> raise (Invalid_version s)
+ 
 
 module LL = struct
 
@@ -161,15 +82,14 @@ module LL = struct
       State.LL.set_linked_program state None;
       GL.Program.use None
     end
-    |Some(p) when State.LL.linked_program state <> Some p.id -> begin
-      State.LL.set_linked_program state (Some p.id);
-      GL.Program.use (Some p.program);
+    |Some(p) when State.LL.linked_program state <> Some p.ProgramInternal.id -> begin
+      State.LL.set_linked_program state (Some p.ProgramInternal.id);
+      GL.Program.use (Some p.ProgramInternal.program);
     end
     | _ -> ()
 
+  let iter_uniforms prog f = List.iter f prog.ProgramInternal.uniforms
 
-  let iter_uniforms prog f = List.iter f prog.uniforms
-
-  let iter_attributes prog f = List.iter f prog.attributes
+  let iter_attributes prog f = List.iter f prog.ProgramInternal.attributes
 
 end

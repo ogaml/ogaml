@@ -50,7 +50,8 @@ module Texture2D = struct
   end
 
 
-  let create state src = 
+  let create (type s) (module M : RenderTarget.T with type t = s) target src = 
+    let state = M.state target in
     (* Extract the texture parameters *)
     let width, height, data = 
       match src with

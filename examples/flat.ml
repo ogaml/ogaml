@@ -7,6 +7,7 @@ let settings =
     ~resizable:true
     ~fullscreen:true
     ()
+
 let window =
   Window.create ~width:900 ~height:600 ~settings ~title:"Flat Example" ()
 
@@ -104,15 +105,15 @@ let circle =
     ()
 
 let draw () =
-  Shape.draw ~window ~shape:rectangle1 ();
-  Shape.draw ~window ~shape:rectangle2 ();
-  Shape.draw ~window ~shape:polygon1 ();
-  Shape.draw ~window ~shape:polygon2 ();
-  Shape.draw ~window ~shape:regular1 ();
-  Shape.draw ~window ~shape:regular2 ();
-  Shape.draw ~window ~shape:line1 ();
-  Shape.draw ~window ~shape:line2 ();
-  Shape.draw ~window ~shape:circle ()
+  Shape.draw (module Window) ~target:window ~shape:rectangle1 ();
+  Shape.draw (module Window) ~target:window ~shape:rectangle2 ();
+  Shape.draw (module Window) ~target:window ~shape:polygon1 ();
+  Shape.draw (module Window) ~target:window ~shape:polygon2 ();
+  Shape.draw (module Window) ~target:window ~shape:regular1 ();
+  Shape.draw (module Window) ~target:window ~shape:regular2 ();
+  Shape.draw (module Window) ~target:window ~shape:line1 ();
+  Shape.draw (module Window) ~target:window ~shape:line2 ();
+  Shape.draw (module Window) ~target:window ~shape:circle ()
 
 let do_all action param =
   action rectangle1 param ;

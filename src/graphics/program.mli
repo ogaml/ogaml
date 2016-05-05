@@ -53,28 +53,30 @@ end
 
 
 (** The type of GL programs *)
-type t
+type t = ProgramInternal.t
 
 (** Type of a source *)
 type src = [`File of string | `String of string]
 
 (** Creates a program from two shader sources. *)
-val from_source : State.t -> vertex_source:src -> fragment_source:src -> t
+val from_source : (module RenderTarget.T with type t = 'a) -> 
+  target:'a -> vertex_source:src -> fragment_source:src -> t
 
 (** Creates a program from a list of shader sources
   * and version numbers. Choses the best source for 
   * the current hardware. *)
-val from_source_list : State.t 
-                       -> vertex_source:(int * src) list  
-                       -> fragment_source:(int * src) list -> t 
+val from_source_list : (module RenderTarget.T with type t = 'a)
+  -> target:'a 
+  -> vertex_source:(int * src) list 
+  -> fragment_source:(int * src) list -> t 
 
 (** Creates a program from a source by prepending 
   * #version v where v is the best GLSL version supported
   * by the given context. *)
-val from_source_pp : State.t 
-                     -> vertex_source:src
-                     -> fragment_source:src -> t
+val from_source_pp : (module RenderTarget.T with type t = 'a) -> 
+  target:'a -> vertex_source:src -> fragment_source:src -> t
 
+(* Non-exposed functions *)
 module LL : sig
 
   (** Activates the program for use in the next rendering 

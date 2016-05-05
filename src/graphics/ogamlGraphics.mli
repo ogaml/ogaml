@@ -307,8 +307,8 @@ module State : sig
   (** This module encapsulates a copy of the internal GL state.
     * This allows efficient optimizations of state changes.
     *
-    * Most OpenGL functions require an instance of State.t. To get one,
-    * create a window and use Window.state. *)
+    * To get an instance of a State.t, create a context (via a window) and
+    * use Window.state *)
 
   (** Raised when trying to perform an invalid state change 
     * (for example, binding a texture to an invalid texture unit) *)
@@ -335,6 +335,39 @@ module State : sig
 
   (** Returns the number of available texture units *)
   val max_textures : t -> int
+
+end
+
+
+(** Render target specification *)
+module RenderTarget : sig
+
+  (** This module contains the common signature for all valid render targets.
+    * This includes the module Window and all the submodules of RenderTexture. *)
+
+  (** Signature of a valid render target module *)
+  module type T = sig
+
+    (** Type of a render target *)
+    type t
+
+    (** Returns the size of a render target *)
+    val size : t -> OgamlMath.Vector2i.t
+
+    (** Returns the internal context associated to a render target *)
+    val state : t -> State.t
+
+    (** Displays the render target *)
+    val display : t -> unit
+
+    (** Clears a render target *)
+    val clear : ?color:Color.t -> ?depth:bool -> ?stencil:bool -> t -> unit
+
+    (** Binds a render target for drawing. System-only function, usually done
+      * automatically. *)
+    val bind : t -> DrawParameter.t -> unit
+
+  end
 
 end
 
@@ -397,7 +430,8 @@ module Texture : sig
     type t
 
     (** Creates a texture from a source (a file or an image) *)
-    val create : State.t -> [< `File of string | `Image of Image.t ] -> t
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> 
+                 [< `File of string | `Image of Image.t ] -> t
 
     (** Returns the size of a texture *)
     val size : t -> OgamlMath.Vector2i.t
@@ -476,7 +510,8 @@ module Font : sig
   val spacing : t -> int -> float
 
   (** Returns the texture associated to a given font size *)
-  val texture : State.t -> t -> int -> Texture.Texture2D.t
+  val texture : (module RenderTarget.T with type t = 'a) -> 'a -> 
+                t -> int -> Texture.Texture2D.t
 
 end
 
@@ -503,25 +538,26 @@ module Program : sig
   (** Type of a source, from a file or from a string *)
   type src = [`File of string | `String of string]
 
-  (** Compiles a program from a state (gotten from a window), a vertex source 
+  (** Compiles a program from a rendering context, a vertex source 
     * and a fragment source.
     * The source must begin with a version assigment $#version xxx$ *)
-  val from_source : State.t -> vertex_source:src -> fragment_source:src -> t
+  val from_source : (module RenderTarget.T with type t = 'a) -> target:'a -> 
+                    vertex_source:src -> fragment_source:src -> t
 
-  (** Compiles a program from a state (gotten from a window) and
+  (** Compiles a program from a rendering context and
     * a list of sources paired with their required GLSL version.
     * The function will chose the best source for the current context.
     * @see:OgamlGraphics.State *)
-  val from_source_list : State.t
+  val from_source_list : (module RenderTarget.T with type t = 'a) -> target:'a 
                         -> vertex_source:(int * src) list
                         -> fragment_source:(int * src) list -> t
 
-  (** Compiles a program from a vertex source and a fragment source.
+  (** Compiles a program from a rendering context and a source.
     * The source should not begin with a $#version xxx$ assignment,
     * as the function will preprocess the sources and prepend the
     * best version declaration.
     * @see:OgamlGraphics.State *)
-  val from_source_pp : State.t
+  val from_source_pp : (module RenderTarget.T with type t = 'a) -> target:'a 
                       -> vertex_source:src
                       -> fragment_source:src -> t
 
@@ -589,54 +625,6 @@ module Uniform : sig
 end
 
 
-(** Library of useful predefined programs *)
-module ProgramLibrary : sig
-  
-  (** This module provides several predefined programs 
-    * that are used internally by Ogaml.
-    * Those programs are compatible with the types used by the module VertexArray *)
-
-  (** Type of a library *)
-  type t
-
-  (** Creates a library from a GL state. 
-    * The library will compile the programs using the best
-    * version supported by the state. *)
-  val create : State.t -> t
-
-  (** Returns a shape drawing program from a library.
-    * This program requires the following attributes :
-    *
-    *   - position : as a Vector3f.t, in pixels, relative to the top-left corner
-    * (the 3rd coordinate is there for compatibility with VertexArray and is ignored)
-    *
-    *   - color : as a Color.t
-    *
-    * It also requires the following uniforms :
-    *   
-    *   - size : the size of the window, in pixels, as a Vector2f.t
-    *)
-  val shape_drawing : t -> Program.t
-
-  (** Returns a sprite drawing program from a library.
-    * This program requires the following attributes :
-    *
-    *   - position : as a Vector3f.t, in pixels, relative to the top-left corner
-    * (the 3rd coordinate is there for compatibility with VertexArray and is ignored)
-    *
-    *   - uv : as a Vector2f.t, in relative coordinates (between 0 and 1)
-    *
-    * It also requires the following uniforms :
-    *   
-    *   - size : the size of the window, in pixels, as a Vector2f.t
-    *
-    *   - utexture : as a Texture.t
-    *)
-  val sprite_drawing : t -> Program.t
-
-end
-
-
 (** High-level window wrapper for rendering and event management *)
 module Window : sig
 
@@ -667,6 +655,9 @@ module Window : sig
     ?height:int ->
     ?title:string ->
     ?settings:OgamlCore.ContextSettings.t -> unit -> t
+
+  (** Returns the settings used at the creation of the window *)
+  val settings : t -> OgamlCore.ContextSettings.t
 
   (** Returns the internal GL state of the window
     * @see:OgamlGraphics.State *)
@@ -714,11 +705,16 @@ module Window : sig
   (** Displays the window after the GL calls *)
   val display : t -> unit
 
-  (** Clears the window *)
-  val clear : ?color:Color.t -> t -> unit
+  (** Clears the window.
+    * The default color is opaque black. 
+    * Clears the depth buffer and the stencil buffer by default. *)
+  val clear : ?color:Color.t -> ?depth:bool -> ?stencil:bool -> t -> unit
 
   (** Show or hide the cursor *)
   val show_cursor : t -> bool -> unit
+
+  (** Binds the window for drawing. This function is for internal use only. *)
+  val bind : t -> DrawParameter.t -> unit
 
 end
 
@@ -776,11 +772,11 @@ module IndexArray : sig
 
   (** Creates a static index array. A static array is faster but can not be modified after creation.
     * @see:OgamlGraphics.IndexArray.Source *)
-  val static : State.t -> Source.t -> static t
+  val static : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> static t
 
   (** Creates a dynamic index array that can be modified after creation.
     * @see:OgamlGraphics.IndexArray.Source *)
-  val dynamic : State.t -> Source.t -> dynamic t
+  val dynamic : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> dynamic t
 
   (** $rebuild array src offset$ rebuilds $array$ starting from
     * the index at position $offset$ using $src$.
@@ -834,9 +830,9 @@ module VertexArray : sig
       * @see:OgamlMath.Vector2f
       * @see:OgamlGraphics.Color *)
     val create : ?position:OgamlMath.Vector3f.t ->
-                ?texcoord:OgamlMath.Vector2f.t ->
-                ?normal:OgamlMath.Vector3f.t   ->
-                ?color:Color.t -> unit -> t
+                 ?texcoord:OgamlMath.Vector2f.t ->
+                 ?normal:OgamlMath.Vector3f.t   ->
+                 ?color:Color.t -> unit -> t
 
     (** Returns the (optional) position of a vertex *)
     val position : t -> OgamlMath.Vector3f.t option
@@ -946,11 +942,11 @@ module VertexArray : sig
 
   (** Creates a static array from a source. A static array is faster
     * but cannot be modified later. @see:OgamlGraphics.VertexArray.Source *)
-  val static : State.t -> Source.t -> static t
+  val static : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> static t
 
   (** Creates a dynamic vertex array that can be modified later.
     * @see:OgamlGraphics.VertexArray.Source *)
-  val dynamic : State.t -> Source.t -> dynamic t
+  val dynamic : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> dynamic t
 
   (** $rebuild array src offset$ rebuilds $array$ starting from
     * the vertex at position $offset$ using $src$.
@@ -979,9 +975,10 @@ module VertexArray : sig
     * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
   val draw :
-    vertices   : 'a t ->
-    window     : Window.t ->
-    ?indices   : 'b IndexArray.t ->
+    (module RenderTarget.T with type t = 'a) ->
+    vertices   : 'b t ->
+    target     : 'a ->
+    ?indices   : 'c IndexArray.t ->
     program    : Program.t ->
     ?uniform    : Uniform.t ->
     ?parameters : DrawParameter.t ->
@@ -1167,11 +1164,11 @@ module VertexMap : sig
 
   (** Creates a static map from a source. A static map is faster
     * but cannot be modified later. @see:OgamlGraphics.VertexMap.Source *)
-  val static : State.t -> Source.t -> static t
+  val static : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> static t
 
   (** Creates a dynamic vertex map that can be modified later.
     * @see:OgamlGraphics.VertexMap.Source *)
-  val dynamic : State.t -> Source.t -> dynamic t
+  val dynamic : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> dynamic t
 
   (** $rebuild map src offset$ rebuilds $map$ starting from
     * the vertex at position $offset$ using $src$.
@@ -1200,9 +1197,10 @@ module VertexMap : sig
     * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
   val draw :
-    vertices   : 'a t ->
-    window     : Window.t ->
-    ?indices   : 'b IndexArray.t ->
+    (module RenderTarget.T with type t = 'a) ->
+    vertices   : 'b t ->
+    target     : 'a ->
+    ?indices   : 'c IndexArray.t ->
     program    : Program.t ->
     ?uniform    : Uniform.t ->
     ?parameters : DrawParameter.t ->
@@ -1417,7 +1415,8 @@ module Shape : sig
     *
     * @see:OgamlGraphics.DrawParameter
     * @see:OgamlGraphics.Window *)
-  val draw : ?parameters:DrawParameter.t -> window:Window.t -> shape:t -> unit -> unit
+  val draw : (module RenderTarget.T with type t = 'a) ->
+             ?parameters:DrawParameter.t -> target:'a -> shape:t -> unit -> unit
 
   (** Sets the position of the origin in the window. *)
   val set_position : t -> OgamlMath.Vector2f.t -> unit
@@ -1529,7 +1528,8 @@ val debug_t : debug_times
     *
     * @see:OgamlGraphics.DrawParameter
     * @see:OgamlGraphics.Window *)
-  val draw : ?parameters:DrawParameter.t -> window:Window.t -> sprite:t -> unit -> unit
+  val draw : (module RenderTarget.T with type t = 'a) -> 
+             ?parameters:DrawParameter.t -> target:'a -> sprite:t -> unit -> unit
 
   (** Sets the position of the origin of the sprite in the window. *)
   val set_position : t -> OgamlMath.Vector2f.t -> unit
@@ -1651,7 +1651,8 @@ module Text : sig
 
     (** Creates a drawable text with strongly customisable parameters. *)
     val create :
-      state : State.t ->
+      (module RenderTarget.T with type t = 'a) ->
+      target : 'a ->
       text : string ->
       position : OgamlMath.Vector2f.t ->
       font : Font.t ->
@@ -1661,9 +1662,10 @@ module Text : sig
 
     (** Draws a Fx.t. *)
     val draw :
+      (module RenderTarget.T with type t = 'a) ->
       ?parameters : DrawParameter.t ->
       text : t ->
-      window : Window.t ->
+      target : 'a ->
       unit -> unit
 
     (** The global advance of the text.
@@ -1692,9 +1694,10 @@ module Text : sig
 
   (** Draws text on the screen. *)
   val draw :
+    (module RenderTarget.T with type t = 'a) ->
     ?parameters : DrawParameter.t ->
     text : t ->
-    window : Window.t ->
+    target : 'a ->
     unit -> unit
 
   (** The global advance of the text.

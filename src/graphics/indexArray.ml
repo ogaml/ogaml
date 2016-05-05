@@ -41,7 +41,7 @@ type _ t = {
   id : int;
 }
 
-let dynamic state src = 
+let dynamic (type s) (module M : RenderTarget.T with type t = s) target src = 
   let buffer = GL.EBO.create () in
   let data = src.Source.data in
   GL.EBO.bind (Some buffer);
@@ -51,10 +51,10 @@ let dynamic state src =
     buffer;
     size = GL.Data.length data;
     length = Source.length src; 
-    id = State.LL.ebo_id state
+    id = State.LL.ebo_id (M.state target)
   }
 
-let static state src = 
+let static (type s) (module M : RenderTarget.T with type t = s) target src = 
   let buffer = GL.EBO.create () in
   let data = src.Source.data in
   GL.EBO.bind (Some buffer);
@@ -64,7 +64,7 @@ let static state src =
     buffer;
     size = GL.Data.length data;
     length = Source.length src; 
-    id = State.LL.ebo_id state
+    id = State.LL.ebo_id (M.state target)
   }
 
 let rebuild t src start =

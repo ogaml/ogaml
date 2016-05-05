@@ -58,7 +58,9 @@ val create_line :
   unit -> t
 
 (** Draws a shape. *)
-val draw : ?parameters:DrawParameter.t -> window:Window.t -> shape:t -> unit -> unit
+val draw : 
+    (module RenderTarget.T with type t = 'a) ->
+    ?parameters:DrawParameter.t -> target:'a -> shape:t -> unit -> unit
 
 (** Outputs a shape to a vertex array source by mapping its vertices *)
 val map_to_source : t -> 

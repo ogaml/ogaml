@@ -1,5 +1,22 @@
 open OgamlMath
 
+module type T = sig
+
+  type t
+
+  val size : t -> OgamlMath.Vector2i.t
+
+  val state : t -> State.t
+
+  val display : t -> unit
+
+  val clear : ?color:Color.t -> ?depth:bool -> ?stencil:bool -> t -> unit
+
+  val bind : t -> DrawParameter.t -> unit
+
+end
+
+
 let bind_fbo state id fbo = 
   if State.LL.bound_fbo state <> id then begin 
     State.LL.set_bound_fbo state id;

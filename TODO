@@ -48,7 +48,7 @@ Interface changes:
   Textures:
     ☐ Check for texture max size at creation
   State:
-    ☐ Rename State in GLState
+    ☐ Rename State in GLContext
     ✔ Add state to all functions that need it, even implicitly (ie. Program.create) @done(2016-04-30 12:00) @project(Interface changes / State)
     ✔ Fix VAO, VBO, EBO and Program ID recycling @done(2016-04-30 12:00) @project(Interface changes / State)
   Parameters:

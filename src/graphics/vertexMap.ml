@@ -311,9 +311,11 @@ let create state src kind =
    id = State.LL.vao_id state
   }
 
-let dynamic state src = create state src GLTypes.VBOKind.DynamicDraw
+let dynamic (type s) (module M : RenderTarget.T with type t = s) target src = 
+  create (M.state target) src GLTypes.VBOKind.DynamicDraw
 
-let static  state src = create state src GLTypes.VBOKind.StaticDraw
+let static (type s) (module M : RenderTarget.T with type t = s) target src = 
+  create (M.state target) src GLTypes.VBOKind.StaticDraw
 
 let length t = t.length
 
@@ -406,12 +408,13 @@ let bind state t prog =
   end
 
 
-let draw ~vertices ~window ?indices ~program
+let draw (type s) (module M : RenderTarget.T with type t = s)
+         ~vertices ~target ?indices ~program
          ?uniform:(uniform = Uniform.empty) 
          ?parameters:(parameters = DrawParameter.make ()) 
          ?start ?length
          ?mode:(mode = DrawMode.Triangles) () =
-  let state = Window.state window in
+  let state = M.state target in
   let start = 
     match start with
     |None -> 0
@@ -423,7 +426,7 @@ let draw ~vertices ~window ?indices ~program
     |None, Some ebo -> IndexArray.length ebo - start
     |Some l, _ -> l
   in
-  Window.LL.bind_draw_parameters window parameters;
+  M.bind target parameters;
   Program.LL.use state (Some program);
   Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind state uniform unif);
   bind state vertices program;

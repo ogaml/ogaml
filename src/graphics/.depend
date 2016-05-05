@@ -7,17 +7,19 @@ color.cmx : ../math/ogamlMath.cmi color.cmi
 drawParameter.cmo : ../math/ogamlMath.cmi drawParameter.cmi
 drawParameter.cmx : ../math/ogamlMath.cmi drawParameter.cmi
 font.cmo : ../math/vector2i.cmi ../math/vector2f.cmi texture.cmi \
-    ../math/ogamlMath.cmi ../math/intRect.cmi image.cmi ../math/floatRect.cmi \
-    color.cmi font.cmi
+    renderTarget.cmi ../math/ogamlMath.cmi ../math/intRect.cmi image.cmi \
+    ../math/floatRect.cmi color.cmi font.cmi
 font.cmx : ../math/vector2i.cmx ../math/vector2f.cmx texture.cmx \
-    ../math/ogamlMath.cmi ../math/intRect.cmx image.cmx ../math/floatRect.cmx \
-    color.cmx font.cmi
+    renderTarget.cmx ../math/ogamlMath.cmi ../math/intRect.cmx image.cmx \
+    ../math/floatRect.cmx color.cmx font.cmi
 image.cmo : ../math/vector2i.cmi ../math/ogamlMath.cmi ../math/intRect.cmi \
     color.cmi image.cmi
 image.cmx : ../math/vector2i.cmx ../math/ogamlMath.cmi ../math/intRect.cmx \
     color.cmx image.cmi
-indexArray.cmo : state.cmi GLTypes.cmi GL.cmi indexArray.cmi
-indexArray.cmx : state.cmx GLTypes.cmi GL.cmx indexArray.cmi
+indexArray.cmo : state.cmi renderTarget.cmi GLTypes.cmi GL.cmi \
+    indexArray.cmi
+indexArray.cmx : state.cmx renderTarget.cmx GLTypes.cmi GL.cmx \
+    indexArray.cmi
 keyboard.cmo : ../core/ogamlCore.cmi ../core/LL.cmi keyboard.cmi
 keyboard.cmx : ../core/ogamlCore.cmi ../core/LL.cmx keyboard.cmi
 model.cmo : vertexArray.cmi ../math/vector3i.cmi ../math/vector3f.cmi \
@@ -28,119 +30,125 @@ model.cmx : vertexArray.cmx ../math/vector3i.cmx ../math/vector3f.cmx \
     ../math/matrix3D.cmx indexArray.cmx color.cmx model.cmi
 mouse.cmo : window.cmi ../core/ogamlCore.cmi ../core/LL.cmi mouse.cmi
 mouse.cmx : window.cmx ../core/ogamlCore.cmi ../core/LL.cmx mouse.cmi
-program.cmo : state.cmi GLTypes.cmi GL.cmi program.cmi
-program.cmx : state.cmx GLTypes.cmi GL.cmx program.cmi
-programLibrary.cmo : state.cmi program.cmi programLibrary.cmi
-programLibrary.cmx : state.cmx program.cmx programLibrary.cmi
-renderFunctions.cmo : ../math/vector2i.cmi ../math/vector2f.cmi state.cmi \
+program.cmo : state.cmi renderTarget.cmi programInternal.cmo GL.cmi \
+    program.cmi
+program.cmx : state.cmx renderTarget.cmx programInternal.cmx GL.cmx \
+    program.cmi
+programInternal.cmo : GLTypes.cmi GL.cmi
+programInternal.cmx : GLTypes.cmi GL.cmx
+renderTarget.cmo : ../math/vector2i.cmi ../math/vector2f.cmi state.cmi \
     ../math/ogamlMath.cmi ../math/intRect.cmi GL.cmi ../math/floatRect.cmi \
-    drawParameter.cmi color.cmi renderFunctions.cmi
-renderFunctions.cmx : ../math/vector2i.cmx ../math/vector2f.cmx state.cmx \
+    drawParameter.cmi color.cmi renderTarget.cmi
+renderTarget.cmx : ../math/vector2i.cmx ../math/vector2f.cmx state.cmx \
     ../math/ogamlMath.cmi ../math/intRect.cmx GL.cmx ../math/floatRect.cmx \
-    drawParameter.cmx color.cmx renderFunctions.cmi
+    drawParameter.cmx color.cmx renderTarget.cmi
 renderTexture.cmo : ../math/vector2i.cmi texture.cmi state.cmi \
-    renderFunctions.cmi programLibrary.cmi ../math/ogamlMath.cmi image.cmi \
-    GLTypes.cmi GL.cmi color.cmi renderTexture.cmi
+    ../math/ogamlMath.cmi image.cmi GLTypes.cmi GL.cmi color.cmi \
+    renderTexture.cmi
 renderTexture.cmx : ../math/vector2i.cmx texture.cmx state.cmx \
-    renderFunctions.cmx programLibrary.cmx ../math/ogamlMath.cmi image.cmx \
-    GLTypes.cmi GL.cmx color.cmx renderTexture.cmi
-shape.cmo : window.cmi vertexMap.cmi vertexArray.cmi ../math/vector3f.cmi \
-    ../math/vector2f.cmi uniform.cmi programLibrary.cmi ../math/ogamlMath.cmi \
-    drawParameter.cmi drawMode.cmi ../math/constants.cmi color.cmi shape.cmi
-shape.cmx : window.cmx vertexMap.cmx vertexArray.cmx ../math/vector3f.cmx \
-    ../math/vector2f.cmx uniform.cmx programLibrary.cmx ../math/ogamlMath.cmi \
-    drawParameter.cmx drawMode.cmi ../math/constants.cmx color.cmx shape.cmi
-sprite.cmo : window.cmi vertexMap.cmi vertexArray.cmi ../math/vector3f.cmi \
-    ../math/vector2f.cmi uniform.cmi texture.cmi programLibrary.cmi \
+    ../math/ogamlMath.cmi image.cmx GLTypes.cmi GL.cmx color.cmx \
+    renderTexture.cmi
+shape.cmo : vertexMap.cmi vertexArray.cmi ../math/vector3f.cmi \
+    ../math/vector2f.cmi uniform.cmi state.cmi renderTarget.cmi \
+    ../math/ogamlMath.cmi drawParameter.cmi drawMode.cmi \
+    ../math/constants.cmi color.cmi shape.cmi
+shape.cmx : vertexMap.cmx vertexArray.cmx ../math/vector3f.cmx \
+    ../math/vector2f.cmx uniform.cmx state.cmx renderTarget.cmx \
+    ../math/ogamlMath.cmi drawParameter.cmx drawMode.cmi \
+    ../math/constants.cmx color.cmx shape.cmi
+sprite.cmo : vertexMap.cmi vertexArray.cmi ../math/vector3f.cmi \
+    ../math/vector2f.cmi uniform.cmi texture.cmi state.cmi renderTarget.cmi \
     ../math/ogamlMath.cmi ../math/intRect.cmi ../math/floatRect.cmi \
     drawParameter.cmi ../math/constants.cmi sprite.cmi
-sprite.cmx : window.cmx vertexMap.cmx vertexArray.cmx ../math/vector3f.cmx \
-    ../math/vector2f.cmx uniform.cmx texture.cmx programLibrary.cmx \
+sprite.cmx : vertexMap.cmx vertexArray.cmx ../math/vector3f.cmx \
+    ../math/vector2f.cmx uniform.cmx texture.cmx state.cmx renderTarget.cmx \
     ../math/ogamlMath.cmi ../math/intRect.cmx ../math/floatRect.cmx \
     drawParameter.cmx ../math/constants.cmx sprite.cmi
-state.cmo : ../math/ogamlMath.cmi GLTypes.cmi GL.cmi drawParameter.cmi \
-    color.cmi state.cmi
-state.cmx : ../math/ogamlMath.cmi GLTypes.cmi GL.cmx drawParameter.cmx \
-    color.cmx state.cmi
-text.cmo : window.cmi vertexMap.cmi vertexArray.cmi ../math/vector3f.cmi \
+state.cmo : programInternal.cmo ../math/ogamlMath.cmi GLTypes.cmi GL.cmi \
+    drawParameter.cmi color.cmi state.cmi
+state.cmx : programInternal.cmx ../math/ogamlMath.cmi GLTypes.cmi GL.cmx \
+    drawParameter.cmx color.cmx state.cmi
+text.cmo : vertexMap.cmi vertexArray.cmi ../math/vector3f.cmi \
     ../math/vector2f.cmi uniform.cmi ../utils/UTF8String.cmi texture.cmi \
-    programLibrary.cmi ../utils/ogamlUtils.cmi ../math/ogamlMath.cmi \
+    state.cmi renderTarget.cmi ../utils/ogamlUtils.cmi ../math/ogamlMath.cmi \
     ../core/ogamlCore.cmi font.cmi ../math/floatRect.cmi drawParameter.cmi \
     drawMode.cmi color.cmi text.cmi
-text.cmx : window.cmx vertexMap.cmx vertexArray.cmx ../math/vector3f.cmx \
+text.cmx : vertexMap.cmx vertexArray.cmx ../math/vector3f.cmx \
     ../math/vector2f.cmx uniform.cmx ../utils/UTF8String.cmx texture.cmx \
-    programLibrary.cmx ../utils/ogamlUtils.cmi ../math/ogamlMath.cmi \
+    state.cmx renderTarget.cmx ../utils/ogamlUtils.cmi ../math/ogamlMath.cmi \
     ../core/ogamlCore.cmi font.cmx ../math/floatRect.cmx drawParameter.cmx \
     drawMode.cmi color.cmx text.cmi
-texture.cmo : state.cmi ../math/ogamlMath.cmi image.cmi GLTypes.cmi GL.cmi \
-    texture.cmi
-texture.cmx : state.cmx ../math/ogamlMath.cmi image.cmx GLTypes.cmi GL.cmx \
-    texture.cmi
+texture.cmo : state.cmi renderTarget.cmi ../math/ogamlMath.cmi image.cmi \
+    GLTypes.cmi GL.cmi texture.cmi
+texture.cmx : state.cmx renderTarget.cmx ../math/ogamlMath.cmi image.cmx \
+    GLTypes.cmi GL.cmx texture.cmi
 uniform.cmo : texture.cmi state.cmi program.cmi ../math/ogamlMath.cmi \
     GLTypes.cmi GL.cmi color.cmi uniform.cmi
 uniform.cmx : texture.cmx state.cmx program.cmx ../math/ogamlMath.cmi \
     GLTypes.cmi GL.cmx color.cmx uniform.cmi
-vertexArray.cmo : window.cmi ../math/vector3f.cmi ../math/vector2f.cmi \
-    uniform.cmi state.cmi program.cmi ../math/ogamlMath.cmi indexArray.cmi \
-    GLTypes.cmi GL.cmi drawParameter.cmi drawMode.cmi color.cmi \
-    vertexArray.cmi
-vertexArray.cmx : window.cmx ../math/vector3f.cmx ../math/vector2f.cmx \
-    uniform.cmx state.cmx program.cmx ../math/ogamlMath.cmi indexArray.cmx \
-    GLTypes.cmi GL.cmx drawParameter.cmx drawMode.cmi color.cmx \
-    vertexArray.cmi
-vertexMap.cmo : window.cmi vertexArray.cmi ../math/vector3i.cmi \
-    ../math/vector3f.cmi ../math/vector2i.cmi ../math/vector2f.cmi \
-    uniform.cmi state.cmi program.cmi ../math/ogamlMath.cmi indexArray.cmi \
+vertexArray.cmo : ../math/vector3f.cmi ../math/vector2f.cmi uniform.cmi \
+    state.cmi renderTarget.cmi program.cmi ../math/ogamlMath.cmi \
+    indexArray.cmi GLTypes.cmi GL.cmi drawParameter.cmi drawMode.cmi \
+    color.cmi vertexArray.cmi
+vertexArray.cmx : ../math/vector3f.cmx ../math/vector2f.cmx uniform.cmx \
+    state.cmx renderTarget.cmx program.cmx ../math/ogamlMath.cmi \
+    indexArray.cmx GLTypes.cmi GL.cmx drawParameter.cmx drawMode.cmi \
+    color.cmx vertexArray.cmi
+vertexMap.cmo : vertexArray.cmi ../math/vector3i.cmi ../math/vector3f.cmi \
+    ../math/vector2i.cmi ../math/vector2f.cmi uniform.cmi state.cmi \
+    renderTarget.cmi program.cmi ../math/ogamlMath.cmi indexArray.cmi \
     GLTypes.cmi GL.cmi drawParameter.cmi drawMode.cmi color.cmi vertexMap.cmi
-vertexMap.cmx : window.cmx vertexArray.cmx ../math/vector3i.cmx \
-    ../math/vector3f.cmx ../math/vector2i.cmx ../math/vector2f.cmx \
-    uniform.cmx state.cmx program.cmx ../math/ogamlMath.cmi indexArray.cmx \
+vertexMap.cmx : vertexArray.cmx ../math/vector3i.cmx ../math/vector3f.cmx \
+    ../math/vector2i.cmx ../math/vector2f.cmx uniform.cmx state.cmx \
+    renderTarget.cmx program.cmx ../math/ogamlMath.cmi indexArray.cmx \
     GLTypes.cmi GL.cmx drawParameter.cmx drawMode.cmi color.cmx vertexMap.cmi
-window.cmo : state.cmi renderFunctions.cmi programLibrary.cmi \
-    ../math/ogamlMath.cmi ../core/ogamlCore.cmi ../core/LL.cmi \
-    ../core/contextSettings.cmi color.cmi window.cmi
-window.cmx : state.cmx renderFunctions.cmx programLibrary.cmx \
-    ../math/ogamlMath.cmi ../core/ogamlCore.cmi ../core/LL.cmx \
-    ../core/contextSettings.cmx color.cmx window.cmi
+window.cmo : state.cmi renderTarget.cmi ../math/ogamlMath.cmi \
+    ../core/ogamlCore.cmi ../core/LL.cmi ../core/contextSettings.cmi \
+    color.cmi window.cmi
+window.cmx : state.cmx renderTarget.cmx ../math/ogamlMath.cmi \
+    ../core/ogamlCore.cmi ../core/LL.cmx ../core/contextSettings.cmx \
+    color.cmx window.cmi
 GL.cmi : ../math/ogamlMath.cmi GLTypes.cmi drawParameter.cmi drawMode.cmi \
     color.cmi
 GLTypes.cmi :
 color.cmi :
 drawMode.cmi :
 drawParameter.cmi : ../math/ogamlMath.cmi
-font.cmi : texture.cmi state.cmi ../math/ogamlMath.cmi
+font.cmi : texture.cmi renderTarget.cmi ../math/ogamlMath.cmi
 image.cmi : ../math/ogamlMath.cmi color.cmi
-indexArray.cmi : state.cmi
+indexArray.cmi : state.cmi renderTarget.cmi
 keyboard.cmi : ../core/ogamlCore.cmi
 model.cmi : vertexArray.cmi ../math/ogamlMath.cmi indexArray.cmi color.cmi
 mouse.cmi : window.cmi ../math/ogamlMath.cmi ../core/ogamlCore.cmi
 objAST.cmi : ../math/ogamlMath.cmi
 objParser.cmi : objAST.cmi
 ogamlGraphics.cmi : ../math/ogamlMath.cmi ../core/ogamlCore.cmi
-program.cmi : state.cmi GLTypes.cmi GL.cmi
-programLibrary.cmi : state.cmi program.cmi
-renderFunctions.cmi : state.cmi ../math/ogamlMath.cmi GL.cmi \
+program.cmi : state.cmi renderTarget.cmi programInternal.cmo GLTypes.cmi \
+    GL.cmi
+renderTarget.cmi : state.cmi ../math/ogamlMath.cmi GL.cmi drawParameter.cmi \
+    color.cmi
+renderTexture.cmi : texture.cmi state.cmi ../math/ogamlMath.cmi \
     drawParameter.cmi color.cmi
-renderTexture.cmi : texture.cmi state.cmi programLibrary.cmi \
+shape.cmi : vertexMap.cmi vertexArray.cmi renderTarget.cmi \
     ../math/ogamlMath.cmi drawParameter.cmi color.cmi
-shape.cmi : window.cmi vertexMap.cmi vertexArray.cmi ../math/ogamlMath.cmi \
-    drawParameter.cmi color.cmi
-sprite.cmi : window.cmi vertexMap.cmi vertexArray.cmi texture.cmi \
+sprite.cmi : vertexMap.cmi vertexArray.cmi texture.cmi renderTarget.cmi \
     ../math/ogamlMath.cmi drawParameter.cmi
-state.cmi : ../math/ogamlMath.cmi GLTypes.cmi drawParameter.cmi color.cmi
-text.cmi : window.cmi vertexMap.cmi vertexArray.cmi state.cmi \
+state.cmi : programInternal.cmo ../math/ogamlMath.cmi GLTypes.cmi \
+    drawParameter.cmi color.cmi
+text.cmi : vertexMap.cmi vertexArray.cmi renderTarget.cmi \
     ../math/ogamlMath.cmi font.cmi drawParameter.cmi color.cmi
-texture.cmi : state.cmi ../math/ogamlMath.cmi image.cmi GL.cmi
+texture.cmi : state.cmi renderTarget.cmi ../math/ogamlMath.cmi image.cmi \
+    GL.cmi
 uniform.cmi : texture.cmi state.cmi program.cmi ../math/ogamlMath.cmi \
     color.cmi
-vertexArray.cmi : window.cmi uniform.cmi state.cmi program.cmi \
+vertexArray.cmi : uniform.cmi renderTarget.cmi program.cmi \
     ../math/ogamlMath.cmi indexArray.cmi drawParameter.cmi drawMode.cmi \
     color.cmi
-vertexMap.cmi : window.cmi vertexArray.cmi uniform.cmi state.cmi program.cmi \
+vertexMap.cmi : vertexArray.cmi uniform.cmi renderTarget.cmi program.cmi \
     ../math/ogamlMath.cmi indexArray.cmi drawParameter.cmi drawMode.cmi \
     color.cmi
-window.cmi : state.cmi programLibrary.cmi ../math/ogamlMath.cmi \
-    ../core/ogamlCore.cmi drawParameter.cmi color.cmi
+window.cmi : state.cmi ../math/ogamlMath.cmi ../core/ogamlCore.cmi \
+    drawParameter.cmi color.cmi
 objParser.cmo : objAST.cmi objParser.cmi
 objParser.cmx : objAST.cmi objParser.cmi
 objParser.cmi : objAST.cmi

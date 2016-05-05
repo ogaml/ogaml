@@ -49,7 +49,8 @@ val linegap : t -> int -> float
 val spacing : t -> int -> float
 
 (** Returns the texture of a given font size *)
-val texture : State.t -> t -> int -> Texture.Texture2D.t
+val texture : (module RenderTarget.T with type t = 'a) -> 'a 
+              -> t -> int -> Texture.Texture2D.t
 
 
 

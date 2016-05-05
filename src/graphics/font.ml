@@ -90,11 +90,11 @@ module Shelf = struct
                 height = h})
     end
 
-  let texture state s =
+  let texture (type s) (module M : RenderTarget.T with type t = s) target s =
     let global = Image.create (`Empty (Vector2i.({x = s.width; y = s.height + s.row_height + 1}), `RGB Color.RGB.transparent)) in
     Image.blit s.full global Vector2i.zero;
     Image.blit s.row global Vector2i.({x = 0; y = s.height + 1});
-    Texture.Texture2D.create state (`Image global)
+    Texture.Texture2D.create (module M) target (`Image global)
 
 end
 
@@ -278,10 +278,10 @@ let spacing t i =
   (ascent t i) -. (descent t i) +. (linegap t i)
 
 
-let texture state t s =
+let texture (type s) (module M : RenderTarget.T with type t = s) target t s =
   let page = get_size t s in
   if page.modified || page.texture = None then begin
-    page.texture <- Some (Shelf.texture state page.shelf);
+    page.texture <- Some (Shelf.texture (module M) target page.shelf);
     page.modified <- false
   end;
   match page.texture with

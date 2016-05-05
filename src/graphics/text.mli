@@ -18,7 +18,8 @@ module Fx : sig
 
   (* TODO: Exception when the iterator doesn't return list of right size *)
   val create :
-    state : State.t ->
+    (module RenderTarget.T with type t = 'a) ->
+    target : 'a ->
     text : string ->
     position : OgamlMath.Vector2f.t ->
     font : Font.t ->
@@ -27,9 +28,10 @@ module Fx : sig
     unit -> t
 
   val draw :
+    (module RenderTarget.T with type t = 'a) ->
     ?parameters : DrawParameter.t ->
     text : t ->
-    window : Window.t ->
+    target : 'a ->
     unit -> unit
 
   val advance : t -> OgamlMath.Vector2f.t
@@ -50,9 +52,10 @@ val create :
   unit -> t
 
 val draw :
+  (module RenderTarget.T with type t = 'a) ->
   ?parameters : DrawParameter.t ->
   text : t ->
-  window : Window.t ->
+  target : 'a ->
   unit -> unit
 
 val map_to_source : t -> 

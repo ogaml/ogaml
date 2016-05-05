@@ -11,6 +11,9 @@ val create :
 (** Changes the title of the window. *)
 val set_title : t -> string -> unit
 
+(** Returns the settings used at the creation of the window *)
+val settings : t -> OgamlCore.ContextSettings.t
+
 (** Closes a window, but does not free the memory.
   * This should prevent segfaults when calling functions on this window. *)
 val close : t -> unit
@@ -45,7 +48,7 @@ val poll_event : t -> OgamlCore.Event.t option
 val display : t -> unit
 
 (** Clears the window *)
-val clear : ?color:Color.t -> t -> unit
+val clear : ?color:Color.t -> ?depth:bool -> ?stencil:bool -> t -> unit
 
 (** Returns the internal GL state of the window *)
 val state : t -> State.t
@@ -53,15 +56,10 @@ val state : t -> State.t
 (** Show/hide the cursor *)
 val show_cursor : t -> bool -> unit
 
+(** System-only, binds the window for drawing *)
+val bind : t -> DrawParameter.t -> unit
 
-module LL : sig
+(** Returns the internal window of this window.
+  * Used internally, hidden from the global interface. *)
+val internal : t -> OgamlCore.LL.Window.t
 
-  (** Returns the internal window of this window, should only be used internally *)
-  val internal : t -> OgamlCore.LL.Window.t
-
-  (** Returns the program library associated to the window *)
-  val programs : t -> ProgramLibrary.t
-
-  val bind_draw_parameters : t -> DrawParameter.t -> unit
-
-end

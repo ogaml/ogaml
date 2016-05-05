@@ -11,10 +11,8 @@ let settings =
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Noise Example" ()
 
-let state = Window.state window
-
 let img = 
-  Image.create (`Empty (800, 600, `RGB Color.RGB.white))
+  Image.create (`Empty (Vector2i.({x = 800; y = 600}), `RGB Color.RGB.white))
 
 let perlin = 
   Random.self_init ();
@@ -40,11 +38,11 @@ let () =
   Printf.printf "Noise min : %f, noise max : %f\n%!" !mini !maxi
 
 let tex = 
-  Texture.Texture2D.create state (`Image img)
+  Texture.Texture2D.create (module Window) window (`Image img)
 
 let draw = 
   let sprite = Sprite.create ~texture:tex () in
-  Sprite.draw ~window ~sprite
+  Sprite.draw (module Window) ~target:window ~sprite
 
 let rec handle_events () =
   let open OgamlCore in

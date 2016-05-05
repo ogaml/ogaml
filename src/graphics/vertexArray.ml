@@ -254,7 +254,7 @@ type _ t = {
   id : int
 }
 
-let dynamic state src = 
+let dynamic (type s) (module M : RenderTarget.T with type t = s) target src = 
   let vao    = GL.VAO.create () in
   let buffer = GL.VBO.create () in
   let data = src.Source.data in
@@ -268,10 +268,10 @@ let dynamic state src =
    attribs = Source.attribs src;
    stride = Source.stride src;
    bound = None;
-   id = State.LL.vao_id state;
+   id = State.LL.vao_id (M.state target);
   }
 
-let static state src = 
+let static (type s) (module M : RenderTarget.T with type t = s) target src = 
   let vao    = GL.VAO.create () in
   let buffer = GL.VBO.create () in
   let data = src.Source.data in
@@ -285,7 +285,7 @@ let static state src =
    attribs = Source.attribs src;
    stride = Source.stride src;
    bound = None;
-   id = State.LL.vao_id state
+   id = State.LL.vao_id (M.state target)
   }
 
 let rebuild t src start =
@@ -379,12 +379,13 @@ let debug_t = {
 
 let tm = Unix.gettimeofday 
 
-let draw ~vertices ~window ?indices ~program 
+let draw (type s) (module M : RenderTarget.T with type t = s)
+         ~vertices ~target ?indices ~program 
          ?uniform:(uniform = Uniform.empty) 
          ?parameters:(parameters = DrawParameter.make ()) 
          ?start ?length
          ?mode:(mode = DrawMode.Triangles) () =
-  let state = Window.state window in
+  let state = M.state target in
   let start = 
     match start with
     |None -> 0
@@ -398,7 +399,7 @@ let draw ~vertices ~window ?indices ~program
   in
 
   let t = tm () in
-  Window.LL.bind_draw_parameters window parameters;
+  M.bind target parameters;
   debug_t.param_bind_t <- debug_t.param_bind_t +. (tm () -. t);
 
   let t = tm () in

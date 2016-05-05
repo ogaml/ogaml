@@ -85,7 +85,8 @@ module Fx = struct
 
   let full_lift (it,init,conv) = (lift it, init, conv)
 
-  let create ~state
+  let create (type s) (module M : RenderTarget.T with type t = s) 
+             ~target
              ~text
              ~position
              ~font
@@ -190,7 +191,7 @@ module Fx = struct
           0.
         )
         chars
-      |> fun (source, advance, line_width) -> VertexArray.static state source,
+      |> fun (source, advance, line_width) -> VertexArray.static (module M) target source,
                                          advance,
                                          max advance.Vector2f.x line_width
     in
@@ -212,14 +213,16 @@ module Fx = struct
       boundaries
     }
 
-  let draw ?parameters:(parameters = DrawParameter.make
-                                      ~antialiasing:false
-                                      ~depth_test:DrawParameter.DepthTest.None
-                                      ~blend_mode:DrawParameter.BlendMode.alpha ())
-           ~text ~window () =
-    let program = ProgramLibrary.atlas_drawing (Window.LL.programs window) in
-    let texture = Font.texture (Window.state window) text.font text.size in
-    let size = Vector2f.from_int (Window.size window) in
+  let draw (type s) (module M : RenderTarget.T with type t = s) 
+           ?parameters:(parameters = DrawParameter.make
+           ~antialiasing:false
+           ~depth_test:DrawParameter.DepthTest.None
+           ~blend_mode:DrawParameter.BlendMode.alpha ())
+           ~text ~target () =
+    let state = M.state target in
+    let program = State.LL.text_drawing state in
+    let texture = Font.texture (module M) target text.font text.size in
+    let size = Vector2f.from_int (M.size target) in
     let tsize = Vector2f.from_int (Texture.Texture2D.size texture) in
     let uniform =
       Uniform.empty
@@ -228,8 +231,8 @@ module Fx = struct
       |> Uniform.texture2D "atlas" texture
     in
     let vertices = text.vertices in
-    VertexArray.draw
-          ~window
+    VertexArray.draw (module M)
+          ~target
           ~vertices
           ~program
           ~parameters
@@ -360,14 +363,16 @@ let create ~text ~position ~font ?color:(color=(`RGB Color.RGB.black)) ~size ~bo
   }
 
 
-let draw ?parameters:(parameters = DrawParameter.make
-                                    ~antialiasing:false
-                                    ~depth_test:DrawParameter.DepthTest.None
-                                    ~blend_mode:DrawParameter.BlendMode.alpha ())
-         ~text ~window () =
-  let program = ProgramLibrary.atlas_drawing (Window.LL.programs window) in
-  let texture = Font.texture (Window.state window) text.font text.size in
-  let size = Vector2f.from_int (Window.size window) in
+let draw (type s) (module M : RenderTarget.T with type t = s) 
+         ?parameters:(parameters = DrawParameter.make
+         ~antialiasing:false
+         ~depth_test:DrawParameter.DepthTest.None
+         ~blend_mode:DrawParameter.BlendMode.alpha ())
+         ~text ~target () =
+  let state = M.state target in
+  let program = State.LL.text_drawing state in
+  let texture = Font.texture (module M) target text.font text.size in
+  let size = Vector2f.from_int (M.size target) in
   let tsize = Vector2f.from_int (Texture.Texture2D.size texture) in
   let uniform =
     Uniform.empty
@@ -384,10 +389,11 @@ let draw ?parameters:(parameters = DrawParameter.make
       ~size:32 () 
     in
     List.iter (VertexArray.Source.add src) vtx;
-    VertexArray.static (Window.state window) src
+    VertexArray.static (module M) target src
   in
   VertexArray.draw
-        ~window
+        (module M)
+        ~target
         ~vertices
         ~program
         ~parameters

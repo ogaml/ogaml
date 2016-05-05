@@ -83,18 +83,21 @@ type dynamic
 
 type 'a t 
 
-val static : State.t -> Source.t -> static t
+val static : (module RenderTarget.T with type t = 'a) 
+              -> 'a -> Source.t -> static t
 
-val dynamic : State.t -> Source.t -> dynamic t
+val dynamic : (module RenderTarget.T with type t = 'a) 
+               -> 'a -> Source.t -> dynamic t
 
 val rebuild : dynamic t -> Source.t -> int -> unit
 
 val length : 'a t -> int
 
 val draw :
-  vertices   : 'a t ->
-  window     : Window.t ->
-  ?indices   : 'b IndexArray.t ->
+  (module RenderTarget.T with type t = 'a) ->
+  vertices   : 'b t ->
+  target     : 'a ->
+  ?indices   : 'c IndexArray.t ->
   program    : Program.t ->
   ?uniform    : Uniform.t ->
   ?parameters : DrawParameter.t ->

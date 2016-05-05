@@ -330,12 +330,14 @@ let color shape = shape.shape_vals.color
 
 let border_color shape = shape.shape_vals.out_color
 
-let draw ?parameters:(parameters = DrawParameter.make
-                                    ~depth_test:DrawParameter.DepthTest.None
-                                    ~blend_mode:DrawParameter.BlendMode.alpha ())
-         ~window ~shape () =
-  let program = ProgramLibrary.shape_drawing (Window.LL.programs window) in
-  let size = Window.size window in
+let draw (type s) (module M : RenderTarget.T with type t = s)
+         ?parameters:(parameters = DrawParameter.make
+         ~depth_test:DrawParameter.DepthTest.None
+         ~blend_mode:DrawParameter.BlendMode.alpha ())
+         ~target ~shape () =
+  let state = M.state target in
+  let program = State.LL.shape_drawing state in
+  let size = M.size target in
   let uniform =
     Uniform.empty
     |> Uniform.vector2f "size" (Vector2f.from_int size)
@@ -352,10 +354,10 @@ let draw ?parameters:(parameters = DrawParameter.make
     | None -> ()
     | Some vtcs -> List.iter (VertexArray.Source.add src) vtcs
     end;
-    VertexArray.static (Window.state window) src
+    VertexArray.static (module M) target src
   in
-  VertexArray.draw
-        ~window
+  VertexArray.draw (module M)
+        ~target
         ~vertices
         ~program
         ~parameters

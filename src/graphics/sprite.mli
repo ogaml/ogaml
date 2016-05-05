@@ -28,7 +28,9 @@ type debug_times = {
 val debug_t : debug_times
 
 (** Draws a sprite. *)
-val draw : ?parameters:DrawParameter.t -> window:Window.t -> sprite:t -> unit -> unit
+val draw : 
+  (module RenderTarget.T with type t = 'a) ->
+  ?parameters:DrawParameter.t -> target:'a -> sprite:t -> unit -> unit
 
 (** Outputs a sprite to a vertex array source by mapping its vertices *)
 val map_to_source : t -> 

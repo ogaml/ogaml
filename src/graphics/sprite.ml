@@ -139,13 +139,15 @@ let debug_t = {
 
 let tm = Unix.gettimeofday
 
-let draw ?parameters:(parameters = DrawParameter.make
-                                    ~depth_test:DrawParameter.DepthTest.None
-                                    ~blend_mode:DrawParameter.BlendMode.alpha ())
-         ~window ~sprite () =
-  let program = ProgramLibrary.sprite_drawing (Window.LL.programs window) in
+let draw (type s) (module Target : RenderTarget.T with type t = s)
+         ?parameters:(parameters = DrawParameter.make
+         ~depth_test:DrawParameter.DepthTest.None
+         ~blend_mode:DrawParameter.BlendMode.alpha ())
+         ~target ~sprite () =
+  let state = Target.state target in
+  let program = State.LL.sprite_drawing state in
   let t = tm () in
-  let sizei = Window.size window in
+  let sizei = Target.size target in
   debug_t.size_get_t <- debug_t.size_get_t +. (tm () -. t);
   let size = Vector2f.from_int sizei in
   let t = tm () in
@@ -167,13 +169,13 @@ let draw ?parameters:(parameters = DrawParameter.make
     List.iter (VertexArray.Source.add src) (get_vertices sprite);
     debug_t.vertices_create_t <- debug_t.vertices_create_t +. (tm () -. t);
     let t = tm () in
-    let vao = VertexArray.static (Window.state window) src in
+    let vao = VertexArray.static (module Target) target src in
     debug_t.vao_create_t <- debug_t.vao_create_t +. (tm () -. t);
     vao
   in
   let t = tm () in
-  VertexArray.draw
-        ~window
+  VertexArray.draw (module Target)
+        ~target
         ~vertices
         ~program
         ~parameters

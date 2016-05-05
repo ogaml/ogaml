@@ -21,7 +21,7 @@ let rec draw_curve color = function
                 ~top:Vector2f.({x = x1'; y = y1'}) 
                 ~tip:Vector2f.({x = x2'; y = y2'}) ()
     in
-    Shape.draw ~window ~shape:l ();
+    Shape.draw (module Window) ~target:window ~shape:l ();
     draw_curve color ((x2,y2)::t)
   | _ -> ()
 
@@ -63,10 +63,10 @@ let draw_grid () =
                 ~tip:Vector2f.({x = 205.; y = 100.})
                 ()
   in
-  Shape.draw ~window ~shape:abs ();
-  Shape.draw ~window ~shape:ord ();
-  Shape.draw ~window ~shape:onex ();
-  Shape.draw ~window ~shape:oney ()
+  Shape.draw (module Window) ~target:window ~shape:abs ();
+  Shape.draw (module Window) ~target:window ~shape:ord ();
+  Shape.draw (module Window) ~target:window ~shape:onex ();
+  Shape.draw (module Window) ~target:window ~shape:oney ()
 
 let ip1 = Interpolator.linear 0.5 [] 0.7 
 

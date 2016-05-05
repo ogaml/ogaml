@@ -37,6 +37,15 @@ module LL : sig
   (** Creates a new, default-initialized GL state *)
   val create : unit -> t
 
+  (** Returns the internal sprite-drawing program *)
+  val sprite_drawing : t -> ProgramInternal.t
+
+  (** Returns the internal shape-drawing program *)
+  val shape_drawing : t -> ProgramInternal.t
+
+  (** Returns the internal text-drawing program *)
+  val text_drawing : t -> ProgramInternal.t
+
   (** Returns the current culling mode *)
   val culling_mode : t -> DrawParameter.CullingMode.t
 

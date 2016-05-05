@@ -14,9 +14,6 @@ let settings = OgamlCore.ContextSettings.create ()
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°02" ()
 
-let glstate = 
-  Window.state window
-
 let vertex_shader_source = "
   in vec3 position;
 
@@ -39,7 +36,8 @@ let fragment_shader_source = "
 
 let program =
   Program.from_source_pp
-    (Window.state window)
+    (module Window)
+    ~target:window
     ~vertex_source:(`String vertex_shader_source)
     ~fragment_source:(`String fragment_shader_source)
 
@@ -62,7 +60,7 @@ let vertex_source = VertexArray.Source.(
     << vertex3
 )
 
-let vertices = VertexArray.static glstate vertex_source
+let vertices = VertexArray.static (module Window) window vertex_source
 
 let rec event_loop () =
   match Window.poll_event window with
@@ -76,7 +74,7 @@ let rec event_loop () =
 let rec main_loop () =
   if Window.is_open window then begin
     Window.clear ~color:(`RGB Color.RGB.white) window;
-    VertexArray.draw ~window ~vertices ~program ~mode:DrawMode.Triangles ();
+    VertexArray.draw (module Window) ~target:window ~vertices ~program ~mode:DrawMode.Triangles ();
     Window.display window;
     event_loop ();
     main_loop ();
