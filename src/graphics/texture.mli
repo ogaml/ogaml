@@ -1,4 +1,18 @@
 
+module type T = sig
+
+  type t
+
+  (* System only *)
+  val bind : t -> int -> unit
+
+end
+
+module MinifyFilter = GLTypes.MinifyFilter
+
+module MagnifyFilter = GLTypes.MagnifyFilter
+
+module WrapFunction = GLTypes.WrapFunction
 
 module Texture2D : sig
 
@@ -9,12 +23,12 @@ module Texture2D : sig
 
   val size : t -> OgamlMath.Vector2i.t
 
-  module LL : sig
+  val minify : t -> MinifyFilter.t -> unit
 
-    val bind : State.t -> int -> t option -> unit
+  val magnify : t -> MagnifyFilter.t -> unit
 
-    val internal : t -> GL.Texture.t
+  val wrap : t -> WrapFunction.t -> unit
 
-  end
+  val bind : t -> int -> unit
 
 end

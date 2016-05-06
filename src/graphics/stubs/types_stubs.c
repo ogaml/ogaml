@@ -290,8 +290,39 @@ GLenum Minify_val(value min)
     case 3:
       return GL_LINEAR_MIPMAP_NEAREST;
 
+    case 4:
+      return GL_NEAREST_MIPMAP_LINEAR;
+
+    case 5:
+      return GL_LINEAR_MIPMAP_LINEAR;
+
     default:
       caml_failwith("Caml variant error in Minify_val(1)");
+  }
+}
+
+
+GLenum Wrap_val(value wrp)
+{
+  switch(Int_val(wrp))
+  {
+    case 0:
+      return GL_CLAMP_TO_EDGE;
+
+    case 1:
+      return GL_CLAMP_TO_BORDER;
+
+    case 2:
+      return GL_MIRRORED_REPEAT;
+
+    case 3:
+      return GL_REPEAT;
+
+    case 4:
+      return GL_MIRROR_CLAMP_TO_EDGE;
+
+    default:
+      caml_failwith("Caml variant error in Wrap_val(1)");
   }
 }
 

@@ -55,6 +55,9 @@ Interface changes:
     ☐ Add optional depth writing
   RenderTextures:
     ☐ Check against GL_MAX_RENDERBUFFER_SIZE when creating
+  VertexArrays (and probably others):
+    ☐ Fix state not being modified at creation (binding then unbinding a vertex array DOES modify the state)
+
     
 
 Bugs:

@@ -25,6 +25,8 @@
 
 #define MLvar_Magnify (-1011094397)
 
+#define MLvar_Wrap (1940966357)
+
 void finalise_tex(value v)
 {
   glDeleteTextures(1,&TEX(v));
@@ -125,19 +127,26 @@ caml_tex_image_2D(value target, value fmt, value size, value tfmt, value data)
 }
 
 
-// INPUT   a variant containing the min/mag filter
-// OUTPUT  nothing, sets the texture2D parameter
+// INPUT   a variant containing the texture type and a min/mag filter
+// OUTPUT  nothing, sets the texture parameter
 CAMLprim value
-caml_tex_parameter_2D(value loc)
+caml_tex_parameter(value typ, value loc)
 {
-  CAMLparam1(loc);
+  CAMLparam2(typ, loc);
 
   if(Field(loc, 0) == MLvar_Magnify)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, Magnify_val(Field(loc, 1)));
+    glTexParameteri(Target_val(typ), GL_TEXTURE_MAG_FILTER, Magnify_val(Field(loc, 1)));
   else if(Field(loc, 0) == MLvar_Minify)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Minify_val(Field(loc, 1)));
-  else
+    glTexParameteri(Target_val(typ), GL_TEXTURE_MIN_FILTER, Minify_val(Field(loc, 1)));
+  else if(Field(loc, 0) == MLvar_Wrap) {
+    glTexParameteri(Target_val(typ), GL_TEXTURE_WRAP_S, Wrap_val(Field(loc, 1)));
+    glTexParameteri(Target_val(typ), GL_TEXTURE_WRAP_R, Wrap_val(Field(loc, 1)));
+    glTexParameteri(Target_val(typ), GL_TEXTURE_WRAP_T, Wrap_val(Field(loc, 1)));
+  }
+  else {
+    printf("%i\n", Field(loc,0));
     caml_failwith("Caml polymorphic variant error in tex_parameter_2D(1)");
+  }
 
   CAMLreturn(Val_unit);
 }

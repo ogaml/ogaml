@@ -155,9 +155,11 @@ module Texture : sig
   val image : GLTypes.TextureTarget.t -> GLTypes.PixelFormat.t -> (int * int) 
            -> GLTypes.TextureFormat.t -> Bytes.t option -> unit
 
-  (** Sets the value of a parameter of the currently bound texture2D *)
-  val parameter2D : [`Magnify of GLTypes.MagnifyFilter.t 
-                    |`Minify  of GLTypes.MinifyFilter.t] -> unit
+  (** Sets the value of a parameter of the currently bound texture *)
+  val parameter : GLTypes.TextureTarget.t ->
+                  [`Magnify of GLTypes.MagnifyFilter.t 
+                  |`Minify  of GLTypes.MinifyFilter.t
+                  |`Wrap    of GLTypes.WrapFunction.t] -> unit
 
   (** Deletes a texture from the memory *)
   val destroy : t -> unit

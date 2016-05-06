@@ -94,7 +94,7 @@ module LL = struct
     | Int      i, GLTypes.GlslType.Int      ->
         GL.Uniform.int1 location i
     | Texture2D (u,t), GLTypes.GlslType.Sampler2D ->
-        Texture.Texture2D.LL.bind state u (Some t);
+        Texture.Texture2D.bind t u;
         GL.Uniform.int1 location (State.LL.texture_unit state)
     | _ -> raise (Invalid_uniform (Printf.sprintf "Uniform %s has wrong type" name))
 

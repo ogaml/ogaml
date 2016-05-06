@@ -20,7 +20,7 @@ LEXER_FILES = objLexer.mll
 
 PARSER_FILES = objParser.mly
 
-MLSOURCES = color.ml drawParameter.ml GL.ml programInternal.ml state.ml\
+MLSOURCES = color.ml GLTypes.ml drawParameter.ml GL.ml programInternal.ml state.ml\
 	    renderTarget.ml image.ml texture.ml\
 	    program.ml font.ml uniform.ml\
 	    window.ml indexArray.ml\
@@ -28,7 +28,7 @@ MLSOURCES = color.ml drawParameter.ml GL.ml programInternal.ml state.ml\
 	    $(PARSER_FILES:.mly=.ml) $(LEXER_FILES:.mll=.ml)\
 	    model.ml shape.ml sprite.ml mouse.ml keyboard.ml 
 
-MLINTERFACES = drawMode.mli GLTypes.mli objAST.mli
+MLINTERFACES = drawMode.mli objAST.mli
 
 MLOBJS = $(MLSOURCES:.ml=.cmo)
 

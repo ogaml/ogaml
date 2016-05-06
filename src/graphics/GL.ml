@@ -204,9 +204,12 @@ module Texture = struct
 
   external bind : GLTypes.TextureTarget.t -> t option -> unit = "caml_bind_texture"
 
-  external parameter2D : 
-    [`Magnify of GLTypes.MagnifyFilter.t |`Minify  of GLTypes.MinifyFilter.t] 
-    -> unit = "caml_tex_parameter_2D"
+  external parameter : 
+    GLTypes.TextureTarget.t ->
+    [`Magnify of GLTypes.MagnifyFilter.t 
+    |`Minify  of GLTypes.MinifyFilter.t
+    |`Wrap    of GLTypes.WrapFunction.t]
+    -> unit = "caml_tex_parameter"
 
   external destroy : t -> unit = "caml_destroy_texture"
 

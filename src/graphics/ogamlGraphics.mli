@@ -419,6 +419,54 @@ module Texture : sig
   (** This module provides wrappers around different kinds
     * of OpenGL textures *)
 
+  (** Common signature for all texture types *)
+  module type T = sig
+
+    (** Type of a texture *)
+    type t
+
+    (** System only function, binds a texture to a texture unit for drawing *)
+    val bind : t -> int -> unit
+
+  end
+
+  (** Module containing an enumeration of the minifying filters *)
+  module MinifyFilter : sig
+
+    (** Enumeration of the minifying filters *)
+    type t = 
+      | Nearest
+      | Linear
+      | NearestMipmapNearest
+      | LinearMipmapNearest
+      | NearestMipmapLinear
+      | LinearMipmapLinear
+
+  end
+
+  (** Module containing an enumeration of the magnifying filters *)
+  module MagnifyFilter : sig
+
+    (** Enumeration of the magnifying filters *)
+    type t = 
+      | Nearest
+      | Linear
+
+  end
+
+  (** Module containing an enumeration of the wrapping functions *)
+  module WrapFunction : sig
+
+    (** Enumeration of the wrapping functions *)
+    type t = 
+      | ClampEdge
+      | ClampBorder
+      | MirrorRepeat
+      | Repeat
+      | MirrorClamp
+
+  end
+
   (** Represents a simple 2D texture *)
   module Texture2D : sig
 
@@ -435,6 +483,18 @@ module Texture : sig
 
     (** Returns the size of a texture *)
     val size : t -> OgamlMath.Vector2i.t
+
+    (** Sets the minifying filter of a texture *)
+    val minify : t -> MinifyFilter.t -> unit
+
+    (** Sets the magnifying filter of a texture *)
+    val magnify : t -> MagnifyFilter.t -> unit
+
+    (** Sets the wrapping function of a texture *)
+    val wrap : t -> WrapFunction.t -> unit
+
+    (** System only function, binds a texture to a texture unit for drawing *)
+    val bind : t -> int -> unit
 
   end
 

@@ -1,5 +1,5 @@
 (** Shader types enumeration *)
-module ShaderType : sig
+module ShaderType = struct
 
   type t = 
     | Fragment
@@ -8,7 +8,7 @@ module ShaderType : sig
 end
 
 (** GLSL types enumeration *)
-module GlslType : sig
+module GlslType = struct
 
   type t =
     | Int
@@ -35,7 +35,7 @@ module GlslType : sig
 end
 
 (** Texture targets enumeration *)
-module TextureTarget : sig
+module TextureTarget = struct
 
   type t = 
     | Texture1D
@@ -45,7 +45,7 @@ module TextureTarget : sig
 end
 
 (** Pixel format enumeration *)
-module PixelFormat : sig
+module PixelFormat = struct
 
   type t = 
     | R
@@ -60,7 +60,7 @@ module PixelFormat : sig
 end
 
 (** Texture format enumeration *)
-module TextureFormat : sig
+module TextureFormat = struct
 
   type t = 
     | R
@@ -73,18 +73,20 @@ module TextureFormat : sig
 end
 
 (** Texture minify filter values *)
-module MinifyFilter : sig
+module MinifyFilter = struct
 
   type t = 
     | Nearest
     | Linear
-    | NearestMipmap
-    | LinearMipmap
+    | NearestMipmapNearest
+    | LinearMipmapNearest
+    | NearestMipmapLinear
+    | LinearMipmapLinear
 
 end
 
 (** Texture magnify filter values *)
-module MagnifyFilter : sig
+module MagnifyFilter = struct
 
   type t = 
     | Nearest
@@ -92,8 +94,20 @@ module MagnifyFilter : sig
 
 end
 
+(** Texture wrap function *)
+module WrapFunction = struct
+
+  type t =
+    | ClampEdge
+    | ClampBorder
+    | MirrorRepeat
+    | Repeat
+    | MirrorClamp
+
+end
+
 (** VBO kinds enumeration *)
-module VBOKind : sig
+module VBOKind = struct
 
   type t = 
     | StaticDraw
@@ -102,7 +116,7 @@ module VBOKind : sig
 end
 
 (** GL float types *)
-module GlFloatType : sig
+module GlFloatType = struct
 
   type t = 
     | Byte
@@ -117,7 +131,7 @@ module GlFloatType : sig
 end
 
 (** GL int types *)
-module GlIntType : sig
+module GlIntType = struct
 
   type t  =
     | Byte
@@ -130,7 +144,7 @@ module GlIntType : sig
 end
 
 (** GL errors *)
-module GlError : sig
+module GlError = struct
 
   type t = 
     | Invalid_enum
@@ -144,7 +158,7 @@ module GlError : sig
 end
 
 (** Texture attachements *)
-module GlAttachement : sig
+module GlAttachement = struct
 
   type t = 
     | Color
