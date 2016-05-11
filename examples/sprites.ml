@@ -51,7 +51,7 @@ let rec handle_events () =
 
 let rec each_frame () =
   if Window.is_open window then begin
-    Window.clear ~color:(`RGB Color.RGB.white) window ;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window ;
     draw () ;
     Window.display window ;
     handle_events () ;

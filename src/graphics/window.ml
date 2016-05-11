@@ -43,13 +43,13 @@ let display win =
   RenderTarget.bind_fbo win.state 0 None;
   LL.Window.display win.internal
 
-let clear ?color:(color=`RGB Color.RGB.black) 
+let clear ?color:(color=Some (`RGB Color.RGB.black))
           ?depth:(depth=true) 
           ?stencil:(stencil=true) win =
   let depth = (ContextSettings.depth_bits win.settings > 0) && depth in
   let stencil = (ContextSettings.stencil_bits win.settings > 0) && stencil in
   RenderTarget.bind_fbo win.state 0 None;
-  RenderTarget.clear ~color ~depth ~stencil win.state
+  RenderTarget.clear ?color ~depth ~stencil win.state
 
 let show_cursor win b = LL.Window.show_cursor win.internal b
 

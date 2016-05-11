@@ -142,7 +142,7 @@ let rec event_loop () =
 (* Main loop *)
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(`RGB Color.RGB.white) window;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window;
     display ();
     Window.display window;
     (* We only capture the mouse and listen to the keyboard when focused *)

@@ -127,7 +127,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(`RGB Color.RGB.white) window;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window;
     display ();
     Window.display window;
     event_loop ();

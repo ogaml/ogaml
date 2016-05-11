@@ -318,8 +318,13 @@ GLenum Wrap_val(value wrp)
     case 3:
       return GL_REPEAT;
 
+    #ifndef GL_MIRROR_CLAMP_TO_EDGE
+    case 4:
+      caml_failwith("GL_MIRROR_CLAMP_TO_EDGE is not supported");
+    #else
     case 4:
       return GL_MIRROR_CLAMP_TO_EDGE;
+    #endif
 
     default:
       caml_failwith("Caml variant error in Wrap_val(1)");

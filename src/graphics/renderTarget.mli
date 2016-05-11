@@ -15,7 +15,7 @@ module type T = sig
   val display : t -> unit
 
   (* Clears a render target *)
-  val clear : ?color:Color.t -> ?depth:bool -> ?stencil:bool -> t -> unit
+  val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 
   (* Binds a render target for drawing. System-only function, usually done
    * automatically. *)

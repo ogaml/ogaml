@@ -361,7 +361,7 @@ module RenderTarget : sig
     val display : t -> unit
 
     (** Clears a render target *)
-    val clear : ?color:Color.t -> ?depth:bool -> ?stencil:bool -> t -> unit
+    val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 
     (** Binds a render target for drawing. System-only function, usually done
       * automatically. *)
@@ -766,9 +766,9 @@ module Window : sig
   val display : t -> unit
 
   (** Clears the window.
-    * The default color is opaque black. 
+    * Clears the color buffer with opaque black by default. 
     * Clears the depth buffer and the stencil buffer by default. *)
-  val clear : ?color:Color.t -> ?depth:bool -> ?stencil:bool -> t -> unit
+  val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 
   (** Show or hide the cursor *)
   val show_cursor : t -> bool -> unit

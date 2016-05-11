@@ -48,7 +48,7 @@ val poll_event : t -> OgamlCore.Event.t option
 val display : t -> unit
 
 (** Clears the window *)
-val clear : ?color:Color.t -> ?depth:bool -> ?stencil:bool -> t -> unit
+val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 
 (** Returns the internal GL state of the window *)
 val state : t -> State.t
