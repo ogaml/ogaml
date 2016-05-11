@@ -26,7 +26,7 @@ default: .depend $(ML_OBJS) $(ML_NATS)
 # Cleaning
 
 clean:
-	rm -rf $(CLEAN_EXTENSIONS)
+	rm -f $(CLEAN_EXTENSIONS)
 
 
 # Dependencies

@@ -43,7 +43,7 @@ compile_math_byte: .depend $(MLCMIS) $(MLOBJS) ogamlMath.cmi
 # Cleaning
 
 clean:
-	rm -rf $(CLEAN_EXTENSIONS)
+	rm -f $(CLEAN_EXTENSIONS)
 
 
 # Dependencies

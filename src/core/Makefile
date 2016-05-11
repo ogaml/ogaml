@@ -82,7 +82,7 @@ ml_stubs:
 # Cleaning
 
 clean:
-	rm -rf $(CLEAN_EXTENSIONS);
+	rm -f $(CLEAN_EXTENSIONS);
 	cd $(OS_WIN_LIB) && make clean
 
 

@@ -2,7 +2,9 @@ include ../../common_defs.mk
 
 # Override
 
-INCLUDE_DIRS = -I ../math/ -I ../core/ -I ../utils/
+INCLUDE_DIRS = -I ../math/ -I ../core/ -I ../utils/\
+	       -I 2d/ -I backend/ -I fbo/ -I program/ -I texture/ -I vertex/\
+	       -I model/
 
 GRAPHICS_STUBS = shader_stubs.c program_stubs.c texture_stubs.c\
 	         vao_stubs.c vbo_stubs.c uniform_stubs.c text_stubs.c\
@@ -16,19 +18,36 @@ STUBS_TARGET = $(STUBS_SRC:.c=.o)
 
 STUBS_OBJS = $(GRAPHICS_STUBS:.c=.o)
 
-LEXER_FILES = objLexer.mll
+LEXER_FILES = model/objLexer.mll
 
-PARSER_FILES = objParser.mly
+PARSER_FILES = model/objParser.mly
 
-MLSOURCES = color.ml GLTypes.ml drawParameter.ml GL.ml programInternal.ml state.ml\
-	    renderTarget.ml image.ml texture.ml\
-	    program.ml font.ml uniform.ml\
-	    window.ml indexArray.ml\
-	    vertexArray.ml vertexMap.ml text.ml\
-	    $(PARSER_FILES:.mly=.ml) $(LEXER_FILES:.mll=.ml)\
-	    model.ml shape.ml sprite.ml mouse.ml keyboard.ml 
+MLSOURCES = 2d/color.ml\
+	    backend/GLTypes.ml\
+	    vertex/drawParameter.ml\
+	    backend/GL.ml\
+	    program/programInternal.ml\
+	    backend/state.ml\
+	    fbo/renderTarget.ml\
+	    texture/image.ml\
+	    texture/texture.ml\
+	    program/program.ml\
+	    2d/font.ml\
+	    program/uniform.ml\
+	    backend/window.ml\
+	    vertex/indexArray.ml\
+	    vertex/vertexArray.ml\
+	    vertex/vertexMap.ml\
+	    2d/text.ml\
+	    $(PARSER_FILES:.mly=.ml)\
+	    $(LEXER_FILES:.mll=.ml)\
+	    model/model.ml\
+	    2d/shape.ml\
+	    2d/sprite.ml\
+	    backend/mouse.ml\
+	    backend/keyboard.ml
 
-MLINTERFACES = drawMode.mli objAST.mli
+MLINTERFACES = vertex/drawMode.mli model/objAST.mli
 
 MLOBJS = $(MLSOURCES:.ml=.cmo)
 
@@ -90,14 +109,21 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).c
 # Cleaning
 
 clean:
-	rm -rf $(CLEAN_EXTENSIONS)
+	cd 2d/ && rm -f $(CLEAN_EXTENSIONS);
+	cd backend/ && rm -f $(CLEAN_EXTENSIONS);
+	cd fbo/ && rm -f $(CLEAN_EXTENSIONS);
+	cd model/ && rm -f $(CLEAN_EXTENSIONS);
+	cd program/ && rm -f $(CLEAN_EXTENSIONS);
+	cd texture/ && rm -f $(CLEAN_EXTENSIONS);
+	cd vertex/ && rm -f $(CLEAN_EXTENSIONS);
+	rm -f $(CLEAN_EXTENSIONS)
 
 
 # Dependencies
 
 .depend:
-	$(DEPCOMMAND) *.ml *.mli > .depend;
-	$(MENHIR) --depend *.mly >> .depend
+	$(DEPCOMMAND) */*.ml */*.mli > .depend;
+	$(MENHIR) --depend */*.mly >> .depend
 
 include .depend
 

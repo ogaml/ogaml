@@ -41,7 +41,7 @@ compile_utils_byte: .depend $(MLCMIS) $(MLOBJS) ogamlUtils.cmi
 # Cleaning
 
 clean:
-	rm -rf $(CLEAN_EXTENSIONS)
+	rm -f $(CLEAN_EXTENSIONS)
 
 
 # Dependencies
