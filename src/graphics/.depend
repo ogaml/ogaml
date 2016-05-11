@@ -116,6 +116,7 @@ color.cmi :
 drawMode.cmi :
 drawParameter.cmi : ../math/ogamlMath.cmi
 font.cmi : texture.cmi renderTarget.cmi ../math/ogamlMath.cmi
+frameBuffer.cmi :
 image.cmi : ../math/ogamlMath.cmi color.cmi
 indexArray.cmi : state.cmi renderTarget.cmi
 keyboard.cmi : ../core/ogamlCore.cmi

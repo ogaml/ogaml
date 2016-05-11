@@ -13,7 +13,7 @@ module MagnifyFilter = GLTypes.MagnifyFilter
 
 module WrapFunction = GLTypes.WrapFunction
 
-module Any = struct
+module Common = struct
 
   type t = {
       context : State.t;
@@ -104,7 +104,7 @@ end
 module Texture2D = struct
 
   type t = {
-    internal  : Any.t;
+    internal  : Common.t;
     width     : int;
     height    : int;
   }
@@ -123,12 +123,12 @@ module Texture2D = struct
         v.OgamlMath.Vector2i.x, v.OgamlMath.Vector2i.y, Image.data img
     in
     (* Create the internal texture *)
-    let internal = Any.create state GLTypes.TextureTarget.Texture2D in
+    let internal = Common.create state GLTypes.TextureTarget.Texture2D in
     let tex = {internal; 
                width; 
                height} in
     (* Bind the texture *)
-    Any.bind tex.internal 0;
+    Common.bind tex.internal 0;
     (* Load the corresponding image *)
     GL.Texture.image
       GLTypes.TextureTarget.Texture2D
@@ -141,12 +141,12 @@ module Texture2D = struct
 
   let size tex = OgamlMath.Vector2i.({x = tex.width; y = tex.height})
 
-  let minify tex filter = Any.minify tex.internal filter
+  let minify tex filter = Common.minify tex.internal filter
 
-  let magnify tex filter = Any.magnify tex.internal filter
+  let magnify tex filter = Common.magnify tex.internal filter
 
-  let wrap tex func = Any.wrap tex.internal func
+  let wrap tex func = Common.wrap tex.internal func
 
-  let bind tex uid = Any.bind tex.internal uid
+  let bind tex uid = Common.bind tex.internal uid
 
 end
