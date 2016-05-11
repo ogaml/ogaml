@@ -144,7 +144,6 @@ caml_tex_parameter(value typ, value loc)
     glTexParameteri(Target_val(typ), GL_TEXTURE_WRAP_T, Wrap_val(Field(loc, 1)));
   }
   else {
-    printf("%i\n", Field(loc,0));
     caml_failwith("Caml polymorphic variant error in tex_parameter_2D(1)");
   }
 

@@ -34,6 +34,8 @@ GLenum Magnify_val(value mag);
 
 GLenum Minify_val(value min);
 
+GLenum Wrap_val(value wrp);
+
 GLenum TextureFormat_val(value fmt);
 
 GLenum PixelFormat_val(value fmt);
