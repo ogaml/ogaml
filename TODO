@@ -14,6 +14,7 @@ Cocoa specific:
   ☐ Differentiate between Middle and Other for mouse
   ☐ Window doesn't resign being key on mission control
   ☐ Implement LL.show_cursor
+  ☐ Fix all pixel/point related issues
 
 Interface changes:
   Color:
@@ -58,7 +59,7 @@ Interface changes:
   VertexArrays (and probably others):
     ☐ Fix state not being modified at creation (binding then unbinding a vertex array DOES modify the state)
 
-    
+
 
 Bugs:
   ✔ Use a custom ID system for textures as checking the equality of two textures in State can be wrong (if an ID gets recycled) @done(2016-04-14 12:00) @project(Bugs)
@@ -75,8 +76,8 @@ New modules:
     ☐ Tests
   Segment trees:
     ☐ Functorized for use with various coordinate systems @unsure
-    ☐ Quadtree 
-    ☐ Octree 
+    ☐ Quadtree
+    ☐ Octree
 
 Advanced features:
   More Image and Texture types:

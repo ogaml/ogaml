@@ -62,7 +62,7 @@ let display () =
     |> Uniform.matrix3D "MVMatrix" mv
     |> Uniform.matrix3D "VMatrix" view
   in
-  VertexArray.draw (module Window) ~target:window 
+  VertexArray.draw (module Window) ~target:window
                    ~vertices:cube ~uniform ~program:normal_program ~parameters ~mode:DrawMode.Triangles ()
 
 

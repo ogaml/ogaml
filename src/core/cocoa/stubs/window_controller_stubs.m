@@ -118,22 +118,35 @@
 
 -(void)setProperRelativeMouseLocationTo:(NSPoint)loc
 {
-  int scale = [[m_window screen] backingScaleFactor];
+  CGFloat scale = [[m_window screen] backingScaleFactor];
   NSPoint p = NSMakePoint(loc.x / scale, loc.y / scale);
 
   // Now we get global coordinates (Thanks SFML)
   p.y = [m_view frame].size.height - p.y;
 
-  p = [m_view convertPoint:p toView:m_view];
-  p = [m_view convertPoint:p toView:nil];
+  // p = [m_view convertPoint:p toView:m_view];
+  // p = [m_view convertPoint:p toView:nil];
 
   NSRect rect = NSZeroRect;
   rect.origin = p;
   rect = [m_window convertRectToScreen:rect];
   p = rect.origin;
 
-  const float screenHeight = [[[m_view window] screen] frame].size.height;
+  const float screenHeight = [[m_window screen] frame].size.height;
   p.y = screenHeight - p.y;
+
+  // CGFloat scale = [[m_window screen] backingScaleFactor];
+  // NSPoint p = NSMakePoint(loc.x / scale, loc.y / scale);
+
+  // NSRect screenFrame = [[m_window screen] frame];
+  // screenFrame = [[m_window screen] convertRectToBacking:screenFrame];
+  //
+  // NSPoint p = NSMakePoint(loc.x, screenFrame.size.height - loc.y);
+  //
+  // NSRect rect = NSZeroRect;
+  // rect.origin = p;
+  // // rect = [[m_window screen] convertRectFromBacking:rect];
+  // rect = [m_view convertRectFromBacking:rect];
 
   // No we set the cursor to p
   warpCursor(p);
@@ -163,6 +176,11 @@
 -(void)toggleFullScreen
 {
   [m_window toggleFullScreen:nil];
+}
+
+-(NSWindow*)window
+{
+  return m_window;
 }
 
 @end
@@ -232,6 +250,13 @@ caml_cocoa_controller_content_frame(value mlcontroller)
 
   OGWindowController* controller = (OGWindowController*) mlcontroller;
   NSRect rect = [controller contentFrame];
+
+  // Converting to pixels
+  CGFloat scale = [[[controller window] screen] backingScaleFactor];
+  rect.origin.x = rect.origin.x * scale ;
+  rect.origin.y = rect.origin.y * scale ;
+  rect.size.width = rect.size.width * scale ;
+  rect.size.height = rect.size.height * scale ;
 
   memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
 

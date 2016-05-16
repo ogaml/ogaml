@@ -155,4 +155,6 @@ typedef union
 
 -(void)toggleFullScreen;
 
+-(NSWindow*)window;
+
 @end
