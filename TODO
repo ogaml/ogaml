@@ -54,8 +54,9 @@ Interface changes:
     ✔ Fix VAO, VBO, EBO and Program ID recycling @done(2016-04-30 12:00) @project(Interface changes / State)
   Parameters:
     ☐ Add optional depth writing
-  RenderTextures:
+  RenderTextures/Framebuffers:
     ☐ Check against GL_MAX_RENDERBUFFER_SIZE when creating
+    ☐ Remove size from RenderTarget and Framebuffers
   VertexArrays (and probably others):
     ☐ Fix state not being modified at creation (binding then unbinding a vertex array DOES modify the state)
 

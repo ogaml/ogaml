@@ -31,4 +31,6 @@ module Texture2D : sig
 
   val bind : t -> int -> unit
 
+  val to_color_attachment : t -> Attachment.ColorAttachment.t
+
 end

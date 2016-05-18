@@ -104,9 +104,9 @@ end
 module Texture2D = struct
 
   type t = {
-    internal  : Common.t;
-    width     : int;
-    height    : int;
+    common  : Common.t;
+    width   : int;
+    height  : int;
   }
 
   let create (type s) (module M : RenderTarget.T with type t = s) target src = 
@@ -123,12 +123,12 @@ module Texture2D = struct
         v.OgamlMath.Vector2i.x, v.OgamlMath.Vector2i.y, Image.data img
     in
     (* Create the internal texture *)
-    let internal = Common.create state GLTypes.TextureTarget.Texture2D in
-    let tex = {internal; 
+    let common = Common.create state GLTypes.TextureTarget.Texture2D in
+    let tex = {common; 
                width; 
                height} in
     (* Bind the texture *)
-    Common.bind tex.internal 0;
+    Common.bind tex.common 0;
     (* Load the corresponding image *)
     GL.Texture.image
       GLTypes.TextureTarget.Texture2D
@@ -141,12 +141,15 @@ module Texture2D = struct
 
   let size tex = OgamlMath.Vector2i.({x = tex.width; y = tex.height})
 
-  let minify tex filter = Common.minify tex.internal filter
+  let minify tex filter = Common.minify tex.common filter
 
-  let magnify tex filter = Common.magnify tex.internal filter
+  let magnify tex filter = Common.magnify tex.common filter
 
-  let wrap tex func = Common.wrap tex.internal func
+  let wrap tex func = Common.wrap tex.common func
 
-  let bind tex uid = Common.bind tex.internal uid
+  let bind tex uid = Common.bind tex.common uid
+
+  let to_color_attachment tex = 
+    Attachment.ColorAttachment.Texture2D (tex.common.Common.internal, 0)
 
 end

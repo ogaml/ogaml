@@ -64,6 +64,16 @@ backend/window.cmo : backend/state.cmi fbo/renderTarget.cmi \
 backend/window.cmx : backend/state.cmx fbo/renderTarget.cmx \
     ../math/ogamlMath.cmi ../core/ogamlCore.cmi ../core/LL.cmx \
     ../core/contextSettings.cmx 2d/color.cmx backend/window.cmi
+fbo/attachment.cmo : ../math/vector2i.cmi ../math/ogamlMath.cmi \
+    backend/GL.cmi
+fbo/attachment.cmx : ../math/vector2i.cmx ../math/ogamlMath.cmi \
+    backend/GL.cmx
+fbo/framebuffer.cmo : ../math/vector2i.cmi backend/state.cmi \
+    fbo/renderTarget.cmi ../math/ogamlMath.cmi backend/GLTypes.cmo \
+    backend/GL.cmi 2d/color.cmi fbo/attachment.cmo fbo/framebuffer.cmi
+fbo/framebuffer.cmx : ../math/vector2i.cmx backend/state.cmx \
+    fbo/renderTarget.cmx ../math/ogamlMath.cmi backend/GLTypes.cmx \
+    backend/GL.cmx 2d/color.cmx fbo/attachment.cmx fbo/framebuffer.cmi
 fbo/renderTarget.cmo : ../math/vector2i.cmi ../math/vector2f.cmi \
     backend/state.cmi ../math/ogamlMath.cmi ../math/intRect.cmi \
     backend/GL.cmi ../math/floatRect.cmi vertex/drawParameter.cmi \
@@ -104,10 +114,10 @@ texture/image.cmx : ../math/vector2i.cmx ../math/ogamlMath.cmi \
     ../math/intRect.cmx 2d/color.cmx texture/image.cmi
 texture/texture.cmo : backend/state.cmi fbo/renderTarget.cmi \
     ../math/ogamlMath.cmi texture/image.cmi backend/GLTypes.cmo \
-    backend/GL.cmi texture/texture.cmi
+    backend/GL.cmi fbo/attachment.cmo texture/texture.cmi
 texture/texture.cmx : backend/state.cmx fbo/renderTarget.cmx \
     ../math/ogamlMath.cmi texture/image.cmx backend/GLTypes.cmx \
-    backend/GL.cmx texture/texture.cmi
+    backend/GL.cmx fbo/attachment.cmx texture/texture.cmi
 vertex/drawParameter.cmo : ../math/ogamlMath.cmi vertex/drawParameter.cmi
 vertex/drawParameter.cmx : ../math/ogamlMath.cmi vertex/drawParameter.cmi
 vertex/indexArray.cmo : backend/state.cmi fbo/renderTarget.cmi \
@@ -156,7 +166,9 @@ backend/state.cmi : program/programInternal.cmo ../math/ogamlMath.cmi \
     backend/GLTypes.cmo vertex/drawParameter.cmi 2d/color.cmi
 backend/window.cmi : backend/state.cmi ../math/ogamlMath.cmi \
     ../core/ogamlCore.cmi vertex/drawParameter.cmi 2d/color.cmi
-fbo/frameBuffer.cmi :
+fbo/framebuffer.cmi : backend/state.cmi fbo/renderTarget.cmi \
+    ../math/ogamlMath.cmi vertex/drawParameter.cmi 2d/color.cmi \
+    fbo/attachment.cmo
 fbo/renderTarget.cmi : backend/state.cmi ../math/ogamlMath.cmi \
     backend/GL.cmi vertex/drawParameter.cmi 2d/color.cmi
 fbo/renderTexture.cmi : texture/texture.cmi backend/state.cmi \
@@ -171,7 +183,7 @@ program/uniform.cmi : texture/texture.cmi backend/state.cmi \
     program/program.cmi ../math/ogamlMath.cmi 2d/color.cmi
 texture/image.cmi : ../math/ogamlMath.cmi 2d/color.cmi
 texture/texture.cmi : fbo/renderTarget.cmi ../math/ogamlMath.cmi \
-    texture/image.cmi backend/GLTypes.cmo
+    texture/image.cmi backend/GLTypes.cmo fbo/attachment.cmo
 vertex/drawMode.cmi :
 vertex/drawParameter.cmi : ../math/ogamlMath.cmi
 vertex/indexArray.cmi : backend/state.cmi fbo/renderTarget.cmi

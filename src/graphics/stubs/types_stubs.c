@@ -496,18 +496,26 @@ GLenum VBOKind_val(value kind)
 
 GLenum Attachment_val(value att)
 {
-  switch(Int_val(att))
-  {
-    case 0:
-      return GL_COLOR_ATTACHMENT0;
+  if(Is_long(att)) {
+    switch(Int_val(att))
+    {
+      case 0:
+        return GL_DEPTH_ATTACHMENT;
 
-    case 1:
-      return GL_DEPTH_ATTACHMENT;
+      case 1:
+        return GL_STENCIL_ATTACHMENT;
+          
+      default:
+        caml_failwith("Caml variant error in Attachment_val (long val)");
+    }
+  } else {
+    switch(Tag_val(att))
+    {
+      case 0:
+        return (GL_COLOR_ATTACHMENT0 + Int_val(Field(att,0)));
 
-    case 2:
-      return GL_STENCIL_ATTACHMENT;
-        
-    default:
-      caml_failwith("Caml variant error in Attachment_val(1)");
+      default:
+        caml_failwith("Caml variant error in Attachment_val (tag val)");
+    }
   }
 }

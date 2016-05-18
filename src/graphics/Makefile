@@ -29,6 +29,8 @@ MLSOURCES = 2d/color.ml\
 	    program/programInternal.ml\
 	    backend/state.ml\
 	    fbo/renderTarget.ml\
+	    fbo/attachment.ml\
+	    fbo/framebuffer.ml\
 	    texture/image.ml\
 	    texture/texture.ml\
 	    program/program.ml\

@@ -11,9 +11,6 @@ module type T = sig
   (* Returns the internal context associated to a render target *)
   val state : t -> State.t
 
-  (* Displays the render target *)
-  val display : t -> unit
-
   (* Clears a render target *)
   val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 

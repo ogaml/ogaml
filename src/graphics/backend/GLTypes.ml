@@ -161,7 +161,7 @@ end
 module GlAttachement = struct
 
   type t = 
-    | Color
+    | Color of int
     | Depth
     | Stencil
 

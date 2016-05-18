@@ -98,13 +98,13 @@ caml_destroy_fbo(value buf)
 }
 
 
-// INPUT   : an attachment point, a texture
+// INPUT   : an attachment point, a texture, a mipmap level
 // OUTPUT  : nothing, attaches the texture to the currently bound FBO
 CAMLprim value
-caml_fbo_texture2D(value atc, value tex)
+caml_fbo_texture2D(value atc, value tex, value level)
 {
-  CAMLparam2(atc,tex);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, Attachment_val(atc), GL_TEXTURE_2D, TEX(tex), 0);
+  CAMLparam3(atc,tex,level);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, Attachment_val(atc), GL_TEXTURE_2D, TEX(tex), Int_val(level));
   CAMLreturn(Val_unit);
 }
 

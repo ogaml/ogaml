@@ -357,9 +357,6 @@ module RenderTarget : sig
     (** Returns the internal context associated to a render target *)
     val state : t -> State.t
 
-    (** Displays the render target *)
-    val display : t -> unit
-
     (** Clears a render target *)
     val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 
@@ -370,6 +367,157 @@ module RenderTarget : sig
   end
 
 end
+
+
+(** Framebuffer attachments *)
+module Attachment : sig
+
+  (** This module contains the common interfaces 
+    * shared by textures or renderbuffers that can be attached
+    * to a certain attachment of an FBO *)
+
+  (** Represents a color attachment *)
+  module ColorAttachment : sig
+
+    (** Contains only the abstract type of a color attachment *)
+
+    (** Abstract type of a color attachment *)
+    type t 
+
+  end
+
+  (** Represents a depth attachment *)
+  module DepthAttachment : sig
+
+    (** Contains only the abstract type of a depth attachment *)
+
+    (** Abstract type of a depth attachment *)
+    type t
+
+  end
+
+  (** Represents a stencil attachment *)
+  module StencilAttachment : sig
+
+    (** Contains only the abstract type of a stencil attachment *)
+
+    (** Abstract type of a stencil attachment *)
+    type t
+
+  end
+
+  (** Represents a depth-stencil attachment *)
+  module DepthStencilAttachment : sig
+
+    (** Contains only the abstract type of a depth-stencil attachment *)
+
+    (** Abstract type of a depth-stencil attachment *)
+    type t
+
+  end
+
+  (** Interface of a color-attachable texture or RBO *)
+  module type ColorAttachable = sig
+
+    type t
+
+    val to_color_attachment : t -> ColorAttachment.t
+
+    val size : t -> OgamlMath.Vector2i.t
+
+  end
+
+  (** Interface of a depth-attachable texture or RBO *)
+  module type DepthAttachable = sig
+
+    type t 
+
+    val to_depth_attachment : t -> DepthAttachment.t
+
+    val size : t -> OgamlMath.Vector2i.t
+
+  end
+
+  (** Interface of a stencil-attachable texture or RBO *)
+  module type StencilAttachable = sig
+
+    type t
+
+    val to_stencil_attachment : t -> StencilAttachment.t
+
+    val size : t -> OgamlMath.Vector2i.t
+
+  end
+
+  (** Interface of a depth-stencil-attachable texture or RBO *)
+  module type DepthStencilAttachable = sig
+
+    type t
+
+    val to_depthstencil_attachment : t -> DepthStencilAttachment.t
+
+    val size : t -> OgamlMath.Vector2i.t
+
+  end
+end
+
+
+(** Framebuffer creation and manipulation *)
+module Framebuffer : sig
+
+  (** This module provides a safe way to create framebuffer objects (FBO) and 
+    * attach textures to them. *)
+
+  (** Type of a framebuffer object *)
+  type t
+
+  (** Creates a framebuffer from a valid context *)
+  val create : (module RenderTarget.T with type t = 'a) -> 'a -> t
+
+  (** Returns the maximal number of color attachments for a framebuffer *)
+  val max_color_attachments : t -> int
+
+  (** Attaches a valid color attachment to a framebuffer *)
+  val attach_color : (module Attachment.ColorAttachable with type t = 'a) 
+                      -> t -> int -> 'a -> unit
+
+  (** Attaches a valid depth attachment to a framebuffer *)
+  val attach_depth : (module Attachment.DepthAttachable with type t = 'a)
+                      -> t -> 'a -> unit
+
+  (** Attaches a valid stencil attachment to a framebuffer *)
+  val attach_stencil : (module Attachment.StencilAttachable with type t = 'a)
+                      -> t -> 'a -> unit
+
+  (** Attaches a valid depth and stencil attachment to a framebuffer *)
+  val attach_depthstencil : (module Attachment.DepthStencilAttachable with type t = 'a)
+                      -> t -> 'a -> unit
+
+  (** Returns true iff the FBO has a color attachment *)
+  val has_color : t -> bool
+
+  (** Returns true iff the FBO has a depth attachment *)
+  val has_depth : t -> bool
+
+  (** Returns true iff the FBO has a stencil attachment *)
+  val has_stencil : t -> bool
+
+  (** Returns the size of an FBO, that is the intersection of the sizes of 
+    * its attachments.
+    * Returns the maximal allowed size if nothing has been attached to this FBO *)
+  val size : t -> OgamlMath.Vector2i.t
+
+  (** Returns the GL context associated to the FBO *) 
+  val state : t -> State.t
+
+  (** Clears the FBO *)
+  val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+
+  (** Binds the FBO for drawing. Internal use only. *)
+  val bind : t -> DrawParameter.t -> unit
+
+end
+
 
 
 (** Image manipulation and creation *)
@@ -495,6 +643,9 @@ module Texture : sig
 
     (** System only function, binds a texture to a texture unit for drawing *)
     val bind : t -> int -> unit
+
+    (** Texture2D implements the interface ColorAttachable *)
+    val to_color_attachment : t -> Attachment.ColorAttachment.t
 
   end
 

@@ -8,8 +8,6 @@ module type T = sig
 
   val state : t -> State.t
 
-  val display : t -> unit
-
   val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 
   val bind : t -> DrawParameter.t -> unit
