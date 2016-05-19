@@ -4,7 +4,7 @@ include ../../common_defs.mk
 
 INCLUDE_DIRS = -I ../math/ -I ../core/ -I ../utils/\
 	       -I 2d/ -I backend/ -I fbo/ -I program/ -I texture/ -I vertex/\
-	       -I model/
+	       -I model/ -I window/
 
 GRAPHICS_STUBS = shader_stubs.c program_stubs.c texture_stubs.c\
 	         vao_stubs.c vbo_stubs.c uniform_stubs.c text_stubs.c\
@@ -22,11 +22,11 @@ LEXER_FILES = model/objLexer.mll
 
 PARSER_FILES = model/objParser.mly
 
-MLSOURCES = 2d/color.ml\
+MLSOURCES = backend/color.ml\
 	    backend/GLTypes.ml\
-	    vertex/drawParameter.ml\
 	    backend/GL.ml\
-	    program/programInternal.ml\
+	    backend/drawParameter.ml\
+	    backend/programInternal.ml\
 	    backend/state.ml\
 	    fbo/renderTarget.ml\
 	    fbo/attachment.ml\
@@ -34,20 +34,20 @@ MLSOURCES = 2d/color.ml\
 	    texture/image.ml\
 	    texture/texture.ml\
 	    program/program.ml\
-	    2d/font.ml\
 	    program/uniform.ml\
-	    backend/window.ml\
 	    vertex/indexArray.ml\
 	    vertex/vertexArray.ml\
 	    vertex/vertexMap.ml\
-	    2d/text.ml\
 	    $(PARSER_FILES:.mly=.ml)\
 	    $(LEXER_FILES:.mll=.ml)\
 	    model/model.ml\
+	    2d/font.ml\
+	    2d/text.ml\
 	    2d/shape.ml\
 	    2d/sprite.ml\
-	    backend/mouse.ml\
-	    backend/keyboard.ml
+	    window/window.ml\
+	    window/mouse.ml\
+	    window/keyboard.ml
 
 MLINTERFACES = vertex/drawMode.mli model/objAST.mli
 
