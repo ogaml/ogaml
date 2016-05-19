@@ -42,12 +42,15 @@ Interface changes:
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
   Uniform:
     ✘ Optional vec2 font_size parameter for uniform font -- font uniform was a bad idea @cancelled(2016-04-14 11:49) @project(Interface changes / Uniform)
+    ☐ Change behavior of tex_unit to use an available unit (only at binding)
+    ☐ Add exception when all units are taken/a unit is bound twice by the user
   Sprite & Text:
     ☐ Local relative-space conversion (rather than uniforms)
     ☐ Same for texture coordinates for fonts
     ☐ (+Shape) Centralize transformations
   Textures:
     ☐ Check for texture max size at creation
+    ☐ Add default texture wraping (clamp to edge)
   State:
     ☐ Rename State in GLContext
     ✔ Add state to all functions that need it, even implicitly (ie. Program.create) @done(2016-04-30 12:00) @project(Interface changes / State)
@@ -56,11 +59,12 @@ Interface changes:
     ☐ Add optional depth writing
   RenderTextures/Framebuffers:
     ☐ Check against GL_MAX_RENDERBUFFER_SIZE when creating
-    ☐ Remove size from RenderTarget and Framebuffers
+    ✘ Remove size from RenderTarget and Framebuffers @cancelled(2016-05-18 16:52) @project(Interface changes / RenderTextures/Framebuffers)
   VertexArrays (and probably others):
     ☐ Fix state not being modified at creation (binding then unbinding a vertex array DOES modify the state)
-
-
+  Program:
+    ☐ Remove error msg from exception, add optional logging function at creation
+    ☐ Add Program.log to get the last log
 
 Bugs:
   ✔ Use a custom ID system for textures as checking the equality of two textures in State can be wrong (if an ID gets recycled) @done(2016-04-14 12:00) @project(Bugs)
@@ -86,7 +90,7 @@ Advanced features:
     ☐ Texture3D
     ☐ Texture2D array
     ☐ TextureCube
-  ☐ Render textures
+  ✔ Render textures @done(2016-05-18 16:51) @project(Advanced features)
 
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
