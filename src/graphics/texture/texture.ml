@@ -48,7 +48,7 @@ module Common = struct
     set_unit tex.context uid;
     let bound_tex = State.LL.bound_texture tex.context uid in
     if bound_tex <> Some tex.id then begin
-      State.LL.set_bound_texture tex.context uid (Some (tex.id, tex.target));
+      State.LL.set_bound_texture tex.context uid (Some (tex.internal, tex.id, tex.target));
       GL.Texture.bind tex.target (Some tex.internal)
     end
 

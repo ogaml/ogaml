@@ -17,7 +17,10 @@ end
 
 let bind_fbo state id fbo = 
   if State.LL.bound_fbo state <> id then begin 
-    State.LL.set_bound_fbo state id;
+    (match fbo with
+     | None   -> State.LL.set_bound_fbo state None
+     | Some f -> State.LL.set_bound_fbo state (Some (f,id))
+    );
     GL.FBO.bind fbo;
   end
 

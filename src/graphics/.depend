@@ -165,7 +165,8 @@ backend/GL.cmi : ../math/ogamlMath.cmi backend/GLTypes.cmo \
 backend/color.cmi :
 backend/drawParameter.cmi : ../math/ogamlMath.cmi
 backend/state.cmi : backend/programInternal.cmo ../math/ogamlMath.cmi \
-    backend/GLTypes.cmo backend/drawParameter.cmi backend/color.cmi
+    backend/GLTypes.cmo backend/GL.cmi backend/drawParameter.cmi \
+    backend/color.cmi
 fbo/framebuffer.cmi : backend/state.cmi fbo/renderTarget.cmi \
     ../math/ogamlMath.cmi backend/drawParameter.cmi backend/color.cmi \
     fbo/attachment.cmo

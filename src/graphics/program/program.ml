@@ -83,7 +83,7 @@ module LL = struct
       GL.Program.use None
     end
     |Some(p) when State.LL.linked_program state <> Some p.ProgramInternal.id -> begin
-      State.LL.set_linked_program state (Some p.ProgramInternal.id);
+      State.LL.set_linked_program state (Some (p.ProgramInternal.program, p.ProgramInternal.id));
       GL.Program.use (Some p.ProgramInternal.program);
     end
     | _ -> ()

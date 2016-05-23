@@ -16,17 +16,17 @@ type t = {
   mutable depth_function : DrawParameter.DepthTest.t;
   mutable texture_id : int;
   mutable texture_unit  : int;
-  mutable bound_texture : (int * GLTypes.TextureTarget.t) option array;
+  mutable bound_texture : (GL.Texture.t * int * GLTypes.TextureTarget.t) option array;
   mutable program_id    : int;
-  mutable linked_program : int option;
-  mutable bound_vbo : int option;
+  mutable linked_program : (GL.Program.t * int) option;
+  mutable bound_vbo : (GL.VBO.t * int) option;
   mutable vao_id    : int;
-  mutable bound_vao : int option;
+  mutable bound_vao : (GL.VAO.t * int) option;
   mutable ebo_id    : int;
-  mutable bound_ebo : int option;
+  mutable bound_ebo : (GL.EBO.t * int) option;
   mutable fbo_id    : int;
   mutable rbo_id    : int;
-  mutable bound_fbo : int;
+  mutable bound_fbo : (GL.FBO.t * int) option;
   mutable color    : Color.t;
   mutable blending : bool;
   mutable blend_equation : DrawParameter.BlendMode.t;
@@ -96,7 +96,7 @@ module LL = struct
       ebo_id = 0;
       bound_ebo = None;
       fbo_id = 1;
-      bound_fbo = 0;
+      bound_fbo = None;
       rbo_id = 0;
       color = `RGB (Color.RGB.transparent);
       blending = false;
@@ -161,14 +161,14 @@ module LL = struct
       Printf.ksprintf error "Invalid texture unit %i" i;
     match s.bound_texture.(i) with
     | None       -> None
-    | Some (t,_) -> Some t
+    | Some (_,t,_) -> Some t
 
   let bound_target s i = 
     if i >= s.textures || i < 0 then
       Printf.ksprintf error "Invalid texture unit %i" i;
     match s.bound_texture.(i) with
     | None       -> None
-    | Some (_,t) -> Some t
+    | Some (_,_,t) -> Some t
 
   let set_bound_texture s i t = 
     if i >= s.textures || i < 0 then
@@ -176,7 +176,9 @@ module LL = struct
     s.bound_texture.(i) <- t
 
   let linked_program s = 
-    s.linked_program
+    match s.linked_program with
+    | None -> None
+    | Some (_,t) -> Some t
 
   let set_linked_program s p =
     s.linked_program <- p
@@ -186,13 +188,17 @@ module LL = struct
     s.program_id - 1
 
   let bound_vbo s = 
-    s.bound_vbo
+    match s.bound_vbo with
+    | None -> None
+    | Some (_,t) -> Some t
 
   let set_bound_vbo s v = 
     s.bound_vbo <- v
 
   let bound_vao s = 
-    s.bound_vao
+    match s.bound_vao with
+    | None -> None
+    | Some (_,t) -> Some t
 
   let set_bound_vao s v = 
     s.bound_vao <- v
@@ -202,7 +208,9 @@ module LL = struct
     s.vao_id - 1
 
   let bound_ebo s = 
-    s.bound_ebo
+    match s.bound_ebo with
+    | None -> None
+    | Some (_,t) -> Some t
 
   let set_bound_ebo s v = 
     s.bound_ebo <- v
@@ -212,7 +220,9 @@ module LL = struct
     s.ebo_id - 1
 
   let bound_fbo s = 
-    s.bound_fbo
+    match s.bound_fbo with
+    | None -> 0
+    | Some (_,t) -> t
 
   let set_bound_fbo s i = 
     s.bound_fbo <- i

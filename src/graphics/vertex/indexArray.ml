@@ -97,7 +97,7 @@ module LL = struct
   let bind state t = 
     if State.LL.bound_ebo state <> (Some t.id) then begin
       GL.EBO.bind (Some t.buffer);
-      State.LL.set_bound_ebo state (Some t.id);
+      State.LL.set_bound_ebo state (Some (t.buffer, t.id));
     end
 
 end

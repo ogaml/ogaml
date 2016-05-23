@@ -92,7 +92,7 @@ module LL : sig
   val texture_id : t -> int
 
   (** Sets the currently bound texture ID to a texture unit and a target *)
-  val set_bound_texture : t -> int -> (int * GLTypes.TextureTarget.t) option -> unit
+  val set_bound_texture : t -> int -> (GL.Texture.t * int * GLTypes.TextureTarget.t) option -> unit
 
   (** Returns the texture ID currently bound to a texture unit *)
   val bound_texture : t -> int -> int option
@@ -101,24 +101,24 @@ module LL : sig
   val bound_target : t -> int -> GLTypes.TextureTarget.t option
 
   (** Sets the currently linked program *)
-  val set_linked_program : t -> int option -> unit
+  val set_linked_program : t -> (GL.Program.t * int) option -> unit
 
-  (** Returns the currently linked program *)
+  (** Returns the currently linked program ID *)
   val linked_program : t -> int option
 
   (** Returns a new fresh program ID *)
   val program_id : t -> int
 
   (** Sets the currently bound VBO *)
-  val set_bound_vbo : t -> int option -> unit
+  val set_bound_vbo : t -> (GL.VBO.t * int) option -> unit
 
-  (** Returns the currently bound VBO *)
+  (** Returns the currently bound VBO ID *)
   val bound_vbo : t -> int option
 
   (** Sets the currently bound VAO *)
-  val set_bound_vao : t -> int option -> unit
+  val set_bound_vao : t -> (GL.VAO.t * int) option -> unit
 
-  (** Returns the currently bound VAO *)
+  (** Returns the currently bound VAO ID *)
   val bound_vao : t -> int option
 
   (** Returns a new fresh vao ID *)
@@ -128,19 +128,19 @@ module LL : sig
   val set_clear_color : t -> Color.t -> unit
 
   (** Sets the currently bound EBO *)
-  val set_bound_ebo : t -> int option -> unit
+  val set_bound_ebo : t -> (GL.EBO.t * int) option -> unit
 
-  (** Returns the currently bound EBO *)
+  (** Returns the currently bound EBO ID *)
   val bound_ebo : t -> int option
 
   (** Returns a new fresh ebo ID *)
   val ebo_id : t -> int
 
-  (** Returns the currently bound FBO *)
+  (** Returns the currently bound FBO ID *)
   val bound_fbo : t -> int
 
   (** Sets the currently bound FBO *)
-  val set_bound_fbo : t -> int -> unit
+  val set_bound_fbo : t -> (GL.FBO.t * int) option -> unit
 
   (** Returns a new fresh fbo ID *)
   val fbo_id : t -> int

@@ -320,9 +320,9 @@ let bind state t prog =
   if t.bound <> Some prog then begin
     t.bound <- Some prog;
     GL.VAO.bind (Some t.vao);
-    State.LL.set_bound_vao state (Some t.id);
+    State.LL.set_bound_vao state (Some (t.vao, t.id));
     GL.VBO.bind (Some t.buffer);
-    State.LL.set_bound_vbo state (Some t.id);
+    State.LL.set_bound_vbo state (Some (t.buffer, t.id));
     let attribs = ref t.attribs in
     let rec find_remove s = function
       | [] -> 
@@ -357,8 +357,8 @@ let bind state t prog =
   end
   else if State.LL.bound_vao state <> (Some t.id) then begin
     GL.VAO.bind (Some t.vao);
-    State.LL.set_bound_vao state (Some t.id);
-    State.LL.set_bound_vbo state (Some t.id);
+    State.LL.set_bound_vao state (Some (t.vao, t.id));
+    State.LL.set_bound_vbo state (Some (t.buffer, t.id));
   end
 
 type debug_times = {
