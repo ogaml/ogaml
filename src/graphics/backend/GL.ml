@@ -192,12 +192,15 @@ module Texture = struct
   type t
 
 
-  (* Abstract functions *)
-  external image2D : GLTypes.TextureTarget.t -> GLTypes.PixelFormat.t ->
-    (int * int) -> GLTypes.TextureFormat.t -> Bytes.t option -> unit = "caml_tex_image_2D"
+  external image2D : GLTypes.TextureTarget.t -> int -> GLTypes.PixelFormat.t ->
+    (int * int) -> GLTypes.TextureFormat.t -> Bytes.t option -> unit 
+    = "caml_tex_image_2D_bytecode"
+      "caml_tex_image_2D_native"
 
+  external storage2D : GLTypes.TextureTarget.t -> int -> GLTypes.TextureFormat.t ->
+    (int * int) -> unit
+    = "caml_tex_storage_2D"
 
-  (* Exposed functions *)
   external create : unit -> t = "caml_create_texture"
 
   external activate : int -> unit = "caml_activate_texture"
@@ -212,12 +215,6 @@ module Texture = struct
     -> unit = "caml_tex_parameter"
 
   external destroy : t -> unit = "caml_destroy_texture"
-
-  let image target = 
-    match target with
-    |GLTypes.TextureTarget.Texture1D -> failwith "Not yet implemented"
-    |GLTypes.TextureTarget.Texture2D -> image2D target
-    |GLTypes.TextureTarget.Texture3D -> failwith "Not yet implemented"
 
 end
 
@@ -378,7 +375,7 @@ module FBO = struct
 
   external texture2D : GLTypes.GlAttachement.t -> Texture.t -> int -> unit = "caml_fbo_texture2D"
 
-  external render : GLTypes.GlAttachement.t -> RBO.t -> unit = "caml_fbo_renderbuffer"
+  external renderbuffer : GLTypes.GlAttachement.t -> RBO.t -> unit = "caml_fbo_renderbuffer"
 
 end
 

@@ -25,6 +25,7 @@ type t = {
   mutable ebo_id    : int;
   mutable bound_ebo : int option;
   mutable fbo_id    : int;
+  mutable rbo_id    : int;
   mutable bound_fbo : int;
   mutable color    : Color.t;
   mutable blending : bool;
@@ -96,6 +97,7 @@ module LL = struct
       bound_ebo = None;
       fbo_id = 1;
       bound_fbo = 0;
+      rbo_id = 0;
       color = `RGB (Color.RGB.transparent);
       blending = false;
       blend_equation = DrawParameter.BlendMode.(
@@ -218,6 +220,10 @@ module LL = struct
   let fbo_id s = 
     s.fbo_id <- s.fbo_id + 1;
     s.fbo_id - 1
+
+  let rbo_id s = 
+    s.rbo_id <- s.rbo_id + 1;
+    s.rbo_id - 1
 
   let set_clear_color s c = 
     s.color <- c

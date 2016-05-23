@@ -1,3 +1,5 @@
+open OgamlMath
+
 
 module type T = sig
 
@@ -20,11 +22,20 @@ module Common = struct
       internal: GL.Texture.t;
       target  : GLTypes.TextureTarget.t;
       id      : int;
+      mipmaps : int;
       mutable minify  : MinifyFilter.t option;
       mutable magnify : MagnifyFilter.t option;
       mutable wrap    : WrapFunction.t option;
   }
 
+  let max_mipmaps size = 
+    let rec log2 i = 
+      match i with
+      | 0 -> 0
+      | 1 -> 0
+      | n -> 1 + (log2 (n lsr 1))
+    in
+    max (log2 size.Vector2i.x) (log2 size.Vector2i.y) + 1
 
   let set_unit st uid = 
     let bound_unit = State.LL.texture_unit st in
@@ -56,14 +67,15 @@ module Common = struct
       GL.Texture.bind target None
     end
 
-  let create state target =
+  let create state mipmaps target =
     (* Create the texture *)
     let internal = GL.Texture.create () in
     let tex = {internal; 
                context = state;
                target;
+               mipmaps;
                id = State.LL.texture_id state; 
-               wrap = None;
+               wrap = Some GLTypes.WrapFunction.ClampEdge;
                magnify = Some GLTypes.MagnifyFilter.Linear;
                minify = Some GLTypes.MinifyFilter.Linear} in
     (* Bind it *)
@@ -71,6 +83,7 @@ module Common = struct
     (* Set reasonable parameters *)
     GL.Texture.parameter target (`Minify GLTypes.MinifyFilter.Linear);
     GL.Texture.parameter target (`Magnify GLTypes.MagnifyFilter.Linear);
+    GL.Texture.parameter target (`Wrap GLTypes.WrapFunction.ClampEdge);
     tex
 
 
@@ -109,7 +122,7 @@ module Texture2D = struct
     height  : int;
   }
 
-  let create (type s) (module M : RenderTarget.T with type t = s) target src = 
+  let create (type s) (module M : RenderTarget.T with type t = s) target (*?mipmaps*) src = 
     let state = M.state target in
     (* Extract the texture parameters *)
     let width, height, data = 
@@ -117,35 +130,43 @@ module Texture2D = struct
       | `File s -> 
         let img = Image.create (`File s) in
         let v = Image.size img in
-        v.OgamlMath.Vector2i.x, v.OgamlMath.Vector2i.y, Image.data img
+        v.Vector2i.x, v.Vector2i.y, (Some (Image.data img))
       | `Image img ->
         let v = Image.size img in
-        v.OgamlMath.Vector2i.x, v.OgamlMath.Vector2i.y, Image.data img
+        v.Vector2i.x, v.Vector2i.y, (Some (Image.data img))
+      | `Empty size ->
+        size.Vector2i.x, size.Vector2i.y, None
     in
+    (* TODO : mipmaps *)
     (* Create the internal texture *)
-    let common = Common.create state GLTypes.TextureTarget.Texture2D in
-    let tex = {common; 
-               width; 
-               height} in
+    let common = Common.create state 0 GLTypes.TextureTarget.Texture2D in
+    let tex = {common; width; height} in
     (* Bind the texture *)
     Common.bind tex.common 0;
+    (* Allocate the texture *)
+    (* TODO *)
+    (*GL.Texture.storage2D
+      GLTypes.TextureTarget.Texture2D *)
     (* Load the corresponding image *)
-    GL.Texture.image
-      GLTypes.TextureTarget.Texture2D
+    GL.Texture.image2D
+      GLTypes.TextureTarget.Texture2D 
+      0
       GLTypes.PixelFormat.RGBA
       (width, height)
       GLTypes.TextureFormat.RGBA
-      (Some data);
+      data;
     (* Return the texture *)
     tex
 
-  let size tex = OgamlMath.Vector2i.({x = tex.width; y = tex.height})
+  let size tex = Vector2i.({x = tex.width; y = tex.height})
 
   let minify tex filter = Common.minify tex.common filter
 
   let magnify tex filter = Common.magnify tex.common filter
 
   let wrap tex func = Common.wrap tex.common func
+
+  let mipmap_levels tex = tex.common.Common.mipmaps
 
   let bind tex uid = Common.bind tex.common uid
 

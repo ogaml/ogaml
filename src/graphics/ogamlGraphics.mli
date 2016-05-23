@@ -459,6 +459,33 @@ module Attachment : sig
     val size : t -> OgamlMath.Vector2i.t
 
   end
+
+end
+
+
+(** Renderbuffer creation and manipulation *)
+module Renderbuffer : sig
+
+  (** This module provides several implementations of Renderbuffer Objects (RBO)
+    * that can be attached to framebuffer objects. *)
+
+  (** Depth Renderbuffer *)
+  module DepthBuffer : sig
+
+    (** Type of a depth renderbuffer *)
+    type t
+
+    (** Creates a depth renderbuffer from a context and a size *)
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+
+    (** DepthBuffer implements the interface DepthAttachable *)
+    val to_depth_attachment : t -> Attachment.DepthAttachment.t
+
+    (** Returns the size of a renderbuffer *)
+    val size : t -> OgamlMath.Vector2i.t
+
+  end
+
 end
 
 

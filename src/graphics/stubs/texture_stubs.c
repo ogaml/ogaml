@@ -106,15 +106,16 @@ caml_activate_texture(value loc)
 }
 
 
-// INPUT   a texture target, a pixel format, a size, a texture format, some data
+// INPUT   a texture target, a level, a pixel format, a size, a texture format, some data
 // OUTPUT  nothing, binds an image to the current texture2D
 CAMLprim value
-caml_tex_image_2D(value target, value fmt, value size, value tfmt, value data)
+caml_tex_image_2D_native(value target, value lvl, value fmt, value size, value tfmt, value data)
 {
   CAMLparam5(target, fmt, size, tfmt, data);
+  CAMLxparam1(lvl);
 
   glTexImage2D(Target_val(target),
-               0,
+               Int_val(lvl),
                TextureFormat_val(tfmt),
                Int_val(Field(size,0)),
                Int_val(Field(size,1)),
@@ -122,6 +123,29 @@ caml_tex_image_2D(value target, value fmt, value size, value tfmt, value data)
                PixelFormat_val(fmt),
                GL_UNSIGNED_BYTE,
                (data == Val_none)? NULL : String_val(Some_val(data)));
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_tex_image_2D_bytecode(value *argv, int argn) 
+{
+  return caml_tex_image_2D_native(argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);
+}
+
+
+// INPUT   a texture target, a number of mipmaps, a texture format, a texture size
+// OUTPUT  nothing, allocates the space for a texture2D
+CAMLprim value
+caml_tex_storage_2D(value target, value lvls, value tfmt, value size)
+{
+  CAMLparam4(target,lvls,tfmt,size);
+
+  glTexStorage2D(Target_val(target), 
+                 Int_val(lvls), 
+                 TextureFormat_val(tfmt),
+                 Int_val(Field(size,0)),
+                 Int_val(Field(size,1)));
 
   CAMLreturn(Val_unit);
 }

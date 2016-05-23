@@ -145,6 +145,9 @@ module LL : sig
   (** Returns a new fresh fbo ID *)
   val fbo_id : t -> int
 
+  (** Returns a new fresh rbo ID *)
+  val rbo_id : t -> int
+
   (** Returns whether alpha blending is currently enabled *)
   val blending : t -> bool
 

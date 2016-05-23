@@ -61,6 +61,11 @@ let display () =
     |> Uniform.matrix3D "MVPMatrix" mvp
     |> Uniform.matrix3D "MVMatrix" mv
     |> Uniform.matrix3D "VMatrix" view
+    |> Uniform.vector3f "Light.LightDir" Vector3f.{x = -4.; y = -2.; z = -3.}
+    |> Uniform.vector3f "Light.AmbientIntensity" Vector3f.{x = 0.3; y = 0.3; z = 0.3}
+    |> Uniform.float    "Light.SunIntensity" 1.6
+    |> Uniform.float    "Light.MaxIntensity" 1.9
+    |> Uniform.float    "Light.Gamma"  1.2
   in
   VertexArray.draw (module Window) ~target:window
                    ~vertices:cube ~uniform ~program:normal_program ~parameters ~mode:DrawMode.Triangles ()

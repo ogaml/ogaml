@@ -30,6 +30,7 @@ MLSOURCES = backend/color.ml\
 	    backend/state.ml\
 	    fbo/renderTarget.ml\
 	    fbo/attachment.ml\
+	    fbo/renderbuffer.ml\
 	    fbo/framebuffer.ml\
 	    texture/image.ml\
 	    texture/texture.ml\

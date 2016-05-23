@@ -151,9 +151,13 @@ module Texture : sig
   (** Binds a texture to the current point with a given format *)
   val bind : GLTypes.TextureTarget.t -> t option -> unit
 
-  (** Associates an image with the currently bound texture *)
-  val image : GLTypes.TextureTarget.t -> GLTypes.PixelFormat.t -> (int * int) 
-           -> GLTypes.TextureFormat.t -> Bytes.t option -> unit
+  (** Associates an image with the currently bound 2D texture *)
+  val image2D : GLTypes.TextureTarget.t -> int -> GLTypes.PixelFormat.t -> 
+                (int * int) -> GLTypes.TextureFormat.t -> Bytes.t option -> unit
+
+  (** Allocates some storage for a 2D texture *)
+  val storage2D : GLTypes.TextureTarget.t -> int -> GLTypes.TextureFormat.t -> 
+                (int * int) -> unit
 
   (** Sets the value of a parameter of the currently bound texture *)
   val parameter : GLTypes.TextureTarget.t ->
@@ -389,7 +393,7 @@ module FBO : sig
   val texture2D : GLTypes.GlAttachement.t -> Texture.t -> int -> unit
 
   (** Attaches a render buffer to an FBO *)
-  val render : GLTypes.GlAttachement.t -> RBO.t -> unit
+  val renderbuffer : GLTypes.GlAttachement.t -> RBO.t -> unit
 
 end
 

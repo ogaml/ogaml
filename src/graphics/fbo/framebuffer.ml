@@ -33,7 +33,6 @@ let attach_color (type a) (module A : Attachment.ColorAttachable with type t = a
   | Attachment.ColorAttachment.Texture2D (tex, lvl) ->
     GL.FBO.texture2D (GLTypes.GlAttachement.Color nb) tex lvl
 
-(* TODO *)
 let attach_depth (type a) (module A : Attachment.DepthAttachable with type t = a)
                  fbo (attachment : a) =
   let size = A.size attachment in
@@ -42,7 +41,9 @@ let attach_depth (type a) (module A : Attachment.DepthAttachable with type t = a
   fbo.depth <- true;
   State.LL.set_bound_fbo fbo.state fbo.id;
   GL.FBO.bind (Some fbo.fbo);
-  ignore attc
+  match attc with
+  | Attachment.DepthAttachment.DepthRBO rbo -> 
+    GL.FBO.renderbuffer GLTypes.GlAttachement.Depth rbo
 
 (* TODO *)
 let attach_stencil (type a) (module A : Attachment.StencilAttachable with type t = a)

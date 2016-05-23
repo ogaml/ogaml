@@ -51,6 +51,7 @@ Interface changes:
   Textures:
     ☐ Check for texture max size at creation
     ☐ Add default texture wraping (clamp to edge)
+    ☐ Empty textures
   State:
     ☐ Rename State in GLContext
     ✔ Add state to all functions that need it, even implicitly (ie. Program.create) @done(2016-04-30 12:00) @project(Interface changes / State)
@@ -65,6 +66,7 @@ Interface changes:
   Program:
     ☐ Remove error msg from exception, add optional logging function at creation
     ☐ Add Program.log to get the last log
+    ☐ Change target to context at creation
 
 Bugs:
   ✔ Use a custom ID system for textures as checking the equality of two textures in State can be wrong (if an ID gets recycled) @done(2016-04-14 12:00) @project(Bugs)
@@ -87,8 +89,12 @@ New modules:
 Advanced features:
   More Image and Texture types:
     ☐ Single-channeled images
+    ☐ Image slices
     ☐ Texture3D
     ☐ Texture2D array
+    ☐ Depth textures
+    ☐ Stencil textures
+    ☐ Mipmaps
     ☐ TextureCube
   ✔ Render textures @done(2016-05-18 16:51) @project(Advanced features)
 

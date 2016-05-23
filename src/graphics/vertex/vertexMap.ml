@@ -414,34 +414,36 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
          ?parameters:(parameters = DrawParameter.make ()) 
          ?start ?length
          ?mode:(mode = DrawMode.Triangles) () =
-  let state = M.state target in
-  let start = 
-    match start with
-    |None -> 0
-    |Some i -> i
-  in
-  let length = 
-    match length, indices with
-    |None, None     -> vertices.length - start
-    |None, Some ebo -> IndexArray.length ebo - start
-    |Some l, _ -> l
-  in
-  M.bind target parameters;
-  Program.LL.use state (Some program);
-  Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind state uniform unif);
-  bind state vertices program;
-  match indices with
-  |None -> 
-    if start < 0 || start + length > vertices.length then
-      raise (Out_of_bounds "Invalid vertex array bounds")
-    else GL.VAO.draw mode start length
-  |Some ebo ->
-    if start < 0 || start + length > (IndexArray.length ebo) then
-      raise (Out_of_bounds "Invalid index array bounds")
-    else begin
-      IndexArray.LL.bind state ebo;
-      GL.VAO.draw_elements mode start length 
-    end
+  if vertices.length <> 0 then begin
+    let state = M.state target in
+    let start = 
+      match start with
+      |None -> 0
+      |Some i -> i
+    in
+    let length = 
+      match length, indices with
+      |None, None     -> vertices.length - start
+      |None, Some ebo -> IndexArray.length ebo - start
+      |Some l, _ -> l
+    in
+    M.bind target parameters;
+    Program.LL.use state (Some program);
+    Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind state uniform unif);
+    bind state vertices program;
+    match indices with
+    |None -> 
+      if start < 0 || start + length > vertices.length then
+        raise (Out_of_bounds "Invalid vertex array bounds")
+      else GL.VAO.draw mode start length
+    |Some ebo ->
+      if start < 0 || start + length > (IndexArray.length ebo) then
+        raise (Out_of_bounds "Invalid index array bounds")
+      else begin
+        IndexArray.LL.bind state ebo;
+        GL.VAO.draw_elements mode start length 
+      end
+  end
 
 
 

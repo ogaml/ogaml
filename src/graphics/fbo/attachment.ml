@@ -9,7 +9,8 @@ end
 
 module DepthAttachment = struct
 
-  type t = unit
+  type t = 
+    | DepthRBO of GL.RBO.t
 
 end
 
