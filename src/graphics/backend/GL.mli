@@ -112,6 +112,9 @@ module Pervasives : sig
   (** Flushes the current buffer *)
   val flush : unit -> unit
 
+  (** Finishes the pending actions *)
+  val finish : unit -> unit
+
   (** Sets the MSAA *)
   val msaa : bool -> unit
 

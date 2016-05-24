@@ -56,6 +56,11 @@ let max_textures s =
 let assert_no_error s = 
   assert (GL.Pervasives.error () = None)
 
+let flush s = 
+  GL.Pervasives.flush ()
+
+let finish s = 
+  GL.Pervasives.finish ()
 
 module LL = struct
   

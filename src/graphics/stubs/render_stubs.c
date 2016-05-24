@@ -195,3 +195,14 @@ caml_glflush(value unit)
   glFlush();
   CAMLreturn(Val_unit);
 }
+
+
+// INPUT   nothing
+// OUTPUT  nothing, finishes the pending actions
+CAMLprim value
+caml_glfinish(value unit)
+{
+  CAMLparam0();
+  glFinish();
+  CAMLreturn(Val_unit);
+}

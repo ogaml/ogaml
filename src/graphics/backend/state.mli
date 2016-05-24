@@ -31,6 +31,12 @@ val max_textures : t -> int
 (** Asserts that no GL error occured *)
 val assert_no_error : t -> unit
 
+(** Flushes the GL buffer *)
+val flush : t -> unit
+
+(** Finishes all pending actions *)
+val finish : t -> unit
+
 
 module LL : sig
 

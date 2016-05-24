@@ -165,6 +165,8 @@ module Pervasives = struct
 
   external flush : unit -> unit = "caml_glflush"
 
+  external finish : unit -> unit = "caml_glfinish"
+
   external msaa : bool -> unit = "caml_enable_msaa"
 
 end
