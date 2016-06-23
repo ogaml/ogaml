@@ -336,6 +336,12 @@ module State : sig
   (** Returns the number of available texture units *)
   val max_textures : t -> int
 
+  (** Flushes the GL buffer *)
+  val flush : t -> unit
+
+  (** Finishes all pending actions *)
+  val finish : t -> unit
+
 end
 
 
