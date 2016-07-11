@@ -30,15 +30,15 @@ EXAMPLE_PKG = ogaml.graphics,ogaml.utils
 
 # Compilation
 
-default: math_lib core_lib utils_lib graphics_lib 
+default: depend math_lib core_lib utils_lib graphics_lib 
 
-utils_lib:
+utils_lib: depend
 	cd src/utils/ && make
 
-math_lib:
+math_lib: depend
 	cd src/math/ && make
 
-core_lib:
+core_lib: depend
 	cd src/core/ && make
 
 graphics_lib: core_lib math_lib utils_lib
@@ -87,5 +87,11 @@ clean:
 	cd src/graphics/ && make clean;
 	cd tests/ && make clean;
 	cd examples/ && make clean
+
+depend:
+	cd src/core/ && make depend;
+	cd src/math/ && make depend;
+	cd src/utils/ && make depend;
+	cd src/graphics/ && make depend
 
 .PHONY: install uninstall reinstall examples doc

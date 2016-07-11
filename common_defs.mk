@@ -56,7 +56,7 @@ LEX = ocamllex
 
 # Constants
   # Extensions used for cleaning
-CLEAN_EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so *.native *.out *.byte *.d
+CLEAN_EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so *.native *.out *.byte *.d .depend
 
 STUBS_DIR = stubs
 

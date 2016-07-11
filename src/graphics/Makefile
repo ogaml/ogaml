@@ -66,12 +66,13 @@ CMXA_DEPS = ../core/$(CORE_LIB).cmxa ../math/$(MATH_LIB).cmxa ../utils/$(UTILS_L
 
 # Compilation
 
-.INTERMEDIATE: $(LEXER_FILES:.mll=.ml) $(PARSER_FILES:.mly=.ml) $(PARSER_FILES:.mly=.mli)
+.INTERMEDIATE: $(LEXER_FILES:.mll=.ml) $(PARSER_FILES:.mly=.ml) objParser.mli
 
-default: .depend graphics_lib
+default: graphics_lib
 
+include .depend
 
-graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).cmi
+graphics_lib: depend $(STUBS_TARGET) $(MLINTERFACES) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).cmi
 	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(GRAPHICS_LIB).cmo $(MLCMIS) $(MLOBJS);
 	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(GRAPHICS_LIB).cmx $(MLCMIS) $(MLNATOBJS);
 	$(OCAMLFIND) $(OCAMLMKLIB) -o $(GRAPHICS_LIB) $(STUBS_OBJS) $(GRAPHICS_LIB).cmo $(GRAPHICS_LIB).cmx\
@@ -88,8 +89,8 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).c
 
 %.cmx:%.ml $(wildcard %.cmi)
 	$(OCAMLFIND) $(OCAMLOPT_CMD) -for-pack $(GRAPHICS_PACK) $(INCLUDE_DIRS) $(CMXA_DEPS) -c $< -o $@
-
-%.cmo:%.ml $(wildcard %.cmi)
+ 
+%.cmo:%.ml $(wildcard %.mli)
 	$(OCAMLFIND) $(OCAMLC_CMD) -for-pack $(GRAPHICS_PACK) $(INCLUDE_DIRS) $(CMA_DEPS) -c $< -o $@
 
 %.ml:%.mll
@@ -107,8 +108,6 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).c
 	$(OCAMLFIND) $(OCAMLC_CMD) -o ./$(notdir $@) -c $< -ccopt '$(COPTS)' -cclib "$(GLOBAL_CLIBS)"
 
 
-
-
 # Cleaning
 
 clean:
@@ -119,15 +118,17 @@ clean:
 	cd program/ && rm -f $(CLEAN_EXTENSIONS);
 	cd texture/ && rm -f $(CLEAN_EXTENSIONS);
 	cd vertex/ && rm -f $(CLEAN_EXTENSIONS);
-	rm -f $(CLEAN_EXTENSIONS)
+	rm -f $(CLEAN_EXTENSIONS);
+	rm -f .depend
 
 
 # Dependencies
+
+depend:.depend
 
 .depend:
 	$(DEPCOMMAND) */*.ml */*.mli > .depend;
 	$(MENHIR) --depend */*.mly >> .depend
 
-include .depend
 
 .PHONY: .depend

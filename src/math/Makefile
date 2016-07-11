@@ -19,13 +19,15 @@ MLCMIS = $(MLINTERFACES:.mli=.cmi)
 
 # Compilation
 
-default: .depend compile_math_nat compile_math_byte
+default: compile_math_nat compile_math_byte
 
-compile_math_nat: .depend $(MLCMIS) $(MLNATOBJS) ogamlMath.cmi
+include .depend
+
+compile_math_nat: depend $(MLCMIS) $(MLNATOBJS) ogamlMath.cmi
 	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(MATH_LIB).cmx $(MLCMIS) $(MLNATOBJS);
 	$(OCAMLFIND) $(OCAMLOPT_CMD) -a -o $(MATH_LIB).cmxa $(INCLUDE_DIRS) $(MATH_LIB).cmx
 
-compile_math_byte: .depend $(MLCMIS) $(MLOBJS) ogamlMath.cmi
+compile_math_byte: depend $(MLCMIS) $(MLOBJS) ogamlMath.cmi
 	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(MATH_LIB).cmo $(MLCMIS) $(MLOBJS);
 	$(OCAMLFIND) $(OCAMLC_CMD) -a -o $(MATH_LIB).cma $(INCLUDE_DIRS) $(MATH_LIB).cmo
 
@@ -48,10 +50,10 @@ clean:
 
 # Dependencies
 
+depend:.depend
+
 .depend:
 	$(DEPCOMMAND) *.ml *.mli > .depend
-
-include .depend
 
 .PHONY: .depend
 

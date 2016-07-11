@@ -52,9 +52,11 @@ ML_CMIS = $(ML_INTERFACES:.mli=.cmi)
 
 # Compilation
 
-default: .depend core_lib
+default: core_lib
 
-core_lib: ml_stubs $(STUBS_TARGETS) $(ML_CMIS) $(ML_OBJ) $(ML_NAT) $(CORE_LIB).cmi
+include .depend
+
+core_lib: depend ml_stubs $(STUBS_TARGETS) $(ML_CMIS) $(ML_OBJ) $(ML_NAT) $(CORE_LIB).cmi
 	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(CORE_LIB).cmx $(OS_WIN_LIB)/$(OS_WIN_LIB).cmx $(ML_CMIS) $(ML_NAT);
 	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(CORE_LIB).cmo $(OS_WIN_LIB)/$(OS_WIN_LIB).cmo $(ML_CMIS) $(ML_OBJ);
 	$(OCAMLFIND) $(OCAMLMKLIB) -o $(CORE_LIB) $(CORE_LIB).cmx $(CORE_LIB).cmo\
@@ -88,10 +90,11 @@ clean:
 
 # Dependencies
 
-.depend:
-	$(DEPCOMMAND) *.ml *.mli cocoa/*.ml cocoa/*.mli x11/*.ml x11/*.mli > .depend
+depend:.depend
 
-include .depend
+.depend:
+	$(DEPCOMMAND) *.ml *.mli cocoa/*.ml cocoa/*.mli x11/*.ml x11/*.mli > .depend;
+	cd $(OS_WIN_LIB) && make depend
 
 .PHONY: .depend
 
