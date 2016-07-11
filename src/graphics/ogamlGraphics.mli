@@ -591,6 +591,10 @@ module Image : sig
     * @see:OgamlMath.IntRect @see:OgamlMath.Vector2i *)
   val blit : t -> ?rect:OgamlMath.IntRect.t -> t -> OgamlMath.Vector2i.t -> unit
 
+  (** $mipmap img lvl$ returns a new, fresh image that is the $lvl$-th reduction 
+    * of the image $img$ *)
+  val mipmap : t -> int -> t
+
 end
 
 
@@ -648,6 +652,32 @@ module Texture : sig
 
   end
 
+
+  (** Represents a mipmap level of a 2D texture *)
+  module Texture2DMipmap : sig
+
+    (** Type of a 2D mipmap level *)
+    type t
+
+    (** Size of the mipmap level *)
+    val size : t -> OgamlMath.Vector2i.t
+
+    (** Writes an image to a sub-rectangle of a mipmap level.
+      * Writes to the full mipmap level by default. *)
+    val write : t -> ?rect:OgamlMath.IntRect.t -> Image.t -> unit
+
+    (** Returns the level of a Texture2DMipmap.t *)
+    val level : t -> int
+ 
+    (** System only function, binds the original texture of the mipmap *)
+    val bind : t -> int -> unit 
+
+    (** Texture2DMipmap implements the interface ColorAttachable *)
+    val to_color_attachment : t -> Attachment.ColorAttachment.t
+
+  end
+
+
   (** Represents a simple 2D texture *)
   module Texture2D : sig
 
@@ -660,19 +690,27 @@ module Texture : sig
 
     (** Creates a texture from a source (a file or an image) *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a -> 
-                 [< `File of string | `Image of Image.t ] -> t
+                 ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None] ->
+                 [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] -> t
 
     (** Returns the size of a texture *)
     val size : t -> OgamlMath.Vector2i.t
 
-    (** Sets the minifying filter of a texture *)
+    (** Sets the minifying filter of a texture. Defaults as LinearMipmapLinear. *)
     val minify : t -> MinifyFilter.t -> unit
 
-    (** Sets the magnifying filter of a texture *)
+    (** Sets the magnifying filter of a texture. Defaults as Linear *)
     val magnify : t -> MagnifyFilter.t -> unit
 
-    (** Sets the wrapping function of a texture *)
+    (** Sets the wrapping function of a texture. Defaults as ClampEdge.  *)
     val wrap : t -> WrapFunction.t -> unit
+    
+    (** Returns the number of mipmap levels of a texture *)
+    val mipmap_levels : t -> int
+
+    (** Returns a mipmap level of a texture.
+      * Raises Invalid_argument if the requested level is out of bounds *)
+    val mipmap : t -> int -> Texture2DMipmap.t
 
     (** System only function, binds a texture to a texture unit for drawing *)
     val bind : t -> int -> unit

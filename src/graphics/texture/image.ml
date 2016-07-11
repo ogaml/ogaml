@@ -86,6 +86,18 @@ let get img v =
 
 let data img = img.data
 
+let mipmap img lvl = 
+  let new_width  = img.width  lsr lvl in
+  let new_height = img.height lsr lvl in
+  let new_img    = create (`Empty ({Vector2i.x = new_width; y = new_height}, `RGB Color.RGB.black)) in
+  for x = 0 to new_width - 1 do
+    for y = 0 to new_height - 1 do
+      set new_img {Vector2i.x; y} 
+        (`RGB (get img {Vector2i.x = x lsl lvl; y = y lsl lvl}))
+    done;
+  done;
+  new_img
+
 let blit src ?rect dest pos = 
   let rect = 
     match rect with

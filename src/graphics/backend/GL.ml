@@ -199,6 +199,11 @@ module Texture = struct
     = "caml_tex_image_2D_bytecode"
       "caml_tex_image_2D_native"
 
+  external subimage2D : GLTypes.TextureTarget.t -> int -> (int * int) -> (int * int) ->
+                        GLTypes.PixelFormat.t -> Bytes.t option -> unit 
+    = "caml_tex_subimage_2D_bytecode"
+      "caml_tex_subimage_2D_native"
+
   external storage2D : GLTypes.TextureTarget.t -> int -> GLTypes.TextureFormat.t ->
     (int * int) -> unit
     = "caml_tex_storage_2D"

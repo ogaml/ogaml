@@ -158,6 +158,11 @@ module Texture : sig
   val image2D : GLTypes.TextureTarget.t -> int -> GLTypes.PixelFormat.t -> 
                 (int * int) -> GLTypes.TextureFormat.t -> Bytes.t option -> unit
 
+  (** Associates an subimage with the currently bound 2D texture *)
+  val subimage2D : GLTypes.TextureTarget.t -> int -> (int * int) -> (int * int) ->
+                   GLTypes.PixelFormat.t -> Bytes.t option -> unit
+
+
   (** Allocates some storage for a 2D texture *)
   val storage2D : GLTypes.TextureTarget.t -> int -> GLTypes.TextureFormat.t -> 
                 (int * int) -> unit

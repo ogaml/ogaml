@@ -337,22 +337,22 @@ GLenum TextureFormat_val(value fmt)
   switch(Int_val(fmt))
   {
     case 0:
-      return GL_RED;
+      return GL_R8;
 
     case 1:
-      return GL_RG;
+      return GL_RG8;
 
     case 2:
-      return GL_RGB;
+      return GL_RGB8;
 
     case 3:
-      return GL_RGBA;
+      return GL_RGBA8;
 
     case 4:
-      return GL_DEPTH_COMPONENT;
+      return GL_DEPTH_COMPONENT24;
 
     case 5:
-      return GL_DEPTH_STENCIL;
+      return GL_DEPTH24_STENCIL8;
 
     default:
       caml_failwith("Caml variant error in TextureFormat_val(1)");

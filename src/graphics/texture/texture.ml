@@ -77,15 +77,14 @@ module Common = struct
                id = State.LL.texture_id state; 
                wrap = Some GLTypes.WrapFunction.ClampEdge;
                magnify = Some GLTypes.MagnifyFilter.Linear;
-               minify = Some GLTypes.MinifyFilter.Linear} in
+               minify = Some GLTypes.MinifyFilter.LinearMipmapLinear} in
     (* Bind it *)
     bind tex 0;
     (* Set reasonable parameters *)
-    GL.Texture.parameter target (`Minify GLTypes.MinifyFilter.Linear);
+    GL.Texture.parameter target (`Minify GLTypes.MinifyFilter.LinearMipmapLinear);
     GL.Texture.parameter target (`Magnify GLTypes.MagnifyFilter.Linear);
     GL.Texture.parameter target (`Wrap GLTypes.WrapFunction.ClampEdge);
     tex
-
 
   let minify tex filter = 
     bind tex 0;
@@ -103,7 +102,6 @@ module Common = struct
       GL.Texture.parameter tex.target (`Magnify filter);
       tex.magnify <- Some filter
 
-
   let wrap tex func = 
     bind tex 0;
     match tex.wrap with
@@ -114,6 +112,44 @@ module Common = struct
 
 end
 
+module Texture2DMipmap = struct
+
+  type t = {
+    common  : Common.t;
+    width   : int;
+    height  : int;
+    level   : int
+  }
+
+  let bind tex uid = 
+    Common.bind tex.common uid
+
+  let size tex = 
+    Vector2i.({x = tex.width; y = tex.height})
+
+  let write tex ?rect img = 
+    bind tex 0;
+    let rect = 
+      match rect with
+      | None   -> IntRect.create Vector2i.zero (size tex)
+      | Some r -> r
+    in
+    GL.Texture.subimage2D 
+      GLTypes.TextureTarget.Texture2D
+      tex.level (rect.IntRect.x, rect.IntRect.y)
+      (rect.IntRect.width, rect.IntRect.height)
+      GLTypes.PixelFormat.RGBA
+      (Some (Image.data img))
+
+  let level tex = 
+    tex.level
+
+  let to_color_attachment tex = 
+    Attachment.ColorAttachment.Texture2D (tex.common.Common.internal, tex.level)
+
+end
+
+
 module Texture2D = struct
 
   type t = {
@@ -122,39 +158,58 @@ module Texture2D = struct
     height  : int;
   }
 
-  let create (type s) (module M : RenderTarget.T with type t = s) target (*?mipmaps*) src = 
+  let create (type s) (module M : RenderTarget.T with type t = s) target 
+    ?mipmaps:(mipmaps=`AllGenerated) src = 
     let state = M.state target in
     (* Extract the texture parameters *)
-    let width, height, data = 
+    let width, height, img = 
       match src with
       | `File s -> 
         let img = Image.create (`File s) in
         let v = Image.size img in
-        v.Vector2i.x, v.Vector2i.y, (Some (Image.data img))
+        v.Vector2i.x, v.Vector2i.y, (Some img)
       | `Image img ->
         let v = Image.size img in
-        v.Vector2i.x, v.Vector2i.y, (Some (Image.data img))
+        v.Vector2i.x, v.Vector2i.y, (Some img)
       | `Empty size ->
         size.Vector2i.x, size.Vector2i.y, None
     in
-    (* TODO : mipmaps *)
+    let levels = 
+      let max_levels = Common.max_mipmaps Vector2i.({x = width; y = height}) in
+      match mipmaps with
+      | `AllGenerated | `AllEmpty    -> max_levels
+      | `Empty i      | `Generated i -> max 1 (min max_levels i)
+      | `None -> 1
+     in
     (* Create the internal texture *)
-    let common = Common.create state 0 GLTypes.TextureTarget.Texture2D in
+    let common = Common.create state levels GLTypes.TextureTarget.Texture2D in
     let tex = {common; width; height} in
     (* Bind the texture *)
     Common.bind tex.common 0;
     (* Allocate the texture *)
-    (* TODO *)
-    (*GL.Texture.storage2D
-      GLTypes.TextureTarget.Texture2D *)
-    (* Load the corresponding image *)
-    GL.Texture.image2D
+    GL.Texture.storage2D
       GLTypes.TextureTarget.Texture2D 
-      0
-      GLTypes.PixelFormat.RGBA
-      (width, height)
-      GLTypes.TextureFormat.RGBA
-      data;
+      levels 
+      GLTypes.TextureFormat.RGBA8
+      (width, height);
+    (* Load the corresponding image in each mipmap if requested *)
+    begin match mipmaps with
+    | `AllGenerated | `Generated _ ->
+      for lvl = 0 to levels -1 do
+        let data = 
+          match img with
+          | Some img -> Some (Image.data (Image.mipmap img lvl))
+          | None     -> None
+        in
+        GL.Texture.subimage2D
+          GLTypes.TextureTarget.Texture2D 
+          lvl (0,0)
+          (width lsr lvl, height lsr lvl)
+          GLTypes.PixelFormat.RGBA
+          data
+      done;
+    | `None | `AllEmpty | `Empty _ -> ()
+    end;
     (* Return the texture *)
     tex
 
@@ -167,6 +222,15 @@ module Texture2D = struct
   let wrap tex func = Common.wrap tex.common func
 
   let mipmap_levels tex = tex.common.Common.mipmaps
+
+  let mipmap tex i = 
+    if i >= tex.common.Common.mipmaps || i < 0 then
+      raise (Invalid_argument (Printf.sprintf "Mipmap level out of bounds"))
+    else
+      {Texture2DMipmap.common = tex.common; 
+       width = tex.width lsr i; 
+       height = tex.height lsr i;
+       level = i}
 
   let bind tex uid = Common.bind tex.common uid
 

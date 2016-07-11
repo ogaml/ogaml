@@ -15,5 +15,7 @@ val get : t -> OgamlMath.Vector2i.t -> Color.RGB.t
 
 val data : t -> Bytes.t
 
+val mipmap : t -> int -> t
+
 val blit : t -> ?rect:OgamlMath.IntRect.t -> t -> OgamlMath.Vector2i.t -> unit
 

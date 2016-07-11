@@ -63,12 +63,12 @@ end
 module TextureFormat = struct
 
   type t = 
-    | R
-    | RG
-    | RGB
-    | RGBA
-    | Depth
-    | DepthStencil
+    | R8
+    | RG8
+    | RGB8
+    | RGBA8
+    | Depth24
+    | Depth24Stencil8
 
 end
 

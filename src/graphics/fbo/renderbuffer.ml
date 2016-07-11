@@ -13,7 +13,7 @@ module DepthBuffer = struct
     let state = M.state target in
     let id = State.LL.rbo_id state in
     GL.RBO.bind (Some internal);
-    GL.RBO.storage GLTypes.TextureFormat.Depth size.Vector2i.x size.Vector2i.y;
+    GL.RBO.storage GLTypes.TextureFormat.Depth24 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
     {id; internal; size}
 

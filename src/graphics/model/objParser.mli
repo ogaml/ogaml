@@ -1,4 +1,6 @@
+
 (* The type of tokens. *)
+
 type token = 
   | VERTEX
   | UV
@@ -20,8 +22,9 @@ type token =
   | EOF
 
 (* This exception is raised by the monolithic API functions. *)
+
 exception Error
 
 (* The monolithic API. *)
-val file: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (ObjAST.t list)
 
+val file: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (ObjAST.t list)

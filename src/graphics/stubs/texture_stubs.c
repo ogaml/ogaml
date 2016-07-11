@@ -134,6 +134,34 @@ caml_tex_image_2D_bytecode(value *argv, int argn)
 }
 
 
+// INPUT   a texture target, a level, an offset, a size, a pixel format, some data
+// OUTPUT  nothing, binds an subimage to the current texture2D
+CAMLprim value
+caml_tex_subimage_2D_native(value target, value lvl, value off, value size, value fmt, value data)
+{
+  CAMLparam5(target, lvl, off, size, fmt);
+  CAMLxparam1(data);
+
+  glTexSubImage2D(Target_val(target),
+                  Int_val(lvl),
+                  Int_val(Field(off,0)),
+                  Int_val(Field(off,1)),
+                  Int_val(Field(size,0)),
+                  Int_val(Field(size,1)),
+                  PixelFormat_val(fmt),
+                  GL_UNSIGNED_BYTE,
+                  (data == Val_none)? NULL : String_val(Some_val(data)));
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_tex_subimage_2D_bytecode(value *argv, int argn) 
+{
+  return caml_tex_subimage_2D_native(argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);
+}
+
+
 // INPUT   a texture target, a number of mipmaps, a texture format, a texture size
 // OUTPUT  nothing, allocates the space for a texture2D
 CAMLprim value

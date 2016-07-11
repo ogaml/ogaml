@@ -14,26 +14,28 @@ module MagnifyFilter = GLTypes.MagnifyFilter
 
 module WrapFunction = GLTypes.WrapFunction
 
-(*module Texture2DMipmap : sig
+module Texture2DMipmap : sig
 
   type t
 
   val size : t -> OgamlMath.Vector2i.t
 
-  val write : t -> OgamlMath.IntRect.t -> Image.t -> unit
+  val write : t -> ?rect:OgamlMath.IntRect.t -> Image.t -> unit
 
   val level : t -> int
 
+  val to_color_attachment : t -> Attachment.ColorAttachment.t
+
   val bind : t -> int -> unit
 
-end*)
+end
 
 module Texture2D : sig
 
   type t
 
   val create : (module RenderTarget.T with type t = 'a) -> 'a 
-(*                -> ?mipmaps:[< `AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None] *)
+               -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
                -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] -> t
 
   val size : t -> OgamlMath.Vector2i.t
@@ -46,7 +48,7 @@ module Texture2D : sig
 
   val mipmap_levels : t -> int
 
-(*   val mipmap : t -> int -> Texture2DMipmap.t *)
+  val mipmap : t -> int -> Texture2DMipmap.t
 
   val to_color_attachment : t -> Attachment.ColorAttachment.t
 
