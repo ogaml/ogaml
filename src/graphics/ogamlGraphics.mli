@@ -604,6 +604,11 @@ module Texture : sig
   (** This module provides wrappers around different kinds
     * of OpenGL textures *)
 
+
+  (** Raised if the creation of a texture fails *)
+  exception Creation_error of string
+
+
   (** Common signature for all texture types *)
   module type T = sig
 
@@ -681,14 +686,15 @@ module Texture : sig
   (** Represents a simple 2D texture *)
   module Texture2D : sig
 
-    (** This modules provides an abstraction of openGL 2D textures
+    (** This module provides an abstraction of OpenGL 2D textures
       * that can be used for 2D rendering (with sprites) or
       * 3D rendering when passed to a GLSL program. *)
 
     (** Type of a 2D texture *)
     type t
 
-    (** Creates a texture from a source (a file or an image) *)
+    (** Creates a texture from a source (a file or an image).
+      * Generates all mipmaps by default. *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a -> 
                  ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None] ->
                  [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] -> t
@@ -717,6 +723,50 @@ module Texture : sig
 
     (** Texture2D implements the interface ColorAttachable *)
     val to_color_attachment : t -> Attachment.ColorAttachment.t
+
+  end
+
+
+  (** Represents arrays of 2D textures *)
+  module Texture2DArray : sig
+
+    (** This module provides an abstraction of OpenGL 2D texture arrays *)
+
+    (** Type of a 2D texture array *)
+    type t 
+
+    (** Creates a texture array from a list of files, a list of images, or
+      * creates an empty array of given dimensions.
+      * Generates all mipmaps by default for every layer by default.
+      *
+      * Raises Creation_error if the list of images (or files) is empty, or
+      * if all the images do not have the same dimensions. *)
+    val create : (module RenderTarget.T with type t = 'a) -> 'a
+                 -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+                 -> [< `File of string list | `Image of Image.t list | `Empty of OgamlMath.Vector3i.t] -> t
+
+    (** Returns the size of a texture array *)
+    val size : t -> OgamlMath.Vector3i.t
+
+    (** Sets the minifying filter of a texture. Defaults as LinearMipmapLinear. *)
+    val minify : t -> MinifyFilter.t -> unit
+
+    (** Sets the magnifying filter of a texture. Defaults as Linear. *)
+    val magnify : t -> MagnifyFilter.t -> unit
+
+    (** Sets the wrapping function of a texture. Defaults as ClampEdge. *)
+    val wrap : t -> WrapFunction.t -> unit
+
+    (** Returns the number of layers of a texture. Equivalent to $(size tex).z$ *)
+    val layers : t -> int
+
+    (** Returns the number of mipmap levels of a texture. *)
+    val mipmap_levels : t -> int
+
+  (*   val layer : t -> int -> Texture2DArrayLayer.t *)
+
+    (** System only function, binds the texture to a texture unit. *)
+    val bind : t -> int -> unit
 
   end
 

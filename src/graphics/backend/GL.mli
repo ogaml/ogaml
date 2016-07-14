@@ -167,6 +167,20 @@ module Texture : sig
   val storage2D : GLTypes.TextureTarget.t -> int -> GLTypes.TextureFormat.t -> 
                 (int * int) -> unit
 
+  (** Associates an image with the currently bound 3D texture *)
+  val image3D : GLTypes.TextureTarget.t -> int -> GLTypes.PixelFormat.t -> 
+                (int * int * int) -> GLTypes.TextureFormat.t -> Bytes.t option -> unit
+
+  (** Associates an subimage with the currently bound 3D texture *)
+  val subimage3D : GLTypes.TextureTarget.t -> int -> (int * int * int) -> (int * int * int) ->
+                   GLTypes.PixelFormat.t -> Bytes.t option -> unit
+
+
+  (** Allocates some storage for a 3D texture *)
+  val storage3D : GLTypes.TextureTarget.t -> int -> GLTypes.TextureFormat.t -> 
+                (int * int * int) -> unit
+
+
   (** Sets the value of a parameter of the currently bound texture *)
   val parameter : GLTypes.TextureTarget.t ->
                   [`Magnify of GLTypes.MagnifyFilter.t 

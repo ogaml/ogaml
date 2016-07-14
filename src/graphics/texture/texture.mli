@@ -1,4 +1,6 @@
 
+exception Creation_error of string
+
 module type T = sig
 
   type t
@@ -104,14 +106,14 @@ module Texture2DArrayLayer : sig
 
   val to_color_attachment : t -> Attachment.ColorAttachment.t
 
-end
+end*)
 
 module Texture2DArray : sig
 
   type t 
 
   val create : (module RenderTarget.T with type t = 'a) -> 'a
-               -> ?mipmaps:[< `AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+               -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
                -> [< `File of string list | `Image of Image.t list | `Empty of OgamlMath.Vector3i.t] -> t
 
   val size : t -> OgamlMath.Vector3i.t
@@ -126,10 +128,9 @@ module Texture2DArray : sig
 
   val mipmap_levels : t -> int
 
-  val layer : t -> int -> Texture2DArrayLayer.t
+(*   val layer : t -> int -> Texture2DArrayLayer.t *)
 
   val bind : t -> int -> unit
 
 end
 
-*)

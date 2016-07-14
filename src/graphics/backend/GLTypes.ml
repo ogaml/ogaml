@@ -40,6 +40,7 @@ module TextureTarget = struct
   type t = 
     | Texture1D
     | Texture2D
+    | Texture2DArray
     | Texture3D
 
 end

@@ -250,6 +250,9 @@ GLenum Target_val(value target)
       return GL_TEXTURE_2D;
 
     case 2:
+      return GL_TEXTURE_2D_ARRAY;
+
+    case 3:
       return GL_TEXTURE_3D;
 
     default:

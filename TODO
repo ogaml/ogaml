@@ -94,7 +94,7 @@ Advanced features:
     ☐ Texture2D array
     ☐ Depth textures
     ☐ Stencil textures
-    ☐ Mipmaps
+    ✔ Mipmaps @done(2016-07-14 12:06) @project(Advanced features / More Image and Texture types)
     ☐ TextureCube
   ✔ Render textures @done(2016-05-18 16:51) @project(Advanced features)
 

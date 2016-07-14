@@ -208,6 +208,21 @@ module Texture = struct
     (int * int) -> unit
     = "caml_tex_storage_2D"
 
+  external image3D : GLTypes.TextureTarget.t -> int -> GLTypes.PixelFormat.t ->
+    (int * int * int) -> GLTypes.TextureFormat.t -> Bytes.t option -> unit 
+    = "caml_tex_image_3D_bytecode"
+      "caml_tex_image_3D_native"
+
+  external subimage3D : GLTypes.TextureTarget.t -> int -> (int * int * int) -> (int * int * int) ->
+                        GLTypes.PixelFormat.t -> Bytes.t option -> unit 
+    = "caml_tex_subimage_3D_bytecode"
+      "caml_tex_subimage_3D_native"
+
+  external storage3D : GLTypes.TextureTarget.t -> int -> GLTypes.TextureFormat.t ->
+    (int * int * int) -> unit
+    = "caml_tex_storage_3D"
+
+
   external create : unit -> t = "caml_create_texture"
 
   external activate : int -> unit = "caml_activate_texture"

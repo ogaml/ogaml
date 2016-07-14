@@ -7,6 +7,12 @@
 DISCLAIMER: This library is only in early stages and some features will probably
 change or be removed.
 
+NOTE: When developping Ogaml, we try to enforce the absence of undefined 
+behaviours. We also try to hide most low-level functions, even though there are
+cases where we need to expose them (such as texture binding functions). If you
+find an error that is not catched, an undefined behaviour, or a low-level
+function that could have been hidden, please open an issue :-)
+
 ## Presentation:
 
 OGAML is a fast and cross-platform multimedia library for OCaml. It provides
