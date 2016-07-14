@@ -245,6 +245,101 @@ module Texture2D = struct
 end
 
 
+module Texture2DArrayLayerMipmap = struct
+
+  type t = {
+    common : Common.t;
+    width  : int;
+    height : int;
+    level  : int;
+    layer  : int
+  }
+
+  let size t = Vector2i.({x = t.width; y = t.height})
+
+  let layer t = t.layer
+
+  let level t = t.level
+
+  let bind t uid = Common.bind t.common uid
+
+  let write t rect img = 
+    bind t 0;
+    GL.Texture.subimage3D GLTypes.TextureTarget.Texture2DArray
+                          t.level
+                          (rect.IntRect.x, rect.IntRect.y, t.layer)
+                          (rect.IntRect.width, rect.IntRect.height, 1)
+                          GLTypes.PixelFormat.RGBA
+                          (Some (Image.data img))
+
+  let to_color_attachment t = 
+    Attachment.ColorAttachment.Texture2DArray (t.common.Common.internal, t.layer, t.level)
+
+end
+
+
+module Texture2DArrayMipmap = struct
+
+  type t = {
+    common : Common.t;
+    width  : int;
+    height : int;
+    depth  : int;
+    level  : int
+  }
+
+  let size t = Vector3i.({x = t.width; y = t.height; z = t.depth})
+
+  let layers t = t.depth
+
+  let level t = t.level
+
+  let layer t i = 
+    if i < 0 || i >= t.depth then 
+      raise (Invalid_argument "Texture 2D array : layer out of bounds");
+    {Texture2DArrayLayerMipmap.common = t.common;
+                               width  = t.width;
+                               height = t.height;
+                               level  = t.level;
+                               layer  = i}
+
+  let bind t uid = Common.bind t.common uid
+
+end
+
+
+module Texture2DArrayLayer = struct
+
+  type t = {
+    common : Common.t;
+    width  : int;
+    height : int;
+    layer  : int
+  }
+
+  let size t = Vector2i.({x = t.width; y = t.height})
+
+  let layer t = t.layer
+
+  let mipmap_levels t = t.common.Common.mipmaps
+
+  let mipmap t i = 
+    if i < 0 || i >= t.common.Common.mipmaps then 
+      raise (Invalid_argument "Texture 2D array : mipmap level out of bounds");
+    {Texture2DArrayLayerMipmap.common = t.common;
+                               width  = t.width lsr i;
+                               height = t.height lsr i;
+                               level  = i;
+                               layer  = t.layer}
+
+  let bind t uid = Common.bind t.common uid
+
+  let to_color_attachment t = 
+    Attachment.ColorAttachment.Texture2DArray (t.common.Common.internal, t.layer, 0)
+
+end
+
+
 module Texture2DArray = struct
 
   type t = {
@@ -351,6 +446,23 @@ module Texture2DArray = struct
   let layers t = t.depth
 
   let mipmap_levels t = t.common.Common.mipmaps
+
+  let layer t i = 
+    if i < 0 || i >= t.depth then 
+      raise (Invalid_argument "Texture 2D array : layer out of bounds");
+    {Texture2DArrayLayer.common = t.common;
+                         width  = t.width;
+                         height = t.height;
+                         layer  = i}
+
+  let mipmap t i = 
+    if i < 0 || i >= t.common.Common.mipmaps then 
+      raise (Invalid_argument "Texture 2D array : mipmap level out of bounds");
+    {Texture2DArrayMipmap.common = t.common;
+                          width  = t.width lsr i;
+                          height = t.height lsr i;
+                          depth  = t.depth;
+                          level  = i}
 
   let bind t uid = Common.bind t.common uid
 

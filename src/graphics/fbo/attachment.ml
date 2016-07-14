@@ -4,6 +4,7 @@ module ColorAttachment = struct
 
   type t = 
     | Texture2D of GL.Texture.t * int
+    | Texture2DArray of GL.Texture.t * int * int
 
 end
 

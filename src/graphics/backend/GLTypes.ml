@@ -159,7 +159,7 @@ module GlError = struct
 end
 
 (** Texture attachements *)
-module GlAttachement = struct
+module GlAttachment = struct
 
   type t = 
     | Color of int

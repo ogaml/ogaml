@@ -57,7 +57,8 @@ module Texture2D : sig
   val bind : t -> int -> unit
 
 end
-(*
+
+
 module Texture2DArrayLayerMipmap : sig
 
   type t
@@ -72,7 +73,10 @@ module Texture2DArrayLayerMipmap : sig
 
   val bind : t -> int -> unit
 
+  val to_color_attachment : t -> Attachment.ColorAttachment.t
+
 end
+
 
 module Texture2DArrayMipmap : sig
 
@@ -90,6 +94,7 @@ module Texture2DArrayMipmap : sig
 
 end
 
+
 module Texture2DArrayLayer : sig
 
   type t
@@ -106,7 +111,8 @@ module Texture2DArrayLayer : sig
 
   val to_color_attachment : t -> Attachment.ColorAttachment.t
 
-end*)
+end
+
 
 module Texture2DArray : sig
 
@@ -128,7 +134,9 @@ module Texture2DArray : sig
 
   val mipmap_levels : t -> int
 
-(*   val layer : t -> int -> Texture2DArrayLayer.t *)
+  val layer : t -> int -> Texture2DArrayLayer.t
+
+  val mipmap : t -> int -> Texture2DArrayMipmap.t
 
   val bind : t -> int -> unit
 

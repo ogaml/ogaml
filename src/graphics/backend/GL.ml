@@ -395,9 +395,11 @@ module FBO = struct
 
   external destroy : t -> unit = "caml_destroy_fbo"
 
-  external texture2D : GLTypes.GlAttachement.t -> Texture.t -> int -> unit = "caml_fbo_texture2D"
+  external texture_layer : GLTypes.GlAttachment.t -> Texture.t -> int -> int -> unit = "caml_fbo_texture_layer"
 
-  external renderbuffer : GLTypes.GlAttachement.t -> RBO.t -> unit = "caml_fbo_renderbuffer"
+  external texture2D : GLTypes.GlAttachment.t -> Texture.t -> int -> unit = "caml_fbo_texture2D"
+
+  external renderbuffer : GLTypes.GlAttachment.t -> RBO.t -> unit = "caml_fbo_renderbuffer"
 
 end
 

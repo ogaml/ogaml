@@ -91,7 +91,7 @@ Advanced features:
     ☐ Single-channeled images
     ☐ Image slices
     ☐ Texture3D
-    ☐ Texture2D array
+    ✔ Texture2D array @done(2016-07-14 14:06) @project(Advanced features / More Image and Texture types)
     ☐ Depth textures
     ☐ Stencil textures
     ✔ Mipmaps @done(2016-07-14 12:06) @project(Advanced features / More Image and Texture types)

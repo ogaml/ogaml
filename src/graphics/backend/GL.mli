@@ -411,11 +411,14 @@ module FBO : sig
   (** Destroys an FBO *)
   val destroy : t -> unit
 
+  (** Attaches a texture layer to an FBO *)
+  val texture_layer : GLTypes.GlAttachment.t -> Texture.t -> int -> int -> unit
+
   (** Attaches a 2D texture to an FBO *)
-  val texture2D : GLTypes.GlAttachement.t -> Texture.t -> int -> unit
+  val texture2D : GLTypes.GlAttachment.t -> Texture.t -> int -> unit
 
   (** Attaches a render buffer to an FBO *)
-  val renderbuffer : GLTypes.GlAttachement.t -> RBO.t -> unit
+  val renderbuffer : GLTypes.GlAttachment.t -> RBO.t -> unit
 
 end
 

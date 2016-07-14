@@ -36,7 +36,9 @@ let attach_color (type a) (module A : Attachment.ColorAttachable with type t = a
   RenderTarget.bind_fbo fbo.state fbo.id (Some fbo.fbo);
   match attc with
   | Attachment.ColorAttachment.Texture2D (tex, lvl) ->
-    GL.FBO.texture2D (GLTypes.GlAttachement.Color nb) tex lvl
+    GL.FBO.texture2D (GLTypes.GlAttachment.Color nb) tex lvl
+  | Attachment.ColorAttachment.Texture2DArray (tex, layer, lvl) ->
+    GL.FBO.texture_layer (GLTypes.GlAttachment.Color nb) tex layer lvl 
 
 let attach_depth (type a) (module A : Attachment.DepthAttachable with type t = a)
                  fbo (attachment : a) =
@@ -48,7 +50,7 @@ let attach_depth (type a) (module A : Attachment.DepthAttachable with type t = a
   RenderTarget.bind_fbo fbo.state fbo.id (Some fbo.fbo);
   match attc with
   | Attachment.DepthAttachment.DepthRBO rbo -> 
-    GL.FBO.renderbuffer GLTypes.GlAttachement.Depth rbo
+    GL.FBO.renderbuffer GLTypes.GlAttachment.Depth rbo
 
 (* TODO *)
 let attach_stencil (type a) (module A : Attachment.StencilAttachable with type t = a)

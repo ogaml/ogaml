@@ -677,7 +677,8 @@ module Texture : sig
     (** System only function, binds the original texture of the mipmap *)
     val bind : t -> int -> unit 
 
-    (** Texture2DMipmap implements the interface ColorAttachable *)
+    (** Texture2DMipmap implements the interface ColorAttachable and
+      * can be attached to an FBO. *)
     val to_color_attachment : t -> Attachment.ColorAttachment.t
 
   end
@@ -721,13 +722,100 @@ module Texture : sig
     (** System only function, binds a texture to a texture unit for drawing *)
     val bind : t -> int -> unit
 
-    (** Texture2D implements the interface ColorAttachable *)
+    (** Texture2D implements the interface ColorAttachable and can be attached
+      * to an FBO. Binds the mipmap level 0. *)
     val to_color_attachment : t -> Attachment.ColorAttachment.t
 
   end
 
 
-  (** Represents arrays of 2D textures *)
+  (** Represents a layer's mipmap of a 2D texture array *)
+  module Texture2DArrayLayerMipmap : sig
+  
+    (** This module gives an abstract representation of a mipmap level
+      * of a particular layer of a texture array *)
+
+    (** Type of a layer's mipmap *)
+    type t
+
+    (** Size of a mipmap *)
+    val size : t -> OgamlMath.Vector2i.t
+
+    (** Writes to a layer's mipmap *)
+    val write : t -> OgamlMath.IntRect.t -> Image.t -> unit
+
+    (** Returns the layer's index *)
+    val layer : t -> int
+
+    (** Returns the mipmap's level *)
+    val level : t -> int
+
+    (** System only : binds the original texture array for drawing *)
+    val bind : t -> int -> unit
+    
+    (** Texture2DArrayLayerMipmap implements the interface ColorAttachable
+      * and can be attached to an FBO *)
+    val to_color_attachment : t -> Attachment.ColorAttachment.t
+
+  end
+
+  
+  (** Represents a mipmap level of a 2D texture array *)
+  module Texture2DArrayMipmap : sig
+
+    (** This module gives an abstract representation of a mipmap level
+      * of a 2D texture array (that is, a mipmap array) *)
+
+    (** Type of a mipmap *)
+    type t
+
+    (** Size of a mipmap *)
+    val size : t -> OgamlMath.Vector3i.t
+
+    (** Number of layers in the array of mipmaps *)
+    val layers : t -> int
+
+    (** Returns the mipmap's level *)
+    val level : t -> int
+
+    (** Returns the mipmap of a particular layer *)
+    val layer : t -> int -> Texture2DArrayLayerMipmap.t
+
+  end
+
+
+  (** Represents a layer of a 2D texture array *)
+  module Texture2DArrayLayer : sig
+
+    (** This module gives an abstract representation of a particular layer
+      * of a 2D texture array *)
+
+    (** Type of a 2D texture array's layer *)
+    type t
+
+    (** Size of a layer *)
+    val size : t -> OgamlMath.Vector2i.t
+
+    (** Returns the layer's index *)
+    val layer : t -> int
+
+    (** Returns the number of mipmap levels of a layer *)
+    val mipmap_levels : t -> int
+
+    (** Returns a particular mipmap level of a layer *)
+    val mipmap : t -> int -> Texture2DArrayLayerMipmap.t
+
+    (** System only : binds the original texture array for drawing *)
+    val bind : t -> int -> unit
+
+    (** Texture2DArrayLayerMipmap implements the interface ColorAttachable
+      * and can be attached to an FBO. Binds the mipmap level 0. *)
+    val to_color_attachment : t -> Attachment.ColorAttachment.t 
+
+  end
+
+
+    (** Represents arrays of 2D textures *)
   module Texture2DArray : sig
 
     (** This module provides an abstraction of OpenGL 2D texture arrays *)
@@ -763,10 +851,11 @@ module Texture : sig
     (** Returns the number of mipmap levels of a texture. *)
     val mipmap_levels : t -> int
 
-  (*   val layer : t -> int -> Texture2DArrayLayer.t *)
+    (** Returns a particular layer of a texture array. *)
+    val layer : t -> int -> Texture2DArrayLayer.t
 
-    (** System only function, binds the texture to a texture unit. *)
-    val bind : t -> int -> unit
+    (** Returns a particular mipmap of a texture array. *)
+    val mipmap : t -> int -> Texture2DArrayMipmap.t
 
   end
 

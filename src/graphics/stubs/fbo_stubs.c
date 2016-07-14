@@ -98,6 +98,17 @@ caml_destroy_fbo(value buf)
 }
 
 
+// INPUT   : an attachment point, a texture, a layer, a mipmap level
+// OUTPUT  : nothing, attaches the texture to the currently bound FBO
+CAMLprim value
+caml_fbo_texture_layer(value atc, value tex, value layer, value level)
+{
+  CAMLparam4(atc,tex,layer,level);
+  glFramebufferTextureLayer(GL_FRAMEBUFFER, Attachment_val(atc), TEX(tex), Int_val(level), Int_val(layer));
+  CAMLreturn(Val_unit);
+}
+
+
 // INPUT   : an attachment point, a texture, a mipmap level
 // OUTPUT  : nothing, attaches the texture to the currently bound FBO
 CAMLprim value
