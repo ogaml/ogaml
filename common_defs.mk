@@ -35,7 +35,14 @@ ifeq ($(UNAME), Darwin)
   GLOBAL_CLIBS = -framework Foundation -framework Cocoa -framework Carbon -lobjc -framework openGL
 	# GLOBAL_CLIBS =
 endif
-
+ifeq ($(UNAME), windows32)
+  PP_DEFINE = __WIN__
+  OS_NAME = WIN
+  OS_WIN_LIB = windows
+  GLOBAL_OBJCOPTS = 
+  GLOBAL_CLIBS =
+endif
+  
 
 # Compilers
 
@@ -49,7 +56,7 @@ OCAMLMKLIB = ocamlmklib
 
 CLANG = clang
 
-OCAMLFIND = ocamlfind
+OCAMLFIND = 
 
 MENHIR = menhir
 
@@ -77,18 +84,18 @@ MATH_LIB = ogamlMath
 
 UTILS_LIB = ogamlUtils
 
-CORE_PACK = $(shell echo $(CORE_LIB) | sed -e 's/^./\U&/')
+CORE_PACK = OgamlCore
 
-GRAPHICS_PACK = $(shell echo $(GRAPHICS_LIB) | sed -e 's/^./\U&/')
+GRAPHICS_PACK = OgamlGraphics
 
-MATH_PACK = $(shell echo $(MATH_LIB) | sed -e 's/^./\U&/')
+MATH_PACK = OgamlMath
 
-UTILS_PACK = $(shell echo $(UTILS_LIB) | sed -e 's/^./\U&/')
+UTILS_PACK = OgamlUtils
 
 
 # Commands
 
-PPCOMMAND = -pp "cppo -D '$(strip $(PP_DEFINE))'"
+PPCOMMAND = -pp "cppo -D \"$(strip $(PP_DEFINE))\""
 
 DEPCOMMAND = $(OCAMLDEP) $(PPCOMMAND) $(INCLUDE_DIRS)
 

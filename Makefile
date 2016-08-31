@@ -45,16 +45,16 @@ graphics_lib: core_lib math_lib utils_lib
 	cd src/graphics/ && make
 
 examples:
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/cube.ml -o cube.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut01.ml -o tut01.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut02.ml -o tut02.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut_tex.ml -o tut_tex.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut_idx.ml -o tut_idx.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/flat.ml -o flat.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/vertexmaps.ml -o vertexmaps.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/sprites.ml -o sprites.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/ip.ml -o ip.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/text.ml -o text.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/cube.ml -o cube.out &\
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut01.ml -o tut01.out &\
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut02.ml -o tut02.out &\
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut_tex.ml -o tut_tex.out &\
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut_idx.ml -o tut_idx.out &\
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/flat.ml -o flat.out &\
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/vertexmaps.ml -o vertexmaps.out &\
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/sprites.ml -o sprites.out &\
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/ip.ml -o ip.out &\
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/text.ml -o text.out &\
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/noise.ml -o noise.out
 
 tests: math_lib core_lib graphics_lib utils_lib
@@ -65,8 +65,8 @@ tests: math_lib core_lib graphics_lib utils_lib
 	echo "Tests passed !"
 
 doc:
-	ocamlbuild -use-ocamlfind -use-menhir -I src/doc -package unix,str gendoc.native;
-	./gendoc.native $(DOC_FILES);
+	ocamlbuild -use-ocamlfind -use-menhir -I src/doc -package unix,str gendoc.native &\
+	./gendoc.native $(DOC_FILES) &\
 	ocamlbuild -clean
 
 install: math_lib core_lib graphics_lib utils_lib
@@ -78,14 +78,14 @@ uninstall:
 	$(OCAMLFIND) remove "ogaml"
 
 clean:
-	rm -rf *.out;
-	rm -rf doc;
-	ocamlbuild -clean;
-	cd src/core/ && make clean;
-	cd src/math/ && make clean;
-	cd src/utils/ && make clean;
-	cd src/graphics/ && make clean;
-	cd tests/ && make clean;
+	rm -rf *.out &\
+	rm -rf doc &\
+	ocamlbuild -clean &\
+	cd src/core/ && make clean &\
+	cd src/math/ && make clean &\
+	cd src/utils/ && make clean &\
+	cd src/graphics/ && make clean &\
+	cd tests/ && make clean &\
 	cd examples/ && make clean
 
 .PHONY: install uninstall reinstall examples doc

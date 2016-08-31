@@ -47,16 +47,17 @@ ML_OBJ = $(ML_SOURCES:.ml=.cmo)
 
 ML_NAT = $(ML_SOURCES:.ml=.cmx)
 
-ML_CMIS = $(ML_INTERFACES:.mli=.cmi)
+ML_CMISALONE = $(ML_INTERFACES:.mli=.cmi)
 
+ML_CMIS = $(ML_CMISALONE) $(ML_SOURCES:.ml=.cmi) 
 
 # Compilation
 
 default: .depend core_lib
 
 core_lib: ml_stubs $(STUBS_TARGETS) $(ML_CMIS) $(ML_OBJ) $(ML_NAT) $(CORE_LIB).cmi
-	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(CORE_LIB).cmx $(OS_WIN_LIB)/$(OS_WIN_LIB).cmx $(ML_CMIS) $(ML_NAT);
-	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(CORE_LIB).cmo $(OS_WIN_LIB)/$(OS_WIN_LIB).cmo $(ML_CMIS) $(ML_OBJ);
+	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(CORE_LIB).cmx $(OS_WIN_LIB)/$(OS_WIN_LIB).cmx $(ML_CMISALONE) $(ML_NAT) &&\
+	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(CORE_LIB).cmo $(OS_WIN_LIB)/$(OS_WIN_LIB).cmo $(ML_CMISALONE) $(ML_OBJ) &&\
 	$(OCAMLFIND) $(OCAMLMKLIB) -o $(CORE_LIB) $(CORE_LIB).cmx $(CORE_LIB).cmo\
 	  $(STUBS_OBJECTS) $(MKLIB_LIBS) $(GLOBAL_CLIBS)
 
@@ -82,7 +83,7 @@ ml_stubs:
 # Cleaning
 
 clean:
-	rm -rf $(CLEAN_EXTENSIONS);
+	rm -rf $(CLEAN_EXTENSIONS) &\
 	cd $(OS_WIN_LIB) && make clean
 
 

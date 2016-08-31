@@ -47,8 +47,8 @@ default: .depend graphics_lib
 
 
 graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).cmi
-	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(GRAPHICS_LIB).cmo $(MLCMIS) $(MLOBJS);
-	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(GRAPHICS_LIB).cmx $(MLCMIS) $(MLNATOBJS);
+	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(GRAPHICS_LIB).cmo $(MLCMIS) $(MLOBJS) &&\
+	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(GRAPHICS_LIB).cmx $(MLCMIS) $(MLNATOBJS) &&\
 	$(OCAMLFIND) $(OCAMLMKLIB) -o $(GRAPHICS_LIB) $(STUBS_OBJS) $(GRAPHICS_LIB).cmo $(GRAPHICS_LIB).cmx\
 	  $(MLOBJS) $(MLNATOBJS) $(GLOBAL_CLIBS)
 
@@ -93,7 +93,7 @@ clean:
 # Dependencies
 
 .depend:
-	$(DEPCOMMAND) *.ml *.mli > .depend;
+	$(DEPCOMMAND) *.ml *.mli > .depend &&\
 	$(MENHIR) --depend *.mly >> .depend
 
 include .depend
