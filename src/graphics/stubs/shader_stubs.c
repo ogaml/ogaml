@@ -15,7 +15,7 @@
       #define GL_PATCHES 0x0000000e
   #endif
 #else
-  #include <gl/gl.h>
+  #include <GL/gl.h>
 #endif
 #include <caml/bigarray.h>
 #include "utils.h"
