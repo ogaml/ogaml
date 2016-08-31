@@ -1,4 +1,8 @@
 #define GL_GLEXT_PROTOTYPES
+#if defined(_WIN32)
+  #include <windows.h>
+  #include <gl/glew.h>
+#endif
 #if defined(__APPLE__)
   #include <OpenGL/gl3.h>
   #ifndef GL_TESS_CONTROL_SHADER
@@ -32,6 +36,8 @@ GLenum EBOKind_val(value kind)
     default:
       caml_failwith("Caml variant error in EBOKind_val(1)");
   }
+
+  return 0;
 }
 
 

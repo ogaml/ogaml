@@ -1,4 +1,8 @@
 #define GL_GLEXT_PROTOTYPES
+#if defined(_WIN32)
+  #include <windows.h>
+  #include <gl/glew.h>
+#endif
 #if defined(__APPLE__)
   #include <OpenGL/gl3.h>
   #ifndef GL_TESS_CONTROL_SHADER
@@ -11,7 +15,7 @@
       #define GL_PATCHES 0x0000000e
   #endif
 #else
-  #include <GL/gl.h>
+  #include <gl/gl.h>
 #endif
 #include <caml/bigarray.h>
 #include "utils.h"
@@ -30,6 +34,8 @@ GLenum Shader_val(value type)
     default:
       caml_failwith("Caml variant error in Shader_val(1)");
   }
+
+  return 0;
 }
 
 
@@ -118,11 +124,15 @@ caml_shader_log(value id)
   CAMLlocal1(res);
 
   GLint tmp;
+  GLsizei maxl;
+  GLsizei len[1] = {0};
+  GLchar* log;
+
   glGetShaderiv((GLuint)id, GL_INFO_LOG_LENGTH, &tmp);
 
-  GLsizei maxl = tmp;
-  GLsizei len[1] = {0};
-  GLchar* log = malloc(tmp * sizeof(GLchar));
+  maxl = tmp;
+  log = malloc(tmp * sizeof(GLchar));
+
   glGetShaderInfoLog((GLuint)id, maxl, len, log);
 
   res = caml_copy_string(log);

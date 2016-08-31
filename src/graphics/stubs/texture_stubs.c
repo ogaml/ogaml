@@ -1,4 +1,8 @@
 #define GL_GLEXT_PROTOTYPES
+#if defined(_WIN32)
+  #include <windows.h>
+  #include <gl/glew.h>
+#endif
 #if defined(__APPLE__)
   #include <OpenGL/gl3.h>
   #ifndef GL_TESS_CONTROL_SHADER
@@ -41,6 +45,8 @@ GLenum Target_val(value target)
     default:
       caml_failwith("Caml variant error in Target_val(1)");
   }
+
+  return 0;
 }
 
 
@@ -57,6 +63,8 @@ GLenum Magnify_val(value mag)
     default:
       caml_failwith("Caml variant error in Magnify_val(1)");
   }
+
+  return 0;
 }
 
 
@@ -79,6 +87,8 @@ GLenum Minify_val(value min)
     default:
       caml_failwith("Caml variant error in Minify_val(1)");
   }
+
+  return 0;
 }
 
 
@@ -101,6 +111,8 @@ GLenum TextureFormat_val(value fmt)
     default:
       caml_failwith("Caml variant error in TextureFormat_val(1)");
   }
+
+  return 0;
 }
 
 
@@ -135,6 +147,8 @@ GLenum PixelFormat_val(value fmt)
     default:
       caml_failwith("Caml variant error in TextureFormat_val(1)");
   }
+
+  return 0;
 }
 
 
@@ -160,12 +174,12 @@ intnat hash_tex(value v)
 }
 
 static struct custom_operations tex_custom_ops = {
-  .identifier  = "texture GC handling",
-  .finalize    =  finalise_tex,
-  .compare     =  compare_tex,
-  .hash        =  hash_tex,
-  .serialize   =  custom_serialize_default,
-  .deserialize =  custom_deserialize_default
+  "texture GC handling",
+  finalise_tex,
+  compare_tex,
+  hash_tex,
+  custom_serialize_default,
+  custom_deserialize_default
 };
 
 

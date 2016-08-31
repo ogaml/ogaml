@@ -11,6 +11,7 @@ caml_stb_load_font(value filename)
   long size;
   unsigned char* fontBuffer;
   FILE* fontFile = fopen(String_val(filename), "rb");
+  stbtt_fontinfo* info;
 
   fseek(fontFile, 0, SEEK_END);
   size = ftell(fontFile);
@@ -21,7 +22,6 @@ caml_stb_load_font(value filename)
   fread(fontBuffer, size, 1, fontFile);
   fclose(fontFile);
 
-  stbtt_fontinfo* info;
   info = malloc(sizeof(stbtt_fontinfo));
   stbtt_InitFont(info, fontBuffer, 0);
 

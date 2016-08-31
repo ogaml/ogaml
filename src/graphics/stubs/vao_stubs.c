@@ -1,4 +1,8 @@
 #define GL_GLEXT_PROTOTYPES
+#if defined(_WIN32)
+  #include <windows.h>
+  #include <gl/glew.h>
+#endif
 #if defined(__APPLE__)
   #include <OpenGL/gl3.h>
   #ifndef GL_TESS_CONTROL_SHADER
@@ -51,6 +55,9 @@ GLenum Floattype_val(value type)
     default:
       failwith("Caml variant error in Floattype_val(1)");
   }
+  
+  return 0;
+  
 }
 
 
@@ -79,6 +86,9 @@ GLenum Inttype_val(value type)
     default:
       failwith("Caml variant error in Inttype_val(1)");
   }
+
+  return 0;
+
 }
 
 
@@ -101,6 +111,9 @@ GLenum Drawmode_val(value mode)
     default:
       failwith("Caml variant error in Drawmode_val(1)");
   }
+
+  return 0;
+
 }
 
 
@@ -125,12 +138,12 @@ intnat hash_vao(value v)
 }
 
 static struct custom_operations vao_custom_ops = {
-  .identifier  = "vao gc handling",
-  .finalize    =  finalise_vao,
-  .compare     =  compare_vao,
-  .hash        =  hash_vao,
-  .serialize   =  custom_serialize_default,
-  .deserialize =  custom_deserialize_default
+  "vao gc handling",
+  finalise_vao,
+  compare_vao,
+  hash_vao,
+  custom_serialize_default,
+  custom_deserialize_default
 };
 
 

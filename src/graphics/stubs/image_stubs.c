@@ -8,12 +8,14 @@ caml_image_load_from_file(value filename)
   CAMLparam1(filename);
 
   CAMLlocal2(result, px);
+  
+  int x,y,chan;
+
+  char* pixels;
 
   stbi_set_flip_vertically_on_load(1);
 
-  int x,y,chan;
-
-  char* pixels = stbi_load(String_val(filename), &x, &y, &chan, STBI_rgb_alpha);
+  pixels = stbi_load(String_val(filename), &x, &y, &chan, STBI_rgb_alpha);
 
   if(pixels && x && y) {
     result = caml_alloc(3,0);
