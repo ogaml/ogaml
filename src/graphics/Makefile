@@ -31,7 +31,9 @@ MLOBJS = $(MLSOURCES:.ml=.cmo)
 
 MLNATOBJS = $(MLSOURCES:.ml=.cmx)
 
-MLCMIS = $(MLINTERFACES:.mli=.cmi)
+MLCMISALONE = $(MLINTERFACES:.mli=.cmi)
+
+MLCMIS = $(MLCMISALONE) $(MLSOURCES:.ml=.cmi)
 
 COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast -Wno-pointer-sign
 
@@ -47,8 +49,8 @@ default: .depend graphics_lib
 
 
 graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).cmi
-	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(GRAPHICS_LIB).cmo $(MLCMIS) $(MLOBJS) &&\
-	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(GRAPHICS_LIB).cmx $(MLCMIS) $(MLNATOBJS) &&\
+	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(GRAPHICS_LIB).cmo $(MLCMISALONE) $(MLOBJS) &&\
+	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(GRAPHICS_LIB).cmx $(MLCMISALONE) $(MLNATOBJS) &&\
 	$(OCAMLFIND) $(OCAMLMKLIB) -o $(GRAPHICS_LIB) $(STUBS_OBJS) $(GRAPHICS_LIB).cmo $(GRAPHICS_LIB).cmx\
 	  $(MLOBJS) $(MLNATOBJS) $(GLOBAL_CLIBS)
 
