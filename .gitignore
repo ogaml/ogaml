@@ -11,6 +11,9 @@
 *.out
 *.d
 
+# MVC++ files
+.vscode/
+
 # ocamlbuild working directory
 _build/
 
