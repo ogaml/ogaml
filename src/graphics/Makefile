@@ -33,7 +33,7 @@ MLNATOBJS = $(MLSOURCES:.ml=.cmx)
 
 MLCMISALONE = $(MLINTERFACES:.mli=.cmi)
 
-MLCMIS = $(MLCMISALONE) $(MLSOURCES:.ml=.cmi)
+MLCMIS = $(MLCMISALONE) $(PARSER_FILES:.mly=.cmi) $(LEXER_FILES:.mll=.cmi) $(MLSOURCES:.ml=.cmi)
 
 COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast -Wno-pointer-sign
 
@@ -46,7 +46,6 @@ CMXA_DEPS = ../core/$(CORE_LIB).cmxa ../math/$(MATH_LIB).cmxa ../utils/$(UTILS_L
 .INTERMEDIATE: $(LEXER_FILES:.mll=.ml) $(PARSER_FILES:.mly=.ml) $(PARSER_FILES:.mly=.mli)
 
 default: .depend graphics_lib
-
 
 graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).cmi
 	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(GRAPHICS_LIB).cmo $(MLCMISALONE) $(MLOBJS) &&\
@@ -72,7 +71,8 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).c
 %.ml:%.mll
 	$(LEX) $<
 
-%.mli:%.mll
+%.cmi:%.mll %.ml
+	$(OCAMLC_CMD) -c $(<:.mll=.ml)
 
 %.ml:%.mly
 	$(MENHIR) $<
@@ -81,9 +81,7 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).c
 	$(MENHIR) $<
 
 %.o:%.c
-	$(OCAMLFIND) $(OCAMLC_CMD) -o ./$(notdir $@) -c $< -ccopt '$(COPTS)' -cclib "$(GLOBAL_CLIBS)"
-
-
+	$(OCAMLFIND) $(OCAMLC_CMD) -o ./$(notdir $@) -c $< -ccopt "$(COPTS)" -cclib "$(GLOBAL_CLIBS)"
 
 
 # Cleaning
@@ -95,8 +93,7 @@ clean:
 # Dependencies
 
 .depend:
-	$(DEPCOMMAND) *.ml *.mli > .depend &&\
-	$(MENHIR) --depend *.mly >> .depend
+	$(DEPCOMMAND) *.ml *.mli > .depend
 
 include .depend
 

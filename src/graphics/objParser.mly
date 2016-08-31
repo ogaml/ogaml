@@ -7,109 +7,114 @@
 %token SMOOTH OFF
 %token LEFTBRACKET RIGHTBRACKET SLASH
 
-%start <ObjAST.t list> file
+%start file
+%type <ObjAST.t list> file
 %%
 
 file:
-  |l = obj_list; EOF {l}
+  |obj_list EOF {$1}
   ;
 
 float_lit:
-  |i = INT {float_of_int i}
-  |f = FLOAT {f}
+  |INT {float_of_int $1}
+  |FLOAT {$1}
   ;
 
 vertex:
-  |VERTEX; x = float_lit; y = float_lit; z = float_lit 
-    {ObjAST.Vertex OgamlMath.Vector3f.({x; y; z})}
-  |VERTEX; x = float_lit; y = float_lit; z = float_lit; w = float_lit 
-    {ObjAST.Vertex OgamlMath.Vector3f.({x; y; z})}
+  |VERTEX float_lit float_lit float_lit 
+    {ObjAST.Vertex OgamlMath.Vector3f.({x = $2; y = $3; z = $4})}
+  |VERTEX float_lit float_lit float_lit float_lit 
+    {ObjAST.Vertex OgamlMath.Vector3f.({x = $2; y = $3; z = $4})}
   ;
 
 uv:
-  |UV; x = float_lit; y = float_lit
-    {ObjAST.UV OgamlMath.Vector2f.({x; y})}
-  |UV; x = float_lit; y = float_lit; z = float_lit
-    {ObjAST.UV OgamlMath.Vector2f.({x; y})}
+  |UV float_lit float_lit
+    {ObjAST.UV OgamlMath.Vector2f.({x = $2; y = $3})}
+  |UV float_lit float_lit float_lit
+    {ObjAST.UV OgamlMath.Vector2f.({x = $2; y = $3})}
   ;
 
 normal:
-  |NORMAL; x = float_lit; y = float_lit; z = float_lit 
-    {ObjAST.Normal OgamlMath.Vector3f.({x; y; z} |> normalize)}
+  |NORMAL float_lit float_lit float_lit 
+    {ObjAST.Normal OgamlMath.Vector3f.({x = $2; y = $3; z = $4} |> normalize)}
   ;
 
 param:
-  |PARAM; x = float_lit 
+  |PARAM float_lit 
     {ObjAST.Param}
-  |PARAM; x = float_lit; y = float_lit
+  |PARAM float_lit float_lit
     {ObjAST.Param}
-  |PARAM; x = float_lit; y = float_lit; z = float_lit
+  |PARAM float_lit float_lit float_lit
     {ObjAST.Param}
   ;
 
-%inline triple:
-  |x = INT
-    {OgamlMath.Vector3i.({x; y = 0; z = 0})}
-  |x = INT; SLASH; y = INT 
-    {OgamlMath.Vector3i.({x; y; z = 0})}
-  |x = INT; SLASH; SLASH; z = INT
-    {OgamlMath.Vector3i.({x; y = 0; z})}
-  |x = INT; SLASH; y = INT; SLASH; z = INT
-    {OgamlMath.Vector3i.({x; y; z})}
+triple:
+  |INT
+    {OgamlMath.Vector3i.({x = $1; y = 0; z = 0})}
+  |INT SLASH INT 
+    {OgamlMath.Vector3i.({x = $1; y = $3; z = 0})}
+  |INT SLASH SLASH INT
+    {OgamlMath.Vector3i.({x = $1; y = 0; z = $4})}
+  |INT SLASH INT SLASH INT
+    {OgamlMath.Vector3i.({x = $1; y = $3; z = $5})}
   ;
 
 face:
-  |FACE; t1 = triple; t2 = triple; t3 = triple 
-    {ObjAST.Tri (t1,t2,t3)}
-  |FACE; t1 = triple; t2 = triple; t3 = triple; t4 = triple
-    {ObjAST.Quad (t1,t2,t3,t4)}
+  |FACE triple triple triple 
+    {ObjAST.Tri ($2,$3,$4)}
+  |FACE triple triple triple triple
+    {ObjAST.Quad ($2,$3,$4,$5)}
   ;
 
 mtllib:
-  |MATLIB; LEFTBRACKET; s = STRING; RIGHTBRACKET
-  |MATLIB; s = STRING 
-    {ObjAST.Mtllib s}
+  |MATLIB LEFTBRACKET STRING RIGHTBRACKET
+    {ObjAST.Mtllib $3}
+  |MATLIB STRING 
+    {ObjAST.Mtllib $2}
   ;
 
 usemtl:
-  |USEMTL; LEFTBRACKET; s = STRING; RIGHTBRACKET
-  |USEMTL; s = STRING 
-    {ObjAST.Usemtl s}
+  |USEMTL LEFTBRACKET STRING RIGHTBRACKET
+    {ObjAST.Usemtl $3}
+  |USEMTL STRING 
+    {ObjAST.Usemtl $2}
   ;
 
 objct:
-  |OBJECT; LEFTBRACKET; s = STRING; RIGHTBRACKET
-  |OBJECT; s = STRING 
-    {ObjAST.Object s}
+  |OBJECT LEFTBRACKET STRING RIGHTBRACKET
+    {ObjAST.Object $3}
+  |OBJECT STRING 
+    {ObjAST.Object $2}
   ;
 
 group:
-  |GROUP; LEFTBRACKET; s = STRING; RIGHTBRACKET
-  |GROUP; s = STRING 
-    {ObjAST.Group s}
+  |GROUP LEFTBRACKET STRING RIGHTBRACKET
+    {ObjAST.Group $3}
+  |GROUP STRING 
+    {ObjAST.Group $2}
   ;
 
 smooth:
-  |SMOOTH; i = INT 
-    {ObjAST.Smooth (Some i)}
-  |SMOOTH; OFF
+  |SMOOTH INT 
+    {ObjAST.Smooth (Some $2)}
+  |SMOOTH OFF
     {ObjAST.Smooth None}
   ;
 
 obj_field:
-  | f = vertex {f}
-  | f = uv     {f}
-  | f = normal {f}
-  | f = param  {f}
-  | f = face   {f}
-  | f = mtllib {f}
-  | f = usemtl {f}
-  | f = objct  {f}
-  | f = group  {f}
-  | f = smooth {f} 
+  | vertex {$1}
+  | uv     {$1}
+  | normal {$1}
+  | param  {$1}
+  | face   {$1}
+  | mtllib {$1}
+  | usemtl {$1}
+  | objct  {$1}
+  | group  {$1}
+  | smooth {$1} 
   ;
 
 obj_list:
   | {[]}
-  | f = obj_field; l = obj_list {f :: l}
+  | obj_field obj_list {$1 :: $2}
   ;

@@ -58,7 +58,7 @@ CLANG = clang
 
 OCAMLFIND = 
 
-MENHIR = menhir
+MENHIR = ocamlyacc
 
 LEX = ocamllex
 
