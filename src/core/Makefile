@@ -12,6 +12,8 @@ COCOA_STUBS = application_delegate_stubs.m event_stubs.m glcontext_stubs.m\
 XLIB_STUBS = atoms_stubs.c display_stubs.c event_stubs.c glx_stubs.c\
 	     mouse_stubs.c keyboard_stubs.c window_stubs.c utils.c
 
+WINDOWS_STUBS = style_stubs.c window_stubs.c
+
 OS_WIN_STUBS =
 
 ifeq ($(OS_WIN_LIB), cocoa)
@@ -19,6 +21,9 @@ ifeq ($(OS_WIN_LIB), cocoa)
 endif
 ifeq ($(OS_WIN_LIB), x11)
   OS_WIN_STUBS = $(XLIB_STUBS)
+endif
+ifeq ($(OS_WIN_LIB), windows)
+  OS_WIN_STUBS = $(WINDOWS_STUBS)
 endif
 
 STUBS_SOURCES = $(addprefix $(OS_WIN_LIB)/$(STUBS_DIR)/, $(OS_WIN_STUBS)) 
@@ -32,6 +37,10 @@ ifeq ($(OS_WIN_LIB), cocoa)
   STUBS_OBJECTS = $(OS_WIN_STUBS:.m=.o)
 endif
 ifeq ($(OS_WIN_LIB), x11)
+  STUBS_TARGETS = $(STUBS_SOURCES:.c=.o)
+  STUBS_OBJECTS = $(OS_WIN_STUBS:.c=.o)
+endif
+ifeq ($(OS_WIN_LIB), windows)
   STUBS_TARGETS = $(STUBS_SOURCES:.c=.o)
   STUBS_OBJECTS = $(OS_WIN_STUBS:.c=.o)
 endif
@@ -51,6 +60,23 @@ ML_CMISALONE = $(ML_INTERFACES:.mli=.cmi)
 
 ML_CMIS = $(ML_CMISALONE) $(ML_SOURCES:.ml=.cmi) 
 
+
+# Lib compilation 
+
+ifeq ($(OS_NAME), WIN)
+    LIB_CMD = \
+        $(OCAMLFIND) $(OCAMLC_CMD) -a -o $(CORE_LIB).cma $(CORE_LIB).cmo\
+            -cclib -l$(CORE_LIB) -cclib "$(GLOBAL_CLIBS)" &&\
+        $(OCAMLFIND) $(OCAMLOPT_CMD) -a -o $(CORE_LIB).cmxa $(CORE_LIB).cmx\
+            -cclib -l$(CORE_LIB) -cclib "$(GLOBAL_CLIBS)"&&\
+        lib -out:lib$(CORE_LIB).lib $(STUBS_OBJECTS)
+else
+    LIB_CMD =\
+        $(OCAMLFIND) $(OCAMLMKLIB) -o $(CORE_LIB) $(STUBS_OBJECTS) $(CORE_LIB).cmo\
+			 $(CORE_LIB).cmx $(GLOBAL_CLIBS)
+endif
+
+
 # Compilation
 
 default: .depend core_lib
@@ -58,8 +84,7 @@ default: .depend core_lib
 core_lib: ml_stubs $(STUBS_TARGETS) $(ML_CMIS) $(ML_OBJ) $(ML_NAT) $(CORE_LIB).cmi
 	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(CORE_LIB).cmx $(OS_WIN_LIB)/$(OS_WIN_LIB).cmx $(ML_CMISALONE) $(ML_NAT) &&\
 	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(CORE_LIB).cmo $(OS_WIN_LIB)/$(OS_WIN_LIB).cmo $(ML_CMISALONE) $(ML_OBJ) &&\
-	$(OCAMLFIND) $(OCAMLMKLIB) -o $(CORE_LIB) $(CORE_LIB).cmx $(CORE_LIB).cmo\
-	  $(STUBS_OBJECTS) $(MKLIB_LIBS) $(GLOBAL_CLIBS)
+	$(LIB_CMD)
 
 ml_stubs: 
 	make -C $(OS_WIN_LIB)/ default

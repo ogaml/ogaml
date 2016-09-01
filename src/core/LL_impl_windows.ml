@@ -1,10 +1,20 @@
 
 module Window = struct
 
-  type t
+  type t = Windows.WindowHandle.t
 
-  let create ~width ~height ~title ~settings = 
-	assert false 
+  let create ~width ~height ~title ~settings =
+    let style = Windows.WindowStyle.(create 
+      [WS_Visible; WS_Popup; WS_Thickframe;
+       WS_MaximizeBox; WS_MinimizeBox; WS_Caption; WS_Sysmenu])
+    in
+    Windows.WindowHandle.register_class "OGAMLWIN"; 
+    Windows.WindowHandle.create 
+      ~classname:"OGAMLWIN"
+      ~name:title
+      ~origin:(50,50)
+      ~size:(width,height)
+      ~style
 	
   let set_title win s = 
 	assert false

@@ -40,7 +40,7 @@ ifeq ($(UNAME), windows32)
   OS_NAME = WIN
   OS_WIN_LIB = windows
   GLOBAL_OBJCOPTS = 
-  GLOBAL_CLIBS = -lopengl32 -lglew32
+  GLOBAL_CLIBS = -lopengl32 -lglew32 -luser32
 endif
   
 

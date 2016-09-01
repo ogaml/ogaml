@@ -40,6 +40,15 @@ else
     TEST_CMD = $(OCAMLFIND) $(OCAMLOPT) -linkpkg $(TEST_INCLUDES) $(TEST_MODULES) -package unix,bigarray
 endif
 
+TEST_OUT = main.out 
+
+ifeq ($(OS_NAME), WIN)
+    LAUNCH_CMD = $(TEST_OUT)
+else
+    LAUNCH_CMD =./$(TEST_OUT)
+endif
+
+
 
 # Install constants
 
@@ -51,6 +60,8 @@ else
     INSTALL_CMD = $(OCAMLFIND) install ogaml META $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES) $(UTILS_FILES)
     UNINSTALL_CMD = $(OCAMLFIND) remove "ogaml"
 endif
+
+
 
 
 # Compilation
@@ -83,10 +94,10 @@ examples:
 	$(EXAMPLE_CMD) examples/noise.ml -o noise.out
 	
 tests: math_lib core_lib graphics_lib utils_lib
-	$(TEST_CMD) tests/programs.ml -o main.out && ./main.out &&\
-	$(TEST_CMD) tests/vertexarrays.ml -o main.out && ./main.out &&\
-	$(TEST_CMD) tests/graphs.ml -o main.out && ./main.out &&\
-	$(TEST_CMD) tests/version.ml -o main.out && ./main.out &&\
+	$(TEST_CMD) tests/programs.ml -o main.out && $(LAUNCH_CMD) &&\
+	$(TEST_CMD) tests/vertexarrays.ml -o main.out && $(LAUNCH_CMD) &&\
+	$(TEST_CMD) tests/graphs.ml -o main.out && $(LAUNCH_CMD) &&\
+	$(TEST_CMD) tests/version.ml -o main.out && $(LAUNCH_CMD) &&\
 	echo "Tests passed !"
 
 doc:
