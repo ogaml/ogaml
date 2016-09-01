@@ -226,7 +226,6 @@ let fragment_shader_source_text_110 = "
 "
 
 let create state = 
-  print_endline "Creating first program";
   let shape =
     if State.is_glsl_version_supported state 130 then
       Program.from_source_pp state
@@ -237,7 +236,6 @@ let create state =
         ~vertex_source:(`String vertex_shader_source_110)
         ~fragment_source:(`String fragment_shader_source_110)
   in
-  print_endline "Creating second program";
   let sprite =
     if State.is_glsl_version_supported state 130 then
       Program.from_source_pp state
@@ -248,7 +246,6 @@ let create state =
         ~vertex_source:(`String vertex_shader_source_tex_110)
         ~fragment_source:(`String fragment_shader_source_tex_110)
   in
-  print_endline "Creating third program";
   let text =
     if State.is_glsl_version_supported state 130 then
       Program.from_source_pp state

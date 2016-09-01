@@ -78,9 +78,8 @@ caml_source_shader(value id, value src)
   CAMLparam2(src, id);
   
   const GLchar* tmp_src = String_val(src);
-  const GLint tmp_len  = -1;
 
-  glShaderSource((GLuint)id, 1, &tmp_src, &tmp_len);
+  glShaderSource((GLuint)id, 1, &tmp_src, NULL);
 
   CAMLreturn(Val_unit);
 }
