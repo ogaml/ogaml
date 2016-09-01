@@ -32,6 +32,8 @@ module WindowHandle : sig
         size:(int * int) ->
         style:WindowStyle.t -> t
 
+    val get_rect : t -> (int * int * int * int)
+
 end
 
 
@@ -74,3 +76,17 @@ module GlContext : sig
     val is_null : t -> bool
 
 end
+
+
+module Event : sig
+
+    type t
+
+    type modifiers = {shift : bool; ctrl : bool; lock : bool; alt : bool}
+
+    type position = {x : int; y : int}
+
+    type key = Code of int | Char of char
+
+end
+

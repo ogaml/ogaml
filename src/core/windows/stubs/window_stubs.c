@@ -47,18 +47,59 @@ caml_create_window_W(value cname, value title, value origin, value size, value s
 
     DWORD winstyle = (DWORD)style;
     HWND window;
+    int width, height, posx, posy;
+    RECT rectangle;
+
+    posx = Field(origin,0);
+    posy = Field(origin,1);
+    width = Field(size,0);
+    height = Field(size,1);
+
+    rectangle.left = posx;
+    rectangle.top  = posy;
+    rectangle.right = posx+width;
+    rectangle.bottom = posy+height;
+
+    AdjustWindowRect(&rectangle, winstyle, 0);
+
+    posx = rectangle.left;
+    posy = rectangle.top;
+    width  = rectangle.right - rectangle.left;
+    height = rectangle.bottom - rectangle.top;
 
     window = CreateWindowW(String_val(cname), 
                            String_val(title),
                            winstyle,
-                           Int_val(Field(origin,0)),
-                           Int_val(Field(origin,1)),
-                           Int_val(Field(size,0)),
-                           Int_val(Field(size,1)),
+                           posx,
+                           posy,
+                           width,
+                           height,
                            NULL,
                            NULL,
                            GetModuleHandle(NULL),
                            (LPCWSTR)NULL);
 
+
     CAMLreturn((value)window);
+}
+
+
+CAMLprim value
+caml_get_window_rect(value handle)
+{
+    CAMLparam1(handle);
+    CAMLlocal1(res);
+
+    HWND wnd = (HWND)handle;
+    RECT rect;
+
+    GetWindowRect(wnd, &rect);
+
+    res = caml_alloc(4,0);
+    Store_field(res, 0, Val_int(rect.left));
+    Store_field(res, 1, Val_int(rect.top));
+    Store_field(res, 2, Val_int(rect.right - rect.left));
+    Store_field(res, 3, Val_int(rect.bottom - rect.top));
+
+    CAMLreturn(res);
 }

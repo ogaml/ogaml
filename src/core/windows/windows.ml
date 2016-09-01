@@ -29,6 +29,10 @@ module WindowHandle = struct
         string -> string -> (int * int) -> (int * int) -> WindowStyle.t -> t 
         = "caml_create_window_W"
 
+    external get_rect :
+        t -> (int * int * int * int)
+        = "caml_get_window_rect"
+
     let create ~classname ~name ~origin ~size ~style = 
         create_private classname name origin size style
 
@@ -77,5 +81,18 @@ module GlContext = struct
     external destroy : t -> unit = "caml_wgl_destroy"
 
     external is_null : t -> bool = "caml_wgl_isnull"
+
+end
+
+
+module Event = struct
+
+    type t
+
+    type modifiers = {shift : bool; ctrl : bool; lock : bool; alt : bool}
+
+    type position = {x : int; y : int}
+
+    type key = Code of int | Char of char
 
 end

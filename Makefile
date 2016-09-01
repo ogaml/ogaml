@@ -17,7 +17,7 @@ DOC_FILES = src/graphics/$(GRAPHICS_LIB).mli src/core/$(CORE_LIB).mli src/math/$
 
 # Examples constants
 
-EXAMPLE_MODULES = unix.cmxa bigarray.cmxa $(CORE_LIB).cmxa $(MATH_LIB).cmxa $(UTILS_LIB).cmxa $(GRAPHICS_LIB).cmxa
+EXAMPLE_MODULES = unix.cmxa bigarray.cmxa $(MATH_LIB).cmxa $(CORE_LIB).cmxa $(UTILS_LIB).cmxa $(GRAPHICS_LIB).cmxa
 
 EXAMPLE_PKGS = ogaml.graphics,ogaml.utils
 
