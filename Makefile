@@ -1,14 +1,6 @@
 include common_defs.mk
 
 
-# Window constants
-
-INCLUDES = -I src/core -I src/math -I src/graphics -I src/utils
-
-MODULES = $(MATH_LIB).cmxa $(CORE_LIB).cmxa $(UTILS_LIB).cmxa $(GRAPHICS_LIB).cmxa
-
-PACKAGES = -package bigarray,unix,str
-
 
 # Install constants
 
@@ -25,7 +17,40 @@ DOC_FILES = src/graphics/$(GRAPHICS_LIB).mli src/core/$(CORE_LIB).mli src/math/$
 
 # Examples constants
 
-EXAMPLE_PKG = ogaml.graphics,ogaml.utils
+EXAMPLE_MODULES = unix.cmxa bigarray.cmxa $(CORE_LIB).cmxa $(MATH_LIB).cmxa $(UTILS_LIB).cmxa $(GRAPHICS_LIB).cmxa
+
+EXAMPLE_PKGS = ogaml.graphics,ogaml.utils
+
+ifeq ($(OS_NAME), WIN)
+    EXAMPLE_CMD = $(OCAMLOPT) $(EXAMPLE_MODULES)
+else
+    EXAMPLE_CMD = $(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKGS)
+endif
+
+
+# Tests constants
+
+TEST_INCLUDES = -I src/core -I src/math -I src/graphics -I src/utils
+
+TEST_MODULES = $(MATH_LIB).cmxa $(CORE_LIB).cmxa $(UTILS_LIB).cmxa $(GRAPHICS_LIB).cmxa
+
+ifeq ($(OS_NAME), WIN)
+    TEST_CMD = $(OCAMLOPT) unix.cmxa bigarray.cmxa $(TEST_MODULES) $(TEST_INCLUDES)
+else
+    TEST_CMD = $(OCAMLFIND) $(OCAMLOPT) -linkpkg $(TEST_INCLUDES) $(TEST_MODULES) -package unix,bigarray
+endif
+
+
+# Install constants
+
+ifeq ($(OS_NAME), WIN)
+    INSTALL_DIR = $(shell ocamlc -where)
+    INSTALL_CMD = cp $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES) $(UTILS_FILES) $(INSTALL_DIR)
+    UNINSTALL_CMD = 
+else
+    INSTALL_CMD = $(OCAMLFIND) install ogaml META $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES) $(UTILS_FILES)
+    UNINSTALL_CMD = $(OCAMLFIND) remove "ogaml"
+endif
 
 
 # Compilation
@@ -33,35 +58,35 @@ EXAMPLE_PKG = ogaml.graphics,ogaml.utils
 default: math_lib core_lib utils_lib graphics_lib 
 
 utils_lib:
-	cd src/utils/ && make
+	make -C src/utils/ default
 
 math_lib:
-	cd src/math/ && make
+	make -C src/math/ default
 
 core_lib:
-	cd src/core/ && make
+	make -C src/core/ default
 
 graphics_lib: core_lib math_lib utils_lib
-	cd src/graphics/ && make
+	make -C src/graphics/ default
 
 examples:
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/cube.ml -o cube.out &\
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut01.ml -o tut01.out &\
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut02.ml -o tut02.out &\
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut_tex.ml -o tut_tex.out &\
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/tut_idx.ml -o tut_idx.out &\
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/flat.ml -o flat.out &\
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/vertexmaps.ml -o vertexmaps.out &\
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/sprites.ml -o sprites.out &\
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/ip.ml -o ip.out &\
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/text.ml -o text.out &\
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/noise.ml -o noise.out
-
+	$(EXAMPLE_CMD) examples/cube.ml -o cube.out &&\
+	$(EXAMPLE_CMD) examples/tut01.ml -o tut01.out &&\
+	$(EXAMPLE_CMD) examples/tut02.ml -o tut02.out &&\
+	$(EXAMPLE_CMD) examples/tut_tex.ml -o tut_tex.out &&\
+	$(EXAMPLE_CMD) examples/tut_idx.ml -o tut_idx.out &&\
+	$(EXAMPLE_CMD) examples/flat.ml -o flat.out &&\
+	$(EXAMPLE_CMD) examples/vertexmaps.ml -o vertexmaps.out &&\
+	$(EXAMPLE_CMD) examples/sprites.ml -o sprites.out &&\
+	$(EXAMPLE_CMD) examples/ip.ml -o ip.out &&\
+	$(EXAMPLE_CMD) examples/text.ml -o text.out &&\
+	$(EXAMPLE_CMD) examples/noise.ml -o noise.out
+	
 tests: math_lib core_lib graphics_lib utils_lib
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/programs.ml -o main.out && ./main.out &&\
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/vertexarrays.ml -o main.out && ./main.out &&\
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/graphs.ml -o main.out && ./main.out &&\
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/version.ml -o main.out && ./main.out &&\
+	$(TEST_CMD) tests/programs.ml -o main.out && ./main.out &&\
+	$(TEST_CMD) tests/vertexarrays.ml -o main.out && ./main.out &&\
+	$(TEST_CMD) tests/graphs.ml -o main.out && ./main.out &&\
+	$(TEST_CMD) tests/version.ml -o main.out && ./main.out &&\
 	echo "Tests passed !"
 
 doc:
@@ -70,22 +95,22 @@ doc:
 	ocamlbuild -clean
 
 install: math_lib core_lib graphics_lib utils_lib
-	$(OCAMLFIND) install ogaml META $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES) $(UTILS_FILES)
+	$(INSTALL_CMD)
 
 reinstall:math_lib core_lib graphics_lib utils_lib uninstall install
 
 uninstall:
-	$(OCAMLFIND) remove "ogaml"
+	$(UNINSTALL_CMD)
 
 clean:
 	rm -rf *.out &\
 	rm -rf doc &\
 	ocamlbuild -clean &\
-	cd src/core/ && make clean &\
-	cd src/math/ && make clean &\
-	cd src/utils/ && make clean &\
-	cd src/graphics/ && make clean &\
-	cd tests/ && make clean &\
-	cd examples/ && make clean
+	make -C src/core clean &\
+	make -C src/math clean &\
+	make -C src/utils clean &\
+	make -C src/graphics clean &\
+	make -C tests/ clean &\
+	make -C examples/ clean 
 
 .PHONY: install uninstall reinstall examples doc

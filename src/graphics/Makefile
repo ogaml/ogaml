@@ -41,6 +41,22 @@ CMA_DEPS = ../core/$(CORE_LIB).cma ../math/$(MATH_LIB).cma ../utils/$(UTILS_LIB)
 CMXA_DEPS = ../core/$(CORE_LIB).cmxa ../math/$(MATH_LIB).cmxa ../utils/$(UTILS_LIB).cmxa
 
 
+# Lib compilation 
+
+ifeq ($(OS_NAME), WIN)
+    LIB_CMD = \
+        $(OCAMLFIND) $(OCAMLC_CMD) -a -o $(GRAPHICS_LIB).cma $(GRAPHICS_LIB).cmo\
+            -cclib -l$(GRAPHICS_LIB) -cclib "$(GLOBAL_CLIBS)" &&\
+        $(OCAMLFIND) $(OCAMLOPT_CMD) -a -o $(GRAPHICS_LIB).cmxa $(GRAPHICS_LIB).cmx\
+            -cclib -l$(GRAPHICS_LIB) -cclib "$(GLOBAL_CLIBS)"&&\
+        lib -out:lib$(GRAPHICS_LIB).lib $(STUBS_OBJS)
+else
+    LIB_CMD =\
+        $(OCAMLFIND) $(OCAMLMKLIB) -o $(GRAPHICS_LIB) $(STUBS_OBJS) $(GRAPHICS_LIB).cmo $(GRAPHICS_LIB).cmx\
+            $(MLOBJS) $(MLNATOBJS) $(GLOBAL_CLIBS)
+endif
+
+
 # Compilation
 
 .INTERMEDIATE: $(LEXER_FILES:.mll=.ml) $(PARSER_FILES:.mly=.ml) $(PARSER_FILES:.mly=.mli)
@@ -50,8 +66,7 @@ default: .depend graphics_lib
 graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).cmi
 	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(GRAPHICS_LIB).cmo $(MLCMISALONE) $(MLOBJS) &&\
 	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(GRAPHICS_LIB).cmx $(MLCMISALONE) $(MLNATOBJS) &&\
-	$(OCAMLFIND) $(OCAMLMKLIB) -o $(GRAPHICS_LIB) $(STUBS_OBJS) $(GRAPHICS_LIB).cmo $(GRAPHICS_LIB).cmx\
-	  $(MLOBJS) $(MLNATOBJS) $(GLOBAL_CLIBS)
+	$(LIB_CMD)
 
 %.cma:%.cmo
 	$(OCAMLFIND) $(OCAMLC_CMD) -a -o $@ $(INCLUDE_DIRS) $<

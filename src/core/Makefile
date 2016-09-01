@@ -62,7 +62,7 @@ core_lib: ml_stubs $(STUBS_TARGETS) $(ML_CMIS) $(ML_OBJ) $(ML_NAT) $(CORE_LIB).c
 	  $(STUBS_OBJECTS) $(MKLIB_LIBS) $(GLOBAL_CLIBS)
 
 ml_stubs: 
-	cd $(OS_WIN_LIB) && make
+	make -C $(OS_WIN_LIB)/ default
 
 %.cmi:%.mli
 	$(OCAMLFIND) $(OCAMLC_CMD) -c $(INCLUDE_DIRS) ../core/$(CORE_LIB).cma ../math/$(MATH_LIB).cma -o $@ $<
@@ -84,7 +84,7 @@ ml_stubs:
 
 clean:
 	rm -rf $(CLEAN_EXTENSIONS) &\
-	cd $(OS_WIN_LIB) && make clean
+	make -C $(OS_WIN_LIB)/ clean
 
 
 # Dependencies

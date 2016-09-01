@@ -40,7 +40,7 @@ ifeq ($(UNAME), windows32)
   OS_NAME = WIN
   OS_WIN_LIB = windows
   GLOBAL_OBJCOPTS = 
-  GLOBAL_CLIBS =
+  GLOBAL_CLIBS = -lopengl32 -lglew32
 endif
   
 
@@ -56,7 +56,11 @@ OCAMLMKLIB = ocamlmklib
 
 CLANG = clang
 
-OCAMLFIND = 
+ifeq ($(OS_NAME), WIN)
+  OCAMLFIND =
+else
+  OCAMLFIND = ocamlfind
+endif
 
 MENHIR = ocamlyacc
 
@@ -66,7 +70,7 @@ LEX = ocamllex
 
 # Constants
   # Extensions used for cleaning
-CLEAN_EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so *.native *.out *.byte *.d
+CLEAN_EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so *.native *.out *.byte *.d *.lib
 
 STUBS_DIR = stubs
 
