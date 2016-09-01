@@ -1,20 +1,48 @@
 
 module Window = struct
 
-  type t = Windows.WindowHandle.t
+  exception Error of string
+
+  type t = {
+    handle : Windows.WindowHandle.t;
+    glcontext : Windows.GlContext.t;
+  }
 
   let create ~width ~height ~title ~settings =
+    let open Windows in
     let style = Windows.WindowStyle.(create 
       [WS_Visible; WS_Popup; WS_Thickframe;
        WS_MaximizeBox; WS_MinimizeBox; WS_Caption; WS_Sysmenu])
     in
-    Windows.WindowHandle.register_class "OGAMLWIN"; 
-    Windows.WindowHandle.create 
-      ~classname:"OGAMLWIN"
-      ~name:title
-      ~origin:(50,50)
-      ~size:(width,height)
-      ~style
+    WindowHandle.register_class "OGAMLWIN"; 
+    let handle = 
+      WindowHandle.create 
+        ~classname:"OGAMLWIN"
+        ~name:title
+        ~origin:(50,50)
+        ~size:(width,height)
+        ~style
+    in
+    let depthbits = ContextSettings.depth_bits settings in
+    let stencilbits = ContextSettings.stencil_bits settings in
+    let pfmtdesc = 
+      PixelFormat.simple_descriptor handle depthbits stencilbits 
+    in
+    let pfmt = 
+      PixelFormat.choose handle pfmtdesc
+    in
+    PixelFormat.set handle pfmtdesc pfmt;
+    PixelFormat.destroy_descriptor pfmtdesc;
+    let glcontext = 
+      GlContext.create handle 
+    in
+    if GlContext.is_null glcontext then
+      raise (Error "Cannot initialize GL context");
+    GlContext.make_current handle glcontext;
+    let glewinit = Glew.init () in
+    if glewinit <> "" then 
+      raise (Error ("Cannot initialize Glew : " ^ glewinit));
+    {handle; glcontext}
 	
   let set_title win s = 
 	assert false

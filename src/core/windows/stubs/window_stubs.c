@@ -7,7 +7,6 @@ LRESULT CALLBACK onEvent(HWND handle, UINT message, WPARAM wParam, LPARAM lParam
 {
 
     if (message == WM_CLOSE) {
-        printf("Received close message!");
         return 0;
     }
 
@@ -49,17 +48,17 @@ caml_create_window_W(value cname, value title, value origin, value size, value s
     DWORD winstyle = (DWORD)style;
     HWND window;
 
-    window = CreateWindow(String_val(cname), 
-                          String_val(title),
-                          winstyle,
-                          Int_val(Field(origin,0)),
-                          Int_val(Field(origin,1)),
-                          Int_val(Field(size,0)),
-                          Int_val(Field(size,1)),
-                          NULL,
-                          NULL,
-                          GetModuleHandle(NULL),
-                          NULL);
+    window = CreateWindowW(String_val(cname), 
+                           String_val(title),
+                           winstyle,
+                           Int_val(Field(origin,0)),
+                           Int_val(Field(origin,1)),
+                           Int_val(Field(size,0)),
+                           Int_val(Field(size,1)),
+                           NULL,
+                           NULL,
+                           GetModuleHandle(NULL),
+                           (LPCWSTR)NULL);
 
     CAMLreturn((value)window);
 }

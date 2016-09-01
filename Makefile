@@ -100,6 +100,9 @@ tests: math_lib core_lib graphics_lib utils_lib
 	$(TEST_CMD) tests/version.ml -o main.out && $(LAUNCH_CMD) &&\
 	echo "Tests passed !"
 
+version_test: math_lib core_lib graphics_lib utils_lib
+	$(TEST_CMD) tests/version.ml -o main.out && $(LAUNCH_CMD)
+
 doc:
 	ocamlbuild -use-ocamlfind -use-menhir -I src/doc -package unix,str gendoc.native &\
 	./gendoc.native $(DOC_FILES) &\

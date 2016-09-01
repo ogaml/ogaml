@@ -1,6 +1,8 @@
 
 module Window = struct
 
+  exception Error of string
+
   type t = {
     display : X11.Display.t;
     window  : X11.Window.t;

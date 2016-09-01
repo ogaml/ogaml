@@ -1,6 +1,8 @@
 
 module Window = struct
 
+  exception Error of string
+
   type t = Cocoa.OGWindowController.t
 
   (* Create the application on first window *)

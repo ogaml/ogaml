@@ -33,3 +33,49 @@ module WindowHandle = struct
         create_private classname name origin size style
 
 end
+
+
+module PixelFormat = struct
+
+    type t
+
+    type descriptor
+
+    external simple_descriptor : WindowHandle.t -> int -> int -> descriptor 
+        = "caml_simple_pfmt_descriptor"
+        
+    external choose : WindowHandle.t -> descriptor -> t
+        = "caml_choose_pixelformat"
+
+    external set : WindowHandle.t -> descriptor -> t -> unit
+        = "caml_set_pixelformat"
+
+    external destroy_descriptor : descriptor -> unit
+        = "caml_destroy_pfmt_descriptor"
+
+end
+
+
+module Glew = struct
+
+    external init : unit -> string
+        = "caml_glew_init"
+
+end
+
+
+module GlContext = struct
+
+    type t
+
+    external create : WindowHandle.t -> t = "caml_wgl_create_context"
+
+    external make_current : WindowHandle.t -> t -> unit = "caml_wgl_make_current"
+
+    external remove_current : WindowHandle.t -> unit = "caml_wgl_remove_current"
+
+    external destroy : t -> unit = "caml_wgl_destroy"
+
+    external is_null : t -> bool = "caml_wgl_isnull"
+
+end

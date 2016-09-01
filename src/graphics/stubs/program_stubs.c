@@ -91,8 +91,13 @@ caml_create_program(value unit)
   CAMLparam0();
   CAMLlocal1(v);
 
-  GLuint prog = glCreateProgram();
+  GLuint prog;
+
+  printf("C side : creating program\n");
+  prog = glCreateProgram();
+  printf("C side : allocating data\n");
   v = caml_alloc_custom( &program_custom_ops, sizeof(GLuint), 0, 1);
+  printf("C side : copying data\n");
   memcpy( Data_custom_val(v), &prog, sizeof(GLuint) );
 
   CAMLreturn(v);

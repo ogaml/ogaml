@@ -52,19 +52,26 @@ let to_source = function
   | `String s -> s
 
 let from_source ~vertex_source ~fragment_source =
+  print_endline "Extracting sources...";
   let vertex_source   = to_source vertex_source   in
   let fragment_source = to_source fragment_source in
+  print_endline "Creating GL program...";
   let program = GL.Program.create () in
+  print_endline "Creating shaders...";
   let vshader = GL.Shader.create GLTypes.ShaderType.Vertex   in
   let fshader = GL.Shader.create GLTypes.ShaderType.Fragment in
+  print_endline "Checking shaders...";
   if not (GL.Shader.valid vshader) ||
      not (GL.Shader.valid fshader) ||
      not (GL.Program.valid program) then
     raise (Compilation_error "Failed to create a GLSL program , the GL context may not be initialized");
+  print_endline "Attaching shaders...";
   GL.Shader.source vshader vertex_source;
   GL.Shader.source fshader fragment_source;
+  print_endline "Compiling shaders...";
   GL.Shader.compile vshader;
   GL.Shader.compile fshader;
+  print_endline "Checking shaders (2)...";
   if GL.Shader.status vshader = false then begin
     let log = GL.Shader.log vshader in
     let msg = Printf.sprintf "Error while compiling vertex shader : %s" log in
@@ -75,8 +82,10 @@ let from_source ~vertex_source ~fragment_source =
     let msg = Printf.sprintf "Error while compiling fragment shader : %s" log in
     raise (Compilation_error msg)
   end;
+  print_endline "Attaching shaders (2)...";
   GL.Program.attach program vshader;
   GL.Program.attach program fshader;
+  print_endline "Linking program...";
   GL.Program.link program;
   GL.Program.detach program vshader;
   GL.Program.detach program fshader;
