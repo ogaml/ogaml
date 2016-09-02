@@ -110,5 +110,14 @@ let blit src ?rect dest pos =
       (fun v -> set dest (Vector2i.add v off) (`RGB (get src v)))
   with Image_error _ -> raise (Image_error "Blit : rectangle out of bounds")
 
-
+let pad img ?offset:(offset = Vector2i.zero) ?color:(color = `RGB Color.RGB.black) size = 
+  let new_img = create (`Empty (size,color)) in
+  for i = offset.Vector2i.x to size.Vector2i.x - 1 do
+    for j = offset.Vector2i.y to size.Vector2i.y - 1 do
+      get new_img Vector2i.({x = i - offset.Vector2i.x; y = j - offset.Vector2i.y})
+      |> (fun c -> `RGB c)
+      |> set new_img Vector2i.({x = i; y = j})
+    done;
+  done;
+  new_img
 

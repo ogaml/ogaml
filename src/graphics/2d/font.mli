@@ -48,9 +48,12 @@ val linegap : t -> int -> float
 (** Returns the space between the baseline of two lines *)
 val spacing : t -> int -> float
 
-(** Returns the texture of a given font size *)
+(** Returns the texture of a font *)
 val texture : (module RenderTarget.T with type t = 'a) -> 'a 
-              -> t -> int -> Texture.Texture2D.t
+              -> t -> Texture.Texture2DArray.t
+
+(** Returns the index associated to a font size in the font's texture *)
+val size_index : t -> int -> int
 
 
 

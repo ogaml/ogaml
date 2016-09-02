@@ -90,11 +90,14 @@ module Shelf = struct
                 height = h})
     end
 
-  let texture (type s) (module M : RenderTarget.T with type t = s) target s =
-    let global = Image.create (`Empty (Vector2i.({x = s.width; y = s.height + s.row_height + 1}), `RGB Color.RGB.transparent)) in
+  let total_height s = 
+    s.height + s.row_height + 1
+
+  let image height s =
+    let global = Image.create (`Empty (Vector2i.({x = s.width; y = height}), `RGB Color.RGB.transparent)) in
     Image.blit s.full global Vector2i.zero;
     Image.blit s.row global Vector2i.({x = 0; y = s.height + 1});
-    Texture.Texture2D.create (module M) target (`Image global)
+    global
 
 end
 
@@ -137,7 +140,7 @@ type page = {
   mutable glyph   : Glyph.t IntMap.t;
   mutable glyph_b : Glyph.t IntMap.t;
   mutable kerning : float IIMap.t;
-  mutable texture : Texture.Texture2D.t option;
+  mutable index   : int; (* Index of the page in the texture array *)
   mutable modified: bool;
   shelf   : Shelf.t;
   scale   : float;
@@ -148,8 +151,11 @@ type page = {
 
 
 type t = {
-  mutable pages : page IntMap.t;
-        internal : Internal.t
+  mutable pages    : page IntMap.t;
+  mutable nindex   : int;
+  mutable texture  : Texture.Texture2DArray.t option;
+  mutable height   : int;
+          internal : Internal.t
 }
 
 
@@ -168,15 +174,16 @@ let load_size (t : t) s =
       glyph    = IntMap.empty;
       glyph_b  = IntMap.empty;
       kerning  = IIMap.empty;
-      texture  = None;
+      index    = t.nindex;
       modified = false;
-      shelf    = Shelf.create 1024;
+      shelf    = Shelf.create 2048;
       spacing  = scale_int linegap scale;
       ascent   = scale_int ascent  scale;
       descent  = scale_int descent scale;
       scale;
     }
   in
+  t.nindex <- t.nindex + 1;
   t.pages <- IntMap.add s new_page t.pages;
   new_page
 
@@ -237,6 +244,9 @@ let load s =
     raise (Font_error (Printf.sprintf "Invalid font file : %s" s));
   {
     pages  = IntMap.empty;
+    nindex = 0;
+    height = 0;
+    texture = None;
     internal
   }
 
@@ -277,15 +287,60 @@ let linegap t i =
 let spacing t i =
   (ascent t i) -. (descent t i) +. (linegap t i)
 
+let rebuild_page_texture (type s) (module M : RenderTarget.T with type t = s) target t height page = 
+  let i_layer = page.index in
+  let layer = 
+    match t.texture with
+    | None   -> assert false
+    | Some t -> Texture.Texture2DArray.layer t i_layer
+  in
+  let mipmap = 
+    Texture.Texture2DArrayLayer.mipmap layer 0
+  in
+  Texture.Texture2DArrayLayerMipmap.write
+    mipmap
+    IntRect.({x = 0; y = 0; width = 2048; height})
+    (Shelf.image height page.shelf)
 
-let texture (type s) (module M : RenderTarget.T with type t = s) target t s =
-  let page = get_size t s in
-  if page.modified || page.texture = None then begin
-    page.texture <- Some (Shelf.texture (module M) target page.shelf);
-    page.modified <- false
+let rebuild_full_texture (type s) (module M : RenderTarget.T with type t = s) target t height = 
+  let rec insert (w, elt) = function
+    | []               -> [w,elt]
+    | (w', e')::t as l -> if w < w' then (w,elt)::l
+                          else (w',e')::(insert (w,elt) t)
+  in
+  let l_imgs = IntMap.fold (fun _ page l -> 
+    let index = page.index in
+    let img   = Shelf.image height page.shelf in
+    insert (index, img) l) t.pages []
+  in
+  let l_imgs_strip = List.map (fun (_,i) -> i) l_imgs in
+  let texture = 
+    if l_imgs_strip = [] then Texture.Texture2DArray.create (module M) target 
+                                                     ~mipmaps:`None (`Empty Vector3i.zero)
+    else Texture.Texture2DArray.create (module M) target 
+                                       ~mipmaps:`None (`Image l_imgs_strip)
+  in
+  t.texture <- Some texture
+
+let texture (type s) (module M : RenderTarget.T with type t = s) target t =
+  let mod_pages, max_height = IntMap.fold (fun _ page (l,h) ->
+    if page.modified then begin
+      page.modified <- false;
+      (page :: l, max (Shelf.total_height page.shelf) h)
+    end else (l, h)
+  ) t.pages ([], t.height)
+  in
+  if t.height < max_height || t.texture = None then begin
+    rebuild_full_texture (module M) target t max_height;
+    t.height <- max_height
+  end else if mod_pages <> [] then begin
+    List.iter (fun p -> rebuild_page_texture (module M) target t max_height p) mod_pages
   end;
-  match page.texture with
+  match t.texture with
   | None -> assert false
   | Some t -> t
 
+let size_index t s = 
+  let page = IntMap.find s t.pages in
+  page.index
 

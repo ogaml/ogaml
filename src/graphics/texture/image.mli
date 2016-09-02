@@ -19,3 +19,5 @@ val mipmap : t -> int -> t
 
 val blit : t -> ?rect:OgamlMath.IntRect.t -> t -> OgamlMath.Vector2i.t -> unit
 
+val pad : t -> ?offset:OgamlMath.Vector2i.t -> ?color:Color.t -> 
+               OgamlMath.Vector2i.t -> t

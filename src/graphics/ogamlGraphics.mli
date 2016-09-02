@@ -595,6 +595,11 @@ module Image : sig
     * of the image $img$ *)
   val mipmap : t -> int -> t
 
+  (** $pad img offset color size$ returns a new image of size $size$, which 
+    * contains $img$ placed at position $offset$, and where the empty pixels
+    * are filled with $color$ *)
+  val pad : t -> ?offset:OgamlMath.Vector2i.t -> ?color:Color.t -> 
+                 OgamlMath.Vector2i.t -> t
 end
 
 
@@ -930,9 +935,15 @@ module Font : sig
     * (equals ascent + linegap - descent) *)
   val spacing : t -> int -> float
 
-  (** Returns the texture associated to a given font size *)
+  (** Returns the texture associated to a font.
+    * In this texture, every layer correspond to a font size (in loading order).
+    * Use $Font.size_index$ to get the layer associated to a font size. 
+    * This texture is not mipmapped. *)
   val texture : (module RenderTarget.T with type t = 'a) -> 'a -> 
-                t -> int -> Texture.Texture2D.t
+                t -> Texture.Texture2DArray.t
+
+  (** Returns the index associated to a font size in the font's texture *)
+  val size_index : t -> int -> int
 
 end
 
