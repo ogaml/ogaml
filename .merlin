@@ -11,7 +11,7 @@ S tests
 S examples
 
 B src
-B src/doc
+B _build/src/doc
 B src/core
 B src/core/x11
 B src/core/cocoa

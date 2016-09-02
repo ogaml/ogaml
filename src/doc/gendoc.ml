@@ -3,6 +3,7 @@
 
 open Lexing
 open AST
+open Docgen
 
 exception DocError
 

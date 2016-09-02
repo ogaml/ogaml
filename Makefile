@@ -66,8 +66,7 @@ tests: math_lib core_lib graphics_lib utils_lib
 
 doc:
 	ocamlbuild -use-ocamlfind -use-menhir -I src/doc -package unix,str gendoc.native;
-	./gendoc.native $(DOC_FILES);
-	ocamlbuild -clean
+	./gendoc.native $(DOC_FILES)
 
 install: math_lib core_lib graphics_lib utils_lib
 	$(OCAMLFIND) install ogaml META $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES) $(UTILS_FILES)
