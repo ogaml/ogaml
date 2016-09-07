@@ -53,6 +53,7 @@ pre {
 code {
   font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace;
   font-size: 1rem;
+  border-radius: 3pt;
 }
 
 .modulename {
@@ -336,6 +337,12 @@ article {
 article p {
   margin-top: 2pt;
   margin-bottom: 0;
+}
+
+article div.more {
+  margin-top: 2pt;
+  margin-bottom: 0;
+  line-height: 2;
 }
 
 .arrow {

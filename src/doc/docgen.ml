@@ -248,9 +248,7 @@ let mk_entry ppf s f2 a2 f3 a3 =
   "<article>
      <span class=\"showmore\">
         <figure class=\"highlight\">
-          <pre><code class=\"OCaml\">@\n@[<hov8>
-            %s
-          @]</code></pre>
+          <pre><code class=\"OCaml\">%s</code></pre>
         </figure>
      </span>
      <div class=\"more\">@\n@[<hov4>

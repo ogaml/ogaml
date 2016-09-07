@@ -197,23 +197,23 @@ module Interpolator : sig
   (** Returns a constant interpolator *)
   val constant : float -> float t
 
-  (** $linear start steps end$ creates a linear interpolator
-    * going from $start$ to $end$ passing through each point
+  (** $linear start steps endt$ creates a linear interpolator
+    * going from $start$ to $endt$ passing through each point
     * $(dt, pos)$ of $steps$ at time $dt$ *)
   val linear : float -> (float * float) list -> float -> float t
 
-  (** $cst_linear start steps end$ creates a linear interpolator 
-    * going from $start$ to $end$ passing through each point 
+  (** $cst_linear start steps endt$ creates a linear interpolator 
+    * going from $start$ to $endt$ passing through each point 
     * of $steps$ at constant speed *)
   val cst_linear : float -> float list -> float -> float t
 
-  (** $cubic (start, sm) steps (end, em)$ creates a cubic spline interpolator
-    * going from $start$ with tangent $sm$ to $end$ with tangeant $em$
+  (** $cubic (start, sm) steps (endt, em)$ creates a cubic spline interpolator
+    * going from $start$ with tangent $sm$ to $endt$ with tangent $em$
     * passing through each point $(dt, pos)$ of $steps$ at time $dt$ *)
   val cubic : (float * float) -> (float * float) list -> (float * float) -> float t
 
-  (** $cubic (start, sm) steps (end, em)$ creates a cubic spline interpolator
-    * going from $start$ with tangent $sm$ to $end$ with tangeant $em$
+  (** $cubic (start, sm) steps (endt, em)$ creates a cubic spline interpolator
+    * going from $start$ with tangent $sm$ to $endt$ with tangent $em$
     * passing through each point of $steps$ at constant speed *)
   val cst_cubic : (float * float) -> float list -> (float * float) -> float t
 
