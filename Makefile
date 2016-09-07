@@ -65,8 +65,8 @@ tests: math_lib core_lib graphics_lib utils_lib
 	echo "Tests passed !"
 
 doc:
-	ocamlbuild -use-ocamlfind -use-menhir -I src/doc -package unix,str gendoc.native;
-	./gendoc.native $(DOC_FILES)
+	ocamlbuild -use-ocamlfind -use-menhir -cflags -rectypes -I src/doc -package unix,str docgen.native;
+	./docgen.native doc src/graphics/ogamlGraphics.mli
 
 install: math_lib core_lib graphics_lib utils_lib
 	$(OCAMLFIND) install ogaml META $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES) $(UTILS_FILES)
