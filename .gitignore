@@ -15,7 +15,7 @@
 _build/
 
 # doc directory
-doc/*
+html/*
 
 # ocamlbuild targets
 *.byte

@@ -93,12 +93,14 @@ and strip_comment_begin s i k =
   end
 
 and remove_comment_end s i = 
-  match s.[i] with
-  | '*' -> remove_comment_end s (i-1)
-  | _   -> i
+  if i < 0 then (-1)
+  else begin
+    match s.[i] with
+    | '*' -> remove_comment_end s (i-1)
+    | _   -> i
+  end
 
 and process_comment s = 
-  let s = String.sub s 1 (String.length s - 2) in
   let j = remove_comment_end s (String.length s - 1) in
   let s = String.sub s 0 (j+1) in
   token_comment s 0 0
@@ -213,27 +215,32 @@ and pp hierarchy modulename ast : ASTpp.module_data =
   let contents = process_module ast in
   {hierarchy; modulename; description; submodules; signatures; contents}
 
+let preprocess modulename ast = pp [] modulename ast
 
-let rec comment_to_html ppf comment =
+let rec to_root = function
+  | 0 -> ""
+  | n -> "../" ^ (to_root (n-1))
+
+let rec comment_to_html depth ppf comment =
   match comment with
   | [] -> ()
   | (PP_CommentString s)::t -> 
-    Format.fprintf ppf "%s%a" s comment_to_html t
+    Format.fprintf ppf "%s%a" s (comment_to_html depth) t
   | (PP_Inline s)::t -> 
-    Format.fprintf ppf "<pre><code>%s</pre></code>%a" s comment_to_html t
+    Format.fprintf ppf "<pre><code>%s</pre></code>%a" s (comment_to_html depth) t
   | PP_EOL::PP_EOL::t -> 
-    Format.fprintf ppf "<br>%a" comment_to_html t
+    Format.fprintf ppf "<br>%a" (comment_to_html depth) t
   | PP_EOL::t -> 
-    Format.fprintf ppf "%a" comment_to_html t
+    Format.fprintf ppf "%a" (comment_to_html depth) t
   | (PP_Related s)::t -> 
     let link = 
       String.lowercase s 
       |> Str.split (Str.regexp "\\.")
       |> String.concat "/"
     in
-    Format.fprintf ppf "<span class=\"see\">See : <a href=\"/%s.html\">%s</a></span>%a" 
-      link s
-      comment_to_html t
+    Format.fprintf ppf "<span class=\"see\">See : <a href=\"%s%s.html\">%s</a></span>%a" 
+      (to_root depth) link s
+      (comment_to_html depth) t
 
 let mk_entry ppf s f2 a2 f3 a3 = 
   Format.fprintf ppf
@@ -251,13 +258,13 @@ let mk_entry ppf s f2 a2 f3 a3 =
    </article>
    %a" s f2 a2 f3 a3
 
-let rec module_to_html ppf mdl = 
+let rec module_to_html depth ppf mdl = 
   match mdl with
   | [] -> ()
   | (PP_Title s)::t ->
-    Format.fprintf ppf "<h3>%s</h3>@\n%a" s module_to_html t
+    Format.fprintf ppf "<h3>%s</h3>@\n%a" s (module_to_html depth) t
   | (PP_Comment c)::t ->
-    Format.fprintf ppf "%a@\n%a" comment_to_html c module_to_html t
+    Format.fprintf ppf "%a@\n%a" (comment_to_html depth) c (module_to_html depth) t
   | (PP_Type (typedata, comment))::t -> 
     let valtext = 
       match (typedata.tparam, typedata.texpr) with
@@ -272,22 +279,22 @@ let rec module_to_html ppf mdl =
                                          typedata.tname
                                          (type_expr_to_string e)
     in
-    mk_entry ppf valtext comment_to_html comment module_to_html t
+    mk_entry ppf valtext (comment_to_html depth) comment (module_to_html depth) t
   | (PP_Val (s, expr, comment))::t ->
     let valtext = 
       Printf.sprintf "val %s : %s" s (type_expr_to_string expr)
     in
-    mk_entry ppf valtext comment_to_html comment module_to_html t
+    mk_entry ppf valtext (comment_to_html depth) comment (module_to_html depth) t
   | (PP_Exn (s, Some expr, comment))::t ->
     let valtext = 
       Printf.sprintf "exception %s of %s" s (type_expr_to_string expr)
     in
-    mk_entry ppf valtext comment_to_html comment module_to_html t
+    mk_entry ppf valtext (comment_to_html depth) comment (module_to_html depth) t
   | (PP_Exn (s, None, comment))::t ->
     let valtext = 
       Printf.sprintf "exception %s" s
     in
-    mk_entry ppf valtext comment_to_html comment module_to_html t
+    mk_entry ppf valtext (comment_to_html depth) comment (module_to_html depth) t
   | (PP_Functor (fdata, comment))::t ->
     let funargs = 
       List.map (fun (s1,s2) -> Printf.sprintf "(%s : %s)" s1 s2) 
@@ -307,7 +314,7 @@ let rec module_to_html ppf mdl =
         (if List.length fdata.fcons <> 0 then " with type " else "")
         constraints
     in
-    mk_entry ppf valtext comment_to_html comment module_to_html t
+    mk_entry ppf valtext (comment_to_html depth) comment (module_to_html depth) t
 
 and type_params_to_string = function
   | ParamTuple []  -> 
@@ -370,9 +377,9 @@ and variance_to_string = function
   | Greater -> ">"
   | Equals -> ""
 
-let to_html_pp ppf modl = 
+let to_html_pp ppf modl depth = 
   let print_head ppf = 
-    Format.fprintf ppf "<head>@\n@[<hov2>  <title>OGAML documentation - %s</title>@]@\n</head>"
+    Format.fprintf ppf "<head>@\n@[<hov2>  <title>OGaml documentation - %s</title>@]@\n</head>"
       modl.modulename
   in
   let hierarchy = 
@@ -385,14 +392,14 @@ let to_html_pp ppf modl =
   let print_headmodule ppf = 
     Format.fprintf ppf "<h1>Module <span class=\"prefix\">%s</span><span class=\"modulename\">%s</span></h1>
     @\n<span class=\"abstract\">%a</span>@\n<hr>"
-      hierarchy modl.modulename comment_to_html modl.description
+      hierarchy modl.modulename (comment_to_html depth) modl.description
   in
   let rec print_submodules_aux ppf = function
     | []   -> ()
     | h::t -> 
       let link = h.hierarchy @ [h.modulename] |> String.concat "/" |> String.lowercase in
-      Format.fprintf ppf "<tr><td><a href=\"/%s.html\">%s</a></td><td>%a</td></tr>@\n%a"
-        link h.modulename comment_to_html h.description print_submodules_aux t
+      Format.fprintf ppf "<tr><td><a href=\"%s%s.html\">%s</a></td><td>%a</td></tr>@\n%a"
+        (to_root depth) link h.modulename (comment_to_html depth) h.description print_submodules_aux t
   in
   let print_submodules ppf = 
     if modl.submodules <> [] then 
@@ -417,16 +424,16 @@ let to_html_pp ppf modl =
       print_headmodule
       print_submodules
       print_signatures
-      module_to_html modl.contents
+      (module_to_html depth) modl.contents
   in
   let print_body ppf = 
     Format.fprintf ppf "<body>@\n@[<hov2>  %t@]@\n</body>" print_main
   in
   Format.fprintf ppf "<!DOCTYPE html>@\n<html>@\n@[<hov2>  %t@\n%t@]@\n</html>" print_head print_body
 
-let to_html modl = 
+let to_html modl depth = 
   let ppf = Format.str_formatter in
-  to_html_pp ppf modl;
+  to_html_pp ppf modl depth;
   Format.flush_str_formatter ()
 
 let print_position lexbuf =
@@ -455,22 +462,7 @@ let parse_from_file f =
   close_in input;
   ast
 
-let gen directory file =
-  let rec gen_aux directory modl =
-    let dir = Unix.getcwd () in
-    if not (Sys.file_exists directory) then 
-      Unix.mkdir directory 0o777;
-    Unix.chdir directory;
-    let output = open_out (String.lowercase modl.modulename ^ ".html") in
-    let ppf = Format.formatter_of_out_channel output in
-    to_html_pp ppf modl;
-    close_out output;
-    List.iter (fun modl' -> gen_aux (String.lowercase modl.modulename) modl')
-      modl.submodules;
-    List.iter (fun modl' -> gen_aux (String.lowercase modl.modulename) modl')
-      modl.signatures;
-    Unix.chdir dir
-  in
+let preprocess_file file = 
   let modulename = 
     let dot = String.rindex file '.' in
     let sls = String.rindex file '/' in
@@ -478,16 +470,24 @@ let gen directory file =
     |> String.capitalize
   in
   let ast = parse_from_file file in
-  let astpp = pp [] modulename ast in
-  gen_aux directory astpp;
-  astpp
+  preprocess modulename ast
 
-let () = 
-  if Array.length Sys.argv < 3 then begin
-    print_endline "Usage : docgen <out directory> <mli files>";
-    exit 2
-  end;
-  for i = 2 to Array.length Sys.argv - 1 do
-    gen Sys.argv.(1) Sys.argv.(i) |> ignore
-  done
+let gen directory modl =
+  let rec gen_aux directory modl depth =
+    let dir = Unix.getcwd () in
+    if not (Sys.file_exists directory) then 
+      Unix.mkdir directory 0o777;
+    Unix.chdir directory;
+    let output = open_out (String.lowercase modl.modulename ^ ".html") in
+    let ppf = Format.formatter_of_out_channel output in
+    to_html_pp ppf modl depth;
+    close_out output;
+    List.iter (fun modl' -> gen_aux (String.lowercase modl.modulename) modl' (depth+1))
+      modl.submodules;
+    List.iter (fun modl' -> gen_aux (String.lowercase modl.modulename) modl' (depth+1))
+      modl.signatures;
+    Unix.chdir dir
+  in
+  gen_aux directory modl 0
+
 

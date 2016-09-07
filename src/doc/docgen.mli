@@ -1,10 +1,12 @@
 
-(** [pp hierarchy modulename fields] *)
-val pp : string list -> string -> AST.module_field list -> ASTpp.module_data
-
-val to_html : ASTpp.module_data -> string
-
+(** [parse_from_file filename] *)
 val parse_from_file : string -> AST.module_field list
 
-(** [gen directory file] *)
-val gen : string -> string -> ASTpp.module_data
+(** [preprocess modulename fields] *)
+val preprocess : string -> AST.module_field list -> ASTpp.module_data
+
+(** [preprocess_file filename] *)
+val preprocess_file : string -> ASTpp.module_data
+
+(** [gen directory moduledata] *)
+val gen : string -> ASTpp.module_data -> unit

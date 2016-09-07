@@ -130,6 +130,9 @@ val tbody : ('a, 'b, tablebody, table) tag
 val tr : ('a, 'b, tablerow, tablebody) tag
 val td : ('a, 'b, flow, tablerow) tag
 
+val ul : ('a, 'b, flow, flow) tag
+val li : ('a, 'b, flow, flow) tag
+
 val body : ('a, 'b, flow, flow) tag
 val body_end : (flow body, flow, 'c, 'd) element
 

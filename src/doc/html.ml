@@ -279,6 +279,8 @@ type _ body_tag =
   | Tag_tbody      : tablebody body              -> table     body_tag
   | Tag_tr         : tablerow body               -> tablebody body_tag
   | Tag_td         : flow body                   -> tablerow  body_tag
+  | Tag_ul         : flow body                   -> flow      body_tag
+  | Tag_li         : flow body                   -> flow      body_tag
 
 and 'a body = 'a full_tag list
 and 'a full_tag = general_attributes * 'a body_tag
@@ -407,6 +409,12 @@ let tr ?id =
 let td ?id =
   mktag id (fun c -> Tag_td c)
 
+let ul ?id = 
+  mktag id (fun c -> Tag_ul c)
+
+let li ?id = 
+  mktag id (fun c -> Tag_li c)
+
 let body ?id = mktag id (fun c -> assert false)
 
 let body_end (c,_) = c
@@ -524,6 +532,13 @@ and export_tag : type a. string -> a full_tag -> string
   | Tag_td c ->
     export_tag_prim indent "td" "" attr
                     (export_content (indent ^ tab) c)
+  | Tag_ul c ->
+    export_tag_prim indent "ul" "" attr
+                    (export_content (indent ^ tab) c)
+  | Tag_li c ->
+    export_tag_prim indent "li" "" attr
+                    (export_content (indent ^ tab) c)
+
 
 let export_body body =
   tab ^ "<body>\n" ^

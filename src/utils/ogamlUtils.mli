@@ -1,3 +1,4 @@
+(** High-level helper functions and data structures *)
 
 (** Log system *)
 module Log : sig

@@ -65,8 +65,8 @@ tests: math_lib core_lib graphics_lib utils_lib
 	echo "Tests passed !"
 
 doc:
-	ocamlbuild -use-ocamlfind -use-menhir -cflags -rectypes -I src/doc -package unix,str docgen.native;
-	./docgen.native doc src/graphics/ogamlGraphics.mli
+	ocamlbuild -use-ocamlfind -use-menhir -cflags -rectypes -I src/doc -package unix,str mkdoc.native;\
+	./mkdoc.native $(DOC_FILES)
 
 install: math_lib core_lib graphics_lib utils_lib
 	$(OCAMLFIND) install ogaml META $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES) $(UTILS_FILES)
@@ -78,7 +78,7 @@ uninstall:
 
 clean:
 	rm -rf *.out;
-	rm -rf doc;
+	rm -rf html;
 	ocamlbuild -clean;
 	cd src/core/ && make clean;
 	cd src/math/ && make clean;
