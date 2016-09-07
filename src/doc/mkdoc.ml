@@ -7,6 +7,8 @@ let index =
                                          link ~href:"css/home.css" ~rel:Rel_stylesheet ();
                                          link ~href:"img/favicon-ogaml.ico" ~rel:Rel_icon ~mimetype:"image/x-icon" ()]
                                  ~scripts:[Script_src "script/highlight.pack.js";
+                                           Script_src "https://code.jquery.com/jquery-1.10.2.js";
+                                           Script_src "script/doc.js";
                                            Js_text Docgen.highlight_init_code] ())
     (body
       (img ~src:"img/ogaml-logo.svg" ())
@@ -59,6 +61,8 @@ let welcome (modules : ASTpp.module_data list) =
                                                link ~href:"../css/doc.css" ~rel:Rel_stylesheet ();
                                                link ~href:"../img/favicon-ogaml.ico" ~rel:Rel_icon ~mimetype:"image/x-icon" ()]
                                        ~scripts:[Script_src "../script/highlight.pack.js";
+                                                 Script_src "https://code.jquery.com/jquery-1.10.2.js";
+                                                 Script_src "../script/doc.js";
                                                  Js_text Docgen.highlight_init_code] ())
     (body
       (main
@@ -100,7 +104,8 @@ let () =
   close_out output;
   copy "src/doc/doc.css" "html/css/doc.css";
   copy "src/doc/highlight.pack.js" "html/script/highlight.pack.js";
+  copy "src/doc/doc.js" "html/script/doc.js";
   copy "src/doc/monokai.css" "html/css/monokai.css";
   copy "src/doc/home.css" "html/css/home.css";
   copy "src/doc/favicon-ogaml.ico" "html/img/favicon-ogaml.ico";
-  copy "src/doc/ogaml-logo.svg" "html/img/ogaml-logo.svg"
+  copy "src/doc/ogaml-logo.svg" "html/img/ogaml-logo.svg";

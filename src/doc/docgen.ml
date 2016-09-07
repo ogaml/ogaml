@@ -393,10 +393,12 @@ let to_html_pp ppf modl depth =
                                         @\n<link rel=\"stylesheet\" href=\"%scss/monokai.css\">
                                         @\n<link rel=\"stylesheet\" href=\"%scss/doc.css\">
                                         @\n<script src=\"%sscript/highlight.pack.js\"></script>
+                                        @\n<script src=\"https://code.jquery.com/jquery-1.10.2.js\"></script>
+                                        @\n<script src=\"%sscript/doc.js\"></script>
                                         @\n<script type=\"text/javascript\">%s</script>
              @\n<link rel=\"shortcut icon\" type=\"image/x-icon\" href=\"%simg/favicon-ogaml.ico\">
              @]@\n</head>"
-      modl.modulename (to_root (depth + 1)) (to_root (depth + 1)) 
+      modl.modulename (to_root (depth + 1)) (to_root (depth + 1)) (to_root (depth + 1))
       (to_root (depth + 1)) highlight_init_code (to_root (depth + 1))
   in
   let hierarchy = 
