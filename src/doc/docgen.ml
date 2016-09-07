@@ -53,6 +53,7 @@ and token_related s i =
     match s.[i] with
     | 'a'..'z' 
     | 'A'..'Z' 
+    | '0'..'9'
     | '.'
     | '_' -> token_related s (i+1)
     | _ -> i
@@ -227,7 +228,7 @@ let rec comment_to_html depth ppf comment =
   | (PP_CommentString s)::t -> 
     Format.fprintf ppf "%s%a" s (comment_to_html depth) t
   | (PP_Inline s)::t -> 
-    Format.fprintf ppf "<pre><code>%s</pre></code>%a" s (comment_to_html depth) t
+    Format.fprintf ppf "<code class=\"OCaml\">%s</code>%a" s (comment_to_html depth) t
   | PP_EOL::PP_EOL::t -> 
     Format.fprintf ppf "<br>%a" (comment_to_html depth) t
   | PP_EOL::t -> 
@@ -377,10 +378,25 @@ and variance_to_string = function
   | Greater -> ">"
   | Equals -> ""
 
+let highlight_init_code = 
+  "<script type=\"text/javascript\"> 
+    hljs.tabReplace = ''; 
+    hljs.initHighlightingOnLoad(); 
+    window.onload = function() { 
+      var aCodes = document.getElementsByTagName('code'); 
+      for (var i=0; i < aCodes.length; i++) { 
+        hljs.highlightBlock(aCodes[i]); 
+      }
+    } </script>"
+
 let to_html_pp ppf modl depth = 
   let print_head ppf = 
-    Format.fprintf ppf "<head>@\n@[<hov2>  <title>OGaml documentation - %s</title>@]@\n</head>"
-      modl.modulename
+    Format.fprintf ppf "<head>@\n@[<hov2>  <title>OGaml documentation - %s</title>
+                                        @\n<link rel=\"stylesheet\" href=\"%scss/monokai.css\">
+                                        @\n<link rel=\"stylesheet\" href=\"%scss/doc.css\">
+                                        @\n<script src=\"%sscript/highlight.pack.js\"></script>
+                                        @\n%s@]@\n</head>"
+      modl.modulename (to_root (depth + 1)) (to_root (depth + 1)) (to_root (depth + 1)) highlight_init_code
   in
   let hierarchy = 
     if modl.hierarchy = [] then ""

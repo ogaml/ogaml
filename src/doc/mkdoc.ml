@@ -60,6 +60,11 @@ let welcome (modules : ASTpp.module_data list) =
       close)
     body_end)
 
+let copy src dest = 
+  let command = Printf.sprintf "cp %s %s" src dest in
+  if not (Sys.file_exists dest) then
+    Unix.system command |> ignore
+
 let () = 
   if Array.length Sys.argv < 1 then begin
     print_endline "Usage : ./mkdoc <file1.mli> ... <fileN.mli>";
@@ -67,6 +72,10 @@ let () =
   end;
   if not (Sys.file_exists "html") then 
     Unix.mkdir "html" 0o777;
+  if not (Sys.file_exists "html/css") then 
+    Unix.mkdir "html/css" 0o777;
+  if not (Sys.file_exists "html/script") then 
+    Unix.mkdir "html/script" 0o777;
   let modules = 
     Array.to_list Sys.argv
     |> List.tl
@@ -78,4 +87,7 @@ let () =
   close_out output;
   let output = open_out "html/doc/doc.html" in
   output_string output (export (welcome modules));
-  close_out output
+  close_out output;
+  copy "src/doc/doc.css" "html/css/doc.css";
+  copy "src/doc/highlight.pack.js" "html/script/highlight.pack.js";
+  copy "src/doc/monokai.css" "html/css/monokai.css"

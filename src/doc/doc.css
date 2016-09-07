@@ -1,0 +1,7 @@
+pre code.hljs {
+  display: block;
+}
+
+code.hljs {
+  display: inline;
+}
