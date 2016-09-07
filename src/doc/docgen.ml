@@ -109,7 +109,7 @@ and process_comment s =
                | PP_CommentString s -> PP_CommentString (" " ^ (strip_comment_begin s 0 0))
                | c -> c)
   |> List.filter (function
-                  | PP_CommentString "" -> false
+                  | PP_CommentString s -> not (Str.string_match (Str.regexp " *$") s 0)
                   | c -> true)
 
 and process_field field comment = 
@@ -508,5 +508,4 @@ let gen directory modl =
     Unix.chdir dir
   in
   gen_aux directory modl 0
-
 
