@@ -3,9 +3,13 @@ open Docgen
 
 let index =
   html
-    (head ~title:"OGaml library" ())
+    (head ~title:"OGaml library" ~links:[link ~href:"css/monokai.css" ~rel:Rel_stylesheet ();
+                                         link ~href:"css/home.css" ~rel:Rel_stylesheet ();
+                                         link ~href:"img/favicon-ogaml.ico" ~rel:Rel_icon ~mimetype:"image/x-icon" ()]
+                                 ~scripts:[Script_src "script/highlight.pack.js";
+                                           Js_text Docgen.highlight_init_code] ())
     (body
-      (h1 (text "OGAML") close)
+      (img ~src:"img/ogaml-logo.svg" ())
       (h2 (text "A powerful OCaml multimedia library") close)
       (p 
         (text "Check out the ")
@@ -51,7 +55,11 @@ let mk_modules modules =
 
 let welcome (modules : ASTpp.module_data list) =
   html
-    (head ~title:"OGaml documentation" ())
+    (head ~title:"OGaml documentation" ~links:[link ~href:"../css/monokai.css" ~rel:Rel_stylesheet ();
+                                               link ~href:"../css/doc.css" ~rel:Rel_stylesheet ();
+                                               link ~href:"../img/favicon-ogaml.ico" ~rel:Rel_icon ~mimetype:"image/x-icon" ()]
+                                       ~scripts:[Script_src "../script/highlight.pack.js";
+                                                 Js_text Docgen.highlight_init_code] ())
     (body
       (main
         (h1 (text "Welcome on the documentation of OGaml") close)
@@ -76,6 +84,8 @@ let () =
     Unix.mkdir "html/css" 0o777;
   if not (Sys.file_exists "html/script") then 
     Unix.mkdir "html/script" 0o777;
+  if not (Sys.file_exists "html/img") then 
+    Unix.mkdir "html/img" 0o777;
   let modules = 
     Array.to_list Sys.argv
     |> List.tl
@@ -90,4 +100,7 @@ let () =
   close_out output;
   copy "src/doc/doc.css" "html/css/doc.css";
   copy "src/doc/highlight.pack.js" "html/script/highlight.pack.js";
-  copy "src/doc/monokai.css" "html/css/monokai.css"
+  copy "src/doc/monokai.css" "html/css/monokai.css";
+  copy "src/doc/home.css" "html/css/home.css";
+  copy "src/doc/favicon-ogaml.ico" "html/img/favicon-ogaml.ico";
+  copy "src/doc/ogaml-logo.svg" "html/img/ogaml-logo.svg"

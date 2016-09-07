@@ -58,6 +58,15 @@ let export_rel r =
   | Rel_icon       -> "icon"
   | Rel_stylesheet -> "stylesheet"
 
+type script = 
+  | Js_text of string
+  | Script_src of string
+
+let export_script indent r = 
+  match r with
+  | Js_text s -> Printf.sprintf "%s<script type=\"text/javascript\">%s</script>\n" indent s
+  | Script_src s -> Printf.sprintf "%s<script src=\"%s\"></script>\n" indent s
+
 type link = {
   href  : string option ;
   media : media option ;
@@ -90,18 +99,21 @@ let export_link indent link =
 
 type head = {
   links : link list ;
-  title : string
+  title : string ;
+  scripts : script list
 }
 
-let head ?links:(links=[]) ~title () = {
+let head ?links:(links=[]) ?scripts:(scripts = []) ~title () = {
   links ;
-  title
+  title ;
+  scripts
 }
 
 let export_head head =
   tab ^ "<head>\n" ^
   tabtab ^ "<title>" ^ head.title ^ "</title>\n" ^
   (List.fold_left (fun a b -> a ^ export_link tabtab b) "" head.links) ^
+  (List.fold_left (fun a b -> a ^ export_script tabtab b) "" head.scripts) ^
   tab ^ "</head>\n"
 
 type target =
@@ -256,6 +268,7 @@ type _ body_tag =
   | Tag_b          : phrasing body               -> phrasing  body_tag
   | Tag_blockquote : blockquote_info * flow body -> flow      body_tag
   | Tag_br         :                                'a        body_tag
+  | Tag_img        : string                      -> flow      body_tag
   | Tag_canvas     : canvas_info * 'a body       -> 'a        body_tag
   | Tag_cite       : phrasing body               -> phrasing  body_tag
   | Tag_code       : phrasing body               -> phrasing  body_tag
@@ -339,6 +352,9 @@ let br ?id =
 
 let hr ?id =
   voidtag id Tag_hr
+
+let img ?src:(src="") ?id =
+  voidtag id (Tag_img src)
 
 let canvas ?height ?width ?id =
   mktag id (fun c -> Tag_canvas ({ height ; width }, c))
@@ -466,6 +482,7 @@ and export_tag : type a. string -> a full_tag -> string
                     (export_content (indent ^ tab) c)
   | Tag_br -> indent ^ "<br" ^ (export_generic_attr attr) ^ " />\n"
   | Tag_hr -> indent ^ "<hr" ^ (export_generic_attr attr) ^ " />\n"
+  | Tag_img src -> indent ^ "<img src=" ^ src ^ " " ^ (export_generic_attr attr) ^ " />\n"
   | Tag_canvas (i,c) ->
     export_tag_prim indent "canvas" (export_canvas_info i) attr
                     (export_content (indent ^ tab) c)

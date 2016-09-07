@@ -26,6 +26,10 @@ type rel_value =
   | Rel_stylesheet
   (* Are the others necessary? *)
 
+type script = 
+  | Js_text of string
+  | Script_src of string
+
 type link
 val link : ?href:  string ->
            ?media: media ->
@@ -38,7 +42,7 @@ val head : (* ?styles: style list -> *)
            (* ?base: ? -> *)
            ?links: link list ->
            (* ?metas: meta list -> *)
-           (* ?scripts: scrupt list -> *)
+           ?scripts: script list -> 
            (* ?noscripts? *)
            title: string ->
            unit -> head
@@ -103,6 +107,7 @@ val b : ('a, 'b, phrasing, phrasing) tag
 val blockquote : ?cite: string -> ('a, 'b, flow, flow) tag
 val br : ('a, 'b, 'c) void_tag
 val hr : ('a, 'b, flow) void_tag
+val img : ?src:string -> ('a, flow, flow) void_tag
 val canvas : ?height: string ->
              ?width: string ->
              ('a, 'b, 'c, 'c) tag

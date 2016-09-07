@@ -356,11 +356,12 @@ and type_expr_to_string = function
     Printf.sprintf "%s:%s" s (type_expr_to_string e)
   | PP_OptionalParam (s,e) ->
     Printf.sprintf "?%s:%s" s (type_expr_to_string e)
-  | PP_Variant l ->
+  | PP_Variant l when List.length l <= 5 ->
     List.map (function
-              | (s, Some e) -> Printf.sprintf "| %s of %s" s (type_expr_to_string e)
-              | (s, None)   -> Printf.sprintf "| %s" s) l
-    |> String.concat "\n"
+              | (s, Some e) -> Printf.sprintf "%s of %s" s (type_expr_to_string e)
+              | (s, None)   -> Printf.sprintf "%s" s) l
+    |> String.concat " | "
+  | PP_Variant _ -> "..."
   | PP_ParamType ([e], t) ->
     Printf.sprintf "%s %s" (type_expr_to_string e) (type_expr_to_string t)
   | PP_ParamType (l, t) ->
@@ -379,15 +380,14 @@ and variance_to_string = function
   | Equals -> ""
 
 let highlight_init_code = 
-  "<script type=\"text/javascript\"> 
-    hljs.tabReplace = ''; 
-    hljs.initHighlightingOnLoad(); 
-    window.onload = function() { 
-      var aCodes = document.getElementsByTagName('code'); 
-      for (var i=0; i < aCodes.length; i++) { 
-        hljs.highlightBlock(aCodes[i]); 
-      }
-    } </script>"
+  "hljs.tabReplace = ''; 
+   hljs.initHighlightingOnLoad(); 
+   window.onload = function() { 
+     var aCodes = document.getElementsByTagName('code'); 
+     for (var i=0; i < aCodes.length; i++) { 
+       hljs.highlightBlock(aCodes[i]); 
+     }
+   }"
 
 let to_html_pp ppf modl depth = 
   let print_head ppf = 
@@ -395,8 +395,11 @@ let to_html_pp ppf modl depth =
                                         @\n<link rel=\"stylesheet\" href=\"%scss/monokai.css\">
                                         @\n<link rel=\"stylesheet\" href=\"%scss/doc.css\">
                                         @\n<script src=\"%sscript/highlight.pack.js\"></script>
-                                        @\n%s@]@\n</head>"
-      modl.modulename (to_root (depth + 1)) (to_root (depth + 1)) (to_root (depth + 1)) highlight_init_code
+                                        @\n<script type=\"text/javascript\">%s</script>
+             @\n<link rel=\"shortcut icon\" type=\"image/x-icon\" href=\"%simg/favicon-ogaml.ico\">
+             @]@\n</head>"
+      modl.modulename (to_root (depth + 1)) (to_root (depth + 1)) 
+      (to_root (depth + 1)) highlight_init_code (to_root (depth + 1))
   in
   let hierarchy = 
     if modl.hierarchy = [] then ""
