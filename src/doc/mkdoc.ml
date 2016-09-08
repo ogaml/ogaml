@@ -53,7 +53,7 @@ let () =
   Printf.fprintf output "<!DOCTYPE html>\n<html>\n%s\n<body>%s\n%s</body>\n</html>"
     (Docgen.gen_header "../" "Index")
     (Docgen.gen_aside "../" None modules)
-    (Docgen.gen_index_main "../" modules);
+    (Docgen.gen_index_main "../" modules "examples/tut02.ml");
   close_out output;
   copy "src/doc/index.html" "html/index.html";
   copy "src/doc/doc.css" "html/css/doc.css";

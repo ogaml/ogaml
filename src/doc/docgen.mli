@@ -14,8 +14,8 @@ val gen_header : string -> string -> string
 (** [gen_main root module] *)
 val gen_main : string -> ASTpp.module_data -> string
 
-(** [gen_index_main root modules] *)
-val gen_index_main : string -> ASTpp.module_data list -> string
+(** [gen_index_main root modules examplefile] *)
+val gen_index_main : string -> ASTpp.module_data list -> string -> string
 
 (** [gen_aside root modules] *)
 val gen_aside : string -> ASTpp.module_data option -> ASTpp.module_data list -> string

@@ -12,8 +12,8 @@ and type_data =
     tparam : type_param option;
     tname : string;
     texpr : type_expr option;
-    tmembers : (string * comment) list;
-    tenum : (string * comment) list
+    tmembers : (string * type_expr * comment) list;
+    tenum : (string * type_expr option * comment) list
   }
 
 and module_field =

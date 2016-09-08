@@ -1,3 +1,8 @@
+
+(** Ugly doc generation code.
+  * Definitely not made to be reusable or pleasant to read.
+  * You have been warned :o) *)
+
 open AST
 open ASTpp
 open Lexing
@@ -187,19 +192,24 @@ and process_expr = function
 
 and get_members = function
   | Record l ->
-    List.map (fun (sopt, s, _) ->
+    List.map (fun (sopt, s, e) ->
       match sopt with
-      | None   -> (s, [])
-      | Some c -> (s, process_comment c)
+      | None   -> (s, process_expr e, [])
+      | Some c -> (s, process_expr e, process_comment c)
     ) l
   | _ -> []
 
 and get_enums = function
   | Variant l ->
-    List.map (fun (sopt, s, _) ->
+    List.map (fun (sopt, s, e) ->
+      let expr = 
+        match e with
+        | None -> None
+        | Some e -> Some (process_expr e)
+      in
       match sopt with
-      | None   -> (s, [])
-      | Some c -> (s, process_comment c)
+      | None   -> (s, expr, [])
+      | Some c -> (s, expr, process_comment c)
     ) l
   | _ -> []
 
@@ -281,12 +291,60 @@ let rec comment_to_html root ppf comment =
     Format.fprintf ppf "<br><span class=\"see\">See : <a href=\"%sdoc/%s.html\">%s</a></span>%a" 
       root link s (comment_to_html root) t
 
-let comment_to_string root comment = 
+and comment_to_string root comment = 
   let ppf = Format.str_formatter in
   comment_to_html root ppf comment;
   Format.flush_str_formatter ()
 
-let mk_entry ppf s f2 a2 f3 a3 = 
+and mk_value root ppf (s, expr, comment) = 
+  Format.fprintf ppf 
+  "<td class=\"variant\">
+     <figure class=\"highlight\">
+        <code class=\"OCaml\">%s%s%s</code>
+     </figure>
+  </td>
+  <td>%a</td>" s (match expr with None -> "" | Some _ -> " of ")
+                 (match expr with None -> "" | Some e -> type_expr_to_string e)
+                 (comment_to_html root) comment
+
+and mk_values root ppf = function
+  | [] -> ()
+  | h::t -> Format.fprintf ppf "<tr>@\n%a@\n</tr>@\n%a" 
+              (mk_value root) h (mk_values root) t
+
+and mk_value_table root ppf vtable =
+  if vtable <> [] then 
+    Format.fprintf ppf
+    "<h4>Possible values</h4>
+     @\n<table class=\"values\"></tbody>@\n@[<hov2>  %a@\n@]</tbody></table>" 
+     (mk_values root) vtable
+
+and mk_member root ppf (s, expr, comment) = 
+  Format.fprintf ppf 
+  "<td class=\"record\">
+     <figure class=\"highlight\">
+        <code class=\"OCaml\">%s : %s</code>
+     </figure>
+  </td>
+  <td>%a</td>" s (type_expr_to_string expr) (comment_to_html root) comment
+
+and mk_members root ppf = function
+  | [] -> ()
+  | h::t -> Format.fprintf ppf "<tr>@\n%a@\n</tr>@\n%a" 
+              (mk_member root) h (mk_members root) t
+
+and mk_member_table root ppf (vtable : (string * type_expr * comment) list) : unit =
+  if vtable <> [] then 
+    Format.fprintf ppf
+    "<h4>Record fields</h4>
+     @\n<table class=\"fields\"></tbody>@\n@[<hov2>  %a@\n@]</tbody></table>" 
+     (mk_members root) vtable
+
+
+and mk_entry : 'a 'b. Format.formatter -> string -> 
+                     (Format.formatter -> 'a -> unit) -> 'a -> 
+                     (Format.formatter -> 'b -> unit) -> 'b -> unit =
+  fun ppf s f2 a2 f3 a3 ->
   Format.fprintf ppf
   "<article>
      <span class=\"arrow-right arrow\"></span>
@@ -301,7 +359,19 @@ let mk_entry ppf s f2 a2 f3 a3 =
    </article>
    %a" s f2 a2 f3 a3
 
-let rec module_to_html root ppf mdl = 
+and mk_type_comment root ppf (comment, typedata) : unit = 
+  let (c1, c2) = 
+    List.partition (function 
+                    | PP_Related _ -> false
+                    | _ -> true) comment
+  in
+  Format.fprintf ppf "%a@\n%a@\n%a@\n%a" (comment_to_html root) c1
+                                         (mk_value_table root) typedata.tenum
+                                         (mk_member_table root) typedata.tmembers
+                                         (comment_to_html root) c2
+  
+
+and module_to_html root ppf mdl = 
   match mdl with
   | [] -> ()
   | (PP_Title s)::t ->
@@ -322,7 +392,7 @@ let rec module_to_html root ppf mdl =
                                          typedata.tname
                                          (type_expr_to_string e)
     in
-    mk_entry ppf valtext (comment_to_html root) comment (module_to_html root) t
+    mk_entry ppf valtext (mk_type_comment root) (comment,typedata) (module_to_html root) t
   | (PP_Val (s, expr, comment))::t ->
     let valtext = 
       Printf.sprintf "val %s : %s" s (type_expr_to_string expr)
@@ -434,6 +504,7 @@ let highlight_init_code =
 let gen_header root modulename = 
   Format.fprintf Format.str_formatter "<head>
       @\n@[<hov2>  <title>OGaml documentation - %s</title>
+      @\n<meta charset=\"utf-8\">
       @\n<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,700' rel='stylesheet' type='text/css'>
       @\n<link rel=\"stylesheet\" href=\"%scss/monokai.css\">
       @\n<link rel=\"stylesheet\" href=\"%scss/doc.css\">
@@ -506,13 +577,24 @@ let gen_index_modules root modules =
   |> String.concat "\n"
   |> Printf.sprintf "<ul>\n%s\n</ul>\n"
 
-let gen_index_main root modules =
+let gen_index_main root modules example =
+  let expl = open_in_bin example in
+  let n = in_channel_length expl in
+  let s = Bytes.create n in
+  really_input expl s 0 n;
+  close_in expl;
   Printf.sprintf 
     "<main>
      <h1>Welcome on the documentation of OGaml !</h1>\n
      <h2>Main modules</h2>\n
      %s
-     </main>" (gen_index_modules root modules)
+     <h2>Example (triangle)</h2>\n
+     <figure class=\"highlight\">
+       <pre>
+         <code class=\"OCaml\">%s</code>
+       </pre>
+     </figure>
+     </main>" (gen_index_modules root modules) s
 
 let aside_header root = 
   Printf.sprintf
