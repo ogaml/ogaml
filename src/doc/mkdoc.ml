@@ -1,4 +1,3 @@
-open Html
 open Docgen
 
 let copy src dest = 
