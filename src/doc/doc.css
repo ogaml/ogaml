@@ -1,0 +1,477 @@
+html {
+  font-size: 62.5%;
+  font-family: 'Open Sans', sans-serif;
+  min-height: 100%;
+}
+
+body {
+  /*background-color: rgb(225, 232, 237);*/
+  /*background-color: rgb(254, 246, 254);*/
+  background: linear-gradient(to bottom, rgb(255, 156, 6) 0,rgb(255, 156, 6) 150pt,rgb(225, 232, 237) 150pt,rgb(225, 232, 237) 100%) no-repeat;
+  font-size: 1.5rem;
+  padding: 0;
+  margin: 0;
+  word-wrap: break-word;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+
+h2, h3, h4, h5, h6 {
+  margin-top: 5pt;
+}
+
+a {
+  color: rgb(67, 132, 185);
+  text-decoration: none;
+}
+
+a:hover {
+  color: rgb(85, 168, 236);
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul ul {
+  padding-left: 5pt;
+}
+
+table td {
+  padding: 2pt 8pt 2pt 0;
+}
+
+pre {
+  overflow: auto;
+  margin: 0;
+}
+
+code {
+  font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  font-size: 1rem;
+  border-radius: 3pt;
+}
+
+.modulename {
+  color: rgb(87, 110, 198);
+}
+
+.prefix {
+  color: rgb(62, 83, 89);
+  font-weight: lighter;
+}
+
+.abstract {
+  color: rgb(125, 136, 139);
+}
+
+.see {
+  font-weight: lighter;
+  font-size: 10pt;
+  color: rgb(126, 126, 126);
+}
+
+/* The menu button */
+nav {
+  display: none;
+}
+
+@media only screen and (max-width: 760pt) {
+  nav {
+    display: block;
+    background-color: rgb(255, 156, 6);
+    width: 100%;
+    height: 30pt;
+    position: fixed;
+    z-index: 2;
+  }
+
+  /* from https://codyhouse.co/gem/responsive-sidebar-navigation/ */
+  #nav-trigger {
+    /* navigation trigger - visible on mobile devices only */
+    float: right;
+    position: relative;
+    display: block;
+    width: 34px;
+    height: 44px;
+    margin-right: 5%;
+    /* hide text */
+    overflow: hidden;
+    white-space: nowrap;
+    color: transparent;
+  }
+  #nav-trigger span, #nav-trigger span::before, #nav-trigger span::after {
+    /* hamburger icon in CSS */
+    position: absolute;
+    display: inline-block;
+    height: 3px;
+    width: 24px;
+    background: #ffffff;
+  }
+  #nav-trigger span {
+    /* line in the center */
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    margin-top: -2px;
+    -webkit-transition: background 0.2s;
+    -moz-transition: background 0.2s;
+    transition: background 0.2s;
+  }
+  #nav-trigger span::before, #nav-trigger span::after {
+    /* other 2 lines */
+    content: '';
+    right: 0;
+    /* Force Hardware Acceleration in WebKit */
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    -o-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform-origin: 0% 50%;
+    -moz-transform-origin: 0% 50%;
+    -ms-transform-origin: 0% 50%;
+    -o-transform-origin: 0% 50%;
+    transform-origin: 0% 50%;
+    -webkit-transition: -webkit-transform 0.2s;
+    -moz-transition: -moz-transform 0.2s;
+    transition: transform 0.2s;
+  }
+  #nav-trigger span::before {
+    /* menu icon top line */
+    top: -6px;
+  }
+  #nav-trigger span::after {
+    /* menu icon bottom line */
+    top: 6px;
+  }
+  #nav-trigger.nav-visible span {
+    /* hide line in the center */
+    background: rgba(255, 255, 255, 0);
+  }
+  #nav-trigger.nav-visible span::before, #nav-trigger.nav-visible span::after {
+    /* keep visible other 2 lines */
+    background: white;
+  }
+  #nav-trigger.nav-visible span::before {
+    -webkit-transform: translateX(4px) translateY(-3px) rotate(45deg);
+    -moz-transform: translateX(4px) translateY(-3px) rotate(45deg);
+    -ms-transform: translateX(4px) translateY(-3px) rotate(45deg);
+    -o-transform: translateX(4px) translateY(-3px) rotate(45deg);
+    transform: translateX(4px) translateY(-3px) rotate(45deg);
+  }
+  #nav-trigger.nav-visible span::after {
+    -webkit-transform: translateX(4px) translateY(2px) rotate(-45deg);
+    -moz-transform: translateX(4px) translateY(2px) rotate(-45deg);
+    -ms-transform: translateX(4px) translateY(2px) rotate(-45deg);
+    -o-transform: translateX(4px) translateY(2px) rotate(-45deg);
+    transform: translateX(4px) translateY(2px) rotate(-45deg);
+  }
+}
+
+/* The side bar */
+aside {
+  z-index: 2;
+  background-color: rgb(251, 251, 251);
+  width: 150pt;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  overflow: auto;
+  box-shadow: 2pt 0 15pt rgba(31, 31, 31, 0.30);
+}
+
+@media only screen and (max-width: 760pt) {
+  aside {
+    /*opacity: 0;*/
+    /*visibility: hidden;*/
+    top: 100%;
+    position: fixed;
+    left: 0;
+    /*top: 30pt;*/
+    width: 100%;
+    height: 100%;
+    /*background-color: rgb(230, 230, 230);*/
+    overflow: auto;
+    /*transition: opacity 0.2s 0s, visibility 0s 0.2s;*/
+    transition: top 0.2s 0s;
+  }
+
+  aside.nav-visible {
+    /*opacity: 1;*/
+    /*visibility: visible;*/
+    top:30pt;
+    /*transition: opacity 0.2s 0s, visibility 0s 0s;*/
+    transition: top 0.2s 0s;
+  }
+}
+
+header {
+  background-color: rgb(255, 156, 6);
+}
+
+/*@media only screen and (max-width: 760pt) {
+  header {
+    background-color: rgb(255, 156, 6);
+  }
+}*/
+
+aside h1 {
+  font-size: 15pt;
+  margin-left: 5pt;
+}
+
+aside h1 .showall {
+  font-size: 10pt;
+  padding-left: 10pt;
+  cursor: pointer;
+  color: #BBDCF9;
+  font-weight: lighter;
+}
+
+aside ul {
+  border-left: 1pt solid rgb(38, 73, 71);
+  padding-left: 3pt;
+  margin-left: 3pt;
+}
+
+aside ul.nav-open {
+  border-color: #188BF1;
+}
+
+#main-nav {
+  margin-bottom: 20pt;
+  margin-left: 6pt;
+}
+
+/*aside ul li {
+  width: 100%;
+}*/
+
+aside span.arrow {
+  cursor: pointer;
+}
+
+aside a {
+  /*display: block;*/
+  /*padding-left: 2pt;*/
+  /*width: calc(100% - 2pt);*/
+  color: rgb(116, 131, 134);
+}
+
+header a {
+  padding-left: 0;
+  width: 100%;
+}
+
+aside a:hover {
+  /*background-color: rgb(168, 196, 224);*/
+  color: rgb(17, 18, 18);
+}
+
+/*aside ul ul {
+  border-left: 5pt solid rgb(38, 73, 71);
+  padding-left: 0;
+}*/
+
+/* Main content */
+
+main {
+  /*margin-left: 196px;*/
+  margin: auto;
+  margin-top: 30pt;
+  margin-bottom: 30pt;
+  max-width: 600pt;
+  padding: 5pt 12pt 20pt 12pt;
+  background-color: rgb(254, 246, 254);
+  box-shadow: 0 2pt 15pt rgba(31, 31, 31, 0.30);
+  border-radius: 2pt;
+}
+
+@media only screen and (max-width: 910pt) {
+  main {
+    margin-left: 160pt;
+  }
+}
+
+@media only screen and (max-width: 760pt) {
+  main {
+    width: calc(100% - 24pt);
+    position: absolute;
+    top: 30pt;
+    left: 0;
+    right: 0;
+    margin: auto;
+  }
+}
+
+table.belowh {
+  border-top: 1pt solid rgb(116, 116, 116);
+}
+
+main h2 {
+  font-weight: normal;
+  margin-top: 20pt;
+  margin-bottom: 0;
+}
+
+main hr {
+  margin-bottom: 30pt;
+  border: 1pt solid rgb(125, 136, 139);
+}
+
+article {
+  margin-left: -12pt;
+  margin-right: -12pt;
+  padding: 2pt 12pt;
+  transition: 1s ease;
+}
+
+article p {
+  margin-top: 2pt;
+  margin-bottom: 0;
+}
+
+article div.more {
+  margin-top: 2pt;
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+.arrow {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.arrow-right {
+  border-width: 5px 0 5px 8.7px;
+  border-color: transparent transparent transparent #000000;
+  transition: all 0.5s ease;
+}
+
+.arrow-bottom {
+  border-width: 4.3px 2.5px 0 2.5px;
+  border-color: #000000 transparent transparent transparent;
+  transition: all 0.5s ease;
+}
+
+.rotate {
+  transform: rotate(90deg);
+}
+
+span.showmore {
+  display: inline-block;
+  /*overflow: scroll;*/
+  cursor: pointer;
+  position: relative;
+  top: 7pt;
+  max-width: calc(100% - 25pt);
+  margin-bottom: 12pt;
+}
+
+div.more {
+  display: block;
+  background-color: rgb(229, 242, 246);
+  border-top: 1pt solid rgb(209, 222, 226);
+  border-bottom: 1pt solid rgb(209, 222, 226);
+  margin: 0 -12pt 0 -12pt;
+  padding: 2pt 12pt;
+  position: relative;
+}
+
+div.more:after, div.more:before {
+  bottom: 100%;
+  left: 31pt;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+div.more:after {
+  border-color: rgba(229, 242, 246, 0);
+  border-bottom-color: rgb(229, 242, 246);
+  border-width: 5px;
+  margin-left: -5px;
+}
+div.more:before {
+  border-color: rgba(209, 222, 226, 0);
+  border-bottom-color: rgb(209, 222, 226);
+  border-width: 6pt;
+  margin-left: -6pt;
+}
+
+/* For overflow */
+span.showmore div.highlight, span.showmore pre {
+  max-width: 100%;
+}
+
+/* At least code in summary is inlined */
+span.showmore div.highlight, span.showmore pre,
+span.showmore div.highlight pre code {
+  display: inline-block;
+  /*overflow: visible;*/
+  /*max-width: 580pt;*/
+  /*background: none;*/
+}
+
+/* Inline code gets similar treatment */
+span.inline-code {
+  background-color: #49483E;
+  border-radius: 3px;
+}
+
+span.inline-code code {
+  padding: 3px 3px;
+  border: none;
+}
+
+table.values div.highlight, table.values pre,
+table.values div.highlight pre code {
+  display: inline;
+  /*background: none;*/
+  padding: 3px 5px;
+  border: none;
+}
+
+table.values td.variant {
+  border-left: 1pt solid rgb(210, 17, 51);
+  padding-left: 4pt;
+}
+
+/*table.values div.highlight {
+  border-left: 1pt solid rgb(210, 17, 51);
+}*/
+
+/* When quoting submodules */
+
+section {
+  border-left: 2pt solid rgb(72, 164, 193);
+  padding-left: 2pt;
+  margin-left: 1.5pt;
+}
+
+pre code.hljs {
+  display: block;
+}
+
+code.hljs {
+  display: inline;
+}
+
+figure {
+  margin-left:5pt;
+  margin-top:0pt;
+  margin-bottom:0pt;
+}
