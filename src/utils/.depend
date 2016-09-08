@@ -1,3 +1,5 @@
+UTF8String.cmo : UTF8String.cmi
+UTF8String.cmx : UTF8String.cmi
 bounding.cmo : ../math/vector3f.cmi ../math/ogamlMath.cmi \
     ../math/matrix3D.cmi bounding.cmi
 bounding.cmx : ../math/vector3f.cmx ../math/ogamlMath.cmi \
@@ -16,8 +18,7 @@ noise.cmx : ../math/vector3f.cmx ../math/vector2f.cmx ../math/ogamlMath.cmi \
     noise.cmi
 priorityQueue.cmo : priorityQueue.cmi
 priorityQueue.cmx : priorityQueue.cmi
-UTF8String.cmo : UTF8String.cmi
-UTF8String.cmx : UTF8String.cmi
+UTF8String.cmi :
 bounding.cmi : ../math/ogamlMath.cmi
 dequeue.cmi :
 graph.cmi :
@@ -26,4 +27,3 @@ log.cmi :
 noise.cmi : ../math/ogamlMath.cmi
 ogamlUtils.cmi : ../math/ogamlMath.cmi
 priorityQueue.cmi :
-UTF8String.cmi :

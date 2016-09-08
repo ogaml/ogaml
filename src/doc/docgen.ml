@@ -224,30 +224,67 @@ and pp hierarchy modulename ast : ASTpp.module_data =
 
 let preprocess modulename ast = pp [] modulename ast
 
-let rec to_root = function
-  | 0 -> ""
-  | n -> "../" ^ (to_root (n-1))
+let print_position lexbuf =
+  let pos = lexbuf.lex_curr_p in
+  let str = Lexing.lexeme lexbuf in
+  let begchar = pos.pos_cnum - pos.pos_bol + 1 in
+  Printf.sprintf "In %s, line %d, characters %d-%d : %s"
+    pos.pos_fname pos.pos_lnum begchar
+    (begchar + (String.length str))
+    (Lexing.lexeme lexbuf)
 
-let rec comment_to_html depth ppf comment =
+let parse_with_errors lexbuf =
+  try
+    Parser.file Lexer.token lexbuf
+  with
+    |Lexer.SyntaxError msg ->
+        error "%s : %s" (print_position lexbuf) msg
+    |Parser.Error ->
+        error "%s : Syntax Error" (print_position lexbuf)
+
+let parse_from_file f = 
+  let input = open_in f in
+  let lexbuf = from_channel input in
+  lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = f};
+  let ast = parse_with_errors lexbuf in
+  close_in input;
+  ast
+
+let preprocess_file file = 
+  let modulename = 
+    let dot = String.rindex file '.' in
+    let sls = String.rindex file '/' in
+    String.sub file (sls+1) (dot-sls-1)
+    |> String.capitalize
+  in
+  let ast = parse_from_file file in
+  preprocess modulename ast
+
+
+let rec comment_to_html root ppf comment =
   match comment with
   | [] -> ()
   | (PP_CommentString s)::t -> 
-    Format.fprintf ppf "%s%a" s (comment_to_html depth) t
+    Format.fprintf ppf "%s%a" s (comment_to_html root) t
   | (PP_Inline s)::t -> 
-    Format.fprintf ppf "<code class=\"OCaml\">%s</code>%a" s (comment_to_html depth) t
+    Format.fprintf ppf "<code class=\"OCaml\">%s</code>%a" s (comment_to_html root) t
   | PP_EOL::PP_EOL::t -> 
-    Format.fprintf ppf "<br>%a" (comment_to_html depth) t
+    Format.fprintf ppf "<br>%a" (comment_to_html root) t
   | PP_EOL::t -> 
-    Format.fprintf ppf "%a" (comment_to_html depth) t
+    Format.fprintf ppf "%a" (comment_to_html root) t
   | (PP_Related s)::t -> 
     let link = 
       String.lowercase s 
       |> Str.split (Str.regexp "\\.")
       |> String.concat "/"
     in
-    Format.fprintf ppf "<br><span class=\"see\">See : <a href=\"%s%s.html\">%s</a></span>%a" 
-      (to_root depth) link s
-      (comment_to_html depth) t
+    Format.fprintf ppf "<br><span class=\"see\">See : <a href=\"%sdoc/%s.html\">%s</a></span>%a" 
+      root link s (comment_to_html root) t
+
+let comment_to_string root comment = 
+  let ppf = Format.str_formatter in
+  comment_to_html root ppf comment;
+  Format.flush_str_formatter ()
 
 let mk_entry ppf s f2 a2 f3 a3 = 
   Format.fprintf ppf
@@ -264,13 +301,13 @@ let mk_entry ppf s f2 a2 f3 a3 =
    </article>
    %a" s f2 a2 f3 a3
 
-let rec module_to_html depth ppf mdl = 
+let rec module_to_html root ppf mdl = 
   match mdl with
   | [] -> ()
   | (PP_Title s)::t ->
-    Format.fprintf ppf "<br><h3>%s</h3>@\n%a" s (module_to_html depth) t
+    Format.fprintf ppf "<br><h3>%s</h3>@\n%a" s (module_to_html root) t
   | (PP_Comment c)::t ->
-    Format.fprintf ppf "<p>%a</p>@\n%a" (comment_to_html depth) c (module_to_html depth) t
+    Format.fprintf ppf "<p>%a</p>@\n%a" (comment_to_html root) c (module_to_html root) t
   | (PP_Type (typedata, comment))::t -> 
     let valtext = 
       match (typedata.tparam, typedata.texpr) with
@@ -285,22 +322,22 @@ let rec module_to_html depth ppf mdl =
                                          typedata.tname
                                          (type_expr_to_string e)
     in
-    mk_entry ppf valtext (comment_to_html depth) comment (module_to_html depth) t
+    mk_entry ppf valtext (comment_to_html root) comment (module_to_html root) t
   | (PP_Val (s, expr, comment))::t ->
     let valtext = 
       Printf.sprintf "val %s : %s" s (type_expr_to_string expr)
     in
-    mk_entry ppf valtext (comment_to_html depth) comment (module_to_html depth) t
+    mk_entry ppf valtext (comment_to_html root) comment (module_to_html root) t
   | (PP_Exn (s, Some expr, comment))::t ->
     let valtext = 
       Printf.sprintf "exception %s of %s" s (type_expr_to_string expr)
     in
-    mk_entry ppf valtext (comment_to_html depth) comment (module_to_html depth) t
+    mk_entry ppf valtext (comment_to_html root) comment (module_to_html root) t
   | (PP_Exn (s, None, comment))::t ->
     let valtext = 
       Printf.sprintf "exception %s" s
     in
-    mk_entry ppf valtext (comment_to_html depth) comment (module_to_html depth) t
+    mk_entry ppf valtext (comment_to_html root) comment (module_to_html root) t
   | (PP_Functor (fdata, comment))::t ->
     let funargs = 
       List.map (fun (s1,s2) -> Printf.sprintf "(%s : %s)" s1 s2) 
@@ -320,7 +357,7 @@ let rec module_to_html depth ppf mdl =
         (if List.length fdata.fcons <> 0 then " with type " else "")
         constraints
     in
-    mk_entry ppf valtext (comment_to_html depth) comment (module_to_html depth) t
+    mk_entry ppf valtext (comment_to_html root) comment (module_to_html root) t
 
 and type_params_to_string = function
   | ParamTuple []  -> 
@@ -394,21 +431,22 @@ let highlight_init_code =
      }
    }"
 
-let to_html_pp ppf modl depth = 
-  let print_head ppf = 
-    Format.fprintf ppf "<head>@\n@[<hov2>  <title>OGaml documentation - %s</title>
-                                        @\n<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,700' rel='stylesheet' type='text/css'>
-                                        @\n<link rel=\"stylesheet\" href=\"%scss/monokai.css\">
-                                        @\n<link rel=\"stylesheet\" href=\"%scss/doc.css\">
-                                        @\n<script src=\"%sscript/highlight.pack.js\"></script>
-                                        @\n<script src=\"https://code.jquery.com/jquery-1.10.2.js\"></script>
-                                        @\n<script src=\"%sscript/doc.js\"></script>
-                                        @\n<script type=\"text/javascript\">%s</script>
-             @\n<link rel=\"shortcut icon\" type=\"image/x-icon\" href=\"%simg/favicon-ogaml.ico\">
-             @]@\n</head>"
-      modl.modulename (to_root (depth + 1)) (to_root (depth + 1)) (to_root (depth + 1))
-      (to_root (depth + 1)) highlight_init_code (to_root (depth + 1))
-  in
+let gen_header root modulename = 
+  Format.fprintf Format.str_formatter "<head>
+      @\n@[<hov2>  <title>OGaml documentation - %s</title>
+      @\n<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,700' rel='stylesheet' type='text/css'>
+      @\n<link rel=\"stylesheet\" href=\"%scss/monokai.css\">
+      @\n<link rel=\"stylesheet\" href=\"%scss/doc.css\">
+      @\n<script src=\"%sscript/highlight.pack.js\"></script>
+      @\n<script src=\"https://code.jquery.com/jquery-1.10.2.js\"></script>
+      @\n<script src=\"%sscript/doc.js\"></script>
+      @\n<script type=\"text/javascript\">%s</script>
+      @\n<link rel=\"shortcut icon\" type=\"image/x-icon\" href=\"%simg/favicon-ogaml.ico\">
+      @]@\n</head>"
+    modulename root root root root highlight_init_code root;
+  Format.flush_str_formatter ()
+
+let gen_main_pp ppf modl root = 
   let hierarchy = 
     if modl.hierarchy = [] then ""
     else begin
@@ -419,14 +457,14 @@ let to_html_pp ppf modl depth =
   let print_headmodule ppf = 
     Format.fprintf ppf "<h1>Module <span class=\"prefix\">%s</span><span class=\"modulename\">%s</span></h1>
     @\n<span class=\"abstract\">%a</span>@\n<hr>"
-      hierarchy modl.modulename (comment_to_html depth) modl.description
+      hierarchy modl.modulename (comment_to_html root) modl.description
   in
   let rec print_submodules_aux ppf = function
     | []   -> ()
     | h::t -> 
       let link = h.hierarchy @ [h.modulename] |> String.concat "/" |> String.lowercase in
-      Format.fprintf ppf "<tr><td><a href=\"%s%s.html\">%s</a></td><td>%a</td></tr>@\n%a"
-        (to_root depth) link h.modulename (comment_to_html depth) h.description print_submodules_aux t
+      Format.fprintf ppf "<tr><td><a href=\"%sdoc/%s.html\">%s</a></td><td>%a</td></tr>@\n%a"
+        root link h.modulename (comment_to_html root) h.description print_submodules_aux t
   in
   let print_submodules ppf = 
     if modl.submodules <> [] then 
@@ -446,74 +484,86 @@ let to_html_pp ppf modl depth =
       print_submodules_aux modl.signatures
     else ()
   in
-  let print_main ppf = 
-    Format.fprintf ppf "<main>@\n@[<hov2>  %t@\n%t@\n%t@\n%a@]@\n</main>"
-      print_headmodule
-      print_submodules
-      print_signatures
-      (module_to_html depth) modl.contents
-  in
-  let print_body ppf = 
-    Format.fprintf ppf "<body>@\n@[<hov2>  %t@]@\n</body>" print_main
-  in
-  Format.fprintf ppf "<!DOCTYPE html>@\n<html>@\n@[<hov2>  %t@\n%t@]@\n</html>" print_head print_body
+  Format.fprintf ppf "<main>@\n@[<hov2>  %t@\n%t@\n%t@\n%a@]@\n</main>"
+    print_headmodule
+    print_submodules
+    print_signatures
+    (module_to_html root) modl.contents
 
-let to_html modl depth = 
+let gen_main root modl = 
   let ppf = Format.str_formatter in
-  to_html_pp ppf modl depth;
+  gen_main_pp ppf modl root;
   Format.flush_str_formatter ()
 
-let print_position lexbuf =
-  let pos = lexbuf.lex_curr_p in
-  let str = Lexing.lexeme lexbuf in
-  let begchar = pos.pos_cnum - pos.pos_bol + 1 in
-  Printf.sprintf "In %s, line %d, characters %d-%d : %s"
-    pos.pos_fname pos.pos_lnum begchar
-    (begchar + (String.length str))
-    (Lexing.lexeme lexbuf)
+let gen_index_entry root modl = 
+  let link = modl.ASTpp.modulename |> String.lowercase in
+  let comm = comment_to_string root modl.ASTpp.description in
+  Printf.sprintf "<li>\n\t<p>\n\t\t<a href=\"%s.html\">%s</a>\n\t%s\n\t</p>\n</li>"
+    link modl.ASTpp.modulename comm
 
-let parse_with_errors lexbuf =
-  try
-    Parser.file Lexer.token lexbuf
-  with
-    |Lexer.SyntaxError msg ->
-        error "%s : %s" (print_position lexbuf) msg
-    |Parser.Error ->
-        error "%s : Syntax Error" (print_position lexbuf)
+let gen_index_modules root modules =
+  List.map (gen_index_entry root) modules
+  |> String.concat "\n"
+  |> Printf.sprintf "<ul>\n%s\n</ul>\n"
 
-let parse_from_file f = 
-  let input = open_in f in
-  let lexbuf = from_channel input in
-  lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = f};
-  let ast = parse_with_errors lexbuf in
-  close_in input;
-  ast
+let gen_index_main root modules =
+  Printf.sprintf 
+    "<main>
+     <h1>Welcome on the documentation of OGaml !</h1>\n
+     <h2>Main modules</h2>\n
+     %s
+     </main>" (gen_index_modules root modules)
 
-let preprocess_file file = 
-  let modulename = 
-    let dot = String.rindex file '.' in
-    let sls = String.rindex file '/' in
-    String.sub file (sls+1) (dot-sls-1)
-    |> String.capitalize
-  in
-  let ast = parse_from_file file in
-  preprocess modulename ast
+let aside_header root = 
+  Printf.sprintf
+  "<header>
+    <a href=\"%sindex.html\">
+      <img src=\"%simg/ogaml-logo.svg\" alt=\"OGAML\" width=\"100%%\">
+    </a>
+  </header>" root root
 
-let gen directory modl =
-  let rec gen_aux directory modl depth =
-    let dir = Unix.getcwd () in
-    if not (Sys.file_exists directory) then 
-      Unix.mkdir directory 0o777;
-    Unix.chdir directory;
-    let output = open_out (String.lowercase modl.modulename ^ ".html") in
-    let ppf = Format.formatter_of_out_channel output in
-    to_html_pp ppf modl depth;
-    close_out output;
-    List.iter (fun modl' -> gen_aux (String.lowercase modl.modulename) modl' (depth+1))
-      modl.submodules;
-    List.iter (fun modl' -> gen_aux (String.lowercase modl.modulename) modl' (depth+1))
-      modl.signatures;
-    Unix.chdir dir
-  in
-  gen_aux directory modl 0
+let rec tree_mem cur mdl = 
+  cur = mdl || (List.exists (tree_mem cur) mdl.signatures)
+            || (List.exists (tree_mem cur) mdl.submodules)
+
+let rec gen_aside_module root curr mdl = 
+  let link = mdl.hierarchy @ [mdl.modulename] 
+             |> String.concat "/" 
+             |> String.lowercase in
+  Printf.sprintf 
+  "<li>
+    <span class=\"arrow-right arrow shownav\"></span>
+    <a href=\"%sdoc/%s.html\">%s</a>
+    <ul %s>
+      %s
+      %s
+    </ul>
+  </li>"
+  root link mdl.modulename
+  (match curr with
+   | Some curr when tree_mem curr mdl ->
+      "class=\"nav-open\" style=\"display: block;\""
+   | _ ->
+    "style=\"display: none;\"")
+  (gen_aside_modules root curr mdl.signatures)
+  (gen_aside_modules root curr mdl.submodules)
+
+and gen_aside_modules root curr modules = 
+  List.map (gen_aside_module root curr) modules
+  |> String.concat "\n"
+
+let gen_aside root curr modules = 
+  Printf.sprintf
+  "<aside>
+    %s
+    <h1> 
+      <a href=\"%sdoc/doc.html\">Modules</a>
+      <span class=\"showall\">Show all</span>
+    </h1>
+    <ul id=\"main-nav\" style=\"display: block;\">
+      %s
+    </ul>
+   </aside>" 
+  (aside_header root) root (gen_aside_modules root curr modules)
+
 

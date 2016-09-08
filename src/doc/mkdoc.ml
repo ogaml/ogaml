@@ -1,85 +1,35 @@
 open Html
 open Docgen
 
-let index =
-  html
-    (head ~title:"OGaml library" ~links:[
-                                         link ~href:"https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" ~rel:Rel_stylesheet ~mimetype:"text/css" ();
-                                         link ~href:"css/monokai.css" ~rel:Rel_stylesheet ();
-                                         link ~href:"css/home.css" ~rel:Rel_stylesheet ();
-                                         link ~href:"img/favicon-ogaml.ico" ~rel:Rel_icon ~mimetype:"image/x-icon" ()]
-                                 ~scripts:[Script_src "script/highlight.pack.js";
-                                           Script_src "https://code.jquery.com/jquery-1.10.2.js";
-                                           Script_src "script/doc.js";
-                                           Js_text Docgen.highlight_init_code] ())
-    (body
-      (h1 (img ~src:"img/ogaml-logo.svg" ~alt:"OGAML" ~width:"520pt" ()) (Obj.magic close))
-      (h2 (text "A powerful OCaml multimedia library") close)
-      (p 
-        (text "Check out the ")
-        (a ~href:"doc/doc.html"
-          (text "documentation")
-        close)
-        (text " for more information about the modules of OGaml.")
-      close)
-      (p
-        (text "If you want to contribute or just see the sources of OGaml, check out our ")
-        (a ~href:"https://github.com/ogaml/ogaml"
-          (text "Github repository")
-        close)
-        (text ". This very website is also ")
-        (a ~href:"https://github.com/ogaml/ogaml.github.io"
-          (text "available on Github.")
-        close)
-      close)
-    body_end)
-
-let rec comment_to_string = function
-  | [] -> ""
-  | ASTpp.PP_CommentString s :: t -> s ^ (comment_to_string t)
-  | ASTpp.PP_EOL :: t -> " " ^ (comment_to_string t)
-  | _ :: t -> comment_to_string t
-
-let mk_entry modl = 
-  let link = modl.ASTpp.modulename |> String.lowercase in
-  let comm = comment_to_string modl.ASTpp.description in
-  li
-    (p
-      (a ~href:(link ^ ".html") (text modl.ASTpp.modulename) close)
-      (text comm)
-    close)
-  close
-
-let mk_modules modules =
-  let rec mk_aux cont = function
-    | []   -> cont 
-    | h::t -> mk_aux (cont (mk_entry h)) t
-  in
-  mk_aux ul modules
-
-let welcome (modules : ASTpp.module_data list) =
-  html
-    (head ~title:"OGaml documentation" ~links:[
-                                               link ~href:"https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" ~rel:Rel_stylesheet ~mimetype:"text/css" ();
-                                               link ~href:"../css/monokai.css" ~rel:Rel_stylesheet ();
-                                               link ~href:"../css/doc.css" ~rel:Rel_stylesheet ();
-                                               link ~href:"../img/favicon-ogaml.ico" ~rel:Rel_icon ~mimetype:"image/x-icon" ()]
-                                       ~scripts:[Script_src "../script/highlight.pack.js";
-                                                 Script_src "https://code.jquery.com/jquery-1.10.2.js";
-                                                 Script_src "../script/doc.js";
-                                                 Js_text Docgen.highlight_init_code] ())
-    (body
-      (main
-        (h1 (text "Welcome on the documentation of OGaml") close)
-        (h2 (text "Main modules") close)
-        (Obj.magic (mk_modules modules) close)
-      close)
-    body_end)
-
 let copy src dest = 
   let command = Printf.sprintf "cp %s %s" src dest in
   if not (Sys.file_exists dest) then
     Unix.system command |> ignore
+
+let rec relative_root = function
+  | 0 -> ""
+  | n -> "../" ^ (relative_root (n-1))
+
+let gen_relative directory modules =
+  let open ASTpp in
+  let rec gen_aux directory modl =
+    let dir = Unix.getcwd () in
+    if not (Sys.file_exists directory) then 
+      Unix.mkdir directory 0o777;
+    Unix.chdir directory;
+    let output = open_out (String.lowercase modl.modulename ^ ".html") in
+    Printf.fprintf output "<!DOCTYPE html>\n<html>\n%s\n<body>%s\n%s</body>\n</html>"
+      (Docgen.gen_header (relative_root (List.length modl.hierarchy + 1)) modl.modulename)
+      (Docgen.gen_aside (relative_root (List.length modl.hierarchy + 1)) (Some modl) modules)
+      (Docgen.gen_main (relative_root (List.length modl.hierarchy + 1)) modl);
+    close_out output;
+    List.iter (fun modl' -> gen_aux (String.lowercase modl.modulename) modl')
+      modl.submodules;
+    List.iter (fun modl' -> gen_aux (String.lowercase modl.modulename) modl')
+      modl.signatures;
+    Unix.chdir dir
+  in
+  List.iter (gen_aux directory) modules
 
 let () = 
   if Array.length Sys.argv < 1 then begin
@@ -99,13 +49,14 @@ let () =
     |> List.tl
     |> List.map (Docgen.preprocess_file)
   in
-  List.iter (Docgen.gen "html/doc") modules;
-  let output = open_out "html/index.html" in
-  output_string output (export index);
-  close_out output;
+  gen_relative "html/doc" modules;
   let output = open_out "html/doc/doc.html" in
-  output_string output (export (welcome modules));
+  Printf.fprintf output "<!DOCTYPE html>\n<html>\n%s\n<body>%s\n%s</body>\n</html>"
+    (Docgen.gen_header "../" "Index")
+    (Docgen.gen_aside "../" None modules)
+    (Docgen.gen_index_main "../" modules);
   close_out output;
+  copy "src/doc/index.html" "html/index.html";
   copy "src/doc/doc.css" "html/css/doc.css";
   copy "src/doc/highlight.pack.js" "html/script/highlight.pack.js";
   copy "src/doc/doc.js" "html/script/doc.js";
