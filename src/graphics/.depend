@@ -1,7 +1,3 @@
-GL.cmo : ../math/ogamlMath.cmi GLTypes.cmi drawParameter.cmi drawMode.cmi \
-    color.cmi GL.cmi
-GL.cmx : ../math/ogamlMath.cmi GLTypes.cmi drawParameter.cmx drawMode.cmi \
-    color.cmx GL.cmi
 color.cmo : ../math/ogamlMath.cmi color.cmi
 color.cmx : ../math/ogamlMath.cmi color.cmi
 drawParameter.cmo : ../math/ogamlMath.cmi drawParameter.cmi
@@ -12,6 +8,10 @@ font.cmo : ../math/vector2i.cmi ../math/vector2f.cmi texture.cmi \
 font.cmx : ../math/vector2i.cmx ../math/vector2f.cmx texture.cmx \
     ../math/ogamlMath.cmi ../math/intRect.cmx image.cmx ../math/floatRect.cmx \
     color.cmx font.cmi
+GL.cmo : ../math/ogamlMath.cmi GLTypes.cmi drawParameter.cmi drawMode.cmi \
+    color.cmi GL.cmi
+GL.cmx : ../math/ogamlMath.cmi GLTypes.cmi drawParameter.cmx drawMode.cmi \
+    color.cmx GL.cmi
 image.cmo : ../math/vector2i.cmi ../math/ogamlMath.cmi ../math/intRect.cmi \
     color.cmi image.cmi
 image.cmx : ../math/vector2i.cmx ../math/ogamlMath.cmi ../math/intRect.cmx \
@@ -28,10 +28,10 @@ model.cmx : vertexArray.cmx ../math/vector3i.cmx ../math/vector3f.cmx \
     ../math/matrix3D.cmx indexArray.cmx color.cmx model.cmi
 mouse.cmo : window.cmi ../core/ogamlCore.cmi ../core/LL.cmi mouse.cmi
 mouse.cmx : window.cmx ../core/ogamlCore.cmi ../core/LL.cmx mouse.cmi
-program.cmo : state.cmi GLTypes.cmi GL.cmi program.cmi
-program.cmx : state.cmx GLTypes.cmi GL.cmx program.cmi
 programLibrary.cmo : state.cmi program.cmi programLibrary.cmi
 programLibrary.cmx : state.cmx program.cmx programLibrary.cmi
+program.cmo : state.cmi GLTypes.cmi GL.cmi program.cmi
+program.cmx : state.cmx GLTypes.cmi GL.cmx program.cmi
 shape.cmo : window.cmi vertexArray.cmi ../math/vector3f.cmi \
     ../math/vector2f.cmi uniform.cmi ../math/ogamlMath.cmi drawParameter.cmi \
     drawMode.cmi ../math/constants.cmi color.cmi shape.cmi
@@ -86,13 +86,13 @@ window.cmx : ../math/vector2i.cmx ../math/vector2f.cmx state.cmx \
     programLibrary.cmx ../math/ogamlMath.cmi ../core/ogamlCore.cmi \
     ../core/LL.cmx ../math/intRect.cmx GL.cmx ../math/floatRect.cmx \
     drawParameter.cmx ../core/contextSettings.cmx color.cmx window.cmi
-GL.cmi : ../math/ogamlMath.cmi GLTypes.cmi drawParameter.cmi drawMode.cmi \
-    color.cmi
-GLTypes.cmi :
 color.cmi :
 drawMode.cmi :
 drawParameter.cmi : ../math/ogamlMath.cmi
 font.cmi : texture.cmi ../math/ogamlMath.cmi
+GL.cmi : ../math/ogamlMath.cmi GLTypes.cmi drawParameter.cmi drawMode.cmi \
+    color.cmi
+GLTypes.cmi :
 image.cmi : ../math/ogamlMath.cmi color.cmi
 indexArray.cmi : state.cmi
 keyboard.cmi : ../core/ogamlCore.cmi
@@ -100,8 +100,8 @@ model.cmi : vertexArray.cmi ../math/ogamlMath.cmi indexArray.cmi color.cmi
 mouse.cmi : window.cmi ../math/ogamlMath.cmi ../core/ogamlCore.cmi
 objAST.cmi : ../math/ogamlMath.cmi
 ogamlGraphics.cmi : ../math/ogamlMath.cmi ../core/ogamlCore.cmi
-program.cmi : state.cmi GLTypes.cmi GL.cmi
 programLibrary.cmi : state.cmi program.cmi
+program.cmi : state.cmi GLTypes.cmi GL.cmi
 shape.cmi : window.cmi ../math/ogamlMath.cmi drawParameter.cmi color.cmi
 sprite.cmi : window.cmi texture.cmi ../math/ogamlMath.cmi drawParameter.cmi
 state.cmi : ../math/ogamlMath.cmi GLTypes.cmi GL.cmi drawParameter.cmi \

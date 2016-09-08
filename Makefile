@@ -20,7 +20,7 @@ GRAPH_FILES = src/graphics/*$(GRAPHICS_LIB).*
 
 UTILS_FILES = src/utils/*$(UTILS_LIB).*
 
-DOC_FILES = src/graphics/$(GRAPHICS_LIB).mli src/core/$(CORE_LIB).mli src/math/$(MATH_LIB).mli src/utils/$(UTILS_LIB).mli
+DOC_FILES = src/core/$(CORE_LIB).mli src/graphics/$(GRAPHICS_LIB).mli src/math/$(MATH_LIB).mli src/utils/$(UTILS_LIB).mli
 
 
 # Examples constants

@@ -111,6 +111,10 @@ and process_comment s =
   |> List.filter (function
                   | PP_CommentString s -> not (Str.string_match (Str.regexp " *$") s 0)
                   | c -> true)
+  |> List.partition (function 
+                     | PP_Related _ -> false
+                     | _ -> true)
+  |> fun (l1,l2) -> (l1 @ l2)
 
 and process_field field comment = 
   match field with
@@ -211,6 +215,8 @@ and pp hierarchy modulename ast : ASTpp.module_data =
   let ast = List.filter (function Comment s -> false | _ -> true) ast in
   let signatures,ast  = extract_sigs hierarchy modulename ast in
   let submodules,ast  = extract_submodules hierarchy modulename ast in
+  let signatures = List.rev signatures in
+  let submodules = List.rev submodules in
   let description,ast = get_description ast in
   let description = process_comment description in
   let contents = process_module ast in
@@ -239,13 +245,14 @@ let rec comment_to_html depth ppf comment =
       |> Str.split (Str.regexp "\\.")
       |> String.concat "/"
     in
-    Format.fprintf ppf "<span class=\"see\">See : <a href=\"%s%s.html\">%s</a></span>%a" 
+    Format.fprintf ppf "<br><span class=\"see\">See : <a href=\"%s%s.html\">%s</a></span>%a" 
       (to_root depth) link s
       (comment_to_html depth) t
 
 let mk_entry ppf s f2 a2 f3 a3 = 
   Format.fprintf ppf
   "<article>
+     <span class=\"arrow-right arrow\"></span>
      <span class=\"showmore\">
         <figure class=\"highlight\">
           <pre><code class=\"OCaml\">%s</code></pre>
@@ -261,9 +268,9 @@ let rec module_to_html depth ppf mdl =
   match mdl with
   | [] -> ()
   | (PP_Title s)::t ->
-    Format.fprintf ppf "<h3>%s</h3>@\n%a" s (module_to_html depth) t
+    Format.fprintf ppf "<br><h3>%s</h3>@\n%a" s (module_to_html depth) t
   | (PP_Comment c)::t ->
-    Format.fprintf ppf "%a@\n%a" (comment_to_html depth) c (module_to_html depth) t
+    Format.fprintf ppf "<p>%a</p>@\n%a" (comment_to_html depth) c (module_to_html depth) t
   | (PP_Type (typedata, comment))::t -> 
     let valtext = 
       match (typedata.tparam, typedata.texpr) with
@@ -390,6 +397,7 @@ let highlight_init_code =
 let to_html_pp ppf modl depth = 
   let print_head ppf = 
     Format.fprintf ppf "<head>@\n@[<hov2>  <title>OGaml documentation - %s</title>
+                                        @\n<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,700' rel='stylesheet' type='text/css'>
                                         @\n<link rel=\"stylesheet\" href=\"%scss/monokai.css\">
                                         @\n<link rel=\"stylesheet\" href=\"%scss/doc.css\">
                                         @\n<script src=\"%sscript/highlight.pack.js\"></script>

@@ -107,7 +107,11 @@ val b : ('a, 'b, phrasing, phrasing) tag
 val blockquote : ?cite: string -> ('a, 'b, flow, flow) tag
 val br : ('a, 'b, 'c) void_tag
 val hr : ('a, 'b, flow) void_tag
-val img : ?src:string -> ('a, flow, flow) void_tag
+val img : ?src:string -> 
+          ?alt:string -> 
+          ?width:string -> 
+          ?height:string -> 
+          ('a, 'b, 'c) void_tag
 val canvas : ?height: string ->
              ?width: string ->
              ('a, 'b, 'c, 'c) tag

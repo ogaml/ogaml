@@ -3,7 +3,9 @@ open Docgen
 
 let index =
   html
-    (head ~title:"OGaml library" ~links:[link ~href:"css/monokai.css" ~rel:Rel_stylesheet ();
+    (head ~title:"OGaml library" ~links:[
+                                         link ~href:"https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" ~rel:Rel_stylesheet ~mimetype:"text/css" ();
+                                         link ~href:"css/monokai.css" ~rel:Rel_stylesheet ();
                                          link ~href:"css/home.css" ~rel:Rel_stylesheet ();
                                          link ~href:"img/favicon-ogaml.ico" ~rel:Rel_icon ~mimetype:"image/x-icon" ()]
                                  ~scripts:[Script_src "script/highlight.pack.js";
@@ -11,14 +13,14 @@ let index =
                                            Script_src "script/doc.js";
                                            Js_text Docgen.highlight_init_code] ())
     (body
-      (img ~src:"img/ogaml-logo.svg" ())
+      (h1 (img ~src:"img/ogaml-logo.svg" ~alt:"OGAML" ~width:"520pt" ()) (Obj.magic close))
       (h2 (text "A powerful OCaml multimedia library") close)
       (p 
         (text "Check out the ")
         (a ~href:"doc/doc.html"
           (text "documentation")
         close)
-        (text " for more information about the modules of OGaml")
+        (text " for more information about the modules of OGaml.")
       close)
       (p
         (text "If you want to contribute or just see the sources of OGaml, check out our ")
@@ -27,7 +29,7 @@ let index =
         close)
         (text ". This very website is also ")
         (a ~href:"https://github.com/ogaml/ogaml.github.io"
-          (text "available on Github")
+          (text "available on Github.")
         close)
       close)
     body_end)
@@ -57,7 +59,9 @@ let mk_modules modules =
 
 let welcome (modules : ASTpp.module_data list) =
   html
-    (head ~title:"OGaml documentation" ~links:[link ~href:"../css/monokai.css" ~rel:Rel_stylesheet ();
+    (head ~title:"OGaml documentation" ~links:[
+                                               link ~href:"https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" ~rel:Rel_stylesheet ~mimetype:"text/css" ();
+                                               link ~href:"../css/monokai.css" ~rel:Rel_stylesheet ();
                                                link ~href:"../css/doc.css" ~rel:Rel_stylesheet ();
                                                link ~href:"../img/favicon-ogaml.ico" ~rel:Rel_icon ~mimetype:"image/x-icon" ()]
                                        ~scripts:[Script_src "../script/highlight.pack.js";

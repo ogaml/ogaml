@@ -189,6 +189,27 @@ let export_audio_info i =
    | None -> ""
    | Some u -> " src=\"" ^ u ^ "\"")
 
+type img_info = {
+  img_src : string option;
+  img_alt : string option;
+  img_width : string option;
+  img_height : string option
+}
+
+let export_img_info i = 
+  (match i.img_src with
+   | None -> ""
+   | Some t -> " src=\"" ^ t ^ "\"") ^ 
+  (match i.img_alt with
+   | None -> ""
+   | Some t -> " alt=\"" ^ t ^ "\"") ^ 
+  (match i.img_width with
+   | None -> ""
+   | Some t -> " width=\"" ^ t ^ "\"") ^ 
+  (match i.img_height with
+   | None -> ""
+   | Some t -> " height=\"" ^ t ^ "\"")
+
 type abbr_info = {
   title : string option
 }
@@ -268,7 +289,7 @@ type _ body_tag =
   | Tag_b          : phrasing body               -> phrasing  body_tag
   | Tag_blockquote : blockquote_info * flow body -> flow      body_tag
   | Tag_br         :                                'a        body_tag
-  | Tag_img        : string                      -> flow      body_tag
+  | Tag_img        : img_info                    -> 'a        body_tag
   | Tag_canvas     : canvas_info * 'a body       -> 'a        body_tag
   | Tag_cite       : phrasing body               -> phrasing  body_tag
   | Tag_code       : phrasing body               -> phrasing  body_tag
@@ -353,8 +374,14 @@ let br ?id =
 let hr ?id =
   voidtag id Tag_hr
 
-let img ?src:(src="") ?id =
-  voidtag id (Tag_img src)
+let img ?src ?alt ?width ?height ?id =
+  let attrs = {
+    img_src = src;
+    img_alt = alt;
+    img_width = width;
+    img_height = height
+  } in
+  voidtag id (Tag_img attrs)
 
 let canvas ?height ?width ?id =
   mktag id (fun c -> Tag_canvas ({ height ; width }, c))
@@ -482,7 +509,7 @@ and export_tag : type a. string -> a full_tag -> string
                     (export_content (indent ^ tab) c)
   | Tag_br -> indent ^ "<br" ^ (export_generic_attr attr) ^ " />\n"
   | Tag_hr -> indent ^ "<hr" ^ (export_generic_attr attr) ^ " />\n"
-  | Tag_img src -> indent ^ "<img src=" ^ src ^ " " ^ (export_generic_attr attr) ^ " />\n"
+  | Tag_img i -> indent ^ "<img" ^ (export_img_info i) ^ (export_generic_attr attr) ^ " />\n"
   | Tag_canvas (i,c) ->
     export_tag_prim indent "canvas" (export_canvas_info i) attr
                     (export_content (indent ^ tab) c)

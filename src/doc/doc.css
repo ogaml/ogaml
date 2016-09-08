@@ -342,7 +342,7 @@ article p {
 article div.more {
   margin-top: 2pt;
   margin-bottom: 0;
-  line-height: 2;
+  line-height: 1.5;
 }
 
 .arrow {
@@ -468,4 +468,10 @@ pre code.hljs {
 
 code.hljs {
   display: inline;
+}
+
+figure {
+  margin-left:5pt;
+  margin-top:0pt;
+  margin-bottom:0pt;
 }
