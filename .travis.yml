@@ -34,6 +34,7 @@ addons:
         - libudev-dev
         - mesa-utils
         - libgl1-mesa-glx
+
 before_install:
   - sudo add-apt-repository -y ppa:oibaf/graphics-drivers
   - sudo apt-get update -qq -y
@@ -45,6 +46,4 @@ before_script:
   - export LIBGL_ALWAYS_SOFTWARE=1
   - xpra --xvfb="Xorg +extension GLX +extension RANDR +extension RENDER -config `pwd`/test/dummy.xorg.conf -logfile ${HOME}/.xpra/xorg.log"  start :99
   - sleep 3 
-  - LIBGL_ALWAYS_SOFTWARE=1 glxinfo
-  - glxinfo
   - cat ${HOME}/.xpra/xorg.log
