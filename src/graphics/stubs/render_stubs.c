@@ -47,6 +47,20 @@ caml_gl_error(value unit)
 }
 
 
+// INPUT   a parameter
+// OUTPUT  returns the integer value of the parameter
+CAMLprim value
+caml_gl_get_integerv(value par)
+{
+  CAMLparam1(par);
+
+  int data;
+  glGetIntegerv(Parameter_val(par),&data);
+
+  CAMLreturn(Val_int(data));
+}
+
+
 // INPUT   four values r g b a
 // OUTPUT  nothing, sets the clear color
 CAMLprim value
@@ -171,18 +185,6 @@ caml_glsl_version(value unit)
 {
   CAMLparam0();
   CAMLreturn(caml_copy_string(glGetString(GL_SHADING_LANGUAGE_VERSION)));
-}
-
-
-// INPUT   nothing
-// OUTPUT  the maximal number of textures
-CAMLprim value
-caml_max_textures(value unit)
-{
-  CAMLparam0();
-  int res;
-  glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &res);
-  CAMLreturn(Val_int(res));
 }
 
 

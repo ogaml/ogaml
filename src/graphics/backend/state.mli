@@ -10,8 +10,32 @@
 (** GL state exception *)
 exception Invalid_state of string
 
+(** Capabilities of the context *)
+type capabilities = {
+  max_3D_texture_size       : int;
+  max_array_texture_layers  : int;
+  max_color_texture_samples : int;
+  max_cube_map_texture_size : int;
+  max_depth_texture_samples : int;
+  max_elements_indices      : int;
+  max_elements_vertices     : int;
+  max_framebuffer_width     : int;
+  max_framebuffer_height    : int;
+  max_framebuffer_layers    : int;
+  max_framebuffer_samples   : int;
+  max_integer_samples       : int;
+  max_renderbuffer_size     : int;
+  max_texture_buffer_size   : int;
+  max_texture_image_units   : int;
+  max_texture_size          : int;
+  max_color_attachments     : int;
+}
+
 (** Type of the GL state *)
 type t
+
+(** Returns the capabilities of the context *)
+val capabilities : t -> capabilities
 
 (** Returns the current OpenGL version. Format : (major, minor) *)
 val version : t -> (int * int)
@@ -24,9 +48,6 @@ val glsl_version : t -> int
 
 (** Returns true iff the GLSL version passed as parameter is supported *)
 val is_glsl_version_supported : t -> int -> bool
-
-(** Returns the maximal number of textures *)
-val max_textures : t -> int
 
 (** Asserts that no GL error occured *)
 val assert_no_error : t -> unit
@@ -84,9 +105,6 @@ module LL : sig
 
   (** Sets the current value of MSAA *)
   val set_msaa : t -> bool -> unit
-
-  (** Returns the number of texture units available *)
-  val textures : t -> int
 
   (** Sets the currently active texture unit *)
   val set_texture_unit : t -> int -> unit

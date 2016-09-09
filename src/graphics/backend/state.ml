@@ -1,11 +1,33 @@
 
 exception Invalid_state of string
 
+
+type capabilities = {
+  max_3D_texture_size       : int;
+  max_array_texture_layers  : int;
+  max_color_texture_samples : int;
+  max_cube_map_texture_size : int;
+  max_depth_texture_samples : int;
+  max_elements_indices      : int;
+  max_elements_vertices     : int;
+  max_framebuffer_width     : int;
+  max_framebuffer_height    : int;
+  max_framebuffer_layers    : int;
+  max_framebuffer_samples   : int;
+  max_integer_samples       : int;
+  max_renderbuffer_size     : int;
+  max_texture_buffer_size   : int;
+  max_texture_image_units   : int;
+  max_texture_size          : int;
+  max_color_attachments     : int;
+}
+
+
 type t = {
+  capabilities : capabilities;
   major : int;
   minor : int;
   glsl  : int;
-  textures : int;
   sprite_program : ProgramInternal.t;
   shape_program  : ProgramInternal.t;
   text_program   : ProgramInternal.t;
@@ -35,6 +57,8 @@ type t = {
 
 let error msg = raise (Invalid_state msg)
 
+let capabilities t = t.capabilities
+
 let version s = 
   (s.major, s.minor)
 
@@ -49,9 +73,6 @@ let glsl_version s =
 
 let is_glsl_version_supported s v = 
   v <= s.glsl
-
-let max_textures s = 
-  GL.Pervasives.max_textures ()
 
 let assert_no_error s = 
   assert (GL.Pervasives.error () = None)
@@ -76,12 +97,31 @@ module LL = struct
       let str = GL.Pervasives.glsl_version () in
       Scanf.sscanf str "%i.%i" (fun a b -> a * 100 + (convert b))
     in
-    let textures = GL.Pervasives.max_textures () in
+    let capabilities = {
+      max_3D_texture_size       = GL.Pervasives.get_integerv GLTypes.Parameter.Max3DTextureSize      ;
+      max_array_texture_layers  = GL.Pervasives.get_integerv GLTypes.Parameter.MaxArrayTextureLayers ;
+      max_color_texture_samples = GL.Pervasives.get_integerv GLTypes.Parameter.MaxColorTextureSamples;
+      max_cube_map_texture_size = GL.Pervasives.get_integerv GLTypes.Parameter.MaxCubeMapTextureSize ;
+      max_depth_texture_samples = GL.Pervasives.get_integerv GLTypes.Parameter.MaxDepthTextureSamples;
+      max_elements_indices      = GL.Pervasives.get_integerv GLTypes.Parameter.MaxElementsIndices    ;
+      max_elements_vertices     = GL.Pervasives.get_integerv GLTypes.Parameter.MaxElementsVertices   ;
+      max_framebuffer_width     = GL.Pervasives.get_integerv GLTypes.Parameter.MaxFramebufferWidth   ;
+      max_framebuffer_height    = GL.Pervasives.get_integerv GLTypes.Parameter.MaxFramebufferHeight  ;
+      max_framebuffer_layers    = GL.Pervasives.get_integerv GLTypes.Parameter.MaxFramebufferLayers  ;
+      max_framebuffer_samples   = GL.Pervasives.get_integerv GLTypes.Parameter.MaxFramebufferSamples ;
+      max_integer_samples       = GL.Pervasives.get_integerv GLTypes.Parameter.MaxIntegerSamples     ;
+      max_renderbuffer_size     = GL.Pervasives.get_integerv GLTypes.Parameter.MaxRenderbufferSize   ;
+      max_texture_buffer_size   = GL.Pervasives.get_integerv GLTypes.Parameter.MaxTextureBufferSize  ;
+      max_texture_image_units   = GL.Pervasives.get_integerv GLTypes.Parameter.MaxTextureImageUnits  ;
+      max_texture_size          = GL.Pervasives.get_integerv GLTypes.Parameter.MaxTextureSize        ;
+      max_color_attachments     = GL.Pervasives.get_integerv GLTypes.Parameter.MaxColorAttachments   ;
+    }
+    in
     {
+      capabilities;
       major   ;
       minor   ;
       glsl    ;
-      textures;
       sprite_program = ProgramInternal.Sources.create_sprite (-3) glsl;
       shape_program  = ProgramInternal.Sources.create_shape  (-2) glsl;
       text_program   = ProgramInternal.Sources.create_text   (-1) glsl;
@@ -92,7 +132,7 @@ module LL = struct
       depth_function = DrawParameter.DepthTest.Less;
       texture_id   = 0;
       texture_unit = 0;
-      bound_texture = Array.make textures None;
+      bound_texture = Array.make capabilities.max_texture_image_units None;
       program_id = 0;
       linked_program = None;
       bound_vbo = None;
@@ -148,9 +188,6 @@ module LL = struct
 
   let set_msaa s b = s.msaa <- b
 
-  let textures s = 
-    s.textures
-
   let texture_unit s = 
     s.texture_unit
 
@@ -162,21 +199,21 @@ module LL = struct
     s.texture_id - 1
 
   let bound_texture s i = 
-    if i >= s.textures || i < 0 then
+    if i >= s.capabilities.max_texture_image_units || i < 0 then
       Printf.ksprintf error "Invalid texture unit %i" i;
     match s.bound_texture.(i) with
     | None       -> None
     | Some (_,t,_) -> Some t
 
   let bound_target s i = 
-    if i >= s.textures || i < 0 then
+    if i >= s.capabilities.max_texture_image_units || i < 0 then
       Printf.ksprintf error "Invalid texture unit %i" i;
     match s.bound_texture.(i) with
     | None       -> None
     | Some (_,_,t) -> Some t
 
   let set_bound_texture s i t = 
-    if i >= s.textures || i < 0 then
+    if i >= s.capabilities.max_texture_image_units || i < 0 then
       Printf.ksprintf error "Invalid texture unit %i" i;
     s.bound_texture.(i) <- t
 

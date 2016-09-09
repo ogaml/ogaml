@@ -358,6 +358,9 @@ GLenum TextureFormat_val(value fmt)
     case 5:
       return GL_DEPTH24_STENCIL8;
 
+    case 6:
+      return GL_STENCIL_INDEX8;
+
     default:
       caml_failwith("Caml variant error in TextureFormat_val(1)");
   }
@@ -508,6 +511,9 @@ GLenum Attachment_val(value att)
 
       case 1:
         return GL_STENCIL_ATTACHMENT;
+
+      case 2:
+        return GL_DEPTH_STENCIL_ATTACHMENT;
           
       default:
         caml_failwith("Caml variant error in Attachment_val (long val)");
@@ -521,5 +527,66 @@ GLenum Attachment_val(value att)
       default:
         caml_failwith("Caml variant error in Attachment_val (tag val)");
     }
+  }
+}
+
+
+GLenum Parameter_val(value par)
+{
+  switch(Int_val(par))
+  {
+    case 0:
+      return GL_MAX_3D_TEXTURE_SIZE;
+
+    case 1:
+      return GL_MAX_ARRAY_TEXTURE_LAYERS;
+
+    case 2:
+      return GL_MAX_COLOR_TEXTURE_SAMPLES;
+
+    case 3:
+      return GL_MAX_CUBE_MAP_TEXTURE_SIZE;
+
+    case 4:
+      return GL_MAX_DEPTH_TEXTURE_SAMPLES;
+
+    case 5:
+      return GL_MAX_ELEMENTS_INDICES;
+
+    case 6:
+      return GL_MAX_ELEMENTS_VERTICES;
+
+    case 7:
+      return GL_MAX_FRAMEBUFFER_WIDTH;
+
+    case 8:
+      return GL_MAX_FRAMEBUFFER_HEIGHT;
+
+    case 9:
+      return GL_MAX_FRAMEBUFFER_LAYERS;
+
+    case 10:
+      return GL_MAX_FRAMEBUFFER_SAMPLES;
+
+    case 11:
+      return GL_MAX_INTEGER_SAMPLES;
+
+    case 12:
+      return GL_MAX_RENDERBUFFER_SIZE;
+      
+    case 13:
+      return GL_MAX_TEXTURE_BUFFER_SIZE;
+
+    case 14:
+      return GL_MAX_TEXTURE_IMAGE_UNITS;
+
+    case 15:
+      return GL_MAX_TEXTURE_SIZE;
+
+    case 16:
+      return GL_MAX_COLOR_ATTACHMENTS;
+
+    default:
+      caml_failwith("Caml variant error in Parameter_val (1)");
   }
 }

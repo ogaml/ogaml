@@ -314,8 +314,32 @@ module State : sig
     * (for example, binding a texture to an invalid texture unit) *)
   exception Invalid_state of string
 
+  (** Rendering capabilities of a context *)
+  type capabilities = {
+    max_3D_texture_size       : int;
+    max_array_texture_layers  : int;
+    max_color_texture_samples : int;
+    max_cube_map_texture_size : int;
+    max_depth_texture_samples : int;
+    max_elements_indices      : int;
+    max_elements_vertices     : int;
+    max_framebuffer_width     : int;
+    max_framebuffer_height    : int;
+    max_framebuffer_layers    : int;
+    max_framebuffer_samples   : int;
+    max_integer_samples       : int;
+    max_renderbuffer_size     : int;
+    max_texture_buffer_size   : int;
+    max_texture_image_units   : int;
+    max_texture_size          : int;
+    max_color_attachments     : int;
+  }
+
   (** Type of a GL state *)
   type t
+
+  (** Returns the rendering capabilities of a context *)
+  val capabilities : t -> capabilities
 
   (** Returns the GL version supported by this state in (major, minor) format *)
   val version : t -> (int * int)
@@ -332,9 +356,6 @@ module State : sig
 
   (** Asserts that no openGL error occured internally. Used for debugging and testing. *)
   val assert_no_error : t -> unit
-
-  (** Returns the number of available texture units *)
-  val max_textures : t -> int
 
   (** Flushes the GL buffer *)
   val flush : t -> unit
@@ -501,28 +522,49 @@ module Framebuffer : sig
   (** This module provides a safe way to create framebuffer objects (FBO) and 
     * attach textures to them. *)
 
+  (** Raised if an error occurs at creation or during an attachment *)
+  exception Error of string
+
   (** Type of a framebuffer object *)
   type t
 
   (** Creates a framebuffer from a valid context *)
   val create : (module RenderTarget.T with type t = 'a) -> 'a -> t
 
-  (** Returns the maximal number of color attachments for a framebuffer *)
-  val max_color_attachments : t -> int
-
-  (** Attaches a valid color attachment to a framebuffer *)
+  (** Attaches a valid color attachment to a framebuffer at a given index.
+    * Raises $Error$ if the index is greater than the maximum number of color
+    * attachments allowed by the context, or if the attachment is larger
+    * than the maximum size allowed by the context.
+    *
+    * @see:OgamlGraphics.Attachment.ColorAttachable
+    * @see:OgamlGraphics.State *)
   val attach_color : (module Attachment.ColorAttachable with type t = 'a) 
                       -> t -> int -> 'a -> unit
 
-  (** Attaches a valid depth attachment to a framebuffer *)
+  (** Attaches a valid depth attachment to a framebuffer.
+    * Raises $Error$ if the attachment is larger than the maximum size 
+    * allowed by the context.
+    *
+    * @see:OgamlGraphics.Attachment.DepthAttachable
+    * @see:OgamlGraphics.State *)
   val attach_depth : (module Attachment.DepthAttachable with type t = 'a)
                       -> t -> 'a -> unit
 
-  (** Attaches a valid stencil attachment to a framebuffer *)
+  (** Attaches a valid stencil attachment to a framebuffer.
+    * Raises $Error$ if the attachment is larger than the maximum size 
+    * allowed by the context.
+    *
+    * @see:OgamlGraphics.Attachment.StencilAttachable
+    * @see:OgamlGraphics.State *)
   val attach_stencil : (module Attachment.StencilAttachable with type t = 'a)
                       -> t -> 'a -> unit
 
-  (** Attaches a valid depth and stencil attachment to a framebuffer *)
+  (** Attaches a valid depth and stencil attachment to a framebuffer.
+    * Raises $Error$ if the attachment is larger than the maximum size 
+    * allowed by the context.
+    *
+    * @see:OgamlGraphics.Attachment.DepthStencilAttachable
+    * @see:OgamlGraphics.State *)
   val attach_depthstencil : (module Attachment.DepthStencilAttachable with type t = 'a)
                       -> t -> 'a -> unit
 

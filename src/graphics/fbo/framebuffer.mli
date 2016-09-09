@@ -1,9 +1,9 @@
 
+exception Error of string
+
 type t
 
 val create : (module RenderTarget.T with type t = 'a) -> 'a -> t
-
-val max_color_attachments : t -> int
 
 val attach_color : (module Attachment.ColorAttachable with type t = 'a) 
                     -> t -> int -> 'a -> unit

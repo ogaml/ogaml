@@ -36,8 +36,7 @@ the following modules:
     state mutability is hidden behind wrappers. 
 
   * OgamlUtils (WIP) - provides several useful functions and data structures for 
-    game development, such as interpolators, graphs or UTF8-encoded strings 
-    (still in OgamlCore for now).
+    game development, such as interpolators, graphs or UTF8-encoded strings.
     
 You can find some examples in the corresponding directory as well as on the 
 documentation http://ogaml.github.io (broken for now).
@@ -108,11 +107,11 @@ OGAML provides advanced functionalities:
   
 You will need the following dependancies: 
 
-  * cppo (preprocessor)
+  * cppo (preprocessor, available on Opam)
 
-  * x11 (Linux only)
+  * x11 (Linux)
 
-  * OpenGL libraries
+  * OpenGL libraries (3.0 minimum)
 
 Then `make install` should do the trick. You can test it on some examples 
 `make examples` or on Travis' tests `make tests`.

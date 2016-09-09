@@ -71,6 +71,7 @@ module TextureFormat = struct
     | RGBA8
     | Depth24
     | Depth24Stencil8
+    | Stencil8
 
 end
 
@@ -166,6 +167,30 @@ module GlAttachment = struct
     | Color of int
     | Depth
     | Stencil
+    | DepthStencil
 
 end
 
+(** Parameters *)
+module Parameter = struct
+
+  type t = 
+    | Max3DTextureSize
+    | MaxArrayTextureLayers
+    | MaxColorTextureSamples
+    | MaxCubeMapTextureSize
+    | MaxDepthTextureSamples
+    | MaxElementsIndices
+    | MaxElementsVertices
+    | MaxFramebufferWidth
+    | MaxFramebufferHeight
+    | MaxFramebufferLayers
+    | MaxFramebufferSamples
+    | MaxIntegerSamples
+    | MaxRenderbufferSize
+    | MaxTextureBufferSize
+    | MaxTextureImageUnits
+    | MaxTextureSize
+    | MaxColorAttachments
+
+end

@@ -82,6 +82,9 @@ module Pervasives : sig
   (** Returns the GL error on top of the stack *)
   val error : unit -> GLTypes.GlError.t option
 
+  (** Returns an integer value *)
+  val get_integerv : GLTypes.Parameter.t -> int
+
   (** Sets the clear color *)
   val color : float -> float -> float -> float -> unit
 
@@ -105,9 +108,6 @@ module Pervasives : sig
 
   (** Returns the current gl version *)
   val gl_version : unit -> string
-
-  (** Returns the maximal number of textures *)
-  val max_textures : unit -> int
 
   (** Flushes the current buffer *)
   val flush : unit -> unit

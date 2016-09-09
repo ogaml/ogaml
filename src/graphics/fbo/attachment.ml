@@ -5,6 +5,7 @@ module ColorAttachment = struct
   type t = 
     | Texture2D of GL.Texture.t * int
     | Texture2DArray of GL.Texture.t * int * int
+    | ColorRBO of GL.RBO.t
 
 end
 
@@ -17,13 +18,15 @@ end
 
 module StencilAttachment = struct
 
-  type t = unit
+  type t = 
+    | StencilRBO of GL.RBO.t
 
 end
 
 module DepthStencilAttachment = struct
 
-  type t = unit
+  type t = 
+    | DepthStencilRBO of GL.RBO.t
 
 end
 

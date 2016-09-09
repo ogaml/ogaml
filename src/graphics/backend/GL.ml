@@ -145,6 +145,8 @@ module Pervasives = struct
 
   external error : unit -> GLTypes.GlError.t option = "caml_gl_error"
 
+  external get_integerv : GLTypes.Parameter.t -> int = "caml_gl_get_integerv"
+
   external color : float -> float -> float -> float -> unit = "caml_clear_color"
 
   external viewport : int -> int -> int -> int -> unit = "caml_viewport"
@@ -160,8 +162,6 @@ module Pervasives = struct
   external glsl_version : unit -> string = "caml_glsl_version"
 
   external gl_version : unit -> string = "caml_gl_version"
-
-  external max_textures : unit -> int = "caml_max_textures"
 
   external flush : unit -> unit = "caml_glflush"
 
