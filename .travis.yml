@@ -11,3 +11,4 @@ env:
 os:
 - linux
 
+dist: stretch

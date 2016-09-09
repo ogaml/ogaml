@@ -3,6 +3,9 @@
 OPAM_DEPEND="cppo menhir"
 
 export DISPLAY=:99.0
+export LIBGL_ALWAYS_SOFTWARE=1
+xpra --xvfb="Xorg +extension GLX +extension RANDR +extension RENDER -config `pwd`/test/dummy.xorg.conf -logfile ${HOME}/.xpra/xorg.log"  start :99
+sleep 3
 sh -e /etc/init.d/xvfb start
 
 case "$OCAML_VERSION" in
