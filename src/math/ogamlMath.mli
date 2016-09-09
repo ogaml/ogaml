@@ -1,3 +1,4 @@
+(** Mathematical helpers for data manipulation and rendering with OpenGL *)
 
 (** Contains various useful constants *)
 module Constants : sig
