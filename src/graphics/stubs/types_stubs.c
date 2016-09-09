@@ -126,7 +126,8 @@ int Val_attrib_type(GLenum type)
     case GL_FLOAT_MAT4   : return 16;
     case GL_SAMPLER_1D   : return 17;
     case GL_SAMPLER_2D   : return 18;
-    case GL_SAMPLER_3D   : return 19;
+    case GL_SAMPLER_2D_ARRAY : return 19;
+    case GL_SAMPLER_3D   : return 20;
     default: caml_failwith("Caml variant error in Val_type(1)");
   }
 }

@@ -221,14 +221,20 @@ module Fx = struct
            ~text ~target () =
     let state = M.state target in
     let program = State.LL.text_drawing state in
-    let texture = Font.texture (module M) target text.font text.size in
+    let texture = Font.texture (module M) target text.font in
     let size = Vector2f.from_int (M.size target) in
-    let tsize = Vector2f.from_int (Texture.Texture2D.size texture) in
+    let index = Font.size_index text.font text.size in
+    let tsize = 
+      Texture.Texture2DArray.size texture
+      |> Vector3i.project
+      |> Vector2f.from_int
+    in
     let uniform =
       Uniform.empty
       |> Uniform.vector2f "window_size" size
       |> Uniform.vector2f "atlas_size" tsize
-      |> Uniform.texture2D "atlas" texture
+      |> Uniform.texture2Darray "atlas" texture
+      |> Uniform.int "atlas_offset" index
     in
     let vertices = text.vertices in
     VertexArray.draw (module M)
@@ -371,14 +377,20 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
          ~text ~target () =
   let state = M.state target in
   let program = State.LL.text_drawing state in
-  let texture = Font.texture (module M) target text.font text.size in
+  let texture = Font.texture (module M) target text.font in
   let size = Vector2f.from_int (M.size target) in
-  let tsize = Vector2f.from_int (Texture.Texture2D.size texture) in
+  let index = Font.size_index text.font text.size in
+  let tsize = 
+    Texture.Texture2DArray.size texture
+    |> Vector3i.project
+    |> Vector2f.from_int
+  in
   let uniform =
     Uniform.empty
     |> Uniform.vector2f "window_size" size
     |> Uniform.vector2f "atlas_size" tsize
-    |> Uniform.texture2D "atlas" texture
+    |> Uniform.texture2Darray "atlas" texture
+    |> Uniform.int "atlas_offset" index
   in
   let vertices = 
     let vtx = text.vertices in

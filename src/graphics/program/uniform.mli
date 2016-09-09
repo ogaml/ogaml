@@ -45,6 +45,9 @@ val color : string -> Color.t -> t -> t
 (** Adds a 2D texture to a uniform structure *)
 val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
 
+(** Adds a 2D texture array to a uniform structure *)
+val texture2Darray : string -> ?tex_unit:int -> Texture.Texture2DArray.t -> t -> t
+
 
 module LL : sig
 

@@ -1,3 +1,5 @@
+(** Base module of OGaml, defines events and low-level window management *)
+
 (** Mouse buttons *)
 module Button : sig
 

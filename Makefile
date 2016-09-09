@@ -20,7 +20,7 @@ GRAPH_FILES = src/graphics/*$(GRAPHICS_LIB).*
 
 UTILS_FILES = src/utils/*$(UTILS_LIB).*
 
-DOC_FILES = src/graphics/$(GRAPHICS_LIB).mli src/core/$(CORE_LIB).mli src/math/$(MATH_LIB).mli src/utils/$(UTILS_LIB).mli
+DOC_FILES = src/core/$(CORE_LIB).mli src/graphics/$(GRAPHICS_LIB).mli src/math/$(MATH_LIB).mli src/utils/$(UTILS_LIB).mli
 
 
 # Examples constants
@@ -65,9 +65,8 @@ tests: math_lib core_lib graphics_lib utils_lib
 	echo "Tests passed !"
 
 doc:
-	ocamlbuild -use-ocamlfind -use-menhir -I src/doc -package unix,str gendoc.native;
-	./gendoc.native $(DOC_FILES);
-	ocamlbuild -clean
+	ocamlbuild -use-ocamlfind -use-menhir -cflags -rectypes -I src/doc -package unix,str mkdoc.native;\
+	./mkdoc.native $(DOC_FILES)
 
 install: math_lib core_lib graphics_lib utils_lib
 	$(OCAMLFIND) install ogaml META $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES) $(UTILS_FILES)
@@ -79,7 +78,7 @@ uninstall:
 
 clean:
 	rm -rf *.out;
-	rm -rf doc;
+	rm -rf html;
 	ocamlbuild -clean;
 	cd src/core/ && make clean;
 	cd src/math/ && make clean;

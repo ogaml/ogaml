@@ -184,6 +184,7 @@ let load_size (t : t) s =
     }
   in
   t.nindex <- t.nindex + 1;
+  t.texture <- None;
   t.pages <- IntMap.add s new_page t.pages;
   new_page
 
@@ -315,10 +316,12 @@ let rebuild_full_texture (type s) (module M : RenderTarget.T with type t = s) ta
   in
   let l_imgs_strip = List.map (fun (_,i) -> i) l_imgs in
   let texture = 
-    if l_imgs_strip = [] then Texture.Texture2DArray.create (module M) target 
-                                                     ~mipmaps:`None (`Empty Vector3i.zero)
-    else Texture.Texture2DArray.create (module M) target 
-                                       ~mipmaps:`None (`Image l_imgs_strip)
+    if l_imgs_strip = [] then 
+      Texture.Texture2DArray.create (module M) target 
+        ~mipmaps:`None (`Empty Vector3i.zero)
+    else 
+      Texture.Texture2DArray.create (module M) target 
+        ~mipmaps:`None (`Image l_imgs_strip)
   in
   t.texture <- Some texture
 
@@ -341,6 +344,9 @@ let texture (type s) (module M : RenderTarget.T with type t = s) target t =
   | Some t -> t
 
 let size_index t s = 
-  let page = IntMap.find s t.pages in
-  page.index
-
+  try 
+    let page = IntMap.find s t.pages in
+    page.index
+  with
+    Not_found -> raise (Font_error "Font size's index not found")
+    

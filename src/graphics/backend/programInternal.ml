@@ -319,7 +319,8 @@ module Sources = struct
   "
 
   let fragment_shader_source_text_130 = "
-    uniform sampler2D atlas;
+    uniform sampler2DArray atlas;
+    uniform int atlas_offset;
 
     in vec2 frag_uv;
     in vec4 frag_color;
@@ -328,7 +329,7 @@ module Sources = struct
 
     void main() {
 
-      color = texture(atlas, frag_uv) * frag_color;
+      color = texture(atlas, vec3(frag_uv.xy,atlas_offset)) * frag_color;
 
     }
   "
@@ -340,10 +341,12 @@ module Sources = struct
     uniform vec2 window_size;
     uniform vec2 atlas_size;
 
+    attribute vec4 color;
     attribute vec3 position;
     attribute vec2 uv;
 
     varying vec2 frag_uv;
+    varying vec4 frag_color;
 
     void main() {
 
@@ -354,6 +357,7 @@ module Sources = struct
 
       frag_uv.x = uv.x / atlas_size.x;
       frag_uv.y = uv.y / atlas_size.y;
+      frag_color = color;
 
     }
   "
@@ -361,13 +365,15 @@ module Sources = struct
   let fragment_shader_source_text_110 = "
     #version 110
 
-    uniform sampler2D atlas;
+    uniform sampler2DArray atlas;
+    uniform int atlas_offset;
 
     varying vec2 frag_uv;
+    varying vec4 frag_color;
 
     void main() {
 
-      gl_FragColor = texture2D(atlas, frag_uv);
+      gl_FragColor = texture2D(atlas, vec3(frag_uv.xy,atlas_offset)) * frag_color;
 
     }
   "

@@ -942,7 +942,8 @@ module Font : sig
   val texture : (module RenderTarget.T with type t = 'a) -> 'a -> 
                 t -> Texture.Texture2DArray.t
 
-  (** Returns the index associated to a font size in the font's texture *)
+  (** Returns the index associated to a font size in the font's texture.
+    * Raises Font_error if the font size has not been loaded yet. *)
   val size_index : t -> int -> int
 
 end
@@ -1053,6 +1054,11 @@ module Uniform : sig
     * See $State.max_textures$ for the number of available units.
     * @see:OgamlGraphics.Texture.Texture2D *)
   val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
+
+  (** See texture2D. Type : sampler2Darray.
+    *
+    * @see:OgamlGraphics.Texture.Texture2DArray *)
+  val texture2Darray : string -> ?tex_unit:int -> Texture.Texture2DArray.t -> t -> t
 
 end
 

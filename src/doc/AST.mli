@@ -30,7 +30,7 @@ and type_param =
 and type_expr = 
   | ModuleType of string * type_expr
   | AtomType of string
-  | Record of (string option * string * type_expr) list
+  | Record of (bool * string option * string * type_expr) list
   | PolyVariant of variance * ((string * type_expr option) list)
   | PolyType of string
   | Arrow of type_expr * type_expr
@@ -39,4 +39,5 @@ and type_expr =
   | OptionalParam of string * type_expr
   | Variant of (string option * string * type_expr option) list
   | ParamType of (type_expr list * type_expr)
+  | FCModule of type_expr * (string * type_expr) list 
 

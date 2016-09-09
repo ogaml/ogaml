@@ -417,12 +417,12 @@ module Texture2DArray = struct
           | None     -> None
         in
         GL.Texture.subimage3D
-          GLTypes.TextureTarget.Texture2D 
+          GLTypes.TextureTarget.Texture2DArray
           lvl (0,0,layer)
-          (width lsr lvl, height lsr lvl, layer)
+          (width lsr lvl, height lsr lvl, 1)
           GLTypes.PixelFormat.RGBA
           data
-      ) imgs
+      ) imgs;
     in
     begin match mipmaps with
     | `AllGenerated | `Generated _ ->

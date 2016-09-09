@@ -14,6 +14,7 @@ type uniform =
   | Texture2D of (int * Texture.Texture2D.t)
   | Float     of float
   | Int       of int
+  | Texture2DArray of (int * Texture.Texture2DArray.t)
 
 module UniformMap = Map.Make (struct
 
@@ -42,6 +43,8 @@ let matrix2D s mat m = UniformMap.add s (Matrix2D mat) m
 let color s c m = UniformMap.add s (Color (Color.rgb c)) m
 
 let texture2D s ?tex_unit:(u=0) t m = UniformMap.add s (Texture2D (u,t)) m
+
+let texture2Darray s ?tex_unit:(u=0) t m = UniformMap.add s (Texture2DArray (u,t)) m
 
 let int s i m = UniformMap.add s (Int i) m
 
@@ -95,6 +98,9 @@ module LL = struct
         GL.Uniform.int1 location i
     | Texture2D (u,t), GLTypes.GlslType.Sampler2D ->
         Texture.Texture2D.bind t u;
+        GL.Uniform.int1 location (State.LL.texture_unit state)
+    | Texture2DArray (u,t), GLTypes.GlslType.Sampler2DArray ->
+        Texture.Texture2DArray.bind t u;
         GL.Uniform.int1 location (State.LL.texture_unit state)
     | _ -> raise (Invalid_uniform (Printf.sprintf "Uniform %s has wrong type" name))
 

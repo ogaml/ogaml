@@ -30,6 +30,7 @@ module GlslType = struct
     | Float4x4
     | Sampler1D
     | Sampler2D
+    | Sampler2DArray
     | Sampler3D
 
 end

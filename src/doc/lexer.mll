@@ -17,6 +17,7 @@
     |> h_add "with"     WITH
     |> h_add "functor"  FUNCTOR
     |> h_add "and"      AND
+    |> h_add "mutable"  MUTABLE
 
 }
 
