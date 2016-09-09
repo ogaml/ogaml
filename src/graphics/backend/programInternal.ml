@@ -169,47 +169,9 @@ module Sources = struct
     }
   "
 
-  let vertex_shader_source_110 = "
-    #version 110
-
-    uniform vec2 size;
-
-    attribute vec3 position;
-    attribute vec4 color;
-
-    varying vec4 frag_color;
-
-    void main() {
-
-      gl_Position.x = 2.0 * position.x / size.x - 1.0;
-      gl_Position.y = 2.0 * (size.y - position.y) / size.y - 1.0;
-      gl_Position.z = 0.0;
-      gl_Position.w = 1.0;
-
-      frag_color = color;
-
-    }
-  "
-
-  let fragment_shader_source_110 = "
-    #version 110
-
-    varying vec4 frag_color;
-
-    void main() {
-
-      gl_FragColor = frag_color;
-
-    }
-  "
-
   let create_shape id version =
-    if 130 <= version then 
-      create_pp ~version ~id ~vertex:vertex_shader_source_130
-                             ~fragment:fragment_shader_source_130
-    else 
-      create ~id ~vertex:vertex_shader_source_110
-                 ~fragment:fragment_shader_source_110
+    create_pp ~version ~id ~vertex:vertex_shader_source_130
+                           ~fragment:fragment_shader_source_130
 
   (* Sprite drawing program *)
   let vertex_shader_source_tex_130 = "
@@ -246,49 +208,9 @@ module Sources = struct
     }
   "
 
-  let vertex_shader_source_tex_110 = "
-    #version 110
-
-    uniform vec2 size;
-
-    attribute vec3 position;
-    attribute vec2 uv;
-
-    varying vec2 frag_uv;
-
-    void main() {
-
-      gl_Position.x = 2.0 * position.x / size.x - 1.0;
-      gl_Position.y = 2.0 * (size.y - position.y) / size.y - 1.0;
-      gl_Position.z = 0.0;
-      gl_Position.w = 1.0;
-
-      frag_uv = vec2(uv.x, 1.0 - uv.y);
-
-    }
-  "
-
-  let fragment_shader_source_tex_110 = "
-    #version 110
-
-    uniform sampler2D utexture;
-
-    varying vec2 frag_uv;
-
-    void main() {
-
-      gl_FragColor = texture2D(utexture, frag_uv);
-
-    }
-  "
-
   let create_sprite id version =
-    if 130 <= version then 
-      create_pp ~version ~id ~vertex:vertex_shader_source_tex_130
-                             ~fragment:fragment_shader_source_tex_130
-    else 
-      create ~id ~vertex:vertex_shader_source_tex_110
-                 ~fragment:fragment_shader_source_tex_110
+    create_pp ~version ~id ~vertex:vertex_shader_source_tex_130
+                           ~fragment:fragment_shader_source_tex_130
 
 
   (* Text drawing program *)
@@ -334,56 +256,8 @@ module Sources = struct
     }
   "
 
-
-  let vertex_shader_source_text_110 = "
-    #version 110
-
-    uniform vec2 window_size;
-    uniform vec2 atlas_size;
-
-    attribute vec4 color;
-    attribute vec3 position;
-    attribute vec2 uv;
-
-    varying vec2 frag_uv;
-    varying vec4 frag_color;
-
-    void main() {
-
-      gl_Position.x = 2.0 * position.x / window_size.x - 1.0;
-      gl_Position.y = 2.0 * (window_size.y - position.y) / window_size.y - 1.0;
-      gl_Position.z = 0.0;
-      gl_Position.w = 1.0;
-
-      frag_uv.x = uv.x / atlas_size.x;
-      frag_uv.y = uv.y / atlas_size.y;
-      frag_color = color;
-
-    }
-  "
-
-  let fragment_shader_source_text_110 = "
-    #version 110
-
-    uniform sampler2DArray atlas;
-    uniform int atlas_offset;
-
-    varying vec2 frag_uv;
-    varying vec4 frag_color;
-
-    void main() {
-
-      gl_FragColor = texture2D(atlas, vec3(frag_uv.xy,atlas_offset)) * frag_color;
-
-    }
-  "
-
   let create_text id version =
-    if 130 <= version then 
-      create_pp ~version ~id ~vertex:vertex_shader_source_text_130
-                             ~fragment:fragment_shader_source_text_130
-    else 
-      create ~id ~vertex:vertex_shader_source_text_110
-                 ~fragment:fragment_shader_source_text_110
+    create_pp ~version ~id ~vertex:vertex_shader_source_text_130
+                           ~fragment:fragment_shader_source_text_130
 
 end
