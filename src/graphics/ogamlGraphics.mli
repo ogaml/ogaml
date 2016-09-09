@@ -496,6 +496,24 @@ module Renderbuffer : sig
   (** This module provides several implementations of Renderbuffer Objects (RBO)
     * that can be attached to framebuffer objects. *)
 
+  (** Color Renderbuffer *)
+  module ColorBuffer : sig
+
+    (** Type of a color renderbuffer *)
+    type t
+
+    (** Creates a color renderbuffer from a context and a size *)
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+
+    (** ColorBuffer implements the interface ColorAttachable *)
+    val to_color_attachment : t -> Attachment.ColorAttachment.t
+
+    (** Returns the size of a renderbuffer *)
+    val size : t -> OgamlMath.Vector2i.t
+
+  end
+
+
   (** Depth Renderbuffer *)
   module DepthBuffer : sig
 
@@ -507,6 +525,42 @@ module Renderbuffer : sig
 
     (** DepthBuffer implements the interface DepthAttachable *)
     val to_depth_attachment : t -> Attachment.DepthAttachment.t
+
+    (** Returns the size of a renderbuffer *)
+    val size : t -> OgamlMath.Vector2i.t
+
+  end
+
+
+  (** Stencil Renderbuffer *)
+  module StencilBuffer : sig
+
+    (** Type of a stencil renderbuffer *)
+    type t
+
+    (** Creates a stencil renderbuffer from a context and a size *)
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+
+    (** StencilBuffer implements the interface StencilAttachable *)
+    val to_stencil_attachment : t -> Attachment.StencilAttachment.t
+
+    (** Returns the size of a renderbuffer *)
+    val size : t -> OgamlMath.Vector2i.t
+
+  end
+
+
+  (** Depth and Stencil Renderbuffer *)
+  module DepthStencilBuffer : sig
+
+    (** Type of a depth stencil renderbuffer *)
+    type t
+
+    (** Creates a depth stencil renderbuffer from a context and a size *)
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+
+    (** DepthStencilBuffer implements the interface DepthStencilAttachable *)
+    val to_depth_stencil_attachment : t -> Attachment.DepthStencilAttachment.t
 
     (** Returns the size of a renderbuffer *)
     val size : t -> OgamlMath.Vector2i.t
