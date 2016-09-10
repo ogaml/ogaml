@@ -49,9 +49,9 @@ rule token = parse
     {try Hashtbl.find keywords_table (Lexing.lexeme lexbuf)
      with Not_found -> UIDENT (Lexing.lexeme lexbuf)}
   | '(' symbolchar * ')' {OPERATOR (Lexing.lexeme lexbuf)}
-  | "(*"   {COMMENT (read_comment (Buffer.create 13) lexbuf)}
-  | "(**"  {DOCCOMMENT (read_comment (Buffer.create 13) lexbuf)}
   | "(***" {TITLECOMMENT (read_comment (Buffer.create 13) lexbuf)}
+  | "(**"  {DOCCOMMENT (read_comment (Buffer.create 13) lexbuf)}
+  | "(*"   {COMMENT (read_comment (Buffer.create 13) lexbuf)}
   | "'"  {APOSTROPHE}
   | "`"  {QUOTE}
   | "?"  {QMARK}

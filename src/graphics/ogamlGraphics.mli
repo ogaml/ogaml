@@ -1503,16 +1503,6 @@ module VertexArray : sig
   (** Type of a vertex array (static or dynamic) *)
   type 'a t
 
-  (*type debug_times = {
-    mutable param_bind_t : float;
-    mutable program_bind_t : float;
-    mutable uniform_bind_t : float;
-    mutable vao_bind_t : float;
-    mutable draw_t : float
-  }
-
-  val debug_t : debug_times*)
-
   (** Creates a static array from a source. A static array is faster
     * but cannot be modified later. @see:OgamlGraphics.VertexArray.Source *)
   val static : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> static t
@@ -2071,18 +2061,6 @@ module Sprite : sig
 
   (** Type of sprites *)
   type t
-
-(*  type debug_times = {
-    mutable size_get_t : float;
-    mutable uniform_create_t : float;
-    mutable source_alloc_t : float;
-    mutable vertices_create_t : float;
-    mutable vao_create_t : float;
-    mutable draw_t : float;
-  }
-  
-  val debug_t : debug_times*)
-
 
   (** Creates a sprite. *)
   val create :
