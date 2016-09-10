@@ -62,6 +62,7 @@ tests: math_lib core_lib graphics_lib utils_lib
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/vertexarrays.ml -o main.out && ./main.out &&\
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/graphs.ml -o main.out && ./main.out &&\
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/version.ml -o main.out && ./main.out &&\
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/capabilities.ml -o main.out && ./main.out &&\
 	echo "Tests passed !"
 
 doc:

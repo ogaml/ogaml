@@ -55,7 +55,12 @@ caml_gl_get_integerv(value par)
   CAMLparam1(par);
 
   int data;
-  glGetIntegerv(Parameter_val(par),&data);
+  int param = Parameter_val(par);
+
+  if(param == -1) 
+    data = -1;
+  else
+    glGetIntegerv(Parameter_val(par),&data);
 
   CAMLreturn(Val_int(data));
 }

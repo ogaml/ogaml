@@ -19,10 +19,10 @@ type capabilities = {
   max_depth_texture_samples : int;
   max_elements_indices      : int;
   max_elements_vertices     : int;
-  max_framebuffer_width     : int;
-  max_framebuffer_height    : int;
-  max_framebuffer_layers    : int;
-  max_framebuffer_samples   : int;
+  max_framebuffer_width     : int option;
+  max_framebuffer_height    : int option;
+  max_framebuffer_layers    : int option;
+  max_framebuffer_samples   : int option;
   max_integer_samples       : int;
   max_renderbuffer_size     : int;
   max_texture_buffer_size   : int;

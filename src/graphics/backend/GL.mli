@@ -85,6 +85,9 @@ module Pervasives : sig
   (** Returns an integer value *)
   val get_integerv : GLTypes.Parameter.t -> int
 
+  (** Returns an integer option *)
+  val get_integer_opt : GLTypes.Parameter.t -> int option
+
   (** Sets the clear color *)
   val color : float -> float -> float -> float -> unit
 

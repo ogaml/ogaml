@@ -171,6 +171,10 @@ module Pervasives = struct
 
   external msaa : bool -> unit = "caml_enable_msaa"
 
+  let get_integer_opt param = 
+    let v = get_integerv param in
+    if v < 0 then None
+    else Some v
 end
 
 
