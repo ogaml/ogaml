@@ -79,10 +79,10 @@ let float s f m =
 
 module LL = struct
 
-  let bind state map unifs =
-    let capabilities = State.capabilities state in
-    let max_units = capabilities.State.max_texture_image_units in
-    let available_units = State.LL.pooled_texture_array state in
+  let bind context map unifs =
+    let capabilities = Context.capabilities context in
+    let max_units = capabilities.Context.max_texture_image_units in
+    let available_units = Context.LL.pooled_texture_array context in
     Array.fill available_units 0 max_units true;
     let add_unit u =
       if u >= max_units || u < 0 then
@@ -139,21 +139,21 @@ module LL = struct
       | Texture2D (Some u,t), GLTypes.GlslType.Sampler2D ->
           add_unit u;
           Texture.Texture2D.bind t u;
-          GL.Uniform.int1 location (State.LL.texture_unit state)
+          GL.Uniform.int1 location (Context.LL.texture_unit context)
       | Texture2D (None, t), GLTypes.GlslType.Sampler2D ->
           let u = next_unit 0 in
           add_unit u;
           Texture.Texture2D.bind t u;
-          GL.Uniform.int1 location (State.LL.texture_unit state)
+          GL.Uniform.int1 location (Context.LL.texture_unit context)
       | Texture2DArray (Some u,t), GLTypes.GlslType.Sampler2DArray ->
           add_unit u;
           Texture.Texture2DArray.bind t u;
-          GL.Uniform.int1 location (State.LL.texture_unit state)
+          GL.Uniform.int1 location (Context.LL.texture_unit context)
       | Texture2DArray (None, t), GLTypes.GlslType.Sampler2DArray ->
           let u = next_unit 0 in
           add_unit u;
           Texture.Texture2DArray.bind t u;
-          GL.Uniform.int1 location (State.LL.texture_unit state)
+          GL.Uniform.int1 location (Context.LL.texture_unit context)
       | _ -> 
         error "Uniform %s does not have the type required by the program" name
     in

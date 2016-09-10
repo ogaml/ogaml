@@ -49,6 +49,6 @@ val texture2Darray : string -> ?tex_unit:int -> Texture.Texture2DArray.t -> t ->
 module LL : sig
 
   (** Binds a value to some program uniforms *)
-  val bind : State.t -> t -> Program.Uniform.t list -> unit
+  val bind : Context.t -> t -> Program.Uniform.t list -> unit
 
 end

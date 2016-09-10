@@ -9,7 +9,7 @@ module type T = sig
   val size : t -> OgamlMath.Vector2i.t
 
   (* Returns the internal context associated to a render target *)
-  val state : t -> State.t
+  val context : t -> Context.t
 
   (* Clears a render target *)
   val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
@@ -22,11 +22,11 @@ end
 
 (* Non-exposed low-level functions *)
 val bind_fbo : 
-  State.t -> int -> GL.FBO.t option -> unit
+  Context.t -> int -> GL.FBO.t option -> unit
 
 val clear : 
-  ?color:Color.t -> depth:bool -> stencil:bool -> State.t -> unit
+  ?color:Color.t -> depth:bool -> stencil:bool -> Context.t -> unit
 
 val bind_draw_parameters : 
-  State.t -> OgamlMath.Vector2i.t -> int -> DrawParameter.t -> unit
+  Context.t -> OgamlMath.Vector2i.t -> int -> DrawParameter.t -> unit
 

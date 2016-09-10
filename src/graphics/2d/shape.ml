@@ -335,8 +335,8 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
          ~depth_test:DrawParameter.DepthTest.None
          ~blend_mode:DrawParameter.BlendMode.alpha ())
          ~target ~shape () =
-  let state = M.state target in
-  let program = State.LL.shape_drawing state in
+  let context = M.context target in
+  let program = Context.LL.shape_drawing context in
   let size = M.size target in
   let uniform =
     Uniform.empty

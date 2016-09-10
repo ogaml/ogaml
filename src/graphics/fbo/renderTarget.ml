@@ -6,7 +6,7 @@ module type T = sig
 
   val size : t -> OgamlMath.Vector2i.t
 
-  val state : t -> State.t
+  val context : t -> Context.t
 
   val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 
@@ -15,83 +15,83 @@ module type T = sig
 end
 
 
-let bind_fbo state id fbo = 
-  if State.LL.bound_fbo state <> id then begin 
+let bind_fbo context id fbo = 
+  if Context.LL.bound_fbo context <> id then begin 
     (match fbo with
-     | None   -> State.LL.set_bound_fbo state None
-     | Some f -> State.LL.set_bound_fbo state (Some (f,id))
+     | None   -> Context.LL.set_bound_fbo context None
+     | Some f -> Context.LL.set_bound_fbo context (Some (f,id))
     );
     GL.FBO.bind fbo;
   end
 
-let clear ?color ~depth ~stencil state = 
+let clear ?color ~depth ~stencil context = 
   match color with
   | None -> GL.Pervasives.clear false depth stencil
   | Some color ->
-    if (State.LL.clear_color state <> color) then begin
+    if (Context.LL.clear_color context <> color) then begin
       let crgb = Color.rgb color in
-      State.LL.set_clear_color state color;
+      Context.LL.set_clear_color context color;
       Color.RGB.(GL.Pervasives.color crgb.r crgb.g crgb.b crgb.a)
     end;
     GL.Pervasives.clear true depth stencil
 
-let bind_culling_mode state parameters = 
+let bind_culling_mode context parameters = 
   let cull_mode = DrawParameter.culling parameters in
-  if State.LL.culling_mode state <> cull_mode then begin
-    State.LL.set_culling_mode state cull_mode;
+  if Context.LL.culling_mode context <> cull_mode then begin
+    Context.LL.set_culling_mode context cull_mode;
     GL.Pervasives.culling cull_mode
   end
 
-let bind_polygon_mode state parameters = 
+let bind_polygon_mode context parameters = 
   let poly_mode = DrawParameter.polygon parameters in
-  if State.LL.polygon_mode state <> poly_mode then begin
-    State.LL.set_polygon_mode state poly_mode;
+  if Context.LL.polygon_mode context <> poly_mode then begin
+    Context.LL.set_polygon_mode context poly_mode;
     GL.Pervasives.polygon poly_mode
   end
 
-let bind_depth_testing state parameters =
+let bind_depth_testing context parameters =
   let depth_testing = DrawParameter.depth_test parameters in
   begin match depth_testing with 
-    | DrawParameter.DepthTest.None when State.LL.depth_test state ->
-      State.LL.set_depth_test state false;
+    | DrawParameter.DepthTest.None when Context.LL.depth_test context ->
+      Context.LL.set_depth_test context false;
       GL.Pervasives.depthtest false
     | DrawParameter.DepthTest.None -> ()
     | depthfun -> begin
-      if State.LL.depth_test state = false then begin
-        State.LL.set_depth_test state true;
+      if Context.LL.depth_test context = false then begin
+        Context.LL.set_depth_test context true;
         GL.Pervasives.depthtest true
       end;
-      if State.LL.depth_function state <> depthfun then begin
-        State.LL.set_depth_function state depthfun;
+      if Context.LL.depth_function context <> depthfun then begin
+        Context.LL.set_depth_function context depthfun;
         GL.Pervasives.depthfunction depthfun
       end;
     end 
   end
 
-let bind_depth_writing state parameters =
+let bind_depth_writing context parameters =
   let depth_writing = DrawParameter.depth_write parameters in
-  if State.LL.depth_writing <> depth_writing then begin
-    State.LL.set_depth_writing state depth_writing;
+  if Context.LL.depth_writing context <> depth_writing then begin
+    Context.LL.set_depth_writing context depth_writing;
     GL.Pervasives.depth_mask depth_writing;
   end
 
-let bind_antialiasing state level parameters = 
+let bind_antialiasing context level parameters = 
   let antialiasing = DrawParameter.antialiasing parameters in
   if level > 0
     && antialiasing
-    && State.LL.msaa state = false
+    && Context.LL.msaa context = false
   then begin
-    State.LL.set_msaa state true;
+    Context.LL.set_msaa context true;
     GL.Pervasives.msaa true;
   end
-  else if State.LL.msaa state = true
+  else if Context.LL.msaa context = true
     && antialiasing = false
   then begin
-    State.LL.set_msaa state false;
+    Context.LL.set_msaa context false;
     GL.Pervasives.msaa false
   end
 
-let bind_viewport state sizei parameters = 
+let bind_viewport context sizei parameters = 
   let viewport =
     DrawParameter.Viewport.(
       let open OgamlMath in
@@ -110,18 +110,18 @@ let bind_viewport state sizei parameters =
       |Absolute r -> r
     )
   in
-  if State.LL.viewport state <> viewport then begin
+  if Context.LL.viewport context <> viewport then begin
     let open OgamlMath.IntRect in
-    State.LL.set_viewport state viewport;
+    Context.LL.set_viewport context viewport;
     GL.Pervasives.viewport viewport.x viewport.y viewport.width viewport.height;
   end
 
-let bind_blend_mode state parameters =
+let bind_blend_mode context parameters =
   let blend_mode = DrawParameter.blend_mode parameters in
   DrawParameter.BlendMode.(
     let blending = (blend_mode.alpha <> Equation.None) || (blend_mode.color <> Equation.None) in
-    if State.LL.blending state <> blending then begin
-      State.LL.set_blending state blending;
+    if Context.LL.blending context <> blending then begin
+      Context.LL.set_blending context blending;
       GL.Blending.enable blending
     end;
     let blend_alpha =
@@ -134,36 +134,36 @@ let bind_blend_mode state parameters =
       |Equation.None -> Equation.Add (Factor.One, Factor.Zero)
       | eq -> eq
     in
-    let tag_alpha = Obj.tag (Obj.repr (State.LL.blend_equation state).alpha) in
-    let tag_color = Obj.tag (Obj.repr (State.LL.blend_equation state).color) in
+    let tag_alpha = Obj.tag (Obj.repr (Context.LL.blend_equation context).alpha) in
+    let tag_color = Obj.tag (Obj.repr (Context.LL.blend_equation context).color) in
     let extract_sd = function
       |Equation.Add (s,d) -> (s,d)
       |Equation.Sub (s,d) -> (s,d)
       | _ -> assert false
     in
-    if (extract_sd blend_alpha <> extract_sd (State.LL.blend_equation state).alpha)
-    || (extract_sd blend_color <> extract_sd (State.LL.blend_equation state).color)
+    if (extract_sd blend_alpha <> extract_sd (Context.LL.blend_equation context).alpha)
+    || (extract_sd blend_color <> extract_sd (Context.LL.blend_equation context).color)
     then begin
       let (s_rgb, d_rgb), (s_alp, d_alp) = extract_sd blend_color, extract_sd blend_alpha in
-      State.LL.set_blend_equation state {alpha = blend_alpha; color = blend_color};
+      Context.LL.set_blend_equation context {alpha = blend_alpha; color = blend_color};
       GL.Blending.blend_func_separate s_rgb d_rgb s_alp d_alp;
     end;
     if ((Obj.tag (Obj.repr blend_color)) <> tag_alpha)
     || ((Obj.tag (Obj.repr blend_alpha)) <> tag_color)
     then begin
-      State.LL.set_blend_equation state {alpha = blend_alpha; color = blend_color};
+      Context.LL.set_blend_equation context {alpha = blend_alpha; color = blend_color};
       GL.Blending.blend_equation_separate blend_color blend_alpha
     end
   )
 
-let bind_draw_parameters state size aa parameters =
-  let state = state in
-  bind_culling_mode state parameters;
-  bind_polygon_mode state parameters;
-  bind_depth_testing state parameters;
-  bind_depth_writing state parameters;
-  bind_antialiasing state aa parameters;
-  bind_viewport state size parameters;
-  bind_blend_mode state parameters
+let bind_draw_parameters context size aa parameters =
+  let context = context in
+  bind_culling_mode context parameters;
+  bind_polygon_mode context parameters;
+  bind_depth_testing context parameters;
+  bind_depth_writing context parameters;
+  bind_antialiasing context aa parameters;
+  bind_viewport context size parameters;
+  bind_blend_mode context parameters
 
 

@@ -17,15 +17,8 @@ Cocoa specific:
   ☐ Fix all pixel/point related issues
 
 Interface changes:
-  Color:
-    ✔ Add Color.alpha @done(2016-04-29 15:19) @project(Interface changes / Color)
   Window:
-    ✘ Coordinate conversions @note(WTF did I mean by that ?) @cancelled(2016-09-10 14:59) @project(Interface changes / Window)
     ☐ Add open (dual of close)
-  Interpolators:
-    ✔ Add begin and end time @done(2016-09-10 15:07) @project(Interface changes / Interpolators)
-  Font:
-    ✔ Switch to use texture2D array @done(2016-09-10 13:14) @project(Interface changes / Font)
   Text:
     ☐ Alinea parameter @unsure
     ☐ Text align
@@ -40,38 +33,12 @@ Interface changes:
     Fx module for text with advanced features:
       ☐ Filtered transformations
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
-  Uniform:
-    ✘ Optional vec2 font_size parameter for uniform font -- font uniform was a bad idea @cancelled(2016-04-14 11:49) @project(Interface changes / Uniform)
-    ✔ Change behavior of tex_unit to use an available unit (only at binding) @done(2016-09-10 13:48) @project(Interface changes / Uniform)
-    ✔ Add exception when all units are taken/a unit is bound twice by the user @done(2016-09-10 13:48) @project(Interface changes / Uniform)
-    ✔ Pool the available units array @done(2016-09-10 14:49) @project(Interface changes / Uniform)
   Sprite & Text:
     ☐ Local relative-space conversion (rather than uniforms)
     ☐ Same for texture coordinates for fonts
     ☐ (+Shape) Centralize transformations
-  Textures:
-    ✔ Check for texture max size at creation @done(2016-09-10 15:12) @project(Interface changes / Textures)
-    ✔ Add default texture wraping (clamp to edge) @done(2016-09-10 15:25) @project(Interface changes / Textures)
-    ✔ Empty textures @done(2016-09-10 15:13) @project(Interface changes / Textures)
-  State:
-    ☐ Rename State in GLContext
-    ✔ Add state to all functions that need it, even implicitly (ie. Program.create) @done(2016-04-30 12:00) @project(Interface changes / State)
-    ✔ Fix VAO, VBO, EBO and Program ID recycling @done(2016-04-30 12:00) @project(Interface changes / State)
-  Parameters:
-    ✔ Add optional depth writing @done(2016-09-10 15:38) @project(Interface changes / Parameters)
   RenderTextures/Framebuffers:
-    ✔ Check against GL_MAX_RENDERBUFFER_SIZE when creating @done(2016-09-09 22:44) @project(Interface changes / RenderTextures/Framebuffers)
     ☐ Test all attachments
-    ✘ Remove size from RenderTarget and Framebuffers @cancelled(2016-05-18 16:52) @project(Interface changes / RenderTextures/Framebuffers)
-  VertexArrays (and probably others):
-    ✔ Fix state not being modified at creation (binding then unbinding a vertex array DOES modify the state) @done(2016-09-10 15:38) @project(Interface changes / VertexArrays (and probably others))
-  Program:
-    ☐ Remove error msg from exception, add optional logging function at creation
-    ☐ Add Program.log to get the last log
-    ☐ Change target to context at creation
-
-Bugs:
-  ✔ Use a custom ID system for textures as checking the equality of two textures in State can be wrong (if an ID gets recycled) @done(2016-04-14 12:00) @project(Bugs)
 
 Before merge:
   ☐ Remove debug type and functions in VertexArray and Sprite
@@ -93,17 +60,39 @@ Advanced features:
     ☐ Single-channeled images
     ☐ Image slices
     ☐ Texture3D
-    ✔ Texture2D array @done(2016-07-14 14:06) @project(Advanced features / More Image and Texture types)
     ☐ Parameterize renderbuffers/textures by a texture format
     ☐ Depth textures
     ☐ Stencil textures
-    ✔ Mipmaps @done(2016-07-14 12:06) @project(Advanced features / More Image and Texture types)
     ☐ TextureCube
-  ✔ Render textures @done(2016-05-18 16:51) @project(Advanced features)
 
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+  ✔ Add Color.alpha @done(2016-04-29 15:19) @project(Interface changes / Color)
+  ✘ Coordinate conversions @note(WTF did I mean by that ?) @cancelled(2016-09-10 14:59) @project(Interface changes / Window)
+  ✔ Add begin and end time @done(2016-09-10 15:07) @project(Interface changes / Interpolators)
+  ✔ Switch to use texture2D array @done(2016-09-10 13:14) @project(Interface changes / Font)
+  ✘ Optional vec2 font_size parameter for uniform font -- font uniform was a bad idea @cancelled(2016-04-14 11:49) @project(Interface changes / Uniform)
+  ✔ Change behavior of tex_unit to use an available unit (only at binding) @done(2016-09-10 13:48) @project(Interface changes / Uniform)
+  ✔ Add exception when all units are taken/a unit is bound twice by the user @done(2016-09-10 13:48) @project(Interface changes / Uniform)
+  ✔ Pool the available units array @done(2016-09-10 14:49) @project(Interface changes / Uniform)
+  ✔ Check for texture max size at creation @done(2016-09-10 15:12) @project(Interface changes / Textures)
+  ✔ Add default texture wraping (clamp to edge) @done(2016-09-10 15:25) @project(Interface changes / Textures)
+  ✔ Empty textures @done(2016-09-10 15:13) @project(Interface changes / Textures)
+  ✔ Rename State in GLContext @done(2016-09-10 15:53) @project(Interface changes / State)
+  ✔ Add state to all functions that need it, even implicitly (ie. Program.create) @done(2016-04-30 12:00) @project(Interface changes / State)
+  ✔ Fix VAO, VBO, EBO and Program ID recycling @done(2016-04-30 12:00) @project(Interface changes / State)
+  ✔ Add optional depth writing @done(2016-09-10 15:38) @project(Interface changes / Parameters)
+  ✔ Check against GL_MAX_RENDERBUFFER_SIZE when creating @done(2016-09-09 22:44) @project(Interface changes / RenderTextures/Framebuffers)
+  ✘ Remove size from RenderTarget and Framebuffers @cancelled(2016-05-18 16:52) @project(Interface changes / RenderTextures/Framebuffers)
+  ✔ Fix state not being modified at creation (binding then unbinding a vertex array DOES modify the state) @done(2016-09-10 15:38) @project(Interface changes / VertexArrays (and probably others))
+  ✔ Remove error msg from exception, add optional logging function at creation @done(2016-09-10 16:22) @project(Interface changes / Program)
+  ✘ Add Program.log to get the last log -- Obsolete @cancelled(2016-09-10 16:22) @project(Interface changes / Program)
+  ✔ Change target to context at creation @done(2016-09-10 15:54) @project(Interface changes / Program)
+  ✔ Use a custom ID system for textures as checking the equality of two textures in State can be wrong (if an ID gets recycled) @done(2016-04-14 12:00) @project(Bugs)
+  ✔ Texture2D array @done(2016-07-14 14:06) @project(Advanced features / More Image and Texture types)
+  ✔ Mipmaps @done(2016-07-14 12:06) @project(Advanced features / More Image and Texture types)
+  ✔ Render textures @done(2016-05-18 16:51) @project(Advanced features)
   ✔ Rewrite Model to add iterators, simplify the interface, and only index ad-hoc (when requested by source) @done(2016-03-16 15:42) @project(Interface changes / Model)
   ✔ Poly export to Model.t @done(2016-03-16 16:07) @project(Interface changes / Model)
   ✔ Remove Poly from Math @done(2016-03-16 16:07) @project(Interface changes / Model)

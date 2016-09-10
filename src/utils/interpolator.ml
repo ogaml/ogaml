@@ -113,7 +113,7 @@ let linear b l e =
     in
     (1. -. fact) *. p1 +. fact *. p2
   in
-  custom func
+  custom func 0. 1.
 
 let cst_linear b l e = 
   linear b (append_times b l e) e
@@ -126,7 +126,7 @@ let cubic b l e =
     let dx = t2 -. t1 in
     (h00 fact) *. p1 +. (h10 fact) *. tg1 *. dx +. (h01 fact) *. p2 +. (h11 fact) *. tg2 *. dx
   in
-  custom func
+  custom func 0. 1.
 
 let cst_cubic b l e = 
   cubic b (append_times (fst b) l (fst e)) e

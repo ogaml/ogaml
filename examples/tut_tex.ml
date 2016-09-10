@@ -40,9 +40,9 @@ let fragment_shader_source = "
 let program =
   Program.from_source_pp
     (module Window)
-    ~target:window
+    ~context:window
     ~vertex_source:(`String vertex_shader_source)
-    ~fragment_source:(`String fragment_shader_source)
+    ~fragment_source:(`String fragment_shader_source) ()
 
 let vertex1 =
   VertexArray.Vertex.create

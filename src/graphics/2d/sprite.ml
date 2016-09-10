@@ -144,8 +144,8 @@ let draw (type s) (module Target : RenderTarget.T with type t = s)
          ~depth_test:DrawParameter.DepthTest.None
          ~blend_mode:DrawParameter.BlendMode.alpha ())
          ~target ~sprite () =
-  let state = Target.state target in
-  let program = State.LL.sprite_drawing state in
+  let context = Target.context target in
+  let program = Context.LL.sprite_drawing context in
   let t = tm () in
   let sizei = Target.size target in
   debug_t.size_get_t <- debug_t.size_get_t +. (tm () -. t);

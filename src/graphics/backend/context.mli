@@ -1,4 +1,4 @@
-(** Represents an OpenGL state and keeps track of bound
+(** Represents an OpenGL context and keeps track of bound
   * values to avoid costly successive bindings.
   * 
   * Note that setters do not change the value stored
@@ -7,8 +7,8 @@
   * NOTE : setters are intended for internal use only
 **)
 
-(** GL state exception *)
-exception Invalid_state of string
+(** GL context exception *)
+exception Invalid_context of string
 
 (** Capabilities of the context *)
 type capabilities = {
@@ -31,7 +31,7 @@ type capabilities = {
   max_color_attachments     : int;
 }
 
-(** Type of the GL state *)
+(** Type of the GL context *)
 type t
 
 (** Returns the capabilities of the context *)
@@ -61,7 +61,7 @@ val finish : t -> unit
 
 module LL : sig
 
-  (** Creates a new, default-initialized GL state *)
+  (** Creates a new, default-initialized GL context *)
   val create : unit -> t
 
   (** Returns the internal sprite-drawing program *)

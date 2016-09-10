@@ -7,7 +7,7 @@ INCLUDE_DIRS = -I ../math/ -I ../core/ -I ../utils/\
 	       -I model/ -I window/
 
 GRAPHICS_STUBS = shader_stubs.c program_stubs.c texture_stubs.c\
-	         vao_stubs.c vbo_stubs.c uniform_stubs.c text_stubs.c\
+	   vao_stubs.c vbo_stubs.c uniform_stubs.c text_stubs.c\
 		 render_stubs.c ebo_stubs.c image_stubs.c blending_stubs.c\
 		 fbo_stubs.c rbo_stubs.c utils.c\
 		 types_stubs.c
@@ -27,7 +27,7 @@ MLSOURCES = backend/color.ml\
 	    backend/GL.ml\
 	    backend/drawParameter.ml\
 	    backend/programInternal.ml\
-	    backend/state.ml\
+	    backend/context.ml\
 	    fbo/renderTarget.ml\
 	    fbo/attachment.ml\
 	    fbo/renderbuffer.ml\

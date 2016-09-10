@@ -10,6 +10,10 @@ open OgamlGraphics
 open OgamlMath
 open OgamlUtils
 
+(* Let's start by creating a log system to the standard output.
+ * This is useful to track our program's progress and to print GLSL
+ * compilation errors. *)
+let log = OgamlUtils.Log.create ()
 
 (* Default context settings *)
 let settings = OgamlCore.ContextSettings.create ()
@@ -44,13 +48,15 @@ let fragment_shader_source = "
 
 (* Compile the GLSL program from the sources.
  * from_source_pp includes a preprocessor that automatically preprends
- * the best version number to the GLSL sources. *)
+ * the best version number to the GLSL sources.
+ * We provide our log (as an optional parameter) to get compilation errors. *)
 let program =
   Program.from_source_pp
     (module Window)
-    ~target:window
+    ~context:window
+    ~log
     ~vertex_source:(`String vertex_shader_source)
-    ~fragment_source:(`String fragment_shader_source)
+    ~fragment_source:(`String fragment_shader_source) ()
 
 (* Create three vertices *)
 let vertex1 =
@@ -120,4 +126,6 @@ let rec main_loop () =
   end
 
 (* Let's launch the main loop and admire the result :o) *)
-let () = main_loop ()
+let () = 
+  Log.info log "Hello triangle !";
+  main_loop ()

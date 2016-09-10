@@ -24,9 +24,9 @@ let cube_source =
 let cube = VertexArray.static (module Window) window cube_source
 
 let normal_program =
-  Program.from_source_pp (module Window) ~target:window
+  Program.from_source_pp (module Window) ~context:window
     ~vertex_source:(`File "examples/normals_shader.vert")
-    ~fragment_source:(`File "examples/normals_shader.frag")
+    ~fragment_source:(`File "examples/normals_shader.frag") ()
 
 (* Display computations *)
 let proj = Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)

@@ -50,8 +50,8 @@ val display : t -> unit
 (** Clears the window *)
 val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 
-(** Returns the internal GL state of the window *)
-val state : t -> State.t
+(** Returns the internal GL context of the window *)
+val context : t -> Context.t
 
 (** Show/hide the cursor *)
 val show_cursor : t -> bool -> unit

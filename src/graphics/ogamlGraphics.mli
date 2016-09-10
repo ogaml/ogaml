@@ -304,18 +304,18 @@ module DrawParameter : sig
 end
 
 
-(** Encapsulates data about an OpenGL internal state *)
-module State : sig
+(** Encapsulates data about an OpenGL internal context *)
+module Context : sig
 
-  (** This module encapsulates a copy of the internal GL state.
+  (** This module encapsulates a copy of the internal GL context.
     * This allows efficient optimizations of state changes.
     *
-    * To get an instance of a State.t, create a context (via a window) and
-    * use Window.state *)
+    * To get an instance of a Context.t, create a GL context (via a window) and
+    * use Window.context *)
 
   (** Raised when trying to perform an invalid state change 
     * (for example, binding a texture to an invalid texture unit) *)
-  exception Invalid_state of string
+  exception Invalid_context of string
 
   (** Rendering capabilities of a context *)
   type capabilities = {
@@ -338,23 +338,23 @@ module State : sig
     max_color_attachments     : int; (* Maximal number of color attachments in a framebuffer *)
   }
 
-  (** Type of a GL state *)
+  (** Type of a GL context *)
   type t
 
   (** Returns the rendering capabilities of a context *)
   val capabilities : t -> capabilities
 
-  (** Returns the GL version supported by this state in (major, minor) format *)
+  (** Returns the GL version supported by this context in (major, minor) format *)
   val version : t -> (int * int)
 
   (** Returns true iff the given GL version in (major, minor) format
-    * is supported by the given state *)
+    * is supported by the given context *)
   val is_version_supported : t -> (int * int) -> bool
 
-  (** Returns the GLSL version supported by this state *)
+  (** Returns the GLSL version supported by this context *)
   val glsl_version : t -> int
 
-  (** Returns true iff the given GLSL version is supported by this state *)
+  (** Returns true iff the given GLSL version is supported by this context *)
   val is_glsl_version_supported : t -> int -> bool
 
   (** Asserts that no openGL error occured internally. Used for debugging and testing. *)
@@ -385,7 +385,7 @@ module RenderTarget : sig
     val size : t -> OgamlMath.Vector2i.t
 
     (** Returns the internal context associated to a render target *)
-    val state : t -> State.t
+    val context : t -> Context.t
 
     (** Clears a render target *)
     val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
@@ -605,7 +605,7 @@ module Framebuffer : sig
     * than the maximum size allowed by the context.
     *
     * @see:OgamlGraphics.Attachment.ColorAttachable
-    * @see:OgamlGraphics.State *)
+    * @see:OgamlGraphics.Context *)
   val attach_color : (module Attachment.ColorAttachable with type t = 'a) 
                       -> t -> int -> 'a -> unit
 
@@ -614,7 +614,7 @@ module Framebuffer : sig
     * allowed by the context.
     *
     * @see:OgamlGraphics.Attachment.DepthAttachable
-    * @see:OgamlGraphics.State *)
+    * @see:OgamlGraphics.Context *)
   val attach_depth : (module Attachment.DepthAttachable with type t = 'a)
                       -> t -> 'a -> unit
 
@@ -623,7 +623,7 @@ module Framebuffer : sig
     * allowed by the context.
     *
     * @see:OgamlGraphics.Attachment.StencilAttachable
-    * @see:OgamlGraphics.State *)
+    * @see:OgamlGraphics.Context *)
   val attach_stencil : (module Attachment.StencilAttachable with type t = 'a)
                       -> t -> 'a -> unit
 
@@ -632,7 +632,7 @@ module Framebuffer : sig
     * allowed by the context.
     *
     * @see:OgamlGraphics.Attachment.DepthStencilAttachable
-    * @see:OgamlGraphics.State *)
+    * @see:OgamlGraphics.Context *)
   val attach_depthstencil : (module Attachment.DepthStencilAttachable with type t = 'a)
                       -> t -> 'a -> unit
 
@@ -651,7 +651,7 @@ module Framebuffer : sig
   val size : t -> OgamlMath.Vector2i.t
 
   (** Returns the GL context associated to the FBO *) 
-  val state : t -> State.t
+  val context : t -> Context.t
 
   (** Clears the FBO *)
   val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
@@ -819,7 +819,7 @@ module Texture : sig
       * allowed by the context.
       * @see:OgamlGraphics.RenderTarget.T 
       * @see:OgamlMath.Vector2i 
-      * @see:OgamlGraphics.State *)
+      * @see:OgamlGraphics.Context *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a -> 
                  ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None] ->
                  [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] -> t
@@ -1036,7 +1036,7 @@ module Font : sig
   (** Loads a font from a file *)
   val load : string -> t
 
-  (** $glyph state font code size bold$ returns the glyph
+  (** $glyph font code size bold$ returns the glyph
     * representing the character $code$ in $font$
     * of size $size$ and with the modifier $bold$ *)
   val glyph : t -> code -> int -> bool -> Glyph.t
@@ -1082,15 +1082,8 @@ module Program : sig
   (** This module provides a high-level wrapper around GL shader programs
     * and can be used to compile shaders. *)
 
-  (** Raised when the compilation of a program fails *)
-  exception Compilation_error of string
-
-  (** Raised when the linking of a program fails *)
-  exception Linking_error of string
-
-  (** Raised when trying to compile a program with a version
-    * that is not supported by the current context *)
-  exception Invalid_version of string
+  (** Raised when an error occurs during the manipulation of a program *)
+  exception Program_error of string
 
   (** Type of a program *)
   type t
@@ -1100,26 +1093,38 @@ module Program : sig
 
   (** Compiles a program from a rendering context, a vertex source 
     * and a fragment source.
-    * The source must begin with a version assigment $#version xxx$ *)
-  val from_source : (module RenderTarget.T with type t = 'a) -> target:'a -> 
-                    vertex_source:src -> fragment_source:src -> t
+    * Compilation errors will be reported on the provided log.
+    * The source must begin with a version assigment $#version xxx$ 
+    * @see:OgamlUtils.Log *)
+  val from_source : (module RenderTarget.T with type t = 'a) -> 
+                    ?log:OgamlUtils.Log.t ->
+                    context:'a -> 
+                    vertex_source:src -> fragment_source:src -> unit -> t
 
   (** Compiles a program from a rendering context and
     * a list of sources paired with their required GLSL version.
     * The function will chose the best source for the current context.
-    * @see:OgamlGraphics.State *)
-  val from_source_list : (module RenderTarget.T with type t = 'a) -> target:'a 
-                        -> vertex_source:(int * src) list
-                        -> fragment_source:(int * src) list -> t
+    * Compilation errors will be reported on the provided log.
+    * @see:OgamlGraphics.Context
+    * @see:OgamlUtils.Log *)
+  val from_source_list : (module RenderTarget.T with type t = 'a) ->
+                         ?log:OgamlUtils.Log.t ->
+                         context:'a  ->
+                         vertex_source:(int * src) list ->
+                         fragment_source:(int * src) list -> unit -> t
 
   (** Compiles a program from a rendering context and a source.
     * The source should not begin with a $#version xxx$ assignment,
     * as the function will preprocess the sources and prepend the
     * best version declaration.
-    * @see:OgamlGraphics.State *)
-  val from_source_pp : (module RenderTarget.T with type t = 'a) -> target:'a 
-                      -> vertex_source:src
-                      -> fragment_source:src -> t
+    * Compilation errors will be reported on the provided log.
+    * @see:OgamlGraphics.Context 
+    * @see:OgamlUtils.Log *)
+  val from_source_pp : (module RenderTarget.T with type t = 'a) ->
+                       ?log:OgamlUtils.Log.t ->
+                       context:'a ->
+                       vertex_source:src ->
+                       fragment_source:src -> unit -> t
 
 end
 
@@ -1180,9 +1185,9 @@ module Uniform : sig
     * are available, or if a unit is explicitly bound twice, drawing
     * with the uniform will raise $Invalid_uniform$.
     *
-    * See $State.max_textures$ for the number of available units.
+    * See $Context.max_textures$ for the number of available units.
     * @see:OgamlGraphics.Texture.Texture2D
-    * @see:OgamlGraphics.State *)
+    * @see:OgamlGraphics.Context *)
   val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
 
   (** See texture2D. Type : sampler2Darray.
@@ -1199,7 +1204,7 @@ module Window : sig
   (** This module provides a high-level wrapper around the low-level
     * window interface of OgamlCore and also provides drawing functions.
     *
-    * Windows encapsulate a copy of the GL state that can be retrieved
+    * Windows encapsulate a copy of the GL context that can be retrieved
     * to obtain information about the GL context. *)
 
   (*** Window creation *)
@@ -1227,9 +1232,9 @@ module Window : sig
   (** Returns the settings used at the creation of the window *)
   val settings : t -> OgamlCore.ContextSettings.t
 
-  (** Returns the internal GL state of the window
-    * @see:OgamlGraphics.State *)
-  val state : t -> State.t
+  (** Returns the internal GL context of the window
+    * @see:OgamlGraphics.Context *)
+  val context : t -> Context.t
 
   (** Changes the title of the window. *)
   val set_title : t -> string -> unit

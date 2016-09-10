@@ -1,5 +1,5 @@
 
-exception Invalid_state of string
+exception Invalid_context of string
 
 
 type capabilities = {
@@ -57,7 +57,7 @@ type t = {
   mutable viewport : OgamlMath.IntRect.t
 }
 
-let error msg = raise (Invalid_state msg)
+let error msg = raise (Invalid_context msg)
 
 let capabilities t = t.capabilities
 

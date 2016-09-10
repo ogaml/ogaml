@@ -1,10 +1,10 @@
 (** Provides unsafe access to the internal openGL state.        
   *
-  * All functions in this module modify the GL context 
+  * All functions in this module modify the GL state
   * without further verification.
   *
   * Any call to one of these functions should be followed
-  * by an update of the current window's State.t
+  * by an update of the current window's Context.t
   *
   * NOTE : For internal use only, may cause bugs 
 **)

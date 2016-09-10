@@ -32,7 +32,7 @@ val length : 'a t -> int
 
 module LL : sig
 
-  val bind : State.t -> 'a t -> unit
+  val bind : Context.t -> 'a t -> unit
 
 end
 

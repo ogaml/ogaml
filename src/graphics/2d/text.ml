@@ -219,8 +219,8 @@ module Fx = struct
            ~depth_test:DrawParameter.DepthTest.None
            ~blend_mode:DrawParameter.BlendMode.alpha ())
            ~text ~target () =
-    let state = M.state target in
-    let program = State.LL.text_drawing state in
+    let context = M.context target in
+    let program = Context.LL.text_drawing context in
     let texture = Font.texture (module M) target text.font in
     let size = Vector2f.from_int (M.size target) in
     let index = Font.size_index text.font text.size in
@@ -375,8 +375,8 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
          ~depth_test:DrawParameter.DepthTest.None
          ~blend_mode:DrawParameter.BlendMode.alpha ())
          ~text ~target () =
-  let state = M.state target in
-  let program = State.LL.text_drawing state in
+  let context = M.context target in
+  let program = Context.LL.text_drawing context in
   let texture = Font.texture (module M) target text.font in
   let size = Vector2f.from_int (M.size target) in
   let index = Font.size_index text.font text.size in

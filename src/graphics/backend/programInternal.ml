@@ -1,9 +1,5 @@
 
-exception Compilation_error of string
-
-exception Linking_error of string
-
-exception Invalid_version of string
+exception Program_internal_error of string
 
 
 module Uniform = struct
@@ -40,27 +36,29 @@ type t =
     attributes : Attribute.t list
   }
 
+let last_log = ref ""
+
 let create ~vertex ~fragment ~id =
   let program = GL.Program.create () in
   let vshader = GL.Shader.create GLTypes.ShaderType.Vertex   in
   let fshader = GL.Shader.create GLTypes.ShaderType.Fragment in
   if not (GL.Shader.valid vshader) ||
      not (GL.Shader.valid fshader) ||
-     not (GL.Program.valid program) then
-    raise (Compilation_error "Failed to create a GLSL program , the GL context may not be correctly initialized");
+     not (GL.Program.valid program) then begin
+    last_log := "Context initialization failure";
+    raise (Program_internal_error "Failed to create a GLSL program , the GL context may not be correctly initialized");
+  end;
   GL.Shader.source vshader vertex;
   GL.Shader.source fshader fragment;
   GL.Shader.compile vshader;
   GL.Shader.compile fshader;
   if GL.Shader.status vshader = false then begin
-    let log = GL.Shader.log vshader in
-    let msg = Printf.sprintf "Error while compiling vertex shader : %s" log in
-    raise (Compilation_error msg)
+    last_log := GL.Shader.log vshader;
+    raise (Program_internal_error "GLSL compilation failure")
   end;
   if GL.Shader.status fshader = false then begin
-    let log = GL.Shader.log fshader in
-    let msg = Printf.sprintf "Error while compiling fragment shader : %s" log in
-    raise (Compilation_error msg)
+    last_log := GL.Shader.log fshader;
+    raise (Program_internal_error "GLSL compilation failure")
   end;
   GL.Program.attach program vshader;
   GL.Program.attach program fshader;
@@ -70,9 +68,8 @@ let create ~vertex ~fragment ~id =
   GL.Shader.delete vshader;
   GL.Shader.delete fshader;
   if GL.Program.status program = false then begin
-    let log = GL.Program.log program in
-    let msg = Printf.sprintf "Error while linking GLSL program : %s" log in
-    raise (Linking_error msg)
+    last_log := GL.Program.log program;
+    raise (Program_internal_error "GLSL linking failure")
   end;
   let rec uniforms = function
     |0 -> []
@@ -124,7 +121,9 @@ let create_list ~vertex ~fragment ~id ~version =
       |> snd
     in
     create ~vertex:best_vshader ~fragment:best_fshader ~id
-  with Not_found -> raise (Invalid_version "No supported GLSL version provided")
+  with Not_found -> 
+    last_log := "No supported GLSL version provided";
+    raise (Program_internal_error "No supported GLSL version provided")
 
 let create_pp ~vertex ~fragment ~id ~version =
   let vsource = Printf.sprintf "#version %i\n\n%s" version vertex in

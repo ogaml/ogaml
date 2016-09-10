@@ -25,7 +25,7 @@ val has_stencil : t -> bool
 
 val size : t -> OgamlMath.Vector2i.t
 
-val state : t -> State.t
+val context : t -> Context.t
 
 val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 

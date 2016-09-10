@@ -51,7 +51,7 @@ let dynamic (type s) (module M : RenderTarget.T with type t = s) target src =
     buffer;
     size = GL.Data.length data;
     length = Source.length src; 
-    id = State.LL.ebo_id (M.state target)
+    id = Context.LL.ebo_id (M.context target)
   }
 
 let static (type s) (module M : RenderTarget.T with type t = s) target src = 
@@ -64,7 +64,7 @@ let static (type s) (module M : RenderTarget.T with type t = s) target src =
     buffer;
     size = GL.Data.length data;
     length = Source.length src; 
-    id = State.LL.ebo_id (M.state target)
+    id = Context.LL.ebo_id (M.context target)
   }
 
 let rebuild t src start =
@@ -94,10 +94,10 @@ let length t = t.length
 
 module LL = struct
 
-  let bind state t = 
-    if State.LL.bound_ebo state <> (Some t.id) then begin
+  let bind context t = 
+    if Context.LL.bound_ebo context <> (Some t.id) then begin
       GL.EBO.bind (Some t.buffer);
-      State.LL.set_bound_ebo state (Some (t.buffer, t.id));
+      Context.LL.set_bound_ebo context (Some (t.buffer, t.id));
     end
 
 end

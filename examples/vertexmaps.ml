@@ -97,9 +97,9 @@ let indices = IndexArray.static (module Window) window cube_indices
 
 let cube_program =
   Program.from_source_pp (module Window)
-    ~target:window
+    ~context:window
     ~vertex_source:(`String cube_shader)
-    ~fragment_source:(`File "examples/normals_shader.frag")
+    ~fragment_source:(`File "examples/normals_shader.frag") ()
 
 (* Display computations *)
 let proj = Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)

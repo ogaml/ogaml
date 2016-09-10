@@ -8,7 +8,7 @@ let settings = OgamlCore.ContextSettings.create ()
 
 let window = Window.create ~width:100 ~height:100 ~settings ~title:"" ()
 
-let state = Window.state window
+let context = Window.context window
 
 let parameters = DrawParameter.make ()
 
@@ -18,7 +18,7 @@ let uniform = Uniform.empty
 
 let program = Program.from_source_list
     (module Window) 
-    ~target:window
+    ~context:window
     ~vertex_source:[
       (130, `String "#version 130
 
@@ -74,7 +74,7 @@ let program = Program.from_source_list
                color = vec4(1.0, 1.0, 1.0, 1.0);
 
              }");
-    ]
+    ] ()
 
 let test_vao1 () =
   let vsource = VertexArray.(Source.(

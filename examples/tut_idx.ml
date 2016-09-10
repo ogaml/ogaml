@@ -32,12 +32,15 @@ let fragment_shader_source = "
   }
 "
 
+let log = OgamlUtils.Log.create ()
+
 let program =
   Program.from_source_pp
     (module Window)
-    ~target:window
+    ~log
+    ~context:window
     ~vertex_source:(`String vertex_shader_source)
-    ~fragment_source:(`String fragment_shader_source)
+    ~fragment_source:(`String fragment_shader_source) ()
 
 let vertex0 =
   VertexArray.Vertex.create

@@ -268,7 +268,7 @@ let dynamic (type s) (module M : RenderTarget.T with type t = s) target src =
    attribs = Source.attribs src;
    stride = Source.stride src;
    bound = None;
-   id = State.LL.vao_id (M.state target);
+   id = Context.LL.vao_id (M.context target);
   }
 
 let static (type s) (module M : RenderTarget.T with type t = s) target src = 
@@ -285,7 +285,7 @@ let static (type s) (module M : RenderTarget.T with type t = s) target src =
    attribs = Source.attribs src;
    stride = Source.stride src;
    bound = None;
-   id = State.LL.vao_id (M.state target)
+   id = Context.LL.vao_id (M.context target)
   }
 
 let rebuild t src start =
@@ -316,13 +316,13 @@ let rebuild t src start =
 let length t = t.length
 
 
-let bind state t prog = 
+let bind context t prog = 
   if t.bound <> Some prog then begin
     t.bound <- Some prog;
     GL.VAO.bind (Some t.vao);
-    State.LL.set_bound_vao state (Some (t.vao, t.id));
+    Context.LL.set_bound_vao context (Some (t.vao, t.id));
     GL.VBO.bind (Some t.buffer);
-    State.LL.set_bound_vbo state (Some (t.buffer, t.id));
+    Context.LL.set_bound_vbo context (Some (t.buffer, t.id));
     let attribs = ref t.attribs in
     let rec find_remove s = function
       | [] -> 
@@ -354,10 +354,10 @@ let bind state t prog =
       Printf.eprintf "Warning : omitting attribute %s not required by program\n%!" 
         (let (_,s,_) = List.hd !attribs in s)*)
   end
-  else if State.LL.bound_vao state <> (Some t.id) then begin
+  else if Context.LL.bound_vao context <> (Some t.id) then begin
     GL.VAO.bind (Some t.vao);
-    State.LL.set_bound_vao state (Some (t.vao, t.id));
-    State.LL.set_bound_vbo state (Some (t.buffer, t.id));
+    Context.LL.set_bound_vao context (Some (t.vao, t.id));
+    Context.LL.set_bound_vbo context (Some (t.buffer, t.id));
   end
 
 type debug_times = {
@@ -385,7 +385,7 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
          ?start ?length
          ?mode:(mode = DrawMode.Triangles) () =
   if vertices.length <> 0 then begin
-    let state = M.state target in
+    let context = M.context target in
     let start = 
       match start with
       |None -> 0
@@ -403,15 +403,15 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
     debug_t.param_bind_t <- debug_t.param_bind_t +. (tm () -. t);
 
     let t = tm () in
-    Program.LL.use state (Some program);
+    Program.LL.use context (Some program);
     debug_t.program_bind_t <- debug_t.program_bind_t +. (tm () -. t);
 
     let t = tm () in
-    Uniform.LL.bind state uniform (Program.LL.uniforms program);
+    Uniform.LL.bind context uniform (Program.LL.uniforms program);
     debug_t.uniform_bind_t <- debug_t.uniform_bind_t +. (tm () -. t);
 
     let t = tm () in
-    bind state vertices program;
+    bind context vertices program;
     debug_t.vao_bind_t <- debug_t.vao_bind_t +. (tm () -. t);
 
     match indices with
@@ -427,7 +427,7 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
       if start < 0 || start + length > (IndexArray.length ebo) then
         raise (Out_of_bounds "Invalid index array bounds")
       else begin
-        IndexArray.LL.bind state ebo;
+        IndexArray.LL.bind context ebo;
         GL.VAO.draw_elements mode start length 
       end
   end
