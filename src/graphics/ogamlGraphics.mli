@@ -280,6 +280,8 @@ module DrawParameter : sig
     *
     * $depth_test$ specifies the depth function to be used when rendering vertices (defaults to $Less$)
     *
+    * $depth_write$ specifies whether depth should be written to the depth buffer (defaults to $true$)
+    *
     * $blend_mode$ specifies the blending equation (defaults to $BlendingMode.default$)
     *
     * $viewport$ specifies the viewport (defaults to $Full$)
@@ -293,6 +295,7 @@ module DrawParameter : sig
   val make : ?culling:CullingMode.t ->
              ?polygon:PolygonMode.t ->
              ?depth_test:DepthTest.t ->
+             ?depth_write:bool ->
              ?blend_mode:BlendMode.t ->
              ?viewport:Viewport.t ->
              ?antialiasing:bool ->
@@ -316,23 +319,23 @@ module State : sig
 
   (** Rendering capabilities of a context *)
   type capabilities = {
-    max_3D_texture_size       : int;
-    max_array_texture_layers  : int;
-    max_color_texture_samples : int;
-    max_cube_map_texture_size : int;
-    max_depth_texture_samples : int;
-    max_elements_indices      : int;
-    max_elements_vertices     : int;
-    max_framebuffer_width     : int;
-    max_framebuffer_height    : int;
-    max_framebuffer_layers    : int;
-    max_framebuffer_samples   : int;
-    max_integer_samples       : int;
-    max_renderbuffer_size     : int;
-    max_texture_buffer_size   : int;
-    max_texture_image_units   : int;
-    max_texture_size          : int;
-    max_color_attachments     : int;
+    max_3D_texture_size       : int; (* Maximal 3D texture size *)
+    max_array_texture_layers  : int; (* Maximal number of layers in a texture array *)
+    max_color_texture_samples : int; (* Maximal number of samples in a multisampled color texture *)
+    max_cube_map_texture_size : int; (* Maximal cubemap texture size *)
+    max_depth_texture_samples : int; (* Maximal number of samples in a multisampled depth texture *)
+    max_elements_indices      : int; (* Maximal number of indices in an element buffer *)
+    max_elements_vertices     : int; (* Maximal number of vertices in an element buffer *)
+    max_framebuffer_width     : int; (* Maximal width of a framebuffer *)
+    max_framebuffer_height    : int; (* Maximal height of a framebuffer *)
+    max_framebuffer_layers    : int; (* Maximal number of mipmap layers of a framebuffer *)
+    max_framebuffer_samples   : int; (* Maximal number of samples in a multisampled framebuffer *)
+    max_integer_samples       : int; (* Maximal number of samples in a multisampled integer texture *)
+    max_renderbuffer_size     : int; (* Maximal size of a renderbuffer *)
+    max_texture_buffer_size   : int; (* Maximal size of a texture buffer *)
+    max_texture_image_units   : int; (* Number of available texture units *)
+    max_texture_size          : int; (* Maximal size of a texture *)
+    max_color_attachments     : int; (* Maximal number of color attachments in a framebuffer *)
   }
 
   (** Type of a GL state *)
@@ -496,13 +499,18 @@ module Renderbuffer : sig
   (** This module provides several implementations of Renderbuffer Objects (RBO)
     * that can be attached to framebuffer objects. *)
 
+  (** Raised if an error occurs while manipulating a renderbuffer. *)
+  exception RBO_Error of string
+
   (** Color Renderbuffer *)
   module ColorBuffer : sig
 
     (** Type of a color renderbuffer *)
     type t
 
-    (** Creates a color renderbuffer from a context and a size *)
+    (** Creates a color renderbuffer from a context and a size 
+      * Raises $RBO_Error$ if the requested size exceeds the maximum size
+      * allowed by the context. *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
 
     (** ColorBuffer implements the interface ColorAttachable *)
@@ -520,7 +528,9 @@ module Renderbuffer : sig
     (** Type of a depth renderbuffer *)
     type t
 
-    (** Creates a depth renderbuffer from a context and a size *)
+    (** Creates a depth renderbuffer from a context and a size
+      * Raises $RBO_Error$ if the requested size exceeds the maximum size
+      * allowed by the context. *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
 
     (** DepthBuffer implements the interface DepthAttachable *)
@@ -538,7 +548,9 @@ module Renderbuffer : sig
     (** Type of a stencil renderbuffer *)
     type t
 
-    (** Creates a stencil renderbuffer from a context and a size *)
+    (** Creates a stencil renderbuffer from a context and a size 
+      * Raises $RBO_Error$ if the requested size exceeds the maximum size
+      * allowed by the context. *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
 
     (** StencilBuffer implements the interface StencilAttachable *)
@@ -556,7 +568,9 @@ module Renderbuffer : sig
     (** Type of a depth stencil renderbuffer *)
     type t
 
-    (** Creates a depth stencil renderbuffer from a context and a size *)
+    (** Creates a depth stencil renderbuffer from a context and a size 
+      * Raises $RBO_Error$ if the requested size exceeds the maximum size
+      * allowed by the context. *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
 
     (** DepthStencilBuffer implements the interface DepthStencilAttachable *)
@@ -577,7 +591,7 @@ module Framebuffer : sig
     * attach textures to them. *)
 
   (** Raised if an error occurs at creation or during an attachment *)
-  exception Error of string
+  exception FBO_Error of string
 
   (** Type of a framebuffer object *)
   type t
@@ -706,8 +720,8 @@ module Texture : sig
     * of OpenGL textures *)
 
 
-  (** Raised if the creation of a texture fails *)
-  exception Creation_error of string
+  (** Raised if an error occurs while manipulating a texture *)
+  exception Texture_error of string
 
 
   (** Common signature for all texture types *)
@@ -765,11 +779,13 @@ module Texture : sig
     (** Type of a 2D mipmap level *)
     type t
 
-    (** Size of the mipmap level *)
+    (** Size of the mipmap level @see:OgamlMath.Vector2i *)
     val size : t -> OgamlMath.Vector2i.t
 
     (** Writes an image to a sub-rectangle of a mipmap level.
-      * Writes to the full mipmap level by default. *)
+      * Writes to the full mipmap level by default. 
+      * @see:OgamlMath.IntRect
+      * @see:OgamlGraphics.Image *)
     val write : t -> ?rect:OgamlMath.IntRect.t -> Image.t -> unit
 
     (** Returns the level of a Texture2DMipmap.t *)
@@ -779,7 +795,8 @@ module Texture : sig
     val bind : t -> int -> unit 
 
     (** Texture2DMipmap implements the interface ColorAttachable and
-      * can be attached to an FBO. *)
+      * can be attached to an FBO.
+      * @see:OgamlGraphics.Attachment.ColorAttachment *)
     val to_color_attachment : t -> Attachment.ColorAttachment.t
 
   end
@@ -795,13 +812,20 @@ module Texture : sig
     (** Type of a 2D texture *)
     type t
 
-    (** Creates a texture from a source (a file or an image).
-      * Generates all mipmaps by default. *)
+    (** Creates a texture from a source (a file or an image), or an empty texture.
+      * Generates all mipmaps by default.
+      *
+      * Raises $Texture_error$ if the requested size exceeds the maximal texture size
+      * allowed by the context.
+      * @see:OgamlGraphics.RenderTarget.T 
+      * @see:OgamlMath.Vector2i 
+      * @see:OgamlGraphics.State *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a -> 
                  ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None] ->
                  [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] -> t
 
-    (** Returns the size of a texture *)
+    (** Returns the size of a texture 
+      * @see:OgamlMath.Vector2i *)
     val size : t -> OgamlMath.Vector2i.t
 
     (** Sets the minifying filter of a texture. Defaults as LinearMipmapLinear. *)
@@ -817,7 +841,7 @@ module Texture : sig
     val mipmap_levels : t -> int
 
     (** Returns a mipmap level of a texture.
-      * Raises Invalid_argument if the requested level is out of bounds *)
+      * Raises $Invalid_argument$ if the requested level is out of bounds *)
     val mipmap : t -> int -> Texture2DMipmap.t
 
     (** System only function, binds a texture to a texture unit for drawing *)
@@ -879,7 +903,8 @@ module Texture : sig
     (** Returns the mipmap's level *)
     val level : t -> int
 
-    (** Returns the mipmap of a particular layer *)
+    (** Returns the mipmap of a particular layer 
+      * Raises $Invalid_argument$ if the layer does not exist. *)
     val layer : t -> int -> Texture2DArrayLayerMipmap.t
 
   end
@@ -903,7 +928,8 @@ module Texture : sig
     (** Returns the number of mipmap levels of a layer *)
     val mipmap_levels : t -> int
 
-    (** Returns a particular mipmap level of a layer *)
+    (** Returns a particular mipmap level of a layer
+      * Raises $Invalid_argument$ if the mipmap level does not exist. *)
     val mipmap : t -> int -> Texture2DArrayLayerMipmap.t
 
     (** System only : binds the original texture array for drawing *)
@@ -928,7 +954,10 @@ module Texture : sig
       * creates an empty array of given dimensions.
       * Generates all mipmaps by default for every layer by default.
       *
-      * Raises Creation_error if the list of images (or files) is empty, or
+      * Raises $Texture_error$ if the requested size exceeds the maximal texture 
+      * size allowed by the context.
+      *
+      * Also raises $Texture_error$ if the list of images (or files) is empty, or
       * if all the images do not have the same dimensions. *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a
                  -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
@@ -952,10 +981,12 @@ module Texture : sig
     (** Returns the number of mipmap levels of a texture. *)
     val mipmap_levels : t -> int
 
-    (** Returns a particular layer of a texture array. *)
+    (** Returns a particular layer of a texture array.
+      * Raises $Invalid_argument$ if the layer does not exist. *)
     val layer : t -> int -> Texture2DArrayLayer.t
 
-    (** Returns a particular mipmap of a texture array. *)
+    (** Returns a particular mipmap of a texture array. 
+      * Raises $Invalid_argument$ if the mipmap level does not exist. *)
     val mipmap : t -> int -> Texture2DArrayMipmap.t
 
   end

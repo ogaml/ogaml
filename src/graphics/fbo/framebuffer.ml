@@ -1,6 +1,6 @@
 open OgamlMath
 
-exception Error of string
+exception FBO_Error of string
 
 type t = {
   fbo    : GL.FBO.t;
@@ -33,10 +33,10 @@ let attach_color (type a) (module A : Attachment.ColorAttachable with type t = a
   let attc = A.to_color_attachment attachment in
   let capabilities = State.capabilities fbo.state in
   if nb >= capabilities.State.max_color_attachments then
-    raise (Error "Color attachment limit exceeded");
+    raise (FBO_Error "Color attachment limit exceeded");
   if size.Vector2i.x >= capabilities.State.max_framebuffer_width 
   || size.Vector2i.y >= capabilities.State.max_framebuffer_height then
-    raise (Error "Max attachment size exceeded");
+    raise (FBO_Error "Max attachment size exceeded");
   fbo.color <- true;
   fbo.color_attachments.(nb) <- Some (size, attc);
   RenderTarget.bind_fbo fbo.state fbo.id (Some fbo.fbo);
@@ -55,7 +55,7 @@ let attach_depth (type a) (module A : Attachment.DepthAttachable with type t = a
   let capabilities = State.capabilities fbo.state in
   if size.Vector2i.x >= capabilities.State.max_framebuffer_width 
   || size.Vector2i.y >= capabilities.State.max_framebuffer_height then
-    raise (Error "Max attachment size exceeded");
+    raise (FBO_Error "Max attachment size exceeded");
   fbo.depth <- true;
   fbo.depth_attachment <- Some (size, attc);
   if fbo.stencil_attachment <> None then
@@ -72,7 +72,7 @@ let attach_stencil (type a) (module A : Attachment.StencilAttachable with type t
   let capabilities = State.capabilities fbo.state in
   if size.Vector2i.x >= capabilities.State.max_framebuffer_width 
   || size.Vector2i.y >= capabilities.State.max_framebuffer_height then
-    raise (Error "Max attachment size exceeded");
+    raise (FBO_Error "Max attachment size exceeded");
   fbo.stencil <- true;
   fbo.stencil_attachment <- Some (size, attc);
   if fbo.depth_attachment <> None then
@@ -89,7 +89,7 @@ let attach_depthstencil (type a) (module A : Attachment.DepthStencilAttachable w
   let capabilities = State.capabilities fbo.state in
   if size.Vector2i.x >= capabilities.State.max_framebuffer_width 
   || size.Vector2i.y >= capabilities.State.max_framebuffer_height then
-    raise (Error "Max attachment size exceeded");
+    raise (FBO_Error "Max attachment size exceeded");
   fbo.stencil <- true;
   fbo.depth <- true;
   fbo.depth_stencil_attachment <- Some (size, attc);

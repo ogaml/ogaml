@@ -1,5 +1,5 @@
 
-exception Creation_error of string
+exception Texture_error of string
 
 module type T = sig
 

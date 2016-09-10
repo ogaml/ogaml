@@ -104,6 +104,7 @@ type t = {
   culling : CullingMode.t;
   polygon : PolygonMode.t;
   depth   : DepthTest.t;
+  depth_write : bool;
   blend   : BlendMode.t;
   viewport: Viewport.t;
   aa      : bool
@@ -112,17 +113,20 @@ type t = {
 let make ?culling:(culling = CullingMode.CullNone)
          ?polygon:(polygon = PolygonMode.DrawFill) 
          ?depth_test:(depth_test = DepthTest.Less)
+         ?depth_write:(depth_write = true)
          ?blend_mode:(blend_mode = BlendMode.default)
          ?viewport:(viewport = Viewport.Full)
          ?antialiasing:(antialiasing = true)
          () = 
-  { culling; polygon; depth = depth_test; blend = blend_mode; viewport; aa = antialiasing}
+  { culling; polygon; depth = depth_test; depth_write; blend = blend_mode; viewport; aa = antialiasing}
 
 let culling t = t.culling
 
 let polygon t = t.polygon
 
 let depth_test t = t.depth
+
+let depth_write t = t.depth_write
 
 let blend_mode t = t.blend
 

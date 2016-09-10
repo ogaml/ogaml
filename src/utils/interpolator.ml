@@ -39,8 +39,8 @@ let loop ip = {
   ip with func = fun t -> ip.func (mod_neg2 t)
 }
 
-let custom f = {
-  func = (fun t -> f (clamp t));
+let custom f start stop = {
+  func = (fun t -> f (start +. (clamp t) *. (stop -. start)));
   start = 0.;
   duration = 0.
 }

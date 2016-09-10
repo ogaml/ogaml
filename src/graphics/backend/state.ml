@@ -35,6 +35,7 @@ type t = {
   mutable culling_mode  : DrawParameter.CullingMode.t;
   mutable polygon_mode  : DrawParameter.PolygonMode.t;
   mutable depth_test : bool;
+  mutable depth_writing : bool;
   mutable depth_function : DrawParameter.DepthTest.t;
   mutable texture_id : int;
   mutable texture_unit  : int;
@@ -130,6 +131,7 @@ module LL = struct
       culling_mode = DrawParameter.CullingMode.CullNone;
       polygon_mode = DrawParameter.PolygonMode.DrawFill;
       depth_test = false;
+      depth_writing = true;
       depth_function = DrawParameter.DepthTest.Less;
       texture_id   = 0;
       texture_unit = 0;
@@ -168,6 +170,9 @@ module LL = struct
   let depth_test s = 
     s.depth_test
 
+  let depth_writing s = 
+    s.depth_writing
+
   let depth_function s = 
     s.depth_function
 
@@ -182,6 +187,9 @@ module LL = struct
 
   let set_depth_test s v = 
     s.depth_test <- v
+
+  let set_depth_writing s v = 
+    s.depth_writing <- v
 
   let set_depth_function s f = 
     s.depth_function <- f

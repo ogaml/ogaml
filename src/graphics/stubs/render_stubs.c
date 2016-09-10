@@ -142,6 +142,22 @@ caml_depth_test(value b)
 }
 
 
+// INPUT   a boolean
+// OUTPUT  nothing, sets the current value of depth writing
+CAMLprim value
+caml_depth_mask(value b)
+{
+  CAMLparam1(b);
+
+  if(Bool_val(b))
+    glDepthMask(GL_TRUE);
+  else
+    glDepthMask(GL_FALSE);
+
+  CAMLreturn(Val_unit);
+}
+
+
 // INPUT   a depth function
 // OUTPUT  nothing, sets the current value of the depth function
 CAMLprim value

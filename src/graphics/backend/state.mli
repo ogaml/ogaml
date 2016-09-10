@@ -82,6 +82,9 @@ module LL : sig
   (** Returns if depth testing is currently activated or not *)
   val depth_test : t -> bool
 
+  (** Returns if depth writing is currently activated or not *)
+  val depth_writing : t -> bool
+
   (** Returns the current depth function *)
   val depth_function : t -> DrawParameter.DepthTest.t
 
@@ -96,6 +99,9 @@ module LL : sig
 
   (** Sets the current value of depth testing *)
   val set_depth_test : t -> bool -> unit
+
+  (** Sets the current value of depth writing*)
+  val set_depth_writing : t -> bool -> unit
 
   (** Sets the current value of the depth function *)
   val set_depth_function : t -> DrawParameter.DepthTest.t -> unit

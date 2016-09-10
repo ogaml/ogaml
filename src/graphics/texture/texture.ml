@@ -1,6 +1,6 @@
 open OgamlMath
 
-exception Creation_error of string
+exception Texture_error of string
 
 module type T = sig
 
@@ -182,6 +182,11 @@ module Texture2D = struct
       | `Empty i      | `Generated i -> max 1 (min max_levels i)
       | `None -> 1
      in
+    (* Check that the size is allowed *)
+    let capabilities = State.capabilities state in
+    let max_size = capabilities.State.max_texture_size in
+    if width > max_size || height > max_size then
+      raise (Texture_error "Maximal texture size exceeded");
     (* Create the internal texture *)
     let common = Common.create state levels GLTypes.TextureTarget.Texture2D in
     let tex = {common; width; height} in
@@ -356,25 +361,25 @@ module Texture2DArray = struct
     let width, height, depth, imgs = 
       match src with
       | `File sl -> 
-        if sl = [] then raise (Creation_error "Texture 2D array : empty file list");
+        if sl = [] then raise (Texture_error "Texture 2D array : empty file list");
         let imgs = List.map (fun s -> Image.create (`File s)) sl in
         let size = 
           List.fold_left (fun size img -> 
             let imgsize = Image.size img in
             if imgsize <> size then 
-              raise (Creation_error "Texture 2D array : images of different sizes");
+              raise (Texture_error "Texture 2D array : images of different sizes");
             size
          ) (Image.size (List.hd imgs)) imgs
         in
         let depth = List.length imgs in
         size.Vector2i.x, size.Vector2i.y, depth, (List.map (fun i -> Some i) imgs)
       | `Image imgs ->
-        if imgs = [] then raise (Creation_error "Texture 2D array : empty image list");
+        if imgs = [] then raise (Texture_error "Texture 2D array : empty image list");
         let size = 
           List.fold_left (fun size img -> 
             let imgsize = Image.size img in
             if imgsize <> size then 
-              raise (Creation_error "Texture 2D array : images of different sizes");
+              raise (Texture_error "Texture 2D array : images of different sizes");
             size
          ) (Image.size (List.hd imgs)) imgs
         in
@@ -397,6 +402,14 @@ module Texture2DArray = struct
       | `Empty i      | `Generated i -> max 1 (min max_levels i)
       | `None -> 1
      in
+    (* Check that the size is allowed *)
+    let capabilities = State.capabilities state in
+    let max_size = capabilities.State.max_texture_size in
+    let max_depth = capabilities.State.max_array_texture_layers in
+    if width > max_size || height > max_size then
+      raise (Texture_error "Maximal texture size exceeded");
+    if depth > max_depth then
+      raise (Texture_error "Maximal texture depth exceeded");
     (* Create the internal texture *)
     let common = Common.create state levels GLTypes.TextureTarget.Texture2DArray in
     let tex = {common; width; height; depth} in

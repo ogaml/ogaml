@@ -68,6 +68,13 @@ let bind_depth_testing state parameters =
     end 
   end
 
+let bind_depth_writing state parameters =
+  let depth_writing = DrawParameter.depth_write parameters in
+  if State.LL.depth_writing <> depth_writing then begin
+    State.LL.set_depth_writing state depth_writing;
+    GL.Pervasives.depth_mask depth_writing;
+  end
+
 let bind_antialiasing state level parameters = 
   let antialiasing = DrawParameter.antialiasing parameters in
   if level > 0
@@ -154,6 +161,7 @@ let bind_draw_parameters state size aa parameters =
   bind_culling_mode state parameters;
   bind_polygon_mode state parameters;
   bind_depth_testing state parameters;
+  bind_depth_writing state parameters;
   bind_antialiasing state aa parameters;
   bind_viewport state size parameters;
   bind_blend_mode state parameters

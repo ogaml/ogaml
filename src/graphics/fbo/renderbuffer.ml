@@ -1,5 +1,7 @@
 open OgamlMath
 
+exception RBO_Error of string
+
 
 module ColorBuffer = struct
 
@@ -13,6 +15,10 @@ module ColorBuffer = struct
     let internal = GL.RBO.create () in
     let state = M.state target in
     let id = State.LL.rbo_id state in
+    let capabilities = State.capabilities state in
+    if size.Vector2i.x >= capabilities.State.max_renderbuffer_size 
+    || size.Vector2i.y >= capabilities.State.max_renderbuffer_size then
+      raise (RBO_Error "Max renderbuffer size exceeded");
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.RGBA8 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
@@ -38,6 +44,10 @@ module DepthBuffer = struct
     let internal = GL.RBO.create () in
     let state = M.state target in
     let id = State.LL.rbo_id state in
+    let capabilities = State.capabilities state in
+    if size.Vector2i.x >= capabilities.State.max_renderbuffer_size 
+    || size.Vector2i.y >= capabilities.State.max_renderbuffer_size then
+      raise (RBO_Error "Max renderbuffer size exceeded");
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.Depth24 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
@@ -63,6 +73,10 @@ module DepthStencilBuffer = struct
     let internal = GL.RBO.create () in
     let state = M.state target in
     let id = State.LL.rbo_id state in
+    let capabilities = State.capabilities state in
+    if size.Vector2i.x >= capabilities.State.max_renderbuffer_size
+    || size.Vector2i.y >= capabilities.State.max_renderbuffer_size then
+      raise (RBO_Error "Max renderbuffer size exceeded");
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.Depth24Stencil8 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
@@ -88,6 +102,10 @@ module StencilBuffer = struct
     let internal = GL.RBO.create () in
     let state = M.state target in
     let id = State.LL.rbo_id state in
+    let capabilities = State.capabilities state in
+    if size.Vector2i.x >= capabilities.State.max_renderbuffer_size 
+    || size.Vector2i.y >= capabilities.State.max_renderbuffer_size then
+      raise (RBO_Error "Max renderbuffer size exceeded");
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.Stencil8 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;

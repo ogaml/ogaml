@@ -1,4 +1,7 @@
 
+exception RBO_Error of string
+
+
 module ColorBuffer : sig
 
   type t

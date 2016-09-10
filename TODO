@@ -20,10 +20,10 @@ Interface changes:
   Color:
     ✔ Add Color.alpha @done(2016-04-29 15:19) @project(Interface changes / Color)
   Window:
-    ☐ Coordinate conversions @note(WTF did I mean by that ?)
+    ✘ Coordinate conversions @note(WTF did I mean by that ?) @cancelled(2016-09-10 14:59) @project(Interface changes / Window)
     ☐ Add open (dual of close)
   Interpolators:
-    ☐ Add begin and end time
+    ✔ Add begin and end time @done(2016-09-10 15:07) @project(Interface changes / Interpolators)
   Font:
     ✔ Switch to use texture2D array @done(2016-09-10 13:14) @project(Interface changes / Font)
   Text:
@@ -50,21 +50,21 @@ Interface changes:
     ☐ Same for texture coordinates for fonts
     ☐ (+Shape) Centralize transformations
   Textures:
-    ☐ Check for texture max size at creation
-    ☐ Add default texture wraping (clamp to edge)
-    ☐ Empty textures
+    ✔ Check for texture max size at creation @done(2016-09-10 15:12) @project(Interface changes / Textures)
+    ✔ Add default texture wraping (clamp to edge) @done(2016-09-10 15:25) @project(Interface changes / Textures)
+    ✔ Empty textures @done(2016-09-10 15:13) @project(Interface changes / Textures)
   State:
     ☐ Rename State in GLContext
     ✔ Add state to all functions that need it, even implicitly (ie. Program.create) @done(2016-04-30 12:00) @project(Interface changes / State)
     ✔ Fix VAO, VBO, EBO and Program ID recycling @done(2016-04-30 12:00) @project(Interface changes / State)
   Parameters:
-    ☐ Add optional depth writing
+    ✔ Add optional depth writing @done(2016-09-10 15:38) @project(Interface changes / Parameters)
   RenderTextures/Framebuffers:
     ✔ Check against GL_MAX_RENDERBUFFER_SIZE when creating @done(2016-09-09 22:44) @project(Interface changes / RenderTextures/Framebuffers)
     ☐ Test all attachments
     ✘ Remove size from RenderTarget and Framebuffers @cancelled(2016-05-18 16:52) @project(Interface changes / RenderTextures/Framebuffers)
   VertexArrays (and probably others):
-    ☐ Fix state not being modified at creation (binding then unbinding a vertex array DOES modify the state)
+    ✔ Fix state not being modified at creation (binding then unbinding a vertex array DOES modify the state) @done(2016-09-10 15:38) @project(Interface changes / VertexArrays (and probably others))
   Program:
     ☐ Remove error msg from exception, add optional logging function at creation
     ☐ Add Program.log to get the last log

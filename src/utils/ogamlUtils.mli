@@ -186,9 +186,9 @@ module Interpolator : sig
     * The $cst_*$ variants create constant-speed interpolators 
     * so the $dt$ parameter is not required. *)
 
-  (** $custom f$ returns a custom interpolator that coincides with  
-    * the function $f$ on [0;1] and equals f(0) or f(1) elsewhere. *)
-  val custom : (float -> 'a) -> 'a t
+  (** $custom f start stop$ returns a custom interpolator $ip$ that coincides with  
+    * the function $f$ such that $ip(0) = f(start)$, $ip(1) = f(stop)$. *)
+  val custom : (float -> 'a) -> float -> float -> 'a t
 
   (** $copy f$ returns a custom interpolator that coincides with  
     * the function $f$ everywhere *)
@@ -199,7 +199,7 @@ module Interpolator : sig
 
   (** $linear start steps endt$ creates a linear interpolator
     * going from $start$ to $endt$ passing through each point
-    * $(dt, pos)$ of $steps$ at time $dt$ *)
+    * $(dt, pos)$ of $steps$ at time $dt < 1.0$ *)
   val linear : float -> (float * float) list -> float -> float t
 
   (** $cst_linear start steps endt$ creates a linear interpolator 
@@ -209,7 +209,7 @@ module Interpolator : sig
 
   (** $cubic (start, sm) steps (endt, em)$ creates a cubic spline interpolator
     * going from $start$ with tangent $sm$ to $endt$ with tangent $em$
-    * passing through each point $(dt, pos)$ of $steps$ at time $dt$ *)
+    * passing through each point $(dt, pos)$ of $steps$ at time $dt < 1.0$ *)
   val cubic : (float * float) -> (float * float) list -> (float * float) -> float t
 
   (** $cubic (start, sm) steps (endt, em)$ creates a cubic spline interpolator

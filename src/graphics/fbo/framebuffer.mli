@@ -1,5 +1,5 @@
 
-exception Error of string
+exception FBO_Error of string
 
 type t
 

@@ -39,7 +39,7 @@ the following modules:
     game development, such as interpolators, graphs or UTF8-encoded strings.
     
 You can find some examples in the corresponding directory as well as on the 
-documentation http://ogaml.github.io (broken for now).
+documentation http://ogaml.github.io.
 
 Upcoming features:
 
