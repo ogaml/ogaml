@@ -17,13 +17,15 @@ MLCMIS = $(MLINTERFACES:.mli=.cmi)
 
 # Compilation
 
-default: .depend compile_utils_nat compile_utils_byte
+default: compile_utils_nat compile_utils_byte
 
-compile_utils_nat: .depend $(MLCMIS) $(MLNATOBJS) ogamlUtils.cmi
+include .depend
+
+compile_utils_nat: depend $(MLCMIS) $(MLNATOBJS) ogamlUtils.cmi
 	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(UTILS_LIB).cmx $(MLCMIS) $(MLNATOBJS);
 	$(OCAMLFIND) $(OCAMLOPT_CMD) -a -o $(UTILS_LIB).cmxa $(INCLUDE_DIRS) $(UTILS_LIB).cmx
 
-compile_utils_byte: .depend $(MLCMIS) $(MLOBJS) ogamlUtils.cmi
+compile_utils_byte: depend $(MLCMIS) $(MLOBJS) ogamlUtils.cmi
 	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(UTILS_LIB).cmo $(MLCMIS) $(MLOBJS);
 	$(OCAMLFIND) $(OCAMLC_CMD) -a -o $(UTILS_LIB).cma $(INCLUDE_DIRS) $(UTILS_LIB).cmo
 
@@ -41,15 +43,15 @@ compile_utils_byte: .depend $(MLCMIS) $(MLOBJS) ogamlUtils.cmi
 # Cleaning
 
 clean:
-	rm -rf $(CLEAN_EXTENSIONS)
+	rm -f $(CLEAN_EXTENSIONS)
 
 
 # Dependencies
 
+depend:.depend
+
 .depend:
 	$(DEPCOMMAND) *.ml *.mli > .depend
-
-include .depend
 
 .PHONY: .depend
 

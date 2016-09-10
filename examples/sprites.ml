@@ -6,19 +6,17 @@ let settings = OgamlCore.ContextSettings.create ()
 let window =
   Window.create ~width:900 ~height:600 ~settings ~title:"Sprite Example" ()
 
-let context = Window.state window
+let texture = Texture.Texture2D.create (module Window) window (`File "examples/mario-block.bmp")
 
-let texture = Texture.Texture2D.create context (`File "examples/mario-block.bmp")
-
-let texture_png = Texture.Texture2D.create context (`File "examples/test.png")
+let texture_png = Texture.Texture2D.create (module Window) window (`File "examples/test.png")
 
 let sprite = Sprite.create ~texture ~size:(Vector2f.({x = 50.; y = 50.})) ~origin:(Vector2f.({x=25.;y=25.})) ()
 
 let sprite2 = Sprite.create ~texture:texture_png ~position:(Vector2f.({x = 50.; y = 50.})) ()
 
 let draw () =
-  Sprite.draw ~window ~sprite ();
-  Sprite.draw ~window ~sprite:sprite2 ()
+  Sprite.draw (module Window) ~target:window ~sprite ();
+  Sprite.draw (module Window) ~target:window ~sprite:sprite2 ()
 
 let do_all action param =
   action sprite param
@@ -53,7 +51,7 @@ let rec handle_events () =
 
 let rec each_frame () =
   if Window.is_open window then begin
-    Window.clear ~color:(`RGB Color.RGB.white) window ;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window ;
     draw () ;
     Window.display window ;
     handle_events () ;

@@ -11,6 +11,10 @@ caml_cocoa_create_window(value frame, value styleMask, value backing, value defe
   CAMLlocal2(hd, tl);
 
   NSRect* rect = (NSRect*) Data_custom_val(frame);
+  CGFloat scale = [[NSScreen mainScreen] backingScaleFactor];
+  // No point in scaling initial position
+  rect->size.width = rect->size.width / scale;
+  rect->size.height = rect->size.height / scale;
 
   // Getting the flags
   int mask = 0;

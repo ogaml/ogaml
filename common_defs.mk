@@ -56,7 +56,7 @@ LEX = ocamllex
 
 # Constants
   # Extensions used for cleaning
-CLEAN_EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so *.native *.out *.byte *.d
+CLEAN_EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so *.native *.out *.byte *.d .depend
 
 STUBS_DIR = stubs
 
@@ -83,7 +83,7 @@ UTILS_PACK = OgamlUtils
 
 PPCOMMAND = -pp "cppo -D '$(strip $(PP_DEFINE))'"
 
-DEPCOMMAND = $(OCAMLDEP) $(PPCOMMAND) $(INCLUDE_DIRS)
+DEPCOMMAND = $(OCAMLFIND) $(OCAMLDEP) $(PPCOMMAND) $(INCLUDE_DIRS)
 
 OCAMLOPT_CMD = $(OCAMLOPT) $(PPCOMMAND)
 

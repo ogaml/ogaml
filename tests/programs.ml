@@ -16,7 +16,8 @@ let test_program0 () =
 
 let test_program1 () =
   let prog = Program.from_source_list
-    state
+    (module Window) 
+    ~target:window
     ~vertex_source:[
       (110, (`String "#version 110
 
@@ -68,7 +69,8 @@ let test_program1 () =
 
 let test_program2 () =
   let prog = Program.from_source_list
-    state
+    (module Window)
+    ~target:window
     ~vertex_source: [
       (130, `String
              "#version 130

@@ -34,7 +34,8 @@ let fragment_shader_source = "
 
 let program =
   Program.from_source_pp
-    (Window.state window)
+    (module Window)
+    ~target:window
     ~vertex_source:(`String vertex_shader_source)
     ~fragment_source:(`String fragment_shader_source)
 
@@ -87,9 +88,9 @@ let index_source = IndexArray.Source.(
     << 4 << 6 << 2 << 4 << 2 << 0
 )
 
-let vertices = VertexArray.static vertex_source
+let vertices = VertexArray.static (module Window) window vertex_source
 
-let indices  = IndexArray.static index_source
+let indices  = IndexArray.static (module Window) window index_source
 
 (* Displaying *)
 let proj = Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
@@ -109,11 +110,11 @@ let display () =
   (* Cube *)
   let parameters = DrawParameter.(make ~culling:CullingMode.CullCounterClockwise ()) in
   let uniform = Uniform.(empty |> matrix3D "MVP" matrixMVP |> color "color" (`RGB Color.RGB.red)) in
-  VertexArray.draw ~window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ();
+  VertexArray.draw (module Window) ~target:window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ();
   (* Edges *)
   let parameters = DrawParameter.(make ~polygon:PolygonMode.DrawLines ()) in
   let uniform = Uniform.(empty |> matrix3D "MVP" matrixMVP |> color "color" (`RGB Color.RGB.black)) in
-  VertexArray.draw ~window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ()
+  VertexArray.draw (module Window) ~target:window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ()
 
 let rec event_loop () =
   match Window.poll_event window with
@@ -126,7 +127,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(`RGB Color.RGB.white) window;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window;
     display ();
     Window.display window;
     event_loop ();

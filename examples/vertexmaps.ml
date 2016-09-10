@@ -91,12 +91,13 @@ let cube_indices =
     << 20 << 21 << 23 << 21 << 22 << 23
   )
 
-let cube = VertexMap.static cube_source
+let cube = VertexMap.static (module Window) window cube_source
 
-let indices = IndexArray.static cube_indices
+let indices = IndexArray.static (module Window) window cube_indices
 
 let cube_program =
-  Program.from_source_pp (Window.state window)
+  Program.from_source_pp (module Window)
+    ~target:window
     ~vertex_source:(`String cube_shader)
     ~fragment_source:(`File "examples/normals_shader.frag")
 
@@ -131,7 +132,7 @@ let display () =
     |> Uniform.matrix3D "MVMatrix" mv
     |> Uniform.matrix3D "VMatrix" view
   in
-  VertexMap.draw ~window ~vertices:cube ~indices ~uniform ~program:cube_program ~parameters ~mode:DrawMode.Triangles ()
+  VertexMap.draw (module Window) ~target:window ~vertices:cube ~indices ~uniform ~program:cube_program ~parameters ~mode:DrawMode.Triangles ()
 
 
 (* Camera *)
@@ -208,7 +209,7 @@ let rec event_loop () =
 (* Main loop *)
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(`RGB Color.RGB.white) window;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window;
     display ();
     Window.display window;
     (* We only capture the mouse and listen to the keyboard when focused *)

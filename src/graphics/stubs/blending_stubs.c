@@ -15,77 +15,7 @@
 #endif
 #include <caml/bigarray.h>
 #include "utils.h"
-
-GLenum BlendFunc_val(value func) 
-{
-  switch(Tag_val(func))
-  {
-    case 0:
-      return GL_FUNC_ADD;
-
-    case 1:
-      return GL_FUNC_SUBTRACT;
-
-    default:
-      caml_failwith("Caml variant error in BlendFunc_val(1)");
-  }
-}
-
-
-GLenum BlendFactor_val(value fac) 
-{
-  switch(Int_val(fac))
-  {
-    case 0 : 
-      return GL_ZERO;
-
-    case 1 : 
-      return GL_ONE;
-
-    case 2 : 
-      return GL_SRC_COLOR;
-
-    case 3 : 
-      return GL_ONE_MINUS_SRC_COLOR;
-
-    case 4 : 
-      return GL_DST_COLOR;
-
-    case 5 : 
-      return GL_ONE_MINUS_DST_COLOR;
-
-    case 6 : 
-      return GL_SRC_ALPHA;
-
-    case 7 : 
-      return GL_SRC_ALPHA_SATURATE;
-
-    case 8 : 
-      return GL_ONE_MINUS_SRC_ALPHA;
-
-    case 9 : 
-      return GL_DST_ALPHA;
-
-    case 10: 
-      return GL_ONE_MINUS_DST_ALPHA;
-
-    case 11: 
-      return GL_CONSTANT_COLOR;
-
-    case 12: 
-      return GL_ONE_MINUS_CONSTANT_COLOR;
-
-    case 13: 
-      return GL_CONSTANT_ALPHA;
-
-    case 14: 
-      return GL_ONE_MINUS_CONSTANT_ALPHA;
-
-    default:
-      caml_failwith("Caml variant error in BlendFactor_val(1)");
-  }
-}
-
+#include "types_stubs.h"
 
 CAMLprim value
 caml_blend_enable(value b)

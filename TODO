@@ -14,6 +14,7 @@ Cocoa specific:
   ☐ Differentiate between Middle and Other for mouse
   ☐ Window doesn't resign being key on mission control
   ☐ Implement LL.show_cursor
+  ☐ Fix all pixel/point related issues
 
 Interface changes:
   Color:
@@ -24,12 +25,12 @@ Interface changes:
   Interpolators:
     ☐ Add begin and end time
   Font:
-    ☐ Switch to use texture2D array
+    ✔ Switch to use texture2D array @done(2016-09-10 13:14) @project(Interface changes / Font)
   Text:
     ☐ Alinea parameter @unsure
     ☐ Text align
     ☐ Text width
-    ☐ Factorize two modules
+    ☐ Factorize two modules - and remove State.t dependency in Text.Fx.create
     ☐ Constraint rectangle
     ☐ Transformations ? (rotation/scale/etc...)
     ☐ Set position
@@ -41,25 +42,40 @@ Interface changes:
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
   Uniform:
     ✘ Optional vec2 font_size parameter for uniform font -- font uniform was a bad idea @cancelled(2016-04-14 11:49) @project(Interface changes / Uniform)
+    ✔ Change behavior of tex_unit to use an available unit (only at binding) @done(2016-09-10 13:48) @project(Interface changes / Uniform)
+    ✔ Add exception when all units are taken/a unit is bound twice by the user @done(2016-09-10 13:48) @project(Interface changes / Uniform)
+    ✔ Pool the available units array @done(2016-09-10 14:49) @project(Interface changes / Uniform)
   Sprite & Text:
     ☐ Local relative-space conversion (rather than uniforms)
     ☐ Same for texture coordinates for fonts
     ☐ (+Shape) Centralize transformations
   Textures:
     ☐ Check for texture max size at creation
+    ☐ Add default texture wraping (clamp to edge)
+    ☐ Empty textures
   State:
-    ☐ Rename State in GLState
-    ☐ Add state to all functions that need it, even implicitly (ie. Program.create)
+    ☐ Rename State in GLContext
+    ✔ Add state to all functions that need it, even implicitly (ie. Program.create) @done(2016-04-30 12:00) @project(Interface changes / State)
+    ✔ Fix VAO, VBO, EBO and Program ID recycling @done(2016-04-30 12:00) @project(Interface changes / State)
   Parameters:
     ☐ Add optional depth writing
-    
+  RenderTextures/Framebuffers:
+    ✔ Check against GL_MAX_RENDERBUFFER_SIZE when creating @done(2016-09-09 22:44) @project(Interface changes / RenderTextures/Framebuffers)
+    ☐ Test all attachments
+    ✘ Remove size from RenderTarget and Framebuffers @cancelled(2016-05-18 16:52) @project(Interface changes / RenderTextures/Framebuffers)
+  VertexArrays (and probably others):
+    ☐ Fix state not being modified at creation (binding then unbinding a vertex array DOES modify the state)
+  Program:
+    ☐ Remove error msg from exception, add optional logging function at creation
+    ☐ Add Program.log to get the last log
+    ☐ Change target to context at creation
 
 Bugs:
   ✔ Use a custom ID system for textures as checking the equality of two textures in State can be wrong (if an ID gets recycled) @done(2016-04-14 12:00) @project(Bugs)
 
 Before merge:
   ☐ Remove debug type and functions in VertexArray and Sprite
-  ☐ Make a custom module to handle smaller VAOs faster
+  ☐ Make a custom module to handle smaller VAOs faster (or pool bigarrays ?)
 
 New modules:
   Bounding module:
@@ -69,16 +85,21 @@ New modules:
     ☐ Tests
   Segment trees:
     ☐ Functorized for use with various coordinate systems @unsure
-    ☐ Quadtree 
-    ☐ Octree 
+    ☐ Quadtree
+    ☐ Octree
 
 Advanced features:
   More Image and Texture types:
     ☐ Single-channeled images
+    ☐ Image slices
     ☐ Texture3D
-    ☐ Texture2D array
+    ✔ Texture2D array @done(2016-07-14 14:06) @project(Advanced features / More Image and Texture types)
+    ☐ Parameterize renderbuffers/textures by a texture format
+    ☐ Depth textures
+    ☐ Stencil textures
+    ✔ Mipmaps @done(2016-07-14 12:06) @project(Advanced features / More Image and Texture types)
     ☐ TextureCube
-  ☐ Render textures
+  ✔ Render textures @done(2016-05-18 16:51) @project(Advanced features)
 
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
