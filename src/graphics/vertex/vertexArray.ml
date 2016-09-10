@@ -334,8 +334,7 @@ let bind state t prog =
         let (e,off,l) = find_remove s t in 
         (e,off,h::l)
     in
-    Program.LL.iter_attributes prog 
-      (fun att ->
+    List.iter (fun att ->
         let (typ,offset,l) = find_remove (Program.Attribute.name att) !attribs in
         attribs := l;
         if Source.type_of_attrib typ <> Program.Attribute.kind att then
@@ -350,7 +349,7 @@ let bind state t prog =
           (GLTypes.GlFloatType.Float)
           (offset   * 4)
           (t.stride * 4)
-      );
+      ) (Program.LL.attributes prog);
     (*if !attribs <> [] then
       Printf.eprintf "Warning : omitting attribute %s not required by program\n%!" 
         (let (_,s,_) = List.hd !attribs in s)*)
@@ -408,7 +407,7 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
     debug_t.program_bind_t <- debug_t.program_bind_t +. (tm () -. t);
 
     let t = tm () in
-    Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind state uniform unif);
+    Uniform.LL.bind state uniform (Program.LL.uniforms program);
     debug_t.uniform_bind_t <- debug_t.uniform_bind_t +. (tm () -. t);
 
     let t = tm () in

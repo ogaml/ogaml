@@ -38,6 +38,7 @@ type t = {
   mutable depth_function : DrawParameter.DepthTest.t;
   mutable texture_id : int;
   mutable texture_unit  : int;
+  mutable pooled_tex_array : bool array;
   mutable bound_texture : (GL.Texture.t * int * GLTypes.TextureTarget.t) option array;
   mutable program_id    : int;
   mutable linked_program : (GL.Program.t * int) option;
@@ -132,6 +133,7 @@ module LL = struct
       depth_function = DrawParameter.DepthTest.Less;
       texture_id   = 0;
       texture_unit = 0;
+      pooled_tex_array = Array.make capabilities.max_texture_image_units true;
       bound_texture = Array.make capabilities.max_texture_image_units None;
       program_id = 0;
       linked_program = None;
@@ -216,6 +218,9 @@ module LL = struct
     if i >= s.capabilities.max_texture_image_units || i < 0 then
       Printf.ksprintf error "Invalid texture unit %i" i;
     s.bound_texture.(i) <- t
+
+  let pooled_texture_array s = 
+    s.pooled_tex_array
 
   let linked_program s = 
     match s.linked_program with

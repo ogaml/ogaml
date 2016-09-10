@@ -124,6 +124,9 @@ module LL : sig
   (** Returns the target currently bound to a texture unit *)
   val bound_target : t -> int -> GLTypes.TextureTarget.t option
 
+  (** Returns a reusable array of booleans of length max_texture_image_units *)
+  val pooled_texture_array : t -> bool array
+
   (** Sets the currently linked program *)
   val set_linked_program : t -> (GL.Program.t * int) option -> unit
 

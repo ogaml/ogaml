@@ -88,8 +88,8 @@ module LL = struct
     end
     | _ -> ()
 
-  let iter_uniforms prog f = List.iter f prog.ProgramInternal.uniforms
+  let uniforms prog = prog.ProgramInternal.uniforms
 
-  let iter_attributes prog f = List.iter f prog.ProgramInternal.attributes
+  let attributes prog = prog.ProgramInternal.attributes
 
 end

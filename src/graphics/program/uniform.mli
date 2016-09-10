@@ -3,10 +3,7 @@
   * when drawing 
 **)
 
-(** Raised when trying to bind a non-provided uniform *)
-exception Unknown_uniform of string
-
-(** Raised when trying to bind a uniform with the wrong type *)
+(** Raised when an error occurs *)
 exception Invalid_uniform of string
 
 (** Type of a set of uniforms *)
@@ -51,7 +48,7 @@ val texture2Darray : string -> ?tex_unit:int -> Texture.Texture2DArray.t -> t ->
 
 module LL : sig
 
-  (** Binds a value to a program uniform *)
-  val bind : State.t -> t -> Program.Uniform.t -> unit
+  (** Binds a value to some program uniforms *)
+  val bind : State.t -> t -> Program.Uniform.t list -> unit
 
 end

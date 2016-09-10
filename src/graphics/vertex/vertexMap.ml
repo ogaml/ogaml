@@ -371,8 +371,7 @@ let bind state t prog =
         let (off,typ,l) = find_remove s t in 
         (off,typ,h::l)
     in
-    Program.LL.iter_attributes prog 
-      (fun att ->
+    List.iter (fun att ->
         let (offset,typ,l) = find_remove (Program.Attribute.name att) !attribs in
         attribs := l;
         if typ <> Program.Attribute.kind att then
@@ -396,7 +395,7 @@ let bind state t prog =
             (offset     * 4)
             (t.stride_f * 4)
         end
-      );
+      ) (Program.LL.attributes prog);
     (*if !attribs <> [] then
       Printf.eprintf "Warning : omitting attribute %s not required by program\n%!" 
         (let (_,s,_) = List.hd !attribs in s)*)
@@ -429,7 +428,7 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
     in
     M.bind target parameters;
     Program.LL.use state (Some program);
-    Program.LL.iter_uniforms program (fun unif -> Uniform.LL.bind state uniform unif);
+    Uniform.LL.bind state uniform (Program.LL.uniforms program);
     bind state vertices program;
     match indices with
     |None -> 

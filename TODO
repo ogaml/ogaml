@@ -25,7 +25,7 @@ Interface changes:
   Interpolators:
     ☐ Add begin and end time
   Font:
-    ☐ Switch to use texture2D array
+    ✔ Switch to use texture2D array @done(2016-09-10 13:14) @project(Interface changes / Font)
   Text:
     ☐ Alinea parameter @unsure
     ☐ Text align
@@ -42,8 +42,9 @@ Interface changes:
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
   Uniform:
     ✘ Optional vec2 font_size parameter for uniform font -- font uniform was a bad idea @cancelled(2016-04-14 11:49) @project(Interface changes / Uniform)
-    ☐ Change behavior of tex_unit to use an available unit (only at binding)
-    ☐ Add exception when all units are taken/a unit is bound twice by the user
+    ✔ Change behavior of tex_unit to use an available unit (only at binding) @done(2016-09-10 13:48) @project(Interface changes / Uniform)
+    ✔ Add exception when all units are taken/a unit is bound twice by the user @done(2016-09-10 13:48) @project(Interface changes / Uniform)
+    ✔ Pool the available units array @done(2016-09-10 14:49) @project(Interface changes / Uniform)
   Sprite & Text:
     ☐ Local relative-space conversion (rather than uniforms)
     ☐ Same for texture coordinates for fonts
@@ -74,7 +75,7 @@ Bugs:
 
 Before merge:
   ☐ Remove debug type and functions in VertexArray and Sprite
-  ☐ Make a custom module to handle smaller VAOs faster
+  ☐ Make a custom module to handle smaller VAOs faster (or pool bigarrays ?)
 
 New modules:
   Bounding module:

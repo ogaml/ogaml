@@ -83,11 +83,11 @@ module LL : sig
     * pass. Used internally by Ogaml, usually not needed. *)
   val use : State.t -> t option -> unit
 
-  (** Iterates on the uniforms of a program *)
-  val iter_uniforms : t -> (Uniform.t -> unit) -> unit
+  (** Returns the list of the uniforms of a program *)
+  val uniforms : t -> Uniform.t list
 
-  (** Iterates on the attributes of a program *)
-  val iter_attributes : t -> (Attribute.t -> unit) -> unit
+  (** Returns the list of the attributes of a program *)
+  val attributes : t -> Attribute.t list
 
 end
 

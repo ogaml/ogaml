@@ -1097,15 +1097,12 @@ end
 module Uniform : sig
 
   (** This module encapsulates a set of uniforms that
-    * can be passed to GLSL programs *)
+    * can be passed to GLSL programs. *)
 
-  (** Raised when trying to draw using a program
-    * that requires a uniform not provided in the set *)
-  exception Unknown_uniform of string
-
-  (** Raised when the type of a uniform is not matching
-    * the type required by the GLSL program *)
+  (** Raised when an error occurs while creating or when drawing using
+    * a uniform. *)
   exception Invalid_uniform of string
+
 
   (** Type of a set of uniforms *)
   type t
@@ -1115,6 +1112,7 @@ module Uniform : sig
 
   (** $vector3f name vec set$ adds the uniform $vec$ to $set$.
     * the uniform should be refered to as $name$ in a glsl program.
+    * Raises $Invalid_uniform$ if $name$ is already bound in $set$.
     * Type : vec3.
     * @see:OgamlMath.Vector3f *)
   val vector3f : string -> OgamlMath.Vector3f.t -> t -> t
@@ -1146,9 +1144,14 @@ module Uniform : sig
   (** See vector3f. Type : sampler2D.
    *
     * The optional parameter $tex_unit$ corresponds to the texture
-    * unit that is used to bind this texture and defaults to $0$.
+    * unit that is used to bind this texture. If not provided, it
+    * defaults to the next available unit. If not additional units
+    * are available, or if a unit is explicitly bound twice, drawing
+    * with the uniform will raise $Invalid_uniform$.
+    *
     * See $State.max_textures$ for the number of available units.
-    * @see:OgamlGraphics.Texture.Texture2D *)
+    * @see:OgamlGraphics.Texture.Texture2D
+    * @see:OgamlGraphics.State *)
   val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
 
   (** See texture2D. Type : sampler2Darray.
