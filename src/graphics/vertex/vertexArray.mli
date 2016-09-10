@@ -75,7 +75,7 @@ module Source : sig
 end
 
 
-type debug_times = {
+(*type debug_times = {
   mutable param_bind_t : float;
   mutable program_bind_t : float;
   mutable uniform_bind_t : float;
@@ -83,7 +83,7 @@ type debug_times = {
   mutable draw_t : float
 }
 
-val debug_t : debug_times
+val debug_t : debug_times*)
 
 
 type static

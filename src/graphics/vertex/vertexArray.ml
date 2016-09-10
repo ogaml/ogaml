@@ -360,7 +360,7 @@ let bind context t prog =
     Context.LL.set_bound_vbo context (Some (t.buffer, t.id));
   end
 
-type debug_times = {
+(*type debug_times = {
   mutable param_bind_t : float;
   mutable program_bind_t : float;
   mutable uniform_bind_t : float;
@@ -374,7 +374,7 @@ let debug_t = {
   uniform_bind_t = 0.;
   vao_bind_t = 0.;
   draw_t = 0.
-}
+}*)
 
 let tm = Unix.gettimeofday 
 
@@ -398,30 +398,30 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
       |Some l, _ -> l
     in
 
-    let t = tm () in
+(*     let t = tm () in *)
     M.bind target parameters;
-    debug_t.param_bind_t <- debug_t.param_bind_t +. (tm () -. t);
+(*     debug_t.param_bind_t <- debug_t.param_bind_t +. (tm () -. t); *)
 
-    let t = tm () in
+(*     let t = tm () in *)
     Program.LL.use context (Some program);
-    debug_t.program_bind_t <- debug_t.program_bind_t +. (tm () -. t);
+(*     debug_t.program_bind_t <- debug_t.program_bind_t +. (tm () -. t); *)
 
-    let t = tm () in
+(*     let t = tm () in *)
     Uniform.LL.bind context uniform (Program.LL.uniforms program);
-    debug_t.uniform_bind_t <- debug_t.uniform_bind_t +. (tm () -. t);
+(*     debug_t.uniform_bind_t <- debug_t.uniform_bind_t +. (tm () -. t); *)
 
-    let t = tm () in
+(*     let t = tm () in *)
     bind context vertices program;
-    debug_t.vao_bind_t <- debug_t.vao_bind_t +. (tm () -. t);
+(*     debug_t.vao_bind_t <- debug_t.vao_bind_t +. (tm () -. t); *)
 
     match indices with
     |None -> 
       if start < 0 || start + length > vertices.length then
         raise (Out_of_bounds "Invalid vertex array bounds")
       else begin
-        let t = tm () in
+(*         let t = tm () in *)
         GL.VAO.draw mode start length;
-        debug_t.draw_t <- debug_t.draw_t +. (tm () -. t);
+(*         debug_t.draw_t <- debug_t.draw_t +. (tm () -. t); *)
       end
     |Some ebo ->
       if start < 0 || start + length > (IndexArray.length ebo) then

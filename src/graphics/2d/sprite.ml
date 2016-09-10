@@ -119,7 +119,7 @@ let to_source sprite src =
 let map_to_custom_source sprite f src = 
   List.iter (fun v -> VertexMap.Source.add src (f v)) (get_vertices sprite)
 
-type debug_times = {
+(*type debug_times = {
   mutable size_get_t : float;
   mutable uniform_create_t : float;
   mutable source_alloc_t : float;
@@ -137,7 +137,7 @@ let debug_t = {
   draw_t = 0.
 }
 
-let tm = Unix.gettimeofday
+let tm = Unix.gettimeofday*)
 
 let draw (type s) (module Target : RenderTarget.T with type t = s)
          ?parameters:(parameters = DrawParameter.make
@@ -146,41 +146,41 @@ let draw (type s) (module Target : RenderTarget.T with type t = s)
          ~target ~sprite () =
   let context = Target.context target in
   let program = Context.LL.sprite_drawing context in
-  let t = tm () in
+(*   let t = tm () in *)
   let sizei = Target.size target in
-  debug_t.size_get_t <- debug_t.size_get_t +. (tm () -. t);
+(*   debug_t.size_get_t <- debug_t.size_get_t +. (tm () -. t); *)
   let size = Vector2f.from_int sizei in
-  let t = tm () in
+(*   let t = tm () in *)
   let uniform =
     Uniform.empty
     |> Uniform.vector2f "size" size
     |> Uniform.texture2D "utexture" sprite.texture
   in
-  debug_t.uniform_create_t <- debug_t.uniform_create_t +. (tm () -. t);
+(*   debug_t.uniform_create_t <- debug_t.uniform_create_t +. (tm () -. t); *)
   let vertices = 
-    let t = tm () in
+(*     let t = tm () in *)
     let src = VertexArray.Source.empty 
       ~position:"position"
       ~texcoord:"uv"
       ~size:6 ()
     in
-    debug_t.source_alloc_t <- debug_t.source_alloc_t +. (tm () -. t);
-    let t = tm () in
+(*     debug_t.source_alloc_t <- debug_t.source_alloc_t +. (tm () -. t); *)
+(*     let t = tm () in *)
     List.iter (VertexArray.Source.add src) (get_vertices sprite);
-    debug_t.vertices_create_t <- debug_t.vertices_create_t +. (tm () -. t);
-    let t = tm () in
+(*     debug_t.vertices_create_t <- debug_t.vertices_create_t +. (tm () -. t); *)
+(*     let t = tm () in *)
     let vao = VertexArray.static (module Target) target src in
-    debug_t.vao_create_t <- debug_t.vao_create_t +. (tm () -. t);
+(*     debug_t.vao_create_t <- debug_t.vao_create_t +. (tm () -. t); *)
     vao
   in
-  let t = tm () in
+(*   let t = tm () in *)
   VertexArray.draw (module Target)
         ~target
         ~vertices
         ~program
         ~parameters
-        ~uniform ();
-  debug_t.draw_t <- debug_t.draw_t +. (tm () -. t)
+        ~uniform ()
+(*   ;debug_t.draw_t <- debug_t.draw_t +. (tm () -. t) *)
 
 let set_position sprite position =
   sprite.position <- position 

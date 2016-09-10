@@ -16,7 +16,7 @@ val create :
   ?rotation : float ->
   unit -> t
 
-type debug_times = {
+(*type debug_times = {
   mutable size_get_t : float;
   mutable uniform_create_t : float;
   mutable source_alloc_t : float;
@@ -25,7 +25,7 @@ type debug_times = {
   mutable draw_t : float;
 }
 
-val debug_t : debug_times
+val debug_t : debug_times*)
 
 (** Draws a sprite. *)
 val draw : 
