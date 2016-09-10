@@ -6,7 +6,7 @@ INCLUDE_DIRS =
 
 MLSOURCES = constants.ml vector2i.ml vector2f.ml vector3i.ml vector3f.ml\
 	    intRect.ml floatRect.ml intBox.ml floatBox.ml\
-	    quaternion.ml vector3fs.ml matrix3D.ml matrix2D.ml
+	    quaternion.ml vector2fs.ml vector3fs.ml matrix3D.ml matrix2D.ml
 
 MLINTERFACES =
 
@@ -19,13 +19,15 @@ MLCMIS = $(MLINTERFACES:.mli=.cmi)
 
 # Compilation
 
-default: .depend compile_math_nat compile_math_byte
+default: compile_math_nat compile_math_byte
 
-compile_math_nat: .depend $(MLCMIS) $(MLNATOBJS) ogamlMath.cmi
+include .depend
+
+compile_math_nat: depend $(MLCMIS) $(MLNATOBJS) ogamlMath.cmi
 	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(MATH_LIB).cmx $(MLCMIS) $(MLNATOBJS);
 	$(OCAMLFIND) $(OCAMLOPT_CMD) -a -o $(MATH_LIB).cmxa $(INCLUDE_DIRS) $(MATH_LIB).cmx
 
-compile_math_byte: .depend $(MLCMIS) $(MLOBJS) ogamlMath.cmi
+compile_math_byte: depend $(MLCMIS) $(MLOBJS) ogamlMath.cmi
 	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(MATH_LIB).cmo $(MLCMIS) $(MLOBJS);
 	$(OCAMLFIND) $(OCAMLC_CMD) -a -o $(MATH_LIB).cma $(INCLUDE_DIRS) $(MATH_LIB).cmo
 
@@ -43,15 +45,15 @@ compile_math_byte: .depend $(MLCMIS) $(MLOBJS) ogamlMath.cmi
 # Cleaning
 
 clean:
-	rm -rf $(CLEAN_EXTENSIONS)
+	rm -f $(CLEAN_EXTENSIONS)
 
 
 # Dependencies
 
+depend:.depend
+
 .depend:
 	$(DEPCOMMAND) *.ml *.mli > .depend
-
-include .depend
 
 .PHONY: .depend
 

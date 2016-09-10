@@ -7,16 +7,17 @@ let settings = OgamlCore.ContextSettings.create ()
 
 let window = Window.create ~width:100 ~height:100 ~settings ~title:"" ()
 
-let state = Window.state window
+let context = Window.context window
 
 let test_program0 () =
-  let (a,b) = State.version state in
+  let (a,b) = Context.version context in
   Printf.printf "GL version : %i.%i\n" a b;
-  Printf.printf "GLSL version : %i\n%!" (State.glsl_version state)
+  Printf.printf "GLSL version : %i\n%!" (Context.glsl_version context)
 
 let test_program1 () =
   let prog = Program.from_source_list
-    state
+    (module Window) 
+    ~context:window
     ~vertex_source:[
       (110, (`String "#version 110
 
@@ -62,13 +63,14 @@ let test_program1 () =
                color = vec4(1.0, 1.0, 1.0, 1.0);
 
              }"))
-    ]
+    ] ()
   in
   ignore prog
 
 let test_program2 () =
   let prog = Program.from_source_list
-    state
+    (module Window)
+    ~context:window
     ~vertex_source: [
       (130, `String
              "#version 130
@@ -142,7 +144,7 @@ let test_program2 () =
 
                color = vec4(1.0, 1.0, 1.0, 1.0);
 
-             }")]
+             }")] ()
   in
   ignore prog
 

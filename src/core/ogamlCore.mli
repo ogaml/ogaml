@@ -132,8 +132,7 @@ module Event : sig
 
     (** A record containing information about a mouse event @see:OgamlCore.Button *)
     type t = {button : Button.t; (* Button corresponding to the event *)
-              x : int; (* X position of the mouse when the event was triggered *)
-              y : int; (* Y position of the mouse when the event was triggered *)
+              position : OgamlMath.Vector2i.t; (* Position of the mouse when the event was triggered *)
               shift : bool;   (* $true$ iff the shift modifier was active during the event *)
               control : bool; (* $true$ iff the ctrl modifier (or cmd under OSX) was active during the event *)
               alt : bool      (* $true$ iff the alt modifier was active during the event *)
@@ -141,28 +140,18 @@ module Event : sig
 
   end
 
-  (** Mouse movement event information *)
-  module MouseEvent : sig
-
-    (** This module defines a public structure encapsulating information
-      * about a mouse movement event *)
-
-    (** Record containing the new mouse position *)
-    type t = {x : int; y : int}
-
-  end
-
-  (** A variant type describing the possible events 
+  (** A variant type describing the possible events
     * @see:OgamlCore.Event.KeyEvent
-    * @see:OgamlCore.Event.ButtonEvent @see:OgamlCore.Event.MouseEvent *)
+    * @see:OgamlCore.Event.ButtonEvent *)
   type t =
     | Closed (* The window sending the event has been closed *)
-    | Resized (* The window has been resized by the user *)
-    | KeyPressed     of KeyEvent.t  (* A key has been pressed *)
-    | KeyReleased    of KeyEvent.t  (* A key has been released *)
-    | ButtonPressed  of ButtonEvent.t (* A mouse button has been pressed *)
-    | ButtonReleased of ButtonEvent.t (* A mouse button has been released *)
-    | MouseMoved     of MouseEvent.t (* The mouse has been moved *)
+    | Resized         of OgamlMath.Vector2i.t (* The window has been resized by the user *)
+    | KeyPressed      of KeyEvent.t  (* A key has been pressed *)
+    | KeyReleased     of KeyEvent.t  (* A key has been released *)
+    | ButtonPressed   of ButtonEvent.t (* A mouse button has been pressed *)
+    | ButtonReleased  of ButtonEvent.t (* A mouse button has been released *)
+    | MouseMoved      of OgamlMath.Vector2i.t (* The mouse has been moved *)
+    | MouseWheelMoved of float (* The mouse wheel has been moved of $delta$ *)
 
 end
 
@@ -268,6 +257,9 @@ module LL : sig
 
     (** Displays the window after all the GL calls *)
     val display : t -> unit
+
+    (** Show/hide the cursor *)
+    val show_cursor : t -> bool -> unit
 
   end
 

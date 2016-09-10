@@ -15,6 +15,8 @@ val abs_position : t -> Vector3f.t
 
 val corner : t -> Vector3f.t
 
+val abs_corner : t -> Vector3f.t
+
 val size : t -> Vector3f.t
 
 val abs_size : t -> Vector3f.t

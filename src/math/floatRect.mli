@@ -14,6 +14,8 @@ val abs_position : t -> Vector2f.t
 
 val corner : t -> Vector2f.t
 
+val abs_corner : t -> Vector2f.t
+
 val size : t -> Vector2f.t
 
 val abs_size : t -> Vector2f.t

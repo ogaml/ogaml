@@ -8,7 +8,7 @@ let settings = OgamlCore.ContextSettings.create ()
 
 let window = Window.create ~width:100 ~height:100 ~settings ~title:"" ()
 
-let state = Window.state window
+let context = Window.context window
 
 let parameters = DrawParameter.make ()
 
@@ -17,7 +17,8 @@ let mode = DrawMode.Triangles
 let uniform = Uniform.empty
 
 let program = Program.from_source_list
-    state
+    (module Window) 
+    ~context:window
     ~vertex_source:[
       (130, `String "#version 130
 
@@ -73,7 +74,7 @@ let program = Program.from_source_list
                color = vec4(1.0, 1.0, 1.0, 1.0);
 
              }");
-    ]
+    ] ()
 
 let test_vao1 () =
   let vsource = VertexArray.(Source.(
@@ -82,7 +83,7 @@ let test_vao1 () =
     << Vertex.create ~position:Vector3f.unit_y ()
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic (module Window) window vsource in
   assert (VertexArray.length vao = 3)
 
 let test_vao2 () =
@@ -95,7 +96,7 @@ let test_vao2 () =
     << Vertex.create ~position:Vector3f.unit_x ()
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic (module Window) window vsource in
   assert (VertexArray.length vao = 6)
 
 let test_vao3 () =
@@ -127,7 +128,7 @@ let test_vao5 () =
     << Vertex.create ~position:Vector3f.unit_x ~texcoord:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
     << Vertex.create ~position:Vector3f.unit_x ~texcoord:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic (module Window) window vsource in
   assert (VertexArray.length vao = 4)
 
 let test_vao6 () =
@@ -137,8 +138,9 @@ let test_vao6 () =
     << Vertex.create ~position:Vector3f.unit_y ()
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
-  let vao = VertexArray.dynamic vsource in
-  VertexArray.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ()
+  let vao = VertexArray.dynamic (module Window) window vsource in
+  VertexArray.draw (module Window) ~target:window 
+                   ~vertices:vao ~program ~parameters ~mode ~uniform ()
 
 let test_vao7 () =
   let vsource = VertexArray.(Source.(
@@ -147,9 +149,9 @@ let test_vao7 () =
     << Vertex.create ~position:Vector3f.unit_y ()
     << Vertex.create ~position:Vector3f.unit_x ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic (module Window) window vsource in
   try
-    VertexArray.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ();
+    VertexArray.draw (module Window) ~target:window ~vertices:vao ~program ~parameters ~mode ~uniform ();
     assert false
   with
     VertexArray.Missing_attribute _ -> ()
@@ -162,12 +164,11 @@ let test_vao8 () =
     << Vertex.create ~position:Vector3f.unit_y ~color:(`RGB Color.RGB.white) ()
     << Vertex.create ~position:Vector3f.unit_x ~color:(`RGB Color.RGB.white) ()
   )) in
-  let vao = VertexArray.dynamic vsource in
+  let vao = VertexArray.dynamic (module Window) window vsource in
   try
-    VertexArray.draw ~window ~vertices:vao ~program ~parameters ~mode ~uniform ();
-    assert false
+    VertexArray.draw (module Window) ~target:window ~vertices:vao ~program ~parameters ~mode ~uniform ();
   with
-    VertexArray.Invalid_attribute _ -> ()
+    VertexArray.Invalid_attribute _ -> assert false
 
 let () =
   test_vao1 ();
@@ -185,4 +186,4 @@ let () =
   test_vao7 ();
   Printf.printf "\tTest 7 passed\n%!";
   test_vao8 ();
-  Printf.printf "\tTest 8 passed\n%!"
+  Printf.printf "\tTest 8 passed\n%!";

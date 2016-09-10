@@ -39,9 +39,10 @@ caml_cocoa_display_size(value unit)
 /////////////////////////////////
 void warpCursor(NSPoint loc)
 {
-  int scale = [[NSScreen mainScreen] backingScaleFactor];
-  CGPoint newCursorPosition = CGPointMake(loc.x / scale,
-                                          loc.y / scale);
+  // int scale = [[NSScreen mainScreen] backingScaleFactor];
+  // CGPoint newCursorPosition = CGPointMake(loc.x / scale,
+  //                                         loc.y / scale);
+  CGPoint newCursorPosition = CGPointMake(loc.x, loc.y);
 
   // First solution
   // CGEventSourceRef evsrc =
@@ -77,6 +78,9 @@ caml_cg_warp_mouse_cursor_position(value mlx, value mly)
   CAMLparam2(mlx,mly);
 
   NSPoint loc = NSMakePoint(Double_val(mlx),Double_val(mly));
+  CGFloat scale = [[NSScreen mainScreen] backingScaleFactor];
+  loc.x = loc.x / scale;
+  loc.y = loc.y / scale;
 
   warpCursor(loc);
 

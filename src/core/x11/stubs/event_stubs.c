@@ -143,34 +143,32 @@ value extract_event(XEvent* evt)
       Store_field(result, 0, position);
       break;
 
-    case EnterNotify      :
-    case LeaveNotify      :
-    case FocusIn          :
-    case FocusOut         :
-    case KeymapNotify     :
-    case Expose           :
-    case GraphicsExpose   :
-    case NoExpose         :
-    case VisibilityNotify :
-    case CreateNotify     :
-    case DestroyNotify    :
-    case UnmapNotify      :
-    case MapNotify        :
-    case MapRequest       :
-    case ReparentNotify   :
-    case ConfigureNotify  :
-    case ConfigureRequest :
-    case GravityNotify    :
-    case ResizeRequest    :
-    case CirculateNotify  :
-    case CirculateRequest :
-    case PropertyNotify   :
-    case SelectionClear   :
-    case SelectionRequest :
-    case SelectionNotify  :
-    case ColormapNotify   :
-      result = Val_int(evt->type - 6);
-      break;
+    case EnterNotify      : result = Val_int(1); break;
+    case LeaveNotify      : result = Val_int(2); break;
+    case FocusIn          : result = Val_int(3); break;
+    case FocusOut         : result = Val_int(4); break;
+    case KeymapNotify     : result = Val_int(5); break;
+    case Expose           : result = Val_int(6); break;
+    case GraphicsExpose   : result = Val_int(7); break;
+    case NoExpose         : result = Val_int(8); break;
+    case VisibilityNotify : result = Val_int(9); break;
+    case CreateNotify     : result = Val_int(10); break;
+    case DestroyNotify    : result = Val_int(11); break;
+    case UnmapNotify      : result = Val_int(12); break;
+    case MapNotify        : result = Val_int(13); break;
+    case MapRequest       : result = Val_int(14); break;
+    case ReparentNotify   : result = Val_int(15); break;
+    case ConfigureNotify  : result = Val_int(16); break;
+    case ConfigureRequest : result = Val_int(17); break;
+    case GravityNotify    : result = Val_int(18); break;
+    case ResizeRequest    : result = Val_int(19); break;
+    case CirculateNotify  : result = Val_int(20); break;
+    case CirculateRequest : result = Val_int(21); break;
+    case PropertyNotify   : result = Val_int(22); break;
+    case SelectionClear   : result = Val_int(23); break;
+    case SelectionRequest : result = Val_int(24); break;
+    case SelectionNotify  : result = Val_int(25); break;
+    case ColormapNotify   : result = Val_int(26); break;
 
     // ClientMessage : get the Atom (message_type)
     case ClientMessage: // 33, 6th parametric variant 
@@ -178,10 +176,10 @@ value extract_event(XEvent* evt)
       Store_field(result, 0, (value)evt->xclient.data.l[0]);
       break;
 
-    case MappingNotify    :
-    case GenericEvent     :
+    case MappingNotify    : result = Val_int(27); break;
+    case GenericEvent     : result = Val_int(28); break;
     case LASTEvent        :
-      result = Val_int(evt->type - 7);
+      result = Val_int(0);
       break;
     
     default: 

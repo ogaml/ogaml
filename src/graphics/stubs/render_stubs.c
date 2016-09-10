@@ -15,61 +15,7 @@
 #endif
 #include <caml/bigarray.h>
 #include "utils.h"
-
-
-GLenum Cull_val(value mode)
-{
-  switch(Int_val(mode))
-  {
-    case 0:
-      return -1;
-
-    case 1:
-      return GL_CCW;
-
-    case 2:
-      return GL_CW;
-
-    default:
-      caml_failwith("Caml variant error in Cull_val(1)");
-  }
-}
-
-
-GLenum Polygon_val(value mode)
-{
-  switch(Int_val(mode))
-  {
-    case 0:
-      return GL_POINT;
-
-    case 1:
-      return GL_LINE;
-
-    case 2:
-      return GL_FILL;
-
-    default:
-      caml_failwith("Caml variant error in Polygon_val(1)");
-  }
-}
-
-
-value Val_error(GLenum err)
-{
-  switch(err)
-  {
-    case GL_NO_ERROR: return Val_none;
-    case GL_INVALID_ENUM      : return Val_some(Val_int(0));
-    case GL_INVALID_VALUE     : return Val_some(Val_int(1));
-    case GL_INVALID_OPERATION : return Val_some(Val_int(2));
-    case GL_INVALID_FRAMEBUFFER_OPERATION : return Val_some(Val_int(3));
-    case GL_OUT_OF_MEMORY   : return Val_some(Val_int(4));
-    case GL_STACK_UNDERFLOW : return Val_some(Val_int(5));
-    case GL_STACK_OVERFLOW  : return Val_some(Val_int(6));
-    default : return Val_none;
-  }
-}
+#include "types_stubs.h"
 
 
 // INPUT   three booleans (color, depth, stencil)
@@ -98,6 +44,20 @@ caml_gl_error(value unit)
   CAMLparam0();
 
   CAMLreturn(Val_error(glGetError()));
+}
+
+
+// INPUT   a parameter
+// OUTPUT  returns the integer value of the parameter
+CAMLprim value
+caml_gl_get_integerv(value par)
+{
+  CAMLparam1(par);
+
+  int data;
+  glGetIntegerv(Parameter_val(par),&data);
+
+  CAMLreturn(Val_int(data));
 }
 
 
@@ -182,6 +142,35 @@ caml_depth_test(value b)
 }
 
 
+// INPUT   a boolean
+// OUTPUT  nothing, sets the current value of depth writing
+CAMLprim value
+caml_depth_mask(value b)
+{
+  CAMLparam1(b);
+
+  if(Bool_val(b))
+    glDepthMask(GL_TRUE);
+  else
+    glDepthMask(GL_FALSE);
+
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   a depth function
+// OUTPUT  nothing, sets the current value of the depth function
+CAMLprim value
+caml_depth_fun(value f)
+{
+  CAMLparam1(f);
+
+  glDepthFunc(Depthfun_val(f));
+
+  CAMLreturn(Val_unit);
+}
+
+
 // INPUT   x, y, width, height
 // OUTPUT  nothing, sets the glViewport
 CAMLprim value
@@ -216,14 +205,22 @@ caml_glsl_version(value unit)
 
 
 // INPUT   nothing
-// OUTPUT  the maximal number of textures
+// OUTPUT  nothing, flushes the current buffer
 CAMLprim value
-caml_max_textures(value unit)
+caml_glflush(value unit)
 {
   CAMLparam0();
-  int res;
-  glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &res);
-  CAMLreturn(Val_int(res));
+  glFlush();
+  CAMLreturn(Val_unit);
 }
 
 
+// INPUT   nothing
+// OUTPUT  nothing, finishes the pending actions
+CAMLprim value
+caml_glfinish(value unit)
+{
+  CAMLparam0();
+  glFinish();
+  CAMLreturn(Val_unit);
+}

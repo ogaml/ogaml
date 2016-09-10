@@ -6,21 +6,16 @@ end
 
 module ButtonEvent : sig
 
-  type t = {button : Button.t; x : int; y : int; shift : bool; control : bool; alt : bool}
-
-end
-
-module MouseEvent : sig
-
-  type t = {x : int; y : int}
+  type t = {button : Button.t; position : OgamlMath.Vector2i.t; shift : bool; control : bool; alt : bool}
 
 end
 
 type t =
   | Closed
-  | Resized
-  | KeyPressed     of KeyEvent.t
-  | KeyReleased    of KeyEvent.t
-  | ButtonPressed  of ButtonEvent.t
-  | ButtonReleased of ButtonEvent.t
-  | MouseMoved     of MouseEvent.t
+  | Resized         of OgamlMath.Vector2i.t
+  | KeyPressed      of KeyEvent.t
+  | KeyReleased     of KeyEvent.t
+  | ButtonPressed   of ButtonEvent.t
+  | ButtonReleased  of ButtonEvent.t
+  | MouseMoved      of OgamlMath.Vector2i.t
+  | MouseWheelMoved of float

@@ -166,7 +166,7 @@ and process_expr = function
   | AtomType s -> 
     PP_AtomType s
   | Record l -> 
-    PP_Record (List.map (fun (_,a,b) -> (a, process_expr b)) l)
+    PP_Record (List.map (fun (mut,_,a,b) -> (mut, a, process_expr b)) l)
   | PolyVariant (v, sl) -> 
     PP_PolyVariant (v, List.map (fun (a,b) -> 
                                  match b with
@@ -189,13 +189,15 @@ and process_expr = function
                           | Some v -> (a, Some (process_expr v))) l)
   | ParamType (l, e) ->
     PP_ParamType (List.map process_expr l, process_expr e)
+  | FCModule (t, e) ->
+    PP_FCModule (process_expr t, List.map (fun (s,e) -> (s,process_expr e)) e)
 
 and get_members = function
   | Record l ->
-    List.map (fun (sopt, s, e) ->
+    List.map (fun (mut, sopt, s, e) ->
       match sopt with
-      | None   -> (s, process_expr e, [])
-      | Some c -> (s, process_expr e, process_comment c)
+      | None   -> (mut, s, process_expr e, [])
+      | Some c -> (mut, s, process_expr e, process_comment c)
     ) l
   | _ -> []
 
@@ -319,21 +321,22 @@ and mk_value_table root ppf vtable =
      @\n<table class=\"values\"></tbody>@\n@[<hov2>  %a@\n@]</tbody></table>" 
      (mk_values root) vtable
 
-and mk_member root ppf (s, expr, comment) = 
+and mk_member root ppf (mut, s, expr, comment) = 
   Format.fprintf ppf 
   "<td class=\"record\">
      <figure class=\"highlight\">
-        <code class=\"OCaml\">%s : %s</code>
+        <code class=\"OCaml\">%s%s : %s</code>
      </figure>
   </td>
-  <td>%a</td>" s (type_expr_to_string expr) (comment_to_html root) comment
+  <td>%a</td>" (if mut then "mutable " else "") 
+               s (type_expr_to_string expr) (comment_to_html root) comment
 
 and mk_members root ppf = function
   | [] -> ()
   | h::t -> Format.fprintf ppf "<tr>@\n%a@\n</tr>@\n%a" 
               (mk_member root) h (mk_members root) t
 
-and mk_member_table root ppf (vtable : (string * type_expr * comment) list) : unit =
+and mk_member_table root ppf (vtable : (bool * string * type_expr * comment) list) : unit =
   if vtable <> [] then 
     Format.fprintf ppf
     "<h4>Record fields</h4>
@@ -447,7 +450,10 @@ and type_expr_to_string = function
   | PP_AtomType s ->
     s
   | PP_Record l ->
-    List.map (fun (s,e) -> Printf.sprintf "%s : %s" s (type_expr_to_string e)) l
+    List.map (fun (mut,s,e) -> 
+      Printf.sprintf "%s%s : %s" 
+        (if mut then "mutable " else "")
+        s (type_expr_to_string e)) l
     |> String.concat "; "
     |> Printf.sprintf "{%s}"
   | PP_PolyVariant (v, l) ->
@@ -480,6 +486,15 @@ and type_expr_to_string = function
     List.map type_expr_to_string l
     |> String.concat ", "
     |> (fun s -> Printf.sprintf "(%s) %s" s (type_expr_to_string t))
+  | PP_FCModule (t, []) ->
+    Printf.sprintf "(module %s)" (type_expr_to_string t)
+  | PP_FCModule (t, l) ->
+    let constraints = 
+      List.map (fun (s,e) -> Printf.sprintf "%s = %s" s (type_expr_to_string e)) l
+      |> String.concat " and "
+    in
+    Printf.sprintf "(module %s with type %s)" (type_expr_to_string t) constraints
+    
 
 and type_expr_to_string_par e = 
   match e with
