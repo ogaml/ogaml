@@ -1181,11 +1181,11 @@ module Uniform : sig
    *
     * The optional parameter $tex_unit$ corresponds to the texture
     * unit that is used to bind this texture. If not provided, it
-    * defaults to the next available unit. If not additional units
+    * defaults to the next available unit. If no additional units
     * are available, or if a unit is explicitly bound twice, drawing
     * with the uniform will raise $Invalid_uniform$.
     *
-    * See $Context.max_textures$ for the number of available units.
+    * See $Context.capabilities$ for the number of available units.
     * @see:OgamlGraphics.Texture.Texture2D
     * @see:OgamlGraphics.Context *)
   val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
