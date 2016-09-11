@@ -50,4 +50,6 @@ GLenum VBOKind_val(value kind);
 
 GLenum Attachment_val(value att);
 
+GLenum Parameter_val(value par);
+
 #endif

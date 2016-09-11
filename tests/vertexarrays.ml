@@ -38,7 +38,7 @@ let program = Program.from_source_list
                 gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);
 
              }");
-      (150, `String "#version 130
+      (150, `String "#version 150
 
              in vec3 pos;
 
