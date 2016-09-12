@@ -30,7 +30,7 @@ EXAMPLE_PKG = ogaml.graphics,ogaml.utils
 
 # Compilation
 
-default: depend math_lib core_lib utils_lib graphics_lib 
+default: depend math_lib utils_lib core_lib graphics_lib 
 
 utils_lib: depend
 	cd src/utils/ && make

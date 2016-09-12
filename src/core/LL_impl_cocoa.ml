@@ -116,6 +116,13 @@ module Window = struct
       size.x , size.y
     ) in
     let (w,h) = float_of_int w, float_of_int h in
+    (* DEBUG *)
+    OgamlUtils.Log.debug OgamlUtils.Log.stdout "Resizing window to %s" 
+      (OgamlMath.Vector2i.print size);
+    OgamlUtils.Log.debug OgamlUtils.Log.stdout "Actual size : %s" 
+      (OgamlMath.FloatRect.(print {x = x+.(oldw-.w)/.2.;
+                                   y = y+.(oldh-.h)/.2.; 
+                                   width = w; height = h}));
     let frame = NSRect.create (x+.(oldw-.w)/.2.) (y+.(oldh-.h)/.2.) w h in
     OGWindowController.resize win frame
 

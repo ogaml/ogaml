@@ -118,3 +118,6 @@ let contains t pt =
   pt.Vector3f.y <= t.y +. t.height &&
   pt.Vector3f.z <= t.z +. t.depth
 
+let print t = 
+  Printf.sprintf "(x = %f; y = %f; z = %f; width = %f; height = %f; depth = %f)" 
+    t.x t.y t.z t.width t.height t.depth

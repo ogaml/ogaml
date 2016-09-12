@@ -10,17 +10,15 @@ open OgamlGraphics
 open OgamlMath
 open OgamlUtils
 
-(* Let's start by creating a log system to the standard output.
- * This is useful to track our program's progress and to print GLSL
- * compilation errors. *)
-let log = OgamlUtils.Log.create ()
-
 (* Default context settings *)
 let settings = OgamlCore.ContextSettings.create ()
 
 (* Window creation with default settings *)
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°02" ()
+
+let () = 
+  Log.debug Log.stdout "Window size at initialization : %s" (Vector2i.print (Window.size window))
 
 (* Source of GLSL vertex shader.
  * We do not add a version number as the program preprocessor will
@@ -49,12 +47,12 @@ let fragment_shader_source = "
 (* Compile the GLSL program from the sources.
  * from_source_pp includes a preprocessor that automatically preprends
  * the best version number to the GLSL sources.
- * We provide our log (as an optional parameter) to get compilation errors. *)
+ * We provide a standard log (as an optional parameter) to get compilation errors. *)
 let program =
   Program.from_source_pp
     (module Window)
     ~context:window
-    ~log
+    ~log:Log.stdout
     ~vertex_source:(`String vertex_shader_source)
     ~fragment_source:(`String fragment_shader_source) ()
 
@@ -97,10 +95,14 @@ let rec event_loop () =
   )
   |None -> ()
 
+let frame_count = ref 0
+
 (* Main loop *)
 let rec main_loop () =
   (* Run while the window is open *)
   if Window.is_open window then begin
+
+    incr frame_count;
 
     (* Clear the window using white.
      * We do not clear the depth/stencil buffers for such a simple app. *)
@@ -108,6 +110,17 @@ let rec main_loop () =
       ~color:(Some (`RGB Color.RGB.white)) 
       window;
 
+    if !frame_count = 120 then begin
+      Window.resize window Vector2i.({x = 100; y = 100});
+      Log.debug Log.stdout "Window size : %s" (Vector2i.print (Window.size window))
+    end else if !frame_count = 60 then begin
+      Window.resize window Vector2i.({x = 200; y = 200});
+      Log.debug Log.stdout "Window size : %s" (Vector2i.print (Window.size window))
+    end else if !frame_count = 180 then begin
+      Window.resize window Vector2i.({x = 800; y = 600});
+      Log.debug Log.stdout "Window size : %s" (Vector2i.print (Window.size window))
+    end;
+      
     (* Draw our triangle on the window.
      * The drawing function is polymorphic and the render target must
      * be specified using first-class modules. *)
@@ -127,5 +140,5 @@ let rec main_loop () =
 
 (* Let's launch the main loop and admire the result :o) *)
 let () = 
-  Log.info log "Hello triangle !";
+  Log.info Log.stdout "Hello triangle !";
   main_loop ()

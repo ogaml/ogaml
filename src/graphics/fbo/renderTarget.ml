@@ -111,6 +111,9 @@ let bind_viewport context sizei parameters =
     )
   in
   if Context.LL.viewport context <> viewport then begin
+    (* DEBUG *)
+    OgamlUtils.Log.debug OgamlUtils.Log.stdout "Binding viewport : %s" (IntRect.print viewport);
+    OgamlUtils.Log.debug OgamlUtils.Log.stdout "Previous viewport : %s" (IntRect.print (Context.LL.viewport context));
     let open OgamlMath.IntRect in
     Context.LL.set_viewport context viewport;
     GL.Pervasives.viewport viewport.x viewport.y viewport.width viewport.height;

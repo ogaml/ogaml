@@ -1,7 +1,7 @@
 include ../../common_defs.mk
 
 
-INCLUDE_DIRS = -I ../math/ -I ../core/
+INCLUDE_DIRS = -I ../math/ -I ../core/ -I ../utils/
 
 # Stubs constants
 
