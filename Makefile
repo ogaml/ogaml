@@ -55,7 +55,8 @@ examples:
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/sprites.ml -o sprites.out;
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/ip.ml -o ip.out;
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/text.ml -o text.out;
-	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/noise.ml -o noise.out
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/noise.ml -o noise.out;
+	$(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKG) examples/shoot.ml -o shoot.out
 
 tests: math_lib core_lib graphics_lib utils_lib
 	$(OCAMLFIND) $(OCAMLOPT) -linkpkg $(INCLUDES) $(MODULES) $(PACKAGES) tests/programs.ml -o main.out && ./main.out &&\
