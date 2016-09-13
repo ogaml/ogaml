@@ -402,7 +402,14 @@ caml_cocoa_controller_resize(value mlcontroller, value mlframe)
   CAMLparam2(mlcontroller,mlframe);
 
   OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  // We need to scale the frame (for it is given in pixels)
   NSRect* frame = (NSRect*) Data_custom_val(mlframe);
+  CGFloat scale = [[NSScreen mainScreen] backingScaleFactor];
+  // Note: We don't scale the origin for it is unused at the moment
+  frame->size.width = frame->size.width / scale;
+  frame->size.height = frame->size.height / scale;
+
   [controller resize:*frame];
 
   CAMLreturn(Val_unit);
