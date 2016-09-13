@@ -126,8 +126,8 @@ module Window = struct
     let frame = NSRect.create (x+.(oldw-.w)/.2.) (y+.(oldh-.h)/.2.) w h in
     OGWindowController.resize win frame
 
-    let toggle_fullscreen win =
-      Cocoa.OGWindowController.toggle_fullscreen win
+  let toggle_fullscreen win =
+    Cocoa.OGWindowController.toggle_fullscreen win
 
   let is_open win =
     Cocoa.OGWindowController.is_window_open win
