@@ -15,8 +15,8 @@ caml_cocoa_create_window(value frame, value styleMask, value backing, value defe
   // No point in scaling initial position
   // rect->origin.x = rect->origin.x / scale;
   // rect->origin.y = rect->origin.y / scale;
-  // rect->size.width = rect->size.width / scale;
-  // rect->size.height = rect->size.height / scale;
+  rect->size.width = rect->size.width / scale;
+  rect->size.height = rect->size.height / scale;
 
   // Getting the flags
   int mask = 0;

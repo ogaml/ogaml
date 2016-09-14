@@ -409,8 +409,8 @@ caml_cocoa_controller_resize(value mlcontroller, value mlframe)
   // Note: We don't scale the origin for it is unused at the moment
   // frame->origin.x = frame->origin.x / scale;
   // frame->origin.y = frame->origin.y / scale;
-  // frame->size.width = frame->size.width / scale;
-  // frame->size.height = frame->size.height / scale;
+  frame->size.width = frame->size.width / scale;
+  frame->size.height = frame->size.height / scale;
 
   [controller resize:*frame];
 
