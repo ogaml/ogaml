@@ -5,7 +5,7 @@ let settings =
   OgamlCore.ContextSettings.create
     ~msaa:8
     ~resizable:true
-    (* ~fullscreen:true *)
+    ~fullscreen:true
     ()
 
 let window =
