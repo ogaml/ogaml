@@ -22,6 +22,9 @@ module Log : sig
     * - short : if true, timestamps will be shortened (defaults to false) *)
   val create : ?output:out_channel -> ?debug:bool -> ?color:bool -> ?short:bool -> unit -> t
 
+  (** Log to the standard output, that would be obtained by calling $create ()$ *)
+  val stdout : t
+
   (** Logs a message *)
   val log : t -> level -> ('a, out_channel, unit) format -> 'a
 

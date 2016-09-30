@@ -38,3 +38,4 @@ val intersects : t -> t -> bool
 
 val contains : t -> Vector2f.t -> bool
 
+val print : t -> string

@@ -39,3 +39,4 @@ val iter : ?strict:bool -> t -> (Vector2i.t -> unit) -> unit
 
 val fold : ?strict:bool -> t -> (Vector2i.t -> 'a -> 'a) -> 'a -> 'a
 
+val print : t -> string

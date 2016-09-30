@@ -621,6 +621,9 @@ module IntRect : sig
     * if $strict$ is set to $false$ then upper bounds are included ($true$ by default) *)
   val fold : ?strict:bool -> t -> (Vector2i.t -> 'a -> 'a) -> 'a -> 'a
 
+  (** Returns a pretty-printed string (not for serialization) *)
+  val print : t -> string
+
 end
 
 
@@ -692,6 +695,9 @@ module FloatRect : sig
 
   (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
   val contains : t -> Vector2f.t -> bool
+
+  (** Returns a pretty-printed string (not for serialization) *)
+  val print : t -> string
 
 end
 
@@ -771,6 +777,9 @@ module IntBox : sig
     * if $strict$ is set to $false$ then upper bounds are included ($true$ by default) *)
   val fold : ?strict:bool -> t -> (Vector3i.t -> 'a -> 'a) -> 'a -> 'a
 
+  (** Returns a pretty-printed string (not for serialization) *)
+  val print : t -> string
+
 end
 
 
@@ -842,6 +851,9 @@ module FloatBox : sig
 
   (** $contains t p$ returns $true$ iff the box $t$ contains $p$ *)
   val contains : t -> Vector3f.t -> bool
+
+  (** Returns a pretty-printed string (not for serialization) *)
+  val print : t -> string
 
 end
 
