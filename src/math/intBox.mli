@@ -27,11 +27,15 @@ val normalize : t -> t
 
 val volume : t -> int
 
+val extend : t -> Vector3i.t -> t
+
 val scale : t -> Vector3i.t -> t
 
 val translate : t -> Vector3i.t -> t
 
 val intersects : t -> t -> bool
+
+val includes : t -> t -> bool
 
 val contains : ?strict:bool -> t -> Vector3i.t -> bool
 

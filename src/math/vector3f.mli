@@ -20,7 +20,7 @@ val prop : float -> t -> t
 
 val div : float -> t -> t
 
-val floor : t -> Vector3i.t
+val to_int : t -> Vector3i.t
 
 val from_int : Vector3i.t -> t
 

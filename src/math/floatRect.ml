@@ -62,6 +62,11 @@ let area t =
   let open Vector2f in
   s.x *. s.y
 
+let extend t v = 
+  {t with
+    width = t.width +. v.Vector2f.x;
+    height = t.height +. v.Vector2f.y}
+
 let scale t v = 
   {t with
     width  = t.width  *. v.Vector2f.x;
@@ -80,7 +85,7 @@ let from_int t = {
   height = float_of_int t.IntRect.height;
 }
 
-let floor t = {
+let to_int t = {
   IntRect.x = int_of_float t.x;
   IntRect.y = int_of_float t.y;
   IntRect.width  = int_of_float t.width ;
@@ -93,6 +98,14 @@ let intersects t1 t2 =
        (t2.x +. t2.width  < t1.x) ||
        (t1.y +. t1.height < t2.y) ||
        (t2.y +. t2.height < t1.y))
+
+let includes t1 t2 = 
+  let t1 = normalize t1 in
+  let t2 = normalize t2 in
+  t2.x >= t1.x && 
+  t2.y >= t1.y && 
+  (t2.width +. t2.x) <= (t1.width +. t1.x) &&
+  (t2.height +. t2.y) <= (t1.height +. t1.y)
 
 let contains t pt = 
   let t = normalize t in

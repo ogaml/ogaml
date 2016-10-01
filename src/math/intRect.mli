@@ -27,11 +27,15 @@ val normalize : t -> t
 
 val area : t -> int
 
+val extend : t -> Vector2i.t -> t
+
 val scale : t -> Vector2i.t -> t
 
 val translate : t -> Vector2i.t -> t
 
 val intersects : t -> t -> bool
+
+val includes : t -> t -> bool
 
 val contains : ?strict:bool -> t -> Vector2i.t -> bool
 

@@ -154,8 +154,8 @@ module Vector2f : sig
   (** Divides a vector by a scalar. Raises Vector2f_exception if the scalar is zero. *)
   val div : float -> t -> t
 
-  (** Rounds-down a vector @see:OgamlMath.Vector2i *)
-  val floor : t -> Vector2i.t
+  (** Truncates the floating-point coordinates of a vector @see:OgamlMath.Vector2i *)
+  val to_int : t -> Vector2i.t
 
   (** Returns a float vector from an int vector @see:OgamlMath.Vector2i *)
   val from_int : Vector2i.t -> t
@@ -359,8 +359,8 @@ module Vector3f : sig
   (** Divides a vector by a scalar. Raises Vector3f_exception if the scalar is zero. *)
   val div : float -> t -> t
 
-  (** Rounds-down a vector @see:OgamlMath.Vector3i *)
-  val floor : t -> Vector3i.t
+  (** Truncates the floating-point coordinates of a vector @see:OgamlMath.Vector3i *)
+  val to_int : t -> Vector3i.t
 
   (** Returns a float vector from an int vector @see:OgamlMath.Vector3i *)
   val from_int : Vector3i.t -> t
@@ -597,14 +597,22 @@ module IntRect : sig
   (** Returns the area of a rectangle *)
   val area : t -> int
 
-  (** Scales a rectangle (the result is normalized) *)
+  (** Scales a rectangle *)
   val scale : t -> Vector2i.t -> t
+
+  (** Adds a vector to the height and width of a rectangle.
+    * Be careful since if the rectangle is not normalized, adding a positive vector
+    * may reduce the effective size of the rectangle. *)
+  val extend : t -> Vector2i.t -> t
 
   (** Translates a rectangle *)
   val translate : t -> Vector2i.t -> t
 
   (** $intersects t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
   val intersects : t -> t -> bool
+
+  (** $includes t r$ returns $true$ iff the rectangle $r$ is included in the rectangle $t$ *)
+  val includes : t -> t -> bool
 
   (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ 
     *
@@ -678,8 +686,13 @@ module FloatRect : sig
   (** Returns the area of a rectangle *)
   val area : t -> float
 
-  (** Scales a rectangle (the result is normalized) *)
+  (** Scales a rectangle *)
   val scale : t -> Vector2f.t -> t
+
+  (** Adds a vector to the height and width of a rectangle.
+    * Be careful since if the rectangle is not normalized, adding a positive vector
+    * may reduce the effective size of the rectangle. *)
+  val extend : t -> Vector2f.t -> t
 
   (** Translates a rectangle *)
   val translate : t -> Vector2f.t -> t
@@ -687,14 +700,17 @@ module FloatRect : sig
   (** Converts an integer rectangle to a float rectangle *)
   val from_int : IntRect.t -> t
 
-  (** Converts a float rectangle to an integer rectangle *)
-  val floor : t -> IntRect.t
+  (** Truncates the floating-point coordinates of a rectangle @see:OgamlMath.IntRect *)
+  val to_int : t -> IntRect.t
 
   (** $intersects t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
   val intersects : t -> t -> bool
 
   (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
   val contains : t -> Vector2f.t -> bool
+
+  (** $includes t r$ returns $true$ iff the rectangle $r$ is included in the rectangle $t$ *)
+  val includes : t -> t -> bool
 
   (** Returns a pretty-printed string (not for serialization) *)
   val print : t -> string
@@ -753,14 +769,22 @@ module IntBox : sig
   (** Returns the volume of a box *)
   val volume : t -> int
 
-  (** Scales a box (the result is normalized) *)
+  (** Scales a box *)
   val scale : t -> Vector3i.t -> t
+
+  (** Adds a vector to the dimensions of a box.
+    * Be careful since if the box is not normalized, adding a positive vector
+    * may reduce the effective size of the box. *)
+  val extend : t -> Vector3i.t -> t
 
   (** Translates a box *)
   val translate : t -> Vector3i.t -> t
 
   (** $intersects t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
   val intersects : t -> t -> bool
+
+  (** $includes t b$ returns $true$ iff the box $b$ is included in the box $t$ *)
+  val includes : t -> t -> bool
 
   (** $contains t p$ returns $true$ iff the box $t$ contains $p$ 
     *
@@ -831,10 +855,15 @@ module FloatBox : sig
       positive size *)
   val normalize : t -> t
 
+  (** Adds a vector to the dimensions of a box.
+    * Be careful since if the box is not normalized, adding a positive vector
+    * may reduce the effective size of the box. *)
+  val extend : t -> Vector3f.t -> t
+
   (** Returns the volume of a box *)
   val volume : t -> float
 
-  (** Scales a box (the result is normalized) *)
+  (** Scales a box *)
   val scale : t -> Vector3f.t -> t
 
   (** Translates a box *)
@@ -843,11 +872,14 @@ module FloatBox : sig
   (** Converts an integer box to a float box *)
   val from_int : IntBox.t -> t
 
-  (** Converts a float box to an integer box *)
-  val floor : t -> IntBox.t
+  (** Truncates the floating-point coordinates of a box @see:OgamlMath.IntBox *)
+  val to_int : t -> IntBox.t
 
   (** $intersects t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
   val intersects : t -> t -> bool
+
+  (** $includes t b$ returns $true$ iff the box $b$ is included in the box $t$ *)
+  val includes : t -> t -> bool
 
   (** $contains t p$ returns $true$ iff the box $t$ contains $p$ *)
   val contains : t -> Vector3f.t -> bool

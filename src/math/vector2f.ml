@@ -30,7 +30,7 @@ let div f v =
   else 
     {x = v.x /. f; y = v.y /. f}
 
-let floor v = {
+let to_int v = {
   Vector2i.x = int_of_float v.x;
   Vector2i.y = int_of_float v.y;
 }

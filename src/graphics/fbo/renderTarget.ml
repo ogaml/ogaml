@@ -102,7 +102,7 @@ let bind_viewport context sizei parameters =
                   width  = sizei.Vector2i.x;
                   height = sizei.Vector2i.y})
       |Relative r ->
-        FloatRect.(floor
+        FloatRect.(to_int
           {x = sizef.Vector2f.x *. r.x;
           y = sizef.Vector2f.y *. r.y;
           width  = sizef.Vector2f.x *. r.width;
