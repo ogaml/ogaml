@@ -152,10 +152,79 @@ caml_stb_bitmap(value info, value code, value scale)
   Store_field(res, 1, Val_int(width));
   Store_field(res, 2, Val_int(height));
 
-  stbtt_FreeBitmap(bitmap, NULL);
+  if(bitmap)
+    stbtt_FreeBitmap(bitmap, NULL);
 
   CAMLreturn(res);
 }
 
 
+CAMLprim value
+caml_stb_render_bitmap(value info, value code, value oversampling, value scale)
+{
+  CAMLparam4(info, code, oversampling, scale);
+  CAMLlocal2(res, bmp);
 
+  stbtt_fontinfo* stb_info = (stbtt_fontinfo*)info;
+  int stb_code = Int_val(code);
+  int stb_oversampling = Int_val(oversampling);
+  float stb_scale = Double_val(scale);
+
+  int ix0, iy0, ix1, iy1;
+  
+  stbtt_GetCodepointBitmapBox(stb_info, 
+                              stb_code,
+                              stb_scale * stb_oversampling,
+                              stb_scale * stb_oversampling,
+                              &ix0,
+                              &iy0,
+                              &ix1,
+                              &iy1);
+
+  int w,h;
+    w = ix1 - ix0;
+    h = iy1 - iy0;
+
+  int width, height;
+    width  = w + stb_oversampling - 1;
+    height = h + stb_oversampling - 1;
+
+  unsigned char bitmap[width * height];
+
+  memset(bitmap, 0, width * height);
+
+  stbtt_MakeCodepointBitmap(stb_info, 
+                            bitmap,
+                            w,
+                            h,
+                            width,
+                            stb_scale * stb_oversampling,
+                            stb_scale * stb_oversampling,
+                            stb_code);
+  
+  if(stb_oversampling > 1) {
+    stbtt__h_prefilter(bitmap, 
+                       width,
+                       height,
+                       width,
+                       stb_oversampling);
+    stbtt__v_prefilter(bitmap, 
+                       width,
+                       height,
+                       width,
+                       stb_oversampling);
+  }
+
+  res = caml_alloc(3,0);
+  
+  bmp = caml_alloc_string(width * height);
+  memcpy(String_val(bmp), bitmap, width * height);
+
+
+  Store_field(res, 0, bmp);
+  Store_field(res, 1, Val_int(width));
+  Store_field(res, 2, Val_int(height));
+
+  CAMLreturn(res);
+
+}

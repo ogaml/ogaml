@@ -46,7 +46,8 @@ module Shelf = struct
             width  : int;
     mutable height : int;
     mutable row_width  : int;
-    mutable row_height : int
+    mutable row_height : int;
+    mutable pad : int
   }
 
   let create width = {
@@ -56,32 +57,39 @@ module Shelf = struct
     height = 0;
     row_width  = 0;
     row_height = 0;
+    pad = 2;
   }
 
   let add s glyph =
     let size = Image.size glyph in
     let w,h  = size.Vector2i.x, size.Vector2i.y in
-    if s.row_width + w + 1 <= s.width then begin
+    if s.row_width + w + s.pad <= s.width then begin
       let new_height = max s.row_height h in
-      let new_row = Image.create (`Empty (Vector2i.({x = s.row_width + w + 1; y = new_height}),`RGB Color.RGB.transparent)) in
+      let new_row = 
+        Image.create 
+          (`Empty (Vector2i.({x = s.row_width + w + s.pad; y = new_height}),`RGB Color.RGB.transparent)) 
+      in
       Image.blit s.row new_row Vector2i.({x = 0; y = 0});
-      Image.blit glyph new_row Vector2i.({x = s.row_width + 1; y = 0});
+      Image.blit glyph new_row Vector2i.({x = s.row_width + s.pad; y = 0});
       s.row <- new_row;
       s.row_height <- new_height;
-      s.row_width <- s.row_width + w + 2;
-      IntRect.({x = s.row_width - w - 1;
-                y = s.height + 1;
+      s.row_width <- s.row_width + w + s.pad;
+      IntRect.({x = s.row_width - w;
+                y = s.height + s.pad;
                 width  = w;
                 height = h})
-    end else if s.height + s.row_height + 1 >= 2048 then begin
+    end else if s.height + s.row_height + s.pad >= 2048 then begin
       raise (Font_error "Font texture overflow")
     end else begin
-      let new_full = Image.create (`Empty (Vector2i.({x = s.width; y = s.height + s.row_height + 1}),(`RGB Color.RGB.transparent))) in
+      let new_full = 
+        Image.create 
+          (`Empty (Vector2i.({x = s.width; y = s.height + s.row_height + s.pad}),(`RGB Color.RGB.transparent))) 
+      in
       Image.blit s.full new_full Vector2i.({x = 0; y = 0});
-      Image.blit s.row new_full Vector2i.({x = 0; y = s.height + 1});
+      Image.blit s.row new_full Vector2i.({x = 0; y = s.height + s.pad});
       s.full <- new_full;
       s.row  <- glyph;
-      s.height <- (s.height + s.row_height + 2);
+      s.height <- (s.height + s.row_height + s.pad);
       s.row_width <- w;
       s.row_height <- h;
       IntRect.({x = 0;
@@ -91,12 +99,12 @@ module Shelf = struct
     end
 
   let total_height s = 
-    s.height + s.row_height + 1
+    s.height + s.row_height + s.pad
 
   let image height s =
     let global = Image.create (`Empty (Vector2i.({x = s.width; y = height}), `RGB Color.RGB.transparent)) in
     Image.blit s.full global Vector2i.zero;
-    Image.blit s.row global Vector2i.({x = 0; y = s.height + 1});
+    Image.blit s.row global Vector2i.({x = 0; y = s.height + s.pad});
     global
 
 end
@@ -121,6 +129,10 @@ module Internal = struct
   external char_box : t -> int -> IntRect.t = "caml_stb_box"
 
   external bitmap : t -> int -> float -> (Bytes.t * int * int) = "caml_stb_bitmap"
+
+  external render_bitmap : 
+    t -> int -> int -> float -> (Bytes.t * int * int) 
+    = "caml_stb_render_bitmap"
 
   let convert_1chan_bitmap bmp =
     let s = Bytes.length bmp in
@@ -194,13 +206,25 @@ let get_size (t : t) s =
   with Not_found ->
     load_size t s
 
+(* For debugging purposes *)
+let print_bitmap bmp w h = 
+  Printf.printf "------- Printing bitmap of size %i %i -------\n%!" w h;
+  for i = 0 to h-1 do
+    for j = 0 to w-1 do
+      if Char.code bmp.[i*w + j] >= 200 then 
+        print_string "#"
+      else
+        print_string "."
+    done;
+    print_endline "";
+  done
 
 let load_glyph_return (t : t) s c b oversampling =
   let page  = get_size t s in
   let glyph =
     let (advance, lbear) = Internal.char_h_metrics t.internal c in
     let rect = Internal.char_box t.internal c in
-    let (bmp,w,h) = Internal.bitmap t.internal c (float_of_int oversampling *. page.scale) in
+    let (bmp,w,h) = Internal.render_bitmap t.internal c oversampling page.scale in
     let bmp = Internal.convert_1chan_bitmap bmp in
     let uv = Shelf.add page.shelf (Image.create (`Data (Vector2i.({x = w; y = h}),bmp))) in
     {
@@ -323,6 +347,8 @@ let rebuild_full_texture (type s) (module M : RenderTarget.T with type t = s) ta
       Texture.Texture2DArray.create (module M) target 
         ~mipmaps:`None (`Image l_imgs_strip)
   in
+  Texture.Texture2DArray.minify  texture Texture.MinifyFilter.Linear;
+  Texture.Texture2DArray.magnify texture Texture.MagnifyFilter.Linear;
   t.texture <- Some texture
 
 let texture (type s) (module M : RenderTarget.T with type t = s) target t =

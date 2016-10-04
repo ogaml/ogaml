@@ -56,6 +56,16 @@ let txt4 = Text.create
   ~bold:false
   ()
 
+let smltxtpos = Vector2f.({x = 30.; y = 400. })
+
+let small_text = Text.create
+  ~text:"Trying to render small text to check if it renders without too many artifacts.\nYou should be able to read this without difficulty."
+  ~position:smltxtpos
+  ~font
+  ~size:12
+  ~bold:false
+  ()
+
 let boundaries4 = Text.boundaries txt4
 
 let border4 = Shape.create_rectangle
@@ -113,6 +123,7 @@ let fxtxt2 = Text.Fx.create
 
 let fxpos3 = Vector2f.add (Text.Fx.advance fxtxt2) fxpos2
 
+
 (* let fxtxt3 = Text.Fx.create
   ~text:"This time we separate words a bit to check everything works."
   ~position:fxpos3
@@ -145,6 +156,7 @@ let draw () =
   Text.draw (module Window) ~parameters ~target:window ~text:txt2' ();
   Text.draw (module Window) ~parameters ~target:window ~text:txt3 ();
   Text.draw (module Window) ~parameters ~target:window ~text:txt4 ();
+  Text.draw (module Window) ~parameters ~target:window ~text:small_text ();
   Text.Fx.draw (module Window) ~parameters ~target:window ~text:fxtxt1 ();
   Text.Fx.draw (module Window) ~parameters ~target:window ~text:fxtxt2 ();
   Text.Fx.draw (module Window) ~parameters ~target:window ~text:fxtxt3 ();
