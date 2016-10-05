@@ -168,15 +168,39 @@
 
 -(void)resize:(NSRect)frame
 {
+
+  printf("Received resize frame : %f,%f,%f,%f\n", frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
+
+  NSRect cFrame = [m_window frameRectForContentRect:frame];
+
+  printf("Content frame : %f,%f,%f,%f\n", cFrame.origin.x, cFrame.origin.y, cFrame.size.width, cFrame.size.height);
+
+  printf("Frame after content computation : %f,%f,%f,%f\n", frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
+
+  NSRect oldFrame = [m_view frame];
+
+  printf("Old openGL view frame : %f,%f,%f,%f\n", oldFrame.origin.x, oldFrame.origin.y, oldFrame.size.width, oldFrame.size.height);
+
   [m_window setFrame:[m_window frameRectForContentRect:frame]
              display:YES
              animate:[m_window isVisible]];
 
-  NSRect rect = NSMakeRect(0, 0, frame.size.width, frame.size.height);
+  [m_view reshape];
+
+  [m_context update];
+
+  NSRect newFrame = [m_view frame];
+
+  printf("New openGL view frame : %f,%f,%f,%f\n", newFrame.origin.x, newFrame.origin.y, newFrame.size.width, newFrame.size.height);
+
+  NSRect rect = NSMakeRect(0, 0, frame.size.width * 2, frame.size.height * 2);
 
   [m_view setFrame:rect];
 
+  [m_view reshape];
+
   [m_context update];
+
 }
 
 -(void)toggleFullScreen
