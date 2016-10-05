@@ -129,6 +129,12 @@ caml_cocoa_window_frame(value mlwindow)
   NSWindow* window = (NSWindow*) mlwindow;
   NSRect rect = [window frame];
 
+  // We need to scale the frame (from pt to pixels)
+  CGFloat scale = [[NSScreen mainScreen] backingScaleFactor];
+  // Note: We don't scale the origin
+  rect.size.width = rect.size.width * scale;
+  rect.size.height = rect.size.height * scale;
+
   memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
 
   CAMLreturn(mlrect);

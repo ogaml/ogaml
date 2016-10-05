@@ -17,6 +17,10 @@ let settings = OgamlCore.ContextSettings.create ()
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°02" ()
 
+let () =
+  Log.debug Log.stdout "Window size at initialization : %s" (Vector2i.print (Window.size window));
+  Log.debug Log.stdout "Widnow rect at initialization : %s" (IntRect.print (Window.rect window))
+
 (* Source of GLSL vertex shader.
  * We do not add a version number as the program preprocessor will
  * add it for us. *)
@@ -80,7 +84,7 @@ let vertex_source = VertexArray.Source.(
     << vertex3
 )
 
-(* Compute and load the VAO (Vertex Array Object) 
+(* Compute and load the VAO (Vertex Array Object)
  * VAOs need a valid GL context to be properly initialized, which
  * is encapsulated inside any render target (window, render texture, ...).
  * Hence the use of first-class modules to provide some polymorphism. *)
@@ -98,24 +102,42 @@ let rec event_loop () =
   )
   |None -> ()
 
+let frame_count = ref 0
+
 (* Main loop *)
 let rec main_loop () =
   (* Run while the window is open *)
   if Window.is_open window then begin
 
+    incr frame_count;
+
     (* Clear the window using white.
      * We do not clear the depth/stencil buffers for such a simple app. *)
-    Window.clear 
-      ~color:(Some (`RGB Color.RGB.white)) 
+    Window.clear
+      ~color:(Some (`RGB Color.RGB.white))
       window;
+
+    if !frame_count = 120 then begin
+      Window.resize window Vector2i.({x = 100; y = 100});
+      Log.debug Log.stdout "Window size : %s" (Vector2i.print (Window.size window));
+      Log.debug Log.stdout "Widnow rect : %s" (IntRect.print (Window.rect window))
+    end else if !frame_count = 60 then begin
+      Window.resize window Vector2i.({x = 200; y = 200});
+      Log.debug Log.stdout "Window size : %s" (Vector2i.print (Window.size window));
+      Log.debug Log.stdout "Widnow rect : %s" (IntRect.print (Window.rect window))
+    end else if !frame_count = 180 then begin
+      Window.resize window Vector2i.({x = 800; y = 600});
+      Log.debug Log.stdout "Window size : %s" (Vector2i.print (Window.size window));
+      Log.debug Log.stdout "Widnow rect : %s" (IntRect.print (Window.rect window))
+    end;
 
     (* Draw our triangle on the window.
      * The drawing function is polymorphic and the render target must
      * be specified using first-class modules. *)
-    VertexArray.draw (module Window) 
-      ~target:window 
-      ~vertices 
-      ~program 
+    VertexArray.draw (module Window)
+      ~target:window
+      ~vertices
+      ~program
       ~mode:DrawMode.Triangles ();
 
     (* Update the window renderbuffer *)
@@ -127,6 +149,6 @@ let rec main_loop () =
   end
 
 (* Let's launch the main loop and admire the result :o) *)
-let () = 
+let () =
   Log.info Log.stdout "Hello triangle !";
   main_loop ()
