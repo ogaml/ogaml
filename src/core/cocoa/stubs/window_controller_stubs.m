@@ -259,9 +259,24 @@ caml_cocoa_controller_content_frame(value mlcontroller)
 
   // We need to scale the frame (from pt to pixels)
   CGFloat scale = [[[controller window] screen] backingScaleFactor];
+
+  printf("Requested window size : %f,%f,%f,%f\n", rect.origin.x, 
+                                                  rect.origin.y, 
+                                                  rect.size.width,
+                                                  rect.size.height);
+
+  printf("Scale factor : %f\n", scale);
+
   // Note: We don't scale the origin
   rect.size.width = rect.size.width * scale;
   rect.size.height = rect.size.height * scale;
+
+  printf("Scaled rectangle : %f,%f,%f,%f\n", rect.origin.x, 
+                                             rect.origin.y, 
+                                             rect.size.width,
+                                             rect.size.height);
+
+
 
   memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
 
@@ -411,9 +426,22 @@ caml_cocoa_controller_resize(value mlcontroller, value mlframe)
   // We need to scale the frame (for it is given in pixels)
   NSRect* frame = (NSRect*) Data_custom_val(mlframe);
   CGFloat scale = [[[controller window] screen] backingScaleFactor];
+
+  printf("Received resize rectangle : %f,%f,%f,%f\n", frame->origin.x, 
+                                                      frame->origin.y, 
+                                                      frame->size.width,
+                                                      frame->size.height);
+
+  printf("Scale factor : %f\n", scale);
+
   // Note: We don't scale the origin
   frame->size.width = frame->size.width / scale;
   frame->size.height = frame->size.height / scale;
+
+  printf("Scaled rectangle : %f,%f,%f,%f\n", frame->origin.x, 
+                                             frame->origin.y, 
+                                             frame->size.width,
+                                             frame->size.height);
 
   [controller resize:*frame];
 
