@@ -171,6 +171,10 @@
   [m_window setFrame:[m_window frameRectForContentRect:frame]
              display:YES
              animate:[m_window isVisible]];
+
+  [m_view setFrame:frame];
+
+  [m_context update];
 }
 
 -(void)toggleFullScreen
