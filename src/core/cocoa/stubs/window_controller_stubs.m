@@ -172,7 +172,9 @@
              display:YES
              animate:[m_window isVisible]];
 
-  [m_view setFrame:frame];
+  NSRect rect = NSMakeRect(0, 0, frame.size.width, frame.size.height);
+
+  [m_view setFrame:rect];
 
   [m_context update];
 }
