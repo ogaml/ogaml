@@ -19,7 +19,7 @@ let window =
 
 let () =
   Log.debug Log.stdout "Window size at initialization : %s" (Vector2i.print (Window.size window));
-  Log.debug Log.stdout "Widnow rect at initialization : %s" (IntRect.print (Window.rect window))
+  Log.debug Log.stdout "Window rect at initialization : %s" (IntRect.print (Window.rect window))
 
 (* Source of GLSL vertex shader.
  * We do not add a version number as the program preprocessor will
@@ -46,7 +46,7 @@ let fragment_shader_source = "
 
   void main() {
 
-    out_color = vec4(frag_position, 1.0);
+    out_color = vec4((frag_position + vec3(0.75, 0.75, 0.0)) / 1.5, 1.0);
 
   }
 "
