@@ -115,14 +115,9 @@ module Window = struct
     let (w,h) = OgamlMath.Vector2i.(
       size.x , size.y
     ) in
-    Printf.printf "Asking to resize window : %f, %f, %f, %f\n%!"
-      (x +. (oldw-.w)/.2.)
-      (y +. (oldh-.h)/.2.)
-      w h;
     let (w,h) = float_of_int w, float_of_int h in
     let frame = NSRect.create (x+.(oldw-.w)/.2.) (y+.(oldh-.h)/.2.) w h in
-    OGWindowController.resize win frame;
-    print_endline "Done\n\n"
+    OGWindowController.resize win frame
 
   let toggle_fullscreen win =
     Cocoa.OGWindowController.toggle_fullscreen win

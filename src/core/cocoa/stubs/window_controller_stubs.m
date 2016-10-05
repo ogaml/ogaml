@@ -169,29 +169,9 @@
 -(void)resize:(NSRect)frame
 {
 
-  printf("Received resize frame : %f,%f,%f,%f\n", frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
-
-  NSRect cFrame = [m_window frameRectForContentRect:frame];
-
-  printf("Content frame : %f,%f,%f,%f\n", cFrame.origin.x, cFrame.origin.y, cFrame.size.width, cFrame.size.height);
-
-  printf("Frame after content computation : %f,%f,%f,%f\n", frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
-
-  NSRect oldFrame = [m_view frame];
-
-  printf("Old openGL view frame : %f,%f,%f,%f\n", oldFrame.origin.x, oldFrame.origin.y, oldFrame.size.width, oldFrame.size.height);
-
   [m_window setFrame:[m_window frameRectForContentRect:frame]
              display:YES
              animate:[m_window isVisible]];
-
-  [m_view reshape];
-
-  [m_context update];
-
-  NSRect newFrame = [m_view frame];
-
-  printf("New openGL view frame : %f,%f,%f,%f\n", newFrame.origin.x, newFrame.origin.y, newFrame.size.width, newFrame.size.height);
 
 }
 
@@ -436,13 +416,9 @@ caml_cocoa_controller_resize(value mlcontroller, value mlframe)
 
   CGFloat scale = [[[controller window] screen] backingScaleFactor];
 
-  printf("Received resize frame and scale factor : %f,%f,%f,%f  --  %f\n", frame->origin.x, frame->origin.y, frame->size.width, frame->size.height, scale);
-
   // Note: We don't scale the origin
   frame->size.width = frame->size.width / scale;
   frame->size.height = frame->size.height / scale;
-
-  printf("Passing frame to parent : %f,%f,%f,%f\n", frame->origin.x, frame->origin.y, frame->size.width, frame->size.height);
 
   [controller resize:*frame];
 
