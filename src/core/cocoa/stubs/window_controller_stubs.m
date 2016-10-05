@@ -193,14 +193,6 @@
 
   printf("New openGL view frame : %f,%f,%f,%f\n", newFrame.origin.x, newFrame.origin.y, newFrame.size.width, newFrame.size.height);
 
-  NSRect rect = NSMakeRect(0, 0, frame.size.width * 2, frame.size.height * 2);
-
-  [m_view setFrame:rect];
-
-  [m_view reshape];
-
-  [m_context update];
-
 }
 
 -(void)toggleFullScreen
@@ -441,11 +433,16 @@ caml_cocoa_controller_resize(value mlcontroller, value mlframe)
 
   // We need to scale the frame (for it is given in pixels)
   NSRect* frame = (NSRect*) Data_custom_val(mlframe);
+
   CGFloat scale = [[[controller window] screen] backingScaleFactor];
+
+  printf("Received resize frame and scale factor : %f,%f,%f,%f  --  %f\n", frame->origin.x, frame->origin.y, frame->size.width, frame->size.height, scale);
 
   // Note: We don't scale the origin
   frame->size.width = frame->size.width / scale;
   frame->size.height = frame->size.height / scale;
+
+  printf("Passing frame to parent : %f,%f,%f,%f\n", frame->origin.x, frame->origin.y, frame->size.width, frame->size.height);
 
   [controller resize:*frame];
 
