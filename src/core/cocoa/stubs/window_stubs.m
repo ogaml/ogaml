@@ -12,10 +12,9 @@ caml_cocoa_create_window(value frame, value styleMask, value backing, value defe
 
   NSRect* rect = (NSRect*) Data_custom_val(frame);
   CGFloat scale = [[NSScreen mainScreen] backingScaleFactor];
-  // No point in scaling initial position
-  // rect->origin.x = rect->origin.x / scale;
-  // rect->origin.y = rect->origin.y / scale;
-  rect->size.width = rect->size.width / scale;
+  rect->origin.x    = rect->origin.x    / scale;
+  rect->origin.y    = rect->origin.y    / scale;
+  rect->size.width  = rect->size.width  / scale;
   rect->size.height = rect->size.height / scale;
 
   // Getting the flags
@@ -128,6 +127,12 @@ caml_cocoa_window_frame(value mlwindow)
 
   NSWindow* window = (NSWindow*) mlwindow;
   NSRect rect = [window frame];
+
+  // We need to scale the frame (from pt to pixels)
+  CGFloat scale = [[NSScreen mainScreen] backingScaleFactor];
+  // Note: We don't scale the origin
+  rect.size.width = rect.size.width * scale;
+  rect.size.height = rect.size.height * scale;
 
   memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
 
