@@ -94,7 +94,7 @@
 
 -(void)reshape
 {
-	[[self openGLContext] update];
+  [[self openGLContext] update];
 }
 
 @end

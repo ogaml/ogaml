@@ -169,11 +169,9 @@
 
 -(void)resize:(NSRect)frame
 {
-
   [m_window setFrame:[m_window frameRectForContentRect:frame]
              display:YES
              animate:[m_window isVisible]];
-
 }
 
 -(void)toggleFullScreen
