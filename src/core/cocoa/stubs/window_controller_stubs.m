@@ -20,6 +20,7 @@
   // Setting the openGL view
   m_view = [[[OGOpenGLView alloc] initWithFrame:[[m_window contentView] bounds]
                                     pixelFormat:[OGOpenGLView defaultPixelFormat]] autorelease];
+  [m_view setWantsBestResolutionOpenGLSurface:YES];
   [m_window setContentView:m_view];
   [m_window makeFirstResponder:m_view];
 
