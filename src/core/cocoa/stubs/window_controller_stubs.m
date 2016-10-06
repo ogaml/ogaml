@@ -239,9 +239,10 @@ caml_cocoa_controller_frame(value mlcontroller)
 
   // We need to scale the frame (from pt to pixels)
   CGFloat scale = [[[controller window] screen] backingScaleFactor];
-  // Note: We don't scale the origin
-  rect.size.width = rect.size.width * scale;
-  rect.size.height = rect.size.height * scale;
+  rect.origin.x    = rect.origin.x    * scale ;
+  rect.origin.y    = rect.origin.y    * scale ;
+  rect.size.width  = rect.size.width  * scale ;
+  rect.size.height = rect.size.height * scale ;
 
   memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
 
@@ -260,10 +261,10 @@ caml_cocoa_controller_content_frame(value mlcontroller)
 
   // We need to scale the frame (from pt to pixels)
   CGFloat scale = [[[controller window] screen] backingScaleFactor];
-
-  // Note: We don't scale the origin
-  rect.size.width = rect.size.width * scale;
-  rect.size.height = rect.size.height * scale;
+  rect.origin.x    = rect.origin.x    * scale ;
+  rect.origin.y    = rect.origin.y    * scale ;
+  rect.size.width  = rect.size.width  * scale ;
+  rect.size.height = rect.size.height * scale ;
 
   memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
 
@@ -414,10 +415,10 @@ caml_cocoa_controller_resize(value mlcontroller, value mlframe)
   NSRect* frame = (NSRect*) Data_custom_val(mlframe);
 
   CGFloat scale = [[[controller window] screen] backingScaleFactor];
-
-  // Note: We don't scale the origin
-  frame->size.width = frame->size.width / scale;
-  frame->size.height = frame->size.height / scale;
+  frame->origin.x    = frame->origin.x    / scale ;
+  frame->origin.y    = frame->origin.y    / scale ;
+  frame->size.width  = frame->size.width  / scale ;
+  frame->size.height = frame->size.height / scale ;
 
   [controller resize:*frame];
 
