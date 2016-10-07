@@ -108,7 +108,14 @@ module Window = struct
   let rect win =
     let i = int_of_float in
     Cocoa.(
-      let (x,y,w,h) = NSRect.get (OGWindowController.content_frame win) in
+      (* We only get the size of the frame, as the coordinates are relative
+         to the window and thus (0,0). *)
+      let (_,_,w,h) = NSRect.get (OGWindowController.content_frame win) in
+      let (x,y,ow,oh) = NSRect.get (OGWindowController.frame win) in
+      (* We add the size of the title bar (and anything that could be extending
+         the window size horizontally by precaution). *)
+      let x = x +. (ow -. w)
+      and y = y +. (oh -. h) in
       OgamlMath.IntRect.({x = i x; y = i y; width = i w; height = i h})
     )
 
