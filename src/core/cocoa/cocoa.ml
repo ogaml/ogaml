@@ -382,6 +382,9 @@ module OGWindowController = struct
   external release_window : t -> unit
     = "caml_cocoa_window_controller_release_window"
 
+  external open_window : t -> unit
+    = "caml_cocoa_window_conroller_open_window"
+
   external pop_event : t -> OGEvent.t option
     = "caml_cocoa_window_controller_pop_event"
 

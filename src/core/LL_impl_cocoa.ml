@@ -95,6 +95,9 @@ module Window = struct
   let destroy win =
     Cocoa.OGWindowController.release_window win
 
+  let reopen win =
+    Cocoa.OGWindowController.open_window win
+
   let size win =
     let i = int_of_float in
     Cocoa.(

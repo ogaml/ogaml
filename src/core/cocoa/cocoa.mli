@@ -307,6 +307,8 @@ module OGWindowController : sig
 
   val release_window : t -> unit
 
+  val open_window : t -> unit
+
   val pop_event : t -> OGEvent.t option
 
   val set_context : t -> NSOpenGLContext.t -> unit

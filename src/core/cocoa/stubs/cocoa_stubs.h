@@ -134,6 +134,8 @@ typedef union
 
 -(void)releaseWindow;
 
+-(void)openWindow;
+
 -(OGEvent *)popEvent;
 
 -(void)setGLContext:(NSOpenGLContext*)context;

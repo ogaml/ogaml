@@ -77,6 +77,11 @@
   m_window = nil;
 }
 
+-(void)openWindow
+{
+  [m_window setIsVisible:YES];
+}
+
 -(BOOL)isWindowOpen
 {
   return m_windowIsOpen;
@@ -303,6 +308,18 @@ caml_cocoa_window_controller_release_window(value mlcontroller)
   OGWindowController* controller = (OGWindowController*) mlcontroller;
 
   [controller releaseWindow];
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_window_conroller_open_window(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  [controller openWindow];
 
   CAMLreturn(Val_unit);
 }
