@@ -26,15 +26,47 @@ module WindowHandle = struct
     external register_class : string -> unit = "caml_register_class_W"
 
     external create_private : 
-        string -> string -> (int * int) -> (int * int) -> WindowStyle.t -> t 
+        string -> string -> (int * int * int * int) -> WindowStyle.t -> int -> t 
         = "caml_create_window_W"
+
+    external set_text : 
+        t -> string -> unit 
+        = "caml_set_window_text"
 
     external get_rect :
         t -> (int * int * int * int)
         = "caml_get_window_rect"
 
-    let create ~classname ~name ~origin ~size ~style = 
-        create_private classname name origin size style
+    external move : 
+        t -> (int * int * int * int) -> unit 
+        = "caml_move_window"
+
+    external attach_userdata : 
+        t -> 'a -> unit
+        = "caml_attach_userdata" 
+
+    external swap_buffers : 
+        t -> unit
+        = "caml_swap_buffers"
+
+    external process_events :
+        t -> unit
+        = "caml_process_events"
+
+    external has_focus :
+        t -> bool
+        = "caml_window_has_focus"
+
+    external close :
+        t -> unit
+        = "caml_close_window"
+
+    external destroy :
+        t -> unit
+        = "caml_destroy_window"
+
+    let create ~classname ~name ~rect ~style ~uid = 
+        create_private classname name rect style uid
 
 end
 
@@ -87,12 +119,25 @@ end
 
 module Event = struct
 
-    type t
-
     type modifiers = {shift : bool; ctrl : bool; lock : bool; alt : bool}
 
     type position = {x : int; y : int}
 
     type key = Code of int | Char of char
+
+    type t =
+        | Unknown
+        | Closed
+        | Resize of bool (* True iff it is not a minimization *)
+        | StartResize
+        | StopResize
+        | KeyDown of key * modifiers
+        | KeyUp of key * modifiers
+
+    external async_key_state : key -> bool = "caml_get_async_key_state"
+
+    external cursor_position : unit -> (int * int) = "caml_cursor_position"
+
+    external set_cursor_position : (int * int) -> unit = "caml_set_cursor_position"
 
 end

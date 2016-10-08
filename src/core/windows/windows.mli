@@ -28,11 +28,27 @@ module WindowHandle : sig
     val create : 
         classname:string ->
         name:string ->
-        origin:(int * int) ->
-        size:(int * int) ->
-        style:WindowStyle.t -> t
+        rect:(int * int * int * int) ->
+        style:WindowStyle.t -> 
+        uid:int -> t
+
+    val set_text : t -> string -> unit
 
     val get_rect : t -> (int * int * int * int)
+    
+    val move : t -> (int * int * int * int) -> unit
+
+    val attach_userdata : t -> 'a -> unit
+
+    val swap_buffers : t -> unit
+
+    val process_events : t -> unit
+
+    val has_focus : t -> bool
+
+    val close : t -> unit
+
+    val destroy : t -> unit
 
 end
 
@@ -80,13 +96,26 @@ end
 
 module Event : sig
 
-    type t
-
     type modifiers = {shift : bool; ctrl : bool; lock : bool; alt : bool}
 
     type position = {x : int; y : int}
 
     type key = Code of int | Char of char
+
+    type t =
+        | Unknown
+        | Closed
+        | Resize of bool (* True iff it is not a minimization *)
+        | StartResize
+        | StopResize
+        | KeyDown of key * modifiers
+        | KeyUp of key * modifiers
+
+    val async_key_state : key -> bool 
+
+    val cursor_position : unit -> (int * int)
+
+    val set_cursor_position : (int * int) -> unit
 
 end
 

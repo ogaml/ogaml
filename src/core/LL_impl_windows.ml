@@ -7,10 +7,29 @@ module Window = struct
   type t = {
     handle : Windows.WindowHandle.t;
     glcontext : Windows.GlContext.t;
-    position : Vector2i.t;
-    size : Vector2i.t
+    mutable position : Vector2i.t;
+    mutable size : Vector2i.t;
+    event_queue : Event.t Queue.t;
+    mutable is_open : bool;
+    mutable resizing : bool;
+    uid : int;
   }
 
+  (** Because we can't safely store an OCaml value in the GWLP_USERDATA field of a window,
+    * we store an (unboxed) UID that maps to the corresponding OCaml window in this table *)
+  let window_table = 
+    Hashtbl.create 13
+
+  (** We simply generate UIDs by incrementing this integer *)
+  let next_window_id = 
+    ref 0
+
+  (** We also need a callback to retrieve the window from an ID *)
+  let get_window id = 
+    try Some (Hashtbl.find window_table id)
+    with Not_found -> None
+
+  (** Now we can implement Window ! *)
   let create ~width ~height ~title ~settings =
     let open Windows in
     let style = Windows.WindowStyle.(create 
@@ -18,13 +37,17 @@ module Window = struct
        WS_MaximizeBox; WS_MinimizeBox; WS_Caption; WS_Sysmenu])
     in
     WindowHandle.register_class "OGAMLWIN"; 
+    let uid = 
+      incr next_window_id;
+      !next_window_id
+    in
     let handle = 
       WindowHandle.create 
         ~classname:"OGAMLWIN"
         ~name:title
-        ~origin:(50,50)
-        ~size:(width,height)
+        ~rect:(50,50,width,height)
         ~style
+        ~uid
     in
     let depthbits = ContextSettings.depth_bits settings in
     let stencilbits = ContextSettings.stencil_bits settings in
@@ -46,36 +69,66 @@ module Window = struct
     if glewinit <> "" then 
       raise (Error ("Cannot initialize Glew : " ^ glewinit));
     let (x,y,width,height) = WindowHandle.get_rect handle in
-    {handle; glcontext;
-     position = Vector2i.({x; y});
-     size = Vector2i.({x = width; y = height})}
+    let event_queue = Queue.create () in
+    let window = 
+      {
+        handle; glcontext;
+        position = Vector2i.({x; y});
+        size = Vector2i.({x = width; y = height});
+        event_queue;
+        is_open = true;
+        resizing = false;
+        uid
+      }
+    in
+    Hashtbl.replace window_table uid window;
+    window
 	
   let set_title win s = 
-	assert false
+    Windows.WindowHandle.set_text win.handle s
 
   let close win = 
-	assert false
+	  win.is_open <- false;
+    Windows.WindowHandle.close win.handle
 
   let destroy win = 
-	assert false
+    Hashtbl.remove window_table win.uid;
+    win.is_open <- false;
+	  Windows.WindowHandle.destroy win.handle
+
+  let update_rect win = 
+    let (x,y,w,h) = Windows.WindowHandle.get_rect win.handle in
+    win.position <- Vector2i.({x; y});
+    win.size <- Vector2i.({x = w; y = h})
+
+  let position win = 
+    update_rect win;
+	  win.position
 
   let size win = 
+    update_rect win;
 	  win.size
 
   let rect win = 
+    update_rect win;
 	  IntRect.create win.position win.size
 
   let resize win v = 
-	assert false
+    Windows.WindowHandle.move win.handle 
+      (win.position.Vector2i.x, 
+       win.position.Vector2i.y,
+       v.Vector2i.x, 
+       v.Vector2i.y);
+    update_rect win
 
   let toggle_fullscreen win = 
-	assert false
+	assert false (* TODO *)
 
   let is_open win = 
-	assert false
+	  win.is_open
 
   let has_focus win = 
-	assert false
+	  Windows.WindowHandle.has_focus win.handle
 
   let keysym_to_key = Keycode.(function
     | Windows.Event.Code i -> begin
@@ -110,32 +163,32 @@ module Window = struct
     end
     | Windows.Event.Char c -> begin
       match c with
-      |'a' -> A |'b' -> B |'c' -> C
-      |'d' -> D |'e' -> E |'f' -> F
-      |'g' -> G |'h' -> H |'i' -> I
-      |'j' -> J |'k' -> K |'l' -> L
-      |'m' -> M |'n' -> N |'o' -> O
-      |'p' -> P |'q' -> Q |'r' -> R
-      |'s' -> S |'t' -> T |'u' -> U
-      |'v' -> V |'w' -> W |'x' -> X
-      |'y' -> Y |'z' -> Z
+      |'A' -> A |'B' -> B |'C' -> C
+      |'D' -> D |'E' -> E |'F' -> F
+      |'G' -> G |'H' -> H |'I' -> I
+      |'J' -> J |'K' -> K |'L' -> L
+      |'M' -> M |'N' -> N |'O' -> O
+      |'P' -> P |'Q' -> Q |'R' -> R
+      |'S' -> S |'T' -> T |'U' -> U
+      |'V' -> V |'W' -> W |'X' -> X
+      |'Y' -> Y |'Z' -> Z
       | _  -> Unknown
     end)
 
   let key_to_keysym = Keycode.(function
-    |A -> Windows.Event.Char 'a'   |B -> Windows.Event.Char 'b'
-    |C -> Windows.Event.Char 'c'   |D -> Windows.Event.Char 'd'
-    |E -> Windows.Event.Char 'e'   |F -> Windows.Event.Char 'f'
-    |G -> Windows.Event.Char 'g'   |H -> Windows.Event.Char 'h'
-    |I -> Windows.Event.Char 'i'   |J -> Windows.Event.Char 'j'
-    |K -> Windows.Event.Char 'k'   |L -> Windows.Event.Char 'l'
-    |M -> Windows.Event.Char 'm'   |N -> Windows.Event.Char 'n'
-    |O -> Windows.Event.Char 'o'   |P -> Windows.Event.Char 'p'
-    |Q -> Windows.Event.Char 'q'   |R -> Windows.Event.Char 'r'
-    |S -> Windows.Event.Char 's'   |T -> Windows.Event.Char 't'
-    |U -> Windows.Event.Char 'u'   |V -> Windows.Event.Char 'v'
-    |W -> Windows.Event.Char 'w'   |X -> Windows.Event.Char 'x'
-    |Y -> Windows.Event.Char 'y'   |Z -> Windows.Event.Char 'z'
+    |A -> Windows.Event.Char 'A'   |B -> Windows.Event.Char 'B'
+    |C -> Windows.Event.Char 'C'   |D -> Windows.Event.Char 'D'
+    |E -> Windows.Event.Char 'E'   |F -> Windows.Event.Char 'F'
+    |G -> Windows.Event.Char 'G'   |H -> Windows.Event.Char 'H'
+    |I -> Windows.Event.Char 'I'   |J -> Windows.Event.Char 'J'
+    |K -> Windows.Event.Char 'K'   |L -> Windows.Event.Char 'L'
+    |M -> Windows.Event.Char 'M'   |N -> Windows.Event.Char 'N'
+    |O -> Windows.Event.Char 'O'   |P -> Windows.Event.Char 'P'
+    |Q -> Windows.Event.Char 'Q'   |R -> Windows.Event.Char 'R'
+    |S -> Windows.Event.Char 'S'   |T -> Windows.Event.Char 'T'
+    |U -> Windows.Event.Char 'U'   |V -> Windows.Event.Char 'V'
+    |W -> Windows.Event.Char 'W'   |X -> Windows.Event.Char 'X'
+    |Y -> Windows.Event.Char 'Y'   |Z -> Windows.Event.Char 'Z'
     |Num1 -> Windows.Event.Code 0x31        |Num2 -> Windows.Event.Code 0x32
     |Num3 -> Windows.Event.Code 0x33        |Num4 -> Windows.Event.Code 0x34
     |Num5 -> Windows.Event.Code 0x35        |Num6 -> Windows.Event.Code 0x36
@@ -165,11 +218,51 @@ module Window = struct
     |Delete -> Windows.Event.Code 0x2E      |Unknown -> assert false 
   )
 
-  let poll_event win = 
-	assert false
+  (** This is a C callback that processes and pushes an event in windows's event queue *)
+  let push_event_in_queue win event =
+    match event with 
+    | Windows.Event.Unknown -> ()
+    | Windows.Event.StartResize -> 
+      win.resizing <- true
+    | Windows.Event.StopResize ->
+      let size = win.size in
+      update_rect win;
+      if size <> win.size then
+        Queue.push (Event.Resized) win.event_queue
+    | Windows.Event.Resize b ->
+      if (not win.resizing) && b then begin
+        let size = win.size in
+        update_rect win;
+        if size <> win.size then 
+          Queue.push (Event.Resized) win.event_queue
+      end
+    | Windows.Event.Closed -> 
+      Queue.push (Event.Closed) win.event_queue
+    | Windows.Event.KeyDown (keydata, {Windows.Event.shift; ctrl; lock; alt}) ->
+      let key = keysym_to_key keydata in
+      let keyevent = 
+        Event.KeyEvent.({key; shift; control = ctrl; alt})
+      in
+      Queue.push (Event.KeyPressed keyevent) win.event_queue
+    | Windows.Event.KeyUp (keydata, {Windows.Event.shift; ctrl; lock; alt}) ->
+      let key = keysym_to_key keydata in
+      let keyevent = 
+        Event.KeyEvent.({key; shift; control = ctrl; alt})
+      in
+      Queue.push (Event.KeyReleased keyevent) win.event_queue
+
+  let rec poll_event win =
+    Windows.WindowHandle.process_events win.handle;
+	  if Queue.is_empty win.event_queue then None
+    else Some (Queue.pop win.event_queue)
 
   let display win = 
-	assert false
+	  Windows.WindowHandle.swap_buffers win.handle
+
+  (** Register the callbacks *)
+  let () =
+    Callback.register "OGAMLCallbackGetWindow" get_window;
+    Callback.register "OGAMLCallbackPushEvent" push_event_in_queue
 
 end
 
@@ -177,16 +270,16 @@ end
 module Keyboard = struct
 
   let is_pressed kcode = 
-	assert false
+	  Windows.Event.async_key_state (Window.key_to_keysym kcode)
 
   let is_shift_down () = 
-	assert false
+	  (is_pressed Keycode.LShift) || (is_pressed Keycode.RShift)
 
   let is_ctrl_down () = 
-	assert false
+	  (is_pressed Keycode.LControl) || (is_pressed Keycode.RControl)
 
   let is_alt_down () = 
-	assert false
+	  (is_pressed Keycode.LAlt) || (is_pressed Keycode.RAlt)
 
 end
 
@@ -194,18 +287,21 @@ end
 module Mouse = struct
 
   let position () = 
-	assert false
+	  let (x,y) = Windows.Event.cursor_position () in
+    Vector2i.({x; y})
 
   let relative_position win = 
-	assert false
+    let pos = position () in
+    Vector2i.sub pos (Window.position win)
 
   let set_position s = 
-	assert false
+	  Windows.Event.set_cursor_position (s.Vector2i.x, s.Vector2i.y)
 
-  let set_relative_position win s = 
-	assert false
+  let set_relative_position win srel =
+    let s = Vector2i.add srel (Window.position win) in 
+  	set_position s
 
   let is_pressed but = 
-	assert false
+	  false (* TODO *)
 
 end
