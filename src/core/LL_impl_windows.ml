@@ -175,6 +175,14 @@ module Window = struct
       | _  -> Unknown
     end)
 
+  let vk_to_button = function
+    | Windows.Event.LButton when Windows.Event.swap_button () -> Button.Right
+    | Windows.Event.RButton when Windows.Event.swap_button () -> Button.Left
+    | Windows.Event.LButton -> Button.Left
+    | Windows.Event.RButton -> Button.Right
+    | Windows.Event.MButton -> Button.Middle
+    | _ -> Button.Unknown
+
   let key_to_keysym = Keycode.(function
     |A -> Windows.Event.Char 'A'   |B -> Windows.Event.Char 'B'
     |C -> Windows.Event.Char 'C'   |D -> Windows.Event.Char 'D'
@@ -218,6 +226,14 @@ module Window = struct
     |Delete -> Windows.Event.Code 0x2E      |Unknown -> assert false 
   )
 
+  let button_to_vk = function
+    | Button.Left  when Windows.Event.swap_button () -> Windows.Event.RButton
+    | Button.Right when Windows.Event.swap_button () -> Windows.Event.LButton
+    | Button.Left  -> Windows.Event.LButton
+    | Button.Right -> Windows.Event.RButton
+    | Button.Middle -> Windows.Event.MButton
+    | Button.Unknown -> assert false
+
   (** This is a C callback that processes and pushes an event in windows's event queue *)
   let push_event_in_queue win event =
     match event with 
@@ -250,6 +266,19 @@ module Window = struct
         Event.KeyEvent.({key; shift; control = ctrl; alt})
       in
       Queue.push (Event.KeyReleased keyevent) win.event_queue
+    | Windows.Event.MouseVWheel (x, y, delta, mods) -> ()
+    | Windows.Event.MouseHWheel (x, y, delta, mods) -> ()
+    | Windows.Event.ButtonUp (mb, x, y, {Windows.Event.shift; ctrl; lock; alt}) ->
+      let buttonevent = 
+        Event.ButtonEvent.({button = vk_to_button mb; x; y; shift; control = ctrl; alt})
+      in
+      Queue.push (Event.ButtonReleased buttonevent) win.event_queue
+    | Windows.Event.ButtonDown (mb, x, y, {Windows.Event.shift; ctrl; lock; alt}) ->
+      let buttonevent = 
+        Event.ButtonEvent.({button = vk_to_button mb; x; y; shift; control = ctrl; alt})
+      in
+      Queue.push (Event.ButtonPressed buttonevent) win.event_queue
+
 
   let rec poll_event win =
     Windows.WindowHandle.process_events win.handle;
@@ -270,7 +299,9 @@ end
 module Keyboard = struct
 
   let is_pressed kcode = 
-	  Windows.Event.async_key_state (Window.key_to_keysym kcode)
+    match kcode with
+    | Keycode.Unknown -> false
+	  | kcode -> Windows.Event.async_key_state (Window.key_to_keysym kcode)
 
   let is_shift_down () = 
 	  (is_pressed Keycode.LShift) || (is_pressed Keycode.RShift)
@@ -302,6 +333,8 @@ module Mouse = struct
   	set_position s
 
   let is_pressed but = 
-	  false (* TODO *)
+    match but with
+    | Button.Unknown -> false
+    | but -> Windows.Event.async_mouse_state (Window.button_to_vk but)
 
 end

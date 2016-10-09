@@ -102,6 +102,13 @@ module Event : sig
 
     type key = Code of int | Char of char
 
+    type mouse_button = 
+        | LButton
+        | RButton
+        | MButton
+        | XButton1
+        | XButton2
+
     type t =
         | Unknown
         | Closed
@@ -110,12 +117,20 @@ module Event : sig
         | StopResize
         | KeyDown of key * modifiers
         | KeyUp of key * modifiers
+        | MouseVWheel of int * int * int * modifiers
+        | MouseHWheel of int * int * int * modifiers
+        | ButtonUp of mouse_button * int * int * modifiers
+        | ButtonDown of mouse_button * int * int * modifiers
 
     val async_key_state : key -> bool 
 
     val cursor_position : unit -> (int * int)
 
     val set_cursor_position : (int * int) -> unit
+
+    val async_mouse_state : mouse_button -> bool
+
+    val swap_button : unit -> bool
 
 end
 

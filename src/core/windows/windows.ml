@@ -125,6 +125,13 @@ module Event = struct
 
     type key = Code of int | Char of char
 
+    type mouse_button = 
+        | LButton
+        | RButton
+        | MButton
+        | XButton1
+        | XButton2
+
     type t =
         | Unknown
         | Closed
@@ -133,11 +140,19 @@ module Event = struct
         | StopResize
         | KeyDown of key * modifiers
         | KeyUp of key * modifiers
+        | MouseVWheel of int * int * int * modifiers
+        | MouseHWheel of int * int * int * modifiers
+        | ButtonUp of mouse_button * int * int * modifiers
+        | ButtonDown of mouse_button * int * int * modifiers
 
     external async_key_state : key -> bool = "caml_get_async_key_state"
 
     external cursor_position : unit -> (int * int) = "caml_cursor_position"
 
     external set_cursor_position : (int * int) -> unit = "caml_set_cursor_position"
+
+    external async_mouse_state : mouse_button -> bool = "caml_get_async_mouse_state"
+
+    external swap_button : unit -> bool = "caml_button_swap"
 
 end

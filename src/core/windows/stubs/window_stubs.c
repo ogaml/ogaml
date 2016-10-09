@@ -1,14 +1,30 @@
 #include "utils.h"
 #include <windows.h>
+#include <Windowsx.h>
 #include <memory.h>
 
 value* callback_get_window_from_id;
 value* callback_push_event_to_window;
 
+value getModifiers()
+{
+    CAMLparam0();
+    CAMLlocal1(res);
+
+    res = caml_alloc(4,0);
+    Store_field(res,0,Val_bool(HIWORD(GetAsyncKeyState(VK_SHIFT)) != 0));
+    Store_field(res,1,Val_bool(HIWORD(GetAsyncKeyState(VK_CONTROL)) != 0));
+    Store_field(res,2,Val_bool(HIWORD(GetAsyncKeyState(VK_CAPITAL)) != 0));
+    Store_field(res,3,Val_bool(HIWORD(GetAsyncKeyState(VK_MENU)) != 0));
+
+    CAMLreturn(res);
+}
+
 value processEvent(UINT message, WPARAM wParam, LPARAM lParam)
 {
     CAMLparam0();
-    CAMLlocal3(res,res_field_1,res_field_2);
+    CAMLlocal3(res,res_field,modifiers);
+    int x,y,dt,button;
 
     switch(message)
     {
@@ -42,20 +58,16 @@ value processEvent(UINT message, WPARAM wParam, LPARAM lParam)
         {
             res = caml_alloc(2,1);
             if(wParam >=65 && wParam <= 90) {
-                res_field_1 = caml_alloc(1,1);
-                Store_field(res_field_1,0,Val_int(wParam));
+                res_field = caml_alloc(1,1);
+                Store_field(res_field,0,Val_int(wParam));
             } else {
-                res_field_1 = caml_alloc(1,0);
-                Store_field(res_field_1,0,Val_int(wParam));
+                res_field = caml_alloc(1,0);
+                Store_field(res_field,0,Val_int(wParam));
             }
-            res_field_2 = caml_alloc(4,0);
-            Store_field(res_field_2,0,Val_bool(HIWORD(GetAsyncKeyState(VK_SHIFT)) != 0));
-            Store_field(res_field_2,1,Val_bool(HIWORD(GetAsyncKeyState(VK_CONTROL)) != 0));
-            Store_field(res_field_2,2,Val_bool(HIWORD(GetAsyncKeyState(VK_CAPITAL)) != 0));
-            Store_field(res_field_2,3,Val_bool(HIWORD(GetAsyncKeyState(VK_MENU)) != 0));
+            modifiers = getModifiers();
 
-            Store_field(res, 0, res_field_1);
-            Store_field(res, 1, res_field_2);
+            Store_field(res, 0, res_field);
+            Store_field(res, 1, modifiers);
             break;
         }
 
@@ -64,20 +76,172 @@ value processEvent(UINT message, WPARAM wParam, LPARAM lParam)
         {
             res = caml_alloc(2,2);
             if(wParam >=65 && wParam <= 90) {
-                res_field_1 = caml_alloc(1,1);
-                Store_field(res_field_1,0,Val_int(wParam));
+                res_field = caml_alloc(1,1);
+                Store_field(res_field,0,Val_int(wParam));
             } else {
-                res_field_1 = caml_alloc(1,0);
-                Store_field(res_field_1,0,Val_int(wParam));
+                res_field = caml_alloc(1,0);
+                Store_field(res_field,0,Val_int(wParam));
             }
-            res_field_2 = caml_alloc(4,0);
-            Store_field(res_field_2,0,Val_bool(HIWORD(GetAsyncKeyState(VK_SHIFT)) != 0));
-            Store_field(res_field_2,1,Val_bool(HIWORD(GetAsyncKeyState(VK_CONTROL)) != 0));
-            Store_field(res_field_2,2,Val_bool(HIWORD(GetAsyncKeyState(VK_CAPITAL)) != 0));
-            Store_field(res_field_2,3,Val_bool(HIWORD(GetAsyncKeyState(VK_MENU)) != 0));
+            modifiers = getModifiers();
 
-            Store_field(res, 0, res_field_1);
-            Store_field(res, 1, res_field_2);
+            Store_field(res, 0, res_field);
+            Store_field(res, 1, modifiers);
+            break;
+        }
+
+        case WM_MOUSEWHEEL:
+        {
+            res = caml_alloc(4,3);
+
+            x = GET_X_LPARAM(lParam);
+            y = GET_Y_LPARAM(lParam);
+            dt = GET_WHEEL_DELTA_WPARAM(wParam);
+            modifiers = getModifiers();
+
+            Store_field(res, 0, Val_int(x));
+            Store_field(res, 1, Val_int(y));
+            Store_field(res, 2, Val_int(dt));
+            Store_field(res, 3, modifiers);
+            break;
+        }
+
+        case WM_MOUSEHWHEEL:
+        {
+            res = caml_alloc(4,4);
+
+            x = GET_X_LPARAM(lParam);
+            y = GET_Y_LPARAM(lParam);
+            dt = GET_WHEEL_DELTA_WPARAM(wParam);
+            modifiers = getModifiers();
+
+            Store_field(res, 0, Val_int(x));
+            Store_field(res, 1, Val_int(y));
+            Store_field(res, 2, Val_int(dt));
+            Store_field(res, 3, modifiers);
+            break;
+        }
+
+        case WM_LBUTTONUP:
+        {
+            res = caml_alloc(4,5);
+
+            x = GET_X_LPARAM(lParam);
+            y = GET_Y_LPARAM(lParam);
+            modifiers = getModifiers();
+
+            Store_field(res, 0, Val_int(0));
+            Store_field(res, 1, Val_int(x));
+            Store_field(res, 2, Val_int(y));
+            Store_field(res, 3, modifiers);
+            break;
+        }
+
+        case WM_LBUTTONDOWN:
+        {
+            res = caml_alloc(4,6);
+
+            x = GET_X_LPARAM(lParam);
+            y = GET_Y_LPARAM(lParam);
+            modifiers = getModifiers();
+
+            Store_field(res, 0, Val_int(0));
+            Store_field(res, 1, Val_int(x));
+            Store_field(res, 2, Val_int(y));
+            Store_field(res, 3, modifiers);
+            break;
+        }
+
+        case WM_RBUTTONUP:
+        {
+            res = caml_alloc(4,5);
+
+            x = GET_X_LPARAM(lParam);
+            y = GET_Y_LPARAM(lParam);
+            modifiers = getModifiers();
+
+            Store_field(res, 0, Val_int(1));
+            Store_field(res, 1, Val_int(x));
+            Store_field(res, 2, Val_int(y));
+            Store_field(res, 3, modifiers);
+            break;
+        }
+
+        case WM_RBUTTONDOWN:
+        {
+            res = caml_alloc(4,6);
+
+            x = GET_X_LPARAM(lParam);
+            y = GET_Y_LPARAM(lParam);
+            modifiers = getModifiers();
+
+            Store_field(res, 0, Val_int(1));
+            Store_field(res, 1, Val_int(x));
+            Store_field(res, 2, Val_int(y));
+            Store_field(res, 3, modifiers);
+            break;
+        }
+
+        case WM_MBUTTONUP:
+        {
+            res = caml_alloc(4,5);
+
+            x = GET_X_LPARAM(lParam);
+            y = GET_Y_LPARAM(lParam);
+            modifiers = getModifiers();
+
+            Store_field(res, 0, Val_int(2));
+            Store_field(res, 1, Val_int(x));
+            Store_field(res, 2, Val_int(y));
+            Store_field(res, 3, modifiers);
+            break;
+        }
+
+        case WM_MBUTTONDOWN:
+        {
+            res = caml_alloc(4,6);
+
+            x = GET_X_LPARAM(lParam);
+            y = GET_Y_LPARAM(lParam);
+            modifiers = getModifiers();
+
+            Store_field(res, 0, Val_int(2));
+            Store_field(res, 1, Val_int(x));
+            Store_field(res, 2, Val_int(y));
+            Store_field(res, 3, modifiers);
+            break;
+        }
+
+        case WM_XBUTTONUP:
+        {
+            res = caml_alloc(4,5);
+
+            x = GET_X_LPARAM(lParam);
+            y = GET_Y_LPARAM(lParam);
+            modifiers = getModifiers();
+
+            button = HIWORD(wParam) == XBUTTON1 ? 3 : 4;
+
+            Store_field(res, 0, Val_int(button));
+            Store_field(res, 1, Val_int(x));
+            Store_field(res, 2, Val_int(y));
+            Store_field(res, 3, modifiers);
+            break;
+        }
+
+        case WM_XBUTTONDOWN:
+        {
+            res = caml_alloc(4,6);
+
+            x = GET_X_LPARAM(lParam);
+            y = GET_Y_LPARAM(lParam);
+            modifiers = getModifiers();
+
+            button = HIWORD(wParam) == XBUTTON1 ? 3 : 4;
+
+            Store_field(res, 0, Val_int(button));
+            Store_field(res, 1, Val_int(x));
+            Store_field(res, 2, Val_int(y));
+            Store_field(res, 3, modifiers);
             break;
         }
 
@@ -99,6 +263,51 @@ caml_get_async_key_state(value key)
     int code = Int_val(Field(key,0));
 
     CAMLreturn(Val_bool(HIWORD(GetAsyncKeyState(code)) != 0));
+}
+
+CAMLprim value
+caml_get_async_mouse_state(value but)
+{
+    CAMLparam1(but);
+    
+    int code = 0;
+
+    switch (Int_val(but))
+    {
+        case 0:
+            code = VK_LBUTTON;
+            break;
+        
+        case 1:
+            code = VK_RBUTTON;
+            break;
+
+        case 2:
+            code = VK_MBUTTON;
+            break;
+
+        case 3:
+            code = VK_XBUTTON1;
+            break;
+
+        case 4:
+            code = VK_XBUTTON2;
+            break;
+
+        default:
+            caml_failwith("Variant error in get_async_mouse_state");
+            break;
+    }
+
+    CAMLreturn(Val_bool(HIWORD(GetAsyncKeyState(code)) != 0));
+}
+
+CAMLprim value
+caml_button_swap(value unit)
+{
+    CAMLparam1(unit);
+
+    CAMLreturn(Val_bool(GetSystemMetrics(SM_SWAPBUTTON)));
 }
 
 LRESULT CALLBACK onEvent(HWND handle, UINT message, WPARAM wParam, LPARAM lParam)
