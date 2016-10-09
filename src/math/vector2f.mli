@@ -18,7 +18,7 @@ val prop : float -> t -> t
 
 val div : float -> t -> t
 
-val floor : t -> Vector2i.t
+val to_int : t -> Vector2i.t
 
 val from_int : Vector2i.t -> t
 

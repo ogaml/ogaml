@@ -91,6 +91,8 @@ module Window : sig
 
   val has_focus : Display.t -> t -> bool
 
+  val show_cursor : Display.t -> t -> bool -> unit
+
 end
 
 

@@ -34,6 +34,11 @@ let corner t = {
   Vector2f.y = t.y +. t.height;
 }
 
+let abs_corner t = {
+  Vector2f.x = max t.x (t.x +. t.width);
+  Vector2f.y = max t.y (t.y +. t.height)
+}
+
 let size t = {
   Vector2f.x = t.width;
   Vector2f.y = t.height;
@@ -57,6 +62,11 @@ let area t =
   let open Vector2f in
   s.x *. s.y
 
+let extend t v = 
+  {t with
+    width = t.width +. v.Vector2f.x;
+    height = t.height +. v.Vector2f.y}
+
 let scale t v = 
   {t with
     width  = t.width  *. v.Vector2f.x;
@@ -75,7 +85,7 @@ let from_int t = {
   height = float_of_int t.IntRect.height;
 }
 
-let floor t = {
+let to_int t = {
   IntRect.x = int_of_float t.x;
   IntRect.y = int_of_float t.y;
   IntRect.width  = int_of_float t.width ;
@@ -89,6 +99,14 @@ let intersects t1 t2 =
        (t1.y +. t1.height < t2.y) ||
        (t2.y +. t2.height < t1.y))
 
+let includes t1 t2 = 
+  let t1 = normalize t1 in
+  let t2 = normalize t2 in
+  t2.x >= t1.x && 
+  t2.y >= t1.y && 
+  (t2.width +. t2.x) <= (t1.width +. t1.x) &&
+  (t2.height +. t2.y) <= (t1.height +. t1.y)
+
 let contains t pt = 
   let t = normalize t in
   pt.Vector2f.x >= t.x &&
@@ -96,3 +114,5 @@ let contains t pt =
   pt.Vector2f.x <= t.x +. t.width  &&
   pt.Vector2f.y <= t.y +. t.height 
 
+let print t = 
+  Printf.sprintf "(x = %f; y = %f; width = %f; height = %f)" t.x t.y t.width t.height

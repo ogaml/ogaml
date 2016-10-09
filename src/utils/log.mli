@@ -5,6 +5,8 @@ type t
 
 val create : ?output:out_channel -> ?debug:bool -> ?color:bool -> ?short:bool -> unit -> t
 
+val stdout : t
+
 val log : t -> level -> ('a, out_channel, unit) format -> 'a
 
 val debug : t -> ('a, out_channel, unit) format -> 'a

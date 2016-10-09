@@ -152,6 +152,7 @@ module OGEvent : sig
     | KeyUp       of key_info
     | KeyDown     of key_info
     | ResizedWindow
+    | ScrollWheel of float
 
   val get_content : t -> content
 
@@ -305,6 +306,8 @@ module OGWindowController : sig
   val is_window_open : t -> bool
 
   val release_window : t -> unit
+
+  val open_window : t -> unit
 
   val pop_event : t -> OGEvent.t option
 

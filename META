@@ -3,7 +3,7 @@ version = "0.01a"
 description = "ocaml multimedia library"
 
 package "core" (
-  requires = "bigarray,unix"
+  requires = "bigarray,unix,ogaml.math,ogaml.utils"
   archive(byte) = "ogamlCore.cma"
   archive(native) = "ogamlCore.cmxa"
 )

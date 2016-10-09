@@ -91,4 +91,10 @@
   return event;
 }
 
+
+-(void)reshape
+{
+  [[self openGLContext] update];
+}
+
 @end

@@ -19,27 +19,9 @@
 #endif
 #include <caml/bigarray.h>
 #include "utils.h"
+#include "types_stubs.h"
 
 #define BUFFER(_a) (*(GLuint*) Data_custom_val(_a))
-
-
-GLenum EBOKind_val(value kind) 
-{
-  switch(Int_val(kind))
-  {
-    case 0:
-      return GL_STATIC_DRAW;
-
-    case 1:
-      return GL_DYNAMIC_DRAW;
-
-    default:
-      caml_failwith("Caml variant error in EBOKind_val(1)");
-  }
-
-  return 0;
-}
-
 
 // INPUT   a buffer name
 // OUTPUT  nothing, binds the buffer

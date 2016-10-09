@@ -1,7 +1,7 @@
 include ../../common_defs.mk
 
 
-INCLUDE_DIRS = -I ../math/ -I ../core/
+INCLUDE_DIRS = -I ../math/ -I ../core/ -I ../utils/
 
 # Stubs constants
 
@@ -80,7 +80,7 @@ endif
 
 # Compilation
 
-default: .depend core_lib
+default: core_lib
 
 core_lib: ml_stubs $(STUBS_TARGETS) $(ML_CMIS) $(ML_OBJ) $(ML_NAT) $(CORE_LIB).cmi
 	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(CORE_LIB).cmx $(OS_WIN_LIB)/$(OS_WIN_LIB).cmx $(ML_CMISALONE) $(ML_NAT) &&\
@@ -109,16 +109,17 @@ ml_stubs:
 # Cleaning
 
 clean:
-	rm -rf $(CLEAN_EXTENSIONS) &\
+	rm -f $(CLEAN_EXTENSIONS) &\
 	make -C $(OS_WIN_LIB)/ clean
 
 
 # Dependencies
 
-.depend:
-	$(DEPCOMMAND) *.ml *.mli cocoa/*.ml cocoa/*.mli x11/*.ml x11/*.mli > .depend
+depend:.depend
 
-include .depend
+.depend:
+	$(DEPCOMMAND) *.ml *.mli cocoa/*.ml cocoa/*.mli x11/*.ml x11/*.mli > .depend;
+	cd $(OS_WIN_LIB) && make depend
 
 .PHONY: .depend
 

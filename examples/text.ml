@@ -56,6 +56,16 @@ let txt4 = Text.create
   ~bold:false
   ()
 
+let smltxtpos = Vector2f.({x = 30.; y = 400. })
+
+let small_text = Text.create
+  ~text:"Trying to render small text to check if it renders without too many artifacts.\nYou should be able to read this without difficulty."
+  ~position:smltxtpos
+  ~font
+  ~size:12
+  ~bold:false
+  ()
+
 let boundaries4 = Text.boundaries txt4
 
 let border4 = Shape.create_rectangle
@@ -87,6 +97,8 @@ let random_color =
 let fxpos = Vector2f.({ x = 10. ; y = 350. })
 
 let fxtxt1 = Text.Fx.create
+  (module Window)
+  ~target:window
   ~text:"Awesome text!"
   ~position:fxpos
   ~font
@@ -97,6 +109,8 @@ let fxtxt1 = Text.Fx.create
 let fxpos2 = Vector2f.add (Text.Fx.advance fxtxt1) fxpos
 
 let fxtxt2 = Text.Fx.create
+  (module Window)
+  ~target:window
   ~text:"Success!!!"
   ~position:fxpos2
   ~font
@@ -108,6 +122,7 @@ let fxtxt2 = Text.Fx.create
   ()
 
 let fxpos3 = Vector2f.add (Text.Fx.advance fxtxt2) fxpos2
+
 
 (* let fxtxt3 = Text.Fx.create
   ~text:"This time we separate words a bit to check everything works."
@@ -122,6 +137,8 @@ let aa = ref false
 let draw () =
   (* Trying computing each frame *)
   let fxtxt3 = Text.Fx.create
+    (module Window)
+    ~target:window
     ~text:"This time we separate words a bit to check everything works."
     ~position:fxpos3
     ~font
@@ -130,21 +147,21 @@ let draw () =
     ()
   in
   let parameters = DrawParameter.make
-                      ~depth_test:false
                       ~antialiasing:!aa
                       ~blend_mode:(DrawParameter.BlendMode.alpha)
                       ()
   in
-  Text.draw ~parameters ~window ~text:txt ();
-  Text.draw ~parameters ~window ~text:txt2 ();
-  Text.draw ~parameters ~window ~text:txt2' ();
-  Text.draw ~parameters ~window ~text:txt3 ();
-  Text.draw ~parameters ~window ~text:txt4 ();
-  Text.Fx.draw ~parameters ~window ~text:fxtxt1 ();
-  Text.Fx.draw ~parameters ~window ~text:fxtxt2 ();
-  Text.Fx.draw ~parameters ~window ~text:fxtxt3 ();
-  Shape.draw ~parameters ~window ~shape:border ();
-  Shape.draw ~parameters ~window ~shape:border4 ()
+  Text.draw (module Window) ~parameters ~target:window ~text:txt ();
+  Text.draw (module Window) ~parameters ~target:window ~text:txt2 ();
+  Text.draw (module Window) ~parameters ~target:window ~text:txt2' ();
+  Text.draw (module Window) ~parameters ~target:window ~text:txt3 ();
+  Text.draw (module Window) ~parameters ~target:window ~text:txt4 ();
+  Text.draw (module Window) ~parameters ~target:window ~text:small_text ();
+  Text.Fx.draw (module Window) ~parameters ~target:window ~text:fxtxt1 ();
+  Text.Fx.draw (module Window) ~parameters ~target:window ~text:fxtxt2 ();
+  Text.Fx.draw (module Window) ~parameters ~target:window ~text:fxtxt3 ();
+  Shape.draw (module Window) ~parameters ~target:window ~shape:border ();
+  Shape.draw (module Window) ~parameters ~target:window ~shape:border4 ()
 
 let rec event_loop () =
   match Window.poll_event window with
@@ -162,7 +179,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(`RGB Color.RGB.magenta) window ;
+    Window.clear ~color:(Some (`RGB Color.RGB.magenta)) window ;
     draw () ;
     Window.display window ;
     event_loop () ;

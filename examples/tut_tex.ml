@@ -39,9 +39,10 @@ let fragment_shader_source = "
 
 let program =
   Program.from_source_pp
-    (Window.state window)
+    (module Window)
+    ~context:window
     ~vertex_source:(`String vertex_shader_source)
-    ~fragment_source:(`String fragment_shader_source)
+    ~fragment_source:(`String fragment_shader_source) ()
 
 let vertex1 =
   VertexArray.Vertex.create
@@ -71,9 +72,9 @@ let vertex_source = VertexArray.Source.(
     << vertex4
 )
 
-let vertices = VertexArray.static vertex_source
+let vertices = VertexArray.static (module Window) window vertex_source
 
-let texture = Texture.Texture2D.create (`File "examples/mario-block.bmp")
+let texture = Texture.Texture2D.create (module Window) window (`File "examples/mario-block.bmp")
 
 let uniform =
   Uniform.empty
@@ -90,8 +91,8 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(`RGB Color.RGB.white) window;
-    VertexArray.draw ~window ~vertices ~program ~uniform ~mode:DrawMode.TriangleStrip ();
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window;
+    VertexArray.draw (module Window) ~target:window ~vertices ~program ~uniform ~mode:DrawMode.TriangleStrip ();
     Window.display window;
     event_loop ();
     main_loop ();

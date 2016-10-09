@@ -15,11 +15,14 @@
 # MVC++ files
 .vscode/
 
+*.depend
+.depend
+
 # ocamlbuild working directory
 _build/
 
 # doc directory
-doc/*
+html/*
 
 # ocamlbuild targets
 *.byte

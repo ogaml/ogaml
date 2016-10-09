@@ -37,6 +37,12 @@ let corner t = {
   Vector3f.z = t.z +. t.depth;
 }
 
+let abs_corner t = {
+  Vector3f.x = max t.x (t.x +. t.width);
+  Vector3f.y = max t.y (t.y +. t.height);
+  Vector3f.z = max t.z (t.z +. t.height)
+}
+
 let size t = {
   Vector3f.x = t.width;
   Vector3f.y = t.height;
@@ -63,6 +69,13 @@ let volume t =
   let open Vector3f in
   s.x *. s.y *. s.z
 
+let extend t v = 
+  {t with
+    width  = t.width  +. v.Vector3f.x;
+    height = t.height +. v.Vector3f.y;
+    depth  = t.depth  +. v.Vector3f.z;
+  } 
+
 let scale t v = 
   {t with
     width  = t.width  *. v.Vector3f.x;
@@ -85,7 +98,7 @@ let from_int t = {
   depth  = float_of_int t.IntBox.depth ;
 }
 
-let floor t = {
+let to_int t = {
   IntBox.x = int_of_float t.x;
   IntBox.y = int_of_float t.y;
   IntBox.z = int_of_float t.z;
@@ -103,6 +116,16 @@ let intersects t1 t2 =
        (t1.z +. t1.depth  < t2.z) ||
        (t2.z +. t2.depth  < t1.z))
 
+let includes t1 t2 = 
+  let t1 = normalize t1 in
+  let t2 = normalize t2 in
+  t2.x >= t1.x && 
+  t2.y >= t1.y && 
+  t2.z >= t1.z && 
+  (t2.width  +. t2.x) <= (t1.width  +. t1.x) &&
+  (t2.height +. t2.y) <= (t1.height +. t1.y) &&
+  (t2.depth  +. t2.z) <= (t1.depth  +. t1.z)
+
 let contains t pt = 
   let t = normalize t in
   pt.Vector3f.x >= t.x &&
@@ -112,3 +135,6 @@ let contains t pt =
   pt.Vector3f.y <= t.y +. t.height &&
   pt.Vector3f.z <= t.z +. t.depth
 
+let print t = 
+  Printf.sprintf "(x = %f; y = %f; z = %f; width = %f; height = %f; depth = %f)" 
+    t.x t.y t.z t.width t.height t.depth

@@ -11,7 +11,9 @@ ML_NATS = $(ML_SOURCES:.ml=.cmx)
 
 # Compilation
 
-default: .depend $(ML_OBJS) $(ML_NATS)
+default: depend $(ML_OBJS) $(ML_NATS)
+
+include .depend
 
 %.cmi:%.mli
 	$(OCAMLC_CMD) -c -o $@ $<
@@ -26,15 +28,15 @@ default: .depend $(ML_OBJS) $(ML_NATS)
 # Cleaning
 
 clean:
-	rm -rf $(CLEAN_EXTENSIONS)
+	rm -f $(CLEAN_EXTENSIONS)
 
 
 # Dependencies
 
+depend:.depend
+
 .depend:
 	$(DEPCOMMAND) *.ml *.mli > .depend
-
-include .depend
 
 .PHONY: .depend
 

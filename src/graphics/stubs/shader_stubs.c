@@ -19,24 +19,7 @@
 #endif
 #include <caml/bigarray.h>
 #include "utils.h"
-
-
-GLenum Shader_val(value type)
-{
-  switch(Int_val(type))
-  {
-    case 0:
-      return GL_FRAGMENT_SHADER;
-
-    case 1:
-      return GL_VERTEX_SHADER;
-
-    default:
-      caml_failwith("Caml variant error in Shader_val(1)");
-  }
-
-  return 0;
-}
+#include "types_stubs.h"
 
 
 // INPUT   a shader type

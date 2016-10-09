@@ -1,3 +1,4 @@
+(** High-level helper functions and data structures *)
 
 (** Log system *)
 module Log : sig
@@ -20,6 +21,9 @@ module Log : sig
     *
     * - short : if true, timestamps will be shortened (defaults to false) *)
   val create : ?output:out_channel -> ?debug:bool -> ?color:bool -> ?short:bool -> unit -> t
+
+  (** Log to the standard output, that would be obtained by calling $create ()$ *)
+  val stdout : t
 
   (** Logs a message *)
   val log : t -> level -> ('a, out_channel, unit) format -> 'a
@@ -185,9 +189,9 @@ module Interpolator : sig
     * The $cst_*$ variants create constant-speed interpolators 
     * so the $dt$ parameter is not required. *)
 
-  (** $custom f$ returns a custom interpolator that coincides with  
-    * the function $f$ on [0;1] and equals f(0) or f(1) elsewhere. *)
-  val custom : (float -> 'a) -> 'a t
+  (** $custom f start stop$ returns a custom interpolator $ip$ that coincides with  
+    * the function $f$ such that $ip(0) = f(start)$, $ip(1) = f(stop)$. *)
+  val custom : (float -> 'a) -> float -> float -> 'a t
 
   (** $copy f$ returns a custom interpolator that coincides with  
     * the function $f$ everywhere *)
@@ -196,23 +200,23 @@ module Interpolator : sig
   (** Returns a constant interpolator *)
   val constant : float -> float t
 
-  (** $linear start steps end$ creates a linear interpolator
-    * going from $start$ to $end$ passing through each point
-    * $(dt, pos)$ of $steps$ at time $dt$ *)
+  (** $linear start steps endt$ creates a linear interpolator
+    * going from $start$ to $endt$ passing through each point
+    * $(dt, pos)$ of $steps$ at time $dt < 1.0$ *)
   val linear : float -> (float * float) list -> float -> float t
 
-  (** $cst_linear start steps end$ creates a linear interpolator 
-    * going from $start$ to $end$ passing through each point 
+  (** $cst_linear start steps endt$ creates a linear interpolator 
+    * going from $start$ to $endt$ passing through each point 
     * of $steps$ at constant speed *)
   val cst_linear : float -> float list -> float -> float t
 
-  (** $cubic (start, sm) steps (end, em)$ creates a cubic spline interpolator
-    * going from $start$ with tangent $sm$ to $end$ with tangeant $em$
-    * passing through each point $(dt, pos)$ of $steps$ at time $dt$ *)
+  (** $cubic (start, sm) steps (endt, em)$ creates a cubic spline interpolator
+    * going from $start$ with tangent $sm$ to $endt$ with tangent $em$
+    * passing through each point $(dt, pos)$ of $steps$ at time $dt < 1.0$ *)
   val cubic : (float * float) -> (float * float) list -> (float * float) -> float t
 
-  (** $cubic (start, sm) steps (end, em)$ creates a cubic spline interpolator
-    * going from $start$ with tangent $sm$ to $end$ with tangeant $em$
+  (** $cubic (start, sm) steps (endt, em)$ creates a cubic spline interpolator
+    * going from $start$ with tangent $sm$ to $endt$ with tangent $em$
     * passing through each point of $steps$ at constant speed *)
   val cst_cubic : (float * float) -> float list -> (float * float) -> float t
 

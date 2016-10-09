@@ -50,6 +50,8 @@ let create ?output:(output = stderr)
            ?short:(short = false) () = 
   {chan = output; debug; color; short}
 
+let stdout = create ()
+
 let log t lvl fmt = 
   let ts = 
     if t.short then short_timestamp () 

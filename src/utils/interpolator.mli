@@ -78,9 +78,9 @@ val loop : 'a t -> 'a t
   * The $cst_*$ variants create constant-speed iterators 
   * so the $dt$ parameter is not required. *)
 
-(** $custom f$ returns a custom interpolator that coincides with  
-  * the function $f$ on [0;1] and equals f(0) or f(1) elsewhere. *)
-val custom : (float -> 'a) -> 'a t
+(** $custom f start stop$ returns a custom interpolator $ip$ that coincides with  
+  * the function $f$ such that $ip(0) = f(start)$, $ip(1) = f(stop)$. *)
+val custom : (float -> 'a) -> float -> float -> 'a t
 
 (** $copy f$ returns a custom interpolator that coincides with  
   * the function $f$ everywhere *)

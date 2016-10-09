@@ -1,6 +1,0 @@
-cocoa/cocoa.cmo : cocoa/cocoa.cmi
-cocoa/cocoa.cmx : cocoa/cocoa.cmi
-cocoa/cocoa.cmi :
-x11/x11.cmo : x11/x11.cmi
-x11/x11.cmx : x11/x11.cmi
-x11/x11.cmi :

@@ -34,6 +34,11 @@ let abs_position t = {
   Vector2i.y = min t.y (t.y + t.height);
 }
 
+let abs_corner t = {
+  Vector2i.x = max t.x (t.x + t.width);
+  Vector2i.y = max t.y (t.y + t.height)
+}
+
 let size t = {
   Vector2i.x = t.width;
   Vector2i.y = t.height;
@@ -57,6 +62,10 @@ let area t =
   let open Vector2i in
   s.x * s.y
 
+let extend t v = 
+  {t with width = t.width + v.Vector2i.x;
+          height = t.height + v.Vector2i.y}
+
 let scale t v = 
   {t with
     width  = t.width  * v.Vector2i.x;
@@ -75,6 +84,14 @@ let intersects t1 t2 =
        (t2.x + t2.width  < t1.x) ||
        (t1.y + t1.height < t2.y) ||
        (t2.y + t2.height < t1.y))
+
+let includes t1 t2 = 
+  let t1 = normalize t1 in
+  let t2 = normalize t2 in
+  t2.x >= t1.x && 
+  t2.y >= t1.y && 
+  (t2.width + t2.x) <= (t1.width + t1.x) &&
+  (t2.height + t2.y) <= (t1.height + t1.y)
 
 let contains1D x posx sizex strict = 
   if sizex >= 0 then begin
@@ -116,4 +133,5 @@ let fold ?strict:(strict=true) t f u =
     );
   !r
 
-
+let print t = 
+  Printf.sprintf "(x = %i; y = %i; width = %i; height = %i)" t.x t.y t.width t.height

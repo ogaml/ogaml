@@ -20,27 +20,9 @@
 #include <caml/bigarray.h>
 #include <string.h>
 #include "utils.h"
+#include "types_stubs.h"
 
 #define BUFFER(_a) (*(GLuint*) Data_custom_val(_a))
-
-
-GLenum VBOKind_val(value kind)
-{
-  switch(Int_val(kind))
-  {
-    case 0:
-      return GL_STATIC_DRAW;
-
-    case 1:
-      return GL_DYNAMIC_DRAW;
-
-    default:
-      caml_failwith("Caml variant error in VBOKind_val(1)");
-  }
-
-  return 0;
-}
-
 
 void finalise_buffer(value v)
 {

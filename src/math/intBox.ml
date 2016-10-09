@@ -37,6 +37,12 @@ let abs_position t = {
   Vector3i.z = min t.z (t.z + t.depth);
 }
 
+let abs_corner t = {
+  Vector3i.x = max t.x (t.x + t.width);
+  Vector3i.y = max t.y (t.y + t.height);
+  Vector3i.z = max t.z (t.z + t.height)
+}
+
 let size t = {
   Vector3i.x = t.width;
   Vector3i.y = t.height;
@@ -63,6 +69,13 @@ let volume t =
   let open Vector3i in
   s.x * s.y * s.z
 
+let extend t v = 
+  {t with
+    width  = t.width  + v.Vector3i.x;
+    height = t.height + v.Vector3i.y;
+    depth  = t.depth  + v.Vector3i.z;
+  } 
+
 let scale t v = 
   {t with
     width  = t.width  * v.Vector3i.x;
@@ -85,6 +98,16 @@ let intersects t1 t2 =
        (t2.y + t2.height < t1.y) ||
        (t1.z + t1.depth  < t2.z) ||
        (t2.z + t2.depth  < t1.z))
+
+let includes t1 t2 = 
+  let t1 = normalize t1 in
+  let t2 = normalize t2 in
+  t2.x >= t1.x && 
+  t2.y >= t1.y && 
+  t2.z >= t1.z && 
+  (t2.width + t2.x) <= (t1.width + t1.x) &&
+  (t2.height + t2.y) <= (t1.height + t1.y) &&
+  (t2.depth + t2.z) <= (t1.depth + t1.z)
 
 let contains1D x posx sizex strict = 
   if sizex >= 0 then begin
@@ -133,4 +156,6 @@ let fold ?strict:(strict=true) t f u =
     );
   !r
 
-
+let print t = 
+  Printf.sprintf "(x = %i; y = %i; z = %i; width = %i; height = %i; depth = %i)" 
+    t.x t.y t.z t.width t.height t.depth

@@ -21,12 +21,12 @@ let cube_source =
   Model.source cmod ~vertex_source:src ();
   src
 
-let cube = VertexArray.static cube_source
+let cube = VertexArray.static (module Window) window cube_source
 
 let normal_program =
-  Program.from_source_pp (Window.state window)
+  Program.from_source_pp (module Window) ~context:window
     ~vertex_source:(`File "examples/normals_shader.vert")
-    ~fragment_source:(`File "examples/normals_shader.frag")
+    ~fragment_source:(`File "examples/normals_shader.frag") ()
 
 (* Display computations *)
 let proj = Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
@@ -61,8 +61,14 @@ let display () =
     |> Uniform.matrix3D "MVPMatrix" mvp
     |> Uniform.matrix3D "MVMatrix" mv
     |> Uniform.matrix3D "VMatrix" view
+    |> Uniform.vector3f "Light.LightDir" Vector3f.{x = -4.; y = -2.; z = -3.}
+    |> Uniform.vector3f "Light.AmbientIntensity" Vector3f.{x = 0.3; y = 0.3; z = 0.3}
+    |> Uniform.float    "Light.SunIntensity" 1.6
+    |> Uniform.float    "Light.MaxIntensity" 1.9
+    |> Uniform.float    "Light.Gamma"  1.2
   in
-  VertexArray.draw ~window ~vertices:cube ~uniform ~program:normal_program ~parameters ~mode:DrawMode.Triangles ()
+  VertexArray.draw (module Window) ~target:window
+                   ~vertices:cube ~uniform ~program:normal_program ~parameters ~mode:DrawMode.Triangles ()
 
 
 (* Camera *)
@@ -141,7 +147,7 @@ let rec event_loop () =
 (* Main loop *)
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(`RGB Color.RGB.white) window;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window;
     display ();
     Window.display window;
     (* We only capture the mouse and listen to the keyboard when focused *)

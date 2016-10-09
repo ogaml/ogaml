@@ -15,6 +15,8 @@ val abs_position : t -> Vector3f.t
 
 val corner : t -> Vector3f.t
 
+val abs_corner : t -> Vector3f.t
+
 val size : t -> Vector3f.t
 
 val abs_size : t -> Vector3f.t
@@ -25,15 +27,20 @@ val normalize : t -> t
 
 val volume : t -> float
 
+val extend : t -> Vector3f.t -> t
+
 val scale : t -> Vector3f.t -> t
 
 val translate : t -> Vector3f.t -> t
 
 val from_int : IntBox.t -> t
 
-val floor : t -> IntBox.t
+val to_int : t -> IntBox.t
 
 val intersects : t -> t -> bool
 
+val includes : t -> t -> bool
+
 val contains : t -> Vector3f.t -> bool
 
+val print : t -> string

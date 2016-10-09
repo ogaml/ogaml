@@ -39,7 +39,7 @@ let div f v =
       z = v.z /. f
     }
 
-let floor v = {
+let to_int v = {
   Vector3i.x = int_of_float v.x;
   Vector3i.y = int_of_float v.y;
   Vector3i.z = int_of_float v.z

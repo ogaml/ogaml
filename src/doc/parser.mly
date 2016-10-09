@@ -11,6 +11,7 @@
 %token PIPE DOT ARROW COMMA
 %token MODULE VAL TYPE END SIG EXN OF FUNCTOR WITH AND
 %token LOWER GREATER
+%token MUTABLE
 
 %start <AST.module_field list> file
 %%
@@ -69,6 +70,11 @@ atomic_type:
   | a = LIDENT {AST.AtomType(a)}
   ;
 
+module_type:
+  | m = UIDENT; DOT; u = module_type {AST.ModuleType(m,u)}
+  | u = UIDENT {AST.AtomType(u)}
+  ;
+
 value_type:
   | t = atomic_type {t}
   | APOSTROPHE; v = LIDENT {AST.PolyType v}
@@ -115,6 +121,7 @@ funparam_type:
   | t = value_type {t}
   | n = LIDENT; COLON; t = value_type {AST.NamedParam(n,t)}
   | QMARK; n = LIDENT; COLON; t = value_type {AST.OptionalParam(n,t)}
+  | LPAREN; MODULE; t = module_type; cons = type_constraints; RPAREN {AST.FCModule (t,cons)}
   ;
 
 tuple_type:
@@ -131,10 +138,14 @@ type_expr:
 optional_comment:
   | s = COMMENT {Some s}
   | {None}
+  ;
 
 record_content:
-  | s = LIDENT; COLON; t = delim_value_type; opt = optional_comment {[opt,s,t]}
-  | s = LIDENT; COLON; t = delim_value_type; SEMICOLON; opt = optional_comment; c = record_content {(opt,s,t)::c}
+  | {[]}
+  | s = LIDENT; COLON; t = delim_value_type; opt = optional_comment {[false,opt,s,t]}
+  | MUTABLE; s = LIDENT; COLON; t = delim_value_type; opt = optional_comment {[true,opt,s,t]}
+  | s = LIDENT; COLON; t = delim_value_type; SEMICOLON; opt = optional_comment; c = record_content {(false,opt,s,t)::c}
+  | MUTABLE; s = LIDENT; COLON; t = delim_value_type; SEMICOLON; opt = optional_comment; c = record_content {(true,opt,s,t)::c}
   ;
 
 variant:

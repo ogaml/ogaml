@@ -15,6 +15,8 @@ val abs_position : t -> Vector3i.t
 
 val corner : t -> Vector3i.t
 
+val abs_corner : t -> Vector3i.t
+
 val size : t -> Vector3i.t
 
 val abs_size : t -> Vector3i.t
@@ -25,14 +27,20 @@ val normalize : t -> t
 
 val volume : t -> int
 
+val extend : t -> Vector3i.t -> t
+
 val scale : t -> Vector3i.t -> t
 
 val translate : t -> Vector3i.t -> t
 
 val intersects : t -> t -> bool
 
+val includes : t -> t -> bool
+
 val contains : ?strict:bool -> t -> Vector3i.t -> bool
 
 val iter : ?strict:bool -> t -> (Vector3i.t -> unit) -> unit
 
 val fold : ?strict:bool -> t -> (Vector3i.t -> 'a -> 'a) -> 'a -> 'a
+
+val print : t -> string

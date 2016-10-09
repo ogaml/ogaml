@@ -30,10 +30,7 @@ ifeq ($(UNAME), Darwin)
   OS_NAME = OSX
   OS_WIN_LIB = cocoa
   GLOBAL_OBJCOPTS = -fconstant-string-class=NSConstantString
-	# Without the following line, I don't get the warnings, but then it fails
-	# when compiling the examples...
   GLOBAL_CLIBS = -framework Foundation -framework Cocoa -framework Carbon -lobjc -framework openGL
-	# GLOBAL_CLIBS =
 endif
 ifeq ($(UNAME), windows32)
   PP_DEFINE = __WIN__
@@ -70,7 +67,7 @@ LEX = ocamllex
 
 # Constants
   # Extensions used for cleaning
-CLEAN_EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so *.native *.out *.byte *.d *.lib
+CLEAN_EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so *.native *.out *.byte *.d *.lib .depend
 
 STUBS_DIR = stubs
 
@@ -81,19 +78,15 @@ OCAML_C_FLAGS = -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT -fPIC -I '$(OCAML_DIR)
 
 # Built libraries
 CORE_LIB = ogamlCore
-
-GRAPHICS_LIB = ogamlGraphics
-
-MATH_LIB = ogamlMath
-
-UTILS_LIB = ogamlUtils
-
 CORE_PACK = OgamlCore
 
+GRAPHICS_LIB = ogamlGraphics
 GRAPHICS_PACK = OgamlGraphics
 
+MATH_LIB = ogamlMath
 MATH_PACK = OgamlMath
 
+UTILS_LIB = ogamlUtils
 UTILS_PACK = OgamlUtils
 
 
@@ -101,7 +94,7 @@ UTILS_PACK = OgamlUtils
 
 PPCOMMAND = -pp "cppo -D \"$(strip $(PP_DEFINE))\""
 
-DEPCOMMAND = $(OCAMLDEP) $(PPCOMMAND) $(INCLUDE_DIRS)
+DEPCOMMAND = $(OCAMLFIND) $(OCAMLDEP) $(PPCOMMAND) $(INCLUDE_DIRS)
 
 OCAMLOPT_CMD = $(OCAMLOPT) $(PPCOMMAND)
 

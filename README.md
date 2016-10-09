@@ -1,4 +1,4 @@
-# OGAML
+# OGaml
 
 #### OCaml Game And Multimedia Library
 
@@ -7,9 +7,15 @@
 DISCLAIMER: This library is only in early stages and some features will probably
 change or be removed.
 
+NOTE: When developping OGaml, we try to enforce the absence of undefined 
+behaviours. We also try to hide most low-level functions, even though there are
+cases where we need to expose them (such as texture binding functions). If you
+find an error that is not catched, an undefined behaviour, or a low-level
+function that could have been hidden, please open an issue :-)
+
 ## Presentation:
 
-OGAML is a fast and cross-platform multimedia library for OCaml. It provides
+OGaml is a fast and cross-platform multimedia library for OCaml. It provides
 the following modules:
 
   * OgamlMath - provides mathematical functions and structures such as 
@@ -30,36 +36,31 @@ the following modules:
     state mutability is hidden behind wrappers. 
 
   * OgamlUtils (WIP) - provides several useful functions and data structures for 
-    game development, such as interpolators, graphs or UTF8-encoded strings 
-    (still in OgamlCore for now).
+    game development, such as interpolators, graphs or UTF8-encoded strings.
     
 You can find some examples in the corresponding directory as well as on the 
-documentation http://ogaml.github.io (broken for now).
+documentation http://ogaml.github.io.
 
 Upcoming features:
-
-  * Render textures
 
   * Batch drawing optimisation
 
   * More image and textures types
-
-  * Tilesets
 
   * Windows support
     
 Our ultimate goal is to add access to music, network, and to implement more 
 helpers to make games (like physics, lighting, etc...).
 
-## Why use OGAML (rather than raw OpenGL for example)?
+## Why use OGaml (rather than raw OpenGL for example)?
 
-OGAML is safe and easy to use: 
+OGaml is safe and easy to use: 
 
   * The functions are high-level and the API tries to be as functional as 
   possible. This should help to avoid bugs due to mutable values, pointers, or
   untyped enumerations.
 
-  * OGAML provides everything necessary to do 2D/3D rendering from window 
+  * OGaml provides everything necessary to do 2D/3D rendering from window 
   management to text rendering and vertex arrays.
 
   * OpenGL structures such as vertex arrays are hidden behind functional and
@@ -78,11 +79,11 @@ OGAML is safe and easy to use:
   Moreover, all state changes are optimised such that no redundant changes are
   performed.
 
-  * OGAML should detect any error or undefined behavior and at least raise an
+  * OGaml should detect any error or undefined behavior and at least raise an
   exception before it happens. This means that you don't need to call 
   `glGetError` (which is quite costly). 
 
-OGAML provides advanced functionalities:
+OGaml provides advanced functionalities:
 
   * The module VertexArray provides a high-level and easy to use wrapper around
   OpenGL's vertex arrays. Unfortunately, this comes at a cost: those arrays 
@@ -95,18 +96,24 @@ OGAML provides advanced functionalities:
 
   * It is easy to render 2D text of any color and size using the module Text. 
   It also provides a way to add effects (such as moving letters, changing color,
-  etc...) in a modular and functional way.
+  etc...) in a modular and functional way. 
 
+  * If you want to make an AAA-looking game with dozens of post-processing 
+  effects, the modules Framebuffer and Renderbuffer provide a high-level and
+  safe way to create off-screen render targets. 
+  All the rendering functions make use of first-class modules to provide some
+  polymorphism. This allows you to easily switch between rendering to a window
+  or to a framebuffer. 
 
-## Building and installing OGAML (OSX/Linux only): 
+## Building and installing OGaml (OSX/Linux only): 
   
 You will need the following dependancies: 
 
-  * cppo (preprocessor)
+  * cppo (preprocessor, available on Opam)
 
-  * x11 (Linux only)
+  * x11 (Linux)
 
-  * OpenGL libraries
+  * OpenGL libraries (3.0 minimum)
 
 Then `make install` should do the trick. You can test it on some examples 
 `make examples` or on Travis' tests `make tests`.

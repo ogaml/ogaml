@@ -1,3 +1,4 @@
+(** Mathematical helpers for data manipulation and rendering with OpenGL *)
 
 (** Contains various useful constants *)
 module Constants : sig
@@ -153,8 +154,8 @@ module Vector2f : sig
   (** Divides a vector by a scalar. Raises Vector2f_exception if the scalar is zero. *)
   val div : float -> t -> t
 
-  (** Rounds-down a vector @see:OgamlMath.Vector2i *)
-  val floor : t -> Vector2i.t
+  (** Truncates the floating-point coordinates of a vector @see:OgamlMath.Vector2i *)
+  val to_int : t -> Vector2i.t
 
   (** Returns a float vector from an int vector @see:OgamlMath.Vector2i *)
   val from_int : Vector2i.t -> t
@@ -358,8 +359,8 @@ module Vector3f : sig
   (** Divides a vector by a scalar. Raises Vector3f_exception if the scalar is zero. *)
   val div : float -> t -> t
 
-  (** Rounds-down a vector @see:OgamlMath.Vector3i *)
-  val floor : t -> Vector3i.t
+  (** Truncates the floating-point coordinates of a vector @see:OgamlMath.Vector3i *)
+  val to_int : t -> Vector3i.t
 
   (** Returns a float vector from an int vector @see:OgamlMath.Vector3i *)
   val from_int : Vector3i.t -> t
@@ -437,6 +438,56 @@ module Vector3f : sig
     * $p$ and $p + tv$. The intersection times are comprised between 0 and t *)
   val raytrace : t -> t -> float -> (float * t * t) list
 
+
+end
+
+
+(** Operations on immutable vectors of 2 floats represented in polar coordinates *)
+module Vector2fs : sig
+
+  (** This module defines the vector2fs type and various operations on it. *)
+
+  (** Raised when an error occurs (usually a division by zero) *)
+  exception Vector2fs_exception of string
+
+  (*** Vector operations *)
+
+  (** Type of immutable vectors of 2 floats represented in polar coordinates *)
+  type t = {r : float; (* Signed radius *)
+            t : float; (* Theta angle. An angle of 0 corresponds to a vector pointing towards positive X. *)
+           }
+
+  (** Zero vector *)
+  val zero : t
+
+  (** Unit x vector *)
+  val unit_x : t
+
+  (** Unit y vector *)
+  val unit_y : t
+
+  (** Multiplies a vector by a scalar *)
+  val prop : float -> t -> t
+
+  (** Divides a vector by a scalar. Raises Vector2fs_exception if the scalar is zero. *)
+  val div : float -> t -> t
+
+  (** Converts a vector represented in polar coordinates to a vector represented in cartesian coordinates 
+    * @see:OgamlMath.Vector2f *)
+  val to_cartesian : t -> Vector2f.t
+
+  (** Converts a vector represented in cartesian coordinates to a vector represented in polar coordinates 
+    * @see:OgamlMath.Vector2f *)
+  val from_cartesian : Vector2f.t -> t
+
+  (** Computes the norm of a vector *)
+  val norm : t -> float
+
+  (** Normalizes a vector. Raises Vector2fs_exception if the vector is zero. *)
+  val normalize : t -> t
+
+  (** Returns a pretty-printed string (not for serialization) *)
+  val print : t -> string
 
 end
 
@@ -526,6 +577,10 @@ module IntRect : sig
   (** Returns the top corner (aka position + size) of a rectangle *)
   val corner : t -> Vector2i.t
 
+  (** Returns the absolute corner of a rectangle, that is the
+    * point of maximal coordinates *)
+  val abs_corner : t -> Vector2i.t
+
   (** Returns the size of a rectangle *)
   val size : t -> Vector2i.t
 
@@ -542,14 +597,22 @@ module IntRect : sig
   (** Returns the area of a rectangle *)
   val area : t -> int
 
-  (** Scales a rectangle (the result is normalized) *)
+  (** Scales a rectangle *)
   val scale : t -> Vector2i.t -> t
+
+  (** Adds a vector to the height and width of a rectangle.
+    * Be careful since if the rectangle is not normalized, adding a positive vector
+    * may reduce the effective size of the rectangle. *)
+  val extend : t -> Vector2i.t -> t
 
   (** Translates a rectangle *)
   val translate : t -> Vector2i.t -> t
 
   (** $intersects t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
   val intersects : t -> t -> bool
+
+  (** $includes t r$ returns $true$ iff the rectangle $r$ is included in the rectangle $t$ *)
+  val includes : t -> t -> bool
 
   (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ 
     *
@@ -565,6 +628,9 @@ module IntRect : sig
     * 
     * if $strict$ is set to $false$ then upper bounds are included ($true$ by default) *)
   val fold : ?strict:bool -> t -> (Vector2i.t -> 'a -> 'a) -> 'a -> 'a
+
+  (** Returns a pretty-printed string (not for serialization) *)
+  val print : t -> string
 
 end
 
@@ -600,6 +666,10 @@ module FloatRect : sig
   (** Returns the top corner (aka position + size) of a rectangle *)
   val corner : t -> Vector2f.t
 
+  (** Returns the absolute corner of a rectangle, that is the
+    * point of maximal coordinates *)
+  val abs_corner : t -> Vector2f.t
+
   (** Returns the size of a rectangle *)
   val size : t -> Vector2f.t
 
@@ -616,8 +686,13 @@ module FloatRect : sig
   (** Returns the area of a rectangle *)
   val area : t -> float
 
-  (** Scales a rectangle (the result is normalized) *)
+  (** Scales a rectangle *)
   val scale : t -> Vector2f.t -> t
+
+  (** Adds a vector to the height and width of a rectangle.
+    * Be careful since if the rectangle is not normalized, adding a positive vector
+    * may reduce the effective size of the rectangle. *)
+  val extend : t -> Vector2f.t -> t
 
   (** Translates a rectangle *)
   val translate : t -> Vector2f.t -> t
@@ -625,14 +700,20 @@ module FloatRect : sig
   (** Converts an integer rectangle to a float rectangle *)
   val from_int : IntRect.t -> t
 
-  (** Converts a float rectangle to an integer rectangle *)
-  val floor : t -> IntRect.t
+  (** Truncates the floating-point coordinates of a rectangle @see:OgamlMath.IntRect *)
+  val to_int : t -> IntRect.t
 
   (** $intersects t1 t2$ returns $true$ iff $t1$ and $t2$ overlap *)
   val intersects : t -> t -> bool
 
   (** $contains t p$ returns $true$ iff the rectangle $t$ contains $p$ *)
   val contains : t -> Vector2f.t -> bool
+
+  (** $includes t r$ returns $true$ iff the rectangle $r$ is included in the rectangle $t$ *)
+  val includes : t -> t -> bool
+
+  (** Returns a pretty-printed string (not for serialization) *)
+  val print : t -> string
 
 end
 
@@ -668,6 +749,10 @@ module IntBox : sig
   (** Returns the top corner (aka position + size) of a box *)
   val corner : t -> Vector3i.t
 
+  (** Returns the absolute corner of a box, that is the
+    * point of maximal coordinates *)
+  val abs_corner : t -> Vector3i.t
+
   (** $normalize box$ returns a box equivalent to $box$ but with
       positive size *)
   val normalize : t -> t
@@ -684,14 +769,22 @@ module IntBox : sig
   (** Returns the volume of a box *)
   val volume : t -> int
 
-  (** Scales a box (the result is normalized) *)
+  (** Scales a box *)
   val scale : t -> Vector3i.t -> t
+
+  (** Adds a vector to the dimensions of a box.
+    * Be careful since if the box is not normalized, adding a positive vector
+    * may reduce the effective size of the box. *)
+  val extend : t -> Vector3i.t -> t
 
   (** Translates a box *)
   val translate : t -> Vector3i.t -> t
 
   (** $intersects t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
   val intersects : t -> t -> bool
+
+  (** $includes t b$ returns $true$ iff the box $b$ is included in the box $t$ *)
+  val includes : t -> t -> bool
 
   (** $contains t p$ returns $true$ iff the box $t$ contains $p$ 
     *
@@ -707,6 +800,9 @@ module IntBox : sig
     * 
     * if $strict$ is set to $false$ then upper bounds are included ($true$ by default) *)
   val fold : ?strict:bool -> t -> (Vector3i.t -> 'a -> 'a) -> 'a -> 'a
+
+  (** Returns a pretty-printed string (not for serialization) *)
+  val print : t -> string
 
 end
 
@@ -742,6 +838,10 @@ module FloatBox : sig
   (** Returns the top corner (aka position + size) of a box *)
   val corner : t -> Vector3f.t
 
+  (** Returns the absolute corner of a box, that is the
+    * point of maximal coordinates *)
+  val abs_corner : t -> Vector3f.t
+
   (** Returns the size of a box *)
   val size : t -> Vector3f.t
 
@@ -755,10 +855,15 @@ module FloatBox : sig
       positive size *)
   val normalize : t -> t
 
+  (** Adds a vector to the dimensions of a box.
+    * Be careful since if the box is not normalized, adding a positive vector
+    * may reduce the effective size of the box. *)
+  val extend : t -> Vector3f.t -> t
+
   (** Returns the volume of a box *)
   val volume : t -> float
 
-  (** Scales a box (the result is normalized) *)
+  (** Scales a box *)
   val scale : t -> Vector3f.t -> t
 
   (** Translates a box *)
@@ -767,14 +872,20 @@ module FloatBox : sig
   (** Converts an integer box to a float box *)
   val from_int : IntBox.t -> t
 
-  (** Converts a float box to an integer box *)
-  val floor : t -> IntBox.t
+  (** Truncates the floating-point coordinates of a box @see:OgamlMath.IntBox *)
+  val to_int : t -> IntBox.t
 
   (** $intersects t1 t2$ returns $true$ iff the boxes $t1$ and $t2$ overlap *)
   val intersects : t -> t -> bool
 
+  (** $includes t b$ returns $true$ iff the box $b$ is included in the box $t$ *)
+  val includes : t -> t -> bool
+
   (** $contains t p$ returns $true$ iff the box $t$ contains $p$ *)
   val contains : t -> Vector3f.t -> bool
+
+  (** Returns a pretty-printed string (not for serialization) *)
+  val print : t -> string
 
 end
 
@@ -901,12 +1012,22 @@ module Matrix3D : sig
     * @see:OgamlMath.Vector3f *)
   val look_at : from:Vector3f.t -> at:Vector3f.t -> up:Vector3f.t -> t
 
+  (** Builds the inverse of a "look-at" view matrix.
+    * Raises Matrix3D_exception if $up = zero$.
+    * @see:OgamlMath.Vector3f *)
+  val ilook_at : from:Vector3f.t -> at:Vector3f.t -> up:Vector3f.t -> t
+
   (** Builds a "look-at" view matrix from eulerian angles. 
     * Theta should be in [0;2pi] and phi in [-pi/2;pi/2]. 
     * If phi = pi/2, the camera is looking up (towards positive Y). 
     * If theta = 0, the camera is looking towards negative Z. 
     * @see:OgamlMath.Vector3f *)
   val look_at_eulerian : from:Vector3f.t -> theta:float -> phi:float -> t
+
+  (** Builds the inverse of a "look-at" view matrix from eulerian angles. 
+    * Theta should be in [0;2pi] and phi in [-pi/2;pi/2]. 
+    * @see:OgamlMath.Vector3f *)
+  val ilook_at_eulerian : from:Vector3f.t -> theta:float -> phi:float -> t
 
   (** Builds an orthographic projection matrix englobing a volume defined by six planes. 
     * Raises Matrix3D_exception if $right = left$ or $near = far$ or $top = bottom$ *)
@@ -970,6 +1091,12 @@ module Matrix2D : sig
   (** Builds a rotation matrix from an angle *)
   val rotation : float -> t
 
+  (** Efficiently builds a transformation matrix *)
+  val transformation : 
+    translation:Vector2f.t ->
+    rotation:float ->
+    scale:Vector2f.t ->
+    origin:Vector2f.t -> t
 
   (*** Matrix Operations *)
 
