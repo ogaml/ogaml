@@ -15,8 +15,8 @@ function that could have been hidden, please open an issue :-)
 
 ## Presentation:
 
-OGaml is a fast and cross-platform multimedia library for OCaml. It provides
-the following modules:
+OGaml is a fast and cross-platform multimedia library for OCaml, currently supporting
+Windows, OSX and Linux (X11 only). It provides the following modules:
 
   * OgamlMath - provides mathematical functions and structures such as 
     vectors, matrices, quaternion and polygons. This module is particularly
@@ -46,8 +46,6 @@ Upcoming features:
   * Batch drawing optimisation
 
   * More image and textures types
-
-  * Windows support
     
 Our ultimate goal is to add access to music, network, and to implement more 
 helpers to make games (like physics, lighting, etc...).
@@ -118,3 +116,36 @@ You will need the following dependancies:
 Then `make install` should do the trick. You can test it on some examples 
 `make examples` or on Travis' tests `make tests`.
 
+## Building and installing OGaml (Windows, MSVC): 
+
+You will need the following dependencies :
+
+  * GNU Make for Windows
+
+  * OpenGL headers and libraries - opengl32.dll (3.0 minimum)
+
+  * GLEW headers and libraries - glew32.dll
+
+  * gdi32.dll and user32.dll, although these should be available by default
+
+  * Microsoft Windows SDK
+
+You will also need to install and configure OCaml to work with MSVC.
+
+Finally, you will need to compile cppo (from the sources) and place the
+resulting .exe in your PATH, so that the compiler can access it.
+
+Executing `make install` will then compile OGaml and install the library
+in OCaml's path. `make examples` will compile the examples, and
+`make tests` will run Travis's tests.
+
+Unfortunately, `make uninstall` is not working on Windows (yet), so uninstalling
+the library should be done manually.
+
+## Redistributing OGaml executables
+
+OGaml executables are almost standalone !
+
+If you want to redistribute an executable, you only have to provide all the
+required assets (shader sources, textures, fonts, ...), and GLEW's DLL (glew32.dll)
+if you're redistributing a Windows executable. That's as simple as that !
