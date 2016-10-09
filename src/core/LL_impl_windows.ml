@@ -9,9 +9,12 @@ module Window = struct
     glcontext : Windows.GlContext.t;
     mutable position : Vector2i.t;
     mutable size : Vector2i.t;
+    mutable old_size : Vector2i.t;
     event_queue : Event.t Queue.t;
     mutable is_open : bool;
     mutable resizing : bool;
+    mutable cursor : bool;
+    mutable fullscreen : bool;
     uid : int;
   }
 
@@ -30,6 +33,47 @@ module Window = struct
     with Not_found -> None
 
   (** Now we can implement Window ! *)
+  let toggle_fullscreen win = 
+    if win.fullscreen then begin 
+      win.fullscreen <- false;
+      win.size <- win.old_size;
+      let style = Windows.WindowStyle.(create 
+        [WS_Visible; WS_Popup; WS_Thickframe;
+        WS_MaximizeBox; WS_MinimizeBox; WS_Caption; WS_Sysmenu])
+      in
+      Windows.WindowHandle.set_style win.handle style;
+      let rect = 
+        (50, 50, win.size.Vector2i.x, win.size.Vector2i.y)
+      in
+      let adjusted_rect = 
+        Windows.WindowHandle.adjust_rect win.handle rect style 
+      in
+      Windows.WindowHandle.move win.handle adjusted_rect false false;
+      if not (Windows.WindowHandle.unset_fullscreen_devmode win.handle) then 
+        raise (Error "Failed to unset fullscreen mode")
+    end else begin
+      win.fullscreen <- true;
+      win.old_size <- win.size;
+      let style = Windows.WindowStyle.(create 
+        [WS_Visible; WS_Popup; WS_Sysmenu; WS_ClipChildren; WS_ClipSiblings])
+      in
+      Windows.WindowHandle.set_style win.handle style;
+      let (w,h) = 
+        Windows.WindowHandle.fullscreen_size ()
+      in
+      let rect = 
+        (0, 0, w, h)
+      in
+      let adjusted_rect = 
+        Windows.WindowHandle.adjust_rect win.handle rect style 
+      in
+      Windows.WindowHandle.move win.handle adjusted_rect false false;
+      let (_,_,w,h) = adjusted_rect in
+      win.size <- Vector2i.({x = w; y = h});
+      if not (Windows.WindowHandle.set_fullscreen_devmode win.handle w h) then 
+        raise (Error "Failed to set fullscreen mode")
+    end
+
   let create ~width ~height ~title ~settings =
     let open Windows in
     let style = Windows.WindowStyle.(create 
@@ -41,14 +85,21 @@ module Window = struct
       incr next_window_id;
       !next_window_id
     in
+    let rect = 
+      (50, 50, width, height)
+    in
     let handle = 
       WindowHandle.create 
         ~classname:"OGAMLWIN"
         ~name:title
-        ~rect:(50,50,width,height)
+        ~rect
         ~style
         ~uid
     in
+    let adjusted_rect = 
+      Windows.WindowHandle.adjust_rect handle rect style
+    in
+    Windows.WindowHandle.move handle adjusted_rect false false;
     let depthbits = ContextSettings.depth_bits settings in
     let stencilbits = ContextSettings.stencil_bits settings in
     let pfmtdesc = 
@@ -75,13 +126,18 @@ module Window = struct
         handle; glcontext;
         position = Vector2i.({x; y});
         size = Vector2i.({x = width; y = height});
+        old_size = Vector2i.({x = width; y = height});
         event_queue;
         is_open = true;
         resizing = false;
+        cursor = true;
+        fullscreen = false;
         uid
       }
     in
     Hashtbl.replace window_table uid window;
+    if ContextSettings.fullscreen settings then 
+      toggle_fullscreen window;
     window
 	
   let set_title win s = 
@@ -114,15 +170,20 @@ module Window = struct
 	  IntRect.create win.position win.size
 
   let resize win v = 
-    Windows.WindowHandle.move win.handle 
-      (win.position.Vector2i.x, 
-       win.position.Vector2i.y,
-       v.Vector2i.x, 
-       v.Vector2i.y);
-    update_rect win
-
-  let toggle_fullscreen win = 
-	assert false (* TODO *)
+    if not (win.fullscreen) then begin
+      let rect = 
+        (win.position.Vector2i.x, 
+        win.position.Vector2i.y,
+        v.Vector2i.x, 
+        v.Vector2i.y)
+      in
+      let adjusted_rect =
+        Windows.WindowHandle.get_style win.handle
+        |> Windows.WindowHandle.adjust_rect win.handle rect
+      in
+      Windows.WindowHandle.move win.handle adjusted_rect true false;
+      update_rect win
+    end
 
   let is_open win = 
 	  win.is_open
@@ -296,7 +357,10 @@ module Window = struct
 	  Windows.WindowHandle.swap_buffers win.handle
 
   let show_cursor win b =
-    assert false (* TODO *)
+    if b <> win.cursor then begin
+      win.cursor <- b;
+      Windows.WindowHandle.show_cursor win.handle b
+    end
 
   (** Register the callbacks *)
   let () =
@@ -332,15 +396,19 @@ module Mouse = struct
     Vector2i.({x; y})
 
   let relative_position win = 
-    let pos = position () in
-    Vector2i.sub pos (Window.position win)
+    let (x,y) = 
+      Windows.Event.cursor_position ()
+      |> Windows.WindowHandle.screen_to_client win.Window.handle 
+    in
+    Vector2i.({x; y})
 
   let set_position s = 
 	  Windows.Event.set_cursor_position (s.Vector2i.x, s.Vector2i.y)
 
   let set_relative_position win srel =
-    let s = Vector2i.add srel (Window.position win) in 
-  	set_position s
+    (srel.Vector2i.x, srel.Vector2i.y)
+    |> Windows.WindowHandle.client_to_screen win.Window.handle 
+    |> Windows.Event.set_cursor_position
 
   let is_pressed but = 
     match but with

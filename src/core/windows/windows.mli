@@ -11,6 +11,8 @@ module WindowStyle : sig
         | WS_Sysmenu
         | WS_Thickframe
         | WS_Visible
+        | WS_ClipChildren
+        | WS_ClipSiblings
 
     type t
 
@@ -32,11 +34,23 @@ module WindowHandle : sig
         style:WindowStyle.t -> 
         uid:int -> t
 
+    val set_style : t -> WindowStyle.t -> unit
+
+    val get_style : t -> WindowStyle.t 
+
     val set_text : t -> string -> unit
 
+    val fullscreen_size : unit -> (int * int)
+
     val get_rect : t -> (int * int * int * int)
+
+    val screen_to_client : t -> (int * int) -> (int * int)
+
+    val client_to_screen : t -> (int * int) -> (int * int)
+
+    val adjust_rect : t -> (int * int * int * int) -> WindowStyle.t -> (int * int * int * int)
     
-    val move : t -> (int * int * int * int) -> unit
+    val move : t -> (int * int * int * int) -> bool -> bool -> unit
 
     val attach_userdata : t -> 'a -> unit
 
@@ -49,6 +63,12 @@ module WindowHandle : sig
     val close : t -> unit
 
     val destroy : t -> unit
+
+    val show_cursor : t -> bool -> unit
+
+    val set_fullscreen_devmode : t -> int -> int -> bool
+
+    val unset_fullscreen_devmode : t -> bool
 
 end
 

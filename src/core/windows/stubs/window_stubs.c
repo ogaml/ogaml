@@ -435,6 +435,115 @@ caml_create_window_W(value cname, value title, value rect, value style, value ui
 
 
 CAMLprim value
+caml_get_window_style(value handle)
+{
+    CAMLparam1(handle);
+
+    HWND wnd = (HWND)handle;
+    DWORD winstyle = (DWORD)GetWindowLongPtr(wnd, GWL_STYLE);
+
+    CAMLreturn((value)winstyle);
+}
+
+
+CAMLprim value
+caml_set_window_style(value handle, value style)
+{
+    CAMLparam2(handle, style);
+
+    HWND wnd = (HWND)handle;
+    DWORD winstyle = (DWORD)style;
+
+    SetWindowLongPtr(wnd, GWL_STYLE, winstyle);
+
+    CAMLreturn(Val_unit);
+}
+
+
+CAMLprim value
+caml_screen_to_client(value handle, value pos)
+{
+    CAMLparam2(handle, pos);
+    CAMLlocal1(res);
+
+    HWND wnd = (HWND)handle;
+    POINT pt;
+        pt.x = Int_val(Field(pos,0));
+        pt.y = Int_val(Field(pos,1));
+
+    ScreenToClient(wnd, &pt);
+
+    res = caml_alloc(2,0);
+        Store_field(res, 0, Val_int(pt.x));
+        Store_field(res, 1, Val_int(pt.y));
+
+    CAMLreturn(res);
+}
+
+
+CAMLprim value
+caml_client_to_screen(value handle, value pos)
+{
+    CAMLparam2(handle, pos);
+    CAMLlocal1(res);
+
+    HWND wnd = (HWND)handle;
+    POINT pt;
+        pt.x = Int_val(Field(pos,0));
+        pt.y = Int_val(Field(pos,1));
+
+    ClientToScreen(wnd, &pt);
+
+    res = caml_alloc(2,0);
+        Store_field(res, 0, Val_int(pt.x));
+        Store_field(res, 1, Val_int(pt.y));
+
+    CAMLreturn(res);
+}
+
+
+CAMLprim value
+caml_adjust_window_rect(value handle, value rect, value style)
+{
+    CAMLparam3(handle, rect, style);
+    CAMLlocal1(res);
+
+    HWND wnd = (HWND)handle;
+    DWORD winstyle = (DWORD)style;
+    RECT rectangle;
+        rectangle.left = Int_val(Field(rect,0));
+        rectangle.top = Int_val(Field(rect,1));
+        rectangle.right = Int_val(Field(rect,2)) + rectangle.left;
+        rectangle.bottom = Int_val(Field(rect,3)) + rectangle.top;
+
+    AdjustWindowRect(&rectangle, winstyle, FALSE);
+
+    res = caml_alloc(4, 0);
+        Store_field(res, 0, Val_int(rectangle.left));
+        Store_field(res, 1, Val_int(rectangle.top));
+        Store_field(res, 2, Val_int(rectangle.right - rectangle.left));
+        Store_field(res, 3, Val_int(rectangle.bottom - rectangle.top));
+
+    CAMLreturn(res);
+}
+
+
+CAMLprim value
+caml_fullscreen_size(value unit)
+{
+    CAMLparam1(unit);
+    CAMLlocal1(res);
+
+    res = caml_alloc(2,0);
+
+    Store_field(res, 0, Val_int(GetSystemMetrics(SM_CXSCREEN)));
+    Store_field(res, 1, Val_int(GetSystemMetrics(SM_CYSCREEN)));
+
+    CAMLreturn(res);
+}
+
+
+CAMLprim value
 caml_set_window_text(value handle, value txt)
 {
     CAMLparam2(handle, txt);
@@ -491,34 +600,43 @@ caml_get_window_rect(value handle)
     CAMLlocal1(res);
 
     HWND wnd = (HWND)handle;
-    RECT rect;
+    RECT rectwin, rectclt;
 
-    GetClientRect(wnd, &rect);
+    GetWindowRect(wnd, &rectwin);
+    GetClientRect(wnd, &rectclt);
 
     res = caml_alloc(4,0);
-    Store_field(res, 0, Val_int(rect.left));
-    Store_field(res, 1, Val_int(rect.top));
-    Store_field(res, 2, Val_int(rect.right - rect.left));
-    Store_field(res, 3, Val_int(rect.bottom - rect.top));
+    Store_field(res, 0, Val_int(rectwin.left));
+    Store_field(res, 1, Val_int(rectwin.top));
+    Store_field(res, 2, Val_int(rectclt.right - rectclt.left));
+    Store_field(res, 3, Val_int(rectclt.bottom - rectclt.top));
 
     CAMLreturn(res);
 }
 
 
 CAMLprim value
-caml_move_window(value handle, value rect)
+caml_move_window(value handle, value rect, value nomove, value nosize)
 {
-    CAMLparam2(handle, rect);
+    CAMLparam4(handle, rect, nomove, nosize);
     
     HWND wnd = (HWND)handle;
     int x, y, w, h;
+    UINT flags = 0;
+
+    if(Bool_val(nomove)) {
+        flags |= SWP_NOMOVE;
+    }
+    if(Bool_val(nosize)) {
+        flags |= SWP_NOSIZE;
+    }
 
     x = Int_val(Field(rect,0));
     y = Int_val(Field(rect,1));
     w = Int_val(Field(rect,2));
     h = Int_val(Field(rect,3));
 
-    MoveWindow(wnd,x,y,w,h,TRUE);
+    SetWindowPos(wnd,NULL,x,y,w,h,flags);
 
     CAMLreturn(Val_unit);
 }
@@ -596,4 +714,40 @@ caml_set_cursor_position(value pos)
     SetCursorPos(Int_val(Field(pos,0)),Int_val(Field(pos,1)));
 
     CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_show_cursor(value handle, value show)
+{
+    CAMLparam2(handle, show);
+
+    ShowCursor(Bool_val(show));
+
+    CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_set_fullscreen_devmode(value handle, value width, value height)
+{
+    CAMLparam1(handle);
+
+    LONG result;
+
+    DEVMODE dm;
+    dm.dmSize = sizeof(DEVMODE);
+    dm.dmPelsWidth = Int_val(width);
+    dm.dmPelsHeight = Int_val(height);
+    dm.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
+
+    result = ChangeDisplaySettingsA(&dm, CDS_FULLSCREEN);
+
+    CAMLreturn(Val_bool(result == DISP_CHANGE_SUCCESSFUL));
+}
+
+CAMLprim value
+caml_unset_fullscreen_devmode(value handle)
+{
+    CAMLparam1(handle);
+
+    CAMLreturn(Val_bool(ChangeDisplaySettingsA(0, 0) == DISP_CHANGE_SUCCESSFUL));
 }

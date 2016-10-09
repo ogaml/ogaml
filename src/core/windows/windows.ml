@@ -11,6 +11,8 @@ module WindowStyle = struct
         | WS_Sysmenu
         | WS_Thickframe
         | WS_Visible
+        | WS_ClipChildren
+        | WS_ClipSiblings
 
     type t 
 
@@ -28,17 +30,41 @@ module WindowHandle = struct
     external create_private : 
         string -> string -> (int * int * int * int) -> WindowStyle.t -> int -> t 
         = "caml_create_window_W"
+    
+    external get_style : 
+        t -> WindowStyle.t
+        = "caml_get_window_style"
+
+    external set_style : 
+        t -> WindowStyle.t -> unit
+        = "caml_set_window_style"
 
     external set_text : 
         t -> string -> unit 
         = "caml_set_window_text"
 
+    external screen_to_client : 
+        t -> (int * int) -> (int * int)
+        = "caml_screen_to_client"
+
+    external client_to_screen : 
+        t -> (int * int) -> (int * int)
+        = "caml_client_to_screen"
+
     external get_rect :
         t -> (int * int * int * int)
         = "caml_get_window_rect"
 
+    external fullscreen_size :
+        unit -> (int * int)
+        = "caml_fullscreen_size"
+
+    external adjust_rect : 
+        t -> (int * int * int * int) -> WindowStyle.t -> (int * int * int * int)
+        = "caml_adjust_window_rect"
+
     external move : 
-        t -> (int * int * int * int) -> unit 
+        t -> (int * int * int * int) -> bool -> bool -> unit 
         = "caml_move_window"
 
     external attach_userdata : 
@@ -64,6 +90,18 @@ module WindowHandle = struct
     external destroy :
         t -> unit
         = "caml_destroy_window"
+
+    external show_cursor : 
+        t -> bool -> unit
+        = "caml_show_cursor"
+
+    external set_fullscreen_devmode : 
+        t -> int -> int -> bool
+        = "caml_set_fullscreen_devmode"
+
+    external unset_fullscreen_devmode :
+        t -> bool
+        = "caml_unset_fullscreen_devmode"
 
     let create ~classname ~name ~rect ~style ~uid = 
         create_private classname name rect style uid

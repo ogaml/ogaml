@@ -36,6 +36,12 @@ DWORD Style_val(value style)
     case 9:
       return WS_VISIBLE;
 
+    case 10:
+      return WS_CLIPCHILDREN;
+
+    case 11:
+      return WS_CLIPSIBLINGS;
+
     default:
       caml_failwith("Caml variant error in Style_val(1)");
   }
