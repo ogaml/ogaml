@@ -8,10 +8,14 @@ ML_OBJS = $(ML_SOURCES:.ml=.cmo)
 
 ML_NATS = $(ML_SOURCES:.ml=.cmx)
 
+ML_INTERFACES = $(ML_SOURCES:.ml=.mli)
+
+ML_CMIS = $(ML_INTERFACES:.mli=.cmi)
+
 
 # Compilation
 
-default: depend $(ML_OBJS) $(ML_NATS)
+default: $(ML_CMIS) $(ML_OBJS) $(ML_NATS)
 
 %.cmi:%.mli
 	$(OCAMLC_CMD) -c -o $@ $<
@@ -26,7 +30,7 @@ default: depend $(ML_OBJS) $(ML_NATS)
 # Cleaning
 
 clean:
-	rm -rf $(CLEAN_EXTENSIONS)
+	rm -f $(CLEAN_EXTENSIONS)
 
 
 # Dependencies
