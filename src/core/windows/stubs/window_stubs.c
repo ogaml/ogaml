@@ -493,7 +493,7 @@ caml_get_window_rect(value handle)
     HWND wnd = (HWND)handle;
     RECT rect;
 
-    GetWindowRect(wnd, &rect);
+    GetClientRect(wnd, &rect);
 
     res = caml_alloc(4,0);
     Store_field(res, 0, Val_int(rect.left));
