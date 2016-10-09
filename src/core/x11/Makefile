@@ -11,9 +11,7 @@ ML_NATS = $(ML_SOURCES:.ml=.cmx)
 
 # Compilation
 
-default: depend $(ML_OBJS) $(ML_NATS)
-
-include .depend
+default: $(ML_OBJS) $(ML_NATS)
 
 %.cmi:%.mli
 	$(OCAMLC_CMD) -c -o $@ $<
