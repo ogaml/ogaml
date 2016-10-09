@@ -346,6 +346,11 @@ module Window = struct
         Event.ButtonEvent.({button = vk_to_button mb; position; shift; control = ctrl; alt})
       in
       Queue.push (Event.ButtonPressed buttonevent) win.event_queue
+    | Windows.Event.MouseMoved (x,y) ->
+      let position = 
+        Vector2i.({x; y})
+      in
+      Queue.push (Event.MouseMoved position) win.event_queue
 
 
   let rec poll_event win =

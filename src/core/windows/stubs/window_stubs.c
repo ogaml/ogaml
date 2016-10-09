@@ -245,6 +245,18 @@ value processEvent(UINT message, WPARAM wParam, LPARAM lParam)
             break;
         }
 
+        case WM_MOUSEMOVE:
+        {
+            res = caml_alloc(2,7);
+
+            x = GET_X_LPARAM(lParam);
+            y = GET_Y_LPARAM(lParam);
+
+            Store_field(res, 0, Val_int(x));
+            Store_field(res, 1, Val_int(y));
+            break;
+        }
+
         default:
         {
             res = Val_int(0);

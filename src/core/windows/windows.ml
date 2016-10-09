@@ -182,6 +182,7 @@ module Event = struct
         | MouseHWheel of int * int * int * modifiers
         | ButtonUp of mouse_button * int * int * modifiers
         | ButtonDown of mouse_button * int * int * modifiers
+        | MouseMoved of int * int
 
     external async_key_state : key -> bool = "caml_get_async_key_state"
 
