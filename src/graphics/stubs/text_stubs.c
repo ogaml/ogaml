@@ -171,6 +171,10 @@ caml_stb_render_bitmap(value info, value code, value oversampling, value scale)
   float stb_scale = Double_val(scale);
 
   int ix0, iy0, ix1, iy1;
+  int w,h;
+  int width, height;
+
+  unsigned char* bitmap;
   
   stbtt_GetCodepointBitmapBox(stb_info, 
                               stb_code,
@@ -181,15 +185,13 @@ caml_stb_render_bitmap(value info, value code, value oversampling, value scale)
                               &ix1,
                               &iy1);
 
-  int w,h;
-    w = ix1 - ix0;
-    h = iy1 - iy0;
+  w = ix1 - ix0;
+  h = iy1 - iy0;
 
-  int width, height;
-    width  = w + stb_oversampling - 1;
-    height = h + stb_oversampling - 1;
+  width  = w + stb_oversampling - 1;
+  height = h + stb_oversampling - 1;
 
-  unsigned char bitmap[width * height];
+  bitmap = malloc(width * height * sizeof(char));
 
   memset(bitmap, 0, width * height);
 
@@ -220,6 +222,7 @@ caml_stb_render_bitmap(value info, value code, value oversampling, value scale)
   bmp = caml_alloc_string(width * height);
   memcpy(String_val(bmp), bitmap, width * height);
 
+  free(bitmap);
 
   Store_field(res, 0, bmp);
   Store_field(res, 1, Val_int(width));

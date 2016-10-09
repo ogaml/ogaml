@@ -244,13 +244,13 @@ module Window = struct
       let size = win.size in
       update_rect win;
       if size <> win.size then
-        Queue.push (Event.Resized) win.event_queue
+        Queue.push (Event.Resized size) win.event_queue
     | Windows.Event.Resize b ->
       if (not win.resizing) && b then begin
         let size = win.size in
         update_rect win;
         if size <> win.size then 
-          Queue.push (Event.Resized) win.event_queue
+          Queue.push (Event.Resized size) win.event_queue
       end
     | Windows.Event.Closed -> 
       Queue.push (Event.Closed) win.event_queue
@@ -266,16 +266,23 @@ module Window = struct
         Event.KeyEvent.({key; shift; control = ctrl; alt})
       in
       Queue.push (Event.KeyReleased keyevent) win.event_queue
-    | Windows.Event.MouseVWheel (x, y, delta, mods) -> ()
+    | Windows.Event.MouseVWheel (x, y, delta, mods) -> 
+      Queue.push (Event.MouseWheelMoved (float_of_int delta /. 120.)) win.event_queue
     | Windows.Event.MouseHWheel (x, y, delta, mods) -> ()
     | Windows.Event.ButtonUp (mb, x, y, {Windows.Event.shift; ctrl; lock; alt}) ->
+      let position = 
+        Vector2i.({x; y})
+      in
       let buttonevent = 
-        Event.ButtonEvent.({button = vk_to_button mb; x; y; shift; control = ctrl; alt})
+        Event.ButtonEvent.({button = vk_to_button mb; position; shift; control = ctrl; alt})
       in
       Queue.push (Event.ButtonReleased buttonevent) win.event_queue
     | Windows.Event.ButtonDown (mb, x, y, {Windows.Event.shift; ctrl; lock; alt}) ->
+      let position = 
+        Vector2i.({x; y})
+      in
       let buttonevent = 
-        Event.ButtonEvent.({button = vk_to_button mb; x; y; shift; control = ctrl; alt})
+        Event.ButtonEvent.({button = vk_to_button mb; position; shift; control = ctrl; alt})
       in
       Queue.push (Event.ButtonPressed buttonevent) win.event_queue
 
@@ -287,6 +294,9 @@ module Window = struct
 
   let display win = 
 	  Windows.WindowHandle.swap_buffers win.handle
+
+  let show_cursor win b =
+    assert false (* TODO *)
 
   (** Register the callbacks *)
   let () =

@@ -1,30 +1,22 @@
-
-(* The type of tokens. *)
-
-type token = 
+type token =
+  | EOF
+  | STRING of (string)
+  | INT of (int)
+  | FLOAT of (float)
   | VERTEX
   | UV
-  | USEMTL
-  | STRING of (string)
-  | SMOOTH
-  | SLASH
-  | RIGHTBRACKET
-  | PARAM
-  | OFF
-  | OBJECT
   | NORMAL
-  | MATLIB
-  | LEFTBRACKET
-  | INT of (int)
-  | GROUP
-  | FLOAT of (float)
   | FACE
-  | EOF
+  | PARAM
+  | USEMTL
+  | MATLIB
+  | OBJECT
+  | GROUP
+  | SMOOTH
+  | OFF
+  | LEFTBRACKET
+  | RIGHTBRACKET
+  | SLASH
 
-(* This exception is raised by the monolithic API functions. *)
-
-exception Error
-
-(* The monolithic API. *)
-
-val file: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (ObjAST.t list)
+val file :
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> ObjAST.t list
