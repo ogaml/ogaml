@@ -226,7 +226,7 @@ let parse_with_errors lexbuf =
         in
         let msg' = Printf.sprintf "Syntax error %s : %s\n%!" (Location.to_string loc) msg in
         raise (Error msg')
-    |ObjParser.Error ->
+    |Parsing.Parse_error ->
         let loc = Location.create lexbuf.Lexing.lex_start_p
                                   lexbuf.Lexing.lex_curr_p
         in

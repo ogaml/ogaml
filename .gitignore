@@ -10,6 +10,11 @@
 *.so
 *.out
 *.d
+*.lib
+
+# MVC++ files
+.vscode/
+
 *.depend
 .depend
 

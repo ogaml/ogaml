@@ -1,4 +1,8 @@
 #define GL_GLEXT_PROTOTYPES
+#if defined(_WIN32)
+  #include <windows.h>
+  #include <gl/glew.h>
+#endif
 #if defined(__APPLE__)
   #include <OpenGL/gl3.h>
   #ifndef GL_TESS_CONTROL_SHADER
@@ -18,6 +22,7 @@
 #include "types_stubs.h"
 
 #define PROGRAM(_a) (*(GLuint*) Data_custom_val(_a))
+
 
 void finalise_program(value v)
 {
@@ -40,12 +45,12 @@ intnat hash_program(value v)
 }
 
 static struct custom_operations program_custom_ops = {
-  .identifier  = "program gc handling",
-  .finalize    =  finalise_program,
-  .compare     =  compare_program,
-  .hash        =  hash_program,
-  .serialize   =  custom_serialize_default,
-  .deserialize =  custom_deserialize_default
+  "program gc handling",
+  finalise_program,
+  compare_program,
+  hash_program,
+  custom_serialize_default,
+  custom_deserialize_default
 };
 
 
@@ -209,13 +214,16 @@ caml_program_log(value id)
   CAMLlocal1(res);
 
   GLint tmp;
+  GLsizei maxl;
+  GLsizei len[1] = {0};
+  GLchar* log;
+
   glGetProgramiv(PROGRAM(id), GL_INFO_LOG_LENGTH, &tmp);
 
-  GLsizei maxl = tmp;
-  GLsizei len[1] = {0};
-  GLchar* log = malloc(tmp * sizeof(GLchar));
-  glGetProgramInfoLog(PROGRAM(id), maxl, len, log);
+  maxl = tmp;
+  log = malloc(tmp * sizeof(GLchar));
 
+  glGetProgramInfoLog(PROGRAM(id), maxl, len, log);
   res = caml_copy_string(log);
 
   free(log);
@@ -233,13 +241,16 @@ caml_uniform_name(value id, value index)
   CAMLlocal1(res);
 
   GLint tmp;
-  glGetProgramiv(PROGRAM(id), GL_ACTIVE_UNIFORM_MAX_LENGTH, &tmp);
-
-  GLsizei maxl = tmp;
+  GLsizei maxl;
   GLsizei tmp_len;
   GLint   tmp_size;
   GLenum  tmp_type;
-  GLchar* name = malloc(tmp * sizeof(GLchar));
+  GLchar* name;
+
+  glGetProgramiv(PROGRAM(id), GL_ACTIVE_UNIFORM_MAX_LENGTH, &tmp);
+
+  maxl = tmp;
+  name = malloc(tmp * sizeof(GLchar));
 
   glGetActiveUniform(PROGRAM(id), Int_val(index), maxl, &tmp_len, &tmp_size, &tmp_type, name);
 
@@ -260,13 +271,16 @@ caml_attribute_name(value id, value index)
   CAMLlocal1(res);
 
   GLint tmp;
-  glGetProgramiv(PROGRAM(id), GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &tmp);
-
-  GLsizei maxl = tmp;
+  GLsizei maxl;
   GLsizei tmp_len;
   GLint   tmp_size;
   GLenum  tmp_type;
-  GLchar* name = malloc(tmp * sizeof(GLchar));
+  GLchar* name;
+
+  glGetProgramiv(PROGRAM(id), GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &tmp);
+
+  maxl = tmp;
+  name = malloc(tmp * sizeof(GLchar));
 
   glGetActiveAttrib(PROGRAM(id), Int_val(index), maxl, &tmp_len, &tmp_size, &tmp_type, name);
 

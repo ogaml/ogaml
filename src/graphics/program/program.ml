@@ -15,7 +15,7 @@ type src = [`File of string | `String of string]
 
 
 let read_file filename =
-  let chan = open_in filename in
+  let chan = open_in_bin filename in
   let len = in_channel_length chan in
   let str = Bytes.create len in
   really_input chan str 0 len;

@@ -1,6 +1,9 @@
 (** Window creation and manipulation *)
 module Window : sig
 
+  (** Raised if an error occurs during window creation *)
+  exception Error of string
+
   type t
 
   (** Creates a window of size width x height *)

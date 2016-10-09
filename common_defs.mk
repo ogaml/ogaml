@@ -32,7 +32,14 @@ ifeq ($(UNAME), Darwin)
   GLOBAL_OBJCOPTS = -fconstant-string-class=NSConstantString
   GLOBAL_CLIBS = -framework Foundation -framework Cocoa -framework Carbon -lobjc -framework openGL
 endif
-
+ifeq ($(UNAME), windows32)
+  PP_DEFINE = __WIN__
+  OS_NAME = WIN
+  OS_WIN_LIB = windows
+  GLOBAL_OBJCOPTS = 
+  GLOBAL_CLIBS = -lopengl32 -lglew32 -luser32 -lgdi32
+endif
+  
 
 # Compilers
 
@@ -46,9 +53,13 @@ OCAMLMKLIB = ocamlmklib
 
 CLANG = clang
 
-OCAMLFIND = ocamlfind
+ifeq ($(OS_NAME), WIN)
+  OCAMLFIND =
+else
+  OCAMLFIND = ocamlfind
+endif
 
-MENHIR = menhir
+MENHIR = ocamlyacc
 
 LEX = ocamllex
 
@@ -56,7 +67,7 @@ LEX = ocamllex
 
 # Constants
   # Extensions used for cleaning
-CLEAN_EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so *.native *.out *.byte *.d .depend
+CLEAN_EXTENSIONS = *.cmi *.cmo *.out *.cma *.cmxa *.o *.a *.cmx *.so *.native *.out *.byte *.d *.lib .depend
 
 STUBS_DIR = stubs
 
@@ -81,7 +92,7 @@ UTILS_PACK = OgamlUtils
 
 # Commands
 
-PPCOMMAND = -pp "cppo -D '$(strip $(PP_DEFINE))'"
+PPCOMMAND = -pp "cppo -D \"$(strip $(PP_DEFINE))\""
 
 DEPCOMMAND = $(OCAMLFIND) $(OCAMLDEP) $(PPCOMMAND) $(INCLUDE_DIRS)
 

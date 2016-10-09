@@ -1,4 +1,8 @@
 #define GL_GLEXT_PROTOTYPES
+#if defined(_WIN32)
+  #include <windows.h>
+  #include <gl/glew.h>
+#endif
 #if defined(__APPLE__)
   #include <OpenGL/gl3.h>
   #ifndef GL_TESS_CONTROL_SHADER
@@ -19,7 +23,6 @@
 #include "types_stubs.h"
 
 #define BUFFER(_a) (*(GLuint*) Data_custom_val(_a))
-
 
 void finalise_buffer(value v)
 {
@@ -42,12 +45,12 @@ intnat hash_buffer(value v)
 }
 
 static struct custom_operations buffer_custom_ops = {
-  .identifier  = "buffer gc handling",
-  .finalize    =  finalise_buffer,
-  .compare     =  compare_buffer,
-  .hash        =  hash_buffer,
-  .serialize   =  custom_serialize_default,
-  .deserialize =  custom_deserialize_default
+  "buffer gc handling",
+  finalise_buffer,
+  compare_buffer,
+  hash_buffer,
+  custom_serialize_default,
+  custom_deserialize_default
 };
 
 

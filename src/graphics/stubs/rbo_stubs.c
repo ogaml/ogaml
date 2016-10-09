@@ -1,4 +1,8 @@
 #define GL_GLEXT_PROTOTYPES
+#if defined(_WIN32)
+  #include <windows.h>
+  #include <gl/glew.h>
+#endif
 #if defined(__APPLE__)
   #include <OpenGL/gl3.h>
   #ifndef GL_TESS_CONTROL_SHADER
@@ -42,12 +46,12 @@ intnat hash_rbo(value v)
 }
 
 static struct custom_operations rbo_custom_ops = {
-  .identifier  = "rbo gc handling",
-  .finalize    =  finalise_rbo,
-  .compare     =  compare_rbo,
-  .hash        =  hash_rbo,
-  .serialize   =  custom_serialize_default,
-  .deserialize =  custom_deserialize_default
+  "rbo gc handling",
+  finalise_rbo,
+  compare_rbo,
+  hash_rbo,
+  custom_serialize_default,
+  custom_deserialize_default
 };
 
 

@@ -1,4 +1,8 @@
 #define GL_GLEXT_PROTOTYPES
+#if defined(_WIN32)
+  #include <windows.h>
+  #include <gl/glew.h>
+#endif
 #if defined(__APPLE__)
   #include <OpenGL/gl3.h>
   #ifndef GL_TESS_CONTROL_SHADER
@@ -49,12 +53,12 @@ intnat hash_tex(value v)
 }
 
 static struct custom_operations tex_custom_ops = {
-  .identifier  = "texture GC handling",
-  .finalize    =  finalise_tex,
-  .compare     =  compare_tex,
-  .hash        =  hash_tex,
-  .serialize   =  custom_serialize_default,
-  .deserialize =  custom_deserialize_default
+  "texture GC handling",
+  finalise_tex,
+  compare_tex,
+  hash_tex,
+  custom_serialize_default,
+  custom_deserialize_default
 };
 
 

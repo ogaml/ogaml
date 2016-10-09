@@ -23,9 +23,9 @@ LEXER_FILES = model/objLexer.mll
 PARSER_FILES = model/objParser.mly
 
 MLSOURCES = backend/color.ml\
-	    backend/GLTypes.ml\
+		backend/GLTypes.ml\
+		backend/drawParameter.ml\
 	    backend/GL.ml\
-	    backend/drawParameter.ml\
 	    backend/programInternal.ml\
 	    backend/context.ml\
 	    fbo/renderTarget.ml\
@@ -56,12 +56,30 @@ MLOBJS = $(MLSOURCES:.ml=.cmo)
 
 MLNATOBJS = $(MLSOURCES:.ml=.cmx)
 
-MLCMIS = $(MLINTERFACES:.mli=.cmi)
+MLCMISALONE = $(MLINTERFACES:.mli=.cmi)
+
+MLCMIS = $(MLCMISALONE) $(PARSER_FILES:.mly=.cmi) $(LEXER_FILES:.mll=.cmi) $(MLSOURCES:.ml=.cmi)
 
 COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast -Wno-pointer-sign
 
 CMA_DEPS = ../core/$(CORE_LIB).cma ../math/$(MATH_LIB).cma ../utils/$(UTILS_LIB).cma
 CMXA_DEPS = ../core/$(CORE_LIB).cmxa ../math/$(MATH_LIB).cmxa ../utils/$(UTILS_LIB).cmxa
+
+
+# Lib compilation 
+
+ifeq ($(OS_NAME), WIN)
+    LIB_CMD = \
+        $(OCAMLFIND) $(OCAMLC_CMD) -a -o $(GRAPHICS_LIB).cma $(GRAPHICS_LIB).cmo\
+            -cclib -l$(GRAPHICS_LIB) -cclib "$(GLOBAL_CLIBS)" &&\
+        $(OCAMLFIND) $(OCAMLOPT_CMD) -a -o $(GRAPHICS_LIB).cmxa $(GRAPHICS_LIB).cmx\
+            -cclib -l$(GRAPHICS_LIB) -cclib "$(GLOBAL_CLIBS)"&&\
+        lib -out:lib$(GRAPHICS_LIB).lib $(STUBS_OBJS)
+else
+    LIB_CMD =\
+        $(OCAMLFIND) $(OCAMLMKLIB) -o $(GRAPHICS_LIB) $(STUBS_OBJS) $(GRAPHICS_LIB).cmo $(GRAPHICS_LIB).cmx\
+            $(MLOBJS) $(MLNATOBJS) $(GLOBAL_CLIBS)
+endif
 
 
 # Compilation
@@ -70,13 +88,10 @@ CMXA_DEPS = ../core/$(CORE_LIB).cmxa ../math/$(MATH_LIB).cmxa ../utils/$(UTILS_L
 
 default: graphics_lib
 
-include .depend
-
-graphics_lib: depend $(STUBS_TARGET) $(MLINTERFACES) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).cmi
-	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(GRAPHICS_LIB).cmo $(MLCMIS) $(MLOBJS);
-	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(GRAPHICS_LIB).cmx $(MLCMIS) $(MLNATOBJS);
-	$(OCAMLFIND) $(OCAMLMKLIB) -o $(GRAPHICS_LIB) $(STUBS_OBJS) $(GRAPHICS_LIB).cmo $(GRAPHICS_LIB).cmx\
-	  $(MLOBJS) $(MLNATOBJS) $(GLOBAL_CLIBS)
+graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).cmi
+	$(OCAMLFIND) $(OCAMLC_CMD) -pack -o $(GRAPHICS_LIB).cmo $(MLCMISALONE) $(MLOBJS) &&\
+	$(OCAMLFIND) $(OCAMLOPT_CMD) -pack -o $(GRAPHICS_LIB).cmx $(MLCMISALONE) $(MLNATOBJS) &&\
+	$(LIB_CMD)
 
 %.cma:%.cmo
 	$(OCAMLFIND) $(OCAMLC_CMD) -a -o $@ $(INCLUDE_DIRS) $<
@@ -85,6 +100,9 @@ graphics_lib: depend $(STUBS_TARGET) $(MLINTERFACES) $(MLOBJS) $(MLNATOBJS) $(GR
 	$(OCAMLFIND) $(OCAMLOPT_CMD) -a -o $@ $(INCLUDE_DIRS) $<
 
 %.cmi:%.mli
+	$(OCAMLFIND) $(OCAMLC_CMD) -for-pack $(GRAPHICS_PACK) $(INCLUDE_DIRS) $(CMA_DEPS) -c $< -o $@
+
+%.cmi:%.ml
 	$(OCAMLFIND) $(OCAMLC_CMD) -for-pack $(GRAPHICS_PACK) $(INCLUDE_DIRS) $(CMA_DEPS) -c $< -o $@
 
 %.cmx:%.ml $(wildcard %.cmi)
@@ -96,7 +114,8 @@ graphics_lib: depend $(STUBS_TARGET) $(MLINTERFACES) $(MLOBJS) $(MLNATOBJS) $(GR
 %.ml:%.mll
 	$(LEX) $<
 
-%.mli:%.mll
+%.cmi:%.mll %.ml
+	$(OCAMLC_CMD) -c $(<:.mll=.ml)
 
 %.ml:%.mly
 	$(MENHIR) $<
@@ -105,20 +124,22 @@ graphics_lib: depend $(STUBS_TARGET) $(MLINTERFACES) $(MLOBJS) $(MLNATOBJS) $(GR
 	$(MENHIR) $<
 
 %.o:%.c
-	$(OCAMLFIND) $(OCAMLC_CMD) -o ./$(notdir $@) -c $< -ccopt '$(COPTS)' -cclib "$(GLOBAL_CLIBS)"
+	$(OCAMLFIND) $(OCAMLC_CMD) -o ./$(notdir $@) -c $< -ccopt "$(COPTS)" -cclib "$(GLOBAL_CLIBS)"
 
 
 # Cleaning
 
 clean:
-	cd 2d/ && rm -f $(CLEAN_EXTENSIONS);
-	cd backend/ && rm -f $(CLEAN_EXTENSIONS);
-	cd fbo/ && rm -f $(CLEAN_EXTENSIONS);
-	cd model/ && rm -f $(CLEAN_EXTENSIONS);
-	cd program/ && rm -f $(CLEAN_EXTENSIONS);
-	cd texture/ && rm -f $(CLEAN_EXTENSIONS);
-	cd vertex/ && rm -f $(CLEAN_EXTENSIONS);
-	rm -f $(CLEAN_EXTENSIONS);
+	make -C 2d/ clean &\
+	make -C backend/ clean &\
+	make -C fbo/ clean &\
+	make -C model/ clean &\
+	make -C program/ clean &\
+	make -C texture/ clean &\
+	make -C vertex/ clean &\
+	make -C window/ clean &\
+	rm -f $(CLEAN_EXTENSIONS) &\
+	rm -f objLexer.ml objParser.ml objParser.mli &\
 	rm -f .depend
 
 
@@ -127,8 +148,7 @@ clean:
 depend:.depend
 
 .depend:
-	$(DEPCOMMAND) */*.ml */*.mli > .depend;
-	$(MENHIR) --depend */*.mly >> .depend
+	$(DEPCOMMAND) *.ml *.mli > .depend
 
 
 .PHONY: .depend

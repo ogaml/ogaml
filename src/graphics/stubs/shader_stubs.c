@@ -1,4 +1,8 @@
 #define GL_GLEXT_PROTOTYPES
+#if defined(_WIN32)
+  #include <windows.h>
+  #include <gl/glew.h>
+#endif
 #if defined(__APPLE__)
   #include <OpenGL/gl3.h>
   #ifndef GL_TESS_CONTROL_SHADER
@@ -57,8 +61,8 @@ caml_source_shader(value id, value src)
   CAMLparam2(src, id);
   
   const GLchar* tmp_src = String_val(src);
-  const GLint tmp_len  = -1;
-  glShaderSource((GLuint)id, 1, &tmp_src, &tmp_len);
+
+  glShaderSource((GLuint)id, 1, &tmp_src, NULL);
 
   CAMLreturn(Val_unit);
 }
@@ -103,11 +107,15 @@ caml_shader_log(value id)
   CAMLlocal1(res);
 
   GLint tmp;
+  GLsizei maxl;
+  GLsizei len[1] = {0};
+  GLchar* log;
+
   glGetShaderiv((GLuint)id, GL_INFO_LOG_LENGTH, &tmp);
 
-  GLsizei maxl = tmp;
-  GLsizei len[1] = {0};
-  GLchar* log = malloc(tmp * sizeof(GLchar));
+  maxl = tmp;
+  log = malloc(tmp * sizeof(GLchar));
+
   glGetShaderInfoLog((GLuint)id, maxl, len, log);
 
   res = caml_copy_string(log);
