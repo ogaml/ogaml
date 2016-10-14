@@ -51,9 +51,9 @@ let get_vertices_aux size position origin rotation scale subrect =
     { x = uvx +. uvw ; y = uvy +. uvh } ;
   ])
   |> List.map (fun (coord,pos) ->
-    VertexArray.Vertex.create
+    VertexArray.SimpleVertex.create
      ~position:(Vector3f.lift pos)
-     ~texcoord:coord ()
+     ~uv:coord ()
   )
   |> function
   | [ a ; b ; c ; d ] -> [a; b; c; c; b; d]
@@ -111,13 +111,13 @@ let create ~texture
   }
 
 let map_to_source sprite f src = 
-  List.iter (fun v -> VertexArray.Source.add src (f v)) (get_vertices sprite)
+  List.iter (fun v -> VertexArray.VertexSource.add src (f v)) (get_vertices sprite)
 
 let to_source sprite src = 
-  List.iter (VertexArray.Source.add src) (get_vertices sprite)
+  List.iter (VertexArray.VertexSource.add src) (get_vertices sprite)
 
 let map_to_custom_source sprite f src = 
-  List.iter (fun v -> VertexMap.Source.add src (f v)) (get_vertices sprite)
+  List.iter (fun v -> VertexArray.VertexSource.add src (f v)) (get_vertices sprite)
 
 (*type debug_times = {
   mutable size_get_t : float;
@@ -139,6 +139,10 @@ let debug_t = {
 
 let tm = Unix.gettimeofday*)
 
+let sprite_source = 
+  VertexArray.VertexSource.empty 
+      ~size:6 ()
+
 let draw (type s) (module Target : RenderTarget.T with type t = s)
          ?parameters:(parameters = DrawParameter.make
          ~depth_test:DrawParameter.DepthTest.None
@@ -159,17 +163,12 @@ let draw (type s) (module Target : RenderTarget.T with type t = s)
 (*   debug_t.uniform_create_t <- debug_t.uniform_create_t +. (tm () -. t); *)
   let vertices = 
 (*     let t = tm () in *)
-    let src = VertexArray.Source.empty 
-      ~position:"position"
-      ~texcoord:"uv"
-      ~size:6 ()
-    in
 (*     debug_t.source_alloc_t <- debug_t.source_alloc_t +. (tm () -. t); *)
 (*     let t = tm () in *)
-    List.iter (VertexArray.Source.add src) (get_vertices sprite);
+    List.iter (VertexArray.VertexSource.add sprite_source) (get_vertices sprite);
 (*     debug_t.vertices_create_t <- debug_t.vertices_create_t +. (tm () -. t); *)
 (*     let t = tm () in *)
-    let vao = VertexArray.static (module Target) target src in
+    let vao = VertexArray.static (module Target) target sprite_source in
 (*     debug_t.vao_create_t <- debug_t.vao_create_t +. (tm () -. t); *)
     vao
   in
@@ -179,7 +178,8 @@ let draw (type s) (module Target : RenderTarget.T with type t = s)
         ~vertices
         ~program
         ~parameters
-        ~uniform ()
+        ~uniform ();
+  VertexArray.VertexSource.clear sprite_source
 (*   ;debug_t.draw_t <- debug_t.draw_t +. (tm () -. t) *)
 
 let set_position sprite position =

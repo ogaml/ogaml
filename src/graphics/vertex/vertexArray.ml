@@ -1,237 +1,480 @@
 open OgamlMath
 
-exception Invalid_source of string
-
-exception Invalid_vertex of string
-
-exception Invalid_attribute of string
-
-exception Missing_attribute of string
-
-exception Out_of_bounds of string
-
-
 module Vertex = struct
 
-  type t = {
-    position : Vector3f.t option;
-    texcoord : Vector2f.t option;
-    normal   : Vector3f.t option;
-    color    : Color.t option
-  }
+  exception Sealed_vertex of string
 
-  let create ?position ?texcoord ?normal ?color () = 
+  exception Unsealed_vertex of string
+
+  exception Unbound_attribute of string
+
+  module AttributeVal = struct
+
+    type s = 
+      | Unset
+      | Int of int
+      | Vec2i of Vector2i.t
+      | Vec3i of Vector3i.t
+      | Float of float
+      | Vec2f of Vector2f.t
+      | Vec3f of Vector3f.t
+      | Color of Color.t
+
+    let fields = function
+      | Unset -> 0
+      | Int _  
+      | Float _ -> 1
+      | Vec2i _
+      | Vec2f _ -> 2
+      | Vec3i _
+      | Vec3f _ -> 3
+      | Color _ -> 4
+
+    let is_int = function
+      | Int _ 
+      | Vec2i _
+      | Vec3i _ -> true
+      | _ -> false
+
+  end
+
+  module AttributeType = struct
+
+    type 'a s = 
+      | Int
+      | Vec2i
+      | Vec3i
+      | Float
+      | Vec2f
+      | Vec3f
+      | Color
+
+    let int = Int
+
+    let vector2i = Vec2i
+
+    let vector3i = Vec3i
+
+    let float = Float
+
+    let vector2f = Vec2f
+
+    let vector3f = Vec3f
+
+    let color = Color
+
+    let value_of (v : 'a) (t : 'a s) = 
+      match t with
+      | Int   -> AttributeVal.Int (Obj.magic v)
+      | Vec2i -> AttributeVal.Vec2i (Obj.magic v)
+      | Vec3i -> AttributeVal.Vec3i (Obj.magic v)
+      | Float -> AttributeVal.Float (Obj.magic v)
+      | Vec2f -> AttributeVal.Vec2f (Obj.magic v)
+      | Vec3f -> AttributeVal.Vec3f (Obj.magic v)
+      | Color -> AttributeVal.Color (Obj.magic v)
+
+    let unbox (v : AttributeVal.s) (t : 'a s) : 'a =
+      match v with
+      | AttributeVal.Unset -> assert false
+      | AttributeVal.Int   f -> (Obj.magic f)
+      | AttributeVal.Vec2i f -> (Obj.magic f)
+      | AttributeVal.Vec3i f -> (Obj.magic f)
+      | AttributeVal.Float f -> (Obj.magic f)
+      | AttributeVal.Vec2f f -> (Obj.magic f)
+      | AttributeVal.Vec3f f -> (Obj.magic f)
+      | AttributeVal.Color f -> (Obj.magic f)
+
+    let to_glsl (t : 'a s) = 
+      match t with
+      | Int   -> GLTypes.GlslType.Int
+      | Vec2i -> GLTypes.GlslType.Int2
+      | Vec3i -> GLTypes.GlslType.Int3
+      | Float -> GLTypes.GlslType.Float
+      | Vec2f -> GLTypes.GlslType.Float2
+      | Vec3f -> GLTypes.GlslType.Float3
+      | Color -> GLTypes.GlslType.Float4
+
+    let glsl_size = function
+      | GLTypes.GlslType.Int    -> 1
+      | GLTypes.GlslType.Int2   -> 2
+      | GLTypes.GlslType.Int3   -> 3
+      | GLTypes.GlslType.Float  -> 1
+      | GLTypes.GlslType.Float2 -> 2
+      | GLTypes.GlslType.Float3 -> 3
+      | GLTypes.GlslType.Float4 -> 4
+      | _ -> assert false
+
+    let glsl_is_int = function
+      | GLTypes.GlslType.Int 
+      | GLTypes.GlslType.Int2
+      | GLTypes.GlslType.Int3   -> true
+      | _ -> false
+
+    let fields t =
+      glsl_size (to_glsl t)
+
+    let is_int t =
+      glsl_is_int (to_glsl t)
+
+  end
+
+  type 'a vertex =
     {
-      position;
-      texcoord;
-      normal  ;
-      color
+      mutable attribs : 'a boxed_attrib list;
+      mutable sealed  : bool;
+      mutable total_size : int;
     }
 
-  let position v = v.position
+  and _ boxed_attrib = 
+    Boxed_Attrib : ('a, 'b) attrib -> 'b boxed_attrib
 
-  let texcoord v = v.texcoord
+  and ('a, 'b) attrib =
+    {
+      aname : string;
+      atype : 'a AttributeType.s;
+      aoffset : int;
+    }
 
-  let normal v = v.normal
+  and 'a t = 
+    {
+      vertex : 'a vertex;
+      data   : 'a data
+    }
 
-  let color v = v.color
+  and 'a data =
+    AttributeVal.s array
+
+  let offset_of attrib = 
+    match attrib with
+    | Boxed_Attrib a -> a.aoffset
+
+  let name_of attrib = 
+    match attrib with
+    | Boxed_Attrib a -> a.aname
+
+  let type_of attrib = 
+    match attrib with
+    | Boxed_Attrib a -> AttributeType.to_glsl a.atype
+
+  module Attribute = struct
+
+    type ('a, 'b) s = ('a, 'b) attrib
+
+    let set (vtx : 'b t) (attr : ('a, 'b) s) (vl : 'a) : unit = 
+      vtx.data.(attr.aoffset) <- (AttributeType.value_of vl attr.atype)
+
+    let get (vtx : 'b t) (attr : ('a, 'b) s) : 'a =
+      match vtx.data.(attr.aoffset) with
+      | AttributeVal.Unset -> raise (Unbound_attribute attr.aname)
+      | v -> AttributeType.unbox v attr.atype
+
+    let name attr = 
+      attr.aname
+
+    let atype attr = 
+      attr.atype
+
+  end
+
+  module type VERTEX = sig
+
+    type s
+
+    val attribute : string -> 'a AttributeType.s -> ('a, s) Attribute.s
+
+    val seal : unit -> unit
+
+    val create : unit -> s t
+
+  end
+
+  let make () = 
+    (module struct
+
+      type s 
+
+      let vertex = 
+        {attribs = []; sealed = false; total_size = 0}
+
+      let attribute s attr =
+        if vertex.sealed then 
+          Printf.ksprintf (fun s -> raise (Sealed_vertex s))
+            "Cannot add attribute %s to sealed vertex structure" s;
+        let attrib = 
+          {
+            aname = s;
+            atype = attr;
+            aoffset = vertex.total_size
+          }
+        in
+        vertex.attribs <- (Boxed_Attrib attrib) :: vertex.attribs;
+        vertex.total_size <- vertex.total_size + 1;
+        attrib
+
+      let seal () = 
+        if vertex.sealed then 
+          raise (Sealed_vertex "Cannot seal already sealed vertex structure");
+        vertex.attribs <- (List.rev vertex.attribs);
+        vertex.sealed <- true
+
+      let create () = 
+        if not vertex.sealed then 
+          raise (Unsealed_vertex "Cannot create vertices from unsealed vertex structure");
+        {vertex; data = Array.make vertex.total_size AttributeVal.Unset}
+
+    end : VERTEX)
 
 end
 
 
-module Source = struct
+module SimpleVertex = struct
 
-  type attrib =
-    | Position
-    | Texcoord
-    | Normal
-    | Color
+  module T = (val Vertex.make () : Vertex.VERTEX)
 
-  type t = {
-    position : string option;
-    texcoord : string option;
-    normal   : string option;
-    color    : string option;
-    mutable length   : int;
-    data     : (float, GL.Data.float_32) GL.Data.t;
+  let position =
+    T.attribute "position" Vertex.AttributeType.vector3f
+
+  let color =
+    T.attribute "color" Vertex.AttributeType.color
+
+  let uv =
+    T.attribute "uv" Vertex.AttributeType.vector2f
+
+  let normal = 
+    T.attribute "normal" Vertex.AttributeType.vector3f
+
+  let () = 
+    T.seal ()
+
+  let create ?position:pp ?color:cl ?uv:tc ?normal:nr () = 
+    let vtx = T.create () in
+    begin match pp with
+    | None   -> ()
+    | Some p -> Vertex.Attribute.set vtx position p
+    end;
+    begin match cl with
+    | None   -> ()
+    | Some p -> Vertex.Attribute.set vtx color p
+    end;
+    begin match tc with
+    | None   -> ()
+    | Some p -> Vertex.Attribute.set vtx uv p
+    end;
+    begin match nr with
+    | None   -> ()
+    | Some p -> Vertex.Attribute.set vtx normal p
+    end;
+    vtx
+
+end
+
+
+module VertexSource = struct
+
+  exception Uninitialized_field of string
+
+  exception Incompatible_sources
+
+  type 'a t = {
+    mutable initialized : bool;
+    mutable length : int;
+    mutable stridef : int;
+    mutable stridei : int;
+    mutable init_fields : ('a Vertex.boxed_attrib * int) list;
+    init_size : int;
+    mutable fdata : (float, GL.Data.float_32) GL.Data.t;
+    mutable idata : (int32, GL.Data.int_32  ) GL.Data.t;
+    mutable layout : 'a Vertex.vertex option;
   }
 
-  let empty ?position ?normal ?texcoord ?color ~size () = 
-    let sizep = if position <> None then 3 else 0 in
-    let sizen = if normal   <> None then 3 else 0 in
-    let sizet = if texcoord <> None then 2 else 0 in
-    let sizec = if color    <> None then 4 else 0 in
-    let size  = size * (sizep + sizen + sizet + sizec) in
+  let empty ?size:(size = 4) () =
     {
-      position;
-      texcoord;
-      normal;
-      color;
+      initialized = false;
       length = 0;
-      data = GL.Data.create_float size
+      stridef = 0;
+      stridei = 0;
+      init_fields = [];
+      init_size = size;
+      fdata = GL.Data.create_float 0;
+      idata = GL.Data.create_int 0;
+      layout = None
     }
 
-  let requires_position s = s.position <> None
-
-  let requires_normal s = s.normal <> None
-
-  let requires_uv s = s.texcoord <> None
-
-  let requires_color s = s.color <> None
-
-  let attrib_position s = s.position
-
-  let attrib_normal s = s.normal
-
-  let attrib_uv s = s.texcoord
-
-  let attrib_color s = s.color
-
-  let add src v = 
-    begin 
-      match v.Vertex.position with
-      |None when src.position <> None -> 
-        raise (Invalid_vertex "Missing vertex position")
-      |Some _ when src.position = None -> ()
-      |Some vec -> GL.Data.add_3f src.data vec
-      | _ -> ()
+  let add src vtx = 
+    if src.layout = None then begin
+      let (init_fields,stridef,stridei,_) = 
+        List.fold_right (fun att (l,sf,si,i) ->
+          let elt = vtx.Vertex.data.(Vertex.offset_of att) in
+          if elt <> Vertex.AttributeVal.Unset then begin
+            if Vertex.AttributeVal.is_int elt then 
+              ((att, Vertex.AttributeVal.fields elt+si)::l,
+                sf,Vertex.AttributeVal.fields elt+si,i+1)
+            else
+              ((att, Vertex.AttributeVal.fields elt+sf)::l,
+                Vertex.AttributeVal.fields elt+sf,si,i+1)
+          end else
+            (l,sf,si,i+1)
+        ) 
+        vtx.Vertex.vertex.Vertex.attribs 
+        ([],0,0,Array.length vtx.Vertex.data - 1)
+      in
+      src.init_fields <- init_fields;
+      src.stridei <- stridei;
+      src.stridef <- stridef;
+      if not src.initialized then begin
+        src.fdata <- GL.Data.create_float (stridef * src.init_size);
+        src.idata <- GL.Data.create_int   (stridei * src.init_size);
+      end;
+      src.initialized <- true;
+      src.layout <- Some vtx.Vertex.vertex
     end;
-    begin 
-      match v.Vertex.texcoord with
-      |None when src.texcoord <> None -> 
-        raise (Invalid_vertex "Missing texture coordinate")
-      |Some _ when src.texcoord = None -> ()
-      |Some vec -> GL.Data.add_2f src.data vec
-      | _ -> ()
-    end;
-    begin 
-      match v.Vertex.normal with
-      |None when src.normal <> None -> 
-        raise (Invalid_vertex "Missing vertex normal")
-      |Some _ when src.normal = None -> ()
-      |Some vec -> GL.Data.add_3f src.data vec
-      | _ -> ()
-    end;
-    begin 
-      match v.Vertex.color with
-      |None when src.color <> None -> 
-        raise (Invalid_vertex "Missing vertex color")
-      |Some _ when src.color = None -> ()
-      |Some vec -> GL.Data.add_color src.data vec
-      | _ -> ()
-    end;
+    List.iter (fun (att, _) ->
+      let i = Vertex.offset_of att in
+      match vtx.Vertex.data.(i) with
+      | Vertex.AttributeVal.Unset ->
+        let open Vertex in
+        begin match List.nth vtx.vertex.attribs i with
+        | Boxed_Attrib f -> raise (Uninitialized_field f.Vertex.aname)
+        end
+      | Vertex.AttributeVal.Float v ->
+        GL.Data.add_float src.fdata v
+      | Vertex.AttributeVal.Vec2f v ->
+        GL.Data.add_2f src.fdata v
+      | Vertex.AttributeVal.Vec3f v ->
+        GL.Data.add_3f src.fdata v
+      | Vertex.AttributeVal.Int v ->
+        GL.Data.add_int src.idata v
+      | Vertex.AttributeVal.Vec2i v ->
+        GL.Data.add_2i src.idata v
+      | Vertex.AttributeVal.Vec3i v ->
+        GL.Data.add_3i src.idata v
+      | Vertex.AttributeVal.Color v ->
+        GL.Data.add_color src.fdata v
+    ) src.init_fields;
     src.length <- src.length + 1
 
-  let (<<) src v = add src v; src
+  let (<<) src vtx = 
+    add src vtx; src
 
-  let length src = src.length
+  let length src =
+    src.length
 
-  let size_of_attrib = function
-    |Position -> 3
-    |Color    -> 4
-    |Normal   -> 3
-    |Texcoord -> 2
+  let clear src =
+    src.length <- 0;
+    GL.Data.clear src.idata;
+    GL.Data.clear src.fdata;
+    src.layout <- None
 
-  let attribs src = 
-    let rec build_list_opt i = function
-      |[] -> []
-      |(_, None)   :: t -> build_list_opt i t
-      |(n, Some s) :: t -> (n, s, i) :: (build_list_opt (size_of_attrib n + i) t)
+  let append src1 src2 =
+    if src2.length <> 0 then begin
+      if src1.init_fields <> src2.init_fields then
+        raise Incompatible_sources;
+      src1.length <- src1.length + src2.length;
+      GL.Data.append src1.fdata src2.fdata;
+      GL.Data.append src1.idata src2.idata
+    end
+
+  let get (src : 'a t) (i : int) : 'a Vertex.t =
+    let i_offset, f_offset = 
+      src.stridei * i, 
+      src.stridef * i
     in
-    build_list_opt 0 [Position, src.position;
-                      Texcoord, src.texcoord;
-                      Normal  , src.normal;
-                      Color   , src.color]
-
-  let type_of_attrib = function
-    |Position -> GLTypes.GlslType.Float3
-    |Texcoord -> GLTypes.GlslType.Float2
-    |Normal   -> GLTypes.GlslType.Float3
-    |Color    -> GLTypes.GlslType.Float4
-
-  let stride src = 
-    List.fold_left (fun v (t,_,_) -> v + size_of_attrib t) 0 (attribs src)
-
-  let append s1 s2 =
-    if (requires_position s1) = (requires_position s2)
-    && (requires_normal   s1) = (requires_normal   s2)
-    && (requires_uv       s1) = (requires_uv       s2)
-    && (requires_color    s1) = (requires_color    s2)
-    then begin 
-      s1.length <- s1.length + s2.length;
-      GL.Data.append s1.data s2.data;
-      s1
-    end else 
-      raise (Invalid_source "Cannot append a source at the end of another source of different type")
-
-  let get s i = 
-    let stride = stride s in
-    let offset = ref (stride * i) in
-    let position =      
-      match s.position with
-      | None   -> None
-      | Some _ -> 
-        let vec = (Vector3f.{x = GL.Data.get s.data (!offset+0);
-                             y = GL.Data.get s.data (!offset+1);
-                             z = GL.Data.get s.data (!offset+2);})
-        in
-        offset := !offset + 3;
-        Some vec
-    in
-    let texcoord =      
-      match s.texcoord with
-      | None   -> None
-      | Some _ -> 
-        let vec = (Vector2f.{x = GL.Data.get s.data (!offset+0);
-                             y = GL.Data.get s.data (!offset+1)})
-        in
-        offset := !offset + 2;
-        Some vec
-    in
-   let normal =      
-      match s.normal with
-      | None   -> None
-      | Some _ -> 
-        let vec = (Vector3f.{x = GL.Data.get s.data (!offset+0);
-                             y = GL.Data.get s.data (!offset+1);
-                             z = GL.Data.get s.data (!offset+2);})
-        in
-        offset := !offset + 3;
-        Some vec
-    in
-    let color =      
-      match s.color with
-      | None   -> None
-      | Some _ -> 
-        let vec = (Color.RGB.{r = GL.Data.get s.data (!offset+0);
-                              g = GL.Data.get s.data (!offset+1);
-                              b = GL.Data.get s.data (!offset+2);
-                              a = GL.Data.get s.data (!offset+3);})
-        in
-        offset := !offset + 4;
-        Some (`RGB vec)
-    in
-    Vertex.create ?position ?texcoord ?normal ?color ()
-
-  let iter s f = 
+    match src.layout with
+    | None     -> assert false
+    | Some vtx -> begin
+      let vertex = 
+      {
+        Vertex.vertex = vtx; 
+        data = Array.make vtx.Vertex.total_size Vertex.AttributeVal.Unset
+      }
+      in
+      List.fold_left (fun (off_i, off_f) att ->
+        match att with
+        | Vertex.Boxed_Attrib attrib ->
+          let aoffset = attrib.Vertex.aoffset in
+          begin match attrib.Vertex.atype with
+          | Vertex.AttributeType.Float -> 
+            let v = GL.Data.get src.fdata (off_f+0) in
+            vertex.Vertex.data.(aoffset) <- Vertex.AttributeVal.Float v;
+            (off_i, off_f + 1)
+          | Vertex.AttributeType.Vec2f -> 
+            let x,y = 
+              GL.Data.get src.fdata (off_f+0),
+              GL.Data.get src.fdata (off_f+1) 
+            in
+            let v = 
+              Vector2f.({x; y})
+            in
+            vertex.Vertex.data.(aoffset) <- Vertex.AttributeVal.Vec2f v;
+            (off_i, off_f + 2)
+          | Vertex.AttributeType.Vec3f -> 
+            let x,y,z = 
+              GL.Data.get src.fdata (off_f+0),
+              GL.Data.get src.fdata (off_f+1),
+              GL.Data.get src.fdata (off_f+2) 
+            in
+            let v = 
+              Vector3f.({x; y; z})
+            in
+            vertex.Vertex.data.(aoffset) <- Vertex.AttributeVal.Vec3f v;
+            (off_i, off_f + 3)
+          | Vertex.AttributeType.Color -> 
+            let r,g,b,a = 
+              GL.Data.get src.fdata (off_f+0),
+              GL.Data.get src.fdata (off_f+1),
+              GL.Data.get src.fdata (off_f+2),
+              GL.Data.get src.fdata (off_f+3) 
+            in
+            let v = 
+              `RGB Color.RGB.({r; g; b; a})
+            in
+            vertex.Vertex.data.(aoffset) <- Vertex.AttributeVal.Color v;
+            (off_i, off_f + 4)
+          | Vertex.AttributeType.Int -> 
+            let i = GL.Data.get src.idata (off_i+0) in
+            let v = Int32.to_int i in
+            vertex.Vertex.data.(aoffset) <- Vertex.AttributeVal.Int v;
+            (off_i + 1, off_f)
+          | Vertex.AttributeType.Vec2i -> 
+            let x,y = 
+              GL.Data.get src.idata (off_i+0),
+              GL.Data.get src.idata (off_i+1) 
+            in
+            let v = 
+              Vector2i.({x = Int32.to_int x; y = Int32.to_int y})
+            in
+            vertex.Vertex.data.(aoffset) <- Vertex.AttributeVal.Vec2i v;
+            (off_i + 2, off_f)
+          | Vertex.AttributeType.Vec3i -> 
+            let x,y,z = 
+              GL.Data.get src.idata (off_i+1) |> Int32.to_int,
+              GL.Data.get src.idata (off_i+1) |> Int32.to_int,
+              GL.Data.get src.idata (off_i+2) |> Int32.to_int 
+            in
+            let v = 
+              Vector3i.({x; y; z})
+            in
+            vertex.Vertex.data.(aoffset) <- Vertex.AttributeVal.Vec3i v;
+            (off_i + 3, off_f)
+          end;
+      ) (i_offset, f_offset) vtx.Vertex.attribs
+      |> ignore;
+      vertex
+    end
+    
+  let iter (s : 'a t) (f : 'a Vertex.t -> unit) : unit =
     for i = 0 to s.length - 1 do
       f (get s i)
     done
 
-  let map s f = 
-    let newsrc = 
-      empty ?position:s.position
-            ?texcoord:s.texcoord
-            ?normal:s.normal
-            ?color:s.color
-            ~size:s.length ()
-    in
+  let map (s : 'a t) (f : 'a Vertex.t -> 'b Vertex.t) : 'b t = 
+    let newsrc = empty () in
     for i = 0 to s.length - 1 do
       add newsrc (f (get s i))
     done;
     newsrc
 
-  let mapto s f d = 
+  let map_to (s : 'a t) (f : 'a Vertex.t -> 'b Vertex.t) (d : 'b t) : unit = 
     for i = 0 to s.length - 1 do
       add d (f (get s i))
     done
@@ -239,82 +482,99 @@ module Source = struct
 end
 
 
+exception Missing_attribute of string
+
+exception Invalid_attribute of string
+
+exception Out_of_bounds of string
+
 type static
 
 type dynamic
 
-type _ t = {
+type ('a, 'b) t = {
+  vao : GL.VAO.t;
   mutable buffer  : GL.VBO.t;
-  vao     : GL.VAO.t;
-  mutable size    : int;
+  mutable size_f  : int;
+  mutable size_i  : int;
   mutable length  : int;
-  attribs : (Source.attrib * string * int) list;
-  stride  : int;
+  init_fields : ('b Vertex.boxed_attrib * int) list;
+  stride_i  : int;
+  stride_f  : int;
   mutable bound : Program.t option;
   id : int
 }
 
-let dynamic (type s) (module M : RenderTarget.T with type t = s) target src = 
+let create context src kind = 
   let vao    = GL.VAO.create () in
   let buffer = GL.VBO.create () in
-  let data = src.Source.data in
+  let dataf = src.VertexSource.fdata in
+  let datai = src.VertexSource.idata in
+  let lengthf = GL.Data.length dataf in
+  let lengthi = GL.Data.length datai in
   GL.VBO.bind (Some buffer);
-  GL.VBO.data (GL.Data.length data * 4) (Some data) (GLTypes.VBOKind.DynamicDraw);
+  if lengthi = 0 then
+    GL.VBO.data (lengthf * 4) (Some dataf) kind
+  else begin
+    GL.VBO.data ((lengthf + lengthi) * 4) None kind;
+    GL.VBO.subdata 0 (lengthf * 4) dataf;
+    GL.VBO.subdata (lengthf * 4) (lengthi * 4) datai;
+  end;
   GL.VBO.bind None;
   {
-   buffer; vao; 
-   size = GL.Data.length data;
-   length = Source.length src; 
-   attribs = Source.attribs src;
-   stride = Source.stride src;
+   vao;
+   buffer;
+   size_f   = lengthf;
+   size_i   = lengthi;
+   length   = VertexSource.length src; 
+   init_fields = src.VertexSource.init_fields;
+   stride_i = src.VertexSource.stridei;
+   stride_f = src.VertexSource.stridef;
    bound = None;
-   id = Context.LL.vao_id (M.context target);
+   id = Context.LL.vao_id context
   }
+
+let dynamic (type s) (module M : RenderTarget.T with type t = s) target src = 
+  create (M.context target) src GLTypes.VBOKind.DynamicDraw
 
 let static (type s) (module M : RenderTarget.T with type t = s) target src = 
-  let vao    = GL.VAO.create () in
-  let buffer = GL.VBO.create () in
-  let data = src.Source.data in
-  GL.VBO.bind (Some buffer);
-  GL.VBO.data (GL.Data.length data * 4) (Some data) (GLTypes.VBOKind.StaticDraw);
-  GL.VBO.bind None;
-  {
-   buffer; vao; 
-   size = GL.Data.length data;
-   length = Source.length src; 
-   attribs = Source.attribs src;
-   stride = Source.stride src;
-   bound = None;
-   id = Context.LL.vao_id (M.context target)
-  }
+  create (M.context target) src GLTypes.VBOKind.StaticDraw
+
+let length t = t.length
 
 let rebuild t src start =
-  let data = src.Source.data in
-  let start_vals = t.stride * start in
-  if Source.attribs src <> t.attribs then
-    raise (Invalid_source "Cannot rebuild vertex array : incompatible vertex source");
+  let dataf = src.VertexSource.fdata in
+  let datai = src.VertexSource.idata in
+  let lengthf = GL.Data.length dataf in
+  let lengthi = GL.Data.length datai in
+  let start_f = t.stride_f * start in
+  let start_i = t.stride_i * start in
+  if t.init_fields <> src.VertexSource.init_fields then
+    raise VertexSource.Incompatible_sources;
   let new_buffer, new_binding = 
-    if t.size < GL.Data.length data + start_vals then begin
+    if t.size_f < lengthf + start_f 
+    || t.size_i < lengthi + start_i 
+    then begin
       let buf = GL.VBO.create () in
       GL.VBO.bind (Some buf);
-      GL.VBO.data ((GL.Data.length data + start_vals) * 4) None (GLTypes.VBOKind.DynamicDraw);
+      GL.VBO.data ((lengthf + lengthi + start_f + start_i) * 4) None 
+                  (GLTypes.VBOKind.DynamicDraw);
       GL.VBO.bind None;
-      GL.VBO.copy_subdata t.buffer buf 0 0 (start_vals * 4); 
+      GL.VBO.copy_subdata t.buffer buf 0 0 (start_f * 4); 
+      GL.VBO.copy_subdata t.buffer buf (t.size_f * 4) ((lengthf + start_f) * 4) (start_i * 4); 
       buf, None
     end else 
       t.buffer, t.bound
   in
   GL.VBO.bind (Some new_buffer);
-  GL.VBO.subdata (start_vals * 4) (GL.Data.length data * 4) data;
+  GL.VBO.subdata (start_f * 4) (lengthf * 4) dataf;
+  GL.VBO.subdata ((lengthf + start_f + start_i) * 4) (lengthi * 4) datai;
   GL.VBO.bind None;
   t.buffer <- new_buffer;
   t.bound  <- new_binding;
-  t.length <- Source.length src + start;
-  t.size   <- max (GL.Data.length data + start_vals) t.size
-
-
-let length t = t.length
-
+  t.size_f <- max (lengthf + start_f) t.size_f;
+  t.size_i <- max (lengthi + start_i) t.size_i;
+  t.length <- VertexSource.length src + start
 
 let bind context t prog = 
   if t.bound <> Some prog then begin
@@ -323,32 +583,43 @@ let bind context t prog =
     Context.LL.set_bound_vao context (Some (t.vao, t.id));
     GL.VBO.bind (Some t.buffer);
     Context.LL.set_bound_vbo context (Some (t.buffer, t.id));
-    let attribs = ref t.attribs in
+    let attribs = ref t.init_fields in
     let rec find_remove s = function
       | [] -> 
         raise (Missing_attribute 
           (Printf.sprintf "Attribute %s not provided in vertex source" s)
         )
-      | (e,h,off)::t when h = s -> (e,off,t)
+      | (attrib,off)::t when Vertex.name_of attrib = s -> (attrib,off,t)
       | h::t -> 
-        let (e,off,l) = find_remove s t in 
-        (e,off,h::l)
+        let (attrib,off,l) = find_remove s t in 
+        (attrib,off,h::l)
     in
     List.iter (fun att ->
-        let (typ,offset,l) = find_remove (Program.Attribute.name att) !attribs in
-        attribs := l;
-        if Source.type_of_attrib typ <> Program.Attribute.kind att then
+        let (attrib,offset,l) = find_remove (Program.Attribute.name att) !attribs in
+        let typ = Vertex.type_of attrib in
+        if typ <> Program.Attribute.kind att then
           raise (Invalid_attribute
             (Printf.sprintf "Attribute %s has invalid type"
               (Program.Attribute.name att)
             ));
         GL.VAO.enable_attrib (Program.Attribute.location att);
-        GL.VAO.attrib_float 
-          (Program.Attribute.location att)
-          (Source.size_of_attrib typ)
-          (GLTypes.GlFloatType.Float)
-          (offset   * 4)
-          (t.stride * 4)
+        if Vertex.AttributeType.glsl_is_int typ then begin 
+          let offset = t.stride_i - offset in
+          GL.VAO.attrib_int
+            (Program.Attribute.location att)
+            (Vertex.AttributeType.glsl_size typ)
+            (GLTypes.GlIntType.Int)
+            ((t.size_f + offset) * 4)
+            (t.stride_i * 4)
+        end else begin
+          let offset = t.stride_f - offset in
+          GL.VAO.attrib_float 
+            (Program.Attribute.location att)
+            (Vertex.AttributeType.glsl_size typ)
+            (GLTypes.GlFloatType.Float)
+            (offset     * 4)
+            (t.stride_f * 4)
+        end
       ) (Program.LL.attributes prog);
     (*if !attribs <> [] then
       Printf.eprintf "Warning : omitting attribute %s not required by program\n%!" 
@@ -360,26 +631,9 @@ let bind context t prog =
     Context.LL.set_bound_vbo context (Some (t.buffer, t.id));
   end
 
-(*type debug_times = {
-  mutable param_bind_t : float;
-  mutable program_bind_t : float;
-  mutable uniform_bind_t : float;
-  mutable vao_bind_t : float;
-  mutable draw_t : float
-}
-
-let debug_t = {
-  param_bind_t = 0.;
-  program_bind_t = 0.;
-  uniform_bind_t = 0.;
-  vao_bind_t = 0.;
-  draw_t = 0.
-}*)
-
-let tm = Unix.gettimeofday 
 
 let draw (type s) (module M : RenderTarget.T with type t = s)
-         ~vertices ~target ?indices ~program 
+         ~vertices ~target ?indices ~program
          ?uniform:(uniform = Uniform.empty) 
          ?parameters:(parameters = DrawParameter.make ()) 
          ?start ?length
@@ -397,32 +651,15 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
       |None, Some ebo -> IndexArray.length ebo - start
       |Some l, _ -> l
     in
-
-(*     let t = tm () in *)
     M.bind target parameters;
-(*     debug_t.param_bind_t <- debug_t.param_bind_t +. (tm () -. t); *)
-
-(*     let t = tm () in *)
     Program.LL.use context (Some program);
-(*     debug_t.program_bind_t <- debug_t.program_bind_t +. (tm () -. t); *)
-
-(*     let t = tm () in *)
     Uniform.LL.bind context uniform (Program.LL.uniforms program);
-(*     debug_t.uniform_bind_t <- debug_t.uniform_bind_t +. (tm () -. t); *)
-
-(*     let t = tm () in *)
     bind context vertices program;
-(*     debug_t.vao_bind_t <- debug_t.vao_bind_t +. (tm () -. t); *)
-
     match indices with
     |None -> 
       if start < 0 || start + length > vertices.length then
         raise (Out_of_bounds "Invalid vertex array bounds")
-      else begin
-(*         let t = tm () in *)
-        GL.VAO.draw mode start length;
-(*         debug_t.draw_t <- debug_t.draw_t +. (tm () -. t); *)
-      end
+      else GL.VAO.draw mode start length
     |Some ebo ->
       if start < 0 || start + length > (IndexArray.length ebo) then
         raise (Out_of_bounds "Invalid index array bounds")
@@ -431,6 +668,4 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
         GL.VAO.draw_elements mode start length 
       end
   end
-
-
 

@@ -55,20 +55,20 @@ let program =
 
 (* Create three vertices *)
 let vertex1 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:Vector3f.({x = -0.75; y = -0.75; z = 0.0}) ()
 
 let vertex2 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:(Vector3f.({x = 0.; y = 0.75; z = 0.0})) ()
 
 let vertex3 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:Vector3f.({x = 0.75; y = -0.75; z = 0.0}) ()
 
 (* Put the vertices in a vertex source *)
-let vertex_source = VertexArray.Source.(
-    empty ~position:"position" ~size:3 ()
+let vertex_source = VertexArray.VertexSource.(
+    empty ~size:3 ()
     << vertex1
     << vertex2
     << vertex3

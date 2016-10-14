@@ -45,27 +45,27 @@ let program =
     ~fragment_source:(`String fragment_shader_source) ()
 
 let vertex1 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:Vector3f.({x = -0.75; y = 0.75; z = 0.0})
-    ~texcoord:Vector2f.({x = 0.; y = 1.}) ()
+    ~uv:Vector2f.({x = 0.; y = 1.}) ()
 
 let vertex2 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:Vector3f.({x = 0.75; y = 0.75; z = 0.0})
-    ~texcoord:Vector2f.({x = 1.; y = 1.}) ()
+    ~uv:Vector2f.({x = 1.; y = 1.}) ()
 
 let vertex3 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:Vector3f.({x = -0.75; y = -0.75; z = 0.0})
-    ~texcoord:Vector2f.({x = 0.; y = 0.}) ()
+    ~uv:Vector2f.({x = 0.; y = 0.}) ()
 
 let vertex4 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:Vector3f.({x = 0.75; y = -0.75; z = 0.0})
-    ~texcoord:Vector2f.({x = 1.; y = 0.}) ()
+    ~uv:Vector2f.({x = 1.; y = 0.}) ()
 
-let vertex_source = VertexArray.Source.(
-    empty ~position:"position" ~texcoord:"uv" ~size:4 ()
+let vertex_source = VertexArray.VertexSource.(
+    empty ~size:4 ()
     << vertex1
     << vertex2
     << vertex3

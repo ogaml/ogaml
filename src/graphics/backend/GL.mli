@@ -22,6 +22,9 @@ module Data : sig
   (** Type of data using caml type 'a and storing type 'b *)
   type ('a, 'b) t  
 
+  (** Clears some data *)
+  val clear : ('a, 'b) t -> unit
+
   (** Append the second array at the end of the first one *)
   val append : ('a, 'b) t -> ('a, 'b) t -> unit
 
@@ -69,6 +72,11 @@ module Data : sig
 
   (** Maps through data (without changing its type) *)
   val map : ('a, 'b) t -> ('a -> 'a) -> ('a, 'b) t
+
+  (** Debug *)
+  val print_f : (float, float_32) t -> unit
+
+  val print_i : (int32, int_32) t -> unit
 
 end
 

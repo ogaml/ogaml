@@ -32,18 +32,14 @@ val draw :
   (module RenderTarget.T with type t = 'a) ->
   ?parameters:DrawParameter.t -> target:'a -> sprite:t -> unit -> unit
 
-(** Outputs a sprite to a vertex array source by mapping its vertices *)
+val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t -> unit
+
+(** Outputs a sprite to a vertex array source by mapping its vertices.
+  *
+  * See $to_source$ for more information. *)
 val map_to_source : t -> 
-                    (VertexArray.Vertex.t -> VertexArray.Vertex.t) -> 
-                    VertexArray.Source.t -> unit
-
-(** Outputs a sprite to a vertex array source *)
-val to_source : t -> VertexArray.Source.t -> unit
-
-(** Outputs a sprite to a vertex map source by mapping its vertices *)
-val map_to_custom_source : t -> 
-                    (VertexArray.Vertex.t -> VertexMap.Vertex.t) -> 
-                    VertexMap.Source.t -> unit
+                    (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
+                    'b VertexArray.VertexSource.t -> unit
 
 (** Sets the position of the origin of the sprite in the window. *)
 val set_position : t -> OgamlMath.Vector2f.t -> unit

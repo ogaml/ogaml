@@ -38,7 +38,6 @@ MLSOURCES = backend/color.ml\
 	    program/uniform.ml\
 	    vertex/indexArray.ml\
 	    vertex/vertexArray.ml\
-	    vertex/vertexMap.ml\
 	    $(PARSER_FILES:.mly=.ml)\
 	    $(LEXER_FILES:.mll=.ml)\
 	    model/model.ml\

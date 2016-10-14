@@ -13,6 +13,9 @@ module Data = struct
     mutable length : int
   }
 
+  let clear d = 
+    d.length <- 0
+
   let create_int i = 
     let arr = 
       Bigarray.Array1.create 
@@ -135,6 +138,20 @@ module Data = struct
       newt.data.{i} <- (f t.data.{i})
     done;
     newt
+
+  let print_f t = 
+    Printf.printf "[";
+    for i = 0 to t.length - 1 do
+      Printf.printf "%f; " t.data.{i}
+    done;
+    Printf.printf "]\n%!"
+
+  let print_i t = 
+    Printf.printf "[";
+    for i = 0 to t.length - 1 do
+      Printf.printf "%i; " (Int32.to_int t.data.{i})
+    done;
+    Printf.printf "]\n%!"
 
 end
 
