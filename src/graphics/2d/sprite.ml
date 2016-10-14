@@ -119,30 +119,6 @@ let to_source sprite src =
 let map_to_custom_source sprite f src = 
   List.iter (fun v -> VertexArray.VertexSource.add src (f v)) (get_vertices sprite)
 
-(*type debug_times = {
-  mutable size_get_t : float;
-  mutable uniform_create_t : float;
-  mutable source_alloc_t : float;
-  mutable vertices_create_t : float;
-  mutable vao_create_t : float;
-  mutable draw_t : float;
-}
-
-let debug_t = {
-  size_get_t = 0.;
-  uniform_create_t = 0.;
-  source_alloc_t = 0.;
-  vertices_create_t = 0.;
-  vao_create_t = 0.;
-  draw_t = 0.
-}
-
-let tm = Unix.gettimeofday*)
-
-let sprite_source = 
-  VertexArray.VertexSource.empty 
-      ~size:6 ()
-
 let draw (type s) (module Target : RenderTarget.T with type t = s)
          ?parameters:(parameters = DrawParameter.make
          ~depth_test:DrawParameter.DepthTest.None
@@ -150,37 +126,25 @@ let draw (type s) (module Target : RenderTarget.T with type t = s)
          ~target ~sprite () =
   let context = Target.context target in
   let program = Context.LL.sprite_drawing context in
-(*   let t = tm () in *)
   let sizei = Target.size target in
-(*   debug_t.size_get_t <- debug_t.size_get_t +. (tm () -. t); *)
   let size = Vector2f.from_int sizei in
-(*   let t = tm () in *)
   let uniform =
     Uniform.empty
     |> Uniform.vector2f "size" size
     |> Uniform.texture2D "utexture" sprite.texture
   in
-(*   debug_t.uniform_create_t <- debug_t.uniform_create_t +. (tm () -. t); *)
   let vertices = 
-(*     let t = tm () in *)
-(*     debug_t.source_alloc_t <- debug_t.source_alloc_t +. (tm () -. t); *)
-(*     let t = tm () in *)
+    let sprite_source = VertexArray.VertexSource.empty ~size:6 () in
     List.iter (VertexArray.VertexSource.add sprite_source) (get_vertices sprite);
-(*     debug_t.vertices_create_t <- debug_t.vertices_create_t +. (tm () -. t); *)
-(*     let t = tm () in *)
     let vao = VertexArray.static (module Target) target sprite_source in
-(*     debug_t.vao_create_t <- debug_t.vao_create_t +. (tm () -. t); *)
     vao
   in
-(*   let t = tm () in *)
   VertexArray.draw (module Target)
         ~target
         ~vertices
         ~program
         ~parameters
-        ~uniform ();
-  VertexArray.VertexSource.clear sprite_source
-(*   ;debug_t.draw_t <- debug_t.draw_t +. (tm () -. t) *)
+        ~uniform ()
 
 let set_position sprite position =
   sprite.position <- position 

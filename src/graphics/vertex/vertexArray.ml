@@ -300,6 +300,14 @@ module VertexSource = struct
       layout = None
     }
 
+  let time_1 = ref 0.
+
+  let iterations_1 = ref 0
+
+  let time_2 = ref 0.
+
+  let iterations_2 = ref 0
+
   let add src vtx = 
     if src.layout = None then begin
       let (init_fields,stridef,stridei,_) = 
@@ -326,7 +334,7 @@ module VertexSource = struct
         src.idata <- GL.Data.create_int   (stridei * src.init_size);
       end;
       src.initialized <- true;
-      src.layout <- Some vtx.Vertex.vertex
+      src.layout <- Some vtx.Vertex.vertex;
     end;
     List.iter (fun (att, _) ->
       let i = Vertex.offset_of att in
