@@ -40,10 +40,6 @@ Interface changes:
   RenderTextures/Framebuffers:
     ☐ Test all attachments
 
-Performance:
-  ☐ Remove debug type and functions in VertexArray and Sprite
-  ☐ Make a custom module to handle smaller VAOs faster (or pool bigarrays ?)
-
 New modules:
   Bounding module:
     ☐ Split module (bounding3D / bounding2D)
