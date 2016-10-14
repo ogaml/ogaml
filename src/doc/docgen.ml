@@ -283,7 +283,7 @@ let rec comment_to_html root ppf comment =
   | (PP_Inline s)::t -> 
     Format.fprintf ppf "<code class=\"OCaml\">%s</code>%a" s (comment_to_html root) t
   | PP_EOL::PP_EOL::t -> 
-    Format.fprintf ppf "<br>%a" (comment_to_html root) t
+    Format.fprintf ppf "<br>%a" (comment_to_html root) (PP_EOL::t)
   | PP_EOL::t -> 
     Format.fprintf ppf "%a" (comment_to_html root) t
   | (PP_Related s)::t -> 
