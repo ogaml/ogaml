@@ -1369,119 +1369,240 @@ module VertexArray : sig
 
   (** This modules provides a high-level and safe access to
     * openGL vertex arrays. Vertex arrays are used to store
-    * vertices on the GPU and can be used to render 3D models. *)
+    * vertices on the GPU and can be used to render 3D models. 
+    *
+    * The idea behind this module is to provide a safe way to
+    * create vertex arrays in 3 steps:
+    *
+    *   - First, you will need to create a vertex structure. This 
+    * is done using the function Vertex.make. You can add attributes
+    * to your structure V by calling V.attribute and giving them a
+    * name and type. The attributes will be passed to GLSL programs
+    * under the provided name. Once you have added some attributes
+    * to your structure, you need to seal it using V.seal. 
+    * Be careful as once a structure is sealed, you cannot add 
+    * attributes to it anymore. You can then create vertices that will
+    * contain the attributes of your structure using V.create.
+    * 
+    * Alternatively, you can use the module SimpleVertex which
+    * is a predefined vertex structure containing a position, 
+    * texture coordinates, a color, and a normal.
+    *
+    *   - Secondly, you will need to create a source which contains
+    * vertices. This is done using VertexSource.empty. The module
+    * VertexSource provides several useful functions to manipulate
+    * sources of vertices.
+    *
+    *   - Finally, you can create a vertex array using one of the 
+    * two functions $static$ or $dynamic$.
+    *)
 
 
+  (** Creation and manipulation of vertices *)
   module Vertex : sig
 
+    (** This module provides a way to create and manipulate vertex structures
+      * and vertices.
+      * A vertex is a collection attributes, and a vertex structure 
+      * creates vertices that have the same attributes. *)
+
+    (** Raised when trying to add an attribute to a sealed structure *)
     exception Sealed_vertex of string
 
+    (** Raised when trying to create a vertex from an unsealed structure *)
     exception Unsealed_vertex of string
 
+    (** Raised when trying to get the value of an unset attribute *)
     exception Unbound_attribute of string
 
+    (** Type of a vertex *)
     type 'a t
 
-
+    (** Attribute types *)
     module AttributeType : sig
 
+      (** This module provides phantom types to enforce the
+        * soundness of attributes. *)
+
+      (** Attribute type phantom type *)
       type 'a s
 
+      (** Integer attribute *)
       val int : int s
 
+      (** Vector2i attribute *)
       val vector2i : OgamlMath.Vector2i.t s
 
+      (** Vector3i attribute *)
       val vector3i : OgamlMath.Vector3i.t s
 
+      (** float attribute *)
       val float : float s
 
+      (** Vector2f attribute *)
       val vector2f : OgamlMath.Vector2f.t s
 
+      (** Vector3f attribute *)
       val vector3f : OgamlMath.Vector3f.t s
 
+      (** Color attribute *)
       val color : Color.t s
 
     end
 
 
+    (** Manipulation of attributes *)
     module Attribute : sig
 
+      (** This module provides a way to set and access the
+        * attributes of a vertex. *)
+
+      (** Type of an attribute *)
       type ('a, 'b) s
 
+      (** Sets the value of a vertex's attribute *)
       val set : 'b t -> ('a, 'b) s -> 'a -> unit
 
+      (** Gets the value of a vertex's attribute.
+        * Raises $Unbound_attribute$ if the attribute is not initialized. *)
       val get : 'b t -> ('a, 'b) s -> 'a
 
+      (** Returns the name of an attribute, that is, the name
+        * that will refer to this attribute in a GLSL program. *)
       val name : ('a, 'b) s -> string
 
+      (** Returns the type of an attribute *)
       val atype : ('a, 'b) s -> 'a AttributeType.s
 
     end
 
 
+    (** Common signature to all vertex structures *)
     module type VERTEX = sig
 
+      (** Phantom type associated to this vertex structure for safety reasons *)
       type s
 
+      (** Adds an attribute to this structure.
+        * Raises $Sealed_vertex$ if the structure is sealed. *)
       val attribute : string -> 'a AttributeType.s -> ('a, s) Attribute.s
 
+      (** Seals this structure. Once sealed, the structure can be used to
+        * create vertices but cannot receive new attributes.
+        * Raises $Sealed_vertex$ if the structure is already sealed. *)
       val seal : unit -> unit
 
+      (** Creates a vertex following this structure.
+        * Raises $Unsealed_vertex$ if the structure is not sealed. *)
       val create : unit -> s t
 
     end
 
 
+    (** Creates a new, custom vertex structure *)
     val make : unit -> (module VERTEX)
 
   end
 
 
+  (** Simple pre-initialized structure *)
   module SimpleVertex : sig
 
+    (** This module provides a simple pre-initialized structure with some
+      * useful attributes :
+      *
+      * - position, which should be refered to as $"position"$, which stores
+      *   values of type $Vector3f.t$.
+      * - color, which should be refered to as $"color"$, which stores
+      *   values of type $Color.t$.
+      * - uv, which should be refered to as $"uv"$, which stores
+      *   values of type $Vector2f.t$.
+      * - normal, which should be refered to as $"normal"$, which stores
+      *   values of type $Vector3f.t$.*)
+
+    (** Associated vertex structure *)
     module T : Vertex.VERTEX
 
+    (** Creates a vertex with predefined attributes *)
     val create : 
       ?position:OgamlMath.Vector3f.t ->
       ?color:Color.t ->
       ?uv:OgamlMath.Vector2f.t ->
       ?normal:OgamlMath.Vector3f.t -> unit -> T.s Vertex.t
 
+    (** Position attribute *)
     val position : (OgamlMath.Vector3f.t, T.s) Vertex.Attribute.s
 
+    (** Color attribute *)
     val color : (Color.t, T.s) Vertex.Attribute.s
 
+    (** UV attribute *)
     val uv : (OgamlMath.Vector2f.t, T.s) Vertex.Attribute.s
 
+    (** Normal attribute *)
     val normal : (OgamlMath.Vector3f.t, T.s) Vertex.Attribute.s
 
   end
 
 
+  (** Vertex source *)
   module VertexSource : sig
 
+    (** This module represents vertex sources, which are collections of
+      * vertices. 
+      *
+      * This module ensures that everything goes well. In particular, it
+      * verifies that all the vertices of a source are compatible (i.e.
+      * have the same initialized attributes).
+      *
+      * An empty source can receive any vertex. The type of the source
+      * is then fixed by the first vertex added to it. Any vertex 
+      * added to the source after the first one must have at least the
+      * same initialized attributes as the first vertex. 
+      *
+      * Note that the type of a source is reinitialized if the source is
+      * cleared. *)
+
+    (** Raised if a vertex is missing some of the attributes required by
+      * the source. *)
     exception Uninitialized_field of string
 
+    (** Raised when trying to concatenate incompatible sources. *)
     exception Incompatible_sources 
 
+    (** Type of a vertex source *)
     type 'a t
 
+    (** Empty vertex source. The source will be redimensionned as needed, but
+      * an initial size can be specified with $size$. *)
     val empty : ?size:int -> unit -> 'a t
 
+    (** Adds a vertex to a source. If the source is not empty, the vertex must 
+      * have at least the same initialized fields as the first vertex put into
+      * the source. *)
     val add : 'a t -> 'a Vertex.t -> unit
 
+    (** Convenient operator to add vertices to a source. *)
     val (<<) : 'a t -> 'a Vertex.t -> 'a t
 
+    (** Returns the length (in vertices) of a source. *)
     val length : 'a t -> int
 
+    (** Clears the source. Any source that has been converted into a vertex array
+      * can be safely cleared and reused. 
+      * This avoids reallocation and garbage collection. *)
     val clear : 'a t -> unit
 
+    (** $append s1 s2$ appends the source $s2$ to $s1$. $s2$ is not modified. *) 
     val append : 'a t -> 'a t -> unit
 
+    (** Iterates through all the vertices of a source. *)
     val iter : 'a t -> ('a Vertex.t -> unit) -> unit
 
+    (** Maps all the vertices of a source to a new source. *)
     val map : 'a t -> ('a Vertex.t -> 'b Vertex.t) -> 'b t
 
+    (** Maps all the vertices of a source to an existing source. *)
     val map_to : 'a t -> ('a Vertex.t -> 'b Vertex.t) -> 'b t -> unit
 
   end

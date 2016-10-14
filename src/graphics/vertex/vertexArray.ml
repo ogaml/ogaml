@@ -388,7 +388,7 @@ module VertexSource = struct
         data = Array.make vtx.Vertex.total_size Vertex.AttributeVal.Unset
       }
       in
-      List.fold_left (fun (off_i, off_f) att ->
+      List.fold_left (fun (off_i, off_f) (att,_) ->
         match att with
         | Vertex.Boxed_Attrib attrib ->
           let aoffset = attrib.Vertex.aoffset in
@@ -457,7 +457,7 @@ module VertexSource = struct
             vertex.Vertex.data.(aoffset) <- Vertex.AttributeVal.Vec3i v;
             (off_i + 3, off_f)
           end;
-      ) (i_offset, f_offset) vtx.Vertex.attribs
+      ) (i_offset, f_offset) src.init_fields
       |> ignore;
       vertex
     end
