@@ -1371,27 +1371,34 @@ module VertexArray : sig
     * openGL vertex arrays. Vertex arrays are used to store
     * vertices on the GPU and can be used to render 3D models. 
     *
+    *
     * The idea behind this module is to provide a safe way to
     * create vertex arrays in 3 steps:
+    *
     *
     *   - First, you will need to create a vertex structure. This 
     * is done using the function Vertex.make. You can add attributes
     * to your structure V by calling V.attribute and giving them a
-    * name and type. The attributes will be passed to GLSL programs
+    * name and type. 
+    *
+    * The attributes will be passed to GLSL programs
     * under the provided name. Once you have added some attributes
     * to your structure, you need to seal it using V.seal. 
+    *
     * Be careful as once a structure is sealed, you cannot add 
     * attributes to it anymore. You can then create vertices that will
     * contain the attributes of your structure using V.create.
-    * 
+    *
     * Alternatively, you can use the module SimpleVertex which
     * is a predefined vertex structure containing a position, 
     * texture coordinates, a color, and a normal.
+    *
     *
     *   - Secondly, you will need to create a source which contains
     * vertices. This is done using VertexSource.empty. The module
     * VertexSource provides several useful functions to manipulate
     * sources of vertices.
+    *
     *
     *   - Finally, you can create a vertex array using one of the 
     * two functions $static$ or $dynamic$.
@@ -1403,6 +1410,7 @@ module VertexArray : sig
 
     (** This module provides a way to create and manipulate vertex structures
       * and vertices.
+      *
       * A vertex is a collection attributes, and a vertex structure 
       * creates vertices that have the same attributes. *)
 
@@ -1511,12 +1519,19 @@ module VertexArray : sig
     (** This module provides a simple pre-initialized structure with some
       * useful attributes :
       *
+      *
       * - position, which should be refered to as $"position"$, which stores
       *   values of type $Vector3f.t$.
+      *
+      *
       * - color, which should be refered to as $"color"$, which stores
       *   values of type $Color.t$.
+      *
+      *
       * - uv, which should be refered to as $"uv"$, which stores
       *   values of type $Vector2f.t$.
+      *
+      *
       * - normal, which should be refered to as $"normal"$, which stores
       *   values of type $Vector3f.t$.*)
 
@@ -1551,14 +1566,17 @@ module VertexArray : sig
     (** This module represents vertex sources, which are collections of
       * vertices. 
       *
+      *
       * This module ensures that everything goes well. In particular, it
       * verifies that all the vertices of a source are compatible (i.e.
       * have the same initialized attributes).
+      *
       *
       * An empty source can receive any vertex. The type of the source
       * is then fixed by the first vertex added to it. Any vertex 
       * added to the source after the first one must have at least the
       * same initialized attributes as the first vertex. 
+      *
       *
       * Note that the type of a source is reinitialized if the source is
       * cleared. *)
