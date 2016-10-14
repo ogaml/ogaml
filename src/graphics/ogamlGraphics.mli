@@ -1645,7 +1645,7 @@ module VertexArray : sig
   val rebuild : (dynamic, 'b) t -> 'b VertexSource.t -> int -> unit
 
   (** Returns the length of a vertex array *)
-  val length : (_, _) t -> int
+  val length : ('a, 'b) t -> int
 
   (** Draws the slice starting at $start$ of length $length$ of a vertex array on a
     * window using the given parameters.
@@ -1665,9 +1665,9 @@ module VertexArray : sig
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
   val draw :
     (module RenderTarget.T with type t = 'a) ->
-    vertices   : (_, _) t ->
+    vertices   : ('b, 'c) t ->
     target     : 'a ->
-    ?indices   : _ IndexArray.t ->
+    ?indices   : 'd IndexArray.t ->
     program    : Program.t ->
     ?uniform    : Uniform.t ->
     ?parameters : DrawParameter.t ->
