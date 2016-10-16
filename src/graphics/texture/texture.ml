@@ -140,7 +140,7 @@ module Texture2DMipmap = struct
       tex.level (rect.IntRect.x, rect.IntRect.y)
       (rect.IntRect.width, rect.IntRect.height)
       GLTypes.PixelFormat.RGBA
-      (Some (Image.data img))
+      (Image.data img)
 
   let level tex = 
     tex.level
@@ -200,17 +200,16 @@ module Texture2D = struct
       (width, height);
     (* Load the corresponding image in each mipmap if requested *)
     let load_level lvl = 
-      let data = 
-        match img with
-        | Some img -> Some (Image.data (Image.mipmap img lvl))
-        | None     -> None
-      in
-      GL.Texture.subimage2D
-        GLTypes.TextureTarget.Texture2D 
-        lvl (0,0)
-        (width lsr lvl, height lsr lvl)
-        GLTypes.PixelFormat.RGBA
-        data
+      match img with
+      | Some img -> 
+        let data = (Image.data (Image.mipmap img lvl)) in
+        GL.Texture.subimage2D
+          GLTypes.TextureTarget.Texture2D 
+          lvl (0,0)
+          (width lsr lvl, height lsr lvl)
+          GLTypes.PixelFormat.RGBA
+          data
+      | None -> ()
     in
     begin match mipmaps with
     | `AllGenerated | `Generated _ ->
@@ -275,7 +274,7 @@ module Texture2DArrayLayerMipmap = struct
                           (rect.IntRect.x, rect.IntRect.y, t.layer)
                           (rect.IntRect.width, rect.IntRect.height, 1)
                           GLTypes.PixelFormat.RGBA
-                          (Some (Image.data img))
+                          (Image.data img)
 
   let to_color_attachment t = 
     Attachment.ColorAttachment.Texture2DArray (t.common.Common.internal, t.layer, t.level)
@@ -424,17 +423,16 @@ module Texture2DArray = struct
     (* Load the corresponding image in each mipmap if requested *)
     let load_level lvl = 
       List.iteri (fun layer img -> 
-        let data = 
-          match img with
-          | Some img -> Some (Image.data (Image.mipmap img lvl))
-          | None     -> None
-        in
-        GL.Texture.subimage3D
-          GLTypes.TextureTarget.Texture2DArray
-          lvl (0,0,layer)
-          (width lsr lvl, height lsr lvl, 1)
-          GLTypes.PixelFormat.RGBA
-          data
+        match img with
+        | Some img -> 
+          let data = Image.data (Image.mipmap img lvl) in
+          GL.Texture.subimage3D
+            GLTypes.TextureTarget.Texture2DArray
+            lvl (0,0,layer)
+            (width lsr lvl, height lsr lvl, 1)
+            GLTypes.PixelFormat.RGBA
+            data
+        | None     -> ()
       ) imgs;
     in
     begin match mipmaps with
