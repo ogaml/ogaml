@@ -12,6 +12,7 @@ val create :
   ?origin   : OgamlMath.Vector2f.t ->
   ?position : OgamlMath.Vector2f.t ->
   ?scale    : OgamlMath.Vector2f.t ->
+  ?color    : Color.t ->
   ?size     : OgamlMath.Vector2f.t ->
   ?rotation : float ->
   unit -> t
@@ -46,6 +47,9 @@ val set_scale : t -> OgamlMath.Vector2f.t -> unit
 (** Sets the base size of the sprite *)
 val set_size : t -> OgamlMath.Vector2f.t -> unit
 
+(** Sets the color of the sprite *)
+val set_color : t -> Color.t -> unit
+
 (** Translates the sprite by the given vector. *)
 val translate : t -> OgamlMath.Vector2f.t -> unit
 
@@ -67,6 +71,9 @@ val size : t -> OgamlMath.Vector2f.t
 
 (** Returns the angle of rotation of the sprite. *)
 val rotation : t -> float
+
+(** Returns the color of the sprite *)
+val color : t -> Color.t
 
 (** Returns the scale of the sprite. *)
 val get_scale : t -> OgamlMath.Vector2f.t

@@ -10,6 +10,7 @@ type t = {
   mutable origin   : Vector2f.t ;
   mutable rotation : float ;
   mutable scale    : Vector2f.t;
+  mutable color    : Color.t;
 }
 
 let error msg = raise (Sprite_error msg)
@@ -36,7 +37,7 @@ let apply_transformations position origin rotation scale point =
         cos(rotation) *. (point.y-.position.y) +. position.y
   })
 
-let get_vertices_aux size position origin rotation scale subrect =
+let get_vertices_aux size position origin rotation scale subrect color =
   let (w,h) = Vector2f.(
     { x = size.x ; y = 0.     },
     { x = 0.     ; y = size.y }
@@ -53,7 +54,8 @@ let get_vertices_aux size position origin rotation scale subrect =
   |> List.map (fun (coord,pos) ->
     VertexArray.SimpleVertex.create
      ~position:(Vector3f.lift pos)
-     ~uv:coord ()
+     ~uv:coord
+     ~color ()
   )
   |> function
   | [ a ; b ; c ; d ] -> [a; b; c; c; b; d]
@@ -67,12 +69,14 @@ let get_vertices sprite =
     sprite.rotation
     sprite.scale
     sprite.subrect
+    sprite.color
 
 let create ~texture
            ?subrect
            ?origin:(origin=Vector2f.zero)
            ?position:(position=Vector2f.zero)
            ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
+           ?color:(color=`RGB Color.RGB.white)
            ?size
            ?rotation:(rotation=0.) () =
   let sizei = Texture.Texture2D.size texture in
@@ -106,6 +110,7 @@ let create ~texture
     size     = size ;
     position = position ;
     origin   = origin ;
+    color    = color ;
     rotation = rotation ;
     scale    = scale
   }
@@ -161,6 +166,9 @@ let set_size sprite size =
 let set_scale sprite scale =
   sprite.scale <- scale 
 
+let set_color sprite color =
+  sprite.color <- color
+
 let translate sprite delta =
   sprite.position <- Vector2f.(add delta sprite.position) 
 
@@ -184,5 +192,7 @@ let origin sprite = sprite.origin
 let rotation sprite = sprite.rotation
 
 let size sprite = sprite.size
+
+let color sprite = sprite.color
 
 let get_scale sprite = sprite.scale
