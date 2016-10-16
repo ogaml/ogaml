@@ -192,6 +192,8 @@ module Sources = struct
 
       frag_uv = vec2(uv.x, 1.0 - uv.y);
 
+      frag_color = color;
+
     }
   "
 
