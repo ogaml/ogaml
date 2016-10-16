@@ -101,7 +101,7 @@ let create ~texture
         if fr.x >= 0. && fr.x <= 1. 
         && fr.y >= 0. && fr.y <= 1.
         && fr.x +. fr.width  >= 0. && fr.x +. fr.width  <= 1.
-        && fr.y +. fr.height >= 0. && fr.x +. fr.height <= 1. then fr
+        && fr.y +. fr.height >= 0. && fr.y +. fr.height <= 1. then fr
         else raise (Sprite_error "invalid texture sub-rectangle")
   in
   {
