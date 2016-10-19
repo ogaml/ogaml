@@ -43,39 +43,39 @@ let program =
     ~fragment_source:(`String fragment_shader_source) ()
 
 let vertex0 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:Vector3f.({x = -0.5; y = -0.5; z = -0.5}) ()
 
 let vertex1 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:(Vector3f.({x = -0.5; y = -0.5; z = 0.5})) ()
 
 let vertex2 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:(Vector3f.({x = -0.5; y =  0.5; z = -0.5})) ()
 
 let vertex3 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:(Vector3f.({x = -0.5; y =  0.5; z = 0.5})) ()
 
 let vertex4 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:(Vector3f.({x =  0.5; y = -0.5; z = -0.5})) ()
 
 let vertex5 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:(Vector3f.({x =  0.5; y = -0.5; z = 0.5})) ()
 
 let vertex6 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:(Vector3f.({x =  0.5; y =  0.5; z = -0.5})) ()
 
 let vertex7 =
-  VertexArray.Vertex.create
+  VertexArray.SimpleVertex.create
     ~position:(Vector3f.({x =  0.5; y =  0.5; z = 0.5})) ()
 
-let vertex_source = VertexArray.Source.(
-    empty ~position:"position" ~size:8 ()
+let vertex_source = VertexArray.VertexSource.(
+    empty ~size:8 ()
     << vertex0 << vertex1 << vertex2
     << vertex3 << vertex4 << vertex5
     << vertex6 << vertex7

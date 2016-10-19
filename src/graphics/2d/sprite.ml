@@ -10,6 +10,7 @@ type t = {
   mutable origin   : Vector2f.t ;
   mutable rotation : float ;
   mutable scale    : Vector2f.t;
+  mutable color    : Color.t;
 }
 
 let error msg = raise (Sprite_error msg)
@@ -36,7 +37,7 @@ let apply_transformations position origin rotation scale point =
         cos(rotation) *. (point.y-.position.y) +. position.y
   })
 
-let get_vertices_aux size position origin rotation scale subrect =
+let get_vertices_aux size position origin rotation scale subrect color =
   let (w,h) = Vector2f.(
     { x = size.x ; y = 0.     },
     { x = 0.     ; y = size.y }
@@ -51,9 +52,10 @@ let get_vertices_aux size position origin rotation scale subrect =
     { x = uvx +. uvw ; y = uvy +. uvh } ;
   ])
   |> List.map (fun (coord,pos) ->
-    VertexArray.Vertex.create
+    VertexArray.SimpleVertex.create
      ~position:(Vector3f.lift pos)
-     ~texcoord:coord ()
+     ~uv:coord
+     ~color ()
   )
   |> function
   | [ a ; b ; c ; d ] -> [a; b; c; c; b; d]
@@ -67,12 +69,14 @@ let get_vertices sprite =
     sprite.rotation
     sprite.scale
     sprite.subrect
+    sprite.color
 
 let create ~texture
            ?subrect
            ?origin:(origin=Vector2f.zero)
            ?position:(position=Vector2f.zero)
            ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
+           ?color:(color=`RGB Color.RGB.white)
            ?size
            ?rotation:(rotation=0.) () =
   let sizei = Texture.Texture2D.size texture in
@@ -97,7 +101,7 @@ let create ~texture
         if fr.x >= 0. && fr.x <= 1. 
         && fr.y >= 0. && fr.y <= 1.
         && fr.x +. fr.width  >= 0. && fr.x +. fr.width  <= 1.
-        && fr.y +. fr.height >= 0. && fr.x +. fr.height <= 1. then fr
+        && fr.y +. fr.height >= 0. && fr.y +. fr.height <= 1. then fr
         else raise (Sprite_error "invalid texture sub-rectangle")
   in
   {
@@ -106,38 +110,19 @@ let create ~texture
     size     = size ;
     position = position ;
     origin   = origin ;
+    color    = color ;
     rotation = rotation ;
     scale    = scale
   }
 
 let map_to_source sprite f src = 
-  List.iter (fun v -> VertexArray.Source.add src (f v)) (get_vertices sprite)
+  List.iter (fun v -> VertexArray.VertexSource.add src (f v)) (get_vertices sprite)
 
 let to_source sprite src = 
-  List.iter (VertexArray.Source.add src) (get_vertices sprite)
+  List.iter (VertexArray.VertexSource.add src) (get_vertices sprite)
 
 let map_to_custom_source sprite f src = 
-  List.iter (fun v -> VertexMap.Source.add src (f v)) (get_vertices sprite)
-
-(*type debug_times = {
-  mutable size_get_t : float;
-  mutable uniform_create_t : float;
-  mutable source_alloc_t : float;
-  mutable vertices_create_t : float;
-  mutable vao_create_t : float;
-  mutable draw_t : float;
-}
-
-let debug_t = {
-  size_get_t = 0.;
-  uniform_create_t = 0.;
-  source_alloc_t = 0.;
-  vertices_create_t = 0.;
-  vao_create_t = 0.;
-  draw_t = 0.
-}
-
-let tm = Unix.gettimeofday*)
+  List.iter (fun v -> VertexArray.VertexSource.add src (f v)) (get_vertices sprite)
 
 let draw (type s) (module Target : RenderTarget.T with type t = s)
          ?parameters:(parameters = DrawParameter.make
@@ -146,41 +131,25 @@ let draw (type s) (module Target : RenderTarget.T with type t = s)
          ~target ~sprite () =
   let context = Target.context target in
   let program = Context.LL.sprite_drawing context in
-(*   let t = tm () in *)
   let sizei = Target.size target in
-(*   debug_t.size_get_t <- debug_t.size_get_t +. (tm () -. t); *)
   let size = Vector2f.from_int sizei in
-(*   let t = tm () in *)
   let uniform =
     Uniform.empty
     |> Uniform.vector2f "size" size
     |> Uniform.texture2D "utexture" sprite.texture
   in
-(*   debug_t.uniform_create_t <- debug_t.uniform_create_t +. (tm () -. t); *)
   let vertices = 
-(*     let t = tm () in *)
-    let src = VertexArray.Source.empty 
-      ~position:"position"
-      ~texcoord:"uv"
-      ~size:6 ()
-    in
-(*     debug_t.source_alloc_t <- debug_t.source_alloc_t +. (tm () -. t); *)
-(*     let t = tm () in *)
-    List.iter (VertexArray.Source.add src) (get_vertices sprite);
-(*     debug_t.vertices_create_t <- debug_t.vertices_create_t +. (tm () -. t); *)
-(*     let t = tm () in *)
-    let vao = VertexArray.static (module Target) target src in
-(*     debug_t.vao_create_t <- debug_t.vao_create_t +. (tm () -. t); *)
+    let sprite_source = VertexArray.VertexSource.empty ~size:6 () in
+    List.iter (VertexArray.VertexSource.add sprite_source) (get_vertices sprite);
+    let vao = VertexArray.static (module Target) target sprite_source in
     vao
   in
-(*   let t = tm () in *)
   VertexArray.draw (module Target)
         ~target
         ~vertices
         ~program
         ~parameters
         ~uniform ()
-(*   ;debug_t.draw_t <- debug_t.draw_t +. (tm () -. t) *)
 
 let set_position sprite position =
   sprite.position <- position 
@@ -196,6 +165,9 @@ let set_size sprite size =
 
 let set_scale sprite scale =
   sprite.scale <- scale 
+
+let set_color sprite color =
+  sprite.color <- color
 
 let translate sprite delta =
   sprite.position <- Vector2f.(add delta sprite.position) 
@@ -220,5 +192,7 @@ let origin sprite = sprite.origin
 let rotation sprite = sprite.rotation
 
 let size sprite = sprite.size
+
+let color sprite = sprite.color
 
 let get_scale sprite = sprite.scale

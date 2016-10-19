@@ -11,12 +11,7 @@ let initial_time = ref 0.
 let frame_count  = ref 0
 
 let cube_source =
-  let src = VertexArray.Source.empty
-    ~position:"in_position"
-    ~color:"in_color"
-    ~normal:"in_normal"
-    ~size:36 ()
-  in
+  let src = VertexArray.VertexSource.empty ~size:36 () in
   let cmod = Model.cube Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) in
   Model.source cmod ~vertex_source:src ();
   src

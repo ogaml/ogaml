@@ -1369,130 +1369,272 @@ module VertexArray : sig
 
   (** This modules provides a high-level and safe access to
     * openGL vertex arrays. Vertex arrays are used to store
-    * vertices on the GPU and can be used to render 3D models. *)
+    * vertices on the GPU and can be used to render 3D models. 
+    *
+    *
+    * The idea behind this module is to provide a safe way to
+    * create vertex arrays in 3 steps:
+    *
+    *
+    *   - First, you will need to create a vertex structure. This 
+    * is done using the function Vertex.make. You can add attributes
+    * to your structure V by calling V.attribute and giving them a
+    * name and type. 
+    *
+    * The attributes will be passed to GLSL programs
+    * under the provided name. Once you have added some attributes
+    * to your structure, you need to seal it using V.seal. 
+    *
+    * Be careful as once a structure is sealed, you cannot add 
+    * attributes to it anymore. You can then create vertices that will
+    * contain the attributes of your structure using V.create.
+    *
+    * Alternatively, you can use the module SimpleVertex which
+    * is a predefined vertex structure containing a position, 
+    * texture coordinates, a color, and a normal.
+    *
+    *
+    *   - Secondly, you will need to create a source which contains
+    * vertices. This is done using VertexSource.empty. The module
+    * VertexSource provides several useful functions to manipulate
+    * sources of vertices.
+    *
+    *
+    *   - Finally, you can create a vertex array using one of the 
+    * two functions $static$ or $dynamic$.
+    *)
 
-  (** Raised when trying to rebuild a vertex array from an invalid source *)
-  exception Invalid_source of string
 
-  (** Raised if a vertex passed to a source has a wrong type *)
-  exception Invalid_vertex of string
-
-  (** Raised if an attribute defined in a GLSL program does not
-    * have a type matching the vertex's *)
-  exception Invalid_attribute of string
-
-  (** Raised when trying to draw with a vertex array containing an
-    * attribute that has not been declared in the GLSL program *)
-  exception Missing_attribute of string
-
-  (** Raised when trying to draw an invalid slice of a vertex array *)
-  exception Out_of_bounds of string
-
-
-  (** Represents a vertex *)
+  (** Creation and manipulation of vertices *)
   module Vertex : sig
 
-    (** This module encapsulates vertices that can be passed to
-      * a source *)
+    (** This module provides a way to create and manipulate vertex structures
+      * and vertices.
+      *
+      * A vertex is a collection attributes, and a vertex structure 
+      * creates vertices that have the same attributes. *)
+
+    (** Raised when trying to add an attribute to a sealed structure *)
+    exception Sealed_vertex of string
+
+    (** Raised when trying to create a vertex from an unsealed structure *)
+    exception Unsealed_vertex of string
+
+    (** Raised when trying to get the value of an unset attribute *)
+    exception Unbound_attribute of string
 
     (** Type of a vertex *)
-    type t
+    type 'a t
 
-    (** Creates a vertex containing various optional attributes
-      * @see:OgamlMath.Vector3f
-      * @see:OgamlMath.Vector2f
-      * @see:OgamlGraphics.Color *)
-    val create : ?position:OgamlMath.Vector3f.t ->
-                 ?texcoord:OgamlMath.Vector2f.t ->
-                 ?normal:OgamlMath.Vector3f.t   ->
-                 ?color:Color.t -> unit -> t
+    (** Attribute types *)
+    module AttributeType : sig
 
-    (** Returns the (optional) position of a vertex *)
-    val position : t -> OgamlMath.Vector3f.t option
+      (** This module provides phantom types to enforce the
+        * soundness of attributes. *)
 
-    (** Returns the (optional) texture coordinates of a vertex *)
-    val texcoord : t -> OgamlMath.Vector2f.t option
+      (** Attribute type phantom type *)
+      type 'a s
 
-    (** Returns the (optional) normal of a vertex *)
-    val normal : t -> OgamlMath.Vector3f.t option
+      (** Integer attribute *)
+      val int : int s
 
-    (** Returns the (optional) color of a vertex *)
-    val color : t -> Color.t option
+      (** Vector2i attribute *)
+      val vector2i : OgamlMath.Vector2i.t s
+
+      (** Vector3i attribute *)
+      val vector3i : OgamlMath.Vector3i.t s
+
+      (** float attribute *)
+      val float : float s
+
+      (** Vector2f attribute *)
+      val vector2f : OgamlMath.Vector2f.t s
+
+      (** Vector3f attribute *)
+      val vector3f : OgamlMath.Vector3f.t s
+
+      (** Color attribute *)
+      val color : Color.t s
+
+    end
+
+
+    (** Manipulation of attributes *)
+    module Attribute : sig
+
+      (** This module provides a way to set and access the
+        * attributes of a vertex. *)
+
+      (** Type of an attribute *)
+      type ('a, 'b) s
+
+      (** Sets the value of a vertex's attribute *)
+      val set : 'b t -> ('a, 'b) s -> 'a -> unit
+
+      (** Gets the value of a vertex's attribute.
+        * Raises $Unbound_attribute$ if the attribute is not initialized. *)
+      val get : 'b t -> ('a, 'b) s -> 'a
+
+      (** Returns the name of an attribute, that is, the name
+        * that will refer to this attribute in a GLSL program. *)
+      val name : ('a, 'b) s -> string
+
+      (** Returns the type of an attribute *)
+      val atype : ('a, 'b) s -> 'a AttributeType.s
+
+    end
+
+
+    (** Common signature to all vertex structures *)
+    module type VERTEX = sig
+
+      (** Phantom type associated to this vertex structure for safety reasons *)
+      type s
+
+      (** Adds an attribute to this structure.
+        * Raises $Sealed_vertex$ if the structure is sealed. *)
+      val attribute : string -> 'a AttributeType.s -> ('a, s) Attribute.s
+
+      (** Seals this structure. Once sealed, the structure can be used to
+        * create vertices but cannot receive new attributes.
+        * Raises $Sealed_vertex$ if the structure is already sealed. *)
+      val seal : unit -> unit
+
+      (** Creates a vertex following this structure.
+        * Raises $Unsealed_vertex$ if the structure is not sealed. *)
+      val create : unit -> s t
+
+    end
+
+
+    (** Creates a new, custom vertex structure *)
+    val make : unit -> (module VERTEX)
+
+  end
+
+
+  (** Simple pre-initialized structure *)
+  module SimpleVertex : sig
+
+    (** This module provides a simple pre-initialized structure with some
+      * useful attributes :
+      *
+      *
+      * - position, which should be refered to as $"position"$, which stores
+      *   values of type $Vector3f.t$.
+      *
+      *
+      * - color, which should be refered to as $"color"$, which stores
+      *   values of type $Color.t$.
+      *
+      *
+      * - uv, which should be refered to as $"uv"$, which stores
+      *   values of type $Vector2f.t$.
+      *
+      *
+      * - normal, which should be refered to as $"normal"$, which stores
+      *   values of type $Vector3f.t$.*)
+
+    (** Associated vertex structure *)
+    module T : Vertex.VERTEX
+
+    (** Creates a vertex with predefined attributes *)
+    val create : 
+      ?position:OgamlMath.Vector3f.t ->
+      ?color:Color.t ->
+      ?uv:OgamlMath.Vector2f.t ->
+      ?normal:OgamlMath.Vector3f.t -> unit -> T.s Vertex.t
+
+    (** Position attribute *)
+    val position : (OgamlMath.Vector3f.t, T.s) Vertex.Attribute.s
+
+    (** Color attribute *)
+    val color : (Color.t, T.s) Vertex.Attribute.s
+
+    (** UV attribute *)
+    val uv : (OgamlMath.Vector2f.t, T.s) Vertex.Attribute.s
+
+    (** Normal attribute *)
+    val normal : (OgamlMath.Vector3f.t, T.s) Vertex.Attribute.s
 
   end
 
-  (** Represents a source of vertices *)
-  module Source : sig
 
-    (** This module provides a way to store vertices in a source
-      * before creating a vertex array.
+  (** Vertex source *)
+  module VertexSource : sig
+
+    (** This module represents vertex sources, which are collections of
+      * vertices. 
       *
-      * Note that a source is a mutable structure, therefore
-      * add and (<<) will directly modify the source.
       *
-      * Sources are redimensionned as needed when adding vertices. *)
-
-    (** Type of a source *)
-    type t
-
-    (** Creates an empty source of a given initial size. The source will
-      * be redimensionned as needed.
+      * This module ensures that everything goes well. In particular, it
+      * verifies that all the vertices of a source are compatible (i.e.
+      * have the same initialized attributes).
       *
-      * The optional arguments specify whether a source should expect vertices
-      * having the corrsponding attributes, and the name of the attribute
-      * in the GLSL program that will be used *)
-    val empty : ?position:string ->
-                ?normal  :string ->
-                ?texcoord:string ->
-                ?color   :string ->
-                size:int -> unit -> t
-
-    (** Returns true iff the source contains (and requests) vertices with
-      * a position attribute *)
-    val requires_position : t -> bool
-
-    (** See requires_position *)
-    val requires_normal   : t -> bool
-
-    (** See requires_position *)
-    val requires_uv : t -> bool
-
-    (** See requires_position *)
-    val requires_color : t -> bool
-
-    (** Adds a vertex to a source. Resizes the source if needed.
-      * @see:OgamlGraphics.VertexArray.Vertex *)
-    val add : t -> Vertex.t -> unit
-
-    (** Syntaxic sugar for sequences of additions. @see:OgamlGraphics.VertexArray.Vertex
       *
-      * $source << vertex1 << vertex2 << vertex3$ *)
-    val (<<) : t -> Vertex.t -> t
-
-    (** Returns the length of a source *)
-    val length : t -> int
-
-    (** $append s1 s2$ appends the source $s2$ at the end of the source $s1$ (in place),
-      * and returns $s1$.
-      * If the attribute names are different, the names in the source $s1$ are used.
-      * Raises Invalid_source if types are incompatible. *)
-    val append : t -> t -> t
-
-    (** $iter src f$ iterates through all the vertices of $src$ *)
-    val iter : t -> (Vertex.t -> unit) -> unit
-
-    (** $map src f$ returns the source obtained by the mapping of all the
-      * vertices of $src$ by $f$.
+      * An empty source can receive any vertex. The type of the source
+      * is then fixed by the first vertex added to it. Any vertex 
+      * added to the source after the first one must have at least the
+      * same initialized attributes as the first vertex. 
       *
-      * The resulting source is assumed to have the same attributes as
-      * $src$. Use $iter$ or $mapto$ to use different attributes *)
-    val map : t -> (Vertex.t -> Vertex.t) -> t
+      *
+      * Note that the type of a source is reinitialized if the source is
+      * cleared. *)
 
-    (** $mapto src f dest$ appends the mapping of the vetices of $src$
-      * by $f$ to $dest$ *)
-    val mapto : t -> (Vertex.t -> Vertex.t) -> t -> unit
+    (** Raised if a vertex is missing some of the attributes required by
+      * the source. *)
+    exception Uninitialized_field of string
+
+    (** Raised when trying to concatenate incompatible sources. *)
+    exception Incompatible_sources 
+
+    (** Type of a vertex source *)
+    type 'a t
+
+    (** Empty vertex source. The source will be redimensionned as needed, but
+      * an initial size can be specified with $size$. *)
+    val empty : ?size:int -> unit -> 'a t
+
+    (** Adds a vertex to a source. If the source is not empty, the vertex must 
+      * have at least the same initialized fields as the first vertex put into
+      * the source. *)
+    val add : 'a t -> 'a Vertex.t -> unit
+
+    (** Convenient operator to add vertices to a source. *)
+    val (<<) : 'a t -> 'a Vertex.t -> 'a t
+
+    (** Returns the length (in vertices) of a source. *)
+    val length : 'a t -> int
+
+    (** Clears the source. Any source that has been converted into a vertex array
+      * can be safely cleared and reused. 
+      * This avoids reallocation and garbage collection. *)
+    val clear : 'a t -> unit
+
+    (** $append s1 s2$ appends the source $s2$ to $s1$. $s2$ is not modified. *) 
+    val append : 'a t -> 'a t -> unit
+
+    (** Iterates through all the vertices of a source. *)
+    val iter : 'a t -> ('a Vertex.t -> unit) -> unit
+
+    (** Maps all the vertices of a source to a new source. *)
+    val map : 'a t -> ('a Vertex.t -> 'b Vertex.t) -> 'b t
+
+    (** Maps all the vertices of a source to an existing source. *)
+    val map_to : 'a t -> ('a Vertex.t -> 'b Vertex.t) -> 'b t -> unit
 
   end
+
+  (** Raised when trying to draw with a program that requires an attribute
+    * not provided by the vertex array. *)
+  exception Missing_attribute of string
+
+  (** Raised when trying to draw with a program that requires an attribute
+    * of a different type than the one provided by the vertex array. *)
+  exception Invalid_attribute of string
+
+  (** Raised when trying to draw an invalid slice of a vertex array. *)
+  exception Out_of_bounds of string
 
   (** Phantom type for static arrays *)
   type static
@@ -1501,25 +1643,27 @@ module VertexArray : sig
   type dynamic
 
   (** Type of a vertex array (static or dynamic) *)
-  type 'a t
+  type ('a, 'b) t 
 
   (** Creates a static array from a source. A static array is faster
     * but cannot be modified later. @see:OgamlGraphics.VertexArray.Source *)
-  val static : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> static t
+  val static : (module RenderTarget.T with type t = 'a) 
+                -> 'a -> 'b VertexSource.t -> (static, 'b) t
 
   (** Creates a dynamic vertex array that can be modified later.
     * @see:OgamlGraphics.VertexArray.Source *)
-  val dynamic : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> dynamic t
+  val dynamic : (module RenderTarget.T with type t = 'a) 
+                 -> 'a -> 'b VertexSource.t -> (dynamic, 'b) t
 
   (** $rebuild array src offset$ rebuilds $array$ starting from
     * the vertex at position $offset$ using $src$.
     *
     * The vertex array is modified in-place and is resized as needed.
     * @see:OgamlGraphics.VertexArray.Source *)
-  val rebuild : dynamic t -> Source.t -> int -> unit
+  val rebuild : (dynamic, 'b) t -> 'b VertexSource.t -> int -> unit
 
   (** Returns the length of a vertex array *)
-  val length : 'a t -> int
+  val length : ('a, 'b) t -> int
 
   (** Draws the slice starting at $start$ of length $length$ of a vertex array on a
     * window using the given parameters.
@@ -1539,237 +1683,15 @@ module VertexArray : sig
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
   val draw :
     (module RenderTarget.T with type t = 'a) ->
-    vertices   : 'b t ->
+    vertices   : ('b, 'c) t ->
     target     : 'a ->
-    ?indices   : 'c IndexArray.t ->
+    ?indices   : 'd IndexArray.t ->
     program    : Program.t ->
     ?uniform    : Uniform.t ->
     ?parameters : DrawParameter.t ->
     ?start     : int ->
     ?length    : int ->
     ?mode      : DrawMode.t ->
-    unit -> unit
-
-end
-
-
-(** Customisable, high-level vertex arrays *)
-module VertexMap : sig
-
-  (** This modules provides a high-level and safe access to
-    * openGL vertex arrays.
-    * Vertex maps are less safe and optimized than vertex arrays,
-    * but can store any kind of data (especially integers).
-    * You should use the module VertexArray when possible. *)
-
-  (** Raised when trying to rebuild a vertex map from an invalid source *)
-  exception Invalid_source of string
-
-  (** Raised if a vertex passed to a source has a wrong type *)
-  exception Invalid_vertex of string
-
-  (** Raised if an attribute defined in a GLSL program does not
-    * have a type matching the vertex's *)
-  exception Invalid_attribute of string
-
-  (** Raised when trying to draw with a vertex map containing an
-    * attribute that has not been declared in the GLSL program *)
-  exception Missing_attribute of string
-
-  (** Raised when trying to draw an invalid slice of a vertex map *)
-  exception Out_of_bounds of string
-
-
-  (** Represents a vertex *)
-  module Vertex : sig
-
-    (** This module encapsulates vertices that can be passed to
-      * a source. A vertex is an immutable collection of
-      * attributes. *)
-
-    (** Type of a vertex attribute *)
-    type data = 
-      | Vector3f of OgamlMath.Vector3f.t
-      | Vector2f of OgamlMath.Vector2f.t
-      | Vector3i of OgamlMath.Vector3i.t
-      | Vector2i of OgamlMath.Vector2i.t
-      | Int   of int
-      | Float of float
-      | Color of Color.t
-
-    (** Type of a vertex *)
-    type t
-
-    (** Empty vertex *)
-    val empty : t
-
-    (** Adds a vector3f to a vertex. The given name must match
-      * the name of the vec3 attribute in the GLSL program
-      * @see:OgamlMath.Vector3f *)
-    val vector3f : string -> OgamlMath.Vector3f.t -> t -> t
-
-    (** Adds a vector2f to a vertex. The given name must match
-      * the name of the vec2 attribute in the GLSL program
-      * @see:OgamlMath.Vector2f *)
-    val vector2f : string -> OgamlMath.Vector2f.t -> t -> t
-
-    (** Adds a vector3i to a vertex. The given name must match
-      * the name of the ivec3 attribute in the GLSL program
-      * @see:OgamlMath.Vector3i *)
-    val vector3i : string -> OgamlMath.Vector3i.t -> t -> t
-
-    (** Adds a vector2i to a vertex. The given name must match
-      * the name of the ivec2 attribute in the GLSL program
-      * @see:OgamlMath.Vector2i *)
-    val vector2i : string -> OgamlMath.Vector2i.t -> t -> t
-
-    (** Adds an integer to a vertex. The given name must match
-      * the name of the int attribute in the GLSL program *)
-    val int : string -> int -> t -> t
-
-    (** Adds a float to a vertex. The given name must match
-      * the name of the float attribute in the GLSL program *)
-    val float : string -> float -> t -> t
-
-    (** Adds a color to a vertex. The given name must match
-      * the name of the vec4 attribute in the GLSL program
-      * @see:OgamlGraphics.Color *)
-    val color : string -> Color.t -> t -> t
-
-    (** Adds any data to a vertex. The given name must match
-      * the name of the corresponding attribute in the GLSL
-      * program *)
-    val data : string -> data -> t -> t
-
-    (** Returns the value of a vertex attribute.
-      * Raises $Invalid_attribute$ if the attribute is unbound *)
-    val attribute : t -> string -> data
-
-  end
-
-
-  (** Represents a source of vertices *)
-  module Source : sig
-
-    (** This module provides a way to store vertices in a source
-      * before creating a vertex map.
-      *
-      * Note that a source is a mutable structure, therefore
-      * add and (<<) will directly modify the source.
-      *
-      * Sources are redimensionned as needed when adding vertices. *)
-
-    (** Type of a source *)
-    type t
-
-    (** Creates an empty source of a given initial size. The source will
-      * be redimensionned as needed.
-      *
-      * The type of the vertices stored by the source will be defined
-      * by the first stored vertex. *)
-    val empty : unit -> t
-
-    (** Adds a vertex to a source. Resizes the source if needed.
-      * @see:OgamlGraphics.VertexMap.Vertex *)
-    val add : t -> Vertex.t -> unit
-
-    (** Syntaxic sugar for sequences of additions. @see:OgamlGraphics.VertexMap.Vertex
-      *
-      * $source << vertex1 << vertex2 << vertex3$ *)
-    val (<<) : t -> Vertex.t -> t
-
-    (** Returns the length of a source *)
-    val length : t -> int
-
-    (** $append s1 s2$ appends the source $s2$ at the end of the source $s1$ (in place),
-      * and returns $s1$.
-      * Raises Invalid_source if types are incompatible. *)
-    val append : t -> t -> t
-
-    (** $iter src f$ iterates through all the vertices of $src$ *)
-    val iter : t -> (Vertex.t -> unit) -> unit
-
-    (** $map src f$ returns the source obtained by the mapping of all the
-      * vertices of $src$ by $f$. *)
-    val map : t -> (Vertex.t -> Vertex.t) -> t
-
-    (** $mapto src f dest$ appends the mapping of the vetices of $src$
-      * by $f$ to $dest$ *)
-    val mapto : t -> (Vertex.t -> Vertex.t) -> t -> unit
-
-    (** $from_array src$ creates a vertex map source equivalent to the
-      * vertex array source $src$ *)
-    val from_array : VertexArray.Source.t -> t
-
-    (** $from_array src dest$ appends the vertex array source $src$ to the
-      * vertex map source $dest$ *)
-    val from_array_to : VertexArray.Source.t -> t -> unit
-
-    (** $map_array src f$ creates a new vertex map source by mapping all the
-      * vertices of the vertex array source $src$ by $f$ *)
-    val map_array : VertexArray.Source.t -> (VertexArray.Vertex.t -> Vertex.t) -> t
-
-    (** $map_array_to src f dest$ maps by $f$ and appends all the
-      * vertices of the vertex array source $src$ to the vertex map source $dest$ *)
-    val map_array_to : VertexArray.Source.t -> (VertexArray.Vertex.t -> Vertex.t) -> t -> unit
-
-  end
-
-
-  (** Phantom type for static maps *)
-  type static
-
-  (** Phantom type for dynamic maps *)
-  type dynamic
-
-  (** Type of a vertex map (static or dynamic) *)
-  type 'a t
-
-  (** Creates a static map from a source. A static map is faster
-    * but cannot be modified later. @see:OgamlGraphics.VertexMap.Source *)
-  val static : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> static t
-
-  (** Creates a dynamic vertex map that can be modified later.
-    * @see:OgamlGraphics.VertexMap.Source *)
-  val dynamic : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> dynamic t
-
-  (** $rebuild map src offset$ rebuilds $map$ starting from
-    * the vertex at position $offset$ using $src$.
-    *
-    * The vertex map is modified in-place and is resized as needed.
-    * @see:OgamlGraphics.VertexMap.Source *)
-  val rebuild : dynamic t -> Source.t -> int -> unit
-
-  (** Returns the length of a vertex map *)
-  val length : 'a t -> int
-
-  (** Draws the slice starting at $start$ of length $length$ of a vertex map on a
-    * window using the given parameters.
-    *
-    * $start$ defaults to 0
-    *
-    * if $length$ is not provided, then the whole vertex map (starting from $start$) is drawn
-    *
-    * $uniform$ should provide the uniforms required by $program$ (defaults to empty)
-    *
-    * $parameters$ defaults to $DrawParameter.make ()$
-    *
-    * $mode$ defaults to $DrawMode.Triangles$
-    *
-    * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.Window
-    * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
-    * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
-  val draw :
-    (module RenderTarget.T with type t = 'a) ->
-    vertices   : 'b t ->
-    target     : 'a ->
-    ?indices   : 'c IndexArray.t ->
-    program    : Program.t ->
-    ?uniform    : Uniform.t ->
-    ?parameters : DrawParameter.t ->
-    ?start      : int ->
-    ?length     : int ->
-    ?mode       : DrawMode.t ->
     unit -> unit
 
 end
@@ -1894,8 +1816,9 @@ module Model : sig
     * Use Triangles as DrawMode with this source.
     * @see:OgamlGraphics.IndexArray.Source
     * @see:OgamlGraphics.VertexArray.Source *)
-  val source : t -> ?index_source:IndexArray.Source.t ->
-                    vertex_source:VertexArray.Source.t -> unit -> unit
+  val source : t -> ?index_source:IndexArray.Source.t 
+                 -> vertex_source:VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t 
+                 -> unit -> unit
 
 
   (*** Iterators *)
@@ -2036,22 +1959,14 @@ module Shape : sig
     * and color attributes.
     *
     * Use DrawMode.Triangles with this source. *)
-  val to_source : t -> VertexArray.Source.t -> unit
+  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t -> unit
 
   (** Outputs a shape to a vertex array source by mapping its vertices.
     *
     * See $to_source$ for more information. *)
   val map_to_source : t -> 
-                      (VertexArray.Vertex.t -> VertexArray.Vertex.t) -> 
-                      VertexArray.Source.t -> unit
-
-  (** Outputs a shape to a vertex map source by mapping its vertices.
-    *
-    * See $to_source$ for more information. *)
-  val map_to_custom_source : t -> 
-                      (VertexArray.Vertex.t -> VertexMap.Vertex.t) -> 
-                      VertexMap.Source.t -> unit
-
+                      (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
+                      'b VertexArray.VertexSource.t -> unit
 
 end
 
@@ -2069,6 +1984,7 @@ module Sprite : sig
     ?origin   : OgamlMath.Vector2f.t ->
     ?position : OgamlMath.Vector2f.t ->
     ?scale    : OgamlMath.Vector2f.t ->
+    ?color    : Color.t ->
     ?size     : OgamlMath.Vector2f.t ->
     ?rotation : float ->
     unit -> t
@@ -2098,6 +2014,9 @@ module Sprite : sig
   (** Sets the base size of a sprite. *)
   val set_size : t -> OgamlMath.Vector2f.t -> unit
 
+  (** Sets the color of a sprite. *)
+  val set_color : t -> Color.t -> unit
+
   (** Translates the sprite by the given vector. *)
   val translate : t -> OgamlMath.Vector2f.t -> unit
 
@@ -2120,6 +2039,9 @@ module Sprite : sig
   (** Returns the angle of rotation of the sprite. *)
   val rotation : t -> float
 
+  (** Returns the color of a sprite. *)
+  val color : t -> Color.t
+
   (** Returns the scale of the sprite. *)
   val get_scale : t -> OgamlMath.Vector2f.t
 
@@ -2131,21 +2053,14 @@ module Sprite : sig
     * and position attributes.
     *
     * Use DrawMode.Triangles with this source. *)
-  val to_source : t -> VertexArray.Source.t -> unit
+  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t -> unit
 
   (** Outputs a sprite to a vertex array source by mapping its vertices.
     *
     * See $to_source$ for more information. *)
   val map_to_source : t -> 
-                      (VertexArray.Vertex.t -> VertexArray.Vertex.t) -> 
-                      VertexArray.Source.t -> unit
-
-  (** Outputs a sprite to a vertex map source by mapping its vertices.
-    *
-    * See $to_source$ for more information. *)
-  val map_to_custom_source : t -> 
-                      (VertexArray.Vertex.t -> VertexMap.Vertex.t) -> 
-                      VertexMap.Source.t -> unit
+                      (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
+                      'b VertexArray.VertexSource.t -> unit
 
 end
 
@@ -2268,23 +2183,14 @@ module Text : sig
     *
     * Use DrawMode.Triangles with this source and bind the
     * correct font before use. *)
-  val to_source : t -> VertexArray.Source.t -> unit
+  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t -> unit
 
   (** Outputs text vertices to a vertex array source by mapping its vertices.
     *
     * See $to_source$ for more information. *)
   val map_to_source : t -> 
-                      (VertexArray.Vertex.t -> VertexArray.Vertex.t) -> 
-                      VertexArray.Source.t -> unit
-
-  (** Outputs text vertices to a vertex map source by mapping its vertices.
-    *
-    * See $to_source$ for more information. *)
-  val map_to_custom_source : t -> 
-                      (VertexArray.Vertex.t -> VertexMap.Vertex.t) -> 
-                      VertexMap.Source.t -> unit
-
-
+                      (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
+                      'b VertexArray.VertexSource.t -> unit
 end
 
 

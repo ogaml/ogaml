@@ -45,6 +45,8 @@ module_field:
     {AST.Module (t, m)}
   |MODULE; TYPE; t = UIDENT; EQUALS; SIG; m = module_content; END
     {AST.Signature (t, m)}
+  |MODULE; t = UIDENT; COLON; m = module_type
+    {AST.ImplicitModule (t, m)}
   |MODULE; t = UIDENT; COLON; FUNCTOR; m = functor_params; 
    ARROW; u = UIDENT; topt = type_constraints
     {AST.(Functor {name = t; args = m; sign = u; constr = topt})}
@@ -83,6 +85,7 @@ value_type:
   | LBRACK; GREATER; r = vp_content; RBRACK {AST.PolyVariant (AST.Greater, r)}
   | LBRACK; r = vp_content; RBRACK {AST.PolyVariant (AST.Equals, r)}
   | LPAREN; t = delim_value_type; RPAREN {t}
+  | LPAREN; MODULE; t = module_type; cons = type_constraints; RPAREN {AST.FCModule (t,cons)}
   | r = value_type_param; t = atomic_type {AST.ParamType (r,t)}
   ;
 
@@ -121,7 +124,6 @@ funparam_type:
   | t = value_type {t}
   | n = LIDENT; COLON; t = value_type {AST.NamedParam(n,t)}
   | QMARK; n = LIDENT; COLON; t = value_type {AST.OptionalParam(n,t)}
-  | LPAREN; MODULE; t = module_type; cons = type_constraints; RPAREN {AST.FCModule (t,cons)}
   ;
 
 tuple_type:

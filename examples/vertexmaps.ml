@@ -45,14 +45,30 @@ let frame_count  = ref 0
 let color_bitmask (r,g,b) =
   (r lsl 16) lor (g lsl 8) lor b
 
-let make_vertex normal position (r,g,b) =
-  VertexMap.Vertex.empty
-  |> VertexMap.Vertex.vector3i "normal" normal
-  |> VertexMap.Vertex.int "color" (color_bitmask (r,g,b))
-  |> VertexMap.Vertex.vector3f "position" position
+(** Create a new custom vertex layout *)
+module MyVertex = (val VertexArray.Vertex.make ())
+
+(** Add 3 attributes to the layout *)
+let normal, color, position = 
+  let open VertexArray.Vertex in
+  MyVertex.attribute "normal"   AttributeType.vector3i,
+  MyVertex.attribute "color"    AttributeType.int,
+  MyVertex.attribute "position" AttributeType.vector3f
+
+(** Seal the layout *)
+let () = 
+  MyVertex.seal ()
+
+(* Now we can create vertices with this layout *)
+let make_vertex nm pos (r,g,b) =
+  let v = MyVertex.create () in
+  VertexArray.Vertex.Attribute.set v normal nm;
+  VertexArray.Vertex.Attribute.set v color (color_bitmask (r,g,b));
+  VertexArray.Vertex.Attribute.set v position pos;
+  v
 
 let cube_source =
-  VertexMap.Source.(
+  VertexArray.VertexSource.(
     empty ()
     << make_vertex Vector3i.unit_x Vector3f.({x =  0.5; y =  0.5; z =  0.5}) (255, 0, 0)
     << make_vertex Vector3i.unit_x Vector3f.({x =  0.5; y = -0.5; z =  0.5}) (255, 0, 0)
@@ -91,7 +107,7 @@ let cube_indices =
     << 20 << 21 << 23 << 21 << 22 << 23
   )
 
-let cube = VertexMap.static (module Window) window cube_source
+let cube = VertexArray.static (module Window) window cube_source
 
 let indices = IndexArray.static (module Window) window cube_indices
 
@@ -137,7 +153,7 @@ let display () =
     |> Uniform.float    "Light.MaxIntensity" 1.9
     |> Uniform.float    "Light.Gamma"  1.2
   in
-  VertexMap.draw (module Window) ~target:window ~vertices:cube ~indices ~uniform ~program:cube_program ~parameters ~mode:DrawMode.Triangles ()
+  VertexArray.draw (module Window) ~target:window ~vertices:cube ~indices ~uniform ~program:cube_program ~parameters ~mode:DrawMode.Triangles ()
 
 
 (* Camera *)

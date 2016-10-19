@@ -178,8 +178,10 @@ module Sources = struct
 
     in vec3 position;
     in vec2 uv;
+    in vec4 color;
 
     out vec2 frag_uv;
+    out vec4 frag_color;
 
     void main() {
 
@@ -190,6 +192,8 @@ module Sources = struct
 
       frag_uv = vec2(uv.x, 1.0 - uv.y);
 
+      frag_color = color;
+
     }
   "
 
@@ -197,12 +201,13 @@ module Sources = struct
     uniform sampler2D utexture;
 
     in vec2 frag_uv;
+    in vec4 frag_color;
 
     out vec4 out_color;
 
     void main() {
 
-      out_color = texture(utexture, frag_uv);
+      out_color = texture(utexture, frag_uv) * frag_color;
 
     }
   "

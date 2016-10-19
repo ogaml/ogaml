@@ -8,7 +8,7 @@ module Fx = struct
     font       : Font.t;
     size       : int;
     chars      : ((float * Font.code * Font.Glyph.t) * Color.t) list ;
-    vertices   : VertexArray.static VertexArray.t ;
+    vertices   : (VertexArray.static, VertexArray.SimpleVertex.T.s) VertexArray.t ;
     advance    : Vector2f.t ;
     boundaries : FloatRect.t
   }
@@ -145,31 +145,31 @@ module Fx = struct
              uv.x, uv.y, uv.width, uv.height
            in
            let v1 =
-             VertexArray.Vertex.create
+             VertexArray.SimpleVertex.create
                ~position:(lift corner)
-               ~texcoord:Vector2f.({ x = uvx ; y = uvy })
+               ~uv:Vector2f.({ x = uvx ; y = uvy })
                ~color
                ()
            and v2 =
-             VertexArray.Vertex.create
+             VertexArray.SimpleVertex.create
                ~position:(lift Vector2f.(add corner width))
-               ~texcoord:Vector2f.({ x = uvx +. uvw ; y = uvy })
+               ~uv:Vector2f.({ x = uvx +. uvw ; y = uvy })
                ~color
                ()
            and v3 =
-             VertexArray.Vertex.create
+             VertexArray.SimpleVertex.create
                ~position:(lift Vector2f.(add corner (add width height)))
-               ~texcoord:Vector2f.({ x = uvx +. uvw ; y = uvy +. uvh })
+               ~uv:Vector2f.({ x = uvx +. uvw ; y = uvy +. uvh })
                ~color
                ()
            and v4 =
-             VertexArray.Vertex.create
+             VertexArray.SimpleVertex.create
                ~position:(lift Vector2f.(add corner height))
-               ~texcoord:Vector2f.({ x = uvx ; y = uvy +. uvh })
+               ~uv:Vector2f.({ x = uvx ; y = uvy +. uvh })
                ~color
                ()
            in
-           VertexArray.Source.(
+           VertexArray.VertexSource.(
              source << v1 << v2 << v3
                     << v3 << v1 << v4
            ),
@@ -179,14 +179,9 @@ module Fx = struct
            line_width
         )
         (
-          VertexArray.Source.(
-            empty
-              ~position:"position"
-              ~texcoord:"uv"
-              ~color:"color"
+          VertexArray.VertexSource.empty 
               ~size:((UTF8String.length utf8) * 6)
-              ()
-          ),
+              (),
           Vector2f.zero,
           0.
         )
@@ -254,8 +249,8 @@ end
 type t = {
   font       : Font.t;
   size       : int;
-  chars      : (float * Font.code * Font.Glyph.t) list ;
-  vertices   : VertexArray.Vertex.t list;
+  chars      : (float * Font.code * Font.Glyph.t) list;
+  vertices   : VertexArray.SimpleVertex.T.s VertexArray.Vertex.t list;
   advance    : Vector2f.t ;
   boundaries : FloatRect.t
 }
@@ -310,27 +305,27 @@ let create ~text ~position ~font ?color:(color=(`RGB Color.RGB.black)) ~size ~bo
            uv.x, uv.y, uv.width, uv.height
          in
          let v1 =
-           VertexArray.Vertex.create
+           VertexArray.SimpleVertex.create
              ~position:(lift corner)
-             ~texcoord:Vector2f.({ x = uvx ; y = uvy })
+             ~uv:Vector2f.({ x = uvx ; y = uvy })
              ~color
              ()
          and v2 =
-           VertexArray.Vertex.create
+           VertexArray.SimpleVertex.create
              ~position:(lift Vector2f.(add corner width))
-             ~texcoord:Vector2f.({ x = uvx +. uvw ; y = uvy })
+             ~uv:Vector2f.({ x = uvx +. uvw ; y = uvy })
              ~color
              ()
          and v3 =
-           VertexArray.Vertex.create
+           VertexArray.SimpleVertex.create
              ~position:(lift Vector2f.(add corner (add width height)))
-             ~texcoord:Vector2f.({ x = uvx +. uvw ; y = uvy +. uvh })
+             ~uv:Vector2f.({ x = uvx +. uvw ; y = uvy +. uvh })
              ~color
              ()
          and v4 =
-           VertexArray.Vertex.create
+           VertexArray.SimpleVertex.create
              ~position:(lift Vector2f.(add corner height))
-             ~texcoord:Vector2f.({ x = uvx ; y = uvy +. uvh })
+             ~uv:Vector2f.({ x = uvx ; y = uvy +. uvh })
              ~color
              ()
          in
@@ -394,13 +389,10 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
   in
   let vertices = 
     let vtx = text.vertices in
-    let src = VertexArray.Source.empty
-      ~position:"position"
-      ~texcoord:"uv"
-      ~color:"color"
+    let src = VertexArray.VertexSource.empty
       ~size:32 () 
     in
-    List.iter (VertexArray.Source.add src) vtx;
+    List.iter (VertexArray.VertexSource.add src) vtx;
     VertexArray.static (module M) target src
   in
   VertexArray.draw
@@ -412,14 +404,11 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
         ~uniform
         ~mode:DrawMode.Triangles ()
 
-let map_to_source text f src = 
-  List.iter (fun v -> VertexArray.Source.add src (f v)) text.vertices
-
 let to_source text src = 
-  List.iter (VertexArray.Source.add src) text.vertices
+  List.iter (VertexArray.VertexSource.add src) text.vertices
 
-let map_to_custom_source text f src = 
-  List.iter (fun v -> VertexMap.Source.add src (f v)) text.vertices
+let map_to_source text f src = 
+  List.iter (fun v -> VertexArray.VertexSource.add src (f v)) text.vertices
 
 let advance text = text.advance
 

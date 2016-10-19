@@ -154,7 +154,7 @@ caml_tex_subimage_2D_native(value target, value lvl, value off, value size, valu
                   Int_val(Field(size,1)),
                   PixelFormat_val(fmt),
                   GL_UNSIGNED_BYTE,
-                  (data == Val_none)? NULL : String_val(Some_val(data)));
+                  String_val(data));
 
   CAMLreturn(Val_unit);
 }
@@ -230,7 +230,7 @@ caml_tex_subimage_3D_native(value target, value lvl, value off, value size, valu
                   Int_val(Field(size,2)),
                   PixelFormat_val(fmt),
                   GL_UNSIGNED_BYTE,
-                  (data == Val_none)? NULL : String_val(Some_val(data)));
+                  String_val(data));
 
   CAMLreturn(Val_unit);
 }

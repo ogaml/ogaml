@@ -12,38 +12,24 @@ val create :
   ?origin   : OgamlMath.Vector2f.t ->
   ?position : OgamlMath.Vector2f.t ->
   ?scale    : OgamlMath.Vector2f.t ->
+  ?color    : Color.t ->
   ?size     : OgamlMath.Vector2f.t ->
   ?rotation : float ->
   unit -> t
-
-(*type debug_times = {
-  mutable size_get_t : float;
-  mutable uniform_create_t : float;
-  mutable source_alloc_t : float;
-  mutable vertices_create_t : float;
-  mutable vao_create_t : float;
-  mutable draw_t : float;
-}
-
-val debug_t : debug_times*)
 
 (** Draws a sprite. *)
 val draw : 
   (module RenderTarget.T with type t = 'a) ->
   ?parameters:DrawParameter.t -> target:'a -> sprite:t -> unit -> unit
 
-(** Outputs a sprite to a vertex array source by mapping its vertices *)
+val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t -> unit
+
+(** Outputs a sprite to a vertex array source by mapping its vertices.
+  *
+  * See $to_source$ for more information. *)
 val map_to_source : t -> 
-                    (VertexArray.Vertex.t -> VertexArray.Vertex.t) -> 
-                    VertexArray.Source.t -> unit
-
-(** Outputs a sprite to a vertex array source *)
-val to_source : t -> VertexArray.Source.t -> unit
-
-(** Outputs a sprite to a vertex map source by mapping its vertices *)
-val map_to_custom_source : t -> 
-                    (VertexArray.Vertex.t -> VertexMap.Vertex.t) -> 
-                    VertexMap.Source.t -> unit
+                    (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
+                    'b VertexArray.VertexSource.t -> unit
 
 (** Sets the position of the origin of the sprite in the window. *)
 val set_position : t -> OgamlMath.Vector2f.t -> unit
@@ -60,6 +46,9 @@ val set_scale : t -> OgamlMath.Vector2f.t -> unit
 
 (** Sets the base size of the sprite *)
 val set_size : t -> OgamlMath.Vector2f.t -> unit
+
+(** Sets the color of the sprite *)
+val set_color : t -> Color.t -> unit
 
 (** Translates the sprite by the given vector. *)
 val translate : t -> OgamlMath.Vector2f.t -> unit
@@ -82,6 +71,9 @@ val size : t -> OgamlMath.Vector2f.t
 
 (** Returns the angle of rotation of the sprite. *)
 val rotation : t -> float
+
+(** Returns the color of the sprite *)
+val color : t -> Color.t
 
 (** Returns the scale of the sprite. *)
 val get_scale : t -> OgamlMath.Vector2f.t

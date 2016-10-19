@@ -12,8 +12,8 @@ type shape_vals = {
 }
 
 type t = {
-  mutable vertices : VertexArray.Vertex.t list option ;
-  mutable outline  : VertexArray.Vertex.t list option ;
+  mutable vertices : VertexArray.SimpleVertex.T.s VertexArray.Vertex.t list option ;
+  mutable outline  : VertexArray.SimpleVertex.T.s VertexArray.Vertex.t list option ;
   shape_vals       : shape_vals
 }
 
@@ -69,7 +69,7 @@ let actual_points vals =
 (* Turns actual points to a vertices for the shape *)
 let vertices_of_points points color =
   List.map (fun v ->
-    VertexArray.Vertex.create ~position:v ~color ()
+    VertexArray.SimpleVertex.create ~position:v ~color ()
   ) points
   |> function
   | [] -> []
@@ -117,7 +117,7 @@ let outline_of_points points thickness color =
       let bisectors = bisectors_of_points points in
       (* Then the outline *)
       let tovtx v =
-        VertexArray.Vertex.create ~position:v ~color ()
+        VertexArray.SimpleVertex.create ~position:v ~color ()
       in
       (* Then we compute the outline *)
       foralltwo
@@ -343,16 +343,14 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
     |> Uniform.vector2f "size" (Vector2f.from_int size)
   in
   let vertices = 
-    let src = VertexArray.Source.empty
-      ~position:"position"
-      ~color:"color"
+    let src = VertexArray.VertexSource.empty
       ~size:8 ()
     in
     let vtcs, outline = compute_vertices shape in
-    List.iter (VertexArray.Source.add src) vtcs;
+    List.iter (VertexArray.VertexSource.add src) vtcs;
     begin match outline with
     | None -> ()
-    | Some vtcs -> List.iter (VertexArray.Source.add src) vtcs
+    | Some vtcs -> List.iter (VertexArray.VertexSource.add src) vtcs
     end;
     VertexArray.static (module M) target src
   in
@@ -366,26 +364,17 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
 
 let map_to_source shape f src = 
   let vtcs, outline = compute_vertices shape in
-  List.iter (fun v -> VertexArray.Source.add src (f v)) vtcs;
+  List.iter (fun v -> VertexArray.VertexSource.add src (f v)) vtcs;
   begin match outline with
   | None -> ()
-  | Some vtcs -> List.iter (fun v -> VertexArray.Source.add src (f v)) vtcs
+  | Some vtcs -> List.iter (fun v -> VertexArray.VertexSource.add src (f v)) vtcs
   end
 
 let to_source shape src = 
   let vtcs, outline = compute_vertices shape in
-  List.iter (VertexArray.Source.add src) vtcs;
+  List.iter (VertexArray.VertexSource.add src) vtcs;
   begin match outline with
   | None -> ()
-  | Some vtcs -> List.iter (VertexArray.Source.add src) vtcs
+  | Some vtcs -> List.iter (VertexArray.VertexSource.add src) vtcs
   end
-
-let map_to_custom_source shape f src = 
-  let vtcs, outline = compute_vertices shape in
-  List.iter (fun v -> VertexMap.Source.add src (f v)) vtcs;
-  begin match outline with
-  | None -> ()
-  | Some vtcs -> List.iter (fun v -> VertexMap.Source.add src (f v)) vtcs
-  end
-
 

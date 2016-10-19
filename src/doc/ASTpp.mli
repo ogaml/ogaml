@@ -23,6 +23,7 @@ and module_field =
   | PP_Val of string * type_expr * comment
   | PP_Exn of string * type_expr option * comment
   | PP_Functor of functor_data * comment
+  | PP_ImplicitModule of string * type_expr * comment
 
 and functor_data = 
   {

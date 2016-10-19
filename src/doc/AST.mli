@@ -15,6 +15,7 @@ and module_field =
   | Value of string * type_expr
   | Exn of string * (type_expr option)
   | Module of string * (module_field list)
+  | ImplicitModule of string * type_expr
   | Functor of mfunctor
   | Signature of string * (module_field list)
 

@@ -143,6 +143,8 @@ and process_field field comment =
     PP_Exn (s, None, comment)
   | Functor func   -> 
     PP_Functor (process_functor func, comment)
+  | ImplicitModule (s, te) ->
+    PP_ImplicitModule (s, process_expr te, comment)
   | _ -> assert false
 
 and process_module = function
@@ -281,7 +283,7 @@ let rec comment_to_html root ppf comment =
   | (PP_Inline s)::t -> 
     Format.fprintf ppf "<code class=\"OCaml\">%s</code>%a" s (comment_to_html root) t
   | PP_EOL::PP_EOL::t -> 
-    Format.fprintf ppf "<br>%a" (comment_to_html root) t
+    Format.fprintf ppf "<br>%a" (comment_to_html root) (PP_EOL::t)
   | PP_EOL::t -> 
     Format.fprintf ppf "%a" (comment_to_html root) t
   | (PP_Related s)::t -> 
@@ -409,6 +411,13 @@ and module_to_html root ppf mdl =
   | (PP_Exn (s, None, comment))::t ->
     let valtext = 
       Printf.sprintf "exception %s" s
+    in
+    mk_entry ppf valtext (comment_to_html root) comment (module_to_html root) t
+  | (PP_ImplicitModule (name, typ, comment))::t ->
+    let valtext = 
+      Printf.sprintf "module %s : %s"
+        name
+        (type_expr_to_string typ);
     in
     mk_entry ppf valtext (comment_to_html root) comment (module_to_html root) t
   | (PP_Functor (fdata, comment))::t ->

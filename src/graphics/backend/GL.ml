@@ -13,6 +13,9 @@ module Data = struct
     mutable length : int
   }
 
+  let clear d = 
+    d.length <- 0
+
   let create_int i = 
     let arr = 
       Bigarray.Array1.create 
@@ -136,6 +139,20 @@ module Data = struct
     done;
     newt
 
+  let print_f t = 
+    Printf.printf "[";
+    for i = 0 to t.length - 1 do
+      Printf.printf "%f; " t.data.{i}
+    done;
+    Printf.printf "]\n%!"
+
+  let print_i t = 
+    Printf.printf "[";
+    for i = 0 to t.length - 1 do
+      Printf.printf "%i; " (Int32.to_int t.data.{i})
+    done;
+    Printf.printf "]\n%!"
+
 end
 
 
@@ -206,7 +223,7 @@ module Texture = struct
       "caml_tex_image_2D_native"
 
   external subimage2D : GLTypes.TextureTarget.t -> int -> (int * int) -> (int * int) ->
-                        GLTypes.PixelFormat.t -> Bytes.t option -> unit 
+                        GLTypes.PixelFormat.t -> Bytes.t -> unit 
     = "caml_tex_subimage_2D_bytecode"
       "caml_tex_subimage_2D_native"
 
@@ -220,7 +237,7 @@ module Texture = struct
       "caml_tex_image_3D_native"
 
   external subimage3D : GLTypes.TextureTarget.t -> int -> (int * int * int) -> (int * int * int) ->
-                        GLTypes.PixelFormat.t -> Bytes.t option -> unit 
+                        GLTypes.PixelFormat.t -> Bytes.t -> unit 
     = "caml_tex_subimage_3D_bytecode"
       "caml_tex_subimage_3D_native"
 
