@@ -156,6 +156,29 @@ module Event : sig
 end
 
 
+(** Provides some OS-relative data *)
+module OS : sig
+
+  (** This module provides some OS-relative data *)
+
+  (** OS enumeration *)
+  type os = 
+    | Windows 
+    | Linux
+    | OSX
+
+  (** OS on which this distribution of OGaml has been compiled *)
+  val os : os
+
+  (** Resources directory prefix.
+    * Prepend this to all the resource paths used by your program before
+    * producing an executable/application bundle.
+    *)
+  val resources_dir : string
+
+end
+
+
 (** Encapsulates data for context creation *)
 module ContextSettings : sig
 
