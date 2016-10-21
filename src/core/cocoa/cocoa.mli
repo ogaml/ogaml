@@ -3,6 +3,8 @@ val init_arp : unit -> unit
 
 val screen_size : unit -> float * float
 
+val resource_path : unit -> string
+
 module NSString : sig
 
   type t
