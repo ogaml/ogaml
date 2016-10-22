@@ -35,6 +35,25 @@ caml_cocoa_display_size(value unit)
   CAMLreturn(tuple);
 }
 
+// Resource Path
+////////////////
+CAMLprim value
+caml_cocoa_resource_path(value unit)
+{
+  CAMLparam0();
+  CAMLlocal1(mlc);
+
+  // Get the app's main bundle
+  NSBundle* main = [NSBundle mainBundle];
+  // Then the path of the resource directory
+  NSString* path = [main resourcePath];
+
+  char* c = (char*)[path UTF8String];
+  mlc = caml_copy_string(c);
+
+  CAMLreturn(mlc);
+}
+
 // Moving the cursor to a NSPoint
 /////////////////////////////////
 void warpCursor(NSPoint loc)
