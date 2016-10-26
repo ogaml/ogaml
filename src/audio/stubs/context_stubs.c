@@ -30,6 +30,18 @@ caml_alc_make_current_context(value context)
 }
 
 CAMLprim value
+caml_alc_remove_current_context(value unit)
+{
+  CAMLparam0();
+
+  ALCboolean res;
+
+  res = alcMakeContextCurrent(NULL);
+
+  CAMLreturn(Val_bool(res == ALC_TRUE));
+}
+
+CAMLprim value
 caml_alc_process_context(value context)
 {
   CAMLparam1(context);

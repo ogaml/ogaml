@@ -96,6 +96,8 @@ module AL : sig
 
     val make_current : t -> bool
 
+    val remove_current : unit -> bool
+
     val process : t -> unit
 
     val suspend : t -> unit
@@ -175,7 +177,6 @@ module AL : sig
       | SourceRelative
       | SourceType
       | Looping
-      | Buffer
       | SourceState
       | BuffersQueued
       | BuffersProcessed
@@ -187,6 +188,8 @@ module AL : sig
     val set_3f : t -> property_3f -> (float * float * float) -> unit
 
     val set_i : t -> property_i -> int -> unit
+
+    val set_buffer : t -> Buffer.t -> unit
 
     val get_f : t -> property_f -> float
 

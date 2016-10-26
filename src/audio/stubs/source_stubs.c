@@ -121,15 +121,12 @@ ALenum ALSourcePropertyi_val(value v)
       return AL_LOOPING;
 
     case 3:
-      return AL_BUFFER;
-
-    case 4:
       return AL_SOURCE_STATE;
 
-    case 5:
+    case 4:
       return AL_BUFFERS_QUEUED;
 
-    case 6:
+    case 5:
       return AL_BUFFERS_PROCESSED;
 
     default:
@@ -181,6 +178,16 @@ caml_al_set_source_i(value src, value prop, value v)
   CAMLparam3(src,prop,v);
 
   alSourcei(SOURCE(src), ALSourcePropertyi_val(prop), Int_val(v));
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_al_set_buffer(value src, value buffer)
+{
+  CAMLparam2(src,buffer);
+
+  alSourcei(SOURCE(src), AL_BUFFER, BUFFER(buffer));
 
   CAMLreturn(Val_unit);
 }

@@ -1,5 +1,52 @@
 open OgamlGraphics
 open OgamlMath
+open OgamlAudio
+
+let aldevice = 
+  AL.Device.open_ None
+
+let alcontext = 
+  AL.Context.create aldevice
+
+let () = 
+  assert (AL.Context.make_current alcontext)
+
+let albuffer = 
+  AL.Buffer.create ()
+
+let base_freq = 44100
+
+let n = base_freq * 8
+
+let bufdata = AL.ShortData.create n
+
+let mk_beep dur freq = 
+  let duri = int_of_float (float_of_int base_freq *. dur) in
+  for i = 0 to duri do
+    let fi = float_of_int i *. 2. *. 3.141592 /. (float_of_int base_freq) in
+    AL.ShortData.add_int bufdata (int_of_float (10000. *. (sin (fi *. freq))));
+    AL.ShortData.add_int bufdata (int_of_float (10000. *. (sin (fi *. freq))))
+  done
+
+let () = 
+  mk_beep 0.15 783.991;
+  mk_beep 0.15 1046.5;
+  mk_beep 0.15 1318.51;
+  mk_beep 0.25 1567.98;
+  mk_beep 0.15 1318.51;
+  mk_beep 0.6 1567.98;
+  AL.Buffer.data albuffer bufdata (AL.ShortData.length bufdata) base_freq
+
+let alsource = 
+  AL.Source.create ()
+ 
+let () = 
+  AL.Source.set_buffer alsource albuffer;
+  AL.Source.play alsource
+
+let () = 
+  assert (AL.Device.error aldevice = AL.ContextError.NoError);
+  assert (AL.Pervasives.error () = AL.ALError.NoError)
 
 let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 
@@ -163,3 +210,8 @@ let () =
   main_loop ();
   Printf.printf "Avg FPS: %f\n%!" (float_of_int (!frame_count) /. (Unix.gettimeofday () -. !initial_time));
   Window.destroy window
+
+let () = 
+  assert (AL.Context.remove_current ());
+  AL.Context.destroy alcontext;
+  assert (AL.Device.close aldevice)

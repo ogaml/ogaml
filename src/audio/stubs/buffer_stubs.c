@@ -11,12 +11,12 @@
 
 #define BUFFER(_a) (*(ALuint*) Data_custom_val(_a))
 
-void finalise_buffer(value v)
+void finalise_albuffer(value v)
 {
   alDeleteBuffers(1,&BUFFER(v));
 }
 
-int compare_buffer(value v1, value v2)
+int compare_albuffer(value v1, value v2)
 {
   ALuint i1 = BUFFER(v1);
   ALuint i2 = BUFFER(v2);
@@ -25,7 +25,7 @@ int compare_buffer(value v1, value v2)
   else return 1;
 }
 
-intnat hash_buffer(value v)
+intnat hash_albuffer(value v)
 {
   ALuint i = BUFFER(v);
   return i;
@@ -33,9 +33,9 @@ intnat hash_buffer(value v)
 
 static struct custom_operations buffer_custom_ops = {
   "AL buffer gc handling",
-  finalise_buffer,
-  compare_buffer,
-  hash_buffer,
+  finalise_albuffer,
+  compare_albuffer,
+  hash_albuffer,
   custom_serialize_default,
   custom_deserialize_default
 };
@@ -82,7 +82,7 @@ caml_al_buffer_data(value buf, value data, value size, value freq)
   CAMLparam4(buf,data,size,freq);
 
   const ALvoid* c_dat = Caml_ba_data_val(Field(data,0));
-  alBufferData(BUFFER(buf), AL_FORMAT_STEREO16, c_dat, Int_val(size), Int_val(freq));
+  alBufferData(BUFFER(buf), AL_FORMAT_STEREO16, c_dat, Int_val(size) * 2, Int_val(freq));
 
   CAMLreturn(Val_unit);
 }

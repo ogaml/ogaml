@@ -149,6 +149,8 @@ module Context = struct
 
   external make_current : t -> bool = "caml_alc_make_current_context"
 
+  external remove_current : unit -> bool = "caml_alc_remove_current_context"
+
   external process : t -> unit = "caml_alc_process_context"
 
   external suspend : t -> unit = "caml_alc_suspend_context"
@@ -230,7 +232,6 @@ module Source = struct
     | SourceRelative
     | SourceType
     | Looping
-    | Buffer
     | SourceState
     | BuffersQueued
     | BuffersProcessed
@@ -246,6 +247,9 @@ module Source = struct
 
   external set_i : t -> property_i -> int -> unit
                  = "caml_al_set_source_i"
+
+  external set_buffer : t -> Buffer.t -> unit
+                      = "caml_al_set_buffer"
 
   external get_f : t -> property_f -> float
                  = "caml_al_get_source_f"

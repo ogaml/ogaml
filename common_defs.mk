@@ -22,7 +22,7 @@ ifeq ($(UNAME), Linux)
     PP_DEFINE = __LINUX__
     OS_WIN_LIB = x11
     GLOBAL_OBJCOPTS =
-    GLOBAL_CLIBS = -lX11 -lGL -lX11-xcb -lxcb
+    GLOBAL_CLIBS = -lX11 -lGL -lX11-xcb -lxcb -lopenal
   endif
 endif
 ifeq ($(UNAME), Darwin)
@@ -30,14 +30,14 @@ ifeq ($(UNAME), Darwin)
   OS_NAME = OSX
   OS_WIN_LIB = cocoa
   GLOBAL_OBJCOPTS = -fconstant-string-class=NSConstantString
-  GLOBAL_CLIBS = -framework Foundation -framework Cocoa -framework Carbon -lobjc -framework openGL
+  GLOBAL_CLIBS = -framework Foundation -framework Cocoa -framework Carbon -lobjc -framework openGL -lopenal
 endif
 ifeq ($(UNAME), windows32)
   PP_DEFINE = __WIN__
   OS_NAME = WIN
   OS_WIN_LIB = windows
   GLOBAL_OBJCOPTS = 
-  GLOBAL_CLIBS = -lopengl32 -lglew32 -luser32 -lgdi32
+  GLOBAL_CLIBS = -lopengl32 -lglew32 -luser32 -lgdi32 -lopenal
 endif
   
 
