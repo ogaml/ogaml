@@ -204,6 +204,75 @@ end
 
 module Source = struct
 
+  type t
+
+  type property_f =
+    | Pitch
+    | Gain
+    | MaxDistance
+    | RolloffFactor
+    | ReferenceDistance
+    | MinGain
+    | MaxGain
+    | ConeOuterGain
+    | ConeInnerAngle
+    | ConeOuterAngle
+    | SecOffset
+    | SampleOffset
+    | ByteOffset
+
+  type property_3f =
+    | Position
+    | Velocity
+    | Direction
+
+  type property_i =
+    | SourceRelative
+    | SourceType
+    | Looping
+    | Buffer
+    | SourceState
+    | BuffersQueued
+    | BuffersProcessed
+
+  external create : unit -> t 
+                  = "caml_al_create_source"
+
+  external set_f : t -> property_f -> float -> unit
+                 = "caml_al_set_source_f"
+
+  external set_3f : t -> property_3f -> (float * float * float) -> unit
+                  = "caml_al_set_source_3f"
+
+  external set_i : t -> property_i -> int -> unit
+                 = "caml_al_set_source_i"
+
+  external get_f : t -> property_f -> float
+                 = "caml_al_get_source_f"
+
+  external get_3f : t -> property_3f -> (float * float * float)
+                  = "caml_al_get_source_3f"
+
+  external get_i : t -> property_i -> int 
+                 = "caml_al_get_source_i"
+
+  external play : t -> unit
+                = "caml_al_play_source"
+
+  external pause : t -> unit
+                 = "caml_al_pause_source"
+
+  external stop : t -> unit
+                = "caml_al_stop_source"
+
+  external rewind : t -> unit
+                  = "caml_al_rewind_source"
+
+  external queue : t -> int -> Buffer.t array -> unit
+                 = "caml_al_queue_source"
+
+  external unqueue : t -> int -> unit
+                   = "caml_al_unqueue_source"
 
 end
 

@@ -17,13 +17,13 @@ Cocoa specific:
   ☐ Fix all pixel/point related issues
 
 Audio (see NOTES for more info):
-  ☐ Low-level binding module:
+  ✔ Low-level binding module: @done(2016-10-26 23:48) @project(Audio (see NOTES for more info))
     ✔ Device @done(2016-10-26 20:33) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
     ✔ Context @done(2016-10-26 21:16) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
     ✔ Listener @done(2016-10-26 21:32) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
-    ☐ Pervasives
+    ✔ Pervasives @done(2016-10-26 22:29) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
     ✔ Buffers @done(2016-10-26 22:21) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
-    ☐ Sources
+    ✔ Sources @done(2016-10-26 23:48) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
   ☐ AudioContext module
   ☐ SoundBuffer module:
     ☐ load (from .ogg file)

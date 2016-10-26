@@ -146,6 +146,62 @@ end
 
 module Source : sig
 
+  type t
+
+  type property_f =
+    | Pitch
+    | Gain
+    | MaxDistance
+    | RolloffFactor
+    | ReferenceDistance
+    | MinGain
+    | MaxGain
+    | ConeOuterGain
+    | ConeInnerAngle
+    | ConeOuterAngle
+    | SecOffset
+    | SampleOffset
+    | ByteOffset
+
+  type property_3f =
+    | Position
+    | Velocity
+    | Direction
+
+  type property_i =
+    | SourceRelative
+    | SourceType
+    | Looping
+    | Buffer
+    | SourceState
+    | BuffersQueued
+    | BuffersProcessed
+
+  val create : unit -> t
+
+  val set_f : t -> property_f -> float -> unit
+
+  val set_3f : t -> property_3f -> (float * float * float) -> unit
+
+  val set_i : t -> property_i -> int -> unit
+
+  val get_f : t -> property_f -> float
+
+  val get_3f : t -> property_3f -> (float * float * float)
+
+  val get_i : t -> property_i -> int 
+
+  val play : t -> unit
+
+  val pause : t -> unit
+
+  val stop : t -> unit
+
+  val rewind : t -> unit
+
+  val queue : t -> int -> Buffer.t array -> unit
+
+  val unqueue : t -> int -> unit
 
 end
 
