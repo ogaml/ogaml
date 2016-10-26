@@ -7,13 +7,13 @@ INCLUDE_DIRS = -I ../math/ -I ../core/ -I ../utils/
 
 COCOA_STUBS = application_delegate_stubs.m event_stubs.m glcontext_stubs.m\
 	      utils_stubs.m window_stubs.m application_stubs.m opengl_stubs.m\
-	      window_controller_stubs.m utils.m
+	      window_controller_stubs.m
 
 XLIB_STUBS = atoms_stubs.c display_stubs.c event_stubs.c glx_stubs.c\
-	     mouse_stubs.c keyboard_stubs.c window_stubs.c utils.c
+	     mouse_stubs.c keyboard_stubs.c window_stubs.c
 
 WINDOWS_STUBS = style_stubs.c window_stubs.c context_stubs.c pixelformat_stubs.c\
-		 glew_stubs.c utils.c
+		 glew_stubs.c 
 
 OS_WIN_STUBS =
 
@@ -61,6 +61,7 @@ ML_CMISALONE = $(ML_INTERFACES:.mli=.cmi)
 
 ML_CMIS = $(ML_CMISALONE) $(ML_SOURCES:.ml=.cmi) 
 
+COPTS = -Wno-unused-function -Wno-unused-variable -Wno-misleading-indentation
 
 # Lib compilation 
 
@@ -103,8 +104,7 @@ ml_stubs:
 	$(CLANG) -c -o ./$(notdir $@) $(OCAML_C_FLAGS) $(GLOBAL_OBJCOPTS) $<
 
 %.o:%.c
-	$(OCAMLC_CMD) -c -o ./$(notdir $@) -cclib "$(GLOBAL_CLIBS)" $<
-
+	$(OCAMLFIND) $(OCAMLC_CMD) -o ./$(notdir $@) -c $< -ccopt "$(COPTS)" -cclib "$(GLOBAL_CLIBS)"
 
 # Cleaning
 

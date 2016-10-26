@@ -4,7 +4,7 @@ include ../../common_defs.mk
 
 INCLUDE_DIRS = -I ../math/ -I ../utils/
 
-AUDIO_STUBS = device_stubs.c utils.c
+AUDIO_STUBS = device_stubs.c
 
 STUBS_SRC = $(addprefix $(STUBS_DIR)/, $(AUDIO_STUBS))
 
@@ -24,7 +24,7 @@ MLCMISALONE = $(MLINTERFACES:.mli=.cmi)
 
 MLCMIS = $(MLCMISALONE) $(PARSER_FILES:.mly=.cmi) $(LEXER_FILES:.mll=.cmi) $(MLSOURCES:.ml=.cmi)
 
-COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast -Wno-pointer-sign
+COPTS = -Wno-unused-function -Wno-unused-variable -Wno-misleading-indentation
 
 CMA_DEPS = ../math/$(MATH_LIB).cma ../utils/$(UTILS_LIB).cma
 CMXA_DEPS = ../math/$(MATH_LIB).cmxa ../utils/$(UTILS_LIB).cmxa

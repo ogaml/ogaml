@@ -9,8 +9,7 @@ INCLUDE_DIRS = -I ../math/ -I ../core/ -I ../utils/\
 GRAPHICS_STUBS = shader_stubs.c program_stubs.c texture_stubs.c\
 	   vao_stubs.c vbo_stubs.c uniform_stubs.c text_stubs.c\
 		 render_stubs.c ebo_stubs.c image_stubs.c blending_stubs.c\
-		 fbo_stubs.c rbo_stubs.c utils.c\
-		 types_stubs.c
+		 fbo_stubs.c rbo_stubs.c types_stubs.c
 
 STUBS_SRC = $(addprefix $(STUBS_DIR)/, $(GRAPHICS_STUBS))
 
@@ -59,7 +58,7 @@ MLCMISALONE = $(MLINTERFACES:.mli=.cmi)
 
 MLCMIS = $(MLCMISALONE) $(PARSER_FILES:.mly=.cmi) $(LEXER_FILES:.mll=.cmi) $(MLSOURCES:.ml=.cmi)
 
-COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast -Wno-pointer-sign
+COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast -Wno-pointer-sign -Wno-unused-function -Wno-unused-variable -Wno-misleading-indentation
 
 CMA_DEPS = ../core/$(CORE_LIB).cma ../math/$(MATH_LIB).cma ../utils/$(UTILS_LIB).cma
 CMXA_DEPS = ../core/$(CORE_LIB).cmxa ../math/$(MATH_LIB).cmxa ../utils/$(UTILS_LIB).cmxa
