@@ -1,3 +1,39 @@
+module ShortData : sig
+
+  type t  
+
+  (** Clears some data *)
+  val clear : t -> unit
+
+  (** Append the second array at the end of the first one *)
+  val append : t -> t -> unit
+
+  (** Creates some data, the integer must be the expected size *)
+  val create : int -> t
+
+  (** Adds an int to the data *)
+  val add_int : t -> int -> unit
+
+  (** Returns the data associated to a bigarray *)
+  val of_bigarray : (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t -> t
+
+  (** Returns the length of some data*)
+  val length : t -> int
+
+  (** Returns the data at position i (debug only) *)
+  val get : t -> int -> int
+
+  (** Iters through data *)
+  val iter : t -> (int -> unit) -> unit
+
+  (** Maps through data (without changing its type) *)
+  val map : t -> (int -> int) -> t
+
+  (** Debug *)
+  val print : t -> unit
+
+end
+
 
 module ALError : sig
 
@@ -89,6 +125,21 @@ end
 
 module Buffer : sig
 
+  type t
+
+  type property =
+    | Frequency
+    | Bits
+    | Channels
+    | Size
+
+  val create : unit -> t
+
+  val data : t -> ShortData.t -> int -> int -> unit
+
+  val set : t -> property -> int -> unit
+
+  val get : t -> property -> int
 
 end
 

@@ -22,7 +22,7 @@ Audio (see NOTES for more info):
     ✔ Context @done(2016-10-26 21:16) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
     ✔ Listener @done(2016-10-26 21:32) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
     ☐ Pervasives
-    ☐ Buffers
+    ✔ Buffers @done(2016-10-26 22:21) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
     ☐ Sources
   ☐ AudioContext module
   ☐ SoundBuffer module:
