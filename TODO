@@ -16,6 +16,26 @@ Cocoa specific:
   ☐ Implement LL.show_cursor
   ☐ Fix all pixel/point related issues
 
+Audio (see NOTES for more info):
+  ☐ Low-level binding module:
+    ☐ Device
+    ☐ Context
+    ☐ Listener
+    ☐ Pervasives
+    ☐ Buffers
+    ☐ Sources
+  ☐ AudioContext module
+  ☐ SoundBuffer module:
+    ☐ load (from .ogg file)
+    ☐ create : data -> sampleCount -> channelCount -> sampleRate -> t
+    ☐ duration : t -> int
+  ☐ AudioStream module
+  ☐ AudioSource module:
+    ☐ create (with context)
+    ☐ play : t -> [`Stream of AudioStream.t | `Sound of SoundBuffer.t] -> ... sound parameters ... -> unit
+    ☐ stop/pause/resume
+
+
 Interface changes:
   Window:
     ☐ Add open (dual of close)
