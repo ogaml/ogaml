@@ -32,6 +32,7 @@ addons:
         - libxv-dev
         - libasound2-dev
         - libudev-dev
+        - libopenal-dev
         - mesa-utils
         - libgl1-mesa-glx
 
