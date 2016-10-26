@@ -20,7 +20,7 @@ Audio (see NOTES for more info):
   ☐ Low-level binding module:
     ✔ Device @done(2016-10-26 20:33) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
     ✔ Context @done(2016-10-26 21:16) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
-    ☐ Listener
+    ✔ Listener @done(2016-10-26 21:32) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
     ☐ Pervasives
     ☐ Buffers
     ☐ Sources
