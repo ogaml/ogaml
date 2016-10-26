@@ -4,7 +4,7 @@ include ../../common_defs.mk
 
 INCLUDE_DIRS = -I ../math/ -I ../utils/
 
-AUDIO_STUBS = device_stubs.c
+AUDIO_STUBS = device_stubs.c context_stubs.c audio_stubs.c listener_stubs.c
 
 STUBS_SRC = $(addprefix $(STUBS_DIR)/, $(AUDIO_STUBS))
 
