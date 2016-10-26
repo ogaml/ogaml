@@ -246,7 +246,7 @@ caml_cocoa_create_nsrect(value x, value y, value w, value h)
   CAMLparam4(x,y,w,h);
 
   CAMLlocal1(mlrect);
-  mlrect = caml_alloc_custom(&empty_custom_opts, sizeof(NSRect), 0, 1);
+  mlrect = caml_alloc_custom(&empty_custom_ops, sizeof(NSRect), 0, 1);
 
   NSRect rect = NSMakeRect(Double_val(x), Double_val(y), Double_val(w), Double_val(h));
 

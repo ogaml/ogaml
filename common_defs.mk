@@ -89,6 +89,9 @@ MATH_PACK = OgamlMath
 UTILS_LIB = ogamlUtils
 UTILS_PACK = OgamlUtils
 
+AUDIO_LIB = ogamlAudio
+AUDIO_PACK = OgamlAudio
+
 
 # Commands
 

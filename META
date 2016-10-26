@@ -25,3 +25,9 @@ package "utils" (
   archive(byte) = "ogamlUtils.cma"
   archive(native) = "ogamlUtils.cmxa"
 )
+
+package "audio" (
+  requires = "bigarray,unix,ogaml.math,ogaml.utils"
+  archive(byte) = "ogamlAudio.cma"
+  archive(native) = "ogamlAudio.cmxa"
+)

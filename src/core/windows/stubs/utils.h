@@ -14,8 +14,6 @@
 
 #define Some_val(v) Field(v,0)
 
-struct custom_operations empty_custom_opts;
-
 value Val_some(value v);
 
 value Int_pair(int a, int b);

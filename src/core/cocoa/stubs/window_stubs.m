@@ -123,7 +123,7 @@ caml_cocoa_window_frame(value mlwindow)
 {
   CAMLparam1(mlwindow);
   CAMLlocal1(mlrect);
-  mlrect = caml_alloc_custom(&empty_custom_opts, sizeof(NSRect), 0, 1);
+  mlrect = caml_alloc_custom(&empty_custom_ops, sizeof(NSRect), 0, 1);
 
   NSWindow* window = (NSWindow*) mlwindow;
   NSRect rect = [window frame];

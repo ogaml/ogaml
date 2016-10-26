@@ -2,8 +2,8 @@
 
 #include "utils.h"
 
-struct custom_operations empty_custom_opts = {
-  .identifier  = "obj_st handling",
+struct custom_operations empty_custom_ops = {
+  .identifier  = "default object handling",
   .finalize    = custom_finalize_default,
   .compare     = custom_compare_default,
   .hash        = custom_hash_default,

@@ -237,7 +237,7 @@ caml_cocoa_controller_frame(value mlcontroller)
 {
   CAMLparam1(mlcontroller);
   CAMLlocal1(mlrect);
-  mlrect = caml_alloc_custom(&empty_custom_opts, sizeof(NSRect), 0, 1);
+  mlrect = caml_alloc_custom(&empty_custom_ops, sizeof(NSRect), 0, 1);
 
   OGWindowController* controller = (OGWindowController*) mlcontroller;
   NSRect rect = [controller frame];
@@ -259,7 +259,7 @@ caml_cocoa_controller_content_frame(value mlcontroller)
 {
   CAMLparam1(mlcontroller);
   CAMLlocal1(mlrect);
-  mlrect = caml_alloc_custom(&empty_custom_opts, sizeof(NSRect), 0, 1);
+  mlrect = caml_alloc_custom(&empty_custom_ops, sizeof(NSRect), 0, 1);
 
   OGWindowController* controller = (OGWindowController*) mlcontroller;
   NSRect rect = [controller contentFrame];

@@ -39,7 +39,7 @@ caml_xnext_event(value disp, value win)
   CAMLlocal1(evt);
   XEvent event;
   if(XCheckIfEvent((Display*) disp, &event, &checkEvent, (XPointer)win) == True) {
-    evt = caml_alloc_custom(&empty_custom_opts, sizeof(XEvent), 0, 1);
+    evt = caml_alloc_custom(&empty_custom_ops, sizeof(XEvent), 0, 1);
     memcpy(Data_custom_val(evt), &event, sizeof(XEvent));
     CAMLreturn(Val_some(evt));
   }

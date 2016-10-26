@@ -12,14 +12,16 @@ GRAPH_FILES = src/graphics/*$(GRAPHICS_LIB).*
 
 UTILS_FILES = src/utils/*$(UTILS_LIB).*
 
-DOC_FILES = src/core/$(CORE_LIB).mli src/graphics/$(GRAPHICS_LIB).mli src/math/$(MATH_LIB).mli src/utils/$(UTILS_LIB).mli
+AUDIO_FILES = src/audio/*$(AUDIO_LIB).*
+
+DOC_FILES = src/core/$(CORE_LIB).mli src/graphics/$(GRAPHICS_LIB).mli src/math/$(MATH_LIB).mli src/utils/$(UTILS_LIB).mli src/audio/$(AUDIO_LIB).mli
 
 
 # Examples constants
 
-EXAMPLE_MODULES = unix.cmxa bigarray.cmxa $(MATH_LIB).cmxa $(CORE_LIB).cmxa $(UTILS_LIB).cmxa $(GRAPHICS_LIB).cmxa
+EXAMPLE_MODULES = unix.cmxa bigarray.cmxa $(MATH_LIB).cmxa $(CORE_LIB).cmxa $(UTILS_LIB).cmxa $(GRAPHICS_LIB).cmxa $(AUDIO_LIB).cmxa
 
-EXAMPLE_PKGS = ogaml.graphics,ogaml.utils
+EXAMPLE_PKGS = ogaml.graphics,ogaml.utils,ogaml.audio
 
 ifeq ($(OS_NAME), WIN)
     EXAMPLE_CMD = $(OCAMLOPT) $(EXAMPLE_MODULES)
@@ -30,9 +32,9 @@ endif
 
 # Tests constants
 
-TEST_INCLUDES = -I src/core -I src/math -I src/graphics -I src/utils
+TEST_INCLUDES = -I src/core -I src/math -I src/graphics -I src/utils -I src/audio
 
-TEST_MODULES = $(MATH_LIB).cmxa $(CORE_LIB).cmxa $(UTILS_LIB).cmxa $(GRAPHICS_LIB).cmxa
+TEST_MODULES = $(MATH_LIB).cmxa $(CORE_LIB).cmxa $(UTILS_LIB).cmxa $(GRAPHICS_LIB).cmxa $(AUDIO_LIB).cmxa
 
 ifeq ($(OS_NAME), WIN)
     TEST_CMD = $(OCAMLOPT) unix.cmxa bigarray.cmxa $(TEST_MODULES) $(TEST_INCLUDES)
@@ -54,10 +56,10 @@ endif
 
 ifeq ($(OS_NAME), WIN)
     INSTALL_DIR = $(shell ocamlc -where)
-    INSTALL_CMD = cp $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES) $(UTILS_FILES) $(INSTALL_DIR)
+    INSTALL_CMD = cp $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES) $(UTILS_FILES) $(AUDIO_FILES) $(INSTALL_DIR)
     UNINSTALL_CMD = 
 else
-    INSTALL_CMD = $(OCAMLFIND) install ogaml META $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES) $(UTILS_FILES)
+    INSTALL_CMD = $(OCAMLFIND) install ogaml META $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES) $(UTILS_FILES) $(AUDIO_FILES)
     UNINSTALL_CMD = $(OCAMLFIND) remove "ogaml"
 endif
 
@@ -66,7 +68,7 @@ endif
 
 # Compilation
 
-default: depend math_lib utils_lib core_lib graphics_lib 
+default: depend math_lib utils_lib core_lib graphics_lib audio_lib
 
 utils_lib:
 	make -C src/utils/ default
@@ -79,6 +81,9 @@ core_lib:
 
 graphics_lib: math_lib core_lib utils_lib
 	make -C src/graphics/ default
+
+audio_lib: utils_lib math_lib
+	make -C src/audio/ default
 
 examples:
 	$(EXAMPLE_CMD) examples/cube.ml -o cube.out &&\
@@ -94,7 +99,7 @@ examples:
 	$(EXAMPLE_CMD) examples/noise.ml -o noise.out &&\
 	$(EXAMPLE_CMD) examples/shoot.ml -o shoot.out
 	
-tests: math_lib core_lib graphics_lib utils_lib
+tests: math_lib core_lib graphics_lib utils_lib audio_lib
 	$(TEST_CMD) tests/programs.ml -o main.out && $(LAUNCH_CMD) &&\
 	$(TEST_CMD) tests/vertexarrays.ml -o main.out && $(LAUNCH_CMD) &&\
 	$(TEST_CMD) tests/graphs.ml -o main.out && $(LAUNCH_CMD) &&\
@@ -102,17 +107,17 @@ tests: math_lib core_lib graphics_lib utils_lib
 	$(TEST_CMD) tests/capabilities.ml -o main.out && $(LAUNCH_CMD) &&\
 	echo "Tests passed !"
 
-version_test: math_lib core_lib graphics_lib utils_lib
+version_test: math_lib core_lib graphics_lib utils_lib audio_lib
 	$(TEST_CMD) tests/version.ml -o main.out && $(LAUNCH_CMD)
 
 doc:
 	ocamlbuild -use-ocamlfind -use-menhir -cflags -rectypes -I src/doc -package unix,str mkdoc.native;\
 	./mkdoc.native $(DOC_FILES)
 
-install: math_lib core_lib graphics_lib utils_lib
+install: math_lib core_lib graphics_lib utils_lib audio_lib
 	$(INSTALL_CMD)
 
-reinstall:math_lib core_lib graphics_lib utils_lib uninstall install
+reinstall:math_lib core_lib graphics_lib utils_lib audio_lib uninstall install
 
 uninstall:
 	$(UNINSTALL_CMD)
@@ -125,6 +130,7 @@ clean:
 	make -C src/math clean &\
 	make -C src/utils clean &\
 	make -C src/graphics clean &\
+	make -C src/audio clean &\
 	make -C tests/ clean &\
 	make -C examples/ clean 
 
@@ -132,6 +138,7 @@ depend:
 	make -C src/core depend &\
 	make -C src/math depend &\
 	make -C src/utils depend &\
+	make -C src/audio depend &\
 	make -C src/graphics depend
 
 .PHONY: install uninstall reinstall examples doc
