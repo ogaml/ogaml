@@ -81,8 +81,8 @@ caml_alc_get_position(value unit)
   CAMLparam0();
   CAMLlocal1(res);
 
-  res = caml_alloc(3,0);
   float cres[3];
+  res = caml_alloc(3,0);
 
   alGetListenerfv(AL_POSITION, cres);
 
@@ -99,8 +99,8 @@ caml_alc_get_velocity(value unit)
   CAMLparam0();
   CAMLlocal1(res);
 
-  res = caml_alloc(3,0);
   float cres[3];
+  res = caml_alloc(3,0);
 
   alGetListenerfv(AL_VELOCITY, cres);
 
@@ -117,10 +117,10 @@ caml_alc_get_orientation(value unit)
   CAMLparam0();
   CAMLlocal3(res, resat, resup);
 
+  float cres[6];
   res = caml_alloc(2,0);
   resat = caml_alloc(3,0);
   resup = caml_alloc(3,0);
-  float cres[6];
 
   alGetListenerfv(AL_ORIENTATION, cres);
 
