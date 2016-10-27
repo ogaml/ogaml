@@ -1,15 +1,21 @@
+open OgamlMath
 
 type t = {
   context     : AudioContext.t ;
-  position    : OgamlMath.Vector3f.t option ;
-  velocity    : OgamlMath.Vector3f.t option ;
-  orientation : OgamlMath.Vector3f.t option ;
-  status      : [`Playing | `Stopped | `Paused] ;
-  source      : AL.Source.t option
+  position    : Vector3f.t ;
+  velocity    : Vector3f.t ;
+  orientation : Vector3f.t ;
+  mutable status : [`Playing | `Stopped | `Paused] ;
+  mutable source : AL.Source.t option
 }
 
-let create ?position ?velocity ?orientation context = {
-  context ; position ; velocity ; orientation ;
+let create ?position:(position = Vector3f.zero) 
+           ?velocity:(velocity = Vector3f.zero)
+           ?orientation:(orientation = Vector3f.zero) context = {
+  context ; 
+  position ; 
+  velocity ; 
+  orientation ;
   status = `Stopped ;
   source = None
 }
@@ -20,38 +26,29 @@ let play source ?pitch ?gain ?loop ?force sound =
   match sound with
   | `Stream str -> ()
   | `Sound buff ->
-    begin match AudioContext.LL.get_available_mono_source ~force source with
+    begin match AudioContext.LL.get_available_mono_source ?force source.context with
     | None -> ()
     | Some s ->
-        source.source := s ;
+        source.source <- Some s;
         begin match pitch with
-        | Some p -> AL.Source.set_f AL.Source.Pitch p
+        | Some p -> AL.Source.set_f s AL.Source.Pitch p
         | None -> ()
         end ;
         begin match gain with
-        | Some g -> AL.Source.set_f AL.Source.Gain g
+        | Some g -> AL.Source.set_f s AL.Source.Gain g
         | None -> ()
         end ;
         begin match loop with
-        | Some l -> AL.Source.set_i AL.Source.Looping l
+        | Some l -> AL.Source.set_i s AL.Source.Looping (if l then 1 else 0)
         | None -> ()
         end ;
         let vec3f v = OgamlMath.Vector3f.(v.x, v.y, v.z) in
-        begin match source.position with
-        | Some p -> AL.Source.set_3f AL.Source.Position (vec3f p)
-        | None -> ()
-        end ;
-        begin match source.velocity with
-        | Some p -> AL.Source.set_3f AL.Source.Velocity (vec3f p)
-        | None -> ()
-        end ;
-        begin match source.orientation with
-        | Some p -> AL.Source.set_3f AL.Source.Direction (vec3f p)
-        | None -> ()
-        end ;
+        AL.Source.set_3f s AL.Source.Position (vec3f source.position);
+        AL.Source.set_3f s AL.Source.Velocity (vec3f source.velocity);
+        AL.Source.set_3f s AL.Source.Direction (vec3f source.orientation);
         AL.Source.set_buffer s (SoundBuffer.LL.buffer buff) ;
         AL.Source.play s ;
-        source.status := `Playing
+        source.status <- `Playing
     end
 
 let stop source = ()
