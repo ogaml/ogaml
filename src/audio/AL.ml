@@ -138,6 +138,10 @@ module Device = struct
 
   external error : t -> ContextError.t = "caml_alc_error"
 
+  external max_mono_sources : t -> int = "caml_alc_max_mono_sources"
+
+  external max_stereo_sources : t -> int = "caml_alc_max_stereo_sources"
+
 end
 
 
@@ -195,7 +199,9 @@ module Buffer = struct
 
   external create : unit -> t = "caml_al_create_buffer"
 
-  external data : t -> ShortData.t -> int -> int -> unit = "caml_al_buffer_data"
+  external data_mono : t -> ShortData.t -> int -> int -> unit = "caml_al_buffer_mono_data"
+
+  external data_stereo : t -> ShortData.t -> int -> int -> unit = "caml_al_buffer_stereo_data"
 
   external set : t -> property -> int -> unit = "caml_al_set_buffer_property"
 

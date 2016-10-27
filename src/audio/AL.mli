@@ -82,6 +82,10 @@ module Device : sig
 
   val error : t -> ContextError.t
 
+  val max_mono_sources : t -> int
+
+  val max_stereo_sources : t -> int
+
 end
 
 
@@ -137,7 +141,9 @@ module Buffer : sig
 
   val create : unit -> t
 
-  val data : t -> ShortData.t -> int -> int -> unit
+  val data_mono : t -> ShortData.t -> int -> int -> unit
+
+  val data_stereo : t -> ShortData.t -> int -> int -> unit
 
   val set : t -> property -> int -> unit
 

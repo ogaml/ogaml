@@ -77,7 +77,18 @@ caml_al_create_buffer(value unit)
 }
 
 CAMLprim value
-caml_al_buffer_data(value buf, value data, value size, value freq)
+caml_al_buffer_mono_data(value buf, value data, value size, value freq)
+{
+  CAMLparam4(buf,data,size,freq);
+
+  const ALvoid* c_dat = Caml_ba_data_val(Field(data,0));
+  alBufferData(BUFFER(buf), AL_FORMAT_MONO16, c_dat, Int_val(size) * 2, Int_val(freq));
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_al_buffer_stereo_data(value buf, value data, value size, value freq)
 {
   CAMLparam4(buf,data,size,freq);
 

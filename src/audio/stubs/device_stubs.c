@@ -69,3 +69,62 @@ caml_alc_error(value device)
   CAMLreturn(Val_alcerror(alcGetError((ALCdevice*)device)));
 }
 
+CAMLprim value
+caml_alc_max_mono_sources(value device)
+{
+  CAMLparam1(device);
+
+  int res, size, i;
+  int* attrs;
+
+  res = 0;
+
+  alcGetIntegerv((ALCdevice*)(device), ALC_ATTRIBUTES_SIZE, 1, &size);
+  
+  attrs = malloc(size * sizeof(int));
+
+  alcGetIntegerv((ALCdevice*)(device), ALC_ALL_ATTRIBUTES, size, attrs);
+
+  for(i = 0; i < size; i++) 
+  {
+    if(attrs[i] == ALC_MONO_SOURCES)
+    {
+      res = attrs[i+1];
+      break;
+    }
+  }
+
+  free(attrs);
+
+  CAMLreturn(Val_int(res));
+}
+
+CAMLprim value
+caml_alc_max_stereo_sources(value device)
+{
+  CAMLparam1(device);
+
+  int res, size, i;
+  int* attrs;
+
+  res = 0;
+
+  alcGetIntegerv((ALCdevice*)(device), ALC_ATTRIBUTES_SIZE, 1, &size);
+  
+  attrs = malloc(size * sizeof(int));
+
+  alcGetIntegerv((ALCdevice*)(device), ALC_ALL_ATTRIBUTES, size, attrs);
+
+  for(i = 0; i < size; i++) 
+  {
+    if(attrs[i] == ALC_STEREO_SOURCES)
+    {
+      res = attrs[i+1];
+      break;
+    }
+  }
+
+  free(attrs);
+
+  CAMLreturn(Val_int(res));
+}

@@ -11,6 +11,10 @@ let alcontext =
 let () = 
   assert (AL.Context.make_current alcontext)
 
+let () = 
+  Printf.printf "Maximum number of mono sources : %i\n%!" (AL.Device.max_mono_sources aldevice);
+  Printf.printf "Maximum number of stereo sources : %i\n%!" (AL.Device.max_stereo_sources aldevice)
+
 let albuffer = 
   AL.Buffer.create ()
 
@@ -24,25 +28,25 @@ let mk_beep dur freq =
   let duri = int_of_float (float_of_int base_freq *. dur) in
   for i = 0 to duri do
     let fi = float_of_int i *. 2. *. 3.141592 /. (float_of_int base_freq) in
-    AL.ShortData.add_int bufdata (int_of_float (10000. *. (sin (fi *. freq))));
-    AL.ShortData.add_int bufdata (int_of_float (10000. *. (sin (fi *. freq))))
+    AL.ShortData.add_int bufdata (int_of_float (20000. *. (sin (fi *. freq))));
   done
 
 let () = 
-  mk_beep 0.15 783.991;
-  mk_beep 0.15 1046.5;
-  mk_beep 0.15 1318.51;
-  mk_beep 0.25 1567.98;
-  mk_beep 0.15 1318.51;
-  mk_beep 0.6 1567.98;
-  AL.Buffer.data albuffer bufdata (AL.ShortData.length bufdata) base_freq
+  mk_beep 10. 440.;
+  AL.Buffer.data_mono albuffer bufdata (AL.ShortData.length bufdata) base_freq
 
 let alsource = 
   AL.Source.create ()
  
 let () = 
   AL.Source.set_buffer alsource albuffer;
-  AL.Source.play alsource
+  AL.Source.set_3f alsource AL.Source.Velocity (-10., 0., 0.);
+  AL.Source.set_3f alsource AL.Source.Position (30., 1., 0.);
+  AL.Source.play alsource;
+  for i = 0 to 10000000 do
+    let fi = float_of_int i /. 10000000. in
+    AL.Source.set_3f alsource AL.Source.Position (30. -. (fi *. 60.), 1., 0.)
+  done
 
 let () = 
   assert (AL.Device.error aldevice = AL.ContextError.NoError);
