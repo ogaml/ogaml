@@ -1,13 +1,13 @@
 
 type t
 
-val create : 
-  ?position:OgamlMath.Vector3f.t -> 
+val create :
+  ?position:OgamlMath.Vector3f.t ->
   ?velocity:OgamlMath.Vector3f.t ->
-  ?orientation:OgamlMath.Vector3f.t -> 
+  ?orientation:OgamlMath.Vector3f.t ->
   AudioContext.t -> t
 
-val play : t -> 
+val play : t ->
   ?pitch:float ->
   ?gain:float ->
   ?loop:bool ->
@@ -33,4 +33,3 @@ val set_velocity : t -> OgamlMath.Vector3f.t -> unit
 val orientation : t -> OgamlMath.Vector3f.t
 
 val set_orientation : t -> OgamlMath.Vector3f.t -> unit
-
