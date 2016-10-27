@@ -72,4 +72,4 @@ let set_velocity source vel = ()
 
 let orientation source = source.orientation
 
-let set_orientation source or = ()
+let set_orientation source ori = ()
