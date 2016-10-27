@@ -141,6 +141,8 @@ module Buffer : sig
 
   val create : unit -> t
 
+  (** [data_mono buf data n rate] stores the [n] samples [data] in [buf],
+    * assuming a sample rate/frequency of [rate] *)
   val data_mono : t -> ShortData.t -> int -> int -> unit
 
   val data_stereo : t -> ShortData.t -> int -> int -> unit
