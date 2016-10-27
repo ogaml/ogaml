@@ -20,6 +20,8 @@ val pause : t -> unit
 
 val resume : t -> unit
 
+val status : t -> [`Playing | `Stopped | `Paused]
+
 val position : t -> OgamlMath.Vector3f.t
 
 val set_position : t -> OgamlMath.Vector3f.t -> unit

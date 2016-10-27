@@ -39,5 +39,9 @@ module LL : sig
 
   val allocate_mono_source : t -> AL.Source.t -> float -> (unit -> unit) -> unit
 
+  val deallocate_stereo_source : t -> AL.Source.t -> unit
+
+  val deallocate_mono_source : t -> AL.Source.t -> unit
+
 end
 
