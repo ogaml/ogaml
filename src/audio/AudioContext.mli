@@ -32,9 +32,9 @@ val has_mono_source_available : t -> bool
 module LL : sig
 
   (** Returns an available source, if there is one *)
-  val get_available_stereo_source : t -> AL.Source.t option
+  val get_available_stereo_source : ?force:bool -> t -> AL.Source.t option
 
-  val get_available_mono_source : t -> AL.Source.t option
+  val get_available_mono_source : ?force:bool -> t -> AL.Source.t option
 
   (** [allocate_stereo_source ctx src dur cbk] marks the source [src] as
     * allocated for [dur] seconds. The callback [cbk] will be called when the
