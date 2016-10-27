@@ -101,6 +101,14 @@ module ALError = struct
     | InvalidOperation
     | OutOfMemory
 
+  let to_string = function
+    | NoError -> "No error"
+    | InvalidName -> "Invalid name"
+    | InvalidEnum -> "Invalid enum"
+    | InvalidValue -> "Invalid value"
+    | InvalidOperation -> "Invalid operation"
+    | OutOfMemory -> "Out of memory"
+
 end
 
 
@@ -113,6 +121,14 @@ module ContextError = struct
     | InvalidEnum
     | InvalidValue
     | OutOfMemory
+
+  let to_string = function
+    | NoError -> "No error"
+    | InvalidDevice -> "Invalid device"
+    | InvalidContext -> "Invalid context"
+    | InvalidEnum -> "Invalid enum"
+    | InvalidValue -> "Invalid value"
+    | OutOfMemory -> "Out of memory"
 
 end
 

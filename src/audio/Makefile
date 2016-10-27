@@ -12,7 +12,7 @@ STUBS_TARGET = $(STUBS_SRC:.c=.o)
 
 STUBS_OBJS = $(AUDIO_STUBS:.c=.o)
 
-MLSOURCES = AL.ml
+MLSOURCES = AL.ml AudioContext.ml SoundBuffer.ml AudioStream.ml AudioSource.ml
 
 MLINTERFACES = 
 

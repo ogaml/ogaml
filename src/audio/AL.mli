@@ -45,6 +45,8 @@ module ALError : sig
     | InvalidOperation
     | OutOfMemory
 
+  val to_string : t -> string
+
 end
 
 
@@ -57,6 +59,8 @@ module ContextError : sig
     | InvalidEnum
     | InvalidValue
     | OutOfMemory
+
+  val to_string : t -> string
 
 end
 

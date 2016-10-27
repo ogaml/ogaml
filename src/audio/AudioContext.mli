@@ -1,4 +1,8 @@
 
+exception Creation_error of string
+
+exception Destruction_error of string
+
 type t
 
 val create : 
@@ -24,6 +28,10 @@ val set_look_at : t -> OgamlMath.Vector3f.t -> unit
 val up_dir : t -> OgamlMath.Vector3f.t
 
 val set_up_dir : t -> OgamlMath.Vector3f.t -> unit
+
+val max_stereo_sources : t -> int
+
+val max_mono_sources : t -> int
 
 val has_stereo_source_available : t -> bool
 
