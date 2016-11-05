@@ -60,6 +60,15 @@ let play source ?pitch ?gain ?loop ?force sound =
 
 let stop source =
   may AL.Source.stop source.source ;
+  may
+    (fun s -> AL.Source.set_3f s AL.Source.Position (vec3f source.position))
+    source.source ;
+  may
+    (fun s -> AL.Source.set_3f s AL.Source.Velocity (vec3f source.velocity))
+    source.source ;
+  may (fun s ->
+        AL.Source.set_3f s AL.Source.Direction (vec3f source.orientation)
+  ) source.source ;
   source.status <- `Stopped
 
 let pause source =
@@ -76,18 +85,30 @@ let position source = source.position
 
 let set_position source pos =
   source.position <- pos ;
-  may (fun s -> AL.Source.set_3f s AL.Source.Position (vec3f pos)) source.source
+  match source.status with
+  | `Playing ->
+    may
+      (fun s -> AL.Source.set_3f s AL.Source.Position (vec3f pos))
+      source.source
+  | _ -> ()
 
 let velocity source = source.velocity
 
 let set_velocity source vel =
   source.velocity <- vel ;
-  may (fun s -> AL.Source.set_3f s AL.Source.Velocity (vec3f vel)) source.source
+  match source.status with
+  | `Playing ->
+    may
+      (fun s -> AL.Source.set_3f s AL.Source.Velocity (vec3f vel))
+      source.source
+  | _ -> ()
 
 let orientation source = source.orientation
 
 let set_orientation source ori =
   source.orientation <- ori ;
-  may
-    (fun s -> AL.Source.set_3f s AL.Source.Direction (vec3f source.orientation))
-    source.source
+  match source.status with
+  | `Playing ->
+    may
+      (fun s -> AL.Source.set_3f s AL.Source.Direction (vec3f ori))
+      source.source
