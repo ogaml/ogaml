@@ -17,7 +17,14 @@ let create ~samples ~channels ~rate =
   | `Stereo -> AL.Buffer.data_stereo
   | `Mono   -> AL.Buffer.data_mono
   end buffer data (AL.ShortData.length data) rate ;
-  { buffer ; duration = 0. ; samples ; channels }
+  let size = AL.Buffer.get buffer AL.Buffer.Size in
+  let duration =
+    let mondur = float_of_int size /. float_of_int rate in
+    match channels with
+    | `Stereo -> mondur /. 2.
+    | `Mono   -> mondur
+  in
+  { buffer ; duration ; samples ; channels }
 
 let duration buff = buff.duration
 
