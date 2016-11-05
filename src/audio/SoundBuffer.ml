@@ -11,6 +11,8 @@ let duration buff = 0.
 
 let samples buff = assert false
 
+let channels buff = `Mono
+
 module LL = struct
 
   let buffer buff = assert false

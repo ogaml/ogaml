@@ -1,4 +1,6 @@
 
+exception NoSourceAvailable
+
 type t
 
 val create :
@@ -7,6 +9,8 @@ val create :
   ?orientation:OgamlMath.Vector3f.t ->
   AudioContext.t -> t
 
+(* Will raise NoSourceAvailable if force is true and no source is available,
+   this could still happen in extreme cases. *)
 val play : t ->
   ?pitch:float ->
   ?gain:float ->
