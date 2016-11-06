@@ -233,6 +233,30 @@ module LL = struct
     in
     t.m_sources <- insert t.m_sources
 
+  let reallocate_stereo_source t source dur = 
+    let rec find_remove = function
+      | [] -> assert false
+      | (_,_,src,cbk)::tail when src==source -> (cbk, tail)
+      | e::tail -> 
+        let (cbk, tail) = find_remove tail in 
+        (cbk, e::tail)
+    in
+    let (cbk, ls) = find_remove t.s_sources in
+    t.s_sources <- ls;
+    allocate_stereo_source t source dur cbk
+
+  let reallocate_mono_source t source dur = 
+    let rec find_remove = function
+      | [] -> assert false
+      | (_,_,src,cbk)::tail when src==source -> (cbk, tail)
+      | e::tail -> 
+        let (cbk, tail) = find_remove tail in 
+        (cbk, e::tail)
+    in
+    let (cbk, ls) = find_remove t.m_sources in
+    t.m_sources <- ls;
+    allocate_mono_source t source dur cbk
+
   let deallocate_stereo_source t source = 
     let rec find_remove = function
       | [] -> assert false

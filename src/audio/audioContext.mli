@@ -51,6 +51,12 @@ module LL : sig
 
   val allocate_mono_source : t -> AL.Source.t -> float -> (unit -> unit) -> unit
 
+  (** Reallocates a source for a given time (for example if the source has
+    * been paused) *)
+  val reallocate_stereo_source : t -> AL.Source.t -> float -> unit
+
+  val reallocate_mono_source : t -> AL.Source.t -> float -> unit
+
   (** Marks a source as de-allocated *)
   val deallocate_stereo_source : t -> AL.Source.t -> unit
 
