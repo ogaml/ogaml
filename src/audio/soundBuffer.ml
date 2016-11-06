@@ -1,4 +1,6 @@
 
+exception Error of string
+
 type samples = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
 
 type t = {
@@ -7,8 +9,6 @@ type t = {
   samples  : samples ;
   channels : [`Stereo | `Mono]
 }
-
-let load s = assert false
 
 let create ~samples ~channels ~rate =
   let buffer = AL.Buffer.create () in
@@ -25,6 +25,20 @@ let create ~samples ~channels ~rate =
     | `Mono   -> mondur
   in
   { buffer ; duration ; samples ; channels }
+
+let load s = 
+  if (not (Sys.file_exists s)) || (Sys.is_directory s) then 
+    raise (Error ("File not found : " ^ s));
+  let (channels_nb, rate, samples) = AL.Vorbis.decode_file s in
+  let channels = 
+    match channels_nb with
+    | 1 -> `Mono
+    | 2 -> `Stereo
+    | _ -> raise (Error "unsupported number of channels (>2)")
+  in
+  let sound = create ~samples ~rate ~channels in
+  AL.Vorbis.free_data samples;
+  sound
 
 let duration buff = buff.duration
 

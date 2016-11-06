@@ -221,3 +221,13 @@ module Source : sig
 end
 
 
+module Vorbis : sig
+
+  type data = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
+
+  (* Returns channels * rate * data *)
+  val decode_file : string -> (int * int * data)
+
+  val free_data : data -> unit
+
+end

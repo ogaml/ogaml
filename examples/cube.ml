@@ -13,7 +13,7 @@ let base_freq = 44100
 
 let n = base_freq * 2
 
-let buffer_data = 
+(*let buffer_data = 
   Bigarray.Array1.create Bigarray.int16_signed Bigarray.c_layout n
 
 let curr_index = ref 0
@@ -33,10 +33,13 @@ let () =
   mk_beep 0.25 [440.; 261.626; 130.813];
   mk_beep 0.25 [466.164; 277.183; 138.591];
   mk_beep 0.25 [493.883; 293.665; 146.832];
-  mk_beep 1.25 [523.251; 311.127; 155.563]
+  mk_beep 1.25 [523.251; 311.127; 155.563]*)
+
+(*let audio_buffer = 
+  SoundBuffer.create ~samples:buffer_data ~channels:`Mono ~rate:base_freq*)
 
 let audio_buffer = 
-  SoundBuffer.create ~samples:buffer_data ~channels:`Mono ~rate:base_freq
+  SoundBuffer.load "examples/sound.ogg"
 
 let audio_source = 
   AudioSource.create audio_ctx

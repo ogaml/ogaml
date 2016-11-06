@@ -1,4 +1,6 @@
 
+exception Error of string
+
 type t
 
 type samples = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
