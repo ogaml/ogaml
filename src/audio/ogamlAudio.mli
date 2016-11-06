@@ -1,220 +1,113 @@
 
-module AL : sig
+module AudioContext : sig
 
-  module ShortData : sig
+  exception Creation_error of string
 
-    type t  
+  exception Destruction_error of string
 
-    (** Clears some data *)
-    val clear : t -> unit
+  type t
 
-    (** Append the second array at the end of the first one *)
-    val append : t -> t -> unit
+  val create : 
+    ?position:OgamlMath.Vector3f.t -> 
+    ?velocity:OgamlMath.Vector3f.t ->
+    ?look_at:OgamlMath.Vector3f.t ->
+    ?up_dir:OgamlMath.Vector3f.t -> unit -> t
 
-    (** Creates some data, the integer must be the expected size *)
-    val create : int -> t
+  val destroy : t -> unit
 
-    (** Adds an int to the data *)
-    val add_int : t -> int -> unit
+  val position : t -> OgamlMath.Vector3f.t
 
-    (** Returns the data associated to a bigarray *)
-    val of_bigarray : (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t -> t
+  val set_position : t -> OgamlMath.Vector3f.t -> unit
 
-    (** Returns the length of some data*)
-    val length : t -> int
+  val velocity : t -> OgamlMath.Vector3f.t
 
-    (** Returns the data at position i (debug only) *)
-    val get : t -> int -> int
+  val set_velocity : t -> OgamlMath.Vector3f.t -> unit
 
-    (** Iters through data *)
-    val iter : t -> (int -> unit) -> unit
+  val look_at : t -> OgamlMath.Vector3f.t
 
-    (** Maps through data (without changing its type) *)
-    val map : t -> (int -> int) -> t
+  val set_look_at : t -> OgamlMath.Vector3f.t -> unit
 
-    (** Debug *)
-    val print : t -> unit
+  val up_dir : t -> OgamlMath.Vector3f.t
 
-  end
+  val set_up_dir : t -> OgamlMath.Vector3f.t -> unit
 
+  val max_stereo_sources : t -> int
 
-  module ALError : sig
+  val max_mono_sources : t -> int
 
-    type t = 
-      | NoError
-      | InvalidName
-      | InvalidEnum
-      | InvalidValue
-      | InvalidOperation
-      | OutOfMemory
+  val has_stereo_source_available : t -> bool
 
-  end
+  val has_mono_source_available : t -> bool
 
+end
 
-  module ContextError : sig
 
-    type t = 
-      | NoError
-      | InvalidDevice
-      | InvalidContext
-      | InvalidEnum
-      | InvalidValue
-      | OutOfMemory
+module SoundBuffer : sig
 
-  end
+  type t
 
+  type samples = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
 
-  module Pervasives : sig
+  val load : string -> t
 
-    val speed_of_sound : float -> unit
+  val create :
+    samples:samples ->
+    channels:[`Stereo | `Mono] ->
+    rate:int -> t
 
-    val doppler_factor : float -> unit
+  val duration : t -> float
 
-    val error : unit -> ALError.t
+  val samples : t -> samples
 
-  end
+  val channels : t -> [`Stereo | `Mono]
 
+end
 
-  module Device : sig
 
-    type t
+module AudioStream : sig
 
-    val open_ : string option -> t
+  type t
 
-    val close : t -> bool
+end
 
-    val error : t -> ContextError.t
 
-    val max_mono_sources : t -> int
+module AudioSource : sig
 
-    val max_stereo_sources : t -> int
+  exception NoSourceAvailable
 
-  end
+  type t
 
+  val create :
+    ?position:OgamlMath.Vector3f.t ->
+    ?velocity:OgamlMath.Vector3f.t ->
+    ?orientation:OgamlMath.Vector3f.t ->
+    AudioContext.t -> t
 
-  module Context : sig
+  val play : t ->
+    ?pitch:float ->
+    ?gain:float ->
+    ?loop:bool ->
+    ?force:bool -> 
+    [`Stream of AudioStream.t | `Sound of SoundBuffer.t] -> unit
 
-    type t
+  val stop : t -> unit
 
-    val create : Device.t -> t
+  val pause : t -> unit
 
-    val make_current : t -> bool
+  val resume : t -> unit
 
-    val remove_current : unit -> bool
+  val status : t -> [`Playing | `Stopped | `Paused]
 
-    val process : t -> unit
+  val position : t -> OgamlMath.Vector3f.t
 
-    val suspend : t -> unit
+  val set_position : t -> OgamlMath.Vector3f.t -> unit
 
-    val destroy : t -> unit
+  val velocity : t -> OgamlMath.Vector3f.t
 
-  end
+  val set_velocity : t -> OgamlMath.Vector3f.t -> unit
 
+  val orientation : t -> OgamlMath.Vector3f.t
 
-  module Listener : sig
-
-    val set_gain : float -> unit
-
-    val set_position : (float * float * float) -> unit
-
-    val set_velocity : (float * float * float) -> unit
-
-    val set_orientation : (float * float * float) -> (float * float * float) -> unit
-
-    val gain : unit -> float
-
-    val position : unit -> (float * float * float)
-
-    val velocity : unit -> (float * float * float)
-
-    val orientation : unit -> ((float * float * float) * (float * float * float))
-
-  end
-
-
-  module Buffer : sig
-
-    type t
-
-    type property =
-      | Frequency
-      | Bits
-      | Channels
-      | Size
-
-    val create : unit -> t
-
-    val data_mono : t -> ShortData.t -> int -> int -> unit
-
-    val data_stereo : t -> ShortData.t -> int -> int -> unit
-
-    val set : t -> property -> int -> unit
-
-    val get : t -> property -> int
-
-  end
-
-
-  module Source : sig
-
-    type t
-
-    type property_f =
-      | Pitch
-      | Gain
-      | MaxDistance
-      | RolloffFactor
-      | ReferenceDistance
-      | MinGain
-      | MaxGain
-      | ConeOuterGain
-      | ConeInnerAngle
-      | ConeOuterAngle
-      | SecOffset
-      | SampleOffset
-      | ByteOffset
-
-    type property_3f =
-      | Position
-      | Velocity
-      | Direction
-
-    type property_i =
-      | SourceRelative
-      | SourceType
-      | Looping
-      | SourceState
-      | BuffersQueued
-      | BuffersProcessed
-
-    val create : unit -> t
-
-    val set_f : t -> property_f -> float -> unit
-
-    val set_3f : t -> property_3f -> (float * float * float) -> unit
-
-    val set_i : t -> property_i -> int -> unit
-
-    val set_buffer : t -> Buffer.t -> unit
-
-    val get_f : t -> property_f -> float
-
-    val get_3f : t -> property_3f -> (float * float * float)
-
-    val get_i : t -> property_i -> int 
-
-    val play : t -> unit
-
-    val pause : t -> unit
-
-    val stop : t -> unit
-
-    val rewind : t -> unit
-
-    val queue : t -> int -> Buffer.t array -> unit
-
-    val unqueue : t -> int -> unit
-
-  end
+  val set_orientation : t -> OgamlMath.Vector3f.t -> unit
 
 end

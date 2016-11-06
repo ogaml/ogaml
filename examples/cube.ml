@@ -2,55 +2,47 @@ open OgamlGraphics
 open OgamlMath
 open OgamlAudio
 
-let aldevice = 
-  AL.Device.open_ None
-
-let alcontext = 
-  AL.Context.create aldevice
+let audio_ctx = 
+  AudioContext.create ()
 
 let () = 
-  assert (AL.Context.make_current alcontext)
-
-let () = 
-  Printf.printf "Maximum number of mono sources : %i\n%!" (AL.Device.max_mono_sources aldevice);
-  Printf.printf "Maximum number of stereo sources : %i\n%!" (AL.Device.max_stereo_sources aldevice)
-
-let albuffer = 
-  AL.Buffer.create ()
+  Printf.printf "Maximum number of mono sources : %i\n%!" (AudioContext.max_mono_sources audio_ctx);
+  Printf.printf "Maximum number of stereo sources : %i\n%!" (AudioContext.max_stereo_sources audio_ctx)
 
 let base_freq = 44100
 
-let n = base_freq * 8
+let n = base_freq * 2
 
-let bufdata = AL.ShortData.create n
+let buffer_data = 
+  Bigarray.Array1.create Bigarray.int16_signed Bigarray.c_layout n
+
+let curr_index = ref 0
 
 let mk_beep dur freq = 
   let duri = int_of_float (float_of_int base_freq *. dur) in
-  for i = 0 to duri do
+  for i = 1 to duri do
     let fi = float_of_int i *. 2. *. 3.141592 /. (float_of_int base_freq) in
-    AL.ShortData.add_int bufdata (int_of_float (20000. *. (sin (fi *. freq))));
+    let v = 
+      List.fold_left (fun v f -> v +. (sin (fi *. f))) 0. freq
+    in
+    buffer_data.{!curr_index} <- (int_of_float (v *. 30000. /. (float_of_int (List.length freq))));
+    incr curr_index
   done
 
 let () = 
-  mk_beep 10. 440.;
-  AL.Buffer.data_mono albuffer bufdata (AL.ShortData.length bufdata) base_freq
+  mk_beep 0.25 [440.; 261.626; 130.813];
+  mk_beep 0.25 [466.164; 277.183; 138.591];
+  mk_beep 0.25 [493.883; 293.665; 146.832];
+  mk_beep 1.25 [523.251; 311.127; 155.563]
 
-let alsource = 
-  AL.Source.create ()
+let audio_buffer = 
+  SoundBuffer.create ~samples:buffer_data ~channels:`Mono ~rate:base_freq
+
+let audio_source = 
+  AudioSource.create audio_ctx
  
 let () = 
-  AL.Source.set_buffer alsource albuffer;
-  AL.Source.set_3f alsource AL.Source.Velocity (-10., 0., 0.);
-  AL.Source.set_3f alsource AL.Source.Position (30., 1., 0.);
-  AL.Source.play alsource;
-  for i = 0 to 10000000 do
-    let fi = float_of_int i /. 10000000. in
-    AL.Source.set_3f alsource AL.Source.Position (30. -. (fi *. 60.), 1., 0.)
-  done
-
-let () = 
-  assert (AL.Device.error aldevice = AL.ContextError.NoError);
-  assert (AL.Pervasives.error () = AL.ALError.NoError)
+  AudioSource.play audio_source (`Sound audio_buffer)
 
 let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 
@@ -216,6 +208,4 @@ let () =
   Window.destroy window
 
 let () = 
-  assert (AL.Context.remove_current ());
-  AL.Context.destroy alcontext;
-  assert (AL.Device.close aldevice)
+  AudioContext.destroy audio_ctx
