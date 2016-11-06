@@ -45,6 +45,7 @@ let audio_source =
   AudioSource.create audio_ctx
  
 let () = 
+  Printf.printf "Duration of sound : %.5fs\n%!" (SoundBuffer.duration audio_buffer);
   AudioSource.play audio_source (`Sound audio_buffer)
 
 let settings = OgamlCore.ContextSettings.create ~msaa:8 ()

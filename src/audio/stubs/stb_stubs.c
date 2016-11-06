@@ -26,7 +26,6 @@ caml_stb_decode_file(value filename)
   res = caml_alloc(3,0);
   Store_field(res, 0, Val_int(channels));
   Store_field(res, 1, Val_int(sample_rate));
-
   Store_field(res, 2, caml_ba_alloc(CAML_BA_SINT16 | CAML_BA_C_LAYOUT, 1, data, dims));
 
   CAMLreturn(res);
