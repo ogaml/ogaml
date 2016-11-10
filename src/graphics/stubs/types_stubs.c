@@ -260,6 +260,27 @@ GLenum Target_val(value target)
     case 3:
       return GL_TEXTURE_3D;
 
+    case 4:
+      return GL_TEXTURE_CUBE_MAP;
+
+    case 5:
+      return GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+
+    case 6:
+      return GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
+
+    case 7:
+      return GL_TEXTURE_CUBE_MAP_POSITIVE_Z;
+
+    case 8:
+      return GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
+ 
+    case 9:
+      return GL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
+ 
+    case 10:
+      return GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
+                
     default:
       caml_failwith("Caml variant error in Target_val(1)");
   }

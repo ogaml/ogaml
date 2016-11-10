@@ -385,13 +385,13 @@ module Texture2DArray = struct
     let lparams = 
       List.map extract_params src
     in
-    let (size, fst_img) = List.hd lparams in
+    let (size, _) = List.hd lparams in
     let depth, imgs = 
-      List.fold_left (fun (n, l_imgs) (img_size, img) -> 
+      List.fold_right (fun (img_size, img) (n, l_imgs) -> 
         if img_size <> size then 
           raise (Texture_error "Texture 2D array : images of different sizes");
         (n+1, img :: l_imgs)
-      ) (1, [fst_img]) (List.tl lparams)
+      ) lparams (0, []) 
     in
     let levels = 
       let max_levels = Common.max_mipmaps size in
@@ -495,15 +495,41 @@ module CubemapMipmapFace = struct
 
   let size t = t.size
 
-  let write t r img = assert false (* TODO *)
+  let bind t uid = Common.bind t.common uid
+
+  let write t rect img =
+    let target = 
+      match t.face with
+      | `PositiveX -> GLTypes.TextureTarget.CubemapPositiveX
+      | `NegativeX -> GLTypes.TextureTarget.CubemapNegativeX
+      | `PositiveY -> GLTypes.TextureTarget.CubemapPositiveY
+      | `NegativeY -> GLTypes.TextureTarget.CubemapNegativeY
+      | `PositiveZ -> GLTypes.TextureTarget.CubemapPositiveZ
+      | `NegativeZ -> GLTypes.TextureTarget.CubemapNegativeZ
+    in
+    bind t 0;
+    GL.Texture.subimage2D target
+                          t.level
+                          (rect.IntRect.x, rect.IntRect.y)
+                          (rect.IntRect.width, rect.IntRect.height)
+                          GLTypes.PixelFormat.RGBA
+                          (Image.data img)
 
   let level t = t.level
 
   let face t = t.face
 
-  let bind t uid = Common.bind t.common uid
-
-  let to_color_attachment t = assert false (* TODO *)
+  let to_color_attachment t = 
+    let f = 
+      match t.face with
+      | `PositiveX -> 0
+      | `NegativeX -> 1
+      | `PositiveY -> 2
+      | `NegativeY -> 3
+      | `PositiveZ -> 4
+      | `NegativeZ -> 5
+    in
+    Attachment.ColorAttachment.TextureCubemap (t.common.Common.internal, f, t.level)
 
 end
 
@@ -532,7 +558,17 @@ module CubemapFace = struct
 
   let bind t uid = Common.bind t.common uid
 
-  let to_color_attachment t = assert false (* TODO *)
+  let to_color_attachment t = 
+    let f = 
+      match t.face with
+      | `PositiveX -> 0
+      | `NegativeX -> 1
+      | `PositiveY -> 2
+      | `NegativeY -> 3
+      | `PositiveZ -> 4
+      | `NegativeZ -> 5
+    in
+    Attachment.ColorAttachment.TextureCubemap (t.common.Common.internal, f, 0)
 
 end
 

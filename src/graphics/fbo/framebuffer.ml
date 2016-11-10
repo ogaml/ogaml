@@ -54,6 +54,8 @@ let attach_color (type a) (module A : Attachment.ColorAttachable with type t = a
     GL.FBO.texture2D (GLTypes.GlAttachment.Color nb) tex lvl
   | Attachment.ColorAttachment.Texture2DArray (tex, layer, lvl) ->
     GL.FBO.texture_layer (GLTypes.GlAttachment.Color nb) tex layer lvl 
+  | Attachment.ColorAttachment.TextureCubemap (tex, face, lvl) ->
+    GL.FBO.texture_layer (GLTypes.GlAttachment.Color nb) tex face lvl 
   | Attachment.ColorAttachment.ColorRBO rbo ->
     GL.FBO.renderbuffer (GLTypes.GlAttachment.Color nb) rbo
 
