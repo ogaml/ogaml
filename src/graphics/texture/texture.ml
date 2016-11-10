@@ -484,6 +484,82 @@ end
 (*                                                           *)
 (*************************************************************)
 
+module CubemapMipmapFace = struct
+
+  type t = {
+    common : Common.t;
+    size   : Vector2i.t;
+    level  : int;
+    face   : [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ] 
+  }
+
+  let size t = t.size
+
+  let write t r img = assert false (* TODO *)
+
+  let level t = t.level
+
+  let face t = t.face
+
+  let bind t uid = Common.bind t.common uid
+
+  let to_color_attachment t = assert false (* TODO *)
+
+end
+
+
+module CubemapFace = struct
+
+  type t = {
+    common : Common.t;
+    size   : Vector2i.t;
+    face   : [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ] 
+  }
+
+  let size t = t.size
+
+  let mipmap_levels t = t.common.Common.mipmaps
+
+  let mipmap t i = 
+    if i < 0 || i >= t.common.Common.mipmaps then 
+      raise (Invalid_argument "Cubemap texture : mipmap level out of bounds");
+    {CubemapMipmapFace.common = t.common;
+                       size   = Vector2i.map t.size (fun v -> v lsr i);
+                       face   = t.face;
+                       level  = i}
+
+  let face t = t.face
+
+  let bind t uid = Common.bind t.common uid
+
+  let to_color_attachment = assert false (* TODO *)
+
+end
+
+
+module CubemapMipmap = struct
+
+  type t = {
+    common : Common.t;
+    size   : Vector2i.t;
+    level  : int
+  }
+
+  let size t = t.size
+
+  let level t = t.level
+
+  let face t f = 
+    {CubemapMipmapFace.common = t.common;
+                         size = t.size;
+                        level = t.level;
+                         face = f}
+
+  let bind t uid = Common.bind t.common uid
+
+end
+
+
 module Cubemap = struct
 
   type t = {
@@ -584,7 +660,7 @@ module Cubemap = struct
     if i < 0 || i >= t.common.Common.mipmaps then 
       raise (Invalid_argument "Cubemap texture : mipmap level out of bounds");
     {CubemapMipmap.common = t.common;
-                   size   = Vector2i.map (fun v -> v lsr i) t.size;
+                   size   = Vector2i.map t.size (fun v -> v lsr i);
                    level  = i}
 
   let face t f = 
