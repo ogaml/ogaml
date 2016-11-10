@@ -532,7 +532,7 @@ module CubemapFace = struct
 
   let bind t uid = Common.bind t.common uid
 
-  let to_color_attachment = assert false (* TODO *)
+  let to_color_attachment t = assert false (* TODO *)
 
 end
 
