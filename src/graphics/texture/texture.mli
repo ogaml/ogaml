@@ -120,7 +120,7 @@ module Texture2DArray : sig
 
   val create : (module RenderTarget.T with type t = 'a) -> 'a
                -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
-               -> [< `File of string list | `Image of Image.t list | `Empty of OgamlMath.Vector3i.t] -> t
+               -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list -> t
 
   val size : t -> OgamlMath.Vector3i.t
 
