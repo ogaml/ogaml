@@ -338,14 +338,14 @@ let rebuild_full_texture (type s) (module M : RenderTarget.T with type t = s) ta
     let img   = Shelf.image height page.shelf in
     insert (index, img) l) t.pages []
   in
-  let l_imgs_strip = List.map (fun (_,i) -> i) l_imgs in
+  let l_imgs_strip = List.map (fun (_,i) -> `Image i) l_imgs in
   let texture = 
     if l_imgs_strip = [] then 
       Texture.Texture2DArray.create (module M) target 
-        ~mipmaps:`None (`Empty Vector3i.zero)
+        ~mipmaps:`None [`Empty Vector2i.zero]
     else 
       Texture.Texture2DArray.create (module M) target 
-        ~mipmaps:`None (`Image l_imgs_strip)
+        ~mipmaps:`None l_imgs_strip
   in
   Texture.Texture2DArray.minify  texture Texture.MinifyFilter.Linear;
   Texture.Texture2DArray.magnify texture Texture.MagnifyFilter.Linear;
