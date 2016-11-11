@@ -43,6 +43,13 @@ module TextureTarget = struct
     | Texture2D
     | Texture2DArray
     | Texture3D
+    | CubemapTexture
+    | CubemapPositiveX
+    | CubemapPositiveY
+    | CubemapPositiveZ
+    | CubemapNegativeX
+    | CubemapNegativeY
+    | CubemapNegativeZ
 
 end
 
