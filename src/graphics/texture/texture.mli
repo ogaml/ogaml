@@ -209,7 +209,7 @@ module Cubemap : sig
                -> negative_x:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                -> negative_y:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                -> negative_z:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
-               -> t
+               -> unit -> t
 
   val size : t -> OgamlMath.Vector2i.t
 

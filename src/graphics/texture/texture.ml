@@ -606,7 +606,7 @@ module Cubemap = struct
   let create (type a) (module M : RenderTarget.T with type t = a) target
     ?mipmaps:(mipmaps = `AllGenerated) 
     ~positive_x ~positive_y ~positive_z 
-    ~negative_x ~negative_y ~negative_z =
+    ~negative_x ~negative_y ~negative_z () =
     let context = M.context target in
     (* Extract the texture parameters *)
     let extract_params = function

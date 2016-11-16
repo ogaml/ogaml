@@ -45,6 +45,9 @@ val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
 (** Adds a 2D texture array to a uniform structure *)
 val texture2Darray : string -> ?tex_unit:int -> Texture.Texture2DArray.t -> t -> t
 
+(** Adds a cubemap texture to a uniform structure *)
+val cubemap : string -> ?tex_unit:int -> Texture.Cubemap.t -> t -> t
+
 
 module LL : sig
 

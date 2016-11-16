@@ -111,28 +111,29 @@ int Val_attrib_type(GLenum type)
 {
   switch(type)
   {
-    case GL_INT          : return 0;
-    case GL_INT_VEC2     : return 1;
-    case GL_INT_VEC3     : return 2;
-    case GL_INT_VEC4     : return 3;
-    case GL_FLOAT        : return 4;
-    case GL_FLOAT_VEC2   : return 5;
-    case GL_FLOAT_VEC3   : return 6;
-    case GL_FLOAT_VEC4   : return 7;
-    case GL_FLOAT_MAT2   : return 8;
-    case GL_FLOAT_MAT2x3 : return 9;
-    case GL_FLOAT_MAT2x4 : return 10;
-    case GL_FLOAT_MAT3x2 : return 11;
-    case GL_FLOAT_MAT3   : return 12;
-    case GL_FLOAT_MAT3x4 : return 13;
-    case GL_FLOAT_MAT4x2 : return 14;
-    case GL_FLOAT_MAT4x3 : return 15;
-    case GL_FLOAT_MAT4   : return 16;
-    case GL_SAMPLER_1D   : return 17;
-    case GL_SAMPLER_2D   : return 18;
-    case GL_SAMPLER_2D_ARRAY : return 19;
-    case GL_SAMPLER_3D   : return 20;
-    default: caml_failwith("Caml variant error in Val_type(1)");
+    case GL_INT          : return 1;
+    case GL_INT_VEC2     : return 2;
+    case GL_INT_VEC3     : return 3;
+    case GL_INT_VEC4     : return 4;
+    case GL_FLOAT        : return 5;
+    case GL_FLOAT_VEC2   : return 6;
+    case GL_FLOAT_VEC3   : return 7;
+    case GL_FLOAT_VEC4   : return 8;
+    case GL_FLOAT_MAT2   : return 9;
+    case GL_FLOAT_MAT2x3 : return 10;
+    case GL_FLOAT_MAT2x4 : return 11;
+    case GL_FLOAT_MAT3x2 : return 12;
+    case GL_FLOAT_MAT3   : return 13;
+    case GL_FLOAT_MAT3x4 : return 14;
+    case GL_FLOAT_MAT4x2 : return 15;
+    case GL_FLOAT_MAT4x3 : return 16;
+    case GL_FLOAT_MAT4   : return 17;
+    case GL_SAMPLER_1D   : return 18;
+    case GL_SAMPLER_2D   : return 19;
+    case GL_SAMPLER_2D_ARRAY : return 20;
+    case GL_SAMPLER_3D   : return 21;
+    case GL_SAMPLER_CUBE : return 22;
+    default: return 0;
   }
 }
 
