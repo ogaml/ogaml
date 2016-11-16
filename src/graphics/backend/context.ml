@@ -99,6 +99,11 @@ module LL = struct
       let str = GL.Pervasives.glsl_version () in
       Scanf.sscanf str "%i.%i" (fun a b -> a * 100 + (convert b))
     in
+    let max_opt o v = 
+      match o with
+      | Some o -> Some (max o v)
+      | None -> None
+    in
     let capabilities = {
       max_3D_texture_size       = GL.Pervasives.get_integerv GLTypes.Parameter.Max3DTextureSize      ;
       max_array_texture_layers  = GL.Pervasives.get_integerv GLTypes.Parameter.MaxArrayTextureLayers ;
@@ -107,10 +112,10 @@ module LL = struct
       max_depth_texture_samples = GL.Pervasives.get_integerv GLTypes.Parameter.MaxDepthTextureSamples;
       max_elements_indices      = GL.Pervasives.get_integerv GLTypes.Parameter.MaxElementsIndices    ;
       max_elements_vertices     = GL.Pervasives.get_integerv GLTypes.Parameter.MaxElementsVertices   ;
-      max_framebuffer_width     = GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferWidth   ;
-      max_framebuffer_height    = GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferHeight  ;
-      max_framebuffer_layers    = GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferLayers  ;
-      max_framebuffer_samples   = GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferSamples ;
+      max_framebuffer_width     = max_opt (GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferWidth ) 16384;
+      max_framebuffer_height    = max_opt (GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferHeight) 16384;
+      max_framebuffer_layers    = max_opt (GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferLayers ) 2048;
+      max_framebuffer_samples   = max_opt (GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferSamples) 4;
       max_integer_samples       = GL.Pervasives.get_integerv GLTypes.Parameter.MaxIntegerSamples     ;
       max_renderbuffer_size     = GL.Pervasives.get_integerv GLTypes.Parameter.MaxRenderbufferSize   ;
       max_texture_buffer_size   = GL.Pervasives.get_integerv GLTypes.Parameter.MaxTextureBufferSize  ;
