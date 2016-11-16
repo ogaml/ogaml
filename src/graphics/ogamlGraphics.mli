@@ -942,7 +942,7 @@ module Texture : sig
   end
 
 
-    (** Represents arrays of 2D textures *)
+  (** Represents arrays of 2D textures *)
   module Texture2DArray : sig
 
     (** This module provides an abstraction of OpenGL 2D texture arrays *)
@@ -950,15 +950,15 @@ module Texture : sig
     (** Type of a 2D texture array *)
     type t 
 
-    (** Creates a texture array from a list of files, a list of images, or
-      * creates an empty array of given dimensions.
+    (** Creates a texture array from a list of files, images, or empty
+      * layers of given dimensions.
       * Generates all mipmaps by default for every layer by default.
       *
       * Raises $Texture_error$ if the requested size exceeds the maximal texture 
       * size allowed by the context.
       *
-      * Also raises $Texture_error$ if the list of images (or files) is empty, or
-      * if all the images do not have the same dimensions. *)
+      * Also raises $Texture_error$ if the list of layers is empty, or
+      * if all the layers do not have the same dimensions. *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a
                  -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
                  -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list -> t
@@ -988,6 +988,143 @@ module Texture : sig
     (** Returns a particular mipmap of a texture array. 
       * Raises $Invalid_argument$ if the mipmap level does not exist. *)
     val mipmap : t -> int -> Texture2DArrayMipmap.t
+
+  end
+
+
+  (** Mipmap level of a cubemap face *)
+  module CubemapMipmapFace : sig
+
+    (** Represents a single mipmap level of a cubemap texture's face *)
+
+    (** Type of a face's mipmap level *)
+    type t
+
+    (** Size of the mipmap *)
+    val size : t -> OgamlMath.Vector2i.t
+
+    (** Writes an image to a subrectangle of the mipmap *)
+    val write : t -> OgamlMath.IntRect.t -> Image.t -> unit
+
+    (** Returns the mipmap level of this mipmap *)
+    val level : t -> int
+
+    (** Returns the face corresponding to this face's mipmap *)
+    val face : t -> [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ] 
+
+    (** System only : binds the original cubemap texture *)
+    val bind : t -> int -> unit
+
+    (** CubemapMipmapFace implements the interface ColorAttachable *)
+    val to_color_attachment : t -> Attachment.ColorAttachment.t
+
+  end
+
+
+  (** Cubemap face *)
+  module CubemapFace : sig
+
+    (** Represents a single cubemap texture's face *)
+
+    (** Type of a face *)
+    type t
+
+    (** Size of the texture *)
+    val size : t -> OgamlMath.Vector2i.t
+
+    (** Returns the number of mipmap levels of this texture *)
+    val mipmap_levels : t -> int
+
+    (** Returns a particular mipmap level of this face *)
+    val mipmap : t -> int -> CubemapMipmapFace.t
+
+    (** Returns the face corresponding to this texture *)
+    val face : t -> [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ] 
+
+    (** System only : binds the original texture for drawing *)
+    val bind : t -> int -> unit
+
+    (** CubemapFace implements the interface ColorAttachable *)
+    val to_color_attachment : t -> Attachment.ColorAttachment.t
+
+  end
+
+  
+  (** Mipmap level of a cubemap texture *)
+  module CubemapMipmap : sig
+    
+    (** Represents a single mipmap level of a cubemap texture *)
+
+    (** Type of a mipmap level *)
+    type t
+
+    (** Size of a face of a mipmap *)
+    val size : t -> OgamlMath.Vector2i.t
+
+    (** Returns the level associated to a mipmap *)
+    val level : t -> int
+
+    (** Returns a particular face of this mipmap *)
+    val face : t -> [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ] 
+                 -> CubemapMipmapFace.t
+
+    (** System only : binds the original texture for drawing *)
+    val bind : t -> int -> unit
+
+  end
+
+
+  (** Cubemap textures *)
+  module Cubemap : sig
+    
+    (** This module provides an abstraction of OpenGL's cubemap textures *)
+
+    (** Cubemap texture *)
+    type t
+
+    (** Creates a cubemap texture from 6 textures, images or empty layers of
+      * a given dimension.
+      * Generates all mipmaps by default.
+      *
+      * Raises $Texture_error$ if the requested size exceeds the maximal texture 
+      * size allowed by the context.
+      *
+      * Also raises $Texture_error$ if the 6 textures, images or empty layers
+      * do not have the same dimensions. *)
+    val create : (module RenderTarget.T with type t = 'a) -> 'a
+                 -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+                 -> positive_x:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
+                 -> positive_y:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
+                 -> positive_z:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
+                 -> negative_x:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
+                 -> negative_y:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
+                 -> negative_z:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
+                 -> unit -> t
+
+    (** Size of a face of a cubemap texture *)
+    val size : t -> OgamlMath.Vector2i.t
+
+    (** Sets the minifying filter of a texture. Defaults as LinearMipmapLinear. *)
+    val minify : t -> MinifyFilter.t -> unit
+
+    (** Sets the magnifying filter of a texture. Defaults as Linear. *)
+    val magnify : t -> MagnifyFilter.t -> unit
+
+    (** Sets the wrapping function of a texture. Defaults as ClampEdge. *)
+    val wrap : t -> WrapFunction.t -> unit
+
+    (** Returns the number of mipmap levels of a texture *)
+    val mipmap_levels : t -> int
+
+    (** Returns a particular mipmap level of a texture *)
+    val mipmap : t -> int -> CubemapMipmap.t
+
+    (** Returns a particular face of a texture *)
+    val face : t -> [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ] 
+                 -> CubemapFace.t
+
+    (** System only : binds the texture for drawing *)
+    val bind : t -> int -> unit
 
   end
 
@@ -1194,6 +1331,11 @@ module Uniform : sig
     *
     * @see:OgamlGraphics.Texture.Texture2DArray *)
   val texture2Darray : string -> ?tex_unit:int -> Texture.Texture2DArray.t -> t -> t
+
+  (** See texture2D. Type : samplerCube. 
+    *
+    * @see:OgamlGraphics.Texture.Cubemap *)
+  val cubemap : string -> ?tex_unit:int -> Texture.Cubemap.t -> t -> t
 
 end
 

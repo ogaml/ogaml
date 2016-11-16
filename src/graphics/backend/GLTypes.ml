@@ -11,6 +11,7 @@ end
 module GlslType = struct
 
   type t =
+    | Unknown
     | Int
     | Int2
     | Int3
@@ -32,6 +33,7 @@ module GlslType = struct
     | Sampler2D
     | Sampler2DArray
     | Sampler3D
+    | SamplerCube
 
 end
 
