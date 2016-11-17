@@ -139,7 +139,7 @@ let iter ?strict:(strict=true) t f =
     (fun i ->
       iter1D t.y t.height strict 
         (fun j ->
-          iter1D t.z t.height strict 
+          iter1D t.z t.depth strict 
             (fun k -> f Vector3i.({x = i; y = j; z = k}))
         )
     )
@@ -150,7 +150,7 @@ let fold ?strict:(strict=true) t f u =
     (fun i ->
       iter1D t.y t.height strict 
         (fun j ->
-          iter1D t.z t.height strict 
+          iter1D t.z t.depth strict 
             (fun k -> r := f Vector3i.({x = i; y = j; z = k}) !r)
         )
     );
