@@ -98,6 +98,8 @@ module GLContext = struct
 
   external destroy : Display.t -> t -> unit = "caml_glx_destroy_context"
 
+  external debug : unit -> unit = "caml_glcontext_debug"
+
 end
 
 

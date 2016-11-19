@@ -55,6 +55,9 @@ module GLContext : sig
 
   val destroy : Display.t -> t -> unit
 
+  (** Prints the last GL error, if any *)
+  val debug : unit -> unit 
+
 end
 
 

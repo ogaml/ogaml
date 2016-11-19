@@ -10,10 +10,6 @@ type capabilities = {
   max_depth_texture_samples : int;
   max_elements_indices      : int;
   max_elements_vertices     : int;
-  max_framebuffer_width     : int option;
-  max_framebuffer_height    : int option;
-  max_framebuffer_layers    : int option;
-  max_framebuffer_samples   : int option;
   max_integer_samples       : int;
   max_renderbuffer_size     : int;
   max_texture_buffer_size   : int;
@@ -77,7 +73,15 @@ let is_glsl_version_supported s v =
   v <= s.glsl
 
 let assert_no_error s = 
-  assert (GL.Pervasives.error () = None)
+  match GL.Pervasives.error () with
+ | Some GLTypes.GlError.Invalid_enum    -> error "Invalid enum"
+ | Some GLTypes.GlError.Invalid_value   -> error "Invalid value"
+ | Some GLTypes.GlError.Invalid_op      -> error "Invalid op"
+ | Some GLTypes.GlError.Invalid_fbop    -> error "Invalid fbop"
+ | Some GLTypes.GlError.Out_of_memory   -> error "Out of memory"
+ | Some GLTypes.GlError.Stack_overflow  -> error "Stack overflow"
+ | Some GLTypes.GlError.Stack_underflow -> error "Stack underflow"
+ | None -> ()
 
 let flush s = 
   GL.Pervasives.flush ()
@@ -99,11 +103,6 @@ module LL = struct
       let str = GL.Pervasives.glsl_version () in
       Scanf.sscanf str "%i.%i" (fun a b -> a * 100 + (convert b))
     in
-    let max_opt o v = 
-      match o with
-      | Some o -> Some (max o v)
-      | None -> None
-    in
     let capabilities = {
       max_3D_texture_size       = GL.Pervasives.get_integerv GLTypes.Parameter.Max3DTextureSize      ;
       max_array_texture_layers  = GL.Pervasives.get_integerv GLTypes.Parameter.MaxArrayTextureLayers ;
@@ -112,10 +111,6 @@ module LL = struct
       max_depth_texture_samples = GL.Pervasives.get_integerv GLTypes.Parameter.MaxDepthTextureSamples;
       max_elements_indices      = GL.Pervasives.get_integerv GLTypes.Parameter.MaxElementsIndices    ;
       max_elements_vertices     = GL.Pervasives.get_integerv GLTypes.Parameter.MaxElementsVertices   ;
-      max_framebuffer_width     = max_opt (GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferWidth ) 16384;
-      max_framebuffer_height    = max_opt (GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferHeight) 16384;
-      max_framebuffer_layers    = max_opt (GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferLayers ) 2048;
-      max_framebuffer_samples   = max_opt (GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferSamples) 4;
       max_integer_samples       = GL.Pervasives.get_integerv GLTypes.Parameter.MaxIntegerSamples     ;
       max_renderbuffer_size     = GL.Pervasives.get_integerv GLTypes.Parameter.MaxRenderbufferSize   ;
       max_texture_buffer_size   = GL.Pervasives.get_integerv GLTypes.Parameter.MaxTextureBufferSize  ;

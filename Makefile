@@ -24,7 +24,7 @@ EXAMPLE_PKGS = ogaml.graphics,ogaml.utils
 ifeq ($(OS_NAME), WIN)
     EXAMPLE_CMD = $(OCAMLOPT) $(EXAMPLE_MODULES)
 else
-    EXAMPLE_CMD = $(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKGS)
+    EXAMPLE_CMD = $(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKGS) -g
 endif
 
 

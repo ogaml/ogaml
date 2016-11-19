@@ -2,6 +2,7 @@
 #include <GL/gl.h>
 #include <GL/glx.h>
 #include <memory.h>
+#include <stdio.h>
 #include "utils.h"
 
 
@@ -114,4 +115,36 @@ caml_glx_destroy_context(value disp, value ctx)
 }
 
 
+CAMLprim value
+caml_glcontext_debug(value unit)
+{
+  CAMLparam0();
 
+  switch(glGetError())
+  {
+    case GL_NO_ERROR:          
+      printf("No error\n"); break;
+    case GL_INVALID_ENUM:      
+      printf("Invalid enum\n"); break;
+    case GL_INVALID_VALUE:     
+      printf("Invalid value\n"); break;
+    case GL_INVALID_OPERATION: 
+      printf("Invalid operation\n"); break;
+    case GL_INVALID_FRAMEBUFFER_OPERATION: 
+      printf("Invalid FBO operation\n"); break;
+    case GL_OUT_OF_MEMORY:     
+      printf("Out of memory\n"); break;
+  #ifdef GL_STACK_UNDERFLOW
+    case GL_STACK_UNDERFLOW: 
+      printf("Stack underflow\n"); break;
+  #endif
+  #ifdef GL_STACK_OVERFLOW
+    case GL_STACK_OVERFLOW: 
+      printf("Stack overflow\n"); break;
+  #endif
+    default:
+      break;
+  }
+
+  CAMLreturn(Val_unit);
+}

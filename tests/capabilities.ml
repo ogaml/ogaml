@@ -26,10 +26,6 @@ let () =
   Printf.printf "\tMaximal depth texture samples : %i\n%!" capabilities.Context.max_depth_texture_samples; 
   Printf.printf "\tMaximal elements indices : %i\n%!" capabilities.Context.max_elements_indices; 
   Printf.printf "\tMaximal elements vertices : %i\n%!" capabilities.Context.max_elements_vertices; 
-  Printf.printf "\tMaximal framebuffer width : %a\n%!" print_opt capabilities.Context.max_framebuffer_width; 
-  Printf.printf "\tMaximal framebuffer height : %a\n%!" print_opt capabilities.Context.max_framebuffer_height; 
-  Printf.printf "\tMaximal framebuffer layers : %a\n%!" print_opt capabilities.Context.max_framebuffer_layers; 
-  Printf.printf "\tMaximal framebuffer samples : %a\n%!" print_opt capabilities.Context.max_framebuffer_samples; 
   Printf.printf "\tMaximal integer samples : %i\n%!" capabilities.Context.max_integer_samples; 
   Printf.printf "\tMaximal renderbuffer size : %i\n%!" capabilities.Context.max_renderbuffer_size; 
   Printf.printf "\tMaximal texture buffer size : %i\n%!" capabilities.Context.max_texture_buffer_size; 

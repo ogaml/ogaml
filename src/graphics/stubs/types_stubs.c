@@ -583,49 +583,21 @@ GLenum Parameter_val(value par)
       return GL_MAX_ELEMENTS_VERTICES;
 
     case 7:
-      #ifndef GL_MAX_FRAMEBUFFER_WIDTH
-        return -1;
-      #else
-        return GL_MAX_FRAMEBUFFER_WIDTH;
-      #endif
-
-    case 8:
-      #ifndef GL_MAX_FRAMEBUFFER_HEIGHT
-        return -1;
-      #else
-        return GL_MAX_FRAMEBUFFER_HEIGHT;
-      #endif
-
-    case 9:
-      #ifndef GL_MAX_FRAMEBUFFER_LAYERS
-        return -1;
-      #else
-        return GL_MAX_FRAMEBUFFER_LAYERS;
-      #endif
-
-    case 10:
-      #ifndef GL_MAX_FRAMEBUFFER_SAMPLES
-        return -1;
-      #else
-        return GL_MAX_FRAMEBUFFER_SAMPLES;
-      #endif
-
-    case 11:
       return GL_MAX_INTEGER_SAMPLES;
 
-    case 12:
+    case 8:
       return GL_MAX_RENDERBUFFER_SIZE;
       
-    case 13:
+    case 9:
       return GL_MAX_TEXTURE_BUFFER_SIZE;
 
-    case 14:
+    case 10:
       return GL_MAX_TEXTURE_IMAGE_UNITS;
 
-    case 15:
+    case 11:
       return GL_MAX_TEXTURE_SIZE;
 
-    case 16:
+    case 12:
       return GL_MAX_COLOR_ATTACHMENTS;
 
     default:

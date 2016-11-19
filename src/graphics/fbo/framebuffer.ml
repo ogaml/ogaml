@@ -35,14 +35,10 @@ let attach_color (type a) (module A : Attachment.ColorAttachable with type t = a
   if nb >= capabilities.Context.max_color_attachments then
     raise (FBO_Error "Color attachment limit exceeded");
   let max_width = 
-    match capabilities.Context.max_framebuffer_width with
-    | Some w -> w
-    | None   -> capabilities.Context.max_texture_size
+    capabilities.Context.max_texture_size
   in
   let max_height = 
-    match capabilities.Context.max_framebuffer_height with
-    | Some h -> h
-    | None   -> capabilities.Context.max_texture_size
+    capabilities.Context.max_texture_size
   in
   if size.Vector2i.x >= max_width || size.Vector2i.y >= max_height then
     raise (FBO_Error "Max attachment size exceeded");
@@ -65,14 +61,10 @@ let attach_depth (type a) (module A : Attachment.DepthAttachable with type t = a
   let attc = A.to_depth_attachment attachment in
   let capabilities = Context.capabilities fbo.context in
   let max_width = 
-    match capabilities.Context.max_framebuffer_width with
-    | Some w -> w
-    | None   -> capabilities.Context.max_texture_size
+    capabilities.Context.max_texture_size
   in
   let max_height = 
-    match capabilities.Context.max_framebuffer_height with
-    | Some h -> h
-    | None   -> capabilities.Context.max_texture_size
+    capabilities.Context.max_texture_size
   in
   if size.Vector2i.x >= max_width || size.Vector2i.y >= max_height then
     raise (FBO_Error "Max attachment size exceeded");
@@ -91,14 +83,10 @@ let attach_stencil (type a) (module A : Attachment.StencilAttachable with type t
   let attc = A.to_stencil_attachment attachment in
   let capabilities = Context.capabilities fbo.context in
   let max_width = 
-    match capabilities.Context.max_framebuffer_width with
-    | Some w -> w
-    | None   -> capabilities.Context.max_texture_size
+    capabilities.Context.max_texture_size
   in
   let max_height = 
-    match capabilities.Context.max_framebuffer_height with
-    | Some h -> h
-    | None   -> capabilities.Context.max_texture_size
+    capabilities.Context.max_texture_size
   in
   if size.Vector2i.x >= max_width || size.Vector2i.y >= max_height then
     raise (FBO_Error "Max attachment size exceeded");
@@ -117,14 +105,10 @@ let attach_depthstencil (type a) (module A : Attachment.DepthStencilAttachable w
   let attc = A.to_depthstencil_attachment attachment in
   let capabilities = Context.capabilities fbo.context in
   let max_width = 
-    match capabilities.Context.max_framebuffer_width with
-    | Some w -> w
-    | None   -> capabilities.Context.max_texture_size
+    capabilities.Context.max_texture_size
   in
   let max_height = 
-    match capabilities.Context.max_framebuffer_height with
-    | Some h -> h
-    | None   -> capabilities.Context.max_texture_size
+    capabilities.Context.max_texture_size
   in
   if size.Vector2i.x >= max_width || size.Vector2i.y >= max_height then
     raise (FBO_Error "Max attachment size exceeded");
@@ -147,14 +131,10 @@ let has_stencil fbo = fbo.stencil
 let size fbo = 
   let capabilities = Context.capabilities fbo.context in
   let max_width = 
-    match capabilities.Context.max_framebuffer_width with
-    | Some w -> w
-    | None   -> capabilities.Context.max_texture_size
+    capabilities.Context.max_texture_size
   in
   let max_height = 
-    match capabilities.Context.max_framebuffer_height with
-    | Some h -> h
-    | None   -> capabilities.Context.max_texture_size
+    capabilities.Context.max_texture_size
   in
   let msize = ref Vector2i.({x = max_width; y = max_height}) in
   for i = 0 to Array.length fbo.color_attachments - 1 do

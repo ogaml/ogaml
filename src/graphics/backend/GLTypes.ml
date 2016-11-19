@@ -191,10 +191,6 @@ module Parameter = struct
     | MaxDepthTextureSamples
     | MaxElementsIndices
     | MaxElementsVertices
-    | MaxFramebufferWidth
-    | MaxFramebufferHeight
-    | MaxFramebufferLayers
-    | MaxFramebufferSamples
     | MaxIntegerSamples
     | MaxRenderbufferSize
     | MaxTextureBufferSize
