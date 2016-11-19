@@ -48,6 +48,10 @@ let clear ?color:(color=Some (`RGB Color.RGB.black))
           ?stencil:(stencil=true) win =
   let depth = (ContextSettings.depth_bits win.settings > 0) && depth in
   let stencil = (ContextSettings.stencil_bits win.settings > 0) && stencil in
+  if depth && not (Context.LL.depth_writing win.context) then begin
+    Context.LL.set_depth_writing win.context true;
+    GL.Pervasives.depth_mask true
+  end;
   RenderTarget.bind_fbo win.context 0 None;
   RenderTarget.clear ?color ~depth ~stencil win.context
 
