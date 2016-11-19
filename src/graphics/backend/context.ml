@@ -103,6 +103,7 @@ module LL = struct
       let str = GL.Pervasives.glsl_version () in
       Scanf.sscanf str "%i.%i" (fun a b -> a * 100 + (convert b))
     in
+    assert (GL.Pervasives.error () = None);
     let capabilities = {
       max_3D_texture_size       = GL.Pervasives.get_integerv GLTypes.Parameter.Max3DTextureSize      ;
       max_array_texture_layers  = GL.Pervasives.get_integerv GLTypes.Parameter.MaxArrayTextureLayers ;
@@ -119,6 +120,8 @@ module LL = struct
       max_color_attachments     = GL.Pervasives.get_integerv GLTypes.Parameter.MaxColorAttachments   ;
     }
     in
+    (* A bit ugly, but Invalid_enum occurs sometimes even if a feature is supported... *)
+    ignore (GL.Pervasives.error ());
     {
       capabilities;
       major   ;
