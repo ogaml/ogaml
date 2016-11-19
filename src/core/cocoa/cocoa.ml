@@ -5,6 +5,8 @@ external screen_size : unit -> float * float = "caml_cocoa_display_size"
 
 external resource_path : unit -> string = "caml_cocoa_resource_path"
 
+external realpath : string -> string = "caml_realpath"
+
 module NSString = struct
 
   type t

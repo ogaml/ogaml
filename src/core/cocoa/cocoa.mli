@@ -5,6 +5,8 @@ val screen_size : unit -> float * float
 
 val resource_path : unit -> string
 
+val realpath : string -> string
+
 module NSString : sig
 
   type t

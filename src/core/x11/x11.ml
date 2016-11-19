@@ -319,3 +319,10 @@ module Keyboard = struct
     = "caml_is_key_down"
 
 end
+
+
+module Utils = struct
+
+  external realpath : string -> string = "caml_realpath"
+
+end

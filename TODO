@@ -16,6 +16,9 @@ Cocoa specific:
   ☐ Implement LL.show_cursor
   ☐ Fix all pixel/point related issues
 
+Windows specific:
+  ☐ Implement canonical_path
+
 Interface changes:
   Window:
     ☐ Add open (dual of close)

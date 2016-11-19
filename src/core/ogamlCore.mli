@@ -176,6 +176,9 @@ module OS : sig
     *)
   val resources_dir : string
 
+  (** [canonical_path p] returns the resolved path equivalent to [p] *)
+  val canonical_path : string -> string
+
 end
 
 

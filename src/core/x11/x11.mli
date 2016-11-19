@@ -217,3 +217,8 @@ module Keyboard : sig
 
 end
 
+module Utils : sig
+
+  val realpath : string -> string
+
+end
