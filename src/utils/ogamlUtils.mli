@@ -443,14 +443,17 @@ module Graph : sig
     (** Returns all the neighbours of a vertex *)
     val neighbours : t -> vertex -> vertex list
 
+    (** Iterates through all the neighbours of a vertex *)
+    val iter_neighbours : t -> vertex -> (vertex -> unit) -> unit
+
     (** Merges two graphs *)
     val merge : t -> t -> t
 
-    (** $dfs g s f$ iterates $f$ through all the vertices of $g$, 
+    (** $dfs g s f$ iterates $f$ through all the accessible vertices of $g$, 
       * starting from $s$ using a dfs *)
     val dfs : t -> vertex -> (vertex -> unit) -> unit
 
-    (** $bfs g s f$ iterates $f$ through all the vertices of $g$, 
+    (** $bfs g s f$ iterates $f$ through all the accessible vertices of $g$, 
       * starting from $s$ using a bfs *)
     val bfs : t -> vertex -> (vertex -> unit) -> unit
 
