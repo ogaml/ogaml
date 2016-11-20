@@ -59,7 +59,7 @@ let matrix2D s mat m =
 
 let color s c m = 
   assert_free m s;
-  UniformMap.add s (Color (Color.rgb c)) m
+  UniformMap.add s (Color (Color.to_rgb c)) m
 
 let texture2D s ?tex_unit t m = 
   assert_free m s;

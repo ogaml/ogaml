@@ -29,7 +29,7 @@ let clear ?color ~depth ~stencil context =
   | None -> GL.Pervasives.clear false depth stencil
   | Some color ->
     if (Context.LL.clear_color context <> color) then begin
-      let crgb = Color.rgb color in
+      let crgb = Color.to_rgb color in
       Context.LL.set_clear_color context color;
       Color.RGB.(GL.Pervasives.color crgb.r crgb.g crgb.b crgb.a)
     end;

@@ -34,7 +34,7 @@ let create = function
       }
     in
     let r,g,b,a = 
-      let c = Color.rgb color in
+      let c = Color.to_rgb color in
       convert c.Color.RGB.r, 
       convert c.Color.RGB.g, 
       convert c.Color.RGB.b,
@@ -59,7 +59,7 @@ let size img =
 let set img v c = 
   let open Vector2i in
   let r,g,b,a =
-    let c = Color.rgb c in
+    let c = Color.to_rgb c in
     convert c.Color.RGB.r, 
     convert c.Color.RGB.g, 
     convert c.Color.RGB.b,

@@ -76,7 +76,7 @@ module Data = struct
 
   let add_color t col = 
     alloc t 4;
-    let c = Color.rgb col in
+    let c = Color.to_rgb col in
     Bigarray.Array1.unsafe_set t.data (t.length+0) c.Color.RGB.r;
     Bigarray.Array1.unsafe_set t.data (t.length+1) c.Color.RGB.g;
     Bigarray.Array1.unsafe_set t.data (t.length+2) c.Color.RGB.b;

@@ -13,6 +13,9 @@ module Color : sig
     (** Type of a color in RGBA format *)
     type t = {r : float; g : float; b : float; a : float}
 
+    (** Fast way to create an RGB color (alpha defaults to 1) *)
+    val make : ?alpha:float -> float -> float -> float -> t
+
     (** Opaque black *)
     val black : t
 
@@ -56,6 +59,9 @@ module Color : sig
 
     (** Type of a color in HSVA format *)
     type t = {h : float; s : float; v : float; a : float}
+
+    (** Fast way to create an HSV color (alpha defaults to 1) *)
+    val make : ?alpha:float -> float -> float -> float -> t
 
     (** Opaque black *)
     val black : t
@@ -111,11 +117,19 @@ module Color : sig
 
   (** Converts a color to HSV
     * @see:OgamlGraphics.Color.HSV *)
-  val hsv : t -> HSV.t
+  val to_hsv : t -> HSV.t
 
   (** Converts a color to RGB
     * @see:OgamlGraphics.Color.RGB *)
-  val rgb : t -> RGB.t
+  val to_rgb : t -> RGB.t
+
+  (** Fast way to create a HSV color
+    * @see:OgamlGraphics.Color.HSV *)
+  val hsv : ?alpha:float -> float -> float -> float -> t
+
+  (** Fast way to create a RGB color
+    * @see:OgamlGraphics.Color.RGB *)
+  val rgb : ?alpha:float -> float -> float -> float -> t
 
   (** Returns the alpha value of a color *)
   val alpha : t -> float
