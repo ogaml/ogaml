@@ -4,7 +4,7 @@ include ../../common_defs.mk
 
 INCLUDE_DIRS = -I ../math/
 
-MLSOURCES = priorityQueue.ml dequeue.ml graph.ml interpolator.ml noise.ml UTF8String.ml log.ml
+MLSOURCES = priorityQueue.ml dequeue.ml graph.ml interpolator.ml noise.ml UTF8String.ml log.ml clock.ml
 
 MLINTERFACES =
 

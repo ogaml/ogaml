@@ -46,6 +46,38 @@ module Log : sig
 end
 
 
+(** Simple clocks and counters *)
+module Clock : sig
+
+  (** Small utility to make clocks and counters (ex. FPS counter) *)
+
+  (** Type of a clock *)
+  type t
+
+  (** Creates a clock *)
+  val create : unit -> t
+
+  (** Restarts a clock (sets the time origin and resets the tick counter to 0) *)
+  val restart : t -> unit
+
+  (** Increments the tick counter of a clock *)
+  val tick : t -> unit
+
+  (** Returns the elapsed time in seconds *)
+  val time : t -> float
+
+  (** Returns the number of ticks *)
+  val ticks : t -> int
+
+  (** Returns the number of ticks per second *)
+  val tps : t -> float
+
+  (** Returns the average duration of a tick in seconds *)
+  val spt : t -> float
+
+end
+
+
 (** UTF-8 String representation and manipulation *)
 module UTF8String : sig
 
