@@ -2310,7 +2310,7 @@ module Text : sig
     font : Font.t ->
     ?color : Color.t ->
     size : int ->
-    bold : bool ->
+    ?bold : bool ->
     unit -> t
 
   (** Draws text on the screen. *)
