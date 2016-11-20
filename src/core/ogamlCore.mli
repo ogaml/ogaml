@@ -200,12 +200,17 @@ module ContextSettings : sig
     *
     *   $resizable$ - requests a resizable context (defaults to true)
     *
+    *   $fullscreen$ - requests a fullscreen context (defaults to false)
+    *
+    *   $framerate_limit$ - sets a framerate limit 
+    *
     *)
   val create : ?depth:int ->
                ?stencil:int ->
                ?msaa:int ->
                ?resizable:bool ->
                ?fullscreen:bool ->
+               ?framerate_limit:int ->
                unit -> t
 
   (** Returns the requested AA level *)
@@ -222,6 +227,9 @@ module ContextSettings : sig
 
   (** Returns true iff the settings require fullscreen mode *)
   val fullscreen : t -> bool
+
+  (** Returns the requested framerate limit, if any *)
+  val framerate_limit : t -> int option
 
 end
 

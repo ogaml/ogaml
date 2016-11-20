@@ -59,7 +59,7 @@ MLCMISALONE = $(MLINTERFACES:.mli=.cmi)
 
 MLCMIS = $(MLCMISALONE) $(PARSER_FILES:.mly=.cmi) $(LEXER_FILES:.mll=.cmi) $(MLSOURCES:.ml=.cmi)
 
-COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast -Wno-pointer-sign
+COPTS = -Wno-int-to-void-pointer-cast -Wno-int-to-pointer-cast -Wno-pointer-sign 
 
 CMA_DEPS = ../core/$(CORE_LIB).cma ../math/$(MATH_LIB).cma ../utils/$(UTILS_LIB).cma
 CMXA_DEPS = ../core/$(CORE_LIB).cmxa ../math/$(MATH_LIB).cmxa ../utils/$(UTILS_LIB).cmxa

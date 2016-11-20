@@ -1391,6 +1391,9 @@ module Window : sig
   (** Changes the title of the window. *)
   val set_title : t -> string -> unit
 
+  (** Sets a framerate limit *)
+  val set_framerate_limit : t -> int option -> unit
+
   (** Closes a window, but does not free the memory.
     * This should prevent segfaults when calling functions on this window. *)
   val close : t -> unit

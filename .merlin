@@ -39,4 +39,4 @@ B tests
 B examples
 
 PKG ogaml.graphics
-FLG -rectypes
+B +threads
