@@ -11,6 +11,9 @@ val create :
 (** Changes the title of the window. *)
 val set_title : t -> string -> unit
 
+(** Sets a framerate limit *)
+val set_framerate_limit : t -> int option -> unit
+
 (** Returns the settings used at the creation of the window *)
 val settings : t -> OgamlCore.ContextSettings.t
 

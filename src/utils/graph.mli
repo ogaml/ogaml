@@ -38,6 +38,8 @@ module type G = sig
 
   val neighbours : t -> vertex -> vertex list
 
+  val iter_neighbours : t -> vertex -> (vertex -> unit) -> unit
+
   val merge : t -> t -> t
 
   val dfs : t -> vertex -> (vertex -> unit) -> unit

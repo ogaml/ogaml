@@ -22,9 +22,9 @@ EXAMPLE_MODULES = unix.cmxa bigarray.cmxa $(MATH_LIB).cmxa $(CORE_LIB).cmxa $(UT
 EXAMPLE_PKGS = ogaml.graphics,ogaml.utils
 
 ifeq ($(OS_NAME), WIN)
-    EXAMPLE_CMD = $(OCAMLOPT) $(EXAMPLE_MODULES)
+    EXAMPLE_CMD = $(OCAMLOPT) -thread $(EXAMPLE_MODULES)
 else
-    EXAMPLE_CMD = $(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKGS) -g
+    EXAMPLE_CMD = $(OCAMLFIND) $(OCAMLOPT) -thread -linkpkg -package $(EXAMPLE_PKGS) -g
 endif
 
 
@@ -35,9 +35,9 @@ TEST_INCLUDES = -I src/core -I src/math -I src/graphics -I src/utils
 TEST_MODULES = $(MATH_LIB).cmxa $(CORE_LIB).cmxa $(UTILS_LIB).cmxa $(GRAPHICS_LIB).cmxa
 
 ifeq ($(OS_NAME), WIN)
-    TEST_CMD = $(OCAMLOPT) unix.cmxa bigarray.cmxa $(TEST_MODULES) $(TEST_INCLUDES)
+    TEST_CMD = $(OCAMLOPT) -thread unix.cmxa bigarray.cmxa $(TEST_MODULES) $(TEST_INCLUDES)
 else
-    TEST_CMD = $(OCAMLFIND) $(OCAMLOPT) -linkpkg $(TEST_INCLUDES) $(TEST_MODULES) -package unix,bigarray
+    TEST_CMD = $(OCAMLFIND) $(OCAMLOPT) -thread -linkpkg $(TEST_INCLUDES) $(TEST_MODULES) -package unix,bigarray
 endif
 
 TEST_OUT = main.out 

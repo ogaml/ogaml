@@ -255,7 +255,7 @@ type t = {
   boundaries : FloatRect.t
 }
 
-let create ~text ~position ~font ?color:(color=(`RGB Color.RGB.black)) ~size ~bold () =
+let create ~text ~position ~font ?color:(color=(`RGB Color.RGB.black)) ~size ?bold:(bold = false) () =
   let utf8 = UTF8String.from_string text in
   let length = UTF8String.length utf8 in
   let rec iter i =

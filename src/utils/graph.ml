@@ -38,6 +38,8 @@ module type G = sig
 
   val neighbours : t -> vertex -> vertex list
 
+  val iter_neighbours : t -> vertex -> (vertex -> unit) -> unit
+
   val merge : t -> t -> t
 
   val dfs : t -> vertex -> (vertex -> unit) -> unit
@@ -101,11 +103,23 @@ module Make (V : Vertex) : G with type vertex = V.t = struct
 
   let add ?cost:(cost = 1.) v1 v2 g = add_edge g ~cost v1 v2
 
-  let remove_vertex g v = VMap.remove v g
+  let remove_vertex g v : t = 
+    VMap.fold (fun vtx el map -> 
+      if vtx = v then 
+        map
+      else begin
+        let el' = List.filter (fun edge -> edge.e_point <> v) el in
+        VMap.add vtx el' map
+      end
+    ) g VMap.empty
 
   let neighbours g v = 
     if VMap.mem v g then List.map (fun e -> e.e_point) (VMap.find v g)
     else []
+
+  let iter_neighbours g v f = 
+    if VMap.mem v g then List.iter (fun e -> f e.e_point) (VMap.find v g)
+    else ()
 
   let merge g1 g2 = 
     VMap.merge (fun k o1 o2 -> 

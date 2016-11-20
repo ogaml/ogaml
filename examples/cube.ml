@@ -1,14 +1,14 @@
 open OgamlGraphics
 open OgamlMath
+open OgamlUtils
 
 let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 
 let window =
   Window.create ~width:800 ~height:600 ~title:"Cube Example" ~settings ()
 
-let initial_time = ref 0.
-
-let frame_count  = ref 0
+let fps_clock = 
+  Clock.create ()
 
 let cube_source =
   let src = VertexArray.VertexSource.empty ~size:36 () in
@@ -151,7 +151,7 @@ let rec main_loop () =
       handle_keys ()
     ) ;
     event_loop ();
-    incr frame_count;
+    Clock.tick fps_clock;
     main_loop ()
   end
 
@@ -159,7 +159,7 @@ let rec main_loop () =
 (* Start *)
 let () =
   Printf.printf "Rendering %i vertices\n%!" (VertexArray.length cube);
-  initial_time := Unix.gettimeofday ();
+  Clock.restart fps_clock;
   main_loop ();
-  Printf.printf "Avg FPS: %f\n%!" (float_of_int (!frame_count) /. (Unix.gettimeofday () -. !initial_time));
+  Printf.printf "Avg FPS: %f\n%!" (Clock.tps fps_clock);
   Window.destroy window

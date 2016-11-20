@@ -1,23 +1,38 @@
 open OgamlCore
+open OgamlUtils
 
 type t = {
   context : Context.t;
   internal : LL.Window.t;
   settings : ContextSettings.t;
+  mutable min_spf  : float;
+  clock : Clock.t
 }
 
 let create ?width:(width=800) ?height:(height=600) ?title:(title="") 
            ?settings:(settings=OgamlCore.ContextSettings.create ()) () =
   let internal = LL.Window.create ~width ~height ~title ~settings in
   let context = Context.LL.create () in
+  let min_spf = 
+    match ContextSettings.framerate_limit settings with
+    | None   -> 0.
+    | Some i -> 1. /. (float_of_int i)
+  in
   Context.LL.set_viewport context OgamlMath.IntRect.({x = 0; y = 0; width; height});
   {
     context;
     internal;
     settings;
+    min_spf;
+    clock = Clock.create ()
   }
 
 let set_title win title = LL.Window.set_title win.internal title
+
+let set_framerate_limit win i = 
+  match i with
+  | None   -> win.min_spf <- 0.
+  | Some i -> win.min_spf <- 1. /. (float_of_int i)
 
 let settings win = win.settings
 
@@ -41,7 +56,12 @@ let poll_event win = LL.Window.poll_event win.internal
 
 let display win = 
   RenderTarget.bind_fbo win.context 0 None;
-  LL.Window.display win.internal
+  LL.Window.display win.internal;
+  if win.min_spf <> 0. then begin
+    let dt = win.min_spf -. (Clock.time win.clock) in
+    if dt > 0. then Thread.delay dt;
+    Clock.restart win.clock
+  end 
 
 let clear ?color:(color=Some (`RGB Color.RGB.black))
           ?depth:(depth=true) 

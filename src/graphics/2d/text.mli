@@ -47,8 +47,8 @@ val create :
   position : OgamlMath.Vector2f.t ->
   font : Font.t ->
   ?color : Color.t ->
-  size : int ->
-  bold : bool ->
+  size  : int ->
+  ?bold : bool ->
   unit -> t
 
 val draw :

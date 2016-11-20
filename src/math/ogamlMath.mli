@@ -50,6 +50,9 @@ module Vector2i : sig
   (** Type of immutable vectors of 2 integers *)
   type t = {x : int; y : int}
 
+  (** Fast way to create a vector*)
+  val make : int -> int -> t
+
   (** Zero vector *)
   val zero : t
 
@@ -70,6 +73,12 @@ module Vector2i : sig
 
   (** Divides a vector by a scalar. Raises Vector2i_exception if the scalar is zero. *)
   val div : int -> t -> t
+
+  (** Computes the pointwise product of two vectors. *)
+  val pointwise_product : t -> t -> t
+
+  (** Computes the pointwise division of two vectors. *)
+  val pointwise_div : t -> t -> t
 
   (** Computes the dot product of two vectors *)
   val dot : t -> t -> int
@@ -133,6 +142,9 @@ module Vector2f : sig
   (** Type of immutable vectors of 2 floats *)
   type t = {x : float; y : float}
 
+  (** Fast way to create a vector*)
+  val make : float -> float -> t
+
   (** Zero vector *)
   val zero : t
 
@@ -153,6 +165,12 @@ module Vector2f : sig
 
   (** Divides a vector by a scalar. Raises Vector2f_exception if the scalar is zero. *)
   val div : float -> t -> t
+
+  (** Computes the pointwise product of two vectors. *)
+  val pointwise_product : t -> t -> t
+
+  (** Computes the pointwise division of two vectors. *)
+  val pointwise_div : t -> t -> t
 
   (** Truncates the floating-point coordinates of a vector @see:OgamlMath.Vector2i *)
   val to_int : t -> Vector2i.t
@@ -243,6 +261,9 @@ module Vector3i : sig
   (** Type of immutable vectors of 3 ints *)
   type t = {x : int; y : int; z : int}
 
+  (** Fast way to create a vector*)
+  val make : int -> int -> int -> t
+
   (** Zero vector *)
   val zero : t
 
@@ -266,6 +287,12 @@ module Vector3i : sig
 
   (** Divides a vector by a scalar. Raises Vector3i_exception if the scalar is zero. *)
   val div : int -> t -> t
+
+  (** Computes the pointwise product of two vectors. *)
+  val pointwise_product : t -> t -> t
+
+  (** Computes the pointwise division of two vectors. *)
+  val pointwise_div : t -> t -> t
 
   (** Projects a vector on the plane $z = 0$ @see:OgamlMath.Vector2i *)
   val project : t -> Vector2i.t
@@ -335,6 +362,9 @@ module Vector3f : sig
   (** Type of immutable vectors of 3 floats *)
   type t = {x : float; y : float; z : float}
 
+  (** Fast way to create a vector*)
+  val make : float -> float -> float -> t
+
   (** Zero vector *)
   val zero : t
 
@@ -358,6 +388,12 @@ module Vector3f : sig
 
   (** Divides a vector by a scalar. Raises Vector3f_exception if the scalar is zero. *)
   val div : float -> t -> t
+
+  (** Computes the pointwise product of two vectors. *)
+  val pointwise_product : t -> t -> t
+
+  (** Computes the pointwise division of two vectors. *)
+  val pointwise_div : t -> t -> t
 
   (** Truncates the floating-point coordinates of a vector @see:OgamlMath.Vector3i *)
   val to_int : t -> Vector3i.t
