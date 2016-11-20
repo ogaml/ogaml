@@ -176,7 +176,9 @@ module OS : sig
     *)
   val resources_dir : string
 
-  (** [canonical_path p] returns the resolved path equivalent to [p] *)
+  (** $canonical_path p$ returns the resolved path equivalent to $p$.
+    * $p$ must be an existing location. Raises $Invalid_argument$ if
+    * $p$ does not exist. *)
   val canonical_path : string -> string
 
 end
