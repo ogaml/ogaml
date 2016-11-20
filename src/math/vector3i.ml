@@ -3,6 +3,8 @@ exception Vector3i_exception of string
 
 type t = {x : int; y : int; z : int}
 
+let make x y z = {x; y; z}
+
 let zero = {x = 0; y = 0; z = 0}
 
 let unit_x = {x = 1; y = 0; z = 0}
@@ -39,6 +41,11 @@ let div k u =
       z = u.z / k
     }
 
+let pointwise_product v1 v2 = 
+  {x = v1.x * v2.x; y = v1.y * v2.y; z = v1.z * v2.z}
+
+let pointwise_div v1 v2 = 
+  {x = v1.x / v2.x; y = v1.y / v2.y; z = v1.z / v2.z}
 
 let project v = {
   Vector2i.x = v.x;

@@ -3,6 +3,8 @@ exception Vector2f_exception of string
 
 type t = {x : float; y : float}
 
+let make x y = {x; y}
+
 let zero   = {x = 0.; y = 0.}
 
 let unit_x = {x = 1.; y = 0.}
@@ -29,6 +31,12 @@ let div f v =
     raise (Vector2f_exception "Division by zero")
   else 
     {x = v.x /. f; y = v.y /. f}
+
+let pointwise_product v1 v2 = 
+  {x = v1.x *. v2.x; y = v1.y *. v2.y}
+
+let pointwise_div v1 v2 = 
+  {x = v1.x /. v2.x; y = v1.y /. v2.y}
 
 let to_int v = {
   Vector2i.x = int_of_float v.x;

@@ -4,6 +4,8 @@ exception Vector2f_exception of string
 
 type t = {x : float; y : float}
 
+val make : float -> float -> t
+
 val zero : t
 
 val unit_x : t
@@ -17,6 +19,10 @@ val sub : t -> t -> t
 val prop : float -> t -> t
 
 val div : float -> t -> t
+
+val pointwise_product : t -> t -> t
+
+val pointwise_div : t -> t -> t
 
 val to_int : t -> Vector2i.t
 

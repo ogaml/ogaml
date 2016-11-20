@@ -3,6 +3,8 @@ exception Vector2i_exception of string
 
 type t = {x : int; y : int}
 
+let make x y = {x; y}
+
 let zero = {x = 0; y = 0}
 
 let unit_x = {x = 1; y = 0}
@@ -32,6 +34,12 @@ let div k u =
       x = u.x / k;
       y = u.y / k;
     }
+
+let pointwise_product v1 v2 = 
+  {x = v1.x * v2.x; y = v1.y * v2.y}
+
+let pointwise_div v1 v2 = 
+  {x = v1.x / v2.x; y = v1.y / v2.y}
 
 let dot v1 v2 = 
   v1.x * v2.x + 
