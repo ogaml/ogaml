@@ -7,6 +7,8 @@ val create : ?output:out_channel -> ?debug:bool -> ?color:bool -> ?short:bool ->
 
 val stdout : t
 
+val stderr : t
+
 val log : t -> level -> ('a, out_channel, unit) format -> 'a
 
 val debug : t -> ('a, out_channel, unit) format -> 'a

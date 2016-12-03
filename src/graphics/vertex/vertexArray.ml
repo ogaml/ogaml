@@ -470,20 +470,35 @@ module VertexSource = struct
       vertex
     end
     
-  let iter (s : 'a t) (f : 'a Vertex.t -> unit) : unit =
-    for i = 0 to s.length - 1 do
+  let iter (s : 'a t) ?start:(start = 0) ?length (f : 'a Vertex.t -> unit) : unit =
+    let last = 
+      match length with
+      | None   -> s.length - 1
+      | Some l -> min (start + l - 1) (s.length - 1)
+    in
+    for i = start to last do
       f (get s i)
     done
 
-  let map (s : 'a t) (f : 'a Vertex.t -> 'b Vertex.t) : 'b t = 
+  let map (s : 'a t) ?start:(start = 0) ?length (f : 'a Vertex.t -> 'b Vertex.t) : 'b t = 
     let newsrc = empty () in
-    for i = 0 to s.length - 1 do
+    let last = 
+      match length with
+      | None   -> s.length - 1
+      | Some l -> min (start + l - 1) (s.length - 1)
+    in
+    for i = start to last do
       add newsrc (f (get s i))
     done;
     newsrc
 
-  let map_to (s : 'a t) (f : 'a Vertex.t -> 'b Vertex.t) (d : 'b t) : unit = 
-    for i = 0 to s.length - 1 do
+  let map_to (s : 'a t) ?start:(start = 0) ?length (f : 'a Vertex.t -> 'b Vertex.t) (d : 'b t) : unit = 
+    let last = 
+      match length with
+      | None   -> s.length - 1
+      | Some l -> min (start + l - 1) (s.length - 1)
+    in
+    for i = start to last do
       add d (f (get s i))
     done
 
