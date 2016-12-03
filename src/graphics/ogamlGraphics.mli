@@ -1770,13 +1770,13 @@ module VertexArray : sig
     val append : 'a t -> 'a t -> unit
 
     (** Iterates through all the vertices of a source. *)
-    val iter : 'a t -> ('a Vertex.t -> unit) -> unit
+    val iter : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> unit) -> unit
 
     (** Maps all the vertices of a source to a new source. *)
-    val map : 'a t -> ('a Vertex.t -> 'b Vertex.t) -> 'b t
+    val map : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t
 
     (** Maps all the vertices of a source to an existing source. *)
-    val map_to : 'a t -> ('a Vertex.t -> 'b Vertex.t) -> 'b t -> unit
+    val map_to : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t -> unit
 
   end
 
