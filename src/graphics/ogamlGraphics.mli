@@ -1659,6 +1659,9 @@ module VertexArray : sig
         * Raises $Unsealed_vertex$ if the structure is not sealed. *)
       val create : unit -> s t
 
+      (** Creates a copy of a vertex *)
+      val copy : s t -> s t
+
     end
 
 

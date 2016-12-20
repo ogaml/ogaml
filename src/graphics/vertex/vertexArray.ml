@@ -186,6 +186,8 @@ module Vertex = struct
 
     val create : unit -> s t
 
+    val copy : s t -> s t
+
   end
 
   let make () = 
@@ -221,6 +223,9 @@ module Vertex = struct
         if not vertex.sealed then 
           raise (Unsealed_vertex "Cannot create vertices from unsealed vertex structure");
         {vertex; data = Array.make vertex.total_size AttributeVal.Unset}
+
+      let copy v = 
+        {vertex; data = Array.copy v.data}
 
     end : VERTEX)
 

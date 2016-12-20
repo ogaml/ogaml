@@ -56,6 +56,8 @@ module Vertex : sig
 
     val create : unit -> s t
 
+    val copy : s t -> s t
+
   end
 
 
