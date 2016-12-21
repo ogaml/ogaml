@@ -1033,9 +1033,13 @@ module Matrix3D : sig
     * @see:OgamlMath.Vector3f *)
   val rotate : Vector3f.t -> float -> t -> t
 
-  (** Computes the (right-)product of a matrix with a column vector
+  (** Computes the (right-)product of a matrix with a column vector.
+    * 
+    * If $perspective$ is true, then the 4th column of the matrix is
+    * added to the resulting vector. $perspective$ defaults to $true$. 
+    *
     * @see:OgamlMath.Vector3f *)
-  val times : t -> Vector3f.t -> Vector3f.t
+  val times : t -> ?perspective:bool -> Vector3f.t -> Vector3f.t
 
   (** Returns a pretty-printed string (not for serialization) *)
   val print : t -> string
