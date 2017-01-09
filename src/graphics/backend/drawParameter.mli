@@ -84,6 +84,7 @@ module DepthTest : sig
 
   type t = 
     | None
+    | Always
     | Never
     | Less
     | Greater

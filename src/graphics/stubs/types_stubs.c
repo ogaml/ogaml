@@ -181,27 +181,28 @@ GLenum Depthfun_val(value fun)
   switch(Int_val(fun))
   {
     case 0:
+    case 1:
       return GL_ALWAYS;
 
-    case 1:
+    case 2:
       return GL_NEVER;
 
-    case 2:
+    case 3:
       return GL_LESS;
 
-    case 3:
+    case 4:
       return GL_GREATER;
 
-    case 4:
+    case 5:
       return GL_EQUAL;
 
-    case 5:
+    case 6:
       return GL_LEQUAL;
 
-    case 6:
+    case 7:
       return GL_GEQUAL;
 
-    case 7:
+    case 8:
       return GL_NOTEQUAL;
 
     default:

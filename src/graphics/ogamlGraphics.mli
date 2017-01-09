@@ -275,7 +275,8 @@ module DrawParameter : sig
 
     (** Depth testing functions *)
     type t = 
-      | None (* No testing, test always passes *)
+      | None (* Disables depth testing *)
+      | Always (* Test always passes *)
       | Never (* Test never passes *)
       | Less (* Test passes if the incoming value is less (object is closer) than the stored value. Default function *)
       | Greater (* Test passes if the incoming value is greater *)

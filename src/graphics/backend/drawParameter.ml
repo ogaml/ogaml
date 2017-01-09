@@ -89,6 +89,7 @@ module DepthTest = struct
 
   type t = 
     | None
+    | Always
     | Never
     | Less
     | Greater
