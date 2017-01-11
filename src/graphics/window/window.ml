@@ -93,5 +93,11 @@ let screenshot win =
   let data = 
     GL.Pervasives.read_pixels (0,0) (size.Vector2i.x, size.Vector2i.y) GLTypes.PixelFormat.RGBA
   in
-  Image.create (`Data (size, data))
+  let rev_data = 
+    Bytes.create (Bytes.length data) 
+  in
+  for i = 0 to size.Vector2i.y - 1 do
+    Bytes.blit data (i * size.Vector2i.x * 4) rev_data ((size.Vector2i.y - 1 - i) * size.Vector2i.x * 4) (size.Vector2i.x * 4)
+  done;
+  Image.create (`Data (size, rev_data))
 
