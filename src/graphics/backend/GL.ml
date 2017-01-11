@@ -188,6 +188,9 @@ module Pervasives = struct
 
   external msaa : bool -> unit = "caml_enable_msaa"
 
+  external read_pixels : (int * int) -> (int * int) -> GLTypes.PixelFormat.t -> Bytes.t
+    = "caml_read_pixels"
+
   let get_integer_opt param = 
     let v = get_integerv param in
     if v < 0 then None

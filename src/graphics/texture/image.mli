@@ -7,6 +7,8 @@ val create : [`File of string |
               `Empty of OgamlMath.Vector2i.t * Color.t | 
               `Data of OgamlMath.Vector2i.t * Bytes.t] -> t
 
+val save : t -> string -> unit
+
 val size : t -> OgamlMath.Vector2i.t
 
 val set : t -> OgamlMath.Vector2i.t -> Color.t -> unit

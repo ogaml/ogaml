@@ -132,6 +132,7 @@ let rec event_loop () =
       | Escape -> Window.close window
       | Q when k.Event.KeyEvent.control -> Window.close window
       | A -> msaa := (not !msaa)
+      | P -> Image.save (Window.screenshot window) "screenshot.png"
       | _ -> ()
     )
     | _ -> ()

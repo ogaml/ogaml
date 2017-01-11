@@ -66,3 +66,5 @@ val bind : t -> DrawParameter.t -> unit
   * Used internally, hidden from the global interface. *)
 val internal : t -> OgamlCore.LL.Window.t
 
+(** Takes a screenshot of the window *)
+val screenshot : t -> Image.t 

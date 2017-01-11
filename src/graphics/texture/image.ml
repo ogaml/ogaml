@@ -14,6 +14,8 @@ external stbi_load_from_file : string -> (string * int * int) option = "caml_ima
 
 external stbi_load_error : unit -> string = "caml_image_load_error"
 
+external stbi_write_png : string -> (int * int) -> int -> int -> Bytes.t -> unit = "caml_image_write_png"
+
 let create = function
   |`File s -> begin
     match stbi_load_from_file s with
@@ -51,7 +53,12 @@ let create = function
         Bytes.set img.data i a
     done; img
   |`Data ({Vector2i.x = width; y = height}, data) -> 
+    if Bytes.length data <> width * height * 4 then
+      raise (Image_error "Create from data: invalid length of data");
     {width; height; data}
+
+let save img filename =
+  stbi_write_png filename (img.width,img.height) 4 0 img.data 
 
 let size img = 
   OgamlMath.Vector2i.({x = img.width; y = img.height})

@@ -132,6 +132,9 @@ module Pervasives : sig
   (** Sets the MSAA *)
   val msaa : bool -> unit
 
+  (** Reads pixels in the current fb *)
+  val read_pixels : (int * int) -> (int * int) -> GLTypes.PixelFormat.t -> Bytes.t
+
 end
 
 

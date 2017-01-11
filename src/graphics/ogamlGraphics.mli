@@ -694,6 +694,11 @@ module Image : sig
     * @see:OgamlGraphics.Color *)
   val create : [`File of string | `Empty of OgamlMath.Vector2i.t * Color.t | `Data of OgamlMath.Vector2i.t * Bytes.t] -> t
 
+  (** Saves an image to a file.
+    *
+    * Warning: PNG format only ! *)
+  val save : t -> string -> unit
+
   (** Return the size of an image *)
   val size : t -> OgamlMath.Vector2i.t
 
@@ -1444,6 +1449,9 @@ module Window : sig
 
   (** Binds the window for drawing. This function is for internal use only. *)
   val bind : t -> DrawParameter.t -> unit
+
+  (** Takes a screenshot of the window *)
+  val screenshot : t -> Image.t 
 
 end
 

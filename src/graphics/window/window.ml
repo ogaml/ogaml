@@ -1,5 +1,6 @@
 open OgamlCore
 open OgamlUtils
+open OgamlMath
 
 type t = {
   context : Context.t;
@@ -85,4 +86,12 @@ let bind win params =
     (ContextSettings.aa_level win.settings) params
 
 let internal win = win.internal
+
+let screenshot win = 
+  let size = size win in 
+  RenderTarget.bind_fbo win.context 0 None;
+  let data = 
+    GL.Pervasives.read_pixels (0,0) (size.Vector2i.x, size.Vector2i.y) GLTypes.PixelFormat.RGBA
+  in
+  Image.create (`Data (size, data))
 
