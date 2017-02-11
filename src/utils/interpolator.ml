@@ -12,7 +12,7 @@ let mod_neg t =
   if vt < 0. then vt +. 1.
   else vt
 
-let mod_neg2 t = 
+let mod_neg2 t =
   let vt = mod_float t 2. in
   if vt < -1. then 2. +. vt
   else if vt < 0. then -. vt
@@ -23,12 +23,13 @@ let clamp t = min (max t 0.) 1.
 
 let get ip t = ip.func t
 
-let current ip = 
-  let dt = (Unix.gettimeofday () -. ip.start) /. ip.duration in
-  if ip.duration = 0. then get ip dt
-  else get ip 0.
+let current ip =
+  if ip.duration = 0. then get ip 0.
+  else
+    let dt = (Unix.gettimeofday () -. ip.start) /. ip.duration in
+    get ip dt
 
-let start ip t dt = 
+let start ip t dt =
   {ip with start = t; duration = dt}
 
 let repeat ip = {
@@ -62,33 +63,33 @@ let rec distance b l e =
   |[] -> abs_float (e -. b)
   |h::t -> abs_float (h -. b) +. (distance h t e)
 
-let append_times b l e = 
+let append_times b l e =
   let dist = distance b l e in
   let rec times_aux b l acc =
     match l with
     |[] -> []
-    |h::t -> 
+    |h::t ->
       let new_acc = acc +. (abs_float (h -. b)) in
-      let time = 
-        if dist = 0. then 0. 
-        else new_acc /. dist 
+      let time =
+        if dist = 0. then 0.
+        else new_acc /. dist
       in
       (time, h) :: (times_aux h t new_acc)
   in
   times_aux b l 0.
 
-let rec append_tangents pb tb l pe = 
+let rec append_tangents pb tb l pe =
   match l with
   |[] -> []
-  |[(t, pos)] -> 
+  |[(t, pos)] ->
     let mk = (pe -. pos)/.(2.*.(1. -. t)) -. (pos -. pb)/.(2.*.(t -. tb)) in
     [t,(pos,mk)]
-  |(t1,pos1)::(t2,pos2)::tail -> 
+  |(t1,pos1)::(t2,pos2)::tail ->
     let mk = (pos2 -. pos1)/.(2.*.(t2 -. t1)) -. (pos1 -. pb)/.(2.*.(t1 -. tb)) in
     (t1,(pos1,mk))::(append_tangents pos1 t1 ((t2,pos2)::tail) pe)
 
-let points b l e t = 
-  let rec points_aux b l = 
+let points b l e t =
+  let rec points_aux b l =
     match l with
     |[] -> (b, (1.,e))
     |(cur_t, pt)::_ when t <= cur_t -> (b, (cur_t, pt))
@@ -107,20 +108,20 @@ let h11 t = t *. t *. t -. t *. t
 let linear b l e =
   let func = fun t ->
     let (t1, p1), (t2, p2) = points b l e t in
-    let fact = 
+    let fact =
       if t2 = t1 then 1.
-      else (t -. t1) /. (t2 -. t1) 
+      else (t -. t1) /. (t2 -. t1)
     in
     (1. -. fact) *. p1 +. fact *. p2
   in
   custom func 0. 1.
 
-let cst_linear b l e = 
+let cst_linear b l e =
   linear b (append_times b l e) e
 
-let cubic b l e = 
+let cubic b l e =
   let l' = append_tangents (fst b) 0. l (fst e) in
-  let func = fun t -> 
+  let func = fun t ->
     let (t1, (p1, tg1)), (t2, (p2, tg2)) = points b l' e t in
     let fact = (t -. t1) /. (t2 -. t1) in
     let dx = t2 -. t1 in
@@ -128,7 +129,7 @@ let cubic b l e =
   in
   custom func 0. 1.
 
-let cst_cubic b l e = 
+let cst_cubic b l e =
   cubic b (append_times (fst b) l (fst e)) e
 
 let compose ip1 ip2 = {
@@ -167,6 +168,3 @@ let vector2f ip1 ip2 = {
   start = 0.;
   duration = 0.
 }
-
-
-
