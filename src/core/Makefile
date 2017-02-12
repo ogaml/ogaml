@@ -103,7 +103,7 @@ ml_stubs:
 	$(CLANG) -c -o ./$(notdir $@) $(OCAML_C_FLAGS) $(GLOBAL_OBJCOPTS) $<
 
 %.o:%.c
-	$(OCAMLC_CMD) -c -o ./$(notdir $@) -cclib "$(GLOBAL_CLIBS)" $<
+	$(OCAMLC_CMD) -c -cclib "$(GLOBAL_CLIBS)" $<
 
 
 # Cleaning

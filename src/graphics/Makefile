@@ -123,7 +123,7 @@ graphics_lib: $(STUBS_TARGET) $(MLCMIS) $(MLOBJS) $(MLNATOBJS) $(GRAPHICS_LIB).c
 	$(MENHIR) $<
 
 %.o:%.c
-	$(OCAMLFIND) $(OCAMLC_CMD) -o ./$(notdir $@) -c $< -ccopt "$(COPTS)" -cclib "$(GLOBAL_CLIBS)"
+	$(OCAMLFIND) $(OCAMLC_CMD) -c $< -ccopt "$(COPTS)" -cclib "$(GLOBAL_CLIBS)"
 
 
 # Cleaning
