@@ -62,7 +62,7 @@ val min : t -> float
 
 val normalize : t -> t
 
-val print : t -> string
+val to_string : t -> string
 
 (* Returns the normalized direction vector from point1 to point 2 
  * Equivalent to normalize @ sub *)

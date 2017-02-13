@@ -106,7 +106,7 @@ let max u =
 let min u = 
   min (min u.x u.y) u.z
 
-let print u = 
+let to_string u = 
   Printf.sprintf "(x = %i; y = %i; z = %i)" u.x u.y u.z
 
 let raster v1 v2 = 

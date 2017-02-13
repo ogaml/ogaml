@@ -56,7 +56,7 @@ val min : t -> float
 
 val normalize : t -> t
 
-val print : t -> string
+val to_string : t -> string
 
 val direction : t -> t -> t
 

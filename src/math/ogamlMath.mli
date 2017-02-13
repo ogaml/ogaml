@@ -124,7 +124,7 @@ module Vector2i : sig
   val raster : t -> t -> t list
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -219,7 +219,7 @@ module Vector2f : sig
   val min : t -> float 
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
   (** $direction u v$ returns the normalized direction vector from $u$ to $v$.
     * Raises Vector2f_exception if $u = v$. *)
@@ -344,7 +344,7 @@ module Vector3i : sig
   val raster : t -> t -> t list
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -448,7 +448,7 @@ module Vector3f : sig
   val min : t -> float 
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
   (** $direction u v$ returns the normalized direction vector from $u$ to $v$.
     * Raises Vector3f_exception if $u = v$. *)
@@ -523,7 +523,7 @@ module Vector2fs : sig
   val normalize : t -> t
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -577,7 +577,7 @@ module Vector3fs : sig
   val normalize : t -> t
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -666,7 +666,7 @@ module IntRect : sig
   val fold : ?strict:bool -> t -> (Vector2i.t -> 'a -> 'a) -> 'a -> 'a
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -749,7 +749,7 @@ module FloatRect : sig
   val includes : t -> t -> bool
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -838,7 +838,7 @@ module IntBox : sig
   val fold : ?strict:bool -> t -> (Vector3i.t -> 'a -> 'a) -> 'a -> 'a
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -921,7 +921,7 @@ module FloatBox : sig
   val contains : t -> Vector3f.t -> bool
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -1042,7 +1042,7 @@ module Matrix3D : sig
   val times : t -> ?perspective:bool -> Vector3f.t -> Vector3f.t
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 
   (*** Rendering Matrices Creation *)
@@ -1161,7 +1161,7 @@ module Matrix2D : sig
   val times : t -> Vector2f.t -> Vector2f.t
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 
   (*** Rendering Matrices Creation *)

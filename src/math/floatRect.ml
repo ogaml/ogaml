@@ -114,5 +114,5 @@ let contains t pt =
   pt.Vector2f.x <= t.x +. t.width  &&
   pt.Vector2f.y <= t.y +. t.height 
 
-let print t = 
+let to_string t = 
   Printf.sprintf "(x = %f; y = %f; width = %f; height = %f)" t.x t.y t.width t.height

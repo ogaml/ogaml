@@ -97,7 +97,7 @@ let min v =
 let angle u v =
   atan2 (det u v) (dot u v)
 
-let print u = 
+let to_string u = 
   Printf.sprintf "(x = %f; y = %f)" u.x u.y
 
 let direction u v = 

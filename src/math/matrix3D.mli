@@ -12,7 +12,7 @@ val zero : unit -> t
 val identity : unit -> t
 
 (* Pretty-printer to string *)
-val print : t -> string
+val to_string : t -> string
 
 (* Translation matrix *)
 val translation : Vector3f.t -> t

@@ -125,7 +125,7 @@ let min v =
 let angle u v =
   atan2 (norm (cross u v)) (dot u v)
 
-let print u = 
+let to_string u = 
   Printf.sprintf "(x = %f; y = %f; z = %f)" u.x u.y u.z
 
 let direction u v = 

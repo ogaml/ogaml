@@ -133,5 +133,5 @@ let fold ?strict:(strict=true) t f u =
     );
   !r
 
-let print t = 
+let to_string t = 
   Printf.sprintf "(x = %i; y = %i; width = %i; height = %i)" t.x t.y t.width t.height

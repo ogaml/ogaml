@@ -43,4 +43,4 @@ val iter : ?strict:bool -> t -> (Vector3i.t -> unit) -> unit
 
 val fold : ?strict:bool -> t -> (Vector3i.t -> 'a -> 'a) -> 'a -> 'a
 
-val print : t -> string
+val to_string : t -> string

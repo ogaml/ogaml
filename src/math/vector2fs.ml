@@ -51,7 +51,7 @@ let normalize v =
   else 
     div n v
 
-let print u = 
+let to_string u = 
   Printf.sprintf "(r = %f; t = %f)" u.r u.t
 
 

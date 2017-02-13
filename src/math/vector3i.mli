@@ -58,5 +58,5 @@ val min : t -> int
 
 val raster : t -> t -> t list
 
-val print : t -> string
+val to_string : t -> string
 
