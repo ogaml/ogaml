@@ -59,17 +59,37 @@ value extract_keysym(XEvent* evt)
   KeySym result;
   XEvent cpy = *evt;
     cpy.xkey.state &= (~ShiftMask) & (~ControlMask) & (~LockMask) & (~AnyModifier);
-  XLookupString(&cpy.xkey, buffer, sizeof(buffer), &result, &keyboard);
-
-  if(result >= 97 && result <= 122) {
-    key = caml_alloc(1,1);
-    Store_field(key, 0, Val_int(result));
+  
+  if(XLookupString(&cpy.xkey, buffer, sizeof(buffer), &result, &keyboard)) {
+    if(buffer[0] >= 97 && buffer[0] <= 122) {
+      key = caml_alloc(1,1);
+      Store_field(key, 0, Val_int(buffer[0]));
+    }
+    else {
+      key = caml_alloc(1,0);
+      Store_field(key, 0, Val_int(evt->xkey.keycode));
+    }
   }
   else {
     key = caml_alloc(1,0);
     Store_field(key, 0, Val_int(evt->xkey.keycode));
   }
   CAMLreturn(key);
+}
+
+
+// Extract the character code out of an xkey event
+int extract_char(XEvent* evt)
+{
+  static XComposeStatus keyboard;
+  char buffer[32];
+  KeySym result;
+
+  if(XLookupString(&evt->xkey, buffer, sizeof(buffer), &result, &keyboard)) {
+    return buffer[0];
+  }
+  
+  return -1;
 }
 
 
@@ -84,14 +104,15 @@ value extract_event(XEvent* evt)
   switch(evt->type) {
 
     case KeyPress         :     
-      result = caml_alloc(2,0);  // 1st param. variant
+      result = caml_alloc(3,0);  // 1st param. variant
       modifiers = caml_alloc(4,0);
         Store_field(modifiers, 0, Val_bool((evt->xkey.state & ShiftMask) != 0));
         Store_field(modifiers, 1, Val_bool((evt->xkey.state & ControlMask) != 0));
         Store_field(modifiers, 2, Val_bool((evt->xkey.state & LockMask) != 0));
         Store_field(modifiers, 3, Val_bool((evt->xkey.state & Mod1Mask) != 0));
       Store_field(result, 0, extract_keysym(evt));
-      Store_field(result, 1, modifiers);
+      Store_field(result, 1, Val_int(extract_char(evt)));
+      Store_field(result, 2, modifiers);
       break;
 
     case KeyRelease       :

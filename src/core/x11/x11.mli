@@ -132,9 +132,10 @@ module Event : sig
 
   type enum = 
     | Unknown
-    | KeyPress      of key * modifiers
+    (* The second argument is the char code of the key press, -1 if this is not a character *)
+    | KeyPress      of key * int * modifiers 
     | KeyRelease    of key * modifiers
-    | ButtonPress   of int * position * modifiers
+    | ButtonPress   of int * position * modifiers 
     | ButtonRelease of int * position * modifiers
     | MotionNotify  of position
     | EnterNotify     
