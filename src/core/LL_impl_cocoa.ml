@@ -3,7 +3,10 @@ module Window = struct
 
   exception Error of string
 
-  type t = Cocoa.OGWindowController.t
+  type t = {
+    ctrl : Cocoa.OGWindowController.t ;
+    pending_events : Event.t Queue.t
+  }
 
   (* Create the application on first window *)
   let init_app =
@@ -86,24 +89,26 @@ module Window = struct
     Cocoa.OGWindowController.set_context win_ctrl context ;
 
     (* Finally returning the window controller *)
-    win_ctrl
+    { ctrl = win_ctrl ;
+      pending_events = Queue.create ()
+    }
 
   let set_title win title =
-    Cocoa.OGWindowController.set_title win (Cocoa.NSString.create title)
+    Cocoa.OGWindowController.set_title win.ctrl (Cocoa.NSString.create title)
 
   let close win =
-    Cocoa.OGWindowController.close_window win
+    Cocoa.OGWindowController.close_window win.ctrl
 
   let destroy win =
-    Cocoa.OGWindowController.release_window win
+    Cocoa.OGWindowController.release_window win.ctrl
 
   let reopen win =
-    Cocoa.OGWindowController.open_window win
+    Cocoa.OGWindowController.open_window win.ctrl
 
   let size win =
     let i = int_of_float in
     Cocoa.(
-      let (_,_,w,h) = NSRect.get (OGWindowController.content_frame win) in
+      let (_,_,w,h) = NSRect.get (OGWindowController.content_frame win.ctrl) in
       OgamlMath.Vector2i.({x = i w; y = i h})
     )
 
@@ -112,8 +117,8 @@ module Window = struct
     Cocoa.(
       (* We only get the size of the frame, as the coordinates are relative
          to the window and thus (0,0). *)
-      let (_,_,w,h) = NSRect.get (OGWindowController.content_frame win) in
-      let (x,y,ow,oh) = NSRect.get (OGWindowController.frame win) in
+      let (_,_,w,h) = NSRect.get (OGWindowController.content_frame win.ctrl) in
+      let (x,y,ow,oh) = NSRect.get (OGWindowController.frame win.ctrl) in
       (* We add the size of the title bar (and anything that could be extending
          the window size horizontally by precaution). *)
       let x = x +. (ow -. w)
@@ -123,22 +128,22 @@ module Window = struct
 
   let resize win size =
     let open Cocoa in
-    let (x,y,oldw,oldh) = NSRect.get (OGWindowController.frame win) in
+    let (x,y,oldw,oldh) = NSRect.get (OGWindowController.frame win.ctrl) in
     let (w,h) = OgamlMath.Vector2i.(
       size.x , size.y
     ) in
     let (w,h) = float_of_int w, float_of_int h in
     let frame = NSRect.create (x+.(oldw-.w)/.2.) (y+.(oldh-.h)/.2.) w h in
-    OGWindowController.resize win frame
+    OGWindowController.resize win.ctrl frame
 
   let toggle_fullscreen win =
-    Cocoa.OGWindowController.toggle_fullscreen win
+    Cocoa.OGWindowController.toggle_fullscreen win.ctrl
 
   let is_open win =
-    Cocoa.OGWindowController.is_window_open win
+    Cocoa.OGWindowController.is_window_open win.ctrl
 
   let has_focus win =
-    Cocoa.OGWindowController.has_focus win
+    Cocoa.OGWindowController.has_focus win.ctrl
 
   let mk_key_event key_info =
     let keycode = Keycode.(
@@ -243,7 +248,9 @@ module Window = struct
     deltaY
 
   let make_mouse_event button event win =
-    let (x,y) = Cocoa.OGWindowController.proper_relative_mouse_location win in
+    let (x,y) =
+      Cocoa.OGWindowController.proper_relative_mouse_location win.ctrl
+    in
     let modifiers = Cocoa.NSEvent.modifier_flags () in
     let (shift,control,alt) = Cocoa.NSEvent.(
       List.mem NSShiftKeyMask     modifiers,
@@ -260,50 +267,65 @@ module Window = struct
     })
 
   let mouse_loc win =
-    let (x,y) = Cocoa.OGWindowController.proper_relative_mouse_location win in
+    let (x,y) =
+      Cocoa.OGWindowController.proper_relative_mouse_location win.ctrl
+    in
     let i = int_of_float in
     OgamlMath.Vector2i.({ x = i x ; y = i y })
 
   let poll_event win =
-    Cocoa.OGWindowController.process_event win ;
-    match Cocoa.OGWindowController.pop_event win with
-    | Some ogevent ->
-        Cocoa.(
-          match OGEvent.get_content ogevent with
-          | OGEvent.CocoaEvent event ->
-              NSEvent.(
-                match get_type event with
-                | LeftMouseDown  -> Some (Event.ButtonPressed (
-                    make_mouse_event Button.Left event win
-                  ))
-                | RightMouseDown -> Some (Event.ButtonPressed (
-                    make_mouse_event Button.Right event win
-                  ))
-                | OtherMouseDown -> Some (Event.ButtonPressed (
-                    make_mouse_event Button.Middle event win
-                  ))
-                | LeftMouseUp    -> Some (Event.ButtonReleased (
-                    make_mouse_event Button.Left event win
-                  ))
-                | RightMouseUp   -> Some (Event.ButtonReleased (
-                    make_mouse_event Button.Right event win
-                  ))
-                | OtherMouseUp   -> Some (Event.ButtonReleased (
-                    make_mouse_event Button.Middle event win
-                  ))
-                | MouseMoved     -> Some (Event.MouseMoved (mouse_loc win))
-                | _              -> None
-              )
-          | OGEvent.CloseWindow   -> Some Event.Closed
-          | OGEvent.KeyUp   inf   -> Some (Event.KeyPressed  (mk_key_event inf))
-          | OGEvent.KeyDown inf   -> Some (Event.KeyReleased (mk_key_event inf))
-          | OGEvent.ResizedWindow -> Some (Event.Resized (size win))
-          | OGEvent.ScrollWheel f -> Some (Event.MouseWheelMoved (mk_wheel f))
-        )
-    | None -> None
+    if (Queue.is_empty win.pending_events) then begin
+      Cocoa.OGWindowController.process_event win.ctrl ;
+      match Cocoa.OGWindowController.pop_event win.ctrl with
+      | Some ogevent ->
+          Cocoa.(
+            match OGEvent.get_content ogevent with
+            | OGEvent.CocoaEvent event ->
+                NSEvent.(
+                  match get_type event with
+                  | LeftMouseDown  -> Some (Event.ButtonPressed (
+                      make_mouse_event Button.Left event win
+                    ))
+                  | RightMouseDown -> Some (Event.ButtonPressed (
+                      make_mouse_event Button.Right event win
+                    ))
+                  | OtherMouseDown -> Some (Event.ButtonPressed (
+                      make_mouse_event Button.Middle event win
+                    ))
+                  | LeftMouseUp    -> Some (Event.ButtonReleased (
+                      make_mouse_event Button.Left event win
+                    ))
+                  | RightMouseUp   -> Some (Event.ButtonReleased (
+                      make_mouse_event Button.Right event win
+                    ))
+                  | OtherMouseUp   -> Some (Event.ButtonReleased (
+                      make_mouse_event Button.Middle event win
+                    ))
+                  | MouseMoved     -> Some (Event.MouseMoved (mouse_loc win))
+                  | _              -> None
+                )
+            | OGEvent.CloseWindow   -> Some Event.Closed
+            | OGEvent.KeyUp   inf   ->
+              let s = Cocoa.NSString.get Cocoa.OGEvent.(inf.characters) in
+              (* For now we only deal with ASCII. *)
+              if String.length s = 1 then
+                Queue.push (Event.TextEntered s.[0]) win.pending_events ;
+              Some (Event.KeyPressed  (mk_key_event inf))
+            | OGEvent.KeyDown inf   ->
+              let s = Cocoa.NSString.get Cocoa.OGEvent.(inf.characters) in
+              (* For now we only deal with ASCII. *)
+              if String.length s = 1 then
+                Queue.push (Event.TextEntered s.[0]) win.pending_events ;
+              Some (Event.KeyReleased (mk_key_event inf))
+            | OGEvent.ResizedWindow -> Some (Event.Resized (size win))
+            | OGEvent.ScrollWheel f -> Some (Event.MouseWheelMoved (mk_wheel f))
+          )
+      | None -> None
+    end
+    else Some (Queue.pop win.pending_events)
 
   let display win =
-    Cocoa.OGWindowController.flush_context win
+    Cocoa.OGWindowController.flush_context win.ctrl
 
   let show_cursor win b = ()
 
@@ -441,7 +463,9 @@ module Mouse = struct
     OgamlMath.Vector2i.({x = i x; y = i y})
 
   let relative_position win =
-    let (x,y) = Cocoa.OGWindowController.proper_relative_mouse_location win in
+    let (x,y) =
+      Cocoa.OGWindowController.proper_relative_mouse_location win.Window.ctrl
+    in
     let i = int_of_float in
     OgamlMath.Vector2i.({x = i x; y = i y})
 
@@ -451,7 +475,8 @@ module Mouse = struct
 
   let set_relative_position win v =
     let f = float_of_int in
-    Cocoa.OGWindowController.set_proper_relative_mouse_location win (f v.OgamlMath.Vector2i.x) (f v.OgamlMath.Vector2i.y)
+    Cocoa.OGWindowController.set_proper_relative_mouse_location
+      win.Window.ctrl (f v.OgamlMath.Vector2i.x) (f v.OgamlMath.Vector2i.y)
 
   let is_pressed button =
     let pressed_buttons = Cocoa.NSEvent.pressed_mouse_buttons () in
