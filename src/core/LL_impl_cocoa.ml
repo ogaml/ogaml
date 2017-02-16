@@ -211,7 +211,7 @@ module Window = struct
           | 49  -> Space
           (* | 55  -> RControl -- oh... *)
           | 36  -> Return
-          | 117 -> Delete
+          | 51  -> Delete
           | 126 -> Up
           | 123 -> Left
           | 125 -> Down
