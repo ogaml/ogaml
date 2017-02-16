@@ -309,8 +309,11 @@ module Window = struct
             | OGEvent.KeyDown inf   ->
               let s = Cocoa.NSString.get Cocoa.OGEvent.(inf.characters) in
               (* For now we only deal with ASCII. *)
-              if String.length s = 1 then
-                Queue.push (Event.TextEntered s.[0]) win.pending_events ;
+              if String.length s = 1 then begin
+                if Char.code s.[0] = 127
+                then Queue.push (Event.TextEntered (Char.chr 8)) win.pending_events
+                else Queue.push (Event.TextEntered s.[0]) win.pending_events
+              end ;
               Some (Event.KeyPressed (mk_key_event inf))
             | OGEvent.ResizedWindow -> Some (Event.Resized (size win))
             | OGEvent.ScrollWheel f -> Some (Event.MouseWheelMoved (mk_wheel f))
