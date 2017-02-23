@@ -76,6 +76,8 @@ module BlendMode : sig
   val additive : t
 
   val soft_additive : t
+
+  val premultiplied_alpha : t
   
 end
 
