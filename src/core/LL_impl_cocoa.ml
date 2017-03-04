@@ -325,7 +325,9 @@ module Window = struct
   let display win =
     Cocoa.OGWindowController.flush_context win.ctrl
 
-  let show_cursor win b = ()
+  let show_cursor win b =
+    if b then Cocoa.OGWindowController.show_cursor win.ctrl
+    else Cocoa.OGWindowController.hide_cursor win.ctrl
 
 end
 

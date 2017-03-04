@@ -325,6 +325,10 @@ module OGWindowController : sig
 
   val set_proper_relative_mouse_location : t -> float -> float -> unit
 
+  val hide_cursor : t -> unit
+
+  val show_cursor : t -> unit
+
   val has_focus : t -> bool
 
   val resize : t -> NSRect.t -> unit

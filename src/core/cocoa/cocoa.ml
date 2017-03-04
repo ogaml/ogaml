@@ -406,6 +406,12 @@ module OGWindowController = struct
   external set_proper_relative_mouse_location : t -> float -> float -> unit
     = "caml_cocoa_set_proper_relative_mouse_location"
 
+  external hide_cursor : t -> unit
+    = "caml_cocoa_hide_cursor"
+
+  external show_cursor : t -> unit
+    = "caml_cocoa_show_cursor"
+
   external has_focus : t -> bool = "caml_cocoa_controller_has_focus"
 
   external resize : t -> NSRect.t -> unit = "caml_cocoa_controller_resize"

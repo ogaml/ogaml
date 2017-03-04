@@ -158,6 +158,16 @@
   warpCursor(p);
 }
 
+-(void)hideCursor
+{
+  [NSCursor hide];
+}
+
+-(void)showCursor
+{
+  [NSCursor unhide];
+}
+
 -(BOOL)hasFocus
 {
   return [m_window isKeyWindow];
@@ -405,6 +415,30 @@ caml_cocoa_set_proper_relative_mouse_location(value mlcontroller, value mlx, val
   NSPoint loc = NSMakePoint(Double_val(mlx),Double_val(mly));
 
   [controller setProperRelativeMouseLocationTo:loc];
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_hide_cursor(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  [controller hideCursor];
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_cocoa_show_cursor(value mlcontroller)
+{
+  CAMLparam1(mlcontroller);
+
+  OGWindowController* controller = (OGWindowController*) mlcontroller;
+
+  [controller showCursor];
 
   CAMLreturn(Val_unit);
 }
