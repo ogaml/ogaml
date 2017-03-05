@@ -11,6 +11,8 @@ caml_xselect_input(value disp, value win, value masks)
 {
   CAMLparam3(disp, win, masks);
   CAMLlocal2(hd, tl);
+  Display* dpy = Display_val(disp);
+  Window w = Window_val(win);
   int mask = 0;
   tl = masks;
   while(tl != Val_emptylist) {
@@ -18,7 +20,7 @@ caml_xselect_input(value disp, value win, value masks)
     tl = Field(tl,1);
     mask |= (1L << (Int_val(hd)));
   }
-  XSelectInput((Display*) disp, (Window) win, mask);
+  XSelectInput(dpy, w, mask);
   CAMLreturn(Val_unit);
 }
 
@@ -36,15 +38,18 @@ CAMLprim value
 caml_xnext_event(value disp, value win)
 {
   CAMLparam1(disp);
-  CAMLlocal1(evt);
+  CAMLlocal1(res);
+  Display* dpy = Display_val(disp);
+  Window w = Window_val(win);
   XEvent event;
-  if(XCheckIfEvent((Display*) disp, &event, &checkEvent, (XPointer)win) == True) {
-    evt = caml_alloc_custom(&empty_custom_opts, sizeof(XEvent), 0, 1);
-    memcpy(Data_custom_val(evt), &event, sizeof(XEvent));
-    CAMLreturn(Val_some(evt));
+  if(XCheckIfEvent(dpy, &event, &checkEvent, (XPointer)w) == True) {
+    XEvent_alloc(res);
+    XEvent_copy(res, &event);
   }
-  else
-    CAMLreturn(Val_int(0));
+  else {
+    res = Val_int(0);
+  }
+  CAMLreturn(res);
 }
 
 
@@ -197,7 +202,7 @@ caml_event_type(value evt)
 {
   CAMLparam1(evt);
   CAMLlocal1(result);
-  result = extract_event((XEvent*)Data_custom_val(evt));
+  result = extract_event(&XEvent_val(evt));
   CAMLreturn(result);
 }
 

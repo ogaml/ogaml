@@ -2,15 +2,6 @@
 
 #include "utils.h"
 
-struct custom_operations empty_custom_opts = {
-  "obj_st handling",
-  custom_finalize_default,
-  custom_compare_default,
-  custom_hash_default,
-  custom_serialize_default,
-  custom_deserialize_default
-};
-
 value Val_some(value v)
 {
   CAMLparam1(v);

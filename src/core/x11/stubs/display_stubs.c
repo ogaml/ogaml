@@ -10,16 +10,14 @@ CAMLprim value
 caml_xopen_display(value name)
 {
   CAMLparam1(name);
-  if(current_display != NULL)
-    CAMLreturn((value)current_display);
+  if(current_display != NULL) {}
   else if(name == Val_none) {
     current_display = XOpenDisplay(NULL);
-    CAMLreturn((value)current_display);
   }
   else {
     current_display = XOpenDisplay(String_val(Some_val(name)));
-    CAMLreturn((value)current_display);
   }
+  CAMLreturn(Val_Display(current_display));
 }
 
 
@@ -30,8 +28,9 @@ caml_xscreen_size(value disp, value screen)
 {
   CAMLparam2(disp, screen);
 
-  int w = XDisplayWidth ((Display*) disp, Int_val(screen));
-  int h = XDisplayHeight((Display*) disp, Int_val(screen));
+  Display* dpy = Display_val(disp);
+  int w = XDisplayWidth (dpy, Int_val(screen));
+  int h = XDisplayHeight(dpy, Int_val(screen));
 
   CAMLreturn(Int_pair(w,h));
 }
@@ -44,8 +43,9 @@ caml_xscreen_sizemm(value disp, value screen)
 {
   CAMLparam2(disp, screen);
 
-  int w = XDisplayWidthMM ((Display*) disp, Int_val(screen));
-  int h = XDisplayHeightMM ((Display*) disp, Int_val(screen));
+  Display* dpy = Display_val(disp);
+  int w = XDisplayWidthMM (dpy, Int_val(screen));
+  int h = XDisplayHeightMM (dpy, Int_val(screen));
 
   CAMLreturn(Int_pair(w,h));
 }
@@ -57,7 +57,8 @@ CAMLprim value
 caml_xscreen_count(value disp)
 {
   CAMLparam1(disp);
-  CAMLreturn(Val_int(XScreenCount((Display*) disp)));
+  Display* dpy = Display_val(disp);
+  CAMLreturn(Val_int(XScreenCount(dpy)));
 }
 
 
@@ -67,7 +68,8 @@ CAMLprim value
 caml_xdefault_screen(value disp)
 {
   CAMLparam1(disp);
-  CAMLreturn(Val_int(XDefaultScreen((Display*) disp)));
+  Display* dpy = Display_val(disp);
+  CAMLreturn(Val_int(XDefaultScreen(dpy)));
 }
 
 
@@ -77,7 +79,8 @@ CAMLprim value
 caml_xflush(value disp)
 {
   CAMLparam1(disp);
-  XFlush((Display*) disp);
+  Display* dpy = Display_val(disp);
+  XFlush(dpy);
   CAMLreturn(Val_unit);
 }
 
