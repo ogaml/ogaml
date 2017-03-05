@@ -130,36 +130,36 @@
 {
   // The new OLD
 
-  CGFloat scale = [[m_window screen] backingScaleFactor];
-  // int scale = [[m_window screen] backingScaleFactor];
-  NSPoint p = NSMakePoint(loc.x / scale, loc.y / scale);
-
-  // Now we get global coordinates (Thanks SFML)
-  float h = [m_view frame].size.height;
-  p.y = h - p.y;
-
-  // NSLog(@"set : scale = %f", scale);
-  // NSLog(@"set : Frame height %f", h * scale);
-
-  // p = [m_view convertPoint:p toView:m_view];
-  // p = [m_view convertPoint:p toView:nil];
-
-  NSLog(@"Point 1 %f, %f", p.x, p.y);
-
-  NSRect rect = NSZeroRect;
-  rect.origin = p;
-  rect = [m_window convertRectToScreen:rect];
-  p = rect.origin;
-
-  NSLog(@"Point 2 %f, %f", p.x, p.y);
-
-  const float screenHeight = [[m_window screen] frame].size.height;
-  p.y = screenHeight - p.y;
-
-  NSLog(@"Point 3 %f, %f", p.x, p.y);
-
-  NSLog(@"set : Claimed screen height %f", screenHeight);
-  NSLog(@"set : Claimed screen height * scale %f", screenHeight * scale);
+  // CGFloat scale = [[m_window screen] backingScaleFactor];
+  // // int scale = [[m_window screen] backingScaleFactor];
+  // NSPoint p = NSMakePoint(loc.x / scale, loc.y / scale);
+  //
+  // // Now we get global coordinates (Thanks SFML)
+  // float h = [m_view frame].size.height;
+  // p.y = h - p.y;
+  //
+  // // NSLog(@"set : scale = %f", scale);
+  // // NSLog(@"set : Frame height %f", h * scale);
+  //
+  // // p = [m_view convertPoint:p toView:m_view];
+  // // p = [m_view convertPoint:p toView:nil];
+  //
+  // NSLog(@"Point 1 %f, %f", p.x, p.y);
+  //
+  // NSRect rect = NSZeroRect;
+  // rect.origin = p;
+  // rect = [m_window convertRectToScreen:rect];
+  // p = rect.origin;
+  //
+  // NSLog(@"Point 2 %f, %f", p.x, p.y);
+  //
+  // const float screenHeight = [[m_window screen] frame].size.height;
+  // p.y = screenHeight - p.y;
+  //
+  // NSLog(@"Point 3 %f, %f", p.x, p.y);
+  //
+  // NSLog(@"set : Claimed screen height %f", screenHeight);
+  // NSLog(@"set : Claimed screen height * scale %f", screenHeight * scale);
 
   // OLD
 
@@ -177,19 +177,27 @@
   // rect = [m_view convertRectFromBacking:rect];
 
   // No we set the cursor to p
-  warpCursor(p);
+  // warpCursor(p);
 
   // SFML way again
-  // loc.y = [m_window frame].size.height - loc.y;
-  //
-  // loc = [m_view convertPoint:loc toView:m_view];
-  // loc = [m_view convertPoint:loc toView:nil];
-  //
-  // const float screenHeight = [[m_window screen] frame].size.height;
-  // loc.y = screenHeight - loc.y;
-  //
-  // NSNumber* displayId = [[[m_window screen] deviceDescription] objectForKey:@"NSScreenNumber"];
-  // CGDisplayMoveCursorToPoint([displayId intValue], NSPointToCGPoint(loc));
+  CGFloat scale = [[m_window screen] backingScaleFactor];
+  NSPoint point = NSMakePoint(loc.x / scale, loc.y / scale);
+
+  // point.y = [m_window frame].size.height - point.y;
+  point.y = [m_view frame].size.height - point.y;
+
+  point = [m_view convertPoint:point toView:m_view];
+  point = [m_view convertPoint:point toView:nil];
+
+  NSRect rect = NSZeroRect;
+  rect.origin = point;
+  rect = [m_window convertRectToScreen:rect];
+  point = rect.origin;
+
+  const float screenHeight = [[m_window screen] frame].size.height;
+  point.y = screenHeight - point.y;
+
+  warpCursor(point);
 }
 
 -(void)hideCursor
