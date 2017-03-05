@@ -20,6 +20,10 @@ let rec event_loop () =
           "Mouse was at absolute position %s and relative %s"
           (Vector2i.to_string (Mouse.position ()))
           (Vector2i.to_string (Mouse.relative_position window))
+      | A -> Mouse.set_relative_position window Vector2i.zero
+      | B -> Mouse.set_relative_position window (Vector2i.make 800 0)
+      | C -> Mouse.set_relative_position window (Vector2i.make 800 600)
+      | D -> Mouse.set_relative_position window (Vector2i.make 0 600)
       | _ -> ()
       )
     | _     -> event_loop ()
