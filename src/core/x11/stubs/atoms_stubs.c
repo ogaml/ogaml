@@ -32,7 +32,8 @@ CAMLprim value
 caml_xintern_atom(value disp, value nm, value exists)
 {
   CAMLparam3(disp, nm, exists);
-  Atom tmp = XInternAtom((Display*) disp, String_val(nm), Bool_val(exists));
+  Display* dpy = Display_val(disp);
+  Atom tmp = XInternAtom(dpy, String_val(nm), Bool_val(exists));
   if(tmp == None)
     CAMLreturn(Val_int(0));
   else
@@ -46,12 +47,14 @@ CAMLprim value
 caml_xset_wm_protocols(value disp, value win, value atoms, value size)
 {
   CAMLparam4(disp, win, atoms, size);
+  Display* dpy = Display_val(disp);
+  Window w = Window_val(win);
   Atom tmp[Int_val(size)];
   int i = 0;
   for(i = 0; i < Int_val(size); i++) {
     tmp[i] = (Atom) Field(atoms, i);
   }
-  XSetWMProtocols((Display*) disp, (Window) win, tmp, Int_val(size));
+  XSetWMProtocols(dpy, w, tmp, Int_val(size));
   CAMLreturn(Val_unit);
 }
 
@@ -62,13 +65,15 @@ CAMLprim value
 caml_xchange_property(value disp, value win, value prop, value atoms, value length)
 {
   CAMLparam5(disp, win, prop, atoms, length);
+  Display* dpy = Display_val(disp);
+  Window w = Window_val(win);
   Atom tmp[Int_val(length)+1];
   int i = 0;
   for(i = 0; i < Int_val(length); i++) {
     tmp[i] = (Atom) Field(atoms, i);
   }
   tmp[Int_val(length)] = None;
-  XChangeProperty((Display*) disp, (Window) win, (Atom) prop, XA_ATOM, 32, PropModeReplace, (unsigned char*) tmp, Int_val(length));
+  XChangeProperty(dpy, w, (Atom) prop, XA_ATOM, 32, PropModeReplace, (unsigned char*) tmp, Int_val(length));
   CAMLreturn(Val_unit);
 }
 
@@ -79,6 +84,8 @@ CAMLprim value
 caml_xsend_event(value disp, value win, value prop, value atoms, value length)
 {
   CAMLparam5(disp, win, prop, atoms, length);
+  Display* dpy = Display_val(disp);
+  Window w = Window_val(win);
   XEvent xev;
   int i = 0;
   for(i = 0; i < Int_val(length); i++) {
@@ -88,9 +95,9 @@ caml_xsend_event(value disp, value win, value prop, value atoms, value length)
     xev.xclient.type = ClientMessage;
     xev.xclient.serial = 0;
     xev.xclient.send_event = True;
-    xev.xclient.window = (Window) win;
+    xev.xclient.window = w;
     xev.xclient.message_type = (Atom) prop;
     xev.xclient.format = 32;
-  XSendEvent((Display*) disp, DefaultRootWindow((Display*) disp), False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+  XSendEvent(dpy, DefaultRootWindow(dpy), False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
   CAMLreturn(Val_unit);
 }

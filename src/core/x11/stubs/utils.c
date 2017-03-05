@@ -2,14 +2,32 @@
 
 #include "utils.h"
 
-struct custom_operations empty_custom_opts = {
-  .identifier  = "obj_st handling",
-  .finalize    = custom_finalize_default,
-  .compare     = custom_compare_default,
-  .hash        = custom_hash_default,
-  .serialize   = custom_serialize_default,
-  .deserialize = custom_deserialize_default
+static struct custom_operations XVisualInfo_custom_ops = {
+  identifier  : "XVisualInfo handling",
+  finalize    : custom_finalize_default,
+  compare     : custom_compare_default,
+  hash        : custom_hash_default,
+  serialize   : custom_serialize_default,
+  deserialize : custom_deserialize_default
 };
+
+static struct custom_operations XEvent_custom_ops = {
+  identifier  : "XEvent handling",
+  finalize    : custom_finalize_default,
+  compare     : custom_compare_default,
+  hash        : custom_hash_default,
+  serialize   : custom_serialize_default,
+  deserialize : custom_deserialize_default
+};              
+
+static struct custom_operations Window_custom_ops = {
+  identifier  : "Window handling",
+  finalize    : custom_finalize_default,
+  compare     : custom_compare_default,
+  hash        : custom_hash_default,
+  serialize   : custom_serialize_default,
+  deserialize : custom_deserialize_default
+}; 
 
 value Val_some(value v)
 {
