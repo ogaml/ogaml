@@ -144,17 +144,22 @@
   // p = [m_view convertPoint:p toView:m_view];
   // p = [m_view convertPoint:p toView:nil];
 
+  NSLog(@"Point 1 %f, %f", p.x, p.y);
+
   NSRect rect = NSZeroRect;
   rect.origin = p;
   rect = [m_window convertRectToScreen:rect];
   p = rect.origin;
 
+  NSLog(@"Point 2 %f, %f", p.x, p.y);
+
   const float screenHeight = [[m_window screen] frame].size.height;
   p.y = screenHeight - p.y;
 
-  // NSLog(@"set : Claimed screen height %f", screenHeight);
-  // NSLog(@"set : Claimed screen height * scale %f", screenHeight * scale);
-  // NSLog(@"set : Claimed screen height / scale %f", screenHeight / scale);
+  NSLog(@"Point 3 %f, %f", p.x, p.y);
+
+  NSLog(@"set : Claimed screen height %f", screenHeight);
+  NSLog(@"set : Claimed screen height * scale %f", screenHeight * scale);
 
   // OLD
 
