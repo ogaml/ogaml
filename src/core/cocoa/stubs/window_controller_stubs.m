@@ -114,21 +114,32 @@
 {
   NSPoint rawloc = [m_window mouseLocationOutsideOfEventStream];
   NSPoint loc = [m_view convertPoint:rawloc fromView:nil];
-  int scale = [[m_window screen] backingScaleFactor];
+  // int scale = [[m_window screen] backingScaleFactor];
+  CGFloat scale = [[m_window screen] backingScaleFactor];
 
   float h = [m_view frame].size.height;
   loc.y = h - loc.y;
+
+  // NSLog(@"get : scale = %f", scale);
+  // NSLog(@"get : Frame height %f", h * scale);
 
   return NSMakePoint(loc.x * scale, loc.y * scale);
 }
 
 -(void)setProperRelativeMouseLocationTo:(NSPoint)loc
 {
+  // The new OLD
+
   CGFloat scale = [[m_window screen] backingScaleFactor];
+  // int scale = [[m_window screen] backingScaleFactor];
   NSPoint p = NSMakePoint(loc.x / scale, loc.y / scale);
 
   // Now we get global coordinates (Thanks SFML)
-  p.y = [m_view frame].size.height - p.y;
+  float h = [m_view frame].size.height;
+  p.y = h - p.y;
+
+  // NSLog(@"set : scale = %f", scale);
+  // NSLog(@"set : Frame height %f", h * scale);
 
   // p = [m_view convertPoint:p toView:m_view];
   // p = [m_view convertPoint:p toView:nil];
@@ -140,6 +151,12 @@
 
   const float screenHeight = [[m_window screen] frame].size.height;
   p.y = screenHeight - p.y;
+
+  // NSLog(@"set : Claimed screen height %f", screenHeight);
+  // NSLog(@"set : Claimed screen height * scale %f", screenHeight * scale);
+  // NSLog(@"set : Claimed screen height / scale %f", screenHeight / scale);
+
+  // OLD
 
   // CGFloat scale = [[m_window screen] backingScaleFactor];
   // NSPoint p = NSMakePoint(loc.x / scale, loc.y / scale);
@@ -156,6 +173,18 @@
 
   // No we set the cursor to p
   warpCursor(p);
+
+  // SFML way again
+  // loc.y = [m_window frame].size.height - loc.y;
+  //
+  // loc = [m_view convertPoint:loc toView:m_view];
+  // loc = [m_view convertPoint:loc toView:nil];
+  //
+  // const float screenHeight = [[m_window screen] frame].size.height;
+  // loc.y = screenHeight - loc.y;
+  //
+  // NSNumber* displayId = [[[m_window screen] deviceDescription] objectForKey:@"NSScreenNumber"];
+  // CGDisplayMoveCursorToPoint([displayId intValue], NSPointToCGPoint(loc));
 }
 
 -(void)hideCursor
