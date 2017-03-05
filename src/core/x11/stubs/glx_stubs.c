@@ -12,10 +12,12 @@ CAMLprim value
 caml_glx_choose_visual(value disp, value scr, value attributes, value len)
 {
   CAMLparam4(disp, scr, attributes, len);
-  CAMLlocal2(hd,tl);
+  CAMLlocal3(hd,tl,res);
   
   int attrs[Int_val(len)+1];
   int i = 0;
+  int fbcount;
+  Display* dpy = Display_val(disp);
 
   tl = attributes;
 
@@ -56,12 +58,14 @@ caml_glx_choose_visual(value disp, value scr, value attributes, value len)
   }
 
   attrs[i] = None;
-  
-  int fbcount;
-  GLXFBConfig* fbc = glXChooseFBConfig((Display*)disp, Int_val(scr), attrs, &fbcount);
-  XVisualInfo* vis = glXGetVisualFromFBConfig((Display*)disp, fbc[0]);
 
-  CAMLreturn((value) vis);
+  GLXFBConfig* fbc = glXChooseFBConfig(dpy, Int_val(scr), attrs, &fbcount);
+  XVisualInfo* vis = glXGetVisualFromFBConfig(dpy, fbc[0]);
+
+  XVisualInfo_alloc(res);
+  XVisualInfo_copy(res, vis);
+
+  CAMLreturn(res);
 }
 
 
@@ -72,13 +76,13 @@ caml_glx_create_context(value disp, value vi)
 {
   CAMLparam2(disp, vi);
 
-  // a GLXContext is already a pointer
-  GLXContext tmp = glXCreateContext(
-      (Display*) disp,
-      (XVisualInfo*) vi,
-      NULL, True);
+  Display* dpy = Display_val(disp);
+  XVisualInfo* xvi = XVisualInfo_val(vi);
 
-  CAMLreturn((value)tmp);
+  GLXContext tmp = glXCreateContext(dpy, xvi, NULL, True);
+
+  // a GLXContext is a pointer
+  CAMLreturn(Val_GLXContext(tmp));
 }
 
 
@@ -88,7 +92,9 @@ CAMLprim value
 caml_glx_swap_buffers(value disp, value win)
 {
   CAMLparam2(disp, win);
-  glXSwapBuffers((Display*)disp, (Window)win);
+  Display* dpy = Display_val(disp);
+  Window w = Window_val(win);
+  glXSwapBuffers(dpy, w);
   CAMLreturn(Val_unit);
 }
 
@@ -99,7 +105,10 @@ CAMLprim value
 caml_glx_make_current(value disp, value win, value ctx)
 {
   CAMLparam3(disp, win, ctx);
-  glXMakeCurrent((Display*)disp, (Window)win, (GLXContext)ctx);
+  Display* dpy = Display_val(disp);
+  Window w = Window_val(win);
+  GLXContext glc = GLXContext_val(ctx);
+  glXMakeCurrent(dpy, w, glc);
   CAMLreturn(Val_unit);
 }
 
@@ -110,7 +119,9 @@ CAMLprim value
 caml_glx_destroy_context(value disp, value ctx)
 {
   CAMLparam2(disp, ctx);
-  glXDestroyContext((Display*)disp, (GLXContext)ctx);
+  Display* dpy = Display_val(disp);
+  GLXContext glc = GLXContext_val(ctx);
+  glXDestroyContext(dpy, glc);
   CAMLreturn(Val_unit);
 }
 
