@@ -9,6 +9,8 @@
 #include <caml/memory.h>
 #include <caml/alloc.h>
 #include <caml/mlvalues.h>
+#include <stdio.h>
+#include <string.h>
 
 #define Val_none Val_int(0)
 

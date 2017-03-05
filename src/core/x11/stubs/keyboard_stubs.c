@@ -5,9 +5,9 @@
 #include "utils.h"
 
 CAMLprim value
-caml_is_key_down(value display, value code)
+caml_is_key_down(value disp, value code)
 {
-  CAMLparam2(display, code);
+  CAMLparam2(disp, code);
 
   Display* dpy = Display_val(disp);
 

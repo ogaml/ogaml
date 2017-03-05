@@ -17,7 +17,7 @@ caml_glx_choose_visual(value disp, value scr, value attributes, value len)
   int attrs[Int_val(len)+1];
   int i = 0;
   int fbcount;
-  Display dpy = Display_val(disp),
+  Display* dpy = Display_val(disp);
 
   tl = attributes;
 

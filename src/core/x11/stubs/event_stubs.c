@@ -38,13 +38,14 @@ CAMLprim value
 caml_xnext_event(value disp, value win)
 {
   CAMLparam1(disp);
-  CAMLlocal1(res);
+  CAMLlocal2(res, ev);
   Display* dpy = Display_val(disp);
   Window w = Window_val(win);
   XEvent event;
   if(XCheckIfEvent(dpy, &event, &checkEvent, (XPointer)w) == True) {
-    XEvent_alloc(res);
-    XEvent_copy(res, &event);
+    XEvent_alloc(ev);
+    XEvent_copy(ev, &event);
+    res = Val_some(ev);
   }
   else {
     res = Val_int(0);

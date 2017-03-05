@@ -49,7 +49,7 @@ caml_xcreate_simple_window(
     );
 
   Window_alloc(res);
-  Window_copy(res, &win),
+  Window_copy(res, &win);
 
   CAMLreturn(res);
 }
@@ -66,7 +66,7 @@ caml_xroot_window(value disp, value screen)
   Display* dpy = Display_val(disp);
   Window win = XRootWindow(dpy, Int_val(screen));
   Window_alloc(res);
-  Window_copy(res, &win),
+  Window_copy(res, &win);
 
   CAMLreturn(res);
 }
@@ -178,12 +178,12 @@ caml_xwindow_position(value disp, value win)
 // INPUT   display, window, x, y
 // OUTPUT  resizes the window
 CAMLprim value
-caml_resize_window(value disp, value win, value w, value h)
+caml_resize_window(value disp, value win, value width, value height)
 {
-  CAMLparam4(disp, win, w, h);
+  CAMLparam4(disp, win, width, height);
   Display* dpy = Display_val(disp);
   Window w = Window_val(win);
-  XResizeWindow(dpy, w, Int_val(w), Int_val(h));
+  XResizeWindow(dpy, w, Int_val(width), Int_val(height));
   CAMLreturn(Val_unit);
 }
 
