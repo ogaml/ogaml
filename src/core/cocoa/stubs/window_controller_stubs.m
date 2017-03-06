@@ -190,10 +190,10 @@
 
   NSLog(@"Point at 2 %f, %f", point.x, point.y);
 
-  point = [m_view convertPoint:point toView:m_view];
-  NSLog(@"Point at 3 %f, %f", point.x, point.y);
-  point = [m_view convertPoint:point toView:nil];
-  NSLog(@"Point at 4 %f, %f", point.x, point.y);
+  // point = [m_view convertPoint:point toView:m_view];
+  // NSLog(@"Point at 3 %f, %f", point.x, point.y);
+  // point = [m_view convertPoint:point toView:nil];
+  // NSLog(@"Point at 4 %f, %f", point.x, point.y);
 
   // NSRect rect = NSZeroRect;
   // rect.origin = point;
