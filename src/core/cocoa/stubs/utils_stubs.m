@@ -100,15 +100,15 @@ void warpCursor(NSPoint loc)
   // CFRelease(source);
 
   // SFML solution
-  // CGEventRef event = CGEventCreateMouseEvent(NULL,
-  //                                            kCGEventMouseMoved,
-  //                                            newCursorPosition,
-  //                                            0);
-  // CGEventPost(kCGHIDEventTap, event);
-  // CFRelease(event);
+  CGEventRef event = CGEventCreateMouseEvent(NULL,
+                                             kCGEventMouseMoved,
+                                             newCursorPosition,
+                                             0);
+  CGEventPost(kCGHIDEventTap, event);
+  CFRelease(event);
 
-  // Other solution
-  CGWarpMouseCursorPosition(newCursorPosition);
+  // Other solution (too strict!)
+  // CGWarpMouseCursorPosition(newCursorPosition);
 }
 
 CAMLprim value
