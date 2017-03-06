@@ -209,7 +209,10 @@
 
   NSLog(@"Point at 5 %f, %f", point.x, point.y);
 
-  const float screenHeight = [[m_window screen] frame].size.height;
+  // const float screenHeight = [[m_window screen] frame].size.height;
+  // point.y = screenHeight - point.y;
+
+  const float screenHeight = [[NSScreen screens][0] frame].size.height;
   point.y = screenHeight - point.y;
 
   NSLog(@"Point at 6 %f, %f", point.x, point.y);
