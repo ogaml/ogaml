@@ -183,19 +183,36 @@
   CGFloat scale = [[m_window screen] backingScaleFactor];
   NSPoint point = NSMakePoint(loc.x / scale, loc.y / scale);
 
+  NSLog(@"Point at 1 %f, %f", point.x, point.y);
+
   // point.y = [m_window frame].size.height - point.y;
   point.y = [m_view frame].size.height - point.y;
 
-  point = [m_view convertPoint:point toView:m_view];
-  point = [m_view convertPoint:point toView:nil];
+  NSLog(@"Point at 2 %f, %f", point.x, point.y);
 
-  NSRect rect = NSZeroRect;
-  rect.origin = point;
-  rect = [m_window convertRectToScreen:rect];
-  point = rect.origin;
+  point = [m_view convertPoint:point toView:m_view];
+  NSLog(@"Point at 3 %f, %f", point.x, point.y);
+  point = [m_view convertPoint:point toView:nil];
+  NSLog(@"Point at 4 %f, %f", point.x, point.y);
+
+  // NSRect rect = NSZeroRect;
+  // rect.origin = point;
+  // rect = [m_window convertRectToScreen:rect];
+  // point = rect.origin;
+
+  // My way
+
+  point.x = [m_window frame].origin.x + point.x;
+  point.y = [m_window frame].origin.y + point.y;
+
+  // End my way
+
+  NSLog(@"Point at 5 %f, %f", point.x, point.y);
 
   const float screenHeight = [[m_window screen] frame].size.height;
   point.y = screenHeight - point.y;
+
+  NSLog(@"Point at 6 %f, %f", point.x, point.y);
 
   warpCursor(point);
 }
