@@ -133,6 +133,7 @@ module Vertex = struct
       aname : string;
       atype : 'a AttributeType.s;
       aoffset : int;
+      adivisor : int;
     }
 
   and 'a t = 
@@ -156,6 +157,11 @@ module Vertex = struct
     match attrib with
     | Boxed_Attrib a -> AttributeType.to_glsl a.atype
 
+  let divisor_of attrib = 
+    match attrib with
+    | Boxed_Attrib a -> a.adivisor
+
+
   module Attribute = struct
 
     type ('a, 'b) s = ('a, 'b) attrib
@@ -171,6 +177,9 @@ module Vertex = struct
     let name attr = 
       attr.aname
 
+    let divisor attr = 
+      attr.adivisor
+
     let atype attr = 
       attr.atype
 
@@ -180,7 +189,7 @@ module Vertex = struct
 
     type s
 
-    val attribute : string -> 'a AttributeType.s -> ('a, s) Attribute.s
+    val attribute : string -> ?divisor:int -> 'a AttributeType.s -> ('a, s) Attribute.s
 
     val seal : unit -> unit
 
@@ -198,7 +207,7 @@ module Vertex = struct
       let vertex = 
         {attribs = []; sealed = false; total_size = 0}
 
-      let attribute s attr =
+      let attribute s ?divisor:(adivisor=0) attr =
         if vertex.sealed then 
           Printf.ksprintf (fun s -> raise (Sealed_vertex s))
             "Cannot add attribute %s to sealed vertex structure" s;
@@ -206,7 +215,8 @@ module Vertex = struct
           {
             aname = s;
             atype = attr;
-            aoffset = vertex.total_size
+            aoffset = vertex.total_size;
+            adivisor
           }
         in
         vertex.attribs <- (Boxed_Attrib attrib) :: vertex.attribs;
@@ -527,8 +537,13 @@ type ('a, 'b) t = {
   mutable size_i  : int;
   mutable length  : int;
   init_fields : ('b Vertex.boxed_attrib * int) list;
+  (* Stride for integer data *)
   stride_i  : int;
+  (* Stride for floating-point data *)
   stride_f  : int;
+  (* Is the data instanced ? *)
+  instanced : bool;
+  (* Last bound program *)
   mutable bound : Program.t option;
   id : int
 }
@@ -549,18 +564,31 @@ let create context src kind =
     GL.VBO.subdata (lengthf * 4) (lengthi * 4) datai;
   end;
   GL.VBO.bind None;
-  {
-   vao;
-   buffer;
-   size_f   = lengthf;
-   size_i   = lengthi;
-   length   = VertexSource.length src; 
-   init_fields = src.VertexSource.init_fields;
-   stride_i = src.VertexSource.stridei;
-   stride_f = src.VertexSource.stridef;
-   bound = None;
-   id = Context.LL.vao_id context
-  }
+  Context.LL.set_bound_vbo context None;
+  let idpool = Context.LL.vao_pool context in
+  let id = Context.ID_Pool.get_next idpool in
+  let instanced = 
+    List.exists (fun (a,_) -> Vertex.divisor_of a <> 0) src.VertexSource.init_fields
+  in
+  let vao_ = {
+    vao;
+    buffer;
+    size_f   = lengthf;
+    size_i   = lengthi;
+    length   = VertexSource.length src; 
+    init_fields = src.VertexSource.init_fields;
+    stride_i = src.VertexSource.stridei;
+    stride_f = src.VertexSource.stridef;
+    instanced;
+    bound = None;
+    id}
+  in
+  Gc.finalise (fun _ ->
+    Context.ID_Pool.free idpool id;
+    if Context.LL.bound_vao context = Some id then 
+      Context.LL.set_bound_vao context None
+  ) vao_;
+  vao_
 
 let dynamic (type s) (module M : RenderTarget.T with type t = s) target src = 
   create (M.context target) src GLTypes.VBOKind.DynamicDraw
@@ -570,7 +598,7 @@ let static (type s) (module M : RenderTarget.T with type t = s) target src =
 
 let length t = t.length
 
-let rebuild t src start =
+let rebuild (type s) (module M : RenderTarget.T with type t = s) target t src start =
   let dataf = src.VertexSource.fdata in
   let datai = src.VertexSource.idata in
   let lengthf = GL.Data.length dataf in
@@ -598,6 +626,7 @@ let rebuild t src start =
   GL.VBO.subdata (start_f * 4) (lengthf * 4) dataf;
   GL.VBO.subdata ((lengthf + start_f + start_i) * 4) (lengthi * 4) datai;
   GL.VBO.bind None;
+  Context.LL.set_bound_vbo (M.context target) None;
   t.buffer <- new_buffer;
   t.bound  <- new_binding;
   t.size_f <- max (lengthf + start_f) t.size_f;
@@ -631,6 +660,7 @@ let bind context t prog =
               (Program.Attribute.name att)
             ));
         GL.VAO.enable_attrib (Program.Attribute.location att);
+        GL.VAO.attrib_divisor (Program.Attribute.location att) (Vertex.divisor_of attrib);
         if Vertex.AttributeType.glsl_is_int typ then begin 
           let offset = t.stride_i - offset in
           GL.VAO.attrib_int
@@ -649,14 +679,10 @@ let bind context t prog =
             (t.stride_f * 4)
         end
       ) (Program.LL.attributes prog);
-    (*if !attribs <> [] then
-      Printf.eprintf "Warning : omitting attribute %s not required by program\n%!" 
-        (let (_,s,_) = List.hd !attribs in s)*)
   end
   else if Context.LL.bound_vao context <> (Some t.id) then begin
     GL.VAO.bind (Some t.vao);
     Context.LL.set_bound_vao context (Some (t.vao, t.id));
-    Context.LL.set_bound_vbo context (Some (t.buffer, t.id));
   end
 
 
@@ -687,11 +713,17 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
     |None -> 
       if start < 0 || start + length > vertices.length then
         raise (Out_of_bounds "Invalid vertex array bounds")
-      else GL.VAO.draw mode start length
+      (*else if vertices.instanced then 
+        GL.VAO.draw_instanced mode start length*)
+      else
+        GL.VAO.draw mode start length
     |Some ebo ->
       if start < 0 || start + length > (IndexArray.length ebo) then
         raise (Out_of_bounds "Invalid index array bounds")
-      else begin
+      (*else if vertices.instanced then begin
+        IndexArray.LL.bind context ebo;
+        GL.VAO.draw_elements_instanced mode start length 
+      end*) else begin
         IndexArray.LL.bind context ebo;
         GL.VAO.draw_elements mode start length 
       end

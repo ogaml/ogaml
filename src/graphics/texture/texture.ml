@@ -78,14 +78,23 @@ module Common = struct
   let create context mipmaps target =
     (* Create the texture *)
     let internal = GL.Texture.create () in
+    let idpool = Context.LL.texture_pool context in
+    let id = Context.ID_Pool.get_next idpool in
     let tex = {internal; 
-               context = context;
+               context;
                target;
                mipmaps;
-               id = Context.LL.texture_id context; 
+               id;
                wrap = Some GLTypes.WrapFunction.ClampEdge;
                magnify = Some GLTypes.MagnifyFilter.Linear;
                minify = Some GLTypes.MinifyFilter.LinearMipmapLinear} in
+    Gc.finalise (fun _ -> 
+      Context.ID_Pool.free idpool id;
+      for i = 0 to (Context.capabilities context).Context.max_texture_image_units - 1 do
+        if Context.LL.bound_texture context i = Some id then
+          Context.LL.set_bound_texture context i None
+      done
+    ) tex;
     (* Bind it *)
     bind tex 0;
     (* Set reasonable parameters *)

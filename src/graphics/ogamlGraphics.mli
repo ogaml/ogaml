@@ -1518,12 +1518,12 @@ module IndexArray : sig
     * @see:OgamlGraphics.IndexArray.Source *)
   val dynamic : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> dynamic t
 
-  (** $rebuild array src offset$ rebuilds $array$ starting from
+  (** $rebuild (module M) context array src offset$ rebuilds $array$ starting from
     * the index at position $offset$ using $src$.
     *
     * The index array is modified in-place and is resized as needed.
     * @see:OgamlGraphics.IndexArray.Source *)
-  val rebuild : dynamic t -> Source.t -> int -> unit
+  val rebuild : (module RenderTarget.T with type t = 'a) -> 'a -> dynamic t -> Source.t -> int -> unit
 
   (** Returns the length of an index array *)
   val length : 'a t -> int
@@ -1642,6 +1642,9 @@ module VertexArray : sig
         * Raises $Unbound_attribute$ if the attribute is not initialized. *)
       val get : 'b t -> ('a, 'b) s -> 'a
 
+      (** Returns the divisor of the attribute used during instanced rendering. *)
+      val divisor : ('a, 'b) s -> int
+
       (** Returns the name of an attribute, that is, the name
         * that will refer to this attribute in a GLSL program. *)
       val name : ('a, 'b) s -> string
@@ -1659,8 +1662,12 @@ module VertexArray : sig
       type s
 
       (** Adds an attribute to this structure.
+        *
+        * $divisor$ corresponds to the attribute's divisor for instanced rendering,
+        * and defaults to $0$ (non-instanced) 
+        *
         * Raises $Sealed_vertex$ if the structure is sealed. *)
-      val attribute : string -> 'a AttributeType.s -> ('a, s) Attribute.s
+      val attribute : string -> ?divisor:int -> 'a AttributeType.s -> ('a, s) Attribute.s
 
       (** Seals this structure. Once sealed, the structure can be used to
         * create vertices but cannot receive new attributes.
@@ -1825,12 +1832,12 @@ module VertexArray : sig
   val dynamic : (module RenderTarget.T with type t = 'a) 
                  -> 'a -> 'b VertexSource.t -> (dynamic, 'b) t
 
-  (** $rebuild array src offset$ rebuilds $array$ starting from
+  (** $rebuild (module M) context array src offset$ rebuilds $array$ starting from
     * the vertex at position $offset$ using $src$.
     *
     * The vertex array is modified in-place and is resized as needed.
     * @see:OgamlGraphics.VertexArray.Source *)
-  val rebuild : (dynamic, 'b) t -> 'b VertexSource.t -> int -> unit
+  val rebuild : (module RenderTarget.T with type t = 'a) -> 'a -> (dynamic, 'b) t -> 'b VertexSource.t -> int -> unit
 
   (** Returns the length of a vertex array *)
   val length : ('a, 'b) t -> int

@@ -32,8 +32,16 @@ let from_source (type s) (module M : RenderTarget.T with type t = s)
   let vertex = to_source vertex_source   in
   let fragment = to_source fragment_source in
   let context = M.context context in
+  let idpool = Context.LL.program_pool context in
+  let id = Context.ID_Pool.get_next idpool in
   try 
-    ProgramInternal.create ~vertex ~fragment ~id:(Context.LL.program_id context)
+    let prog = ProgramInternal.create ~vertex ~fragment ~id in
+    Gc.finalise (fun _ -> 
+      Context.ID_Pool.free idpool id;
+      if Context.LL.linked_program context = Some id then 
+        Context.LL.set_linked_program context None
+    ) prog;
+    prog
   with 
   | ProgramInternal.Program_internal_error s -> 
       begin match log with
@@ -48,10 +56,20 @@ let from_source_list (type s) (module M : RenderTarget.T with type t = s)
   let vertex = List.map (fun (v,s) -> (v, to_source s)) vertex_source in
   let fragment = List.map (fun (v,s) -> (v, to_source s)) fragment_source in
   let context = M.context context in
+  let idpool = Context.LL.program_pool context in
+  let id = Context.ID_Pool.get_next idpool in
   try 
-    ProgramInternal.create_list
-      ~vertex ~fragment ~id:(Context.LL.program_id context)
-      ~version:(Context.glsl_version context)
+    let prog =
+      ProgramInternal.create_list
+        ~vertex ~fragment ~id
+        ~version:(Context.glsl_version context)
+    in
+    Gc.finalise (fun _ -> 
+      Context.ID_Pool.free idpool id;
+      if Context.LL.linked_program context = Some id then 
+        Context.LL.set_linked_program context None
+    ) prog;
+    prog
   with 
   | ProgramInternal.Program_internal_error s ->
       begin match log with
@@ -66,10 +84,20 @@ let from_source_pp (type s) (module M : RenderTarget.T with type t = s)
   let vertex   = to_source vertex_source   in
   let fragment = to_source fragment_source in
   let context = M.context context in
+  let idpool = Context.LL.program_pool context in
+  let id = Context.ID_Pool.get_next idpool in
   try 
-    ProgramInternal.create_pp
-      ~vertex ~fragment ~id:(Context.LL.program_id context)
-      ~version:(Context.glsl_version context)
+    let prog =
+      ProgramInternal.create_pp
+        ~vertex ~fragment ~id
+        ~version:(Context.glsl_version context)
+    in
+    Gc.finalise (fun _ -> 
+      Context.ID_Pool.free idpool id;
+      if Context.LL.linked_program context = Some id then 
+        Context.LL.set_linked_program context None
+    ) prog;
+    prog
   with 
   | ProgramInternal.Program_internal_error s -> 
       begin match log with

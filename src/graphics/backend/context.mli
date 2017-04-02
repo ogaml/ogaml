@@ -27,6 +27,18 @@ type capabilities = {
   max_color_attachments     : int;
 }
 
+(** Pool of free IDs (used for textures, buffers, etc)
+  * Finalizers should call free on the ID *)
+module ID_Pool : sig
+
+  type t
+
+  val get_next : t -> int
+
+  val free : t -> int -> unit
+
+end
+
 (** Type of the GL context *)
 type t
 
@@ -114,8 +126,8 @@ module LL : sig
   (** Returns the currently active texture unit *)
   val texture_unit : t -> int
 
-  (** Returns a new fresh texture id *)
-  val texture_id : t -> int
+  (** Returns the texture ID pool *)
+  val texture_pool : t -> ID_Pool.t
 
   (** Sets the currently bound texture ID to a texture unit and a target *)
   val set_bound_texture : t -> int -> (GL.Texture.t * int * GLTypes.TextureTarget.t) option -> unit
@@ -135,8 +147,8 @@ module LL : sig
   (** Returns the currently linked program ID *)
   val linked_program : t -> int option
 
-  (** Returns a new fresh program ID *)
-  val program_id : t -> int
+  (** Returns the program ID pool *)
+  val program_pool : t -> ID_Pool.t
 
   (** Sets the currently bound VBO *)
   val set_bound_vbo : t -> (GL.VBO.t * int) option -> unit
@@ -144,14 +156,17 @@ module LL : sig
   (** Returns the currently bound VBO ID *)
   val bound_vbo : t -> int option
 
+  (** Returns the vbo ID pool *)
+  val vbo_pool : t -> ID_Pool.t
+
   (** Sets the currently bound VAO *)
   val set_bound_vao : t -> (GL.VAO.t * int) option -> unit
 
   (** Returns the currently bound VAO ID *)
   val bound_vao : t -> int option
 
-  (** Returns a new fresh vao ID *)
-  val vao_id : t -> int
+  (** Returns the vao ID pool *)
+  val vao_pool : t -> ID_Pool.t
 
   (** Sets the current clear color *)
   val set_clear_color : t -> Color.t -> unit
@@ -162,8 +177,8 @@ module LL : sig
   (** Returns the currently bound EBO ID *)
   val bound_ebo : t -> int option
 
-  (** Returns a new fresh ebo ID *)
-  val ebo_id : t -> int
+  (** Returns the ebo ID pool *)
+  val ebo_pool : t -> ID_Pool.t
 
   (** Returns the currently bound FBO ID *)
   val bound_fbo : t -> int
@@ -171,11 +186,11 @@ module LL : sig
   (** Sets the currently bound FBO *)
   val set_bound_fbo : t -> (GL.FBO.t * int) option -> unit
 
-  (** Returns a new fresh fbo ID *)
-  val fbo_id : t -> int
+  (** Returns the fbo ID pool *)
+  val fbo_pool : t -> ID_Pool.t
 
-  (** Returns a new fresh rbo ID *)
-  val rbo_id : t -> int
+  (** Returns the rbo ID pool *)
+  val rbo_pool : t -> ID_Pool.t
 
   (** Returns whether alpha blending is currently enabled *)
   val blending : t -> bool

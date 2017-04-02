@@ -146,6 +146,22 @@ caml_attrib_int(value loc, value size, value type, value off, value stride)
 }
 
 
+// INPUT   an attribute location, an int
+// OUTPUT  nothing, sets the attribute's divisor
+CAMLprim value
+caml_attrib_divisor(value loc, value divisor)
+{
+  CAMLparam2(loc, divisor);
+
+  GLuint glloc = (GLuint)Int_val(loc);
+  GLint  gldiv = Int_val(divisor);
+
+  glVertexAttribDivisor(glloc, gldiv);
+
+  CAMLreturn(Val_unit);
+}
+
+
 // INPUT   a draw mode, two indices (start, end)
 // OUTPUT  nothing, draws the currently bound VAO
 CAMLprim value
@@ -159,15 +175,42 @@ caml_draw_arrays(value mode, value start, value end)
 }
 
 
+// INPUT   a draw mode, two indices (start, end)
+// OUTPUT  nothing, draws the currently bound VAO
+CAMLprim value
+caml_draw_arrays_instanced(value mode, value start, value end, value count)
+{
+  CAMLparam4(mode, start, end, count);
+
+  glDrawArraysInstanced(Drawmode_val(mode), Int_val(start), Int_val(end), Int_val(count));
+
+  CAMLreturn(Val_unit);
+}
+
+
 // INPUT   a draw mode, a number of elements
 // OUTPUT  nothing, draws the requested number of elements from
 //         the currently bound EBO and VAO
 CAMLprim value
 caml_draw_elements(value mode, value first, value nb)
 {
-  CAMLparam2(mode, nb);
+  CAMLparam3(mode, first, nb);
 
   glDrawElements(Drawmode_val(mode), Int_val(nb), GL_UNSIGNED_INT, (GLvoid*)Int_val(first));
+
+  CAMLreturn(Val_unit);
+}
+
+
+// INPUT   a draw mode, a number of elements
+// OUTPUT  nothing, draws the requested number of elements from
+//         the currently bound EBO and VAO
+CAMLprim value
+caml_draw_elements_instanced(value mode, value first, value nb, value count)
+{
+  CAMLparam4(mode, first, nb, count);
+
+  glDrawElementsInstanced(Drawmode_val(mode), Int_val(nb), GL_UNSIGNED_INT, (GLvoid*)Int_val(first), Int_val(count));
 
   CAMLreturn(Val_unit);
 }

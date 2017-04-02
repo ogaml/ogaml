@@ -384,11 +384,20 @@ module VAO : sig
   (** Binds an integer attribute to an offset and a type in a VBO *)
   val attrib_int : Program.a_location -> int -> GLTypes.GlIntType.t -> int -> int -> unit
 
+  (** Modifies the rate at which a vertex attribute advance during instanced rendering *) 
+  val attrib_divisor : Program.a_location -> int -> unit
+
   (** Draws the currently bound VAO *)
   val draw : DrawMode.t -> int -> int -> unit
 
+  (** Draws the currently bound VAO w/ instancing *)
+  val draw_instanced : DrawMode.t -> int -> int -> int -> unit
+
   (** Draws an element array using the currently bound VAO and EBO *)
   val draw_elements : DrawMode.t -> int -> int -> unit
+
+  (** Draws an element array using the currently bound VAO and EBO w/ instancing *)
+  val draw_elements_instanced : DrawMode.t -> int -> int -> int -> unit
 
 end
 

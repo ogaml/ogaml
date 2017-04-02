@@ -41,6 +41,8 @@ module Vertex : sig
 
     val name : ('a, 'b) s -> string
 
+    val divisor : ('a, 'b) s -> int
+
     val atype : ('a, 'b) s -> 'a AttributeType.s
 
   end
@@ -50,7 +52,7 @@ module Vertex : sig
 
     type s
 
-    val attribute : string -> 'a AttributeType.s -> ('a, s) Attribute.s
+    val attribute : string -> ?divisor:int -> 'a AttributeType.s -> ('a, s) Attribute.s
 
     val seal : unit -> unit
 
@@ -133,7 +135,8 @@ val static : (module RenderTarget.T with type t = 'a)
 val dynamic : (module RenderTarget.T with type t = 'a) 
                -> 'a -> 'b VertexSource.t -> (dynamic, 'b) t
 
-val rebuild : (dynamic, 'b) t -> 'b VertexSource.t -> int -> unit
+val rebuild : (module RenderTarget.T with type t = 'a)
+               -> 'a -> (dynamic, 'b) t -> 'b VertexSource.t -> int -> unit
 
 val length : (_, _) t -> int
 

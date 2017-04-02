@@ -25,7 +25,7 @@ val static : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> stati
 
 val dynamic : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> dynamic t
 
-val rebuild : dynamic t -> Source.t -> int -> unit
+val rebuild : (module RenderTarget.T with type t = 'a) -> 'a -> dynamic t -> Source.t -> int -> unit
 
 val length : 'a t -> int
 

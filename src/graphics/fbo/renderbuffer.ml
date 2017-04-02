@@ -14,7 +14,8 @@ module ColorBuffer = struct
   let create (type a) (module M : RenderTarget.T with type t = a) target size = 
     let internal = GL.RBO.create () in
     let context = M.context target in
-    let id = Context.LL.rbo_id context in
+    let idpool = Context.LL.rbo_pool context in
+    let id = Context.ID_Pool.get_next idpool in
     let capabilities = Context.capabilities context in
     if size.Vector2i.x >= capabilities.Context.max_renderbuffer_size 
     || size.Vector2i.y >= capabilities.Context.max_renderbuffer_size then
@@ -22,7 +23,9 @@ module ColorBuffer = struct
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.RGBA8 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
-    {id; internal; size}
+    let buf = {id; internal; size} in
+    Gc.finalise (fun _ -> Context.ID_Pool.free idpool id) buf;
+    buf
 
   let to_color_attachment t = 
     Attachment.ColorAttachment.ColorRBO t.internal
@@ -43,7 +46,8 @@ module DepthBuffer = struct
   let create (type a) (module M : RenderTarget.T with type t = a) target size = 
     let internal = GL.RBO.create () in
     let context = M.context target in
-    let id = Context.LL.rbo_id context in
+    let idpool = Context.LL.rbo_pool context in
+    let id = Context.ID_Pool.get_next idpool in
     let capabilities = Context.capabilities context in
     if size.Vector2i.x >= capabilities.Context.max_renderbuffer_size 
     || size.Vector2i.y >= capabilities.Context.max_renderbuffer_size then
@@ -51,7 +55,9 @@ module DepthBuffer = struct
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.Depth24 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
-    {id; internal; size}
+    let buf = {id; internal; size} in
+    Gc.finalise (fun _ -> Context.ID_Pool.free idpool id) buf;
+    buf
 
   let to_depth_attachment t = 
     Attachment.DepthAttachment.DepthRBO t.internal
@@ -72,7 +78,8 @@ module DepthStencilBuffer = struct
   let create (type a) (module M : RenderTarget.T with type t = a) target size = 
     let internal = GL.RBO.create () in
     let context = M.context target in
-    let id = Context.LL.rbo_id context in
+    let idpool = Context.LL.rbo_pool context in
+    let id = Context.ID_Pool.get_next idpool in
     let capabilities = Context.capabilities context in
     if size.Vector2i.x >= capabilities.Context.max_renderbuffer_size
     || size.Vector2i.y >= capabilities.Context.max_renderbuffer_size then
@@ -80,7 +87,9 @@ module DepthStencilBuffer = struct
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.Depth24Stencil8 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
-    {id; internal; size}
+    let buf = {id; internal; size} in
+    Gc.finalise (fun _ -> Context.ID_Pool.free idpool id) buf;
+    buf
 
   let to_depth_stencil_attachment t = 
     Attachment.DepthStencilAttachment.DepthStencilRBO t.internal
@@ -101,7 +110,8 @@ module StencilBuffer = struct
   let create (type a) (module M : RenderTarget.T with type t = a) target size = 
     let internal = GL.RBO.create () in
     let context = M.context target in
-    let id = Context.LL.rbo_id context in
+    let idpool = Context.LL.rbo_pool context in
+    let id = Context.ID_Pool.get_next idpool in
     let capabilities = Context.capabilities context in
     if size.Vector2i.x >= capabilities.Context.max_renderbuffer_size 
     || size.Vector2i.y >= capabilities.Context.max_renderbuffer_size then
@@ -109,7 +119,9 @@ module StencilBuffer = struct
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.Stencil8 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
-    {id; internal; size}
+    let buf = {id; internal; size} in
+    Gc.finalise (fun _ -> Context.ID_Pool.free idpool id) buf;
+    buf
 
   let to_stencil_attachment t = 
     Attachment.StencilAttachment.StencilRBO t.internal
