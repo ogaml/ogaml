@@ -51,17 +51,18 @@ let dynamic (type s) (module M : RenderTarget.T with type t = s) target src =
   GL.EBO.data (GL.Data.length data * 4) (Some data) (GLTypes.VBOKind.DynamicDraw);
   GL.EBO.bind None;
   Context.LL.set_bound_ebo context None;
+  let finalize _ = 
+    Context.ID_Pool.free idpool id;
+    if Context.LL.bound_ebo context = Some id then
+      Context.LL.set_bound_ebo context None
+  in
   let ebo = {
       buffer;
       size = GL.Data.length data;
       length = Source.length src; 
       id}
   in
-  Gc.finalise (fun _ ->
-    Context.ID_Pool.free idpool id;
-    if Context.LL.bound_ebo context = Some id then
-      Context.LL.set_bound_ebo context None
-  ) ebo;
+  Gc.finalise finalize ebo;
   ebo
 
 let static (type s) (module M : RenderTarget.T with type t = s) target src = 
@@ -74,19 +75,19 @@ let static (type s) (module M : RenderTarget.T with type t = s) target src =
   GL.EBO.data (GL.Data.length data * 4) (Some data) (GLTypes.VBOKind.StaticDraw);
   GL.EBO.bind None;
   Context.LL.set_bound_ebo context None;
+  let finalize _ = 
+    Context.ID_Pool.free idpool id;
+    if Context.LL.bound_ebo context = Some id then
+      Context.LL.set_bound_ebo context None
+  in
   let ebo = {
       buffer;
       size = GL.Data.length data;
       length = Source.length src; 
       id}
   in
-  Gc.finalise (fun _ ->
-    Context.ID_Pool.free idpool id;
-    if Context.LL.bound_ebo context = Some id then
-      Context.LL.set_bound_ebo context None
-  ) ebo;
+  Gc.finalise finalize ebo;
   ebo
-
 
 let rebuild (type s) (module M : RenderTarget.T with type t = s) target t src start =
   let data = src.Source.data in

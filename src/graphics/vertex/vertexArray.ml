@@ -583,6 +583,11 @@ module Buffer = struct
     let uninstanced = 
       List.exists (fun (a,_) -> Vertex.divisor_of a = 0) src.Source.init_fields
     in
+    let finalize _ = 
+      Context.ID_Pool.free idpool id;
+      if Context.LL.bound_vbo context = Some id then 
+        Context.LL.set_bound_vbo context None
+    in
     let vbo_ = {
       buffer;
       size_f   = lengthf;
@@ -595,11 +600,7 @@ module Buffer = struct
       uninstanced;
       id}
     in
-    Gc.finalise (fun _ ->
-      Context.ID_Pool.free idpool id;
-      if Context.LL.bound_vbo context = Some id then 
-        Context.LL.set_bound_vbo context None
-    ) vbo_;
+    Gc.finalise finalize vbo_;
     vbo_
 
   let dynamic (type s) (module M : RenderTarget.T with type t = s) target src = 
@@ -716,6 +717,12 @@ let create (type s) (module M : RenderTarget.T with type t = s)
       Hashtbl.add attributes n (b,att,off)
     ) b.Buffer.init_fields;
   ) buffers;
+  let finalize _ = 
+    Printf.printf "Freeing vao %i\n%!" id;
+    Context.ID_Pool.free idpool id;
+    if Context.LL.bound_vbo context = Some id then 
+      Context.LL.set_bound_vbo context None
+  in
   let vao_ = {
     vao;
     buffers;
@@ -723,11 +730,7 @@ let create (type s) (module M : RenderTarget.T with type t = s)
     id;
     bound = None}
   in
-  Gc.finalise (fun _ ->
-    Context.ID_Pool.free idpool id;
-    if Context.LL.bound_vao context = Some id then 
-      Context.LL.set_bound_vao context None
-  ) vao_;
+  Gc.finalise finalize vao_;
   vao_
 
 let length t = 

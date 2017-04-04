@@ -23,8 +23,9 @@ module ColorBuffer = struct
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.RGBA8 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
+    let finalize _ = Context.ID_Pool.free idpool id in
     let buf = {id; internal; size} in
-    Gc.finalise (fun _ -> Context.ID_Pool.free idpool id) buf;
+    Gc.finalise finalize buf;
     buf
 
   let to_color_attachment t = 
@@ -55,8 +56,9 @@ module DepthBuffer = struct
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.Depth24 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
+    let finalize _ = Context.ID_Pool.free idpool id in
     let buf = {id; internal; size} in
-    Gc.finalise (fun _ -> Context.ID_Pool.free idpool id) buf;
+    Gc.finalise finalize buf;
     buf
 
   let to_depth_attachment t = 
@@ -87,8 +89,9 @@ module DepthStencilBuffer = struct
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.Depth24Stencil8 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
+    let finalize _ = Context.ID_Pool.free idpool id in
     let buf = {id; internal; size} in
-    Gc.finalise (fun _ -> Context.ID_Pool.free idpool id) buf;
+    Gc.finalise finalize buf;
     buf
 
   let to_depth_stencil_attachment t = 
@@ -119,8 +122,9 @@ module StencilBuffer = struct
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.Stencil8 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
+    let finalize _ = Context.ID_Pool.free idpool id in
     let buf = {id; internal; size} in
-    Gc.finalise (fun _ -> Context.ID_Pool.free idpool id) buf;
+    Gc.finalise finalize buf;
     buf
 
   let to_stencil_attachment t = 

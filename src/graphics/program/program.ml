@@ -35,12 +35,13 @@ let from_source (type s) (module M : RenderTarget.T with type t = s)
   let idpool = Context.LL.program_pool context in
   let id = Context.ID_Pool.get_next idpool in
   try 
-    let prog = ProgramInternal.create ~vertex ~fragment ~id in
-    Gc.finalise (fun _ -> 
+    let finalize _ = 
       Context.ID_Pool.free idpool id;
       if Context.LL.linked_program context = Some id then 
         Context.LL.set_linked_program context None
-    ) prog;
+    in
+    let prog = ProgramInternal.create ~vertex ~fragment ~id in
+    Gc.finalise finalize prog;
     prog
   with 
   | ProgramInternal.Program_internal_error s -> 
@@ -59,16 +60,17 @@ let from_source_list (type s) (module M : RenderTarget.T with type t = s)
   let idpool = Context.LL.program_pool context in
   let id = Context.ID_Pool.get_next idpool in
   try 
+    let finalize _ = 
+      Context.ID_Pool.free idpool id;
+      if Context.LL.linked_program context = Some id then 
+        Context.LL.set_linked_program context None
+    in
     let prog =
       ProgramInternal.create_list
         ~vertex ~fragment ~id
         ~version:(Context.glsl_version context)
     in
-    Gc.finalise (fun _ -> 
-      Context.ID_Pool.free idpool id;
-      if Context.LL.linked_program context = Some id then 
-        Context.LL.set_linked_program context None
-    ) prog;
+    Gc.finalise finalize prog;
     prog
   with 
   | ProgramInternal.Program_internal_error s ->
@@ -87,16 +89,17 @@ let from_source_pp (type s) (module M : RenderTarget.T with type t = s)
   let idpool = Context.LL.program_pool context in
   let id = Context.ID_Pool.get_next idpool in
   try 
+    let finalize _ = 
+      Context.ID_Pool.free idpool id;
+      if Context.LL.linked_program context = Some id then 
+        Context.LL.set_linked_program context None
+    in
     let prog =
       ProgramInternal.create_pp
         ~vertex ~fragment ~id
         ~version:(Context.glsl_version context)
     in
-    Gc.finalise (fun _ -> 
-      Context.ID_Pool.free idpool id;
-      if Context.LL.linked_program context = Some id then 
-        Context.LL.set_linked_program context None
-    ) prog;
+    Gc.finalise finalize prog;
     prog
   with 
   | ProgramInternal.Program_internal_error s -> 
