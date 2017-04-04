@@ -55,6 +55,8 @@ New modules:
     ☐ Octree
 
 Advanced features:
+  ☐ Vertex buffer slices
+  ☐ Index buffer slices
   More Image and Texture types:
     ☐ Single-channeled images
     ☐ Image slices

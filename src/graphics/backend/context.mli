@@ -159,13 +159,13 @@ module LL : sig
   (** Returns the vbo ID pool *)
   val vbo_pool : t -> ID_Pool.t
 
-  (** Sets the currently bound VAO *)
+  (** Sets the currently bound VBO *)
   val set_bound_vao : t -> (GL.VAO.t * int) option -> unit
 
-  (** Returns the currently bound VAO ID *)
+  (** Returns the currently bound VBO ID *)
   val bound_vao : t -> int option
 
-  (** Returns the vao ID pool *)
+  (** Returns the vbo ID pool *)
   val vao_pool : t -> ID_Pool.t
 
   (** Sets the current clear color *)

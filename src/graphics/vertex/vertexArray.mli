@@ -89,7 +89,7 @@ module SimpleVertex : sig
 end
 
 
-module VertexSource : sig
+module Source : sig
 
   exception Uninitialized_field of string
 
@@ -117,33 +117,59 @@ module VertexSource : sig
 
 end
 
+
+module Buffer : sig
+
+  exception Invalid_attribute of string
+  
+  exception Out_of_bounds of string
+ 
+  type static
+  
+  type dynamic
+  
+  type ('a, 'b) t 
+  
+  val static : (module RenderTarget.T with type t = 'a) 
+                -> 'a -> 'b Source.t -> (static, 'b) t
+  
+  val dynamic : (module RenderTarget.T with type t = 'a) 
+                 -> 'a -> 'b Source.t -> (dynamic, 'b) t
+ 
+  val unpack : ('a, 'b) t -> (unit, 'b) t
+
+  val length : (_, _) t -> int
+
+  val blit    : (module RenderTarget.T with type t = 'a) ->
+                 'a -> (dynamic, 'b) t ->
+                 ?first:int -> ?length:int ->
+                 'b Source.t -> unit
+
+end
+
 exception Missing_attribute of string
 
-exception Invalid_attribute of string
+exception Multiple_definition of string
 
-exception Out_of_bounds of string
+exception Length_mismatch 
 
-type static
+type 'a t
 
-type dynamic
+val create : 
+  (module RenderTarget.T with type t = 'a) -> 
+  'a -> ('b, 'c) Buffer.t list -> 'c t
 
-type ('a, 'b) t 
+(* Number of vertices in the array (0 if all the data is instanced) *)
+val length : 'a t -> int
 
-val static : (module RenderTarget.T with type t = 'a) 
-              -> 'a -> 'b VertexSource.t -> (static, 'b) t
-
-val dynamic : (module RenderTarget.T with type t = 'a) 
-               -> 'a -> 'b VertexSource.t -> (dynamic, 'b) t
-
-val rebuild : (module RenderTarget.T with type t = 'a)
-               -> 'a -> (dynamic, 'b) t -> 'b VertexSource.t -> int -> unit
-
-val length : (_, _) t -> int
+(* Maximal number of drawable instances *)
+val max_instances : 'a t -> int
 
 val draw :
   (module RenderTarget.T with type t = 'a) ->
   vertices   : (_, _) t ->
   target     : 'a ->
+  ?instances : int ->
   ?indices   : _ IndexArray.t ->
   program    : Program.t ->
   ?uniform    : Uniform.t ->
@@ -152,4 +178,3 @@ val draw :
   ?length    : int ->
   ?mode      : DrawMode.t ->
   unit -> unit
-

@@ -1842,8 +1842,15 @@ module VertexArray : sig
   (** Returns the length of a vertex array *)
   val length : ('a, 'b) t -> int
 
-  (** Draws the slice starting at $start$ of length $length$ of a vertex array on a
-    * window using the given parameters.
+  (** $slice vao start length$ returns the slice of $vao$ of length $length$
+    * starting at $start$.
+    *
+    * Raises $Out_of_bounds$ if the slice is invalid *)
+  val slice  : ('a, 'b) t -> int -> int -> ('a, 'b) t 
+
+  (** Draws $length$ vertices starting from $start$ of the vertex array $vertices$
+    * on $target$ using the given parameters. Note: $start$ and $length$ are cumulative
+    * with vertex array slices.
     *
     * $start$ defaults to 0
     *
