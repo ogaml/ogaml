@@ -758,7 +758,9 @@ let bind context vao program =
         raise (Missing_attribute aname);
       let (vbo, att, offset) = Hashtbl.find vao.attributes aname in
       Buffer.bind_to_attrib context vbo (program, program_attrib) (att, offset)
-    ) (Program.LL.attributes program)
+    ) (Program.LL.attributes program);
+    Context.LL.set_bound_vbo context None;
+    GL.VBO.bind None;
   end else if Context.LL.bound_vao context <> Some vao.id then begin
     GL.VAO.bind (Some vao.vao);
     Context.LL.set_bound_vao context (Some (vao.vao, vao.id))
