@@ -1518,12 +1518,12 @@ module IndexArray : sig
     * @see:OgamlGraphics.IndexArray.Source *)
   val dynamic : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> dynamic t
 
-  (** $rebuild array src offset$ rebuilds $array$ starting from
+  (** $rebuild (module M) context array src offset$ rebuilds $array$ starting from
     * the index at position $offset$ using $src$.
     *
     * The index array is modified in-place and is resized as needed.
     * @see:OgamlGraphics.IndexArray.Source *)
-  val rebuild : dynamic t -> Source.t -> int -> unit
+  val rebuild : (module RenderTarget.T with type t = 'a) -> 'a -> dynamic t -> Source.t -> int -> unit
 
   (** Returns the length of an index array *)
   val length : 'a t -> int
@@ -1539,14 +1539,15 @@ module VertexArray : sig
     * vertices on the GPU and can be used to render 3D models. 
     *
     *
-    * The idea behind this module is to provide a safe way to
-    * create vertex arrays in 3 steps:
+    * This module aims at providing a safe way to
+    * create vertex arrays in 4 steps:
     *
     *
     *   - First, you will need to create a vertex structure. This 
     * is done using the function Vertex.make. You can add attributes
     * to your structure V by calling V.attribute and giving them a
-    * name and type. 
+    * name and type. You can also provide a divisor that will be used
+    * for instanced rendering.
     *
     * The attributes will be passed to GLSL programs
     * under the provided name. Once you have added some attributes
@@ -1557,18 +1558,32 @@ module VertexArray : sig
     * contain the attributes of your structure using V.create.
     *
     * Alternatively, you can use the module SimpleVertex which
-    * is a predefined vertex structure containing a position, 
+    * is a predefined non-instanced vertex structure containing a position, 
     * texture coordinates, a color, and a normal.
     *
     *
     *   - Secondly, you will need to create a source which contains
-    * vertices. This is done using VertexSource.empty. The module
-    * VertexSource provides several useful functions to manipulate
+    * vertices. This is done using Source.empty. The module
+    * Source provides several useful functions to manipulate
     * sources of vertices.
     *
     *
-    *   - Finally, you can create a vertex array using one of the 
-    * two functions $static$ or $dynamic$.
+    *   - Thirdly, you need to upload the source to the GPU by using the module
+    * Buffer, using one of the two functions $Buffer.static$ or $Buffer.dynamic$.
+    * Once sent to the GPU, you can use Buffer.unpack to un-protect the type
+    * by removing phantom types, which leads us to the fourth and last step:
+    *
+    *
+    *   - Finally, you can create a vertex array from a collection of (unpacked)
+    * vertex buffers. This vertex array can be drawn to a target using the
+    * function $draw$. Every attribute required by the GLSL program will be 
+    * automatically bound to the buffer of the vertex array that contains an
+    * attribute with the same name. As such, when calling $VertexArray.create$
+    * on a collection of buffers, every attribute name must appear only once.
+    * 
+    * Moreover, if any of the buffers contains an instanced attribute (that is,
+    * an attribute with a non-zero divisor), the vertex array will be flaged as
+    * "instanced", and all the draw calls will automatically use instanced rendering.
     *)
 
 
@@ -1642,6 +1657,9 @@ module VertexArray : sig
         * Raises $Unbound_attribute$ if the attribute is not initialized. *)
       val get : 'b t -> ('a, 'b) s -> 'a
 
+      (** Returns the divisor of the attribute used during instanced rendering. *)
+      val divisor : ('a, 'b) s -> int
+
       (** Returns the name of an attribute, that is, the name
         * that will refer to this attribute in a GLSL program. *)
       val name : ('a, 'b) s -> string
@@ -1659,8 +1677,12 @@ module VertexArray : sig
       type s
 
       (** Adds an attribute to this structure.
+        *
+        * $divisor$ corresponds to the attribute's divisor for instanced rendering,
+        * and defaults to $0$ (non-instanced) 
+        *
         * Raises $Sealed_vertex$ if the structure is sealed. *)
-      val attribute : string -> 'a AttributeType.s -> ('a, s) Attribute.s
+      val attribute : string -> ?divisor:int -> 'a AttributeType.s -> ('a, s) Attribute.s
 
       (** Seals this structure. Once sealed, the structure can be used to
         * create vertices but cannot receive new attributes.
@@ -1731,7 +1753,7 @@ module VertexArray : sig
 
 
   (** Vertex source *)
-  module VertexSource : sig
+  module Source : sig
 
     (** This module represents vertex sources, which are collections of
       * vertices. 
@@ -1795,52 +1817,104 @@ module VertexArray : sig
 
   end
 
-  (** Raised when trying to draw with a program that requires an attribute
-    * not provided by the vertex array. *)
+
+  (* Vertex buffer *)
+  module Buffer : sig
+
+    (** This module represents vertex buffers, which are vertex sources that
+      * have been uploaded to the GPU.
+      *
+      * A buffer can be either static or dynamic. The data of a dynamic 
+      * buffer can be changed using $blit$, whereas the data of a static buffer
+      * cannot. However, a static buffer provides faster accesses, and
+      * should therefore be used whenever possible. 
+      *
+      * Buffers can also be unpacked using $unpack$ which unprotects the type 
+      * but allows the user to build lists of buffers. *)
+
+    (** Raised if the type of an attribute is not the one requested by the GLSL program *)
+    exception Invalid_attribute of string
+   
+    (** Raised when trying to access an invalid index *)
+    exception Out_of_bounds of string
+  
+    (** Phantom type for static buffers *)
+    type static
+    
+    (** Phantom type for dynamic buffers *)
+    type dynamic
+  
+    (** Type of a buffer with vertices of type $'b$ *)
+    type ('a, 'b) t 
+ 
+    (** Type of an unprotected buffer *)
+    type unpacked
+   
+    (** Creates a static buffer from a source. A static buffer is faster
+      * but cannot be modified later. @see:OgamlGraphics.VertexArray.Source *)
+    val static : (module RenderTarget.T with type t = 'a) 
+                  -> 'a -> 'b Source.t -> (static, 'b) t
+    
+    (** Creates a dynamic buffer from a source. A dynamic buffer can be
+      * modified later. @see:OgamlGraphics.VertexArray.Source *)
+    val dynamic : (module RenderTarget.T with type t = 'a) 
+                   -> 'a -> 'b Source.t -> (dynamic, 'b) t
+  
+    (** Returns the length (in vertices) of a vertex buffer. *)
+    val length : (_, _) t -> int
+ 
+    (** $blit (module M) context buffer ~first ~length source$ copies
+      * $length$ vertices from $source$ to $buffer$, starting from the
+      * $first$-th element of $buffer$. $buffer$ is modified in place and is
+      * resized as needed.
+      *
+      * $first$ defaults to $0$
+      *
+      * $length$ defaults to the length of $source$
+      *
+      * Raises $Out_of_bounds$ if $first$ or $length$ are invalid. *)
+    val blit    : (module RenderTarget.T with type t = 'a) ->
+                   'a -> (dynamic, 'b) t ->
+                   ?first:int -> ?length:int ->
+                   'b Source.t -> unit
+ 
+    (** Unprotect a buffer so that it is possible to build lists of buffers. *)
+    val unpack : (_, _) t -> unpacked
+  
+  end
+
+  (** Raised if an attribute required by the program is not provided in the array *)
   exception Missing_attribute of string
+ 
+  (** Raised if the array contains multiple definitions of the same attribute *)
+  exception Multiple_definition of string
+ 
+  (** Type of a vertex array *)
+  type t
+ 
+  (** Creates a vertex array from a list of vertex buffers.
+    * 
+    * Raises $Multiple_definition$ if the same attribute is bound twice in the buffers. *)
+  val create : (module RenderTarget.T with type t = 'a) -> 'a -> Buffer.unpacked list -> t
+  
+  (** Returns the maximal number of vertices that can be drawn with the array. *)
+  val length : t -> int
+  
+  (** Returns the maximal number of instanced that can be drawn with the array.
+    * Returns $None$ if none of the buffers are instanced. *)
+  val max_instances : t -> int option
 
-  (** Raised when trying to draw with a program that requires an attribute
-    * of a different type than the one provided by the vertex array. *)
-  exception Invalid_attribute of string
-
-  (** Raised when trying to draw an invalid slice of a vertex array. *)
-  exception Out_of_bounds of string
-
-  (** Phantom type for static arrays *)
-  type static
-
-  (** Phantom type for dynamic arrays *)
-  type dynamic
-
-  (** Type of a vertex array (static or dynamic) *)
-  type ('a, 'b) t 
-
-  (** Creates a static array from a source. A static array is faster
-    * but cannot be modified later. @see:OgamlGraphics.VertexArray.Source *)
-  val static : (module RenderTarget.T with type t = 'a) 
-                -> 'a -> 'b VertexSource.t -> (static, 'b) t
-
-  (** Creates a dynamic vertex array that can be modified later.
-    * @see:OgamlGraphics.VertexArray.Source *)
-  val dynamic : (module RenderTarget.T with type t = 'a) 
-                 -> 'a -> 'b VertexSource.t -> (dynamic, 'b) t
-
-  (** $rebuild array src offset$ rebuilds $array$ starting from
-    * the vertex at position $offset$ using $src$.
+  (** Draws $length$ vertices starting from $start$ of the vertex array $vertices$
+    * on $target$ using the given parameters. Is the vertex array is instanced,
+    * it draws $instances$ instances. Otherwise, the parameter $instances$
+    * is ignored.
     *
-    * The vertex array is modified in-place and is resized as needed.
-    * @see:OgamlGraphics.VertexArray.Source *)
-  val rebuild : (dynamic, 'b) t -> 'b VertexSource.t -> int -> unit
-
-  (** Returns the length of a vertex array *)
-  val length : ('a, 'b) t -> int
-
-  (** Draws the slice starting at $start$ of length $length$ of a vertex array on a
-    * window using the given parameters.
+    * $start$ defaults to 0.
     *
-    * $start$ defaults to 0
+    * If $length$ is not provided, then the whole vertex array (starting from $start$) is drawn.
     *
-    * if $length$ is not provided, then the whole vertex array (starting from $start$) is drawn
+    * If $instances$ is not provided and if the data is instanced, then 
+    * $max_instances vertices$ instances are drawn.
     *
     * $uniform$ should provide the uniforms required by $program$ (defaults to empty)
     *
@@ -1848,14 +1922,23 @@ module VertexArray : sig
     *
     * $mode$ defaults to $DrawMode.Triangles$
     *
+    * Raises $Invalid_argument$ if $start$ or $length$ is invalid. 
+    *
+    * Raises $Missing_attribute$ if an attribute required by the program is
+    * not provided by one of $vertices$'s buffers.
+    *
+    * Raises $Source.Invalid_attribute$ if an attribute required by the program
+    * is provided by a buffer but is not of the required type.
+    *
     * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.Window
     * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
   val draw :
     (module RenderTarget.T with type t = 'a) ->
-    vertices   : ('b, 'c) t ->
+    vertices   : t ->
     target     : 'a ->
-    ?indices   : 'd IndexArray.t ->
+    ?instances : int ->
+    ?indices   : _ IndexArray.t ->
     program    : Program.t ->
     ?uniform    : Uniform.t ->
     ?parameters : DrawParameter.t ->
@@ -1987,7 +2070,7 @@ module Model : sig
     * @see:OgamlGraphics.IndexArray.Source
     * @see:OgamlGraphics.VertexArray.Source *)
   val source : t -> ?index_source:IndexArray.Source.t 
-                 -> vertex_source:VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t 
+                 -> vertex_source:VertexArray.SimpleVertex.T.s VertexArray.Source.t 
                  -> unit -> unit
 
 
@@ -2129,14 +2212,14 @@ module Shape : sig
     * and color attributes.
     *
     * Use DrawMode.Triangles with this source. *)
-  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t -> unit
+  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> unit
 
   (** Outputs a shape to a vertex array source by mapping its vertices.
     *
     * See $to_source$ for more information. *)
   val map_to_source : t -> 
                       (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
-                      'b VertexArray.VertexSource.t -> unit
+                      'b VertexArray.Source.t -> unit
 
 end
 
@@ -2223,14 +2306,14 @@ module Sprite : sig
     * and position attributes.
     *
     * Use DrawMode.Triangles with this source. *)
-  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t -> unit
+  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> unit
 
   (** Outputs a sprite to a vertex array source by mapping its vertices.
     *
     * See $to_source$ for more information. *)
   val map_to_source : t -> 
                       (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
-                      'b VertexArray.VertexSource.t -> unit
+                      'b VertexArray.Source.t -> unit
 
 end
 
@@ -2353,14 +2436,14 @@ module Text : sig
     *
     * Use DrawMode.Triangles with this source and bind the
     * correct font before use. *)
-  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t -> unit
+  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> unit
 
   (** Outputs text vertices to a vertex array source by mapping its vertices.
     *
     * See $to_source$ for more information. *)
   val map_to_source : t -> 
                       (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
-                      'b VertexArray.VertexSource.t -> unit
+                      'b VertexArray.Source.t -> unit
 end
 
 

@@ -5,11 +5,12 @@ open OgamlUtils
 let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~title:"Cube Example" ~settings ()
+  Window.create ~width:800 ~height:600 ~title:"Cube Instancing Example" ~settings ()
 
 let fps_clock = 
   Clock.create ()
 
+(* Create the VBO for one cube *)
 let cube_source =
   let src = VertexArray.Source.empty ~size:36 () in
   let cmod = Model.cube Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) in
@@ -19,12 +20,76 @@ let cube_source =
 let cube_vbo = 
   VertexArray.Buffer.static (module Window) window cube_source
 
+(* Create instanced data for the position of each cube *)
+module InstancedData = (val VertexArray.Vertex.make ())
+
+let cube_position =
+  let open VertexArray.Vertex in
+  InstancedData.attribute "cube_position" ~divisor:1 AttributeType.vector3f
+
+let () = InstancedData.seal ()
+
+(* Create the instanced VBO *)
+let () = Random.self_init ()
+
+let random_position () = 
+  let v = Vector3f.({x = Random.float 400. -. 200.; 
+                     y = Random.float 400. -. 200.; 
+                     z = Random.float 400. -. 200.})
+  in
+  let vtx = InstancedData.create () in
+  VertexArray.Vertex.Attribute.set vtx cube_position v;
+  vtx
+  
+let instanced_source =
+  let src = VertexArray.Source.empty ~size:36 () in
+  for i = 0 to 10000 do
+    VertexArray.Source.add src (random_position ())
+  done;
+  src
+
+let instanced_vbo = 
+  VertexArray.Buffer.static (module Window) window instanced_source
+
+(* Create the VAO that contains both VBOs *)
 let cube = 
-  VertexArray.create (module Window) window [VertexArray.Buffer.unpack cube_vbo]
+  VertexArray.create (module Window) window 
+    [VertexArray.Buffer.unpack cube_vbo;
+     VertexArray.Buffer.unpack instanced_vbo]
+
+
+let vertex_shader = "
+  uniform mat4 MMatrix;
+
+  uniform mat4 VPMatrix;
+
+  in vec3 cube_position;
+
+  in vec3 position;
+  
+  in vec3 normal;
+  
+  in vec4 color;
+  
+  out vec3 out_normal;
+  
+  out vec4 out_color;
+  
+  
+  void main() {
+  
+    gl_Position = VPMatrix * (MMatrix * vec4(position, 1.0) + vec4(cube_position, 1.0));
+  
+    out_normal = normal;
+  
+    out_color = color;
+  
+  }
+"
 
 let normal_program =
   Program.from_source_pp (module Window) ~context:window
-    ~vertex_source:(`File (OgamlCore.OS.resources_dir ^ "examples/normals_shader.vert"))
+    ~vertex_source:(`String vertex_shader)
     ~fragment_source:(`File (OgamlCore.OS.resources_dir ^ "examples/normals_shader.frag")) ()
 
 (* Display computations *)
@@ -58,6 +123,8 @@ let display () =
   let uniform =
     Uniform.empty
     |> Uniform.matrix3D "MVPMatrix" mvp
+    |> Uniform.matrix3D "MMatrix"   model
+    |> Uniform.matrix3D "VPMatrix"  vp
     |> Uniform.matrix3D "MVMatrix" mv
     |> Uniform.matrix3D "VMatrix" view
     |> Uniform.vector3f "Light.LightDir" Vector3f.{x = -4.; y = -2.; z = -3.}

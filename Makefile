@@ -93,7 +93,8 @@ examples:
 	$(EXAMPLE_CMD) examples/ip.ml -o ip.out &&\
 	$(EXAMPLE_CMD) examples/text.ml -o text.out &&\
 	$(EXAMPLE_CMD) examples/noise.ml -o noise.out &&\
-	$(EXAMPLE_CMD) examples/shoot.ml -o shoot.out
+	$(EXAMPLE_CMD) examples/shoot.ml -o shoot.out &&\
+	$(EXAMPLE_CMD) examples/instancing.ml -o instancing.out
 
 tests: math_lib core_lib graphics_lib utils_lib
 	$(TEST_CMD) tests/programs.ml -o main.out && $(LAUNCH_CMD) &&\

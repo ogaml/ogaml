@@ -74,7 +74,7 @@ let vertex7 =
   VertexArray.SimpleVertex.create
     ~position:(Vector3f.({x =  0.5; y =  0.5; z = 0.5})) ()
 
-let vertex_source = VertexArray.VertexSource.(
+let vertex_source = VertexArray.Source.(
     empty ~size:8 ()
     << vertex0 << vertex1 << vertex2
     << vertex3 << vertex4 << vertex5
@@ -91,7 +91,9 @@ let index_source = IndexArray.Source.(
     << 4 << 6 << 2 << 4 << 2 << 0
 )
 
-let vertices = VertexArray.static (module Window) window vertex_source
+let vbo = VertexArray.Buffer.static (module Window) window vertex_source
+
+let vertices = VertexArray.(create (module Window) window [Buffer.unpack vbo])
 
 let indices  = IndexArray.static (module Window) window index_source
 

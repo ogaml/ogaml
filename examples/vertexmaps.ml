@@ -68,7 +68,7 @@ let make_vertex nm pos (r,g,b) =
   v
 
 let cube_source =
-  VertexArray.VertexSource.(
+  VertexArray.Source.(
     empty ()
     << make_vertex Vector3i.unit_x Vector3f.({x =  0.5; y =  0.5; z =  0.5}) (255, 0, 0)
     << make_vertex Vector3i.unit_x Vector3f.({x =  0.5; y = -0.5; z =  0.5}) (255, 0, 0)
@@ -107,7 +107,9 @@ let cube_indices =
     << 20 << 21 << 23 << 21 << 22 << 23
   )
 
-let cube = VertexArray.static (module Window) window cube_source
+let cube_vbo = VertexArray.Buffer.static (module Window) window cube_source
+
+let cube = VertexArray.(create (module Window) window [Buffer.unpack cube_vbo])
 
 let indices = IndexArray.static (module Window) window cube_indices
 

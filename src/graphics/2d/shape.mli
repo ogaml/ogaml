@@ -62,11 +62,11 @@ val draw :
     (module RenderTarget.T with type t = 'a) ->
     ?parameters:DrawParameter.t -> target:'a -> shape:t -> unit -> unit
 
-val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t -> unit
+val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> unit
 
 val map_to_source : t -> 
                     (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
-                    'b VertexArray.VertexSource.t -> unit
+                    'b VertexArray.Source.t -> unit
 
 
 (** Sets the position of the origin in the window. *)

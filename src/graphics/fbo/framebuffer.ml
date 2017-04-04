@@ -18,14 +18,26 @@ type t = {
 let create (type a) (module T : RenderTarget.T with type t = a) (target : a) =
   let context = T.context target in
   let fbo = GL.FBO.create () in
+  let idpool = Context.LL.fbo_pool context in
+  let id = Context.ID_Pool.get_next idpool in
   let maxattc = (Context.capabilities context).Context.max_color_attachments in
   let color_attachments = Array.make maxattc None in
-  {fbo; context; id = Context.LL.fbo_id context;
-   color = false; depth = false; stencil = false;
-   color_attachments; 
-   depth_attachment = None;
-   stencil_attachment = None; 
-   depth_stencil_attachment = None}
+  let fbo_ = {
+    fbo; 
+    context; 
+    id;
+    color = false; depth = false; stencil = false;
+    color_attachments; 
+    depth_attachment = None;
+    stencil_attachment = None; 
+    depth_stencil_attachment = None}
+  in
+  Gc.finalise (fun _ -> 
+    Context.ID_Pool.free idpool id;
+    if Context.LL.bound_fbo context = id then
+      Context.LL.set_bound_fbo context None
+  ) fbo_;
+  fbo_
 
 let attach_color (type a) (module A : Attachment.ColorAttachable with type t = a)
                  fbo nb (attachment : a) =

@@ -58,11 +58,11 @@ val draw :
   target : 'a ->
   unit -> unit
 
-val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t -> unit
+val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> unit
 
 val map_to_source : t -> 
                     (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
-                    'b VertexArray.VertexSource.t -> unit
+                    'b VertexArray.Source.t -> unit
 
 val advance : t -> OgamlMath.Vector2f.t
 

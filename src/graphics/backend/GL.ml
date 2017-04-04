@@ -389,9 +389,16 @@ module VAO = struct
   external attrib_int : 
     int -> int -> GLTypes.GlIntType.t -> int -> int -> unit = "caml_attrib_int"
 
+  external attrib_divisor : 
+    int -> int -> unit = "caml_attrib_divisor"
+
   external draw : DrawMode.t -> int -> int -> unit = "caml_draw_arrays"
 
+  external draw_instanced : DrawMode.t -> int -> int -> int -> unit = "caml_draw_arrays_instanced"
+
   external draw_elements : DrawMode.t -> int -> int -> unit = "caml_draw_elements"
+
+  external draw_elements_instanced : DrawMode.t -> int -> int -> int -> unit = "caml_draw_elements_instanced"
 
 end
 

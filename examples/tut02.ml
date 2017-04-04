@@ -67,18 +67,26 @@ let vertex3 =
     ~position:Vector3f.({x = 0.75; y = -0.75; z = 0.0}) ()
 
 (* Put the vertices in a vertex source *)
-let vertex_source = VertexArray.VertexSource.(
+let vertex_source = VertexArray.Source.(
     empty ~size:3 ()
     << vertex1
     << vertex2
     << vertex3
 )
 
-(* Compute and load the VAO (Vertex Array Object)
- * VAOs need a valid GL context to be properly initialized, which
+(* Compute and load the VBO (Vertex Buffer Object)
+ * VBOs need a valid GL context to be properly initialized, which
  * is encapsulated inside any render target (window, render texture, ...).
  * Hence the use of first-class modules to provide some polymorphism. *)
-let vertices = VertexArray.static (module Window) window vertex_source
+let vbo = VertexArray.Buffer.static (module Window) window vertex_source
+
+(* Compute the VAO (Vertex Array Object)
+ * A VAO encapsulates a collection of VBOs. Since VBOs can have different
+ * types depending on the data they contain, we first need to unpack the
+ * VBO to be able to construct a heterogeneous list of VBOs. *)
+let unpacked_vbo = VertexArray.Buffer.unpack vbo 
+
+let vertices = VertexArray.create (module Window) window [unpacked_vbo]
 
 (* Event-listening loop *)
 let rec event_loop () =
