@@ -40,7 +40,7 @@ module Vertex = struct
 
   module AttributeType = struct
 
-    type 'a s = 
+    type t = 
       | Int
       | Vec2i
       | Vec3i
@@ -49,6 +49,8 @@ module Vertex = struct
       | Vec3f
       | Color
 
+    type 'a s = t
+      
     let int = Int
 
     let vector2i = Vec2i
@@ -161,6 +163,12 @@ module Vertex = struct
     match attrib with
     | Boxed_Attrib a -> a.adivisor
 
+  (* Unsafe conversion functions (non-exposed) *)
+  let attrib_magic : 'a 'b. ('c, 'a) attrib -> ('c, 'b) attrib = 
+    fun a -> {a with atype = a.atype}
+
+  let boxed_magic : 'a 'b. 'a boxed_attrib -> 'b boxed_attrib = function
+    | Boxed_Attrib a -> Boxed_Attrib (attrib_magic a)
 
   module Attribute = struct
 
@@ -522,7 +530,7 @@ module Buffer = struct
 
   type dynamic
 
-  type 'b unsafe = {
+  type ('a, 'b) t = {
     mutable buffer  : GL.VBO.t;
     (* Length of the floating-point data *)
     mutable size_f  : int;
@@ -542,7 +550,7 @@ module Buffer = struct
     id : int
   }
 
-  type ('a, 'b) t = 'b unsafe
+  type unpacked = (unit, unit) t
 
   let create context src kind = 
     let buffer = GL.VBO.create () in
@@ -600,10 +608,11 @@ module Buffer = struct
   let static (type s) (module M : RenderTarget.T with type t = s) target src = 
     create (M.context target) src GLTypes.VBOKind.StaticDraw
 
-  let unpack t = t
-
   let length t = 
     t.length
+
+  let unpack : 'a 'b. ('a, 'b) t -> unpacked = fun t ->
+    {t with init_fields = List.map (fun (a,i) -> (Vertex.boxed_magic a, i)) t.init_fields}
 
   let blit (type s) (module M : RenderTarget.T with type t = s) target t ?(first=0) ?length src =
     if first < 0 then
@@ -684,18 +693,12 @@ exception Missing_attribute of string
 
 exception Multiple_definition of string
 
-exception Length_mismatch
-
-type 'a t = {
+type t = {
   vao        : GL.VAO.t;
-  buffers    : 'a Buffer.unsafe list;
-  attributes : (string, 'a Buffer.unsafe * 'a Vertex.boxed_attrib * int) Hashtbl.t;
+  buffers    : Buffer.unpacked list;
+  attributes : (string, Buffer.unpacked * unit Vertex.boxed_attrib * int) Hashtbl.t;
   id         : int;
   bound      : Program.t option;
-  length     : int;
-  instanced  : bool;
-  (* Number of drawable instances *)
-  i_length   : int;
 }
 
 let create (type s) (module M : RenderTarget.T with type t = s) 
@@ -705,29 +708,6 @@ let create (type s) (module M : RenderTarget.T with type t = s)
   let id      = Context.ID_Pool.get_next idpool in
   let vao     = GL.VAO.create () in
   let attributes = Hashtbl.create 13 in
-  let i_length = 
-    List.fold_left (fun div b -> 
-      if b.Buffer.l_divisor = 0 then div
-      else if div = -1 then b.Buffer.l_divisor * (Buffer.length b)
-      else min div (b.Buffer.l_divisor * (Buffer.length b))
-    ) (-1) buffers 
-  in
-  let i_length, instanced = 
-    if i_length = -1 then 0,false
-    else i_length,true
-  in
-  let length = 
-    List.fold_left (fun lgt buf ->
-      if not buf.Buffer.uninstanced then lgt
-      else if lgt <> buf.Buffer.length && lgt <> (-1) then
-        raise Length_mismatch
-      else
-        buf.Buffer.length
-    ) (-1) buffers
-    |> max 0
-  in
-  if length = -1 then
-    raise (Invalid_argument "Buffers contain only instanced data");
   List.iter (fun b -> 
     List.iter (fun (att,off) ->
       let n = Vertex.name_of att in
@@ -741,10 +721,7 @@ let create (type s) (module M : RenderTarget.T with type t = s)
     buffers;
     attributes;
     id;
-    bound = None;
-    length;
-    i_length;
-    instanced}
+    bound = None}
   in
   Gc.finalise (fun _ ->
     Context.ID_Pool.free idpool id;
@@ -754,10 +731,22 @@ let create (type s) (module M : RenderTarget.T with type t = s)
   vao_
 
 let length t = 
-  t.length
+  List.fold_left (fun lgt buf ->
+    if not buf.Buffer.uninstanced then lgt
+    else if lgt = -1 then buf.Buffer.length
+    else min lgt buf.Buffer.length
+  ) (-1) t.buffers
+  |> max 0
 
 let max_instances t = 
-  t.i_length
+  List.fold_left (fun div b -> 
+      if b.Buffer.l_divisor = 0 then div
+      else begin 
+        match div with
+        | None -> Some (b.Buffer.l_divisor * (Buffer.length b))
+        | Some div -> Some (min div (b.Buffer.l_divisor * (Buffer.length b)))
+      end
+    ) None t.buffers
 
 let bind context vao program = 
   if vao.bound <> Some program then begin
@@ -780,9 +769,10 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
          ?uniform:(uniform = Uniform.empty) 
          ?parameters:(parameters = DrawParameter.make ()) 
          ?start
-         ?length
+         ?length:draw_length
          ?mode:(mode = DrawMode.Triangles) () =
-  if vertices.length <> 0 then begin
+  let v_length = length vertices in 
+  if v_length <> 0 then begin
     let context = M.context target in
     let start = 
       match start with
@@ -790,40 +780,54 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
       |Some i -> i
     in
     let length = 
-      match length, indices with
-      |None, None     -> vertices.length - start
+      match draw_length, indices with
+      |None, None     -> v_length - start
       |None, Some ebo -> IndexArray.length ebo - start
       |Some l, _ -> l
     in
-    let instances = 
-      match instances with
-      | None   -> max_instances vertices
-      | Some i -> 
-        if i > max_instances vertices || i < 0 then
-          raise (Invalid_argument "Invalid number of instances")
-        else
-          i
-    in
+    let max_instances = max_instances vertices in
     M.bind target parameters;
     Program.LL.use context (Some program);
     Uniform.LL.bind context uniform (Program.LL.uniforms program);
     bind context vertices program;
     match indices with
     |None -> 
-      if start < 0 || start + length > vertices.length || length < 0 then
+      if start < 0 || start + length > v_length || length < 0 then
         raise (Invalid_argument "Invalid vertex array bounds")
-      else if vertices.instanced then 
-        GL.VAO.draw_instanced mode start length instances
-      else
-        GL.VAO.draw mode start length
+      else begin
+        match max_instances with
+        | None   -> GL.VAO.draw mode start length
+        | Some max_n -> 
+          let n_instances = 
+            match instances with
+            | None   -> max_n
+            | Some i -> 
+              if i > max_n || i < 0 then
+                raise (Invalid_argument "Invalid number of instances")
+              else
+                i
+          in
+          GL.VAO.draw_instanced mode start length n_instances
+      end
     |Some ebo ->
       if start < 0 || start + length > (IndexArray.length ebo) || length < 0 then
         raise (Invalid_argument "Invalid index array bounds")
-      else if vertices.instanced then begin
-        IndexArray.LL.bind context ebo;
-        GL.VAO.draw_elements_instanced mode start length instances
-      end else begin
-        IndexArray.LL.bind context ebo;
-        GL.VAO.draw_elements mode start length 
+      else begin
+        match max_instances with
+        | None   -> 
+          IndexArray.LL.bind context ebo;
+          GL.VAO.draw_elements mode start length
+        | Some max_n -> 
+          let n_instances = 
+            match instances with
+            | None   -> max_n
+            | Some i -> 
+              if i > max_n || i < 0 then
+                raise (Invalid_argument "Invalid number of instances")
+              else
+                i
+          in
+          IndexArray.LL.bind context ebo;
+          GL.VAO.draw_instanced mode start length n_instances
       end
   end

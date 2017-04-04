@@ -127,8 +127,10 @@ module Buffer : sig
   type static
   
   type dynamic
-  
+ 
   type ('a, 'b) t 
+
+  type unpacked
   
   val static : (module RenderTarget.T with type t = 'a) 
                 -> 'a -> 'b Source.t -> (static, 'b) t
@@ -136,8 +138,6 @@ module Buffer : sig
   val dynamic : (module RenderTarget.T with type t = 'a) 
                  -> 'a -> 'b Source.t -> (dynamic, 'b) t
  
-  val unpack : ('a, 'b) t -> (unit, 'b) t
-
   val length : (_, _) t -> int
 
   val blit    : (module RenderTarget.T with type t = 'a) ->
@@ -145,29 +145,27 @@ module Buffer : sig
                  ?first:int -> ?length:int ->
                  'b Source.t -> unit
 
+  val unpack : (_, _) t -> unpacked
+
 end
 
 exception Missing_attribute of string
 
 exception Multiple_definition of string
 
-exception Length_mismatch 
+type t
 
-type 'a t
-
-val create : 
-  (module RenderTarget.T with type t = 'a) -> 
-  'a -> ('b, 'c) Buffer.t list -> 'c t
+val create : (module RenderTarget.T with type t = 'a) -> 'a -> Buffer.unpacked list -> t
 
 (* Number of vertices in the array (0 if all the data is instanced) *)
-val length : 'a t -> int
+val length : t -> int
 
-(* Maximal number of drawable instances *)
-val max_instances : 'a t -> int
+(* Maximal number of drawable instances. None if non-instanced *)
+val max_instances : t -> int option
 
 val draw :
   (module RenderTarget.T with type t = 'a) ->
-  vertices   : (_, _) t ->
+  vertices   : t ->
   target     : 'a ->
   ?instances : int ->
   ?indices   : _ IndexArray.t ->

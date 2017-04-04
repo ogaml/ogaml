@@ -42,6 +42,7 @@ Interface changes:
     ☐ (+Shape) Centralize transformations
   RenderTextures/Framebuffers:
     ☐ Test all attachments
+  ☐ Unify exceptions
 
 New modules:
   Bounding module:
