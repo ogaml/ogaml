@@ -11,12 +11,16 @@ let fps_clock =
   Clock.create ()
 
 let cube_source =
-  let src = VertexArray.VertexSource.empty ~size:36 () in
+  let src = VertexArray.Source.empty ~size:36 () in
   let cmod = Model.cube Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) in
   Model.source cmod ~vertex_source:src ();
   src
 
-let cube = VertexArray.static (module Window) window cube_source
+let cube_vbo = 
+  VertexArray.Buffer.static (module Window) window cube_source
+
+let cube = 
+  VertexArray.create (module Window) window [VertexArray.Buffer.unpack cube_vbo]
 
 let normal_program =
   Program.from_source_pp (module Window) ~context:window

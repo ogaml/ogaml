@@ -116,13 +116,13 @@ let create ~texture
   }
 
 let map_to_source sprite f src = 
-  List.iter (fun v -> VertexArray.VertexSource.add src (f v)) (get_vertices sprite)
+  List.iter (fun v -> VertexArray.Source.add src (f v)) (get_vertices sprite)
 
 let to_source sprite src = 
-  List.iter (VertexArray.VertexSource.add src) (get_vertices sprite)
+  List.iter (VertexArray.Source.add src) (get_vertices sprite)
 
 let map_to_custom_source sprite f src = 
-  List.iter (fun v -> VertexArray.VertexSource.add src (f v)) (get_vertices sprite)
+  List.iter (fun v -> VertexArray.Source.add src (f v)) (get_vertices sprite)
 
 let draw (type s) (module Target : RenderTarget.T with type t = s)
          ?parameters:(parameters = DrawParameter.make
@@ -139,10 +139,13 @@ let draw (type s) (module Target : RenderTarget.T with type t = s)
     |> Uniform.texture2D "utexture" sprite.texture
   in
   let vertices = 
-    let sprite_source = VertexArray.VertexSource.empty ~size:6 () in
-    List.iter (VertexArray.VertexSource.add sprite_source) (get_vertices sprite);
-    let vao = VertexArray.static (module Target) target sprite_source in
-    vao
+    let sprite_source = VertexArray.Source.empty ~size:6 () in
+    List.iter (VertexArray.Source.add sprite_source) (get_vertices sprite);
+    let vao = 
+      VertexArray.Buffer.static (module Target) target sprite_source 
+      |> VertexArray.Buffer.unpack
+    in
+    VertexArray.create (module Target) target [vao]
   in
   VertexArray.draw (module Target)
         ~target

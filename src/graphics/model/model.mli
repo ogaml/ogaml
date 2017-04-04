@@ -75,7 +75,7 @@ val compute_normals : ?smooth:bool -> t -> t
 val simplify : t -> t
 
 val source : t -> ?index_source:IndexArray.Source.t 
-               -> vertex_source:VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t 
+               -> vertex_source:VertexArray.SimpleVertex.T.s VertexArray.Source.t 
                -> unit -> unit
 
 
