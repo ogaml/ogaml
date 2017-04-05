@@ -718,7 +718,6 @@ let create (type s) (module M : RenderTarget.T with type t = s)
     ) b.Buffer.init_fields;
   ) buffers;
   let finalize _ = 
-    Printf.printf "Freeing vao %i\n%!" id;
     Context.ID_Pool.free idpool id;
     if Context.LL.bound_vbo context = Some id then 
       Context.LL.set_bound_vbo context None
