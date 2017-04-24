@@ -1,5 +1,5 @@
 
-let clamp a mina maxa = max (min a maxa) mina
+let clamp (a : float) (mina : float) (maxa : float) = max (min a maxa) mina
 
 module RGB = struct
 
