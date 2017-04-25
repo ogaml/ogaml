@@ -1,14 +1,14 @@
 open OgamlGraphics
 open OgamlMath
-
-(* FPS counting *)
-let initial_time = ref 0.
-let frame_count  = ref 0
+open OgamlUtils
 
 let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 
 let window =
   Window.create ~width:800 ~height:600 ~settings ~title:"Font sets tests" ()
+
+let fps_clock = 
+  Clock.create ()
 
 let font = Font.load "examples/font1.ttf"
 
@@ -183,14 +183,12 @@ let rec main_loop () =
     draw () ;
     Window.display window ;
     event_loop () ;
-    incr frame_count ;
+    Clock.tick fps_clock;
     main_loop ()
   end
 
 let () =
-  initial_time := Unix.gettimeofday () ;
-  main_loop () ;
-  Printf.printf
-    "Avg FPS: %f\n%!"
-    (float_of_int (!frame_count) /. (Unix.gettimeofday () -. !initial_time)) ;
+  Clock.restart fps_clock;
+  main_loop ();
+  Printf.printf "Avg FPS: %f\n%!" (Clock.tps fps_clock);
   Window.destroy window
