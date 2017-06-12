@@ -1,5 +1,8 @@
 
-let clamp (a : float) (mina : float) (maxa : float) = max (min a maxa) mina
+let clamp (a : float) (mina : float) (maxa : float) = 
+  if a < mina then mina 
+  else if a > maxa then maxa 
+  else a
 
 module RGB = struct
 
