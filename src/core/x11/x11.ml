@@ -98,6 +98,8 @@ module GLContext = struct
 
   external destroy : Display.t -> t -> unit = "caml_glx_destroy_context"
 
+  external debug : unit -> unit = "caml_glcontext_debug"
+
 end
 
 
@@ -224,7 +226,7 @@ module Event = struct
   (* Event enum *)
   type enum = 
     | Unknown
-    | KeyPress      of key * modifiers
+    | KeyPress      of key * int * modifiers
     | KeyRelease    of key * modifiers
     | ButtonPress   of int * position * modifiers
     | ButtonRelease of int * position * modifiers
@@ -317,5 +319,12 @@ module Keyboard = struct
 
   external key_down : Display.t -> Event.key -> bool 
     = "caml_is_key_down"
+
+end
+
+
+module Utils = struct
+
+  external realpath : string -> string = "caml_realpath"
 
 end

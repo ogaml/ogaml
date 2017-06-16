@@ -12,7 +12,7 @@ val zero : unit -> t
 val identity : unit -> t
 
 (* Pretty-printer to string *)
-val print : t -> string
+val to_string : t -> string
 
 (* Translation matrix *)
 val translation : Vector3f.t -> t
@@ -39,7 +39,7 @@ val scale : Vector3f.t -> t -> t
 val rotate : Vector3f.t -> float -> t -> t
 
 (* Vector right-product *)
-val times : t -> Vector3f.t -> Vector3f.t
+val times : t -> ?perspective:bool -> Vector3f.t -> Vector3f.t
 
 (* Rotation matrix from a quaternion *)
 val from_quaternion : Quaternion.t -> t

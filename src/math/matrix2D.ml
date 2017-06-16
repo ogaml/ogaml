@@ -26,7 +26,7 @@ let identity () =
     set i i m 1.
   done; m
 
-let print m = 
+let to_string m = 
   let s = ref "" in
   for i = 0 to 2 do
     s := Printf.sprintf "%s|" !s;

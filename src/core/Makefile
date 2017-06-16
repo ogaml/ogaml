@@ -10,7 +10,7 @@ COCOA_STUBS = application_delegate_stubs.m event_stubs.m glcontext_stubs.m\
 	      window_controller_stubs.m
 
 XLIB_STUBS = atoms_stubs.c display_stubs.c event_stubs.c glx_stubs.c\
-	     mouse_stubs.c keyboard_stubs.c window_stubs.c
+	     mouse_stubs.c keyboard_stubs.c window_stubs.c utils_stubs.c utils.c
 
 WINDOWS_STUBS = style_stubs.c window_stubs.c context_stubs.c pixelformat_stubs.c\
 		 glew_stubs.c 
@@ -104,7 +104,7 @@ ml_stubs:
 	$(CLANG) -c -o ./$(notdir $@) $(OCAML_C_FLAGS) $(GLOBAL_OBJCOPTS) $<
 
 %.o:%.c
-	$(OCAMLFIND) $(OCAMLC_CMD) -o ./$(notdir $@) -c $< -ccopt "$(COPTS)" -cclib "$(GLOBAL_CLIBS)"
+	$(OCAMLC_CMD) -c -cclib "$(GLOBAL_CLIBS)" $<
 
 # Cleaning
 

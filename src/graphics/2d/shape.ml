@@ -343,16 +343,17 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
     |> Uniform.vector2f "size" (Vector2f.from_int size)
   in
   let vertices = 
-    let src = VertexArray.VertexSource.empty
+    let src = VertexArray.Source.empty
       ~size:8 ()
     in
     let vtcs, outline = compute_vertices shape in
-    List.iter (VertexArray.VertexSource.add src) vtcs;
+    List.iter (VertexArray.Source.add src) vtcs;
     begin match outline with
     | None -> ()
-    | Some vtcs -> List.iter (VertexArray.VertexSource.add src) vtcs
+    | Some vtcs -> List.iter (VertexArray.Source.add src) vtcs
     end;
-    VertexArray.static (module M) target src
+    let vbo = VertexArray.Buffer.(unpack (static (module M) target src)) in
+    VertexArray.create (module M) target [vbo]
   in
   VertexArray.draw (module M)
         ~target
@@ -364,17 +365,17 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
 
 let map_to_source shape f src = 
   let vtcs, outline = compute_vertices shape in
-  List.iter (fun v -> VertexArray.VertexSource.add src (f v)) vtcs;
+  List.iter (fun v -> VertexArray.Source.add src (f v)) vtcs;
   begin match outline with
   | None -> ()
-  | Some vtcs -> List.iter (fun v -> VertexArray.VertexSource.add src (f v)) vtcs
+  | Some vtcs -> List.iter (fun v -> VertexArray.Source.add src (f v)) vtcs
   end
 
 let to_source shape src = 
   let vtcs, outline = compute_vertices shape in
-  List.iter (VertexArray.VertexSource.add src) vtcs;
+  List.iter (VertexArray.Source.add src) vtcs;
   begin match outline with
   | None -> ()
-  | Some vtcs -> List.iter (VertexArray.VertexSource.add src) vtcs
+  | Some vtcs -> List.iter (VertexArray.Source.add src) vtcs
   end
 

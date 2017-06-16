@@ -184,14 +184,14 @@ let simplify t =
 let source (t : t) ?index_source ~vertex_source () =
   let source_vertex v = 
     let va = Vertex.to_vao v in
-    try VertexArray.VertexSource.add vertex_source va
-    with VertexArray.VertexSource.Uninitialized_field s -> raise (Error s)
+    try VertexArray.Source.add vertex_source va
+    with VertexArray.Source.Uninitialized_field s -> raise (Error s)
   in
   let indices = Hashtbl.create 97 in
   let get_index v = 
     try Hashtbl.find indices v 
     with Not_found -> 
-      let ind = VertexArray.VertexSource.length vertex_source in
+      let ind = VertexArray.Source.length vertex_source in
       source_vertex v;
       Hashtbl.add indices v ind;
       ind

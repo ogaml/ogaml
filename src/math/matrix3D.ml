@@ -26,7 +26,7 @@ let identity () =
     set i i m 1.
   done; m
 
-let print m = 
+let to_string m = 
   let s = ref "" in
   for i = 0 to 3 do
     s := Printf.sprintf "%s|" !s;
@@ -110,13 +110,20 @@ let scale v m = product (scaling v) m
 
 let rotate v t m = product (rotation v t) m
 
-let times m v = 
+let times m ?perspective:(p = true) v = 
   let open Vector3f in
-  {
-    x = v.x *. m.{0} +. v.y *. m.{4} +. v.z *. m.{8}  +. m.{12};
-    y = v.x *. m.{1} +. v.y *. m.{5} +. v.z *. m.{9}  +. m.{13};
-    z = v.x *. m.{2} +. v.y *. m.{6} +. v.z *. m.{10} +. m.{14}
-  }
+  if p then 
+    {
+      x = v.x *. m.{0} +. v.y *. m.{4} +. v.z *. m.{8}  +. m.{12};
+      y = v.x *. m.{1} +. v.y *. m.{5} +. v.z *. m.{9}  +. m.{13};
+      z = v.x *. m.{2} +. v.y *. m.{6} +. v.z *. m.{10} +. m.{14}
+    }
+  else
+    {
+      x = v.x *. m.{0} +. v.y *. m.{4} +. v.z *. m.{8} ;
+      y = v.x *. m.{1} +. v.y *. m.{5} +. v.z *. m.{9} ;
+      z = v.x *. m.{2} +. v.y *. m.{6} +. v.z *. m.{10}
+    }   
 
 let from_quaternion q = 
   let mat = zero () in Quaternion.(

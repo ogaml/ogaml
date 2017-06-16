@@ -76,7 +76,7 @@ module Data = struct
 
   let add_color t col = 
     alloc t 4;
-    let c = Color.rgb col in
+    let c = Color.to_rgb col in
     Bigarray.Array1.unsafe_set t.data (t.length+0) c.Color.RGB.r;
     Bigarray.Array1.unsafe_set t.data (t.length+1) c.Color.RGB.g;
     Bigarray.Array1.unsafe_set t.data (t.length+2) c.Color.RGB.b;
@@ -187,6 +187,9 @@ module Pervasives = struct
   external finish : unit -> unit = "caml_glfinish"
 
   external msaa : bool -> unit = "caml_enable_msaa"
+
+  external read_pixels : (int * int) -> (int * int) -> GLTypes.PixelFormat.t -> Bytes.t
+    = "caml_read_pixels"
 
   let get_integer_opt param = 
     let v = get_integerv param in
@@ -386,9 +389,16 @@ module VAO = struct
   external attrib_int : 
     int -> int -> GLTypes.GlIntType.t -> int -> int -> unit = "caml_attrib_int"
 
+  external attrib_divisor : 
+    int -> int -> unit = "caml_attrib_divisor"
+
   external draw : DrawMode.t -> int -> int -> unit = "caml_draw_arrays"
 
+  external draw_instanced : DrawMode.t -> int -> int -> int -> unit = "caml_draw_arrays_instanced"
+
   external draw_elements : DrawMode.t -> int -> int -> unit = "caml_draw_elements"
+
+  external draw_elements_instanced : DrawMode.t -> int -> int -> int -> unit = "caml_draw_elements_instanced"
 
 end
 

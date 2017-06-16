@@ -44,30 +44,52 @@ type _ t = {
 let dynamic (type s) (module M : RenderTarget.T with type t = s) target src = 
   let buffer = GL.EBO.create () in
   let data = src.Source.data in
+  let context = M.context target in
+  let idpool = Context.LL.ebo_pool context in
+  let id = Context.ID_Pool.get_next idpool in
   GL.EBO.bind (Some buffer);
   GL.EBO.data (GL.Data.length data * 4) (Some data) (GLTypes.VBOKind.DynamicDraw);
   GL.EBO.bind None;
-  {
-    buffer;
-    size = GL.Data.length data;
-    length = Source.length src; 
-    id = Context.LL.ebo_id (M.context target)
-  }
+  Context.LL.set_bound_ebo context None;
+  let finalize _ = 
+    Context.ID_Pool.free idpool id;
+    if Context.LL.bound_ebo context = Some id then
+      Context.LL.set_bound_ebo context None
+  in
+  let ebo = {
+      buffer;
+      size = GL.Data.length data;
+      length = Source.length src; 
+      id}
+  in
+  Gc.finalise finalize ebo;
+  ebo
 
 let static (type s) (module M : RenderTarget.T with type t = s) target src = 
   let buffer = GL.EBO.create () in
   let data = src.Source.data in
+  let context = M.context target in
+  let idpool = Context.LL.ebo_pool context in
+  let id = Context.ID_Pool.get_next idpool in
   GL.EBO.bind (Some buffer);
   GL.EBO.data (GL.Data.length data * 4) (Some data) (GLTypes.VBOKind.StaticDraw);
   GL.EBO.bind None;
-  {
-    buffer;
-    size = GL.Data.length data;
-    length = Source.length src; 
-    id = Context.LL.ebo_id (M.context target)
-  }
+  Context.LL.set_bound_ebo context None;
+  let finalize _ = 
+    Context.ID_Pool.free idpool id;
+    if Context.LL.bound_ebo context = Some id then
+      Context.LL.set_bound_ebo context None
+  in
+  let ebo = {
+      buffer;
+      size = GL.Data.length data;
+      length = Source.length src; 
+      id}
+  in
+  Gc.finalise finalize ebo;
+  ebo
 
-let rebuild t src start =
+let rebuild (type s) (module M : RenderTarget.T with type t = s) target t src start =
   let data = src.Source.data in
   let new_buffer = 
     if t.size < GL.Data.length data + start then begin
@@ -83,6 +105,7 @@ let rebuild t src start =
   GL.EBO.bind (Some new_buffer);
   GL.EBO.subdata (start * 4) (GL.Data.length data * 4) data;
   GL.EBO.bind None;
+  Context.LL.set_bound_ebo (M.context target) None;
   t.buffer <- new_buffer;
   t.length <- Source.length src + start;
   t.size   <- max (GL.Data.length data + start) t.size

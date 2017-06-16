@@ -15,6 +15,7 @@ type uniform =
   | Float     of float
   | Int       of int
   | Texture2DArray of (int option * Texture.Texture2DArray.t)
+  | Cubemap   of (int option * Texture.Cubemap.t)
 
 module UniformMap = Map.Make (struct
 
@@ -58,7 +59,7 @@ let matrix2D s mat m =
 
 let color s c m = 
   assert_free m s;
-  UniformMap.add s (Color (Color.rgb c)) m
+  UniformMap.add s (Color (Color.to_rgb c)) m
 
 let texture2D s ?tex_unit t m = 
   assert_free m s;
@@ -75,6 +76,10 @@ let int s i m =
 let float s f m = 
   assert_free m s;
   UniformMap.add s (Float f) m
+
+let cubemap s ?tex_unit t m = 
+  assert_free m s;
+  UniformMap.add s (Cubemap (tex_unit,t)) m
 
 
 module LL = struct
@@ -153,6 +158,15 @@ module LL = struct
           let u = next_unit 0 in
           add_unit u;
           Texture.Texture2DArray.bind t u;
+          GL.Uniform.int1 location (Context.LL.texture_unit context)
+      | Cubemap (Some u,t), GLTypes.GlslType.SamplerCube ->
+          add_unit u;
+          Texture.Cubemap.bind t u;
+          GL.Uniform.int1 location (Context.LL.texture_unit context)
+      | Cubemap (None, t), GLTypes.GlslType.SamplerCube ->
+          let u = next_unit 0 in
+          add_unit u;
+          Texture.Cubemap.bind t u;
           GL.Uniform.int1 location (Context.LL.texture_unit context)
       | _ -> 
         error "Uniform %s does not have the type required by the program" name

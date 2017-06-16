@@ -50,6 +50,9 @@ module Vector2i : sig
   (** Type of immutable vectors of 2 integers *)
   type t = {x : int; y : int}
 
+  (** Fast way to create a vector*)
+  val make : int -> int -> t
+
   (** Zero vector *)
   val zero : t
 
@@ -70,6 +73,12 @@ module Vector2i : sig
 
   (** Divides a vector by a scalar. Raises Vector2i_exception if the scalar is zero. *)
   val div : int -> t -> t
+
+  (** Computes the pointwise product of two vectors. *)
+  val pointwise_product : t -> t -> t
+
+  (** Computes the pointwise division of two vectors. *)
+  val pointwise_div : t -> t -> t
 
   (** Computes the dot product of two vectors *)
   val dot : t -> t -> int
@@ -115,7 +124,7 @@ module Vector2i : sig
   val raster : t -> t -> t list
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -132,6 +141,9 @@ module Vector2f : sig
 
   (** Type of immutable vectors of 2 floats *)
   type t = {x : float; y : float}
+
+  (** Fast way to create a vector*)
+  val make : float -> float -> t
 
   (** Zero vector *)
   val zero : t
@@ -153,6 +165,12 @@ module Vector2f : sig
 
   (** Divides a vector by a scalar. Raises Vector2f_exception if the scalar is zero. *)
   val div : float -> t -> t
+
+  (** Computes the pointwise product of two vectors. *)
+  val pointwise_product : t -> t -> t
+
+  (** Computes the pointwise division of two vectors. *)
+  val pointwise_div : t -> t -> t
 
   (** Truncates the floating-point coordinates of a vector @see:OgamlMath.Vector2i *)
   val to_int : t -> Vector2i.t
@@ -201,7 +219,7 @@ module Vector2f : sig
   val min : t -> float 
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
   (** $direction u v$ returns the normalized direction vector from $u$ to $v$.
     * Raises Vector2f_exception if $u = v$. *)
@@ -243,6 +261,9 @@ module Vector3i : sig
   (** Type of immutable vectors of 3 ints *)
   type t = {x : int; y : int; z : int}
 
+  (** Fast way to create a vector*)
+  val make : int -> int -> int -> t
+
   (** Zero vector *)
   val zero : t
 
@@ -266,6 +287,12 @@ module Vector3i : sig
 
   (** Divides a vector by a scalar. Raises Vector3i_exception if the scalar is zero. *)
   val div : int -> t -> t
+
+  (** Computes the pointwise product of two vectors. *)
+  val pointwise_product : t -> t -> t
+
+  (** Computes the pointwise division of two vectors. *)
+  val pointwise_div : t -> t -> t
 
   (** Projects a vector on the plane $z = 0$ @see:OgamlMath.Vector2i *)
   val project : t -> Vector2i.t
@@ -317,7 +344,7 @@ module Vector3i : sig
   val raster : t -> t -> t list
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -334,6 +361,9 @@ module Vector3f : sig
 
   (** Type of immutable vectors of 3 floats *)
   type t = {x : float; y : float; z : float}
+
+  (** Fast way to create a vector*)
+  val make : float -> float -> float -> t
 
   (** Zero vector *)
   val zero : t
@@ -358,6 +388,12 @@ module Vector3f : sig
 
   (** Divides a vector by a scalar. Raises Vector3f_exception if the scalar is zero. *)
   val div : float -> t -> t
+
+  (** Computes the pointwise product of two vectors. *)
+  val pointwise_product : t -> t -> t
+
+  (** Computes the pointwise division of two vectors. *)
+  val pointwise_div : t -> t -> t
 
   (** Truncates the floating-point coordinates of a vector @see:OgamlMath.Vector3i *)
   val to_int : t -> Vector3i.t
@@ -412,7 +448,7 @@ module Vector3f : sig
   val min : t -> float 
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
   (** $direction u v$ returns the normalized direction vector from $u$ to $v$.
     * Raises Vector3f_exception if $u = v$. *)
@@ -487,7 +523,7 @@ module Vector2fs : sig
   val normalize : t -> t
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -541,7 +577,7 @@ module Vector3fs : sig
   val normalize : t -> t
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -630,7 +666,7 @@ module IntRect : sig
   val fold : ?strict:bool -> t -> (Vector2i.t -> 'a -> 'a) -> 'a -> 'a
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -713,7 +749,7 @@ module FloatRect : sig
   val includes : t -> t -> bool
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -802,7 +838,7 @@ module IntBox : sig
   val fold : ?strict:bool -> t -> (Vector3i.t -> 'a -> 'a) -> 'a -> 'a
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -885,7 +921,7 @@ module FloatBox : sig
   val contains : t -> Vector3f.t -> bool
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 end
 
@@ -997,12 +1033,16 @@ module Matrix3D : sig
     * @see:OgamlMath.Vector3f *)
   val rotate : Vector3f.t -> float -> t -> t
 
-  (** Computes the (right-)product of a matrix with a column vector
+  (** Computes the (right-)product of a matrix with a column vector.
+    * 
+    * If $perspective$ is true, then the 4th column of the matrix is
+    * added to the resulting vector. $perspective$ defaults to $true$. 
+    *
     * @see:OgamlMath.Vector3f *)
-  val times : t -> Vector3f.t -> Vector3f.t
+  val times : t -> ?perspective:bool -> Vector3f.t -> Vector3f.t
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 
   (*** Rendering Matrices Creation *)
@@ -1121,7 +1161,7 @@ module Matrix2D : sig
   val times : t -> Vector2f.t -> Vector2f.t
 
   (** Returns a pretty-printed string (not for serialization) *)
-  val print : t -> string
+  val to_string : t -> string
 
 
   (*** Rendering Matrices Creation *)

@@ -4,6 +4,8 @@ exception Vector3i_exception of string
 
 type t = {x : int; y : int; z : int}
 
+val make : int -> int -> int -> t
+
 val zero : t
 
 val unit_x : t
@@ -19,6 +21,10 @@ val sub : t -> t -> t
 val prop : int -> t -> t
 
 val div : int -> t -> t
+
+val pointwise_product : t -> t -> t
+
+val pointwise_div : t -> t -> t
 
 val project : t -> Vector2i.t
 
@@ -52,5 +58,5 @@ val min : t -> int
 
 val raster : t -> t -> t list
 
-val print : t -> string
+val to_string : t -> string
 

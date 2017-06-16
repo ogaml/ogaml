@@ -24,9 +24,9 @@ EXAMPLE_MODULES = unix.cmxa bigarray.cmxa $(MATH_LIB).cmxa $(CORE_LIB).cmxa $(UT
 EXAMPLE_PKGS = ogaml.graphics,ogaml.utils,ogaml.audio
 
 ifeq ($(OS_NAME), WIN)
-    EXAMPLE_CMD = $(OCAMLOPT) $(EXAMPLE_MODULES)
+    EXAMPLE_CMD = $(OCAMLOPT) -thread $(EXAMPLE_MODULES)
 else
-    EXAMPLE_CMD = $(OCAMLFIND) $(OCAMLOPT) -linkpkg -package $(EXAMPLE_PKGS)
+    EXAMPLE_CMD = $(OCAMLFIND) $(OCAMLOPT) -thread -linkpkg -package $(EXAMPLE_PKGS) -g
 endif
 
 
@@ -37,12 +37,12 @@ TEST_INCLUDES = -I src/core -I src/math -I src/graphics -I src/utils -I src/audi
 TEST_MODULES = $(MATH_LIB).cmxa $(CORE_LIB).cmxa $(UTILS_LIB).cmxa $(GRAPHICS_LIB).cmxa $(AUDIO_LIB).cmxa
 
 ifeq ($(OS_NAME), WIN)
-    TEST_CMD = $(OCAMLOPT) unix.cmxa bigarray.cmxa $(TEST_MODULES) $(TEST_INCLUDES)
+    TEST_CMD = $(OCAMLOPT) -thread unix.cmxa bigarray.cmxa $(TEST_MODULES) $(TEST_INCLUDES)
 else
-    TEST_CMD = $(OCAMLFIND) $(OCAMLOPT) -linkpkg $(TEST_INCLUDES) $(TEST_MODULES) -package unix,bigarray
+    TEST_CMD = $(OCAMLFIND) $(OCAMLOPT) -thread -linkpkg $(TEST_INCLUDES) $(TEST_MODULES) -package unix,bigarray
 endif
 
-TEST_OUT = main.out 
+TEST_OUT = main.out
 
 ifeq ($(OS_NAME), WIN)
     LAUNCH_CMD = $(TEST_OUT)
@@ -87,6 +87,7 @@ audio_lib: utils_lib math_lib
 
 examples:
 	$(EXAMPLE_CMD) examples/cube.ml -o cube.out &&\
+	$(EXAMPLE_CMD) examples/cursor.ml -o cursor.out &&\
 	$(EXAMPLE_CMD) examples/tut01.ml -o tut01.out &&\
 	$(EXAMPLE_CMD) examples/tut02.ml -o tut02.out &&\
 	$(EXAMPLE_CMD) examples/tut_tex.ml -o tut_tex.out &&\
@@ -97,9 +98,10 @@ examples:
 	$(EXAMPLE_CMD) examples/ip.ml -o ip.out &&\
 	$(EXAMPLE_CMD) examples/text.ml -o text.out &&\
 	$(EXAMPLE_CMD) examples/noise.ml -o noise.out &&\
-	$(EXAMPLE_CMD) examples/shoot.ml -o shoot.out
-	
-tests: math_lib core_lib graphics_lib utils_lib audio_lib
+	$(EXAMPLE_CMD) examples/shoot.ml -o shoot.out &&\
+	$(EXAMPLE_CMD) examples/instancing.ml -o instancing.out
+
+tests: math_lib core_lib graphics_lib utils_lib
 	$(TEST_CMD) tests/programs.ml -o main.out && $(LAUNCH_CMD) &&\
 	$(TEST_CMD) tests/vertexarrays.ml -o main.out && $(LAUNCH_CMD) &&\
 	$(TEST_CMD) tests/graphs.ml -o main.out && $(LAUNCH_CMD) &&\
@@ -132,7 +134,7 @@ clean:
 	make -C src/graphics clean &\
 	make -C src/audio clean &\
 	make -C tests/ clean &\
-	make -C examples/ clean 
+	make -C examples/ clean
 
 depend:
 	make -C src/core depend &\

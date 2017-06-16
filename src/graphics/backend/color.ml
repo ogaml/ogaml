@@ -1,10 +1,16 @@
 
-let clamp a mina maxa = max (min a maxa) mina
+let clamp (a : float) (mina : float) (maxa : float) = 
+  if a < mina then mina 
+  else if a > maxa then maxa 
+  else a
 
 module RGB = struct
 
   type t = {r : float; g : float; b : float; a : float}
 
+  let make ?alpha:(a = 1.) r g b = 
+    {r; g; b; a}
+    
   let black   = {r = 0.; g = 0.; b = 0.; a = 1.}
 
   let white   = {r = 1.; g = 1.; b = 1.; a = 1.}
@@ -48,6 +54,9 @@ let rad60 = 60. *. OgamlMath.Constants.pi /. 180.
 module HSV = struct
 
   type t = {h : float; s : float; v : float; a : float}
+
+  let make ?alpha:(a = 1.) h s v =
+    {h; s; v; a}
 
   let black   = {h = 0.; s = 0.; v = 0.; a = 1.}
 
@@ -141,20 +150,26 @@ let hsv_to_rgb color =
      RGB.b = (b'+.m);
      RGB.a = color.a}
 
-let hsv = function
+let to_hsv = function
   |`HSV c -> HSV.clamp c
   |`RGB c -> rgb_to_hsv c
 
-let rgb = function
+let to_rgb = function
   |`HSV c -> hsv_to_rgb c
   |`RGB c -> RGB.clamp c
+
+let hsv ?alpha h s v = 
+  `HSV (HSV.make ?alpha h s v)
+
+let rgb ?alpha h s v = 
+  `RGB (RGB.make ?alpha h s v)
 
 let clamp = function
   |`HSV c -> `HSV (HSV.clamp c)
   |`RGB c -> `RGB (RGB.clamp c)
 
 let map c f = 
-  `RGB (RGB.map (rgb c) f)
+  `RGB (RGB.map (to_rgb c) f)
 
 let print c =
   match c with

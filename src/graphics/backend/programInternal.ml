@@ -53,11 +53,11 @@ let create ~vertex ~fragment ~id =
   GL.Shader.compile vshader;
   GL.Shader.compile fshader;
   if GL.Shader.status vshader = false then begin
-    last_log := GL.Shader.log vshader;
+    last_log := "Vertex shader : " ^ (GL.Shader.log vshader);
     raise (Program_internal_error "GLSL compilation failure")
   end;
   if GL.Shader.status fshader = false then begin
-    last_log := GL.Shader.log fshader;
+    last_log := "Fragment shader : " ^ (GL.Shader.log fshader);
     raise (Program_internal_error "GLSL compilation failure")
   end;
   GL.Program.attach program vshader;
@@ -77,6 +77,8 @@ let create ~vertex ~fragment ~id =
       let name = GL.Program.uname program (n - 1) in
       let kind = GL.Program.utype program (n - 1) in
       let location = GL.Program.uloc program name in
+      if kind = GLTypes.GlslType.Unknown then
+        raise (Program_internal_error "Unsupported GLSL type");
       {
         Uniform.name = name; 
         Uniform.kind = kind; 

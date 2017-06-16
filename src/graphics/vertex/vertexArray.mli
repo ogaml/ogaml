@@ -41,6 +41,8 @@ module Vertex : sig
 
     val name : ('a, 'b) s -> string
 
+    val divisor : ('a, 'b) s -> int
+
     val atype : ('a, 'b) s -> 'a AttributeType.s
 
   end
@@ -50,11 +52,13 @@ module Vertex : sig
 
     type s
 
-    val attribute : string -> 'a AttributeType.s -> ('a, s) Attribute.s
+    val attribute : string -> ?divisor:int -> 'a AttributeType.s -> ('a, s) Attribute.s
 
     val seal : unit -> unit
 
     val create : unit -> s t
+
+    val copy : s t -> s t
 
   end
 
@@ -85,7 +89,7 @@ module SimpleVertex : sig
 end
 
 
-module VertexSource : sig
+module Source : sig
 
   exception Uninitialized_field of string
 
@@ -105,40 +109,65 @@ module VertexSource : sig
 
   val append : 'a t -> 'a t -> unit
 
-  val iter : 'a t -> ('a Vertex.t -> unit) -> unit
+  val iter : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> unit) -> unit
 
-  val map : 'a t -> ('a Vertex.t -> 'b Vertex.t) -> 'b t
+  val map : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t
 
-  val map_to : 'a t -> ('a Vertex.t -> 'b Vertex.t) -> 'b t -> unit
+  val map_to : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t -> unit
+
+end
+
+
+module Buffer : sig
+
+  exception Invalid_attribute of string
+  
+  exception Out_of_bounds of string
+ 
+  type static
+  
+  type dynamic
+ 
+  type ('a, 'b) t 
+
+  type unpacked
+  
+  val static : (module RenderTarget.T with type t = 'a) 
+                -> 'a -> 'b Source.t -> (static, 'b) t
+  
+  val dynamic : (module RenderTarget.T with type t = 'a) 
+                 -> 'a -> 'b Source.t -> (dynamic, 'b) t
+ 
+  val length : (_, _) t -> int
+
+  val blit    : (module RenderTarget.T with type t = 'a) ->
+                 'a -> (dynamic, 'b) t ->
+                 ?first:int -> ?length:int ->
+                 'b Source.t -> unit
+
+  val unpack : (_, _) t -> unpacked
 
 end
 
 exception Missing_attribute of string
 
-exception Invalid_attribute of string
+exception Multiple_definition of string
 
-exception Out_of_bounds of string
+type t
 
-type static
+val create : (module RenderTarget.T with type t = 'a) -> 'a -> Buffer.unpacked list -> t
 
-type dynamic
+(* Number of vertices in the array (0 if all the data is instanced) *)
+val length : t -> int
 
-type ('a, 'b) t 
-
-val static : (module RenderTarget.T with type t = 'a) 
-              -> 'a -> 'b VertexSource.t -> (static, 'b) t
-
-val dynamic : (module RenderTarget.T with type t = 'a) 
-               -> 'a -> 'b VertexSource.t -> (dynamic, 'b) t
-
-val rebuild : (dynamic, 'b) t -> 'b VertexSource.t -> int -> unit
-
-val length : (_, _) t -> int
+(* Maximal number of drawable instances. None if non-instanced *)
+val max_instances : t -> int option
 
 val draw :
   (module RenderTarget.T with type t = 'a) ->
-  vertices   : (_, _) t ->
+  vertices   : t ->
   target     : 'a ->
+  ?instances : int ->
   ?indices   : _ IndexArray.t ->
   program    : Program.t ->
   ?uniform    : Uniform.t ->
@@ -147,4 +176,3 @@ val draw :
   ?length    : int ->
   ?mode      : DrawMode.t ->
   unit -> unit
-

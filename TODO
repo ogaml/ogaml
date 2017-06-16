@@ -35,6 +35,8 @@ Audio (see NOTES for more info):
     ☐ play : t -> [`Stream of AudioStream.t | `Sound of SoundBuffer.t] -> ... sound parameters ... -> unit
     ☐ stop/pause/resume
 
+Windows specific:
+  ☐ Implement canonical_path
 
 Interface changes:
   Window:
@@ -59,6 +61,8 @@ Interface changes:
     ☐ (+Shape) Centralize transformations
   RenderTextures/Framebuffers:
     ☐ Test all attachments
+  ☐ Unify exceptions
+  ☐ More tests! (especially for vertex arrays)
 
 New modules:
   Bounding module:
@@ -72,6 +76,8 @@ New modules:
     ☐ Octree
 
 Advanced features:
+  ☐ Vertex buffer slices
+  ☐ Index buffer slices
   More Image and Texture types:
     ☐ Single-channeled images
     ☐ Image slices

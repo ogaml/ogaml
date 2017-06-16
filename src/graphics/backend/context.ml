@@ -10,10 +10,6 @@ type capabilities = {
   max_depth_texture_samples : int;
   max_elements_indices      : int;
   max_elements_vertices     : int;
-  max_framebuffer_width     : int option;
-  max_framebuffer_height    : int option;
-  max_framebuffer_layers    : int option;
-  max_framebuffer_samples   : int option;
   max_integer_samples       : int;
   max_renderbuffer_size     : int;
   max_texture_buffer_size   : int;
@@ -22,6 +18,31 @@ type capabilities = {
   max_color_attachments     : int;
 }
 
+module ID_Pool = struct
+
+  type t = {  
+    mutable next_id  : int;
+    mutable free_ids : int list
+  }
+
+  let create next_id = {
+    next_id;
+    free_ids = []
+  }
+
+  let get_next t = 
+    match t.free_ids with
+    | [] -> 
+      t.next_id <- t.next_id + 1;
+      t.next_id - 1
+    | h::tail ->
+      t.free_ids <- tail;
+      h
+
+  let free t i = 
+    t.free_ids <- i :: t.free_ids
+
+end
 
 type t = {
   capabilities : capabilities;
@@ -31,30 +52,31 @@ type t = {
   sprite_program : ProgramInternal.t;
   shape_program  : ProgramInternal.t;
   text_program   : ProgramInternal.t;
-  mutable msaa : bool;
-  mutable culling_mode  : DrawParameter.CullingMode.t;
-  mutable polygon_mode  : DrawParameter.PolygonMode.t;
-  mutable depth_test : bool;
-  mutable depth_writing : bool;
-  mutable depth_function : DrawParameter.DepthTest.t;
-  mutable texture_id : int;
-  mutable texture_unit  : int;
+  mutable msaa   : bool;
+  mutable culling_mode     : DrawParameter.CullingMode.t;
+  mutable polygon_mode     : DrawParameter.PolygonMode.t;
+  mutable depth_test       : bool;
+  mutable depth_writing    : bool;
+  mutable depth_function   : DrawParameter.DepthTest.t;
+  mutable texture_pool     : ID_Pool.t;
+  mutable texture_unit     : int;
   mutable pooled_tex_array : bool array;
-  mutable bound_texture : (GL.Texture.t * int * GLTypes.TextureTarget.t) option array;
-  mutable program_id    : int;
-  mutable linked_program : (GL.Program.t * int) option;
-  mutable bound_vbo : (GL.VBO.t * int) option;
-  mutable vao_id    : int;
-  mutable bound_vao : (GL.VAO.t * int) option;
-  mutable ebo_id    : int;
-  mutable bound_ebo : (GL.EBO.t * int) option;
-  mutable fbo_id    : int;
-  mutable rbo_id    : int;
-  mutable bound_fbo : (GL.FBO.t * int) option;
-  mutable color    : Color.t;
-  mutable blending : bool;
-  mutable blend_equation : DrawParameter.BlendMode.t;
-  mutable viewport : OgamlMath.IntRect.t
+  mutable bound_texture    : (GL.Texture.t * int * GLTypes.TextureTarget.t) option array;
+  mutable program_pool     : ID_Pool.t;
+  mutable linked_program   : (GL.Program.t * int) option;
+  mutable vbo_pool         : ID_Pool.t;
+  mutable bound_vbo        : (GL.VBO.t * int) option;
+  mutable vao_pool         : ID_Pool.t;
+  mutable bound_vao        : (GL.VAO.t * int) option;
+  mutable ebo_pool         : ID_Pool.t;
+  mutable bound_ebo        : (GL.EBO.t * int) option;
+  mutable fbo_pool         : ID_Pool.t;
+  mutable rbo_pool         : ID_Pool.t;
+  mutable bound_fbo        : (GL.FBO.t * int) option;
+  mutable color            : Color.t;
+  mutable blending         : bool;
+  mutable blend_equation   : DrawParameter.BlendMode.t;
+  mutable viewport         : OgamlMath.IntRect.t
 }
 
 let error msg = raise (Invalid_context msg)
@@ -77,7 +99,15 @@ let is_glsl_version_supported s v =
   v <= s.glsl
 
 let assert_no_error s = 
-  assert (GL.Pervasives.error () = None)
+  match GL.Pervasives.error () with
+ | Some GLTypes.GlError.Invalid_enum    -> error "Invalid enum"
+ | Some GLTypes.GlError.Invalid_value   -> error "Invalid value"
+ | Some GLTypes.GlError.Invalid_op      -> error "Invalid op"
+ | Some GLTypes.GlError.Invalid_fbop    -> error "Invalid fbop"
+ | Some GLTypes.GlError.Out_of_memory   -> error "Out of memory"
+ | Some GLTypes.GlError.Stack_overflow  -> error "Stack overflow"
+ | Some GLTypes.GlError.Stack_underflow -> error "Stack underflow"
+ | None -> ()
 
 let flush s = 
   GL.Pervasives.flush ()
@@ -99,6 +129,7 @@ module LL = struct
       let str = GL.Pervasives.glsl_version () in
       Scanf.sscanf str "%i.%i" (fun a b -> a * 100 + (convert b))
     in
+    assert (GL.Pervasives.error () = None);
     let capabilities = {
       max_3D_texture_size       = GL.Pervasives.get_integerv GLTypes.Parameter.Max3DTextureSize      ;
       max_array_texture_layers  = GL.Pervasives.get_integerv GLTypes.Parameter.MaxArrayTextureLayers ;
@@ -107,10 +138,6 @@ module LL = struct
       max_depth_texture_samples = GL.Pervasives.get_integerv GLTypes.Parameter.MaxDepthTextureSamples;
       max_elements_indices      = GL.Pervasives.get_integerv GLTypes.Parameter.MaxElementsIndices    ;
       max_elements_vertices     = GL.Pervasives.get_integerv GLTypes.Parameter.MaxElementsVertices   ;
-      max_framebuffer_width     = GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferWidth   ;
-      max_framebuffer_height    = GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferHeight  ;
-      max_framebuffer_layers    = GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferLayers  ;
-      max_framebuffer_samples   = GL.Pervasives.get_integer_opt GLTypes.Parameter.MaxFramebufferSamples ;
       max_integer_samples       = GL.Pervasives.get_integerv GLTypes.Parameter.MaxIntegerSamples     ;
       max_renderbuffer_size     = GL.Pervasives.get_integerv GLTypes.Parameter.MaxRenderbufferSize   ;
       max_texture_buffer_size   = GL.Pervasives.get_integerv GLTypes.Parameter.MaxTextureBufferSize  ;
@@ -119,37 +146,40 @@ module LL = struct
       max_color_attachments     = GL.Pervasives.get_integerv GLTypes.Parameter.MaxColorAttachments   ;
     }
     in
+    (* A bit ugly, but Invalid_enum occurs sometimes even if a feature is supported... *)
+    ignore (GL.Pervasives.error ());
     {
       capabilities;
       major   ;
       minor   ;
       glsl    ;
-      sprite_program = ProgramInternal.Sources.create_sprite (-3) glsl;
-      shape_program  = ProgramInternal.Sources.create_shape  (-2) glsl;
-      text_program   = ProgramInternal.Sources.create_text   (-1) glsl;
-      msaa = false;
-      culling_mode = DrawParameter.CullingMode.CullNone;
-      polygon_mode = DrawParameter.PolygonMode.DrawFill;
-      depth_test = false;
-      depth_writing = true;
-      depth_function = DrawParameter.DepthTest.Less;
-      texture_id   = 0;
-      texture_unit = 0;
+      sprite_program   = ProgramInternal.Sources.create_sprite (-3) glsl;
+      shape_program    = ProgramInternal.Sources.create_shape  (-2) glsl;
+      text_program     = ProgramInternal.Sources.create_text   (-1) glsl;
+      msaa             = false;
+      culling_mode     = DrawParameter.CullingMode.CullNone;
+      polygon_mode     = DrawParameter.PolygonMode.DrawFill;
+      depth_test       = false;
+      depth_writing    = true;
+      depth_function   = DrawParameter.DepthTest.Less;
+      texture_pool     = ID_Pool.create 0;
+      texture_unit     = 0;
       pooled_tex_array = Array.make capabilities.max_texture_image_units true;
-      bound_texture = Array.make capabilities.max_texture_image_units None;
-      program_id = 0;
-      linked_program = None;
-      bound_vbo = None;
-      vao_id = 0;
-      bound_vao = None;
-      ebo_id = 0;
-      bound_ebo = None;
-      fbo_id = 1;
-      bound_fbo = None;
-      rbo_id = 0;
-      color = `RGB (Color.RGB.transparent);
-      blending = false;
-      blend_equation = DrawParameter.BlendMode.(
+      bound_texture    = Array.make capabilities.max_texture_image_units None;
+      program_pool     = ID_Pool.create 0;
+      linked_program   = None;
+      vbo_pool         = ID_Pool.create 0;
+      bound_vbo        = None;
+      vao_pool         = ID_Pool.create 0;
+      bound_vao        = None;
+      ebo_pool         = ID_Pool.create 0;
+      bound_ebo        = None;
+      fbo_pool         = ID_Pool.create 1; (* ID 0 corresponds to the default framebuffer *)
+      bound_fbo        = None;
+      rbo_pool         = ID_Pool.create 0;
+      color            = `RGB (Color.RGB.transparent);
+      blending         = false;
+      blend_equation   = DrawParameter.BlendMode.(
         {color = Equation.Add (Factor.One, Factor.Zero);
          alpha = Equation.Add (Factor.One, Factor.Zero)});
       viewport = OgamlMath.IntRect.({x = 0; y = 0; width = 0; height = 0}) 
@@ -204,9 +234,8 @@ module LL = struct
   let set_texture_unit s i = 
     s.texture_unit <- i
 
-  let texture_id s = 
-    s.texture_id <- s.texture_id + 1;
-    s.texture_id - 1
+  let texture_pool s = 
+    s.texture_pool
 
   let bound_texture s i = 
     if i >= s.capabilities.max_texture_image_units || i < 0 then
@@ -238,9 +267,8 @@ module LL = struct
   let set_linked_program s p =
     s.linked_program <- p
 
-  let program_id s = 
-    s.program_id <- s.program_id + 1;
-    s.program_id - 1
+  let program_pool s = 
+    s.program_pool
 
   let bound_vbo s = 
     match s.bound_vbo with
@@ -250,6 +278,9 @@ module LL = struct
   let set_bound_vbo s v = 
     s.bound_vbo <- v
 
+  let vbo_pool s = 
+    s.vbo_pool
+
   let bound_vao s = 
     match s.bound_vao with
     | None -> None
@@ -258,9 +289,8 @@ module LL = struct
   let set_bound_vao s v = 
     s.bound_vao <- v
 
-  let vao_id s = 
-    s.vao_id <- s.vao_id + 1;
-    s.vao_id - 1
+  let vao_pool s = 
+    s.vao_pool
 
   let bound_ebo s = 
     match s.bound_ebo with
@@ -270,9 +300,8 @@ module LL = struct
   let set_bound_ebo s v = 
     s.bound_ebo <- v
 
-  let ebo_id s = 
-    s.ebo_id <- s.ebo_id + 1;
-    s.ebo_id - 1
+  let ebo_pool s = 
+    s.ebo_pool
 
   let bound_fbo s = 
     match s.bound_fbo with
@@ -282,13 +311,11 @@ module LL = struct
   let set_bound_fbo s i = 
     s.bound_fbo <- i
 
-  let fbo_id s = 
-    s.fbo_id <- s.fbo_id + 1;
-    s.fbo_id - 1
+  let fbo_pool s = 
+    s.fbo_pool
 
-  let rbo_id s = 
-    s.rbo_id <- s.rbo_id + 1;
-    s.rbo_id - 1
+  let rbo_pool s = 
+    s.rbo_pool
 
   let set_clear_color s c = 
     s.color <- c

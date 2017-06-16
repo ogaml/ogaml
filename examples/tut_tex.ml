@@ -64,7 +64,7 @@ let vertex4 =
     ~position:Vector3f.({x = 0.75; y = -0.75; z = 0.0})
     ~uv:Vector2f.({x = 1.; y = 0.}) ()
 
-let vertex_source = VertexArray.VertexSource.(
+let vertex_source = VertexArray.Source.(
     empty ~size:4 ()
     << vertex1
     << vertex2
@@ -72,7 +72,10 @@ let vertex_source = VertexArray.VertexSource.(
     << vertex4
 )
 
-let vertices = VertexArray.static (module Window) window vertex_source
+let vbo = VertexArray.Buffer.static (module Window) window vertex_source
+
+let vertices = 
+  VertexArray.(create (module Window) window [Buffer.unpack vbo])
 
 let texture = Texture.Texture2D.create (module Window) window (`File "examples/mario-block.bmp")
 

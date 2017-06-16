@@ -22,8 +22,11 @@ module Log : sig
     * - short : if true, timestamps will be shortened (defaults to false) *)
   val create : ?output:out_channel -> ?debug:bool -> ?color:bool -> ?short:bool -> unit -> t
 
-  (** Log to the standard output, that would be obtained by calling $create ()$ *)
+  (** Log to the standard output, that would be obtained by calling $create ~output:stdout ()$ *)
   val stdout : t
+
+  (** Log to the standard error, that would be obtained by calling $create ()$ *)
+  val stderr : t
 
   (** Logs a message *)
   val log : t -> level -> ('a, out_channel, unit) format -> 'a
@@ -42,6 +45,38 @@ module Log : sig
 
   (** Logs a fatal error message *)
   val fatal : t -> ('a, out_channel, unit) format -> 'a
+
+end
+
+
+(** Simple clocks and counters *)
+module Clock : sig
+
+  (** Small utility to make clocks and counters (ex. FPS counter) *)
+
+  (** Type of a clock *)
+  type t
+
+  (** Creates a clock *)
+  val create : unit -> t
+
+  (** Restarts a clock (sets the time origin and resets the tick counter to 0) *)
+  val restart : t -> unit
+
+  (** Increments the tick counter of a clock *)
+  val tick : t -> unit
+
+  (** Returns the elapsed time in seconds *)
+  val time : t -> float
+
+  (** Returns the number of ticks *)
+  val ticks : t -> int
+
+  (** Returns the number of ticks per second *)
+  val tps : t -> float
+
+  (** Returns the average duration of a tick in seconds *)
+  val spt : t -> float
 
 end
 
@@ -443,14 +478,17 @@ module Graph : sig
     (** Returns all the neighbours of a vertex *)
     val neighbours : t -> vertex -> vertex list
 
+    (** Iterates through all the neighbours of a vertex *)
+    val iter_neighbours : t -> vertex -> (vertex -> unit) -> unit
+
     (** Merges two graphs *)
     val merge : t -> t -> t
 
-    (** $dfs g s f$ iterates $f$ through all the vertices of $g$, 
+    (** $dfs g s f$ iterates $f$ through all the accessible vertices of $g$, 
       * starting from $s$ using a dfs *)
     val dfs : t -> vertex -> (vertex -> unit) -> unit
 
-    (** $bfs g s f$ iterates $f$ through all the vertices of $g$, 
+    (** $bfs g s f$ iterates $f$ through all the accessible vertices of $g$, 
       * starting from $s$ using a bfs *)
     val bfs : t -> vertex -> (vertex -> unit) -> unit
 

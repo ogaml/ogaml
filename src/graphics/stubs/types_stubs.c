@@ -111,28 +111,29 @@ int Val_attrib_type(GLenum type)
 {
   switch(type)
   {
-    case GL_INT          : return 0;
-    case GL_INT_VEC2     : return 1;
-    case GL_INT_VEC3     : return 2;
-    case GL_INT_VEC4     : return 3;
-    case GL_FLOAT        : return 4;
-    case GL_FLOAT_VEC2   : return 5;
-    case GL_FLOAT_VEC3   : return 6;
-    case GL_FLOAT_VEC4   : return 7;
-    case GL_FLOAT_MAT2   : return 8;
-    case GL_FLOAT_MAT2x3 : return 9;
-    case GL_FLOAT_MAT2x4 : return 10;
-    case GL_FLOAT_MAT3x2 : return 11;
-    case GL_FLOAT_MAT3   : return 12;
-    case GL_FLOAT_MAT3x4 : return 13;
-    case GL_FLOAT_MAT4x2 : return 14;
-    case GL_FLOAT_MAT4x3 : return 15;
-    case GL_FLOAT_MAT4   : return 16;
-    case GL_SAMPLER_1D   : return 17;
-    case GL_SAMPLER_2D   : return 18;
-    case GL_SAMPLER_2D_ARRAY : return 19;
-    case GL_SAMPLER_3D   : return 20;
-    default: caml_failwith("Caml variant error in Val_type(1)");
+    case GL_INT          : return 1;
+    case GL_INT_VEC2     : return 2;
+    case GL_INT_VEC3     : return 3;
+    case GL_INT_VEC4     : return 4;
+    case GL_FLOAT        : return 5;
+    case GL_FLOAT_VEC2   : return 6;
+    case GL_FLOAT_VEC3   : return 7;
+    case GL_FLOAT_VEC4   : return 8;
+    case GL_FLOAT_MAT2   : return 9;
+    case GL_FLOAT_MAT2x3 : return 10;
+    case GL_FLOAT_MAT2x4 : return 11;
+    case GL_FLOAT_MAT3x2 : return 12;
+    case GL_FLOAT_MAT3   : return 13;
+    case GL_FLOAT_MAT3x4 : return 14;
+    case GL_FLOAT_MAT4x2 : return 15;
+    case GL_FLOAT_MAT4x3 : return 16;
+    case GL_FLOAT_MAT4   : return 17;
+    case GL_SAMPLER_1D   : return 18;
+    case GL_SAMPLER_2D   : return 19;
+    case GL_SAMPLER_2D_ARRAY : return 20;
+    case GL_SAMPLER_3D   : return 21;
+    case GL_SAMPLER_CUBE : return 22;
+    default: return 0;
   }
 }
 
@@ -180,27 +181,28 @@ GLenum Depthfun_val(value fun)
   switch(Int_val(fun))
   {
     case 0:
+    case 1:
       return GL_ALWAYS;
 
-    case 1:
+    case 2:
       return GL_NEVER;
 
-    case 2:
+    case 3:
       return GL_LESS;
 
-    case 3:
+    case 4:
       return GL_GREATER;
 
-    case 4:
+    case 5:
       return GL_EQUAL;
 
-    case 5:
+    case 6:
       return GL_LEQUAL;
 
-    case 6:
+    case 7:
       return GL_GEQUAL;
 
-    case 7:
+    case 8:
       return GL_NOTEQUAL;
 
     default:
@@ -260,6 +262,27 @@ GLenum Target_val(value target)
     case 3:
       return GL_TEXTURE_3D;
 
+    case 4:
+      return GL_TEXTURE_CUBE_MAP;
+
+    case 5:
+      return GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+
+    case 6:
+      return GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
+
+    case 7:
+      return GL_TEXTURE_CUBE_MAP_POSITIVE_Z;
+
+    case 8:
+      return GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
+ 
+    case 9:
+      return GL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
+ 
+    case 10:
+      return GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
+                
     default:
       caml_failwith("Caml variant error in Target_val(1)");
   }
@@ -561,49 +584,21 @@ GLenum Parameter_val(value par)
       return GL_MAX_ELEMENTS_VERTICES;
 
     case 7:
-      #ifndef GL_MAX_FRAMEBUFFER_WIDTH
-        return -1;
-      #else
-        return GL_MAX_FRAMEBUFFER_WIDTH;
-      #endif
-
-    case 8:
-      #ifndef GL_MAX_FRAMEBUFFER_HEIGHT
-        return -1;
-      #else
-        return GL_MAX_FRAMEBUFFER_HEIGHT;
-      #endif
-
-    case 9:
-      #ifndef GL_MAX_FRAMEBUFFER_LAYERS
-        return -1;
-      #else
-        return GL_MAX_FRAMEBUFFER_LAYERS;
-      #endif
-
-    case 10:
-      #ifndef GL_MAX_FRAMEBUFFER_SAMPLES
-        return -1;
-      #else
-        return GL_MAX_FRAMEBUFFER_SAMPLES;
-      #endif
-
-    case 11:
       return GL_MAX_INTEGER_SAMPLES;
 
-    case 12:
+    case 8:
       return GL_MAX_RENDERBUFFER_SIZE;
       
-    case 13:
+    case 9:
       return GL_MAX_TEXTURE_BUFFER_SIZE;
 
-    case 14:
+    case 10:
       return GL_MAX_TEXTURE_IMAGE_UNITS;
 
-    case 15:
+    case 11:
       return GL_MAX_TEXTURE_SIZE;
 
-    case 16:
+    case 12:
       return GL_MAX_COLOR_ATTACHMENTS;
 
     default:

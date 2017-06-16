@@ -40,7 +40,7 @@ let abs_position t = {
 let abs_corner t = {
   Vector3i.x = max t.x (t.x + t.width);
   Vector3i.y = max t.y (t.y + t.height);
-  Vector3i.z = max t.z (t.z + t.height)
+  Vector3i.z = max t.z (t.z + t.depth)
 }
 
 let size t = {
@@ -139,7 +139,7 @@ let iter ?strict:(strict=true) t f =
     (fun i ->
       iter1D t.y t.height strict 
         (fun j ->
-          iter1D t.z t.height strict 
+          iter1D t.z t.depth strict 
             (fun k -> f Vector3i.({x = i; y = j; z = k}))
         )
     )
@@ -150,12 +150,12 @@ let fold ?strict:(strict=true) t f u =
     (fun i ->
       iter1D t.y t.height strict 
         (fun j ->
-          iter1D t.z t.height strict 
+          iter1D t.z t.depth strict 
             (fun k -> r := f Vector3i.({x = i; y = j; z = k}) !r)
         )
     );
   !r
 
-let print t = 
+let to_string t = 
   Printf.sprintf "(x = %i; y = %i; z = %i; width = %i; height = %i; depth = %i)" 
     t.x t.y t.z t.width t.height t.depth

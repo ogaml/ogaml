@@ -40,7 +40,7 @@ module Vertex = struct
 
   module AttributeType = struct
 
-    type 'a s = 
+    type t = 
       | Int
       | Vec2i
       | Vec3i
@@ -49,6 +49,8 @@ module Vertex = struct
       | Vec3f
       | Color
 
+    type 'a s = t
+      
     let int = Int
 
     let vector2i = Vec2i
@@ -133,6 +135,7 @@ module Vertex = struct
       aname : string;
       atype : 'a AttributeType.s;
       aoffset : int;
+      adivisor : int;
     }
 
   and 'a t = 
@@ -156,6 +159,17 @@ module Vertex = struct
     match attrib with
     | Boxed_Attrib a -> AttributeType.to_glsl a.atype
 
+  let divisor_of attrib = 
+    match attrib with
+    | Boxed_Attrib a -> a.adivisor
+
+  (* Unsafe conversion functions (non-exposed) *)
+  let attrib_magic : 'a 'b. ('c, 'a) attrib -> ('c, 'b) attrib = 
+    fun a -> {a with atype = a.atype}
+
+  let boxed_magic : 'a 'b. 'a boxed_attrib -> 'b boxed_attrib = function
+    | Boxed_Attrib a -> Boxed_Attrib (attrib_magic a)
+
   module Attribute = struct
 
     type ('a, 'b) s = ('a, 'b) attrib
@@ -171,6 +185,9 @@ module Vertex = struct
     let name attr = 
       attr.aname
 
+    let divisor attr = 
+      attr.adivisor
+
     let atype attr = 
       attr.atype
 
@@ -180,11 +197,13 @@ module Vertex = struct
 
     type s
 
-    val attribute : string -> 'a AttributeType.s -> ('a, s) Attribute.s
+    val attribute : string -> ?divisor:int -> 'a AttributeType.s -> ('a, s) Attribute.s
 
     val seal : unit -> unit
 
     val create : unit -> s t
+
+    val copy : s t -> s t
 
   end
 
@@ -196,7 +215,7 @@ module Vertex = struct
       let vertex = 
         {attribs = []; sealed = false; total_size = 0}
 
-      let attribute s attr =
+      let attribute s ?divisor:(adivisor=0) attr =
         if vertex.sealed then 
           Printf.ksprintf (fun s -> raise (Sealed_vertex s))
             "Cannot add attribute %s to sealed vertex structure" s;
@@ -204,7 +223,8 @@ module Vertex = struct
           {
             aname = s;
             atype = attr;
-            aoffset = vertex.total_size
+            aoffset = vertex.total_size;
+            adivisor
           }
         in
         vertex.attribs <- (Boxed_Attrib attrib) :: vertex.attribs;
@@ -221,6 +241,9 @@ module Vertex = struct
         if not vertex.sealed then 
           raise (Unsealed_vertex "Cannot create vertices from unsealed vertex structure");
         {vertex; data = Array.make vertex.total_size AttributeVal.Unset}
+
+      let copy v = 
+        {vertex; data = Array.copy v.data}
 
     end : VERTEX)
 
@@ -269,7 +292,7 @@ module SimpleVertex = struct
 end
 
 
-module VertexSource = struct
+module Source = struct
 
   exception Uninitialized_field of string
 
@@ -297,16 +320,8 @@ module VertexSource = struct
       init_size = size;
       fdata = GL.Data.create_float 0;
       idata = GL.Data.create_int 0;
-      layout = None
+      layout = None;
     }
-
-  let time_1 = ref 0.
-
-  let iterations_1 = ref 0
-
-  let time_2 = ref 0.
-
-  let iterations_2 = ref 0
 
   let add src vtx = 
     if src.layout = None then begin
@@ -470,210 +485,353 @@ module VertexSource = struct
       vertex
     end
     
-  let iter (s : 'a t) (f : 'a Vertex.t -> unit) : unit =
-    for i = 0 to s.length - 1 do
+  let iter (s : 'a t) ?start:(start = 0) ?length (f : 'a Vertex.t -> unit) : unit =
+    let last = 
+      match length with
+      | None   -> s.length - 1
+      | Some l -> min (start + l - 1) (s.length - 1)
+    in
+    for i = start to last do
       f (get s i)
     done
 
-  let map (s : 'a t) (f : 'a Vertex.t -> 'b Vertex.t) : 'b t = 
+  let map (s : 'a t) ?start:(start = 0) ?length (f : 'a Vertex.t -> 'b Vertex.t) : 'b t = 
     let newsrc = empty () in
-    for i = 0 to s.length - 1 do
+    let last = 
+      match length with
+      | None   -> s.length - 1
+      | Some l -> min (start + l - 1) (s.length - 1)
+    in
+    for i = start to last do
       add newsrc (f (get s i))
     done;
     newsrc
 
-  let map_to (s : 'a t) (f : 'a Vertex.t -> 'b Vertex.t) (d : 'b t) : unit = 
-    for i = 0 to s.length - 1 do
+  let map_to (s : 'a t) ?start:(start = 0) ?length (f : 'a Vertex.t -> 'b Vertex.t) (d : 'b t) : unit = 
+    let last = 
+      match length with
+      | None   -> s.length - 1
+      | Some l -> min (start + l - 1) (s.length - 1)
+    in
+    for i = start to last do
       add d (f (get s i))
     done
 
 end
 
 
-exception Missing_attribute of string
+module Buffer = struct
 
-exception Invalid_attribute of string
+  exception Invalid_attribute of string
 
-exception Out_of_bounds of string
+  exception Out_of_bounds of string
 
-type static
+  type static
 
-type dynamic
+  type dynamic
 
-type ('a, 'b) t = {
-  vao : GL.VAO.t;
-  mutable buffer  : GL.VBO.t;
-  mutable size_f  : int;
-  mutable size_i  : int;
-  mutable length  : int;
-  init_fields : ('b Vertex.boxed_attrib * int) list;
-  stride_i  : int;
-  stride_f  : int;
-  mutable bound : Program.t option;
-  id : int
-}
-
-let create context src kind = 
-  let vao    = GL.VAO.create () in
-  let buffer = GL.VBO.create () in
-  let dataf = src.VertexSource.fdata in
-  let datai = src.VertexSource.idata in
-  let lengthf = GL.Data.length dataf in
-  let lengthi = GL.Data.length datai in
-  GL.VBO.bind (Some buffer);
-  if lengthi = 0 then
-    GL.VBO.data (lengthf * 4) (Some dataf) kind
-  else begin
-    GL.VBO.data ((lengthf + lengthi) * 4) None kind;
-    GL.VBO.subdata 0 (lengthf * 4) dataf;
-    GL.VBO.subdata (lengthf * 4) (lengthi * 4) datai;
-  end;
-  GL.VBO.bind None;
-  {
-   vao;
-   buffer;
-   size_f   = lengthf;
-   size_i   = lengthi;
-   length   = VertexSource.length src; 
-   init_fields = src.VertexSource.init_fields;
-   stride_i = src.VertexSource.stridei;
-   stride_f = src.VertexSource.stridef;
-   bound = None;
-   id = Context.LL.vao_id context
+  type ('a, 'b) t = {
+    mutable buffer  : GL.VBO.t;
+    (* Length of the floating-point data *)
+    mutable size_f  : int;
+    (* Length of the integer data *)
+    mutable size_i  : int;
+    (* Number of vertices *)
+    mutable length  : int;
+    init_fields : ('b Vertex.boxed_attrib * int) list;
+    (* Stride for integer data *)
+    stride_i  : int;
+    (* Stride for floating-point data *)
+    stride_f  : int;
+    (* Lowest non-zero instance divisor *)
+    l_divisor : int;
+    (* Is there uninstanced data ? *)
+    uninstanced : bool;
+    id : int
   }
 
-let dynamic (type s) (module M : RenderTarget.T with type t = s) target src = 
-  create (M.context target) src GLTypes.VBOKind.DynamicDraw
+  type unpacked = (unit, unit) t
 
-let static (type s) (module M : RenderTarget.T with type t = s) target src = 
-  create (M.context target) src GLTypes.VBOKind.StaticDraw
-
-let length t = t.length
-
-let rebuild t src start =
-  let dataf = src.VertexSource.fdata in
-  let datai = src.VertexSource.idata in
-  let lengthf = GL.Data.length dataf in
-  let lengthi = GL.Data.length datai in
-  let start_f = t.stride_f * start in
-  let start_i = t.stride_i * start in
-  if t.init_fields <> src.VertexSource.init_fields then
-    raise VertexSource.Incompatible_sources;
-  let new_buffer, new_binding = 
-    if t.size_f < lengthf + start_f 
-    || t.size_i < lengthi + start_i 
-    then begin
-      let buf = GL.VBO.create () in
-      GL.VBO.bind (Some buf);
-      GL.VBO.data ((lengthf + lengthi + start_f + start_i) * 4) None 
-                  (GLTypes.VBOKind.DynamicDraw);
-      GL.VBO.bind None;
-      GL.VBO.copy_subdata t.buffer buf 0 0 (start_f * 4); 
-      GL.VBO.copy_subdata t.buffer buf (t.size_f * 4) ((lengthf + start_f) * 4) (start_i * 4); 
-      buf, None
-    end else 
-      t.buffer, t.bound
-  in
-  GL.VBO.bind (Some new_buffer);
-  GL.VBO.subdata (start_f * 4) (lengthf * 4) dataf;
-  GL.VBO.subdata ((lengthf + start_f + start_i) * 4) (lengthi * 4) datai;
-  GL.VBO.bind None;
-  t.buffer <- new_buffer;
-  t.bound  <- new_binding;
-  t.size_f <- max (lengthf + start_f) t.size_f;
-  t.size_i <- max (lengthi + start_i) t.size_i;
-  t.length <- VertexSource.length src + start
-
-let bind context t prog = 
-  if t.bound <> Some prog then begin
-    t.bound <- Some prog;
-    GL.VAO.bind (Some t.vao);
-    Context.LL.set_bound_vao context (Some (t.vao, t.id));
-    GL.VBO.bind (Some t.buffer);
-    Context.LL.set_bound_vbo context (Some (t.buffer, t.id));
-    let attribs = ref t.init_fields in
-    let rec find_remove s = function
-      | [] -> 
-        raise (Missing_attribute 
-          (Printf.sprintf "Attribute %s not provided in vertex source" s)
-        )
-      | (attrib,off)::t when Vertex.name_of attrib = s -> (attrib,off,t)
-      | h::t -> 
-        let (attrib,off,l) = find_remove s t in 
-        (attrib,off,h::l)
+  let create context src kind = 
+    let buffer = GL.VBO.create () in
+    let dataf = src.Source.fdata in
+    let datai = src.Source.idata in
+    let length = Source.length src in
+    let lengthf = GL.Data.length dataf in
+    let lengthi = GL.Data.length datai in
+    GL.VBO.bind (Some buffer);
+    if lengthi = 0 then
+      GL.VBO.data (lengthf * 4) (Some dataf) kind
+    else begin
+      GL.VBO.data ((lengthf + lengthi) * 4) None kind;
+      GL.VBO.subdata 0 (lengthf * 4) dataf;
+      GL.VBO.subdata (lengthf * 4) (lengthi * 4) datai;
+    end;
+    GL.VBO.bind None;
+    Context.LL.set_bound_vbo context None;
+    let idpool = Context.LL.vbo_pool context in
+    let id = Context.ID_Pool.get_next idpool in
+    let l_divisor = 
+      List.fold_left (fun d (a,_) -> 
+        let div = Vertex.divisor_of a in
+        if div <> 0 then begin
+          if d = 0 then div
+          else min d div
+        end else d
+      ) 0 src.Source.init_fields
     in
-    List.iter (fun att ->
-        let (attrib,offset,l) = find_remove (Program.Attribute.name att) !attribs in
-        let typ = Vertex.type_of attrib in
-        if typ <> Program.Attribute.kind att then
-          raise (Invalid_attribute
-            (Printf.sprintf "Attribute %s has invalid type"
-              (Program.Attribute.name att)
-            ));
-        GL.VAO.enable_attrib (Program.Attribute.location att);
-        if Vertex.AttributeType.glsl_is_int typ then begin 
-          let offset = t.stride_i - offset in
-          GL.VAO.attrib_int
-            (Program.Attribute.location att)
-            (Vertex.AttributeType.glsl_size typ)
-            (GLTypes.GlIntType.Int)
-            ((t.size_f + offset) * 4)
-            (t.stride_i * 4)
-        end else begin
-          let offset = t.stride_f - offset in
-          GL.VAO.attrib_float 
-            (Program.Attribute.location att)
-            (Vertex.AttributeType.glsl_size typ)
-            (GLTypes.GlFloatType.Float)
-            (offset     * 4)
-            (t.stride_f * 4)
-        end
-      ) (Program.LL.attributes prog);
-    (*if !attribs <> [] then
-      Printf.eprintf "Warning : omitting attribute %s not required by program\n%!" 
-        (let (_,s,_) = List.hd !attribs in s)*)
-  end
-  else if Context.LL.bound_vao context <> (Some t.id) then begin
-    GL.VAO.bind (Some t.vao);
-    Context.LL.set_bound_vao context (Some (t.vao, t.id));
-    Context.LL.set_bound_vbo context (Some (t.buffer, t.id));
-  end
+    let uninstanced = 
+      List.exists (fun (a,_) -> Vertex.divisor_of a = 0) src.Source.init_fields
+    in
+    let finalize _ = 
+      Context.ID_Pool.free idpool id;
+      if Context.LL.bound_vbo context = Some id then 
+        Context.LL.set_bound_vbo context None
+    in
+    let vbo_ = {
+      buffer;
+      size_f   = lengthf;
+      size_i   = lengthi;
+      length;
+      init_fields = src.Source.init_fields;
+      stride_i = src.Source.stridei;
+      stride_f = src.Source.stridef;
+      l_divisor;
+      uninstanced;
+      id}
+    in
+    Gc.finalise finalize vbo_;
+    vbo_
 
+  let dynamic (type s) (module M : RenderTarget.T with type t = s) target src = 
+    create (M.context target) src GLTypes.VBOKind.DynamicDraw
 
+  let static (type s) (module M : RenderTarget.T with type t = s) target src = 
+    create (M.context target) src GLTypes.VBOKind.StaticDraw
+
+  let length t = 
+    t.length
+
+  let unpack : 'a 'b. ('a, 'b) t -> unpacked = fun t ->
+    {t with init_fields = List.map (fun (a,i) -> (Vertex.boxed_magic a, i)) t.init_fields}
+
+  let blit (type s) (module M : RenderTarget.T with type t = s) target t ?(first=0) ?length src =
+    if first < 0 then
+      raise (Out_of_bounds "Invalid first vertex");
+    let length = 
+      match length with
+      | None -> src.Source.length
+      | Some i -> i
+    in
+    if length < 0 || length > src.Source.length then
+      raise (Out_of_bounds "Invalid blit length");
+    let dataf = src.Source.fdata in
+    let datai = src.Source.idata in
+    let lengthf = src.Source.stridef * length in
+    let lengthi = src.Source.stridei * length in
+    let start_f = t.stride_f * first in
+    let start_i = t.stride_i * first in
+    if t.init_fields <> src.Source.init_fields then
+      raise Source.Incompatible_sources;
+    let new_buffer = 
+      if first + length > t.length then begin
+        let buf = GL.VBO.create () in
+        GL.VBO.bind (Some buf);
+        GL.VBO.data ((lengthf + lengthi + start_f + start_i) * 4) None 
+                    (GLTypes.VBOKind.DynamicDraw);
+        GL.VBO.bind None;
+        GL.VBO.copy_subdata t.buffer buf 0 0 (start_f * 4); 
+        GL.VBO.copy_subdata t.buffer buf (t.size_f * 4) ((lengthf + start_f) * 4) (start_i * 4); 
+        buf
+      end else 
+        t.buffer
+    in
+    GL.VBO.bind (Some new_buffer);
+    GL.VBO.subdata (start_f * 4) (lengthf * 4) dataf;
+    GL.VBO.subdata ((lengthf + start_f + start_i) * 4) (lengthi * 4) datai;
+    GL.VBO.bind None;
+    Context.LL.set_bound_vbo (M.context target) None;
+    t.buffer <- new_buffer;
+    t.size_f <- max (lengthf + start_f) t.size_f;
+    t.size_i <- max (lengthi + start_i) t.size_i;
+    t.length <- first + length
+
+  let bind_to_attrib context t (prog, program_loc) (attribute, offset) = 
+    if Context.LL.bound_vbo context <> Some t.id then begin
+      GL.VBO.bind (Some t.buffer);
+      Context.LL.set_bound_vbo context (Some (t.buffer, t.id));
+    end;
+    let typ = Vertex.type_of attribute in
+    if typ <> Program.Attribute.kind program_loc then
+      raise (Invalid_attribute
+        (Printf.sprintf "Attribute %s has invalid type"
+          (Program.Attribute.name program_loc)
+        ));
+    GL.VAO.enable_attrib (Program.Attribute.location program_loc);
+    GL.VAO.attrib_divisor (Program.Attribute.location program_loc) 
+                          (Vertex.divisor_of attribute);
+    if Vertex.AttributeType.glsl_is_int typ then begin 
+      let offset = t.stride_i - offset in
+      GL.VAO.attrib_int
+        (Program.Attribute.location program_loc)
+        (Vertex.AttributeType.glsl_size typ)
+        (GLTypes.GlIntType.Int)
+        ((t.size_f + offset) * 4)
+        (t.stride_i * 4)
+    end else begin
+      let offset = t.stride_f - offset in
+      GL.VAO.attrib_float 
+        (Program.Attribute.location program_loc)
+        (Vertex.AttributeType.glsl_size typ)
+        (GLTypes.GlFloatType.Float)
+        (offset * 4)
+        (t.stride_f * 4)
+    end
+
+end
+
+exception Missing_attribute of string
+
+exception Multiple_definition of string
+
+type t = {
+  vao        : GL.VAO.t;
+  buffers    : Buffer.unpacked list;
+  attributes : (string, Buffer.unpacked * unit Vertex.boxed_attrib * int) Hashtbl.t;
+  id         : int;
+  bound      : Program.t option;
+}
+
+let create (type s) (module M : RenderTarget.T with type t = s) 
+           ctx buffers =
+  let context = M.context ctx in 
+  let idpool  = Context.LL.vao_pool context in
+  let id      = Context.ID_Pool.get_next idpool in
+  let vao     = GL.VAO.create () in
+  let attributes = Hashtbl.create 13 in
+  List.iter (fun b -> 
+    List.iter (fun (att,off) ->
+      let n = Vertex.name_of att in
+      if Hashtbl.mem attributes n then
+        raise (Multiple_definition n);
+      Hashtbl.add attributes n (b,att,off)
+    ) b.Buffer.init_fields;
+  ) buffers;
+  let finalize _ = 
+    Context.ID_Pool.free idpool id;
+    if Context.LL.bound_vbo context = Some id then 
+      Context.LL.set_bound_vbo context None
+  in
+  let vao_ = {
+    vao;
+    buffers;
+    attributes;
+    id;
+    bound = None}
+  in
+  Gc.finalise finalize vao_;
+  vao_
+
+let length t = 
+  List.fold_left (fun lgt buf ->
+    if not buf.Buffer.uninstanced then lgt
+    else if lgt = -1 then buf.Buffer.length
+    else min lgt buf.Buffer.length
+  ) (-1) t.buffers
+  |> max 0
+
+let max_instances t = 
+  List.fold_left (fun div b -> 
+      if b.Buffer.l_divisor = 0 then div
+      else begin 
+        match div with
+        | None -> Some (b.Buffer.l_divisor * (Buffer.length b))
+        | Some div -> Some (min div (b.Buffer.l_divisor * (Buffer.length b)))
+      end
+    ) None t.buffers
+
+let bind context vao program = 
+  if vao.bound <> Some program then begin
+    GL.VAO.bind (Some vao.vao);
+    Context.LL.set_bound_vao context (Some (vao.vao, vao.id));
+    List.iter (fun program_attrib ->
+      let aname = Program.Attribute.name program_attrib in 
+      if not (Hashtbl.mem vao.attributes aname) then
+        raise (Missing_attribute aname);
+      let (vbo, att, offset) = Hashtbl.find vao.attributes aname in
+      Buffer.bind_to_attrib context vbo (program, program_attrib) (att, offset)
+    ) (Program.LL.attributes program);
+    Context.LL.set_bound_vbo context None;
+    GL.VBO.bind None;
+  end else if Context.LL.bound_vao context <> Some vao.id then begin
+    GL.VAO.bind (Some vao.vao);
+    Context.LL.set_bound_vao context (Some (vao.vao, vao.id))
+  end
+ 
 let draw (type s) (module M : RenderTarget.T with type t = s)
-         ~vertices ~target ?indices ~program
+         ~vertices ~target ?instances ?indices ~program
          ?uniform:(uniform = Uniform.empty) 
          ?parameters:(parameters = DrawParameter.make ()) 
-         ?start ?length
+         ?start
+         ?length:draw_length
          ?mode:(mode = DrawMode.Triangles) () =
-  if vertices.length <> 0 then begin
+  let v_length = length vertices in 
+  if v_length <> 0 then begin
     let context = M.context target in
     let start = 
       match start with
-      |None -> 0
+      |None   -> 0
       |Some i -> i
     in
     let length = 
-      match length, indices with
-      |None, None     -> vertices.length - start
+      match draw_length, indices with
+      |None, None     -> v_length - start
       |None, Some ebo -> IndexArray.length ebo - start
       |Some l, _ -> l
     in
+    let max_instances = max_instances vertices in
     M.bind target parameters;
     Program.LL.use context (Some program);
     Uniform.LL.bind context uniform (Program.LL.uniforms program);
     bind context vertices program;
     match indices with
     |None -> 
-      if start < 0 || start + length > vertices.length then
-        raise (Out_of_bounds "Invalid vertex array bounds")
-      else GL.VAO.draw mode start length
-    |Some ebo ->
-      if start < 0 || start + length > (IndexArray.length ebo) then
-        raise (Out_of_bounds "Invalid index array bounds")
+      if start < 0 || start + length > v_length || length < 0 then
+        raise (Invalid_argument "Invalid vertex array bounds")
       else begin
-        IndexArray.LL.bind context ebo;
-        GL.VAO.draw_elements mode start length 
+        match max_instances with
+        | None   -> GL.VAO.draw mode start length
+        | Some max_n -> 
+          let n_instances = 
+            match instances with
+            | None   -> max_n
+            | Some i -> 
+              if i > max_n || i < 0 then
+                raise (Invalid_argument "Invalid number of instances")
+              else
+                i
+          in
+          GL.VAO.draw_instanced mode start length n_instances
+      end
+    |Some ebo ->
+      if start < 0 || start + length > (IndexArray.length ebo) || length < 0 then
+        raise (Invalid_argument "Invalid index array bounds")
+      else begin
+        match max_instances with
+        | None   -> 
+          IndexArray.LL.bind context ebo;
+          GL.VAO.draw_elements mode start length
+        | Some max_n -> 
+          let n_instances = 
+            match instances with
+            | None   -> max_n
+            | Some i -> 
+              if i > max_n || i < 0 then
+                raise (Invalid_argument "Invalid number of instances")
+              else
+                i
+          in
+          IndexArray.LL.bind context ebo;
+          GL.VAO.draw_instanced mode start length n_instances
       end
   end
-

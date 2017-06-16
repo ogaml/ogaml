@@ -3,6 +3,8 @@ module RGB : sig
 
   type t = {r : float; g : float; b : float; a : float}
 
+  val make : ?alpha:float -> float -> float -> float -> t
+
   val black : t
 
   val white : t
@@ -33,6 +35,8 @@ end
 module HSV : sig
 
   type t = {h : float; s : float; v : float; a : float}
+
+  val make : ?alpha:float -> float -> float -> float -> t
 
   val black : t
 
@@ -66,9 +70,13 @@ val rgb_to_hsv : RGB.t -> HSV.t
 
 val hsv_to_rgb : HSV.t -> RGB.t
 
-val hsv : t -> HSV.t
+val to_hsv : t -> HSV.t
 
-val rgb : t -> RGB.t
+val to_rgb : t -> RGB.t
+
+val hsv : ?alpha:float -> float -> float -> float -> t
+
+val rgb : ?alpha:float -> float -> float -> float -> t
 
 val alpha : t -> float
 

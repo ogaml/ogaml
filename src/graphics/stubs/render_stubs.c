@@ -64,7 +64,7 @@ caml_gl_get_integerv(value par)
   if(param == -1) 
     data = -1;
   else
-    glGetIntegerv(Parameter_val(par),&data);
+    glGetIntegerv(param,&data);
 
   CAMLreturn(Val_int(data));
 }
@@ -232,4 +232,26 @@ caml_glfinish(value unit)
   CAMLparam0();
   glFinish();
   CAMLreturn(Val_unit);
+}
+
+
+// INPUT   top-left corner, size, pixel format
+// OUTPUT  pixel data (bytes)
+CAMLprim value
+caml_read_pixels(value topl, value size, value pfmt)
+{
+  CAMLparam3(topl, size, pfmt);
+  CAMLlocal1(res);
+
+  int x,y,w,h;
+    x = Int_val(Field(topl,0));
+    y = Int_val(Field(topl,1));
+    w = Int_val(Field(size,0));
+    h = Int_val(Field(size,1));
+
+  // TODO: multiply by format size in bytes
+  res = caml_alloc_string((w-x)*(h-y)*4);
+  glReadPixels(x,y,w,h,PixelFormat_val(pfmt),GL_UNSIGNED_BYTE,String_val(res));
+
+  CAMLreturn(res);
 }

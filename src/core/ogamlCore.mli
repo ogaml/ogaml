@@ -152,6 +152,7 @@ module Event : sig
     | ButtonReleased  of ButtonEvent.t (* A mouse button has been released *)
     | MouseMoved      of OgamlMath.Vector2i.t (* The mouse has been moved *)
     | MouseWheelMoved of float (* The mouse wheel has been moved of $delta$ *)
+    | TextEntered     of char (* A character has been entered *)
 
 end
 
@@ -176,6 +177,11 @@ module OS : sig
     *)
   val resources_dir : string
 
+  (** $canonical_path p$ returns the resolved path equivalent to $p$.
+    * $p$ must be an existing location. Raises $Invalid_argument$ if
+    * $p$ does not exist. *)
+  val canonical_path : string -> string
+
 end
 
 
@@ -197,12 +203,17 @@ module ContextSettings : sig
     *
     *   $resizable$ - requests a resizable context (defaults to true)
     *
+    *   $fullscreen$ - requests a fullscreen context (defaults to false)
+    *
+    *   $framerate_limit$ - sets a framerate limit 
+    *
     *)
   val create : ?depth:int ->
                ?stencil:int ->
                ?msaa:int ->
                ?resizable:bool ->
                ?fullscreen:bool ->
+               ?framerate_limit:int ->
                unit -> t
 
   (** Returns the requested AA level *)
@@ -219,6 +230,9 @@ module ContextSettings : sig
 
   (** Returns true iff the settings require fullscreen mode *)
   val fullscreen : t -> bool
+
+  (** Returns the requested framerate limit, if any *)
+  val framerate_limit : t -> int option
 
 end
 

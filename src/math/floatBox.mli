@@ -43,4 +43,4 @@ val includes : t -> t -> bool
 
 val contains : t -> Vector3f.t -> bool
 
-val print : t -> string
+val to_string : t -> string

@@ -5,6 +5,8 @@ external screen_size : unit -> float * float = "caml_cocoa_display_size"
 
 external resource_path : unit -> string = "caml_cocoa_resource_path"
 
+external realpath : string -> string = "caml_realpath"
+
 module NSString = struct
 
   type t
@@ -403,6 +405,12 @@ module OGWindowController = struct
 
   external set_proper_relative_mouse_location : t -> float -> float -> unit
     = "caml_cocoa_set_proper_relative_mouse_location"
+
+  external hide_cursor : t -> unit
+    = "caml_cocoa_hide_cursor"
+
+  external show_cursor : t -> unit
+    = "caml_cocoa_show_cursor"
 
   external has_focus : t -> bool = "caml_cocoa_controller_has_focus"
 

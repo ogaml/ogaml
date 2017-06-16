@@ -5,13 +5,15 @@
 #include "utils.h"
 
 CAMLprim value
-caml_is_key_down(value display, value code)
+caml_is_key_down(value disp, value code)
 {
-  CAMLparam2(display, code);
+  CAMLparam2(disp, code);
+
+  Display* dpy = Display_val(disp);
 
   xcb_generic_error_t* error = NULL;
 
-  xcb_connection_t* conn = XGetXCBConnection((Display*) display);
+  xcb_connection_t* conn = XGetXCBConnection(dpy);
 
   xcb_query_keymap_reply_t* keymap = 
     xcb_query_keymap_reply(conn,
@@ -27,7 +29,7 @@ caml_is_key_down(value display, value code)
     int val = Int_val(Field(code,0));
     char str[2] = {val, '\0'};
     int ks = XStringToKeysym(str);
-    sym = XKeysymToKeycode((Display*)display, ks);
+    sym = XKeysymToKeycode(dpy, ks);
   }
 
   CAMLreturn(Val_bool((keymap->keys[sym / 8] & (1 << (sym % 8))) != 0));

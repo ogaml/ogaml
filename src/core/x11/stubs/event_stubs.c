@@ -11,6 +11,8 @@ caml_xselect_input(value disp, value win, value masks)
 {
   CAMLparam3(disp, win, masks);
   CAMLlocal2(hd, tl);
+  Display* dpy = Display_val(disp);
+  Window w = Window_val(win);
   int mask = 0;
   tl = masks;
   while(tl != Val_emptylist) {
@@ -18,7 +20,7 @@ caml_xselect_input(value disp, value win, value masks)
     tl = Field(tl,1);
     mask |= (1L << (Int_val(hd)));
   }
-  XSelectInput((Display*) disp, (Window) win, mask);
+  XSelectInput(dpy, w, mask);
   CAMLreturn(Val_unit);
 }
 
@@ -36,15 +38,19 @@ CAMLprim value
 caml_xnext_event(value disp, value win)
 {
   CAMLparam1(disp);
-  CAMLlocal1(evt);
+  CAMLlocal2(res, ev);
+  Display* dpy = Display_val(disp);
+  Window w = Window_val(win);
   XEvent event;
-  if(XCheckIfEvent((Display*) disp, &event, &checkEvent, (XPointer)win) == True) {
-    evt = caml_alloc_custom(&empty_custom_ops, sizeof(XEvent), 0, 1);
-    memcpy(Data_custom_val(evt), &event, sizeof(XEvent));
-    CAMLreturn(Val_some(evt));
+  if(XCheckIfEvent(dpy, &event, &checkEvent, (XPointer)w) == True) {
+    XEvent_alloc(ev);
+    XEvent_copy(ev, &event);
+    res = Val_some(ev);
   }
-  else
-    CAMLreturn(Val_int(0));
+  else {
+    res = Val_int(0);
+  }
+  CAMLreturn(res);
 }
 
 
@@ -59,17 +65,37 @@ value extract_keysym(XEvent* evt)
   KeySym result;
   XEvent cpy = *evt;
     cpy.xkey.state &= (~ShiftMask) & (~ControlMask) & (~LockMask) & (~AnyModifier);
-  XLookupString(&cpy.xkey, buffer, sizeof(buffer), &result, &keyboard);
-
-  if(result >= 97 && result <= 122) {
-    key = caml_alloc(1,1);
-    Store_field(key, 0, Val_int(result));
+  
+  if(XLookupString(&cpy.xkey, buffer, sizeof(buffer), &result, &keyboard)) {
+    if(buffer[0] >= 97 && buffer[0] <= 122) {
+      key = caml_alloc(1,1);
+      Store_field(key, 0, Val_int(buffer[0]));
+    }
+    else {
+      key = caml_alloc(1,0);
+      Store_field(key, 0, Val_int(evt->xkey.keycode));
+    }
   }
   else {
     key = caml_alloc(1,0);
     Store_field(key, 0, Val_int(evt->xkey.keycode));
   }
   CAMLreturn(key);
+}
+
+
+// Extract the character code out of an xkey event
+int extract_char(XEvent* evt)
+{
+  static XComposeStatus keyboard;
+  char buffer[32];
+  KeySym result;
+
+  if(XLookupString(&evt->xkey, buffer, sizeof(buffer), &result, &keyboard)) {
+    return buffer[0];
+  }
+  
+  return -1;
 }
 
 
@@ -84,14 +110,15 @@ value extract_event(XEvent* evt)
   switch(evt->type) {
 
     case KeyPress         :     
-      result = caml_alloc(2,0);  // 1st param. variant
+      result = caml_alloc(3,0);  // 1st param. variant
       modifiers = caml_alloc(4,0);
         Store_field(modifiers, 0, Val_bool((evt->xkey.state & ShiftMask) != 0));
         Store_field(modifiers, 1, Val_bool((evt->xkey.state & ControlMask) != 0));
         Store_field(modifiers, 2, Val_bool((evt->xkey.state & LockMask) != 0));
         Store_field(modifiers, 3, Val_bool((evt->xkey.state & Mod1Mask) != 0));
       Store_field(result, 0, extract_keysym(evt));
-      Store_field(result, 1, modifiers);
+      Store_field(result, 1, Val_int(extract_char(evt)));
+      Store_field(result, 2, modifiers);
       break;
 
     case KeyRelease       :
@@ -197,7 +224,7 @@ caml_event_type(value evt)
 {
   CAMLparam1(evt);
   CAMLlocal1(result);
-  result = extract_event((XEvent*)Data_custom_val(evt));
+  result = extract_event(&XEvent_val(evt));
   CAMLreturn(result);
 }
 

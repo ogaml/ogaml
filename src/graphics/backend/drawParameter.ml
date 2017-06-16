@@ -82,6 +82,11 @@ module BlendMode = struct
     alpha = Equation.Add (Factor.OneMinusDestColor,Factor.One)
   }
 
+  let premultiplied_alpha = {
+    color = Equation.Add (Factor.One, Factor.OneMinusSrcAlpha);
+    alpha = Equation.Add (Factor.One, Factor.Zero)
+  }
+
 end
 
 
@@ -89,6 +94,7 @@ module DepthTest = struct
 
   type t = 
     | None
+    | Always
     | Never
     | Less
     | Greater

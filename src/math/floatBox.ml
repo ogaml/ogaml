@@ -40,7 +40,7 @@ let corner t = {
 let abs_corner t = {
   Vector3f.x = max t.x (t.x +. t.width);
   Vector3f.y = max t.y (t.y +. t.height);
-  Vector3f.z = max t.z (t.z +. t.height)
+  Vector3f.z = max t.z (t.z +. t.depth)
 }
 
 let size t = {
@@ -135,6 +135,6 @@ let contains t pt =
   pt.Vector3f.y <= t.y +. t.height &&
   pt.Vector3f.z <= t.z +. t.depth
 
-let print t = 
+let to_string t = 
   Printf.sprintf "(x = %f; y = %f; z = %f; width = %f; height = %f; depth = %f)" 
     t.x t.y t.z t.width t.height t.depth

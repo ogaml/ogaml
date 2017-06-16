@@ -54,6 +54,23 @@ caml_cocoa_resource_path(value unit)
   CAMLreturn(mlc);
 }
 
+// Real path
+////////////
+CAMLprim value
+caml_realpath(value path)
+{
+  CAMLparam1(path);
+  CAMLlocal1(res);
+
+  char* res_ptr = realpath(String_val(path), NULL);
+
+  res = caml_copy_string(res_ptr);
+
+  free(res_ptr);
+
+  CAMLreturn(res);
+}
+
 // Moving the cursor to a NSPoint
 /////////////////////////////////
 void warpCursor(NSPoint loc)
@@ -89,6 +106,9 @@ void warpCursor(NSPoint loc)
                                              0);
   CGEventPost(kCGHIDEventTap, event);
   CFRelease(event);
+
+  // Other solution (too strict!)
+  // CGWarpMouseCursorPosition(newCursorPosition);
 }
 
 CAMLprim value

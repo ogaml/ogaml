@@ -5,6 +5,8 @@ val screen_size : unit -> float * float
 
 val resource_path : unit -> string
 
+val realpath : string -> string
+
 module NSString : sig
 
   type t
@@ -322,6 +324,10 @@ module OGWindowController : sig
   val proper_relative_mouse_location : t -> float * float
 
   val set_proper_relative_mouse_location : t -> float -> float -> unit
+
+  val hide_cursor : t -> unit
+
+  val show_cursor : t -> unit
 
   val has_focus : t -> bool
 
