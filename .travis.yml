@@ -31,7 +31,7 @@ addons:
     - libxinerama-dev
     - libxrandr-dev
     - libxv-dev
-    - libxcb
+    - libxcb-xkb-dev
     - libasound2-dev
     - libudev-dev
     - libopenal-dev
@@ -44,7 +44,7 @@ before_install:
   - export DEBIAN_FRONTEND=noninteractive
   - sudo apt-get -yq --force-yes install libgl1-mesa-dev libgl1-mesa-glx mesa-common-dev libglapi-mesa libgbm1 libgl1-mesa-dri libxatracker-dev xvfb
   - sudo apt-get -yq --force-yes install libglew-dev freeglut3-dev libxi-dev libxmu-dev xserver-xorg-video-dummy xpra xorg-dev opencl-headers libgl1-mesa-dev
-  - sudo apt-get -yq --force-yes install libxcursor-dev libpulse-dev libxinerama-dev libxrandr-dev libxcb libopenal-dev libxv-dev libasound2-dev libudev-dev mesa-utils libgl1-mesa-glx
+  - sudo apt-get -yq --force-yes install libxcursor-dev libpulse-dev libxinerama-dev libxrandr-dev libxcb-xkb-dev libopenal-dev libxv-dev libasound2-dev libudev-dev mesa-utils libgl1-mesa-glx
 
 before_script:
   - export DISPLAY=:99
