@@ -1,0 +1,12 @@
+opam-version: "1.2"
+name: "OGaml"
+version: "0.1"
+maintainer: ["Théo Winterhalter" "Victor Lanvin victor.lanvin@ens-cachan.fr"]
+author: ["Théo Winterhalter" "Victor Lanvin victor.lanvin@ens-cachan.fr"]
+homepage: "https://ogaml.github.io"
+bug-reports: "https://github.com/ogaml/ogaml/issues"
+license: "MIT"
+dev-repo: "https://github.com/ogaml/ogaml"
+build: [
+  ["jbuilder" "build" "-p" name "-j" jobs]
+]

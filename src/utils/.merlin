@@ -1,0 +1,6 @@
+B ../../_build/default/src/math
+B ../../_build/default/src/utils
+FLG -open OgamlUtils__ -w -40
+PKG bigarray
+PKG unix
+S ../math

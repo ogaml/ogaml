@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OPAM_DEPEND="cppo menhir"
+OPAM_DEPEND="menhir jbuilder"
 
 sh -e /etc/init.d/xvfb start
 

@@ -1,0 +1,4 @@
+B ../../_build/default/src/core
+B ../../_build/default/src/math
+FLG -open OgamlCore__ -w -40
+S ../math

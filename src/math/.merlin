@@ -1,0 +1,2 @@
+B ../../_build/default/src/math
+FLG -open OgamlMath__ -w -40

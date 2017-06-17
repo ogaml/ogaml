@@ -1,0 +1,24 @@
+(jbuild_version 1)
+
+(rule (copy windows/windows.ml                windows.ml))
+(rule (copy windows/windows.mli               windows.mli))
+(rule (copy windows/stubs/context_stubs.c     context_stubs.c))
+(rule (copy windows/stubs/glew_stubs.c        glew_stubs.c))
+(rule (copy windows/stubs/pixelformat_stubs.c pixelformat_stubs.c))
+(rule (copy windows/stubs/style_stubs.c       style_stubs.c))
+(rule (copy windows/stubs/utils.c             utils.c))
+(rule (copy windows/stubs/utils.h             utils.h))
+(rule (copy windows/stubs/window_stubs.c      window_stubs.c))
+
+(rule (copy impl/LL_impl_windows.ml LL.ml))
+(rule (copy impl/OS_impl_windows.ml OS.ml))
+
+(library
+  ((name        OgamlCore)
+   (public_name ogaml.core)
+   (libraries   (OgamlMath))
+   (c_names     (context_stubs glew_stubs pixelformat_stubs style_stubs
+                 utils window_stubs))
+   (c_flags     (:standard -Wno-unused-function -Wno-unused-variable 
+                           -Wno-misleading-indentation))
+   (c_library_flags (:include ../../flags.os))))

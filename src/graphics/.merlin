@@ -1,0 +1,13 @@
+B ../../_build/default/src/core
+B ../../_build/default/src/graphics
+B ../../_build/default/src/math
+B ../../_build/default/src/utils
+FLG -open OgamlGraphics__ -w -40
+PKG bigarray
+PKG str
+PKG threads
+PKG threads.posix
+PKG unix
+S ../core
+S ../math
+S ../utils

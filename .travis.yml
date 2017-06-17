@@ -30,6 +30,7 @@ addons:
    - libxinerama-dev
    - libxrandr-dev
    - libxv-dev
+   - libxcb
    - libasound2-dev
    - libudev-dev
    - libopenal-dev

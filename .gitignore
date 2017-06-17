@@ -1,3 +1,4 @@
+# Build files
 *.annot
 *.cmo
 *.cma
@@ -15,30 +16,39 @@
 # MVC++ files
 .vscode/
 
+# Depend files
 *.depend
 .depend
 
-# ocamlbuild working directory
+# Build directory
 _build/
 
-# doc directory
+# Doc directory
 html/*
 
-# ocamlbuild targets
+# Ocamlbuild targets
 *.byte
 *.native
 
-# oasis generated files
+# Oasis generated files
 setup.data
 setup.log
 
-# vim
+# Vim
 *.swp
 
 # OS X files
 .DS_Store
 
-# parser and lexer files
+# Parser and lexer files
 src/graphics/objLexer.ml
 src/graphics/objParser.ml
 src/graphics/objParser.mli
+
+# Jbuilder
+ogaml.install
+
+# Configuration files
+src/core/jbuild
+flags.os
+

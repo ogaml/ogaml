@@ -1,0 +1,7 @@
+(jbuild_version 1)
+
+(library
+  ((name        OgamlUtils)
+   (libraries   (OgamlMath bigarray))
+   (modules     (:standard \ Bounding))
+   (public_name ogaml.utils)))

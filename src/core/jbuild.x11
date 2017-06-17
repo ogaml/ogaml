@@ -1,0 +1,28 @@
+(jbuild_version 1)
+
+(rule (copy x11/x11.ml                 x11.ml))
+(rule (copy x11/x11.mli                x11.mli))
+(rule (copy x11/stubs/atoms_stubs.c    atoms_stubs.c))
+(rule (copy x11/stubs/event_stubs.c    event_stubs.c))
+(rule (copy x11/stubs/keyboard_stubs.c keyboard_stubs.c))
+(rule (copy x11/stubs/utils.c          utils.c))
+(rule (copy x11/stubs/utils_stubs.c    utils_stubs.c))
+(rule (copy x11/stubs/display_stubs.c  display_stubs.c))
+(rule (copy x11/stubs/glx_stubs.c      glx_stubs.c))
+(rule (copy x11/stubs/mouse_stubs.c    mouse_stubs.c))
+(rule (copy x11/stubs/utils.h          utils.h))
+(rule (copy x11/stubs/window_stubs.c   window_stubs.c))
+
+(rule (copy impl/LL_impl_x11.ml LL.ml))
+(rule (copy impl/OS_impl_linux.ml OS.ml))
+
+(library
+  ((name        OgamlCore)
+   (public_name ogaml.core)
+   (libraries   (OgamlMath))
+   (c_names     (utils atoms_stubs display_stubs event_stubs
+                 glx_stubs mouse_stubs keyboard_stubs window_stubs 
+                 utils_stubs))
+   (c_flags     (:standard -Wno-unused-function -Wno-unused-variable 
+                           -Wno-misleading-indentation))
+   (c_library_flags (:include ../../flags.os))))
