@@ -23,7 +23,6 @@
   ((name        OgamlCore)
    (public_name ogaml.core)
    (libraries   (OgamlMath))
-   (c_names     (utils))
    (self_build_stubs_archive (OgamlCore))
    (install_c_headers (cocoa_stubs))
    (c_flags     (:standard -Wno-unused-function -Wno-unused-variable 
