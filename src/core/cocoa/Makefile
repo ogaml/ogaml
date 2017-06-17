@@ -1,11 +1,10 @@
 OCAMLC_DIR = $(shell $(OCAMLC) -where)
 
-OBJC_FLAGS = -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT -fPIC -I '$(OCAML_DIR)'\
+OBJC_FLAGS = -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT -fPIC -I '$(OCAMLC_DIR)'\
              -Wno-unused-function -Wno-unused-variable\
-             -Wno-misleading-indentation -fconstant-string-class=NSConstantString
+             -fconstant-string-class=NSConstantString
 
-C_FLAGS = -Wno-unused-function -Wno-unused-variable\
-          -Wno-misleading-indentation
+C_FLAGS = -Wno-unused-function -Wno-unused-variable
 
 OBJC_FILES = application_delegate_stubs.m event_stubs.m window_stubs.m\
              application_stubs.m glcontext_stubs.m utils_stubs.m opengl_stubs.m\

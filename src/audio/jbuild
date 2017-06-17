@@ -17,7 +17,7 @@
    (libraries   (OgamlMath OgamlUtils threads))
    (c_names     (utils audio_stubs buffer_stubs context_stubs device_stubs 
                  listener_stubs source_stubs stb_stubs))
-   (c_flags     (:standard -Wno-unused-function -Wno-unused-variable 
+   (c_flags     (:standard -Wno-unknown-warning -Wno-unused-function -Wno-unused-variable 
                            -Wno-misleading-indentation -Wno-maybe-uninitialized
                            -Wno-int-conversion))
    (install_c_headers (stb_vorbis))
