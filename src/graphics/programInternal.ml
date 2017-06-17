@@ -1,3 +1,4 @@
+open OgamlUtils
 
 exception Program_internal_error of string
 
@@ -171,8 +172,14 @@ module Sources = struct
   "
 
   let create_shape id version =
-    create_pp ~version ~id ~vertex:vertex_shader_source_130
-                           ~fragment:fragment_shader_source_130
+    try
+      create_pp ~version ~id ~vertex:vertex_shader_source_130
+                             ~fragment:fragment_shader_source_130
+    with
+      Program_internal_error s ->
+        Log.fatal Log.stderr "%s" s;
+        Log.fatal Log.stderr "%s" !last_log;
+        exit 2
 
   (* Sprite drawing program *)
   let vertex_shader_source_tex_130 = "
@@ -215,9 +222,14 @@ module Sources = struct
   "
 
   let create_sprite id version =
-    create_pp ~version ~id ~vertex:vertex_shader_source_tex_130
-                           ~fragment:fragment_shader_source_tex_130
-
+    try
+      create_pp ~version ~id ~vertex:vertex_shader_source_tex_130
+                             ~fragment:fragment_shader_source_tex_130
+    with
+      Program_internal_error s ->
+        Log.fatal Log.stderr "%s" s;
+        Log.fatal Log.stderr "%s" !last_log;
+        exit 2
 
   (* Text drawing program *)
   let vertex_shader_source_text_130 = "
@@ -263,7 +275,13 @@ module Sources = struct
   "
 
   let create_text id version =
-    create_pp ~version ~id ~vertex:vertex_shader_source_text_130
-                           ~fragment:fragment_shader_source_text_130
+    try
+      create_pp ~version ~id ~vertex:vertex_shader_source_text_130
+                             ~fragment:fragment_shader_source_text_130
+    with
+      Program_internal_error s ->
+        Log.fatal Log.stderr "%s" s;
+        Log.fatal Log.stderr "%s" !last_log;
+        exit 2
 
 end
