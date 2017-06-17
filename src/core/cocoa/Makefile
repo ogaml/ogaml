@@ -1,4 +1,4 @@
-OCAMLC_DIR = $(shell $(OCAMLC) -where)
+OCAMLC_DIR = $(shell ocamlc -where)
 
 OBJC_FLAGS = -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT -fPIC -I '$(OCAMLC_DIR)'\
              -Wno-unused-function -Wno-unused-variable\
