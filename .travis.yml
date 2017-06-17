@@ -14,30 +14,6 @@ os:
 
 dist: trusty
 
-addons:
-  apt:
-    packages:
-    - libglew-dev
-    - freeglut3-dev
-    - libxi-dev
-    - libxmu-dev
-    - xserver-xorg-video-dummy
-    - xpra
-    - xorg-dev
-    - opencl-headers
-    - libgl1-mesa-dev
-    - libxcursor-dev
-    - libpulse-dev
-    - libxinerama-dev
-    - libxrandr-dev
-    - libxv-dev
-    - libx11-xcb-dev
-    - libasound2-dev
-    - libudev-dev
-    - libopenal-dev
-    - mesa-utils
-    - libgl1-mesa-glx
-
 before_install:
   - sudo add-apt-repository -y ppa:oibaf/graphics-drivers
   - sudo apt-get update -qq -y

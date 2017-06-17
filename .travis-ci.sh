@@ -20,6 +20,6 @@ make
 make install
 make tests
 make examples
-make clean
 make uninstall
+make clean
 glxinfo
