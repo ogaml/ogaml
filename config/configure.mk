@@ -12,11 +12,11 @@ endif
 ifeq ($(UNAME), Darwin)
   OS_NAME = OSX
   CORE_JBUILD_FILE = src/core/jbuild.cocoa
-  CLIBS_FILES = config/flags.cocoa
+  CLIBS_FILE = config/flags.cocoa
 endif
 ifeq ($(UNAME), windows32)
   OS_NAME = WIN
   CORE_JBUILD_FILE = src/core/jbuild.win
-  CLIBS_FILES = config/flags.win
+  CLIBS_FILE = config/flags.win
 endif
  
