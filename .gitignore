@@ -53,3 +53,12 @@ ogaml.install
 src/core/jbuild
 flags.os
 
+# Generated .merlin
+examples/.merlin
+src/audio/.merlin
+src/core/.merlin
+src/graphics/.merlin
+src/math/.merlin
+src/utils/.merlin
+tests/.merlin
+
