@@ -168,6 +168,3 @@ let () =
   main_loop ();
   Printf.printf "Avg FPS: %f\n%!" (Clock.tps fps_clock);
   Window.destroy window
-
-let () = 
-  AudioContext.destroy audio_ctx

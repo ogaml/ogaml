@@ -82,7 +82,7 @@ module GameState = struct
 
   let display win s font = 
     let rule_text1 = 
-      Text.create 
+      OgamlGraphics.Text.create 
         ~font 
         ~text:" : right click" 
         ~size:15 
@@ -90,7 +90,7 @@ module GameState = struct
         ~position:Vector2f.({x = 35.; y = 25.}) ()
     in
     let rule_text2 = 
-      Text.create 
+      OgamlGraphics.Text.create 
         ~font 
         ~text:" : left click" 
         ~size:15 
@@ -110,7 +110,7 @@ module GameState = struct
         ~color:(`RGB Color.RGB.green) ()
     in
     let score_text1 = 
-      Text.create
+      OgamlGraphics.Text.create
         ~font
         ~text:(Printf.sprintf "Clicked rectangles : %i" s.count)
         ~size:15
@@ -118,7 +118,7 @@ module GameState = struct
         ~position:Vector2f.({x = 500.; y = 25.}) ()
     in
     let score_text2 = 
-      Text.create
+      OgamlGraphics.Text.create
         ~font
         ~text:(Printf.sprintf "Missed clicks : %i" s.missed)
         ~size:15
@@ -126,7 +126,7 @@ module GameState = struct
         ~position:Vector2f.({x = 500.; y = 55.}) ()
     in
     let score_text3 = 
-      Text.create
+      OgamlGraphics.Text.create
         ~font
         ~text:(Printf.sprintf "Avg time per rectangle : %f" ((Unix.gettimeofday () -. s.starting_time) /. (float_of_int s.count)))
         ~size:15
@@ -134,7 +134,7 @@ module GameState = struct
         ~position:Vector2f.({x = 500.; y = 85.}) ()
     in
     let score_text4 = 
-      Text.create
+      OgamlGraphics.Text.create
         ~font
         ~text:(Printf.sprintf "Hit ratio : %f" ((float_of_int s.count)/.(float_of_int (s.count + s.missed))))
         ~size:15
@@ -149,14 +149,14 @@ module GameState = struct
         ()
     in
     Shape.draw (module Window) ~target:win ~shape:rule_square1 ();
-    Text.draw  (module Window) ~target:win ~text:rule_text1 ();
+    OgamlGraphics.Text.draw  (module Window) ~target:win ~text:rule_text1 ();
     Shape.draw (module Window) ~target:win ~shape:rule_square2 ();
-    Text.draw  (module Window) ~target:win ~text:rule_text2 ();
+    OgamlGraphics.Text.draw  (module Window) ~target:win ~text:rule_text2 ();
     Shape.draw (module Window) ~target:win ~shape:click_square ();
-    Text.draw (module Window) ~target:win ~text:score_text1 ();
-    Text.draw (module Window) ~target:win ~text:score_text2 ();
-    Text.draw (module Window) ~target:win ~text:score_text3 ();
-    Text.draw (module Window) ~target:win ~text:score_text4 ();
+    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text1 ();
+    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text2 ();
+    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text3 ();
+    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text4 ();
     s.last_hits <- List.filter (display_hit win) s.last_hits
     
 end

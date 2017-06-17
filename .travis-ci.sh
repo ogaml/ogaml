@@ -23,9 +23,10 @@ opam init
 eval `opam config env`
 opam install ${OPAM_DEPEND}
 
-make tests
+make
 make install
-make clean
+make tests
 make examples
+make clean
 make uninstall
 glxinfo

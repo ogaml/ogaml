@@ -1,0 +1,6 @@
+(jbuild_version 1)
+
+(executables
+  ((names (cube cursor flat instancing ip noise 
+           shoot sprites text tut01 tut02 tut_idx tut_tex vertexmaps))
+   (libraries (ogaml.graphics))))

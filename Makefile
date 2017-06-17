@@ -1,5 +1,7 @@
 include config/configure.mk
 
+JBUILD_EXAMPLES_DIR = _build/default/examples
+
 DOC_FILES = src/core/ogamlCore.mli\
 						src/graphics/ogamlGraphics.mli\
 						src/math/ogamlMath.mli\
@@ -13,7 +15,7 @@ configure:
 	cp $(CLIBS_FILE) flags.os
 
 build: configure
-	jbuilder build
+	jbuilder build @install
 
 install:
 	jbuilder install
@@ -22,16 +24,31 @@ clean:
 	jbuilder clean;
 	rm -rf html/;
 	rm -f src/core/jbuild;
-	rm -f flags.os
+	rm -f flags.os;
+	rm -f *.exe
 
 uninstall:
 	jbuilder uninstall
 
 tests:
-	echo 'Not yet implemented'
+	jbuilder runtest tests
 
 examples:
-	echo 'Not yet implemented'
+	jbuilder build examples/instancing.exe; 
+	jbuilder build examples/sprites.exe; 
+	jbuilder build examples/tut_idx.exe; 
+	jbuilder build examples/cube.exe; 
+	jbuilder build examples/ip.exe; 
+	jbuilder build examples/text.exe; 
+	jbuilder build examples/tut_tex.exe; 
+	jbuilder build examples/cursor.exe; 
+	jbuilder build examples/noise.exe; 
+	jbuilder build examples/tut01.exe; 
+	jbuilder build examples/vertexmaps.exe; 
+	jbuilder build examples/flat.exe; 
+	jbuilder build examples/shoot.exe; 
+	jbuilder build examples/tut02.exe; 
+	mv $(JBUILD_EXAMPLES_DIR)/*.exe .
 
 doc:
 	ocamlbuild -use-ocamlfind -use-menhir -cflags -rectypes -I src/doc -package unix,str mkdoc.native;\

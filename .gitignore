@@ -29,6 +29,7 @@ html/*
 # Ocamlbuild targets
 *.byte
 *.native
+*.exe
 
 # Oasis generated files
 setup.data
