@@ -35,6 +35,7 @@
                            -Wno-int-to-void-pointer-cast 
                            -Wno-int-to-pointer-cast 
                            -Wno-pointer-sign -Wno-unused-function 
+                           -Wno-gnu-designator
                            -Wno-unused-variable -Wno-misleading-indentation))
    (install_c_headers (stb_image stb_image_write stb_truetype))
    (c_library_flags (:include ../../flags.os))))
