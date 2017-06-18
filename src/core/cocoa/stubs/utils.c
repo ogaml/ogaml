@@ -2,6 +2,15 @@
 
 #include "utils.h"
 
+static struct custom_operations NSRect_custom_ops = {
+  identifier  : "NSRect handling",
+  finalize    : custom_finalize_default,
+  compare     : custom_compare_default,
+  hash        : custom_hash_default,
+  serialize   : custom_serialize_default,
+  deserialize : custom_deserialize_default
+};
+
 value Val_some(value v)
 {
   CAMLparam1(v);
