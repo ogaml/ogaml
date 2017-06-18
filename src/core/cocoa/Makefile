@@ -1,7 +1,7 @@
 OCAMLC_DIR = $(shell ocamlc -where)
 
 OBJC_FLAGS = -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT -fPIC -I '$(OCAMLC_DIR)'\
-             -Wno-unused-function -Wno-unused-variable\
+             -Wno-unused-function -Wno-unused-variable -Wno-deprecated-declarations\
              -fconstant-string-class=NSConstantString
 
 C_FLAGS = -Wno-unused-function -Wno-unused-variable
@@ -25,6 +25,6 @@ cocoa_lib_stubs: $(OBJC_OBJECTS) $(C_OBJECTS)
 	clang -c -o $@ $(OBJC_FLAGS) $<
 
 %.o:%.c
-	ocamlc -c -o $@ $(C_FLAGS) $<
+	ocamlc -c -o $@ -cclib "$(C_FLAGS)" $<
 
 .PHONY: cocoa_lib_stubs
