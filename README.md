@@ -128,8 +128,9 @@ You will need the following dependencies, depending on your OS:
 
   * Microsoft Windows SDK (Windows)
 
+Moreover, having GNUMake and CoreUtils installed on Windows will definitely help.
 Then the usual spell, `make && make install` will take care of the rest.
-You can test it on some examples `make examples` or on Travis' tests `make tests`.
+You can test it on some examples `make examples` or on Travis's tests `make tests`.
 
 ## Redistributing OGaml executables
 

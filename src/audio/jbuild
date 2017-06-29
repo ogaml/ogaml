@@ -17,6 +17,6 @@
    (libraries   (OgamlMath OgamlUtils threads))
    (c_names     (utils audio_stubs buffer_stubs context_stubs device_stubs 
                  listener_stubs source_stubs stb_stubs))
-   (c_flags     (:standard (:include ../../w_flags.os)))
+   (c_flags     (:standard (:include ../../c_flags.os)))
    (install_c_headers (stb_vorbis))
-   (c_library_flags (:standard (:include ../../flags.os)))))
+   (c_library_flags (:standard (:include ../../c_libs.os)))))

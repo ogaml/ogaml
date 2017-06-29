@@ -51,8 +51,8 @@ ogaml.install
 
 # Configuration files
 src/core/jbuild
-flags.os
-w_flags.os
+c_flags.os
+c_libs.os
 
 # Generated .merlin
 examples/.merlin

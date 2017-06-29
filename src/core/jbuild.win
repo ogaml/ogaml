@@ -19,4 +19,5 @@
    (libraries   (OgamlMath))
    (c_names     (context_stubs glew_stubs pixelformat_stubs style_stubs
                  utils window_stubs))
-   (c_library_flags (:include ../../flags.os))))
+   (c_flags     (:standard (:include ../../c_flags.os)))
+   (c_library_flags (:include ../../c_libs.os))))

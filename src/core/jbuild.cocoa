@@ -25,8 +25,8 @@
    (libraries   (OgamlMath))
    (self_build_stubs_archive (OgamlCore))
    (install_c_headers (cocoa_stubs))
-   (c_flags     (:standard -Wno-unused-function -Wno-unused-variable))
-   (c_library_flags (:include ../../flags.os))))
+   (c_flags     (:standard (:include ../../c_flags.os)))
+   (c_library_flags (:include ../../c_libs.os))))
 
 (rule
   ((targets (libOgamlCore_stubs.a dllOgamlCore_stubs.so))

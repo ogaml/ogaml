@@ -12,8 +12,8 @@ default: build
 
 configure:
 	cp $(CORE_JBUILD_FILE) src/core/jbuild &&\
-	cp $(CLIBS_FILE) flags.os &&\
-	cp $(WFLAGS_FILE) w_flags.os
+	cp $(CLIBS_FILE) c_libs.os &&\
+	cp $(CFLAGS_FILE) c_flags.os
 
 build: configure
 	jbuilder build @install
@@ -25,7 +25,8 @@ clean:
 	jbuilder clean &&\
 	rm -rf html/ &&\
 	rm -f src/core/jbuild &&\
-	rm -f flags.os &&\
+	rm -f c_flags.os &&\
+	rm -f c_libs.os &&\
 	rm -f *.exe
 
 uninstall:

@@ -23,6 +23,5 @@
    (c_names     (utils atoms_stubs display_stubs event_stubs
                  glx_stubs mouse_stubs keyboard_stubs window_stubs 
                  utils_stubs))
-   (c_flags     (:standard -Wno-unused-function -Wno-unused-variable 
-                           -Wno-misleading-indentation))
-   (c_library_flags (:include ../../flags.os))))
+   (c_flags     (:standard (:include ../../c_flags.os)))
+   (c_library_flags (:include ../../c_libs.os))))
