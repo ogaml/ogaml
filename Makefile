@@ -11,8 +11,9 @@ DOC_FILES = src/core/ogamlCore.mli\
 default: build
 
 configure:
-	cp $(CORE_JBUILD_FILE) src/core/jbuild;
-	cp $(CLIBS_FILE) flags.os
+	cp $(CORE_JBUILD_FILE) src/core/jbuild &\
+	cp $(CLIBS_FILE) flags.os &\
+	cp $(WFLAGS_FILE) w_flags.os
 
 build: configure
 	jbuilder build @install
@@ -21,10 +22,10 @@ install:
 	jbuilder install
 
 clean:
-	jbuilder clean;
-	rm -rf html/;
-	rm -f src/core/jbuild;
-	rm -f flags.os;
+	jbuilder clean &\
+	rm -rf html/ &\
+	rm -f src/core/jbuild &\
+	rm -f flags.os &\
 	rm -f *.exe
 
 uninstall:
@@ -34,24 +35,24 @@ tests:
 	jbuilder runtest tests
 
 examples:
-	jbuilder build examples/instancing.exe; 
-	jbuilder build examples/sprites.exe; 
-	jbuilder build examples/tut_idx.exe; 
-	jbuilder build examples/cube.exe; 
-	jbuilder build examples/ip.exe; 
-	jbuilder build examples/text.exe; 
-	jbuilder build examples/tut_tex.exe; 
-	jbuilder build examples/cursor.exe; 
-	jbuilder build examples/noise.exe; 
-	jbuilder build examples/tut01.exe; 
-	jbuilder build examples/vertexmaps.exe; 
-	jbuilder build examples/flat.exe; 
-	jbuilder build examples/shoot.exe; 
-	jbuilder build examples/tut02.exe; 
+	jbuilder build examples/instancing.exe &\
+	jbuilder build examples/sprites.exe &\
+	jbuilder build examples/tut_idx.exe &\
+	jbuilder build examples/cube.exe &\
+	jbuilder build examples/ip.exe &\
+	jbuilder build examples/text.exe &\
+	jbuilder build examples/tut_tex.exe &\
+	jbuilder build examples/cursor.exe &\
+	jbuilder build examples/noise.exe &\
+	jbuilder build examples/tut01.exe &\
+	jbuilder build examples/vertexmaps.exe &\
+	jbuilder build examples/flat.exe &\
+	jbuilder build examples/shoot.exe &\
+	jbuilder build examples/tut02.exe &\
 	mv $(JBUILD_EXAMPLES_DIR)/*.exe .
 
 doc:
-	ocamlbuild -use-ocamlfind -use-menhir -cflags -rectypes -I src/doc -package unix,str mkdoc.native;\
+	ocamlbuild -use-ocamlfind -use-menhir -cflags -rectypes -I src/doc -package unix,str mkdoc.native &\
 	./mkdoc.native $(DOC_FILES)
 
 .PHONY: install uninstall doc tests examples

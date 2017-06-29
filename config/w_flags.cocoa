@@ -1,0 +1,8 @@
+-Wno-unknown-warning-option 
+-Wno-unknown-warning 
+-Wno-int-to-void-pointer-cast 
+-Wno-int-to-pointer-cast 
+-Wno-pointer-sign -Wno-unused-function 
+-Wno-gnu-designator
+-Wno-unused-variable
+-Wno-misleading-indentation

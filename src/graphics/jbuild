@@ -31,11 +31,6 @@
    (c_names     (utils shader_stubs program_stubs texture_stubs vao_stubs
                  vbo_stubs uniform_stubs text_stubs render_stubs ebo_stubs
                  image_stubs blending_stubs fbo_stubs rbo_stubs types_stubs))
-   (c_flags     (:standard -Wno-unknown-warning-option -Wno-unknown-warning 
-                           -Wno-int-to-void-pointer-cast 
-                           -Wno-int-to-pointer-cast 
-                           -Wno-pointer-sign -Wno-unused-function 
-                           -Wno-gnu-designator
-                           -Wno-unused-variable -Wno-misleading-indentation))
+   (c_flags     (:standard (:include ../../w_flags.os)))
    (install_c_headers (stb_image stb_image_write stb_truetype))
    (c_library_flags (:include ../../flags.os))))
