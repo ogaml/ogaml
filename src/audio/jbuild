@@ -19,4 +19,4 @@
                  listener_stubs source_stubs stb_stubs))
    (c_flags     (:standard (:include ../../w_flags.os)))
    (install_c_headers (stb_vorbis))
-   (c_library_flags (:include ../../flags.os))))
+   (c_library_flags (:standard (:include ../../flags.os)))))

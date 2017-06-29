@@ -33,4 +33,4 @@
                  image_stubs blending_stubs fbo_stubs rbo_stubs types_stubs))
    (c_flags     (:standard (:include ../../w_flags.os)))
    (install_c_headers (stb_image stb_image_write stb_truetype))
-   (c_library_flags (:include ../../flags.os))))
+   (c_library_flags (:standard (:include ../../flags.os)))))
