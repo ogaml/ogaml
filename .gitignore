@@ -53,6 +53,8 @@ ogaml.install
 src/core/jbuild
 c_flags.os
 c_libs.os
+flags.os   # For retrocompatibility
+w_flags.os
 
 # Generated .merlin
 examples/.merlin
