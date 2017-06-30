@@ -10,7 +10,7 @@ caml_cocoa_create_window(value frame, value styleMask, value backing, value defe
   CAMLparam4(frame,styleMask,backing,defer);
   CAMLlocal2(hd, tl);
 
-  NSRect* rect = (NSRect*) Data_custom_val(frame);
+  NSRect* rect = NSRect_val(frame);
   CGFloat scale = [[NSScreen mainScreen] backingScaleFactor];
   rect->origin.x    = rect->origin.x    / scale;
   rect->origin.y    = rect->origin.y    / scale;
@@ -123,7 +123,8 @@ caml_cocoa_window_frame(value mlwindow)
 {
   CAMLparam1(mlwindow);
   CAMLlocal1(mlrect);
-  mlrect = caml_alloc_custom(&empty_custom_ops, sizeof(NSRect), 0, 1);
+  NSRect_alloc(mlrect);
+
 
   NSWindow* window = (NSWindow*) mlwindow;
   NSRect rect = [window frame];
@@ -134,7 +135,7 @@ caml_cocoa_window_frame(value mlwindow)
   rect.size.width = rect.size.width * scale;
   rect.size.height = rect.size.height * scale;
 
-  memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
+  NSRect_copy(mlrect, &rect);
 
   CAMLreturn(mlrect);
 }
