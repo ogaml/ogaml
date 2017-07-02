@@ -12,10 +12,11 @@ type uniform =
   | Matrix2D  of OgamlMath.Matrix2D.t
   | Color     of Color.RGB.t
   | Texture2D of (int option * Texture.Texture2D.t)
-  | Float     of float
-  | Int       of int
+  | Texture3D of (int option * Texture.Texture3D.t)
   | Texture2DArray of (int option * Texture.Texture2DArray.t)
   | Cubemap   of (int option * Texture.Cubemap.t)
+  | Float     of float
+  | Int       of int
 
 module UniformMap = Map.Make (struct
 
@@ -64,6 +65,10 @@ let color s c m =
 let texture2D s ?tex_unit t m = 
   assert_free m s;
   UniformMap.add s (Texture2D (tex_unit,t)) m
+
+let texture3D s ?tex_unit t m = 
+  assert_free m s;
+  UniformMap.add s (Texture3D (tex_unit,t)) m
 
 let texture2Darray s ?tex_unit t m = 
   assert_free m s;
@@ -149,6 +154,15 @@ module LL = struct
           let u = next_unit 0 in
           add_unit u;
           Texture.Texture2D.bind t u;
+          GL.Uniform.int1 location (Context.LL.texture_unit context)
+      | Texture3D (Some u,t), GLTypes.GlslType.Sampler3D ->
+          add_unit u;
+          Texture.Texture3D.bind t u;
+          GL.Uniform.int1 location (Context.LL.texture_unit context)
+      | Texture3D (None, t), GLTypes.GlslType.Sampler3D ->
+          let u = next_unit 0 in
+          add_unit u;
+          Texture.Texture3D.bind t u;
           GL.Uniform.int1 location (Context.LL.texture_unit context)
       | Texture2DArray (Some u,t), GLTypes.GlslType.Sampler2DArray ->
           add_unit u;

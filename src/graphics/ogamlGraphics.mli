@@ -1423,6 +1423,11 @@ module Uniform : sig
     * @see:OgamlGraphics.Context *)
   val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
 
+  (** See texture3D. Type : sampler3D.
+    *
+    * @see:OgamlGraphics.Texture.Texture3D *)
+  val texture3D : string -> ?tex_unit:int -> Texture.Texture3D.t -> t -> t
+
   (** See texture2D. Type : sampler2Darray.
     *
     * @see:OgamlGraphics.Texture.Texture2DArray *)
