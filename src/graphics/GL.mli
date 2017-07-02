@@ -443,6 +443,9 @@ module FBO : sig
   (** Attaches a 2D texture to an FBO *)
   val texture2D : GLTypes.GlAttachment.t -> Texture.t -> int -> unit
 
+  (** Attaches a 3D texture to an FBO *)
+  val texture3D : GLTypes.GlAttachment.t -> Texture.t -> int -> int -> unit
+
   (** Attaches a render buffer to an FBO *)
   val renderbuffer : GLTypes.GlAttachment.t -> RBO.t -> unit
 

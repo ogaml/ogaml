@@ -10,11 +10,15 @@ module type T = sig
 
 end
 
+
 module MinifyFilter = GLTypes.MinifyFilter
+
 
 module MagnifyFilter = GLTypes.MagnifyFilter
 
+
 module WrapFunction = GLTypes.WrapFunction
+
 
 module Texture2DMipmap : sig
 
@@ -31,6 +35,7 @@ module Texture2DMipmap : sig
   val bind : t -> int -> unit
 
 end
+
 
 module Texture2D : sig
 
@@ -229,3 +234,51 @@ module Cubemap : sig
   val bind : t -> int -> unit
 
 end
+
+
+module Texture3DMipmap : sig
+
+  type t
+
+  val size : t -> OgamlMath.Vector3i.t
+
+  val level : t -> int
+
+  val layer : t -> int -> t
+
+  val current_layer : t -> int
+
+  val bind : t -> int -> unit
+
+  val write : t -> OgamlMath.IntRect.t -> Image.t -> unit
+  
+  val to_color_attachment : t -> Attachment.ColorAttachment.t
+
+end
+
+
+module Texture3D : sig
+
+  type t 
+
+  val create : (module RenderTarget.T with type t = 'a) -> 'a
+               -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+               -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list -> t
+
+  val size : t -> OgamlMath.Vector3i.t
+
+  val minify : t -> MinifyFilter.t -> unit
+
+  val magnify : t -> MagnifyFilter.t -> unit
+
+  val wrap : t -> WrapFunction.t -> unit
+
+  val mipmap_levels : t -> int
+
+  val mipmap : t -> int -> Texture3DMipmap.t
+
+  val bind : t -> int -> unit
+
+end
+
+

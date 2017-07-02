@@ -432,6 +432,8 @@ module FBO = struct
 
   external texture2D : GLTypes.GlAttachment.t -> Texture.t -> int -> unit = "caml_fbo_texture2D"
 
+  external texture3D : GLTypes.GlAttachment.t -> Texture.t -> int -> int -> unit = "caml_fbo_texture3D"
+
   external renderbuffer : GLTypes.GlAttachment.t -> RBO.t -> unit = "caml_fbo_renderbuffer"
 
 end

@@ -45,6 +45,15 @@ module Common = struct
     in
     max (log2 size.Vector2i.x) (log2 size.Vector2i.y) + 1
 
+  let max_mipmaps_3D size = 
+    let rec log2 i = 
+      match i with
+      | 0 -> 0
+      | 1 -> 0
+      | n -> 1 + (log2 (n lsr 1))
+    in
+    max (max (log2 size.Vector3i.x) (log2 size.Vector3i.y)) (log2 size.Vector3i.z) + 1
+
   let set_unit st uid = 
     let bound_unit = Context.LL.texture_unit st in
     if bound_unit <> uid then begin
@@ -717,4 +726,150 @@ module Cubemap = struct
   let bind t uid = Common.bind t.common uid
 
 end
+
+
+module Texture3DMipmap = struct
+
+  type t = {
+    common : Common.t;
+    size   : Vector3i.t;
+    level  : int;
+    layer  : int
+  }
+
+  let size t = t.size
+
+  let level t = t.level
+
+  let bind t uid = Common.bind t.common uid
+
+  let layer t i = 
+    if i < 0 || i >= t.size.Vector3i.z then
+      raise (Invalid_argument "Texture 3D array : layer out of bounds");
+    {t with layer = i}
+
+  let current_layer t =
+    t.layer
+
+  let write t rect img = 
+    bind t 0;
+    GL.Texture.subimage3D GLTypes.TextureTarget.Texture3D
+                          t.level
+                          (rect.IntRect.x, rect.IntRect.y, t.layer)
+                          (rect.IntRect.width, rect.IntRect.height, 1)
+                          GLTypes.PixelFormat.RGBA
+                          (Image.data img)
+
+  let to_color_attachment t = 
+    Attachment.ColorAttachment.Texture3D (t.common.Common.internal, t.layer, t.level)
+
+end
+
+
+module Texture3D = struct
+
+  type t = {
+    common : Common.t;
+    size   : Vector3i.t;
+  }
+
+  let create (type a) (module M : RenderTarget.T with type t = a) target
+    ?mipmaps:(mipmaps = `AllGenerated) src =
+    let context = M.context target in
+    (* Extract the texture parameters *)
+    let extract_params = function
+      | `File s ->
+        let img = Image.create (`File s) in
+        let size = Image.size img in
+        (size, Some img)
+      | `Image i ->
+        (Image.size i, Some i)
+      | `Empty s ->
+        (s, None)
+    in
+    if src = [] then 
+      raise (Texture_error "Texture 3D: empty file list");
+    let lparams =
+      List.map extract_params src
+    in
+    let (size2D, _) = List.hd lparams in
+    let depth, imgs = 
+      List.fold_right (fun (img_size, img) (n, l_imgs) -> 
+        if img_size <> size2D then 
+          raise (Texture_error "Texture 3D: images of different sizes");
+        (n+1, img :: l_imgs)
+      ) lparams (0, []) 
+    in
+    let size = {Vector3i.x = size2D.Vector2i.x; y = size2D.Vector2i.y; z = depth} in
+    let levels = 
+      let max_levels = Common.max_mipmaps_3D size in
+      match mipmaps with
+      | `AllGenerated | `AllEmpty    -> max_levels
+      | `Empty i      | `Generated i -> max 1 (min max_levels i)
+      | `None -> 1
+     in
+    (* Check that the size is allowed *)
+    let capabilities = Context.capabilities context in
+    let max_size = capabilities.Context.max_3D_texture_size in
+    if size.Vector3i.x > max_size || size.Vector3i.y > max_size || size.Vector3i.z > max_size then
+      raise (Texture_error "Maximal 3D texture size exceeded");
+    (* Create the internal texture *)
+    let common = Common.create context levels GLTypes.TextureTarget.Texture3D in
+    let tex = {common; size} in
+    (* Bind the texture *)
+    Common.bind tex.common 0;
+    (* Allocate the texture *)
+    GL.Texture.storage3D
+      GLTypes.TextureTarget.Texture3D
+      levels 
+      GLTypes.TextureFormat.RGBA8
+      (size.Vector3i.x, size.Vector3i.y, size.Vector3i.z);
+    (* Load the corresponding image in each mipmap if requested *)
+    let load_level lvl = 
+      List.iteri (fun layer img -> 
+        match img with
+        | Some img -> 
+          let data = Image.data (Image.mipmap img lvl) in
+          GL.Texture.subimage3D
+            GLTypes.TextureTarget.Texture3D
+            lvl (0,0,layer)
+            (size.Vector3i.x lsr lvl, size.Vector3i.y lsr lvl, 1)
+            GLTypes.PixelFormat.RGBA
+            data
+        | None     -> ()
+      ) imgs;
+    in
+    begin match mipmaps with
+    | `AllGenerated | `Generated _ ->
+      for lvl = 0 to levels -1 do
+        load_level lvl
+      done
+    | `None | `AllEmpty | `Empty _ -> 
+      load_level 0
+    end;
+    (* Return the texture *)
+    tex
+
+  let size tex = tex.size
+
+  let minify tex filter = Common.minify tex.common filter
+
+  let magnify tex filter = Common.magnify tex.common filter
+
+  let wrap tex func = Common.wrap tex.common func
+
+  let mipmap_levels t = t.common.Common.mipmaps
+
+  let mipmap t i = 
+    if i < 0 || i >= t.common.Common.mipmaps then 
+      raise (Invalid_argument "Texture 3D: mipmap level out of bounds");
+    {Texture3DMipmap.common = t.common;
+                     size   = Vector3i.({x = t.size.x lsr i; y = t.size.y lsr i; z = t.size.z lsr i});
+                     level  = i;
+                     layer  = 0}
+
+  let bind t uid = Common.bind t.common uid
+
+end
+
 
