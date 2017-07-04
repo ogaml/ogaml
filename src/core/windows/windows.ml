@@ -195,3 +195,10 @@ module Event = struct
     external swap_button : unit -> bool = "caml_button_swap"
 
 end
+
+
+module Utils = struct
+
+    external get_full_path : string -> string = "caml_get_full_path"
+
+end

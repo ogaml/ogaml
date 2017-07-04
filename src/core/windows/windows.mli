@@ -155,3 +155,9 @@ module Event : sig
 
 end
 
+
+module Utils : sig
+
+    val get_full_path : string -> string
+
+end
