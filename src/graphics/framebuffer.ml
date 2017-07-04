@@ -61,6 +61,8 @@ let attach_color (type a) (module A : Attachment.ColorAttachable with type t = a
   match attc with
   | Attachment.ColorAttachment.Texture2D (tex, lvl) ->
     GL.FBO.texture2D (GLTypes.GlAttachment.Color nb) tex lvl
+  | Attachment.ColorAttachment.Texture3D (tex, layer, lvl) ->
+    GL.FBO.texture3D (GLTypes.GlAttachment.Color nb) tex layer lvl
   | Attachment.ColorAttachment.Texture2DArray (tex, layer, lvl) ->
     GL.FBO.texture_layer (GLTypes.GlAttachment.Color nb) tex layer lvl 
   | Attachment.ColorAttachment.TextureCubemap (tex, face, lvl) ->

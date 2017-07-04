@@ -124,6 +124,17 @@ caml_fbo_texture2D(value atc, value tex, value level)
 }
 
 
+// INPUT   : an attachment point, a texture, a layer, a mipmap level
+// OUTPUT  : nothing, attaches the texture to the currently bound FBO
+CAMLprim value
+caml_fbo_texture3D(value atc, value tex, value layer, value level)
+{
+  CAMLparam4(atc,tex,layer,level);
+  glFramebufferTexture3D(GL_FRAMEBUFFER, Attachment_val(atc), GL_TEXTURE_3D, TEX(tex), Int_val(level), Int_val(layer));
+  CAMLreturn(Val_unit);
+}
+
+
 // INPUT   : an attachment point, an RBO
 // OUTPUT  : nothing, attaches the RBO to the currently bound FBO
 CAMLprim value

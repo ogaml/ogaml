@@ -5,6 +5,7 @@ module ColorAttachment = struct
   type t = 
     | TextureCubemap of GL.Texture.t * int * int
     | Texture2D of GL.Texture.t * int
+    | Texture3D of GL.Texture.t * int * int
     | Texture2DArray of GL.Texture.t * int * int
     | ColorRBO of GL.RBO.t
 

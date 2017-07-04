@@ -1147,6 +1147,83 @@ module Texture : sig
 
   end
 
+
+  (** Represents a mipmap level of a 3D texture *)
+  module Texture3DMipmap : sig
+  
+    (** This module gives an abstract representation of a mipmap level
+      * of a 3D texture *)
+
+    (** Type of a 3D texture's mipmap *)
+    type t
+
+    (** Size of a mipmap *)
+    val size : t -> OgamlMath.Vector3i.t
+
+    (** Returns the mipmap level *)
+    val level : t -> int
+
+    (** Focuses a particular layer of the 3D texture's mipmap *)
+    val layer : t -> int -> t
+
+    (** Returns the currently focused layer of the 3D texture's mipmap *)
+    val current_layer : t -> int
+
+    (** Writes to the currently focused layer of the mipmap *)
+    val write : t -> OgamlMath.IntRect.t -> Image.t -> unit
+
+    (** System only : binds the original 3D texture for drawing *)
+    val bind : t -> int -> unit
+    
+    (** Texture3DMipmap implements the interface ColorAttachable
+      * and the focused layer can be attached to an FBO *)
+    val to_color_attachment : t -> Attachment.ColorAttachment.t
+
+  end
+
+
+  (** Represents 3D textures *)
+  module Texture3D : sig
+
+    (** This module provides an abstraction of OpenGL 3D textures *)
+
+    (** Type of a 3D texture *)
+    type t 
+
+    (** Creates a 3D texture from a list of files, images, or empty
+      * layers of given dimensions.
+      * Generates all mipmaps by default.
+      *
+      * Raises $Texture_error$ if the requested size exceeds the maximal texture 
+      * size allowed by the context.
+      *
+      * Also raises $Texture_error$ if the list of layers is empty, or
+      * if all the layers do not have the same dimensions. *)
+    val create : (module RenderTarget.T with type t = 'a) -> 'a
+                 -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+                 -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list -> t
+
+    (** Returns the size of a 3D texture *)
+    val size : t -> OgamlMath.Vector3i.t
+
+    (** Sets the minifying filter of a texture. Defaults as LinearMipmapLinear. *)
+    val minify : t -> MinifyFilter.t -> unit
+
+    (** Sets the magnifying filter of a texture. Defaults as Linear. *)
+    val magnify : t -> MagnifyFilter.t -> unit
+
+    (** Sets the wrapping function of a texture. Defaults as ClampEdge. *)
+    val wrap : t -> WrapFunction.t -> unit
+
+    (** Returns the number of mipmap levels of a texture. *)
+    val mipmap_levels : t -> int
+
+    (** Returns a particular mipmap of a 3D texture. 
+      * Raises $Invalid_argument$ if the mipmap level does not exist. *)
+    val mipmap : t -> int -> Texture3DMipmap.t
+
+  end
+
 end
 
 
@@ -1345,6 +1422,11 @@ module Uniform : sig
     * @see:OgamlGraphics.Texture.Texture2D
     * @see:OgamlGraphics.Context *)
   val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
+
+  (** See texture3D. Type : sampler3D.
+    *
+    * @see:OgamlGraphics.Texture.Texture3D *)
+  val texture3D : string -> ?tex_unit:int -> Texture.Texture3D.t -> t -> t
 
   (** See texture2D. Type : sampler2Darray.
     *
