@@ -25,8 +25,8 @@ let () =
     for j = 0 to 599 do
       let v = Noise.Perlin2D.get perlin 
         Vector2f.{
-          x = float_of_int i /. 100. -. 4.;
-          y = float_of_int j /. 100. -. 3.;
+          x = float_of_int i /. 100.;
+          y = float_of_int j /. 100.;
         }
       in
       mini := min !mini v;
