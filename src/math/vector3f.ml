@@ -194,9 +194,11 @@ let raytrace_points p1 p2 =
     let rec aux p = function
       |[] -> []
       |(t,face)::tail -> 
-        (* Ignore the first result if the ray starts on integer coordinates *)
-        if t = 0. then 
-          aux p tail
+        (* Ignore the first result if the ray starts on integer coordinates 
+         * and if we cross a face with negative normal (that is, we are
+         * entering a cube, not leaving one) *)
+        if t = 0. && face.x +. face.y +. face.z < 0. then 
+          (aux p tail)
         else begin
           let v = sub p face in 
           (t,v,face)::(aux v tail)
