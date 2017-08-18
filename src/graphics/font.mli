@@ -11,7 +11,8 @@ module Glyph : sig
   (** Bounding rectangle *)
   val rect : t -> OgamlMath.FloatRect.t
 
-  (** Coordinates of the glyph in the font's texture *)
+  (** Coordinates of the glyph in the font's texture 
+    * in pixels, relative to the bottom-left *)
   val uv : t -> OgamlMath.FloatRect.t
 
 end

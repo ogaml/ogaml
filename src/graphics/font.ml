@@ -69,8 +69,8 @@ module Shelf = struct
         Image.create 
           (`Empty (Vector2i.({x = s.row_width + w + s.pad; y = new_height}),`RGB Color.RGB.transparent)) 
       in
-      Image.blit s.row new_row Vector2i.({x = 0; y = 0});
-      Image.blit glyph new_row Vector2i.({x = s.row_width + s.pad; y = 0});
+      Image.blit s.row new_row Vector2i.({x = 0; y = new_height - s.row_height});
+      Image.blit glyph new_row Vector2i.({x = s.row_width + s.pad; y = new_height - h});
       s.row <- new_row;
       s.row_height <- new_height;
       s.row_width <- s.row_width + w + s.pad;
@@ -85,8 +85,8 @@ module Shelf = struct
         Image.create 
           (`Empty (Vector2i.({x = s.width; y = s.height + s.row_height + s.pad}),(`RGB Color.RGB.transparent))) 
       in
-      Image.blit s.full new_full Vector2i.({x = 0; y = 0});
-      Image.blit s.row new_full Vector2i.({x = 0; y = s.height + s.pad});
+      Image.blit s.full new_full Vector2i.({x = 0; y = s.row_height + s.pad});
+      Image.blit s.row new_full Vector2i.zero;
       s.full <- new_full;
       s.row  <- glyph;
       s.height <- (s.height + s.row_height + s.pad);
@@ -103,8 +103,8 @@ module Shelf = struct
 
   let image height s =
     let global = Image.create (`Empty (Vector2i.({x = s.width; y = height}), `RGB Color.RGB.transparent)) in
-    Image.blit s.full global Vector2i.zero;
-    Image.blit s.row global Vector2i.({x = 0; y = s.height + s.pad});
+    Image.blit s.full global Vector2i.({x = 0; y = s.row_height + s.pad});
+    Image.blit s.row global Vector2i.zero;
     global
 
 end
