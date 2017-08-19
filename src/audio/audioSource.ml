@@ -68,11 +68,61 @@ let allocate_source source force channels duration =
       AudioContext.LL.reallocate_mono_source source.context s duration
   end
 
+let stop source =
+  may AL.Source.stop source.source ;
+  begin match source.channels with
+  | `Mono -> may (AudioContext.LL.deallocate_mono_source source.context) source.source;
+  | `Stereo -> may (AudioContext.LL.deallocate_stereo_source source.context) source.source;
+  end;
+  source.source <- None;
+  source.status <- `Stopped
+
+let update_status source = 
+  match source.status with
+  | `Playing ->
+    if Unix.gettimeofday () -. source.start >= source.duration then
+      stop source
+  | _ -> ()
+
+let status source = 
+  update_status source; 
+  source.status
+
+let pause source =
+  match source.source with
+  | Some s when status source = `Playing ->
+    AL.Source.pause s;
+    source.status <- `Paused;
+    begin match source.channels with
+    | `Mono -> AudioContext.LL.reallocate_mono_source source.context s infinity
+    | `Stereo -> AudioContext.LL.reallocate_stereo_source source.context s infinity
+    end;
+    source.duration <- source.duration -. (Unix.gettimeofday () -. source.start);
+  | _ -> ()
+
+let resume source =
+  match source.source with
+  | Some s when status source = `Paused -> 
+    begin match source.channels with
+    | `Mono -> AudioContext.LL.reallocate_mono_source source.context s source.duration
+    | `Stereo -> AudioContext.LL.reallocate_stereo_source source.context s source.duration
+    end;
+    AL.Source.play s;
+    AL.Source.set_3f s AL.Source.Position (vec3f source.position);
+    AL.Source.set_3f s AL.Source.Velocity (vec3f source.velocity);
+    AL.Source.set_3f s AL.Source.Direction (vec3f source.orientation);
+    source.status <- `Playing;
+    source.start <- Unix.gettimeofday ()
+  | _ -> ()
+
+
+
 let play source ?pitch ?gain ?loop ?force:(force = false) sound =
+  let src_status = status source in
   (* We request a source to the context. *)
   match sound with
-  | `Stream str when source.status = `Stopped -> () (* TODO *)
-  | `Sound buff when source.status = `Stopped ->
+  | `Stream str when src_status = `Stopped -> () (* TODO *)
+  | `Sound buff when src_status = `Stopped ->
     let duration = SoundBuffer.duration buff in
     allocate_source source force (SoundBuffer.channels buff) duration;
     begin match source.source with
@@ -94,49 +144,11 @@ let play source ?pitch ?gain ?loop ?force:(force = false) sound =
       end
     | _ -> ()
 
-let stop source =
-  may AL.Source.stop source.source ;
-  begin match source.channels with
-  | `Mono -> may (AudioContext.LL.deallocate_mono_source source.context) source.source;
-  | `Stereo -> may (AudioContext.LL.deallocate_stereo_source source.context) source.source;
-  end;
-  source.source <- None;
-  source.status <- `Stopped
-
-let pause source =
-  match source.source with
-  | Some s when source.status = `Playing ->
-    AL.Source.pause s;
-    source.status <- `Paused;
-    begin match source.channels with
-    | `Mono -> AudioContext.LL.reallocate_mono_source source.context s infinity
-    | `Stereo -> AudioContext.LL.reallocate_stereo_source source.context s infinity
-    end;
-    source.duration <- source.duration -. (Unix.gettimeofday () -. source.start)
-  | _ -> ()
-
-let resume source =
-  match source.source with
-  | Some s when source.status = `Paused -> 
-    begin match source.channels with
-    | `Mono -> AudioContext.LL.reallocate_mono_source source.context s source.duration
-    | `Stereo -> AudioContext.LL.reallocate_stereo_source source.context s source.duration
-    end;
-    AL.Source.play s;
-    AL.Source.set_3f s AL.Source.Position (vec3f source.position);
-    AL.Source.set_3f s AL.Source.Velocity (vec3f source.velocity);
-    AL.Source.set_3f s AL.Source.Direction (vec3f source.orientation);
-    source.status <- `Playing;
-    source.start <- Unix.gettimeofday ()
-  | _ -> ()
-
-let status source = source.status
-
 let position source = source.position
 
 let set_position source pos =
   source.position <- pos ;
-  match source.status with
+  match status source with
   | `Playing ->
     may
       (fun s -> AL.Source.set_3f s AL.Source.Position (vec3f pos))
@@ -147,7 +159,7 @@ let velocity source = source.velocity
 
 let set_velocity source vel =
   source.velocity <- vel ;
-  match source.status with
+  match status source with
   | `Playing ->
     may
       (fun s -> AL.Source.set_3f s AL.Source.Velocity (vec3f vel))
@@ -158,7 +170,7 @@ let orientation source = source.orientation
 
 let set_orientation source ori =
   source.orientation <- ori ;
-  match source.status with
+  match status source with
   | `Playing ->
     may
       (fun s -> AL.Source.set_3f s AL.Source.Direction (vec3f ori))
