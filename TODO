@@ -79,11 +79,11 @@ Advanced features:
   ☐ Vertex buffer slices
   ☐ Index buffer slices
   More Image and Texture types:
-    ☐ Single-channeled images
+    ☐ Single-channeled images (unified images for 8,16,24,32 bits)
     ☐ Image slices
     ✔ Texture3D @done(2017-08-21 20:07) @project(Advanced features / More Image and Texture types)
     ☐ Parameterize renderbuffers/textures by a texture format
-    ☐ Depth textures
+    ✔ Depth textures @done(2017-08-21 22:01) @project(Advanced features / More Image and Texture types)
     ☐ Stencil textures
     ✔ TextureCube @done(2017-08-21 20:07) @project(Advanced features / More Image and Texture types)
 
