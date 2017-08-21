@@ -115,8 +115,6 @@ let resume source =
     source.start <- Unix.gettimeofday ()
   | _ -> ()
 
-
-
 let play source ?pitch ?gain ?loop ?force:(force = false) sound =
   let src_status = status source in
   (* We request a source to the context. *)

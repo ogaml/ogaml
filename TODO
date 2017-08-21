@@ -24,16 +24,16 @@ Audio (see NOTES for more info):
     ✔ Pervasives @done(2016-10-26 22:29) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
     ✔ Buffers @done(2016-10-26 22:21) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
     ✔ Sources @done(2016-10-26 23:48) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
-  ☐ AudioContext module
-  ☐ SoundBuffer module:
-    ☐ load (from .ogg file)
-    ☐ create : data -> sampleCount -> channelCount -> sampleRate -> t
-    ☐ duration : t -> int
+  ✔ AudioContext module @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
+  ✔ SoundBuffer module: @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
+    ✔ load (from .ogg file) @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
+    ✔ create : data -> sampleCount -> channelCount -> sampleRate -> t @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
+    ✔ duration : t -> int @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
   ☐ AudioStream module
-  ☐ AudioSource module:
-    ☐ create (with context)
-    ☐ play : t -> [`Stream of AudioStream.t | `Sound of SoundBuffer.t] -> ... sound parameters ... -> unit
-    ☐ stop/pause/resume
+  ✔ AudioSource module: @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
+    ✔ create (with context) @done(2017-08-21 20:07) @project(Audio (see NOTES for more info) / ☐ SoundBuffer module)
+    ✔ play : t -> [`Stream of AudioStream.t | `Sound of SoundBuffer.t] -> ... sound parameters ... -> unit @done(2017-08-21 20:07) @project(Audio (see NOTES for more info) / ☐ SoundBuffer module)
+    ✔ stop/pause/resume @done(2017-08-21 20:07) @project(Audio (see NOTES for more info) / ☐ SoundBuffer module)
 
 Windows specific:
   ☐ Implement canonical_path
@@ -56,7 +56,7 @@ Interface changes:
       ☐ Filtered transformations
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
   Sprite & Text:
-    ☐ Local relative-space conversion (rather than uniforms)
+    ✘ Local relative-space conversion (rather than uniforms) @cancelled(2017-08-21 20:07) @project(Interface changes / Sprite & Text)
     ☐ Same for texture coordinates for fonts
     ☐ (+Shape) Centralize transformations
   RenderTextures/Framebuffers:
@@ -81,11 +81,11 @@ Advanced features:
   More Image and Texture types:
     ☐ Single-channeled images
     ☐ Image slices
-    ☐ Texture3D
+    ✔ Texture3D @done(2017-08-21 20:07) @project(Advanced features / More Image and Texture types)
     ☐ Parameterize renderbuffers/textures by a texture format
     ☐ Depth textures
     ☐ Stencil textures
-    ☐ TextureCube
+    ✔ TextureCube @done(2017-08-21 20:07) @project(Advanced features / More Image and Texture types)
 
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿

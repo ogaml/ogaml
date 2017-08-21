@@ -78,7 +78,9 @@ module TextureFormat = struct
     | RG8
     | RGB8
     | RGBA8
+    | Depth16
     | Depth24
+    | Depth32
     | Depth24Stencil8
     | Stencil8
 
