@@ -14,6 +14,7 @@ type uniform =
   | Texture2D of (int option * Texture.Texture2D.t)
   | Texture3D of (int option * Texture.Texture3D.t)
   | Texture2DArray of (int option * Texture.Texture2DArray.t)
+  | DepthTexture2D of (int option * Texture.DepthTexture2D.t)
   | Cubemap   of (int option * Texture.Cubemap.t)
   | Float     of float
   | Int       of int
@@ -73,6 +74,10 @@ let texture3D s ?tex_unit t m =
 let texture2Darray s ?tex_unit t m = 
   assert_free m s;
   UniformMap.add s (Texture2DArray (tex_unit,t)) m
+
+let depthtexture2D s ?tex_unit t m = 
+  assert_free m s;
+  UniformMap.add s (DepthTexture2D (tex_unit,t)) m
 
 let int s i m = 
   assert_free m s;
@@ -154,6 +159,15 @@ module LL = struct
           let u = next_unit 0 in
           add_unit u;
           Texture.Texture2D.bind t u;
+          GL.Uniform.int1 location (Context.LL.texture_unit context)
+      | DepthTexture2D (Some u,t), GLTypes.GlslType.Sampler2D ->
+          add_unit u;
+          Texture.DepthTexture2D.bind t u;
+          GL.Uniform.int1 location (Context.LL.texture_unit context)
+      | DepthTexture2D (None, t), GLTypes.GlslType.Sampler2D ->
+          let u = next_unit 0 in
+          add_unit u;
+          Texture.DepthTexture2D.bind t u;
           GL.Uniform.int1 location (Context.LL.texture_unit context)
       | Texture3D (Some u,t), GLTypes.GlslType.Sampler3D ->
           add_unit u;

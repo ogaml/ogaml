@@ -14,6 +14,7 @@ end
 module DepthAttachment = struct
 
   type t = 
+    | Texture2D of GL.Texture.t * int 
     | DepthRBO of GL.RBO.t
 
 end

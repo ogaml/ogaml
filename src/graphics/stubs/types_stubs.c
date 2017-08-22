@@ -380,12 +380,18 @@ GLenum TextureFormat_val(value fmt)
       return GL_RGBA8;
 
     case 4:
-      return GL_DEPTH_COMPONENT24;
+      return GL_DEPTH_COMPONENT16;
 
     case 5:
-      return GL_DEPTH24_STENCIL8;
+      return GL_DEPTH_COMPONENT24;
 
     case 6:
+      return GL_DEPTH_COMPONENT32;
+
+    case 7:
+      return GL_DEPTH24_STENCIL8;
+
+    case 8:
       return GL_STENCIL_INDEX8;
 
     default:

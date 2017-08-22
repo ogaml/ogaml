@@ -20,6 +20,16 @@ module MagnifyFilter = GLTypes.MagnifyFilter
 module WrapFunction = GLTypes.WrapFunction
 
 
+module DepthFormat : sig
+
+  type t = 
+    | Int16
+    | Int24
+    | Int32
+
+end
+
+
 module Texture2DMipmap : sig
 
   type t
@@ -58,6 +68,51 @@ module Texture2D : sig
   val mipmap : t -> int -> Texture2DMipmap.t
 
   val to_color_attachment : t -> Attachment.ColorAttachment.t
+
+  val bind : t -> int -> unit
+
+end
+
+
+module DepthTexture2DMipmap : sig
+
+  type t
+
+  val size : t -> OgamlMath.Vector2i.t
+
+  val write : t -> ?rect:OgamlMath.IntRect.t -> Image.t -> unit
+
+  val level : t -> int
+
+  val to_depth_attachment : t -> Attachment.DepthAttachment.t
+
+  val bind : t -> int -> unit
+
+end
+
+
+module DepthTexture2D : sig
+
+  type t
+
+  val create : (module RenderTarget.T with type t = 'a) -> 'a 
+               -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+               -> DepthFormat.t
+               -> [< `Data of (OgamlMath.Vector2i.t * Bytes.t) | `Empty of OgamlMath.Vector2i.t] -> t
+
+  val size : t -> OgamlMath.Vector2i.t
+
+  val minify : t -> MinifyFilter.t -> unit
+
+  val magnify : t -> MagnifyFilter.t -> unit
+
+  val wrap : t -> WrapFunction.t -> unit
+
+  val mipmap_levels : t -> int
+
+  val mipmap : t -> int -> DepthTexture2DMipmap.t
+
+  val to_depth_attachment : t -> Attachment.DepthAttachment.t
 
   val bind : t -> int -> unit
 

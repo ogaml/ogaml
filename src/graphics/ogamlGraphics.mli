@@ -792,6 +792,18 @@ module Texture : sig
   end
 
 
+  (** Module containing an enumeration of the depth texture formats *)
+  module DepthFormat : sig
+ 
+    (** Enumeration of the depth texture formats *)
+    type t = 
+      | Int16
+      | Int24
+      | Int32
+  
+  end
+
+
   (** Represents a mipmap level of a 2D texture *)
   module Texture2DMipmap : sig
 
@@ -872,6 +884,88 @@ module Texture : sig
 
   end
 
+
+  (** Represents a mipmap level of a 2D depth texture *)
+  module DepthTexture2DMipmap : sig
+
+    (** Type of a 2D mipmap level *)
+    type t
+
+    (** Size of the mipmap level @see:OgamlMath.Vector2i *)
+    val size : t -> OgamlMath.Vector2i.t
+
+    (** Writes an image to a sub-rectangle of a mipmap level.
+      * Writes to the full mipmap level by default. 
+      * @see:OgamlMath.IntRect
+      * @see:OgamlGraphics.Image *)
+    val write : t -> ?rect:OgamlMath.IntRect.t -> Image.t -> unit
+
+    (** Returns the level of a DepthTexture2DMipmap.t *)
+    val level : t -> int
+ 
+    (** System only function, binds the original texture of the mipmap *)
+    val bind : t -> int -> unit 
+
+    (** DepthTexture2DMipmap implements the interface DepthAttachable and
+      * can be attached to an FBO.
+      * @see:OgamlGraphics.Attachment.DepthAttachment *)
+    val to_depth_attachment : t -> Attachment.DepthAttachment.t
+
+  end
+
+
+  (** Represents a 2D depth texture *)
+  module DepthTexture2D : sig
+
+    (** This module provides an abstraction of OpenGL 2D depth textures
+      * that can be used for 2D rendering (with sprites) or
+      * 3D rendering when passed to a GLSL program. *)
+
+    (** Type of a 2D depth texture *)
+    type t
+
+    (** Creates a texture from some data (in row-major order, starting from the
+      * bottom left corner), or an empty texture.
+      * Generates all mipmaps by default.
+      *
+      * Raises $Texture_error$ if the requested size exceeds the maximal texture size
+      * allowed by the context, or if the given data is too small.
+      * @see:OgamlGraphics.RenderTarget.T 
+      * @see:OgamlMath.Vector2i 
+      * @see:OgamlGraphics.Context *)
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> 
+                 ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None] ->
+                 DepthFormat.t ->
+                 [< `Data of (OgamlMath.Vector2i.t * Bytes.t) | `Empty of OgamlMath.Vector2i.t] -> t
+
+    (** Returns the size of a texture 
+      * @see:OgamlMath.Vector2i *)
+    val size : t -> OgamlMath.Vector2i.t
+
+    (** Sets the minifying filter of a texture. Defaults as LinearMipmapLinear. *)
+    val minify : t -> MinifyFilter.t -> unit
+
+    (** Sets the magnifying filter of a texture. Defaults as Linear *)
+    val magnify : t -> MagnifyFilter.t -> unit
+
+    (** Sets the wrapping function of a texture. Defaults as ClampEdge.  *)
+    val wrap : t -> WrapFunction.t -> unit
+    
+    (** Returns the number of mipmap levels of a texture *)
+    val mipmap_levels : t -> int
+
+    (** Returns a mipmap level of a texture.
+      * Raises $Invalid_argument$ if the requested level is out of bounds *)
+    val mipmap : t -> int -> DepthTexture2DMipmap.t
+
+    (** System only function, binds a texture to a texture unit for drawing *)
+    val bind : t -> int -> unit
+
+    (** DepthTexture2D implements the interface DepthAttachable and can be
+      * attached to an FBO. Binds the mipmap level 0. *)
+    val to_depth_attachment : t -> Attachment.DepthAttachment.t
+
+  end
 
   (** Represents a layer's mipmap of a 2D texture array *)
   module Texture2DArrayLayerMipmap : sig
@@ -1423,7 +1517,12 @@ module Uniform : sig
     * @see:OgamlGraphics.Context *)
   val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
 
-  (** See texture3D. Type : sampler3D.
+  (** See texture2D. Type : sampler2D.
+    *
+    * @see:OgamlGraphics.Texture.Texture3D *)
+  val depthtexture2D : string -> ?tex_unit:int -> Texture.DepthTexture2D.t -> t -> t
+
+  (** See texture2D. Type : sampler3D.
     *
     * @see:OgamlGraphics.Texture.Texture3D *)
   val texture3D : string -> ?tex_unit:int -> Texture.Texture3D.t -> t -> t

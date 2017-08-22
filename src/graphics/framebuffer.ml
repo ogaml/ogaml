@@ -91,6 +91,8 @@ let attach_depth (type a) (module A : Attachment.DepthAttachable with type t = a
   match attc with
   | Attachment.DepthAttachment.DepthRBO rbo -> 
     GL.FBO.renderbuffer GLTypes.GlAttachment.Depth rbo
+  | Attachment.DepthAttachment.Texture2D (tex, lvl) -> 
+    GL.FBO.texture2D GLTypes.GlAttachment.Depth tex lvl
 
 let attach_stencil (type a) (module A : Attachment.StencilAttachable with type t = a)
                  fbo (attachment : a) =
