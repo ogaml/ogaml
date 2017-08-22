@@ -42,6 +42,9 @@ val color : string -> Color.t -> t -> t
 (** Adds a 2D texture to a uniform structure *)
 val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
 
+(** Adds a 2D depth texture to a uniform structure *)
+val depthtexture2D : string -> ?tex_unit:int -> Texture.DepthTexture2D.t -> t -> t
+
 (** Adds a 3D texture to a uniform structure *)
 val texture3D : string -> ?tex_unit:int -> Texture.Texture3D.t -> t -> t
 
