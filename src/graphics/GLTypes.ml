@@ -199,5 +199,27 @@ module Parameter = struct
     | MaxTextureImageUnits
     | MaxTextureSize
     | MaxColorAttachments
+    | MaxDrawBuffers
+
+end
+
+(** Window output buffers *)
+module WindowOutputBuffer = struct
+   
+  type t = 
+    | FrontLeft
+    | FrontRight
+    | BackLeft
+    | BackRight
+    | None
+
+end
+
+(** FBO output buffers *)
+module FBOOutputBuffer = struct
+
+  type t = 
+    | Color of int
+    | None
 
 end

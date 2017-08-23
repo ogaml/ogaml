@@ -145,3 +145,40 @@ caml_fbo_renderbuffer(value atc, value rbo)
   CAMLreturn(Val_unit);
 }
 
+
+CAMLprim value
+caml_fbo_drawbuffers(value nbufs, value val_bufs)
+{
+  CAMLparam2(nbufs, val_bufs);
+
+  int i;
+  GLenum bufs[Int_val(nbufs)];
+
+  for(i = 0; i < Int_val(nbufs); i++)
+  {
+    bufs[i] = FBOOutputBuffer_val(Field(val_bufs, i));
+  }
+
+  glDrawBuffers(Int_val(nbufs), bufs);
+  
+  CAMLreturn(Val_unit);
+}
+
+
+CAMLprim value
+caml_fbo_drawwindowbuffers(value nbufs, value val_bufs)
+{
+  CAMLparam2(nbufs, val_bufs);
+
+  int i;
+  GLenum bufs[Int_val(nbufs)];
+
+  for(i = 0; i < Int_val(nbufs); i++)
+  {
+    bufs[i] = WindowOutputBuffer_val(Field(val_bufs, i));
+  }
+
+  glDrawBuffers(Int_val(nbufs), bufs);
+  
+  CAMLreturn(Val_unit);
+}

@@ -16,6 +16,7 @@ type capabilities = {
   max_texture_image_units   : int;
   max_texture_size          : int;
   max_color_attachments     : int;
+  max_draw_buffers          : int;
 }
 
 module ID_Pool = struct
@@ -144,6 +145,7 @@ module LL = struct
       max_texture_image_units   = GL.Pervasives.get_integerv GLTypes.Parameter.MaxTextureImageUnits  ;
       max_texture_size          = GL.Pervasives.get_integerv GLTypes.Parameter.MaxTextureSize        ;
       max_color_attachments     = GL.Pervasives.get_integerv GLTypes.Parameter.MaxColorAttachments   ;
+      max_draw_buffers          = GL.Pervasives.get_integerv GLTypes.Parameter.MaxDrawBuffers        ;
     }
     in
     (* A bit ugly, but Invalid_enum occurs sometimes even if a feature is supported... *)

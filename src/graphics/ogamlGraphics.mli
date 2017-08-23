@@ -350,6 +350,7 @@ module Context : sig
     max_texture_image_units   : int; (* Number of available texture units *)
     max_texture_size          : int; (* Maximal size of a texture *)
     max_color_attachments     : int; (* Maximal number of color attachments in a framebuffer *)
+    max_draw_buffers          : int; (* Maximal number of draw buffers *)
   }
 
   (** Type of a GL context *)
@@ -392,6 +393,15 @@ module RenderTarget : sig
   (** Signature of a valid render target module *)
   module type T = sig
 
+    (** Module encapsulating the enumeration of the output buffers 
+      * of a render target *)
+    module OutputBuffer : sig
+ 
+      (** Enumeration of the output buffers of a render target *)
+      type t
+  
+    end
+
     (** Type of a render target *)
     type t
 
@@ -402,11 +412,11 @@ module RenderTarget : sig
     val context : t -> Context.t
 
     (** Clears a render target *)
-    val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+    val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 
     (** Binds a render target for drawing. System-only function, usually done
       * automatically. *)
-    val bind : t -> DrawParameter.t -> unit
+    val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
 
   end
 
@@ -610,6 +620,16 @@ module Framebuffer : sig
   (** Type of a framebuffer object *)
   type t
 
+  (** Module encapsulating an enumeration of the output buffers of a framebuffer *)
+  module OutputBuffer : sig
+
+    (** Enumeration of the output buffers of a framebuffer *)
+    type t = 
+      | Color of int
+      | None
+
+  end
+
   (** Creates a framebuffer from a valid context *)
   val create : (module RenderTarget.T with type t = 'a) -> 'a -> t
 
@@ -667,11 +687,13 @@ module Framebuffer : sig
   (** Returns the GL context associated to the FBO *) 
   val context : t -> Context.t
 
-  (** Clears the FBO *)
-  val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+  (** Clears the FBO 
+    * 
+    * $buffers$ defaults to $[Color 0]$ *)
+  val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 
   (** Binds the FBO for drawing. Internal use only. *)
-  val bind : t -> DrawParameter.t -> unit
+  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
 
 end
 
@@ -1550,8 +1572,25 @@ module Window : sig
     * to obtain information about the GL context. *)
 
   (*** Window creation *)
+
+  (** Raised if an error occurs in this module *)
+  exception Window_Error of string
+
   (** The type of a window *)
   type t
+
+  (** Module encapsulating an enumeration of the output buffers of a window *)
+  module OutputBuffer : sig
+
+    (** Enumeration of the output buffers of a window *)
+    type t = 
+      | FrontLeft
+      | FrontRight
+      | BackLeft
+      | BackRight
+      | None
+
+  end
 
   (** Creates a window of size $width$ x $height$.
     * This window will create its openGL context following the specified settings.
@@ -1625,14 +1664,16 @@ module Window : sig
 
   (** Clears the window.
     * Clears the color buffer with opaque black by default. 
-    * Clears the depth buffer and the stencil buffer by default. *)
-  val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+    * Clears the depth buffer and the stencil buffer by default. 
+    *
+    * $buffers$ defaults to $[BackLeft]$ *)
+  val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 
   (** Show or hide the cursor *)
   val show_cursor : t -> bool -> unit
 
   (** Binds the window for drawing. This function is for internal use only. *)
-  val bind : t -> DrawParameter.t -> unit
+  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
 
   (** Takes a screenshot of the window *)
   val screenshot : t -> Image.t 
@@ -2101,6 +2142,9 @@ module VertexArray : sig
     *
     * $parameters$ defaults to $DrawParameter.make ()$
     *
+    * $buffers$ defaults to $[Color 0]$ for custom framebuffers, and to
+    * $[BackLeft]$ for the default framebuffer (Window).
+    *
     * $mode$ defaults to $DrawMode.Triangles$
     *
     * Raises $Invalid_argument$ if $start$ or $length$ is invalid. 
@@ -2115,7 +2159,7 @@ module VertexArray : sig
     * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
   val draw :
-    (module RenderTarget.T with type t = 'a) ->
+    (module RenderTarget.T with type t = 'a and type OutputBuffer.t = 'b) ->
     vertices   : t ->
     target     : 'a ->
     ?instances : int ->
@@ -2123,6 +2167,7 @@ module VertexArray : sig
     program    : Program.t ->
     ?uniform    : Uniform.t ->
     ?parameters : DrawParameter.t ->
+    ?buffers   : 'b list ->
     ?start     : int ->
     ?length    : int ->
     ?mode      : DrawMode.t ->

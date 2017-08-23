@@ -25,6 +25,7 @@ type capabilities = {
   max_texture_image_units   : int;
   max_texture_size          : int;
   max_color_attachments     : int;
+  max_draw_buffers          : int;
 }
 
 (** Pool of free IDs (used for textures, buffers, etc)

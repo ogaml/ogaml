@@ -2,6 +2,12 @@
 (* Type of renderable module *)
 module type T = sig
 
+  module OutputBuffer : sig
+
+    type t
+
+  end
+
   (* Type of a render target *)
   type t
 
@@ -12,11 +18,12 @@ module type T = sig
   val context : t -> Context.t
 
   (* Clears a render target *)
-  val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+  val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> 
+    ?depth:bool -> ?stencil:bool -> t -> unit
 
   (* Binds a render target for drawing. System-only function, usually done
    * automatically. *)
-  val bind : t -> DrawParameter.t -> unit
+  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
 
 end
 

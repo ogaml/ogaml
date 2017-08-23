@@ -768,10 +768,12 @@ let bind context vao program =
     Context.LL.set_bound_vao context (Some (vao.vao, vao.id))
   end
  
-let draw (type s) (module M : RenderTarget.T with type t = s)
+let draw (type s) (type buf) 
+         (module M : RenderTarget.T with type t = s and type OutputBuffer.t = buf)
          ~vertices ~target ?instances ?indices ~program
          ?uniform:(uniform = Uniform.empty) 
          ?parameters:(parameters = DrawParameter.make ()) 
+         ?buffers
          ?start
          ?length:draw_length
          ?mode:(mode = DrawMode.Triangles) () =
@@ -790,7 +792,7 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
       |Some l, _ -> l
     in
     let max_instances = max_instances vertices in
-    M.bind target parameters;
+    M.bind target ?buffers parameters;
     Program.LL.use context (Some program);
     Uniform.LL.bind context uniform (Program.LL.uniforms program);
     bind context vertices program;
