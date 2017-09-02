@@ -3,7 +3,7 @@ open OgamlGraphics
 let () =
   Printf.printf "Beginning version test...\n%!"
 
-let settings = OgamlCore.ContextSettings.create ()
+let settings = OgamlCore.ContextSettings.create ~core_profile:true ()
 
 let window = Window.create ~width:100 ~height:100 ~settings ~title:"" ()
 

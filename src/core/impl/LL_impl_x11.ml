@@ -17,15 +17,34 @@ module Window = struct
   let create ~width ~height ~title ~settings =
     (* The display is a singleton in C (created only once) *)
     let display = X11.Display.create () in
-    let vi = X11.VisualInfo.choose display (
-      [X11.VisualInfo.DoubleBuffer;
-       X11.VisualInfo.DepthSize (ContextSettings.depth_bits settings);
-       X11.VisualInfo.StencilSize (ContextSettings.stencil_bits settings)]
+    let vi = X11.GLXFBConfig.choose display (
+      [X11.GLXFBConfig.DoubleBuffer;
+       X11.GLXFBConfig.DepthSize (ContextSettings.depth_bits settings);
+       X11.GLXFBConfig.StencilSize (ContextSettings.stencil_bits settings)]
       |> fun l ->
           if ContextSettings.aa_level settings > 0 then
-            X11.VisualInfo.SampleBuffers 1 ::
-            X11.VisualInfo.Samples (ContextSettings.aa_level settings) :: l
+            X11.GLXFBConfig.SampleBuffers 1 ::
+            X11.GLXFBConfig.Samples (ContextSettings.aa_level settings) :: l
           else l)
+    in
+    let ctx_attribs = 
+      let l = ref [] in
+      if ContextSettings.forward_compatible settings then
+        l := (X11.GLContext.(Flags {fwd_compat = true; debug = false})) :: !l;
+      if ContextSettings.compatibility_profile settings
+      || ContextSettings.core_profile settings then 
+        l := (X11.GLContext.(ProfileMask 
+          {compat = ContextSettings.compatibility_profile settings; 
+           core = ContextSettings.core_profile settings})) :: !l;
+      begin match ContextSettings.minor_version settings with
+      | None -> ()
+      | Some i -> l := (X11.GLContext.MinorVersion i) :: !l
+      end;
+      begin match ContextSettings.major_version settings with
+      | None -> ()
+      | Some i -> l := (X11.GLContext.MajorVersion i) :: !l
+      end;
+      !l
     in
     let window  =
         X11.Window.create_simple
@@ -61,7 +80,7 @@ module Window = struct
       |Some prop, Some atom -> X11.Atom.send_event display window prop [X11.Atom.wm_toggle;atom]
     end;
     X11.Display.flush display;
-    let context = X11.GLContext.create display vi in
+    let context = X11.GLContext.create display vi ctx_attribs in
     X11.Window.attach display window context;
     X11.Window.set_title display window title;
     let (x,y) = X11.Window.position display window in

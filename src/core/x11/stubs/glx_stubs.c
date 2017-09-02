@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "utils.h"
 
+typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 
 // INPUT   : a display, a screen number, an attribute list
 // OUTPUT  : a visual info satisfying the attribute list
@@ -60,26 +61,76 @@ caml_glx_choose_visual(value disp, value scr, value attributes, value len)
   attrs[i] = None;
 
   GLXFBConfig* fbc = glXChooseFBConfig(dpy, Int_val(scr), attrs, &fbcount);
-  XVisualInfo* vis = glXGetVisualFromFBConfig(dpy, fbc[0]);
 
-  XVisualInfo_alloc(res);
-  XVisualInfo_copy(res, vis);
+  GLXFBConfig_alloc(res);
+  GLXFBConfig_copy(res, &fbc[0]);
 
   CAMLreturn(res);
 }
 
 
-// INPUT   : a display, a visualinfo struct
-// OUTPUT  : creates a context satisfying the visualinfo
+// INPUT   : a display, a GLXFBConfig, attributes and the total length of the 
+//           resulting attrib list (w/ flags)
+// OUTPUT  : creates a context satisfying the GLXFBConfig and the attributes
 CAMLprim value
-caml_glx_create_context(value disp, value vi)
+caml_glx_create_context(value disp, value glxfbc, value attribs, value length)
 {
-  CAMLparam2(disp, vi);
+  CAMLparam4(disp, glxfbc, attribs, length);
+  CAMLlocal2(hd,tl);
 
+  int i = 0;
+  int mask;
+  int attrs_list[Int_val(length)+1];
   Display* dpy = Display_val(disp);
-  XVisualInfo* xvi = XVisualInfo_val(vi);
+  GLXFBConfig config = GLXFBConfig_val(glxfbc);
 
-  GLXContext tmp = glXCreateContext(dpy, xvi, NULL, True);
+  tl = attribs;
+
+  while(tl != Val_emptylist) {
+    mask = 0;
+    hd = Field(tl, 0);
+    tl = Field(tl, 1);
+    switch(Tag_val(hd)) {
+      case 0:
+        attrs_list[i] = GLX_CONTEXT_MAJOR_VERSION_ARB;
+        attrs_list[i+1] = Int_val(Field(hd,0));
+        break;
+      case 1:
+        attrs_list[i] = GLX_CONTEXT_MINOR_VERSION_ARB;
+        attrs_list[i+1] = Int_val(Field(hd,0));
+        break;
+      case 2:
+        attrs_list[i] = GLX_CONTEXT_FLAGS_ARB;
+        if(Bool_val(Field(Field(hd,0),0))) {
+          mask |= GLX_CONTEXT_DEBUG_BIT_ARB;
+        }
+        if(Bool_val(Field(Field(hd,0),1))) {
+          mask |= GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
+        }
+        attrs_list[i+1] = mask;
+        break;
+      case 3:
+        attrs_list[i] = GLX_CONTEXT_PROFILE_MASK_ARB;
+        if(Bool_val(Field(Field(hd,0),0))) {
+          mask |= GLX_CONTEXT_CORE_PROFILE_BIT_ARB;
+        }
+        if(Bool_val(Field(Field(hd,0),1))) {
+          mask |= GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
+        }
+        attrs_list[i+1] = mask;
+        break;
+      default:
+        caml_failwith("Variant error in glx_create_context");
+    }
+    i += 2;
+  }
+  attrs_list[i] = 0;
+
+  glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
+  glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)
+    glXGetProcAddressARB((const GLubyte*) "glXCreateContextAttribsARB");
+
+  GLXContext tmp = glXCreateContextAttribsARB(dpy, config, NULL, True, attrs_list);
 
   // a GLXContext is a pointer
   CAMLreturn(Val_GLXContext(tmp));

@@ -18,7 +18,7 @@ module Display : sig
 end
 
 
-module VisualInfo : sig
+module GLXFBConfig : sig
 
   type t
 
@@ -51,7 +51,17 @@ module GLContext : sig
 
   type t
 
-  val create : Display.t -> VisualInfo.t -> t
+  type flags = {debug : bool; fwd_compat : bool}
+
+  type profile = {compat : bool; core : bool}
+
+  type attribute = 
+    | MajorVersion of int
+    | MinorVersion of int
+    | Flags        of flags
+    | ProfileMask  of profile
+
+  val create : Display.t -> GLXFBConfig.t -> attribute list -> t
 
   val destroy : Display.t -> t -> unit
 
@@ -70,7 +80,7 @@ module Window : sig
   val root_of : ?screen:int -> Display.t -> t
 
   val create_simple : display:Display.t -> parent:t -> size:(int * int) -> 
-                      origin:(int * int) -> visual:VisualInfo.t -> t
+                      origin:(int * int) -> visual:GLXFBConfig.t -> t
 
   val set_title : Display.t -> t -> string -> unit
 
