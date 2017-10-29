@@ -128,13 +128,13 @@ let times m ?perspective:(p = true) v =
 let from_quaternion q = 
   let mat = zero () in Quaternion.(
   set 0 0 mat (1. -. 2. *. q.j *. q.j -. 2. *. q.k *. q.k);
-  set 1 0 mat (2. *. q.i *. q.j -. 2. *. q.r *. q.k);
-  set 2 0 mat (2. *. q.i *. q.k +. 2. *. q.r *. q.j);
-  set 0 1 mat (2. *. q.i *. q.j +. 2. *. q.r *. q.k);
+  set 0 1 mat (2. *. q.i *. q.j -. 2. *. q.r *. q.k);
+  set 0 2 mat (2. *. q.i *. q.k +. 2. *. q.r *. q.j);
+  set 1 0 mat (2. *. q.i *. q.j +. 2. *. q.r *. q.k);
   set 1 1 mat (1. -. 2. *. q.i *. q.i -. 2. *. q.k *. q.k);
-  set 2 1 mat (2. *. q.j *. q.k -. 2. *. q.r *. q.i);
-  set 0 2 mat (2. *. q.i *. q.k -. 2. *. q.r *. q.j);
-  set 1 2 mat (2. *. q.j *. q.k +. 2. *. q.r *. q.i);
+  set 1 2 mat (2. *. q.j *. q.k -. 2. *. q.r *. q.i);
+  set 2 0 mat (2. *. q.i *. q.k -. 2. *. q.r *. q.j);
+  set 2 1 mat (2. *. q.j *. q.k +. 2. *. q.r *. q.i);
   set 2 2 mat (1. -. 2. *. q.i *. q.i -. 2. *. q.j *. q.j);
   set 3 3 mat 1.; mat)
 
@@ -196,15 +196,15 @@ let look_at_eulerian ~from ~theta ~phi =
   |> product
     (from_quaternion
       (Quaternion.times
-        (Quaternion.rotation Vector3f.unit_y theta)
         (Quaternion.rotation Vector3f.unit_x phi)
+        (Quaternion.rotation Vector3f.unit_y theta)
       ))
 
 let ilook_at_eulerian ~from ~theta ~phi =
   from_quaternion
     (Quaternion.times
-      (Quaternion.(inverse (rotation Vector3f.unit_x phi)))
-      (Quaternion.(inverse (rotation Vector3f.unit_y theta))))
+      (Quaternion.(inverse (rotation Vector3f.unit_y theta)))
+      (Quaternion.(inverse (rotation Vector3f.unit_x phi))))
   |> product (translation from)
 
 let orthographic ~right ~left ~near ~far ~top ~bottom =
