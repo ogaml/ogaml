@@ -169,6 +169,7 @@ module NSOpenGLPixelFormat : sig
   type profile =
     | NSOpenGLProfileVersionLegacy
     | NSOpenGLProfileVersion3_2Core
+    | NSOpenGLProfileVersion4_1Core
 
   type attribute =
     | NSOpenGLPFAAllRenderers
