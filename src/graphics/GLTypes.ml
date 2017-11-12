@@ -78,7 +78,9 @@ module TextureFormat = struct
     | RG8
     | RGB8
     | RGBA8
+    | Depth16
     | Depth24
+    | Depth32
     | Depth24Stencil8
     | Stencil8
 
@@ -197,5 +199,27 @@ module Parameter = struct
     | MaxTextureImageUnits
     | MaxTextureSize
     | MaxColorAttachments
+    | MaxDrawBuffers
+
+end
+
+(** Window output buffers *)
+module WindowOutputBuffer = struct
+   
+  type t = 
+    | FrontLeft
+    | FrontRight
+    | BackLeft
+    | BackRight
+    | None
+
+end
+
+(** FBO output buffers *)
+module FBOOutputBuffer = struct
+
+  type t = 
+    | Color of int
+    | None
 
 end

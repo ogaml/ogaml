@@ -449,6 +449,12 @@ module FBO : sig
   (** Attaches a render buffer to an FBO *)
   val renderbuffer : GLTypes.GlAttachment.t -> RBO.t -> unit
 
+  (** Activates buffers for drawing *)
+  val draw_buffers : int -> GLTypes.FBOOutputBuffer.t array -> unit
+
+  (** Activates window buffers for drawing *)
+  val draw_default_buffers : int -> GLTypes.WindowOutputBuffer.t array -> unit
+
 end
 
 

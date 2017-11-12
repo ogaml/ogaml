@@ -436,6 +436,11 @@ module FBO = struct
 
   external renderbuffer : GLTypes.GlAttachment.t -> RBO.t -> unit = "caml_fbo_renderbuffer"
 
+  external draw_buffers : int -> GLTypes.FBOOutputBuffer.t array -> unit = "caml_fbo_drawbuffers"
+
+  external draw_default_buffers : int -> GLTypes.WindowOutputBuffer.t array -> unit =
+    "caml_fbo_drawwindowbuffers"
+
 end
 
 

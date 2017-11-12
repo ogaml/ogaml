@@ -2,6 +2,10 @@ open OgamlMath
 
 exception Image_error of string
 
+(* Note : data is stored in row-major order, starting from the bottom-left 
+ * corner to avoid having to flip the image when creating a texture.
+ * However, all accesses are done relatively to the top-left corner to be consistent
+ * with the usual 2D conventions. *)
 type t = {width : int; height : int; data : Bytes.t}
 
 let clamp f a b = min b (max f a)
@@ -18,6 +22,8 @@ external stbi_write_png : string -> (int * int) -> int -> int -> Bytes.t -> unit
 
 let create = function
   |`File s -> begin
+    (* stb_image automatically flips the image so that it is stored in 
+     * the correct order *)
     match stbi_load_from_file s with
     |None -> 
       let msg = Printf.sprintf "Failed to load image file %s. Reason : %s" 
@@ -57,9 +63,6 @@ let create = function
       raise (Image_error "Create from data: invalid length of data");
     {width; height; data}
 
-let save img filename =
-  stbi_write_png filename (img.width,img.height) 4 0 img.data 
-
 let size img = 
   OgamlMath.Vector2i.({x = img.width; y = img.height})
 
@@ -73,10 +76,10 @@ let set img v c =
     convert c.Color.RGB.a
   in
   try 
-    Bytes.set img.data (v.y * 4 * img.width + v.x * 4    ) r;
-    Bytes.set img.data (v.y * 4 * img.width + v.x * 4 + 1) g;
-    Bytes.set img.data (v.y * 4 * img.width + v.x * 4 + 2) b;
-    Bytes.set img.data (v.y * 4 * img.width + v.x * 4 + 3) a;
+    Bytes.set img.data ((img.height - v.y - 1) * 4 * img.width + v.x * 4    ) r;
+    Bytes.set img.data ((img.height - v.y - 1) * 4 * img.width + v.x * 4 + 1) g;
+    Bytes.set img.data ((img.height - v.y - 1) * 4 * img.width + v.x * 4 + 2) b;
+    Bytes.set img.data ((img.height - v.y - 1) * 4 * img.width + v.x * 4 + 3) a;
   with
     Invalid_argument _ -> raise (Image_error "Set : index out of bounds")
 
@@ -84,12 +87,28 @@ let get img v =
   let open Vector2i in
   try 
     Color.RGB.(
-    {r = inverse img.data.[v.y * 4 * img.width + v.x * 4 + 0];
-     g = inverse img.data.[v.y * 4 * img.width + v.x * 4 + 1];
-     b = inverse img.data.[v.y * 4 * img.width + v.x * 4 + 2];
-     a = inverse img.data.[v.y * 4 * img.width + v.x * 4 + 3]})
+    {r = inverse img.data.[(img.height - v.y - 1) * 4 * img.width + v.x * 4 + 0];
+     g = inverse img.data.[(img.height - v.y - 1) * 4 * img.width + v.x * 4 + 1];
+     b = inverse img.data.[(img.height - v.y - 1) * 4 * img.width + v.x * 4 + 2];
+     a = inverse img.data.[(img.height - v.y - 1) * 4 * img.width + v.x * 4 + 3]})
   with
     Invalid_argument _ -> raise (Image_error "Get : index out of bounds")
+
+let mirror_data img = 
+  let img_rev = create (`Empty (size img, `RGB Color.RGB.black)) in
+  for x = 0 to img.width - 1 do
+    for y = 0 to img.height - 1 do
+      let c = get img Vector2i.({x; y}) in
+      set img_rev Vector2i.({x; y = img.height - 1 - y}) (`RGB c);
+    done
+  done;
+  img_rev
+
+let save img filename =
+  (* Since stb_image_write does not offer a way to flip the image when writing,
+   * we need to flip it ourselves. *)
+  let img_rev = mirror_data img in
+  stbi_write_png filename (img.width,img.height) 4 0 img_rev.data 
 
 let data img = img.data
 

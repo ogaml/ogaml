@@ -2,15 +2,22 @@ open OgamlMath
 
 module type T = sig
 
+  module OutputBuffer : sig
+
+    type t
+
+  end
+
   type t
 
   val size : t -> OgamlMath.Vector2i.t
 
   val context : t -> Context.t
 
-  val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+  val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> 
+    ?depth:bool -> ?stencil:bool -> t -> unit
 
-  val bind : t -> DrawParameter.t -> unit
+  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
 
 end
 

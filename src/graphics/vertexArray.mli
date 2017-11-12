@@ -164,7 +164,7 @@ val length : t -> int
 val max_instances : t -> int option
 
 val draw :
-  (module RenderTarget.T with type t = 'a) ->
+  (module RenderTarget.T with type t = 'a and type OutputBuffer.t = 'b) ->
   vertices   : t ->
   target     : 'a ->
   ?instances : int ->
@@ -172,6 +172,7 @@ val draw :
   program    : Program.t ->
   ?uniform    : Uniform.t ->
   ?parameters : DrawParameter.t ->
+  ?buffers   : 'b list ->
   ?start     : int ->
   ?length    : int ->
   ?mode      : DrawMode.t ->

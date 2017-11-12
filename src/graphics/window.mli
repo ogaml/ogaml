@@ -1,3 +1,15 @@
+exception Window_Error of string
+
+module OutputBuffer : sig
+
+  type t = 
+    | FrontLeft
+    | FrontRight
+    | BackLeft
+    | BackRight
+    | None
+
+end
 
 type t
 
@@ -51,7 +63,8 @@ val poll_event : t -> OgamlCore.Event.t option
 val display : t -> unit
 
 (** Clears the window *)
-val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> 
+            ?depth:bool -> ?stencil:bool -> t -> unit
 
 (** Returns the internal GL context of the window *)
 val context : t -> Context.t
@@ -60,7 +73,7 @@ val context : t -> Context.t
 val show_cursor : t -> bool -> unit
 
 (** System-only, binds the window for drawing *)
-val bind : t -> DrawParameter.t -> unit
+val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
 
 (** Returns the internal window of this window.
   * Used internally, hidden from the global interface. *)

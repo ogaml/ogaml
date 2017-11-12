@@ -2,6 +2,8 @@ open OgamlMath
 
 exception FBO_Error of string
 
+module OutputBuffer = GLTypes.FBOOutputBuffer
+
 type t = {
   fbo    : GL.FBO.t;
   context  : Context.t;
@@ -9,7 +11,9 @@ type t = {
   mutable color   : bool;
   mutable depth   : bool;
   mutable stencil : bool;
-  mutable color_attachments : (Vector2i.t * Attachment.ColorAttachment.t) option array;
+  color_attachments : (Vector2i.t * Attachment.ColorAttachment.t) option array;
+  bound_attachments : OutputBuffer.t array;
+  mutable n_bound_attachments : int;
   mutable depth_attachment  : (Vector2i.t * Attachment.DepthAttachment.t) option;
   mutable stencil_attachment  : (Vector2i.t * Attachment.StencilAttachment.t) option;
   mutable depth_stencil_attachment  : (Vector2i.t * Attachment.DepthStencilAttachment.t) option
@@ -22,6 +26,9 @@ let create (type a) (module T : RenderTarget.T with type t = a) (target : a) =
   let id = Context.ID_Pool.get_next idpool in
   let maxattc = (Context.capabilities context).Context.max_color_attachments in
   let color_attachments = Array.make maxattc None in
+  let maxbufs = (Context.capabilities context).Context.max_draw_buffers in
+  let bound_attachments = Array.make maxbufs OutputBuffer.None in
+  bound_attachments.(0) <- OutputBuffer.Color 0;
   let finalize _ = 
     Context.ID_Pool.free idpool id;
     if Context.LL.bound_fbo context = id then
@@ -33,6 +40,8 @@ let create (type a) (module T : RenderTarget.T with type t = a) (target : a) =
     id;
     color = false; depth = false; stencil = false;
     color_attachments; 
+    bound_attachments;
+    n_bound_attachments = 1;
     depth_attachment = None;
     stencil_attachment = None; 
     depth_stencil_attachment = None}
@@ -91,6 +100,8 @@ let attach_depth (type a) (module A : Attachment.DepthAttachable with type t = a
   match attc with
   | Attachment.DepthAttachment.DepthRBO rbo -> 
     GL.FBO.renderbuffer GLTypes.GlAttachment.Depth rbo
+  | Attachment.DepthAttachment.Texture2D (tex, lvl) -> 
+    GL.FBO.texture2D GLTypes.GlAttachment.Depth tex lvl
 
 let attach_stencil (type a) (module A : Attachment.StencilAttachable with type t = a)
                  fbo (attachment : a) =
@@ -173,9 +184,42 @@ let size fbo =
 
 let context fbo = fbo.context
 
-let clear ?color:(color = Some (`RGB Color.RGB.black)) 
+let activate_buffers fbo buffers = 
+  let max_colors = Array.length fbo.color_attachments in
+  let active_buffers = Array.make max_colors false in
+  let max_buffers = Array.length fbo.bound_attachments in
+  let length, changed = 
+    List.fold_left (fun (idx, changed) buf ->
+      if idx >= max_buffers then
+        raise (FBO_Error "Cannot bind more than MAX_DRAW_BUFFERS buffers");
+      let changed = changed 
+        || fbo.bound_attachments.(idx) <> buf 
+        || idx >= fbo.n_bound_attachments 
+      in
+      begin match buf with
+      | OutputBuffer.Color i ->
+        if i < 0 || i >= max_colors then
+          raise (FBO_Error "Color buffer index out of bounds")
+        else if active_buffers.(i) then
+          raise (FBO_Error "Trying to bind same color buffer twice")
+        else
+          active_buffers.(i) <- true;
+      | OutputBuffer.None -> ()
+      end;
+      fbo.bound_attachments.(idx) <- buf;
+      (idx + 1, changed)
+    ) (0, false) buffers
+  in
+  if changed || length <> fbo.n_bound_attachments then begin
+    fbo.n_bound_attachments <- length;
+    GL.FBO.draw_buffers length fbo.bound_attachments
+  end
+      
+let clear ?buffers:(buffers = [OutputBuffer.Color 0]) 
+          ?color:(color = Some (`RGB Color.RGB.black)) 
           ?depth:(depth = true) ?stencil:(stencil = true) fbo = 
   RenderTarget.bind_fbo fbo.context fbo.id (Some fbo.fbo);
+  activate_buffers fbo buffers;
   if fbo.color then 
     RenderTarget.clear 
       ?color
@@ -188,8 +232,9 @@ let clear ?color:(color = Some (`RGB Color.RGB.black))
       ~stencil:(stencil && fbo.stencil)
       fbo.context
 
-let bind fbo params = 
+let bind fbo ?(buffers=[OutputBuffer.Color 0]) params = 
   RenderTarget.bind_fbo fbo.context fbo.id (Some fbo.fbo);
+  activate_buffers fbo buffers;
   RenderTarget.bind_draw_parameters fbo.context (size fbo) 0 params
 
 

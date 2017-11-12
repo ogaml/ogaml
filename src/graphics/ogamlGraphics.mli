@@ -350,6 +350,7 @@ module Context : sig
     max_texture_image_units   : int; (* Number of available texture units *)
     max_texture_size          : int; (* Maximal size of a texture *)
     max_color_attachments     : int; (* Maximal number of color attachments in a framebuffer *)
+    max_draw_buffers          : int; (* Maximal number of draw buffers *)
   }
 
   (** Type of a GL context *)
@@ -392,6 +393,15 @@ module RenderTarget : sig
   (** Signature of a valid render target module *)
   module type T = sig
 
+    (** Module encapsulating the enumeration of the output buffers 
+      * of a render target *)
+    module OutputBuffer : sig
+ 
+      (** Enumeration of the output buffers of a render target *)
+      type t
+  
+    end
+
     (** Type of a render target *)
     type t
 
@@ -402,11 +412,11 @@ module RenderTarget : sig
     val context : t -> Context.t
 
     (** Clears a render target *)
-    val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+    val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 
     (** Binds a render target for drawing. System-only function, usually done
       * automatically. *)
-    val bind : t -> DrawParameter.t -> unit
+    val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
 
   end
 
@@ -610,6 +620,16 @@ module Framebuffer : sig
   (** Type of a framebuffer object *)
   type t
 
+  (** Module encapsulating an enumeration of the output buffers of a framebuffer *)
+  module OutputBuffer : sig
+
+    (** Enumeration of the output buffers of a framebuffer *)
+    type t = 
+      | Color of int
+      | None
+
+  end
+
   (** Creates a framebuffer from a valid context *)
   val create : (module RenderTarget.T with type t = 'a) -> 'a -> t
 
@@ -667,11 +687,13 @@ module Framebuffer : sig
   (** Returns the GL context associated to the FBO *) 
   val context : t -> Context.t
 
-  (** Clears the FBO *)
-  val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+  (** Clears the FBO 
+    * 
+    * $buffers$ defaults to $[Color 0]$ *)
+  val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 
   (** Binds the FBO for drawing. Internal use only. *)
-  val bind : t -> DrawParameter.t -> unit
+  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
 
 end
 
@@ -792,6 +814,18 @@ module Texture : sig
   end
 
 
+  (** Module containing an enumeration of the depth texture formats *)
+  module DepthFormat : sig
+ 
+    (** Enumeration of the depth texture formats *)
+    type t = 
+      | Int16
+      | Int24
+      | Int32
+  
+  end
+
+
   (** Represents a mipmap level of a 2D texture *)
   module Texture2DMipmap : sig
 
@@ -872,6 +906,88 @@ module Texture : sig
 
   end
 
+
+  (** Represents a mipmap level of a 2D depth texture *)
+  module DepthTexture2DMipmap : sig
+
+    (** Type of a 2D mipmap level *)
+    type t
+
+    (** Size of the mipmap level @see:OgamlMath.Vector2i *)
+    val size : t -> OgamlMath.Vector2i.t
+
+    (** Writes an image to a sub-rectangle of a mipmap level.
+      * Writes to the full mipmap level by default. 
+      * @see:OgamlMath.IntRect
+      * @see:OgamlGraphics.Image *)
+    val write : t -> ?rect:OgamlMath.IntRect.t -> Image.t -> unit
+
+    (** Returns the level of a DepthTexture2DMipmap.t *)
+    val level : t -> int
+ 
+    (** System only function, binds the original texture of the mipmap *)
+    val bind : t -> int -> unit 
+
+    (** DepthTexture2DMipmap implements the interface DepthAttachable and
+      * can be attached to an FBO.
+      * @see:OgamlGraphics.Attachment.DepthAttachment *)
+    val to_depth_attachment : t -> Attachment.DepthAttachment.t
+
+  end
+
+
+  (** Represents a 2D depth texture *)
+  module DepthTexture2D : sig
+
+    (** This module provides an abstraction of OpenGL 2D depth textures
+      * that can be used for 2D rendering (with sprites) or
+      * 3D rendering when passed to a GLSL program. *)
+
+    (** Type of a 2D depth texture *)
+    type t
+
+    (** Creates a texture from some data (in row-major order, starting from the
+      * bottom left corner), or an empty texture.
+      * Generates all mipmaps by default.
+      *
+      * Raises $Texture_error$ if the requested size exceeds the maximal texture size
+      * allowed by the context, or if the given data is too small.
+      * @see:OgamlGraphics.RenderTarget.T 
+      * @see:OgamlMath.Vector2i 
+      * @see:OgamlGraphics.Context *)
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> 
+                 ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None] ->
+                 DepthFormat.t ->
+                 [< `Data of (OgamlMath.Vector2i.t * Bytes.t) | `Empty of OgamlMath.Vector2i.t] -> t
+
+    (** Returns the size of a texture 
+      * @see:OgamlMath.Vector2i *)
+    val size : t -> OgamlMath.Vector2i.t
+
+    (** Sets the minifying filter of a texture. Defaults as LinearMipmapLinear. *)
+    val minify : t -> MinifyFilter.t -> unit
+
+    (** Sets the magnifying filter of a texture. Defaults as Linear *)
+    val magnify : t -> MagnifyFilter.t -> unit
+
+    (** Sets the wrapping function of a texture. Defaults as ClampEdge.  *)
+    val wrap : t -> WrapFunction.t -> unit
+    
+    (** Returns the number of mipmap levels of a texture *)
+    val mipmap_levels : t -> int
+
+    (** Returns a mipmap level of a texture.
+      * Raises $Invalid_argument$ if the requested level is out of bounds *)
+    val mipmap : t -> int -> DepthTexture2DMipmap.t
+
+    (** System only function, binds a texture to a texture unit for drawing *)
+    val bind : t -> int -> unit
+
+    (** DepthTexture2D implements the interface DepthAttachable and can be
+      * attached to an FBO. Binds the mipmap level 0. *)
+    val to_depth_attachment : t -> Attachment.DepthAttachment.t
+
+  end
 
   (** Represents a layer's mipmap of a 2D texture array *)
   module Texture2DArrayLayerMipmap : sig
@@ -1423,7 +1539,12 @@ module Uniform : sig
     * @see:OgamlGraphics.Context *)
   val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
 
-  (** See texture3D. Type : sampler3D.
+  (** See texture2D. Type : sampler2D.
+    *
+    * @see:OgamlGraphics.Texture.Texture3D *)
+  val depthtexture2D : string -> ?tex_unit:int -> Texture.DepthTexture2D.t -> t -> t
+
+  (** See texture2D. Type : sampler3D.
     *
     * @see:OgamlGraphics.Texture.Texture3D *)
   val texture3D : string -> ?tex_unit:int -> Texture.Texture3D.t -> t -> t
@@ -1451,8 +1572,25 @@ module Window : sig
     * to obtain information about the GL context. *)
 
   (*** Window creation *)
+
+  (** Raised if an error occurs in this module *)
+  exception Window_Error of string
+
   (** The type of a window *)
   type t
+
+  (** Module encapsulating an enumeration of the output buffers of a window *)
+  module OutputBuffer : sig
+
+    (** Enumeration of the output buffers of a window *)
+    type t = 
+      | FrontLeft
+      | FrontRight
+      | BackLeft
+      | BackRight
+      | None
+
+  end
 
   (** Creates a window of size $width$ x $height$.
     * This window will create its openGL context following the specified settings.
@@ -1526,14 +1664,16 @@ module Window : sig
 
   (** Clears the window.
     * Clears the color buffer with opaque black by default. 
-    * Clears the depth buffer and the stencil buffer by default. *)
-  val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+    * Clears the depth buffer and the stencil buffer by default. 
+    *
+    * $buffers$ defaults to $[BackLeft]$ *)
+  val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
 
   (** Show or hide the cursor *)
   val show_cursor : t -> bool -> unit
 
   (** Binds the window for drawing. This function is for internal use only. *)
-  val bind : t -> DrawParameter.t -> unit
+  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
 
   (** Takes a screenshot of the window *)
   val screenshot : t -> Image.t 
@@ -2002,6 +2142,9 @@ module VertexArray : sig
     *
     * $parameters$ defaults to $DrawParameter.make ()$
     *
+    * $buffers$ defaults to $[Color 0]$ for custom framebuffers, and to
+    * $[BackLeft]$ for the default framebuffer (Window).
+    *
     * $mode$ defaults to $DrawMode.Triangles$
     *
     * Raises $Invalid_argument$ if $start$ or $length$ is invalid. 
@@ -2016,7 +2159,7 @@ module VertexArray : sig
     * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
   val draw :
-    (module RenderTarget.T with type t = 'a) ->
+    (module RenderTarget.T with type t = 'a and type OutputBuffer.t = 'b) ->
     vertices   : t ->
     target     : 'a ->
     ?instances : int ->
@@ -2024,6 +2167,7 @@ module VertexArray : sig
     program    : Program.t ->
     ?uniform    : Uniform.t ->
     ?parameters : DrawParameter.t ->
+    ?buffers   : 'b list ->
     ?start     : int ->
     ?length    : int ->
     ?mode      : DrawMode.t ->

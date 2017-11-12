@@ -16,6 +16,26 @@ module MagnifyFilter = GLTypes.MagnifyFilter
 
 module WrapFunction = GLTypes.WrapFunction
 
+module DepthFormat = struct
+
+  type t = 
+    | Int16
+    | Int24
+    | Int32
+
+  let to_texture_format = function
+    | Int16 -> GLTypes.TextureFormat.Depth16
+    | Int24 -> GLTypes.TextureFormat.Depth24
+    | Int32 -> GLTypes.TextureFormat.Depth32
+
+  let byte_size = function
+    | Int16 -> 2
+    | Int24 -> 3
+    | Int32 -> 4
+
+end
+
+
 (*************************************************************)
 (*                                                           *)
 (*            Common interface to OpenGL Textures            *)
@@ -276,6 +296,158 @@ module Texture2D = struct
 
   let to_color_attachment tex = 
     Attachment.ColorAttachment.Texture2D (tex.common.Common.internal, 0)
+
+end
+
+
+(*************************************************************)
+(*                                                           *)
+(*                    2D Depth Textures                      *)
+(*                                                           *)
+(*                                                           *)
+(*************************************************************)
+
+module DepthTexture2DMipmap = struct
+
+  type t = {
+    common  : Common.t;
+    size    : Vector2i.t;
+    level   : int
+  }
+
+  let bind tex uid = 
+    Common.bind tex.common uid
+
+  let size tex = 
+    tex.size
+
+  let write tex ?rect img = 
+    bind tex 0;
+    let rect = 
+      match rect with
+      | None   -> IntRect.create Vector2i.zero (size tex)
+      | Some r -> r
+    in
+    GL.Texture.subimage2D 
+      GLTypes.TextureTarget.Texture2D
+      tex.level (rect.IntRect.x, rect.IntRect.y)
+      (rect.IntRect.width, rect.IntRect.height)
+      GLTypes.PixelFormat.Depth
+      (Image.data img)
+
+  let level tex = 
+    tex.level
+
+  let to_depth_attachment tex = 
+    Attachment.DepthAttachment.Texture2D (tex.common.Common.internal, tex.level)
+
+end
+
+
+module DepthTexture2D = struct
+
+  type t = {
+    common  : Common.t;
+    size    : Vector2i.t;
+    format  : GLTypes.TextureFormat.t
+  }
+
+  let create (type s) (module M : RenderTarget.T with type t = s) target 
+    ?mipmaps:(mipmaps=`AllGenerated) format src = 
+    let context = M.context target in
+    (* Extract the texture parameters *)
+    let bytesize = DepthFormat.byte_size format in
+    let size, data = 
+      match src with
+      | `Data (size, data) ->
+        if size.Vector2i.x * size.Vector2i.y * bytesize > Bytes.length data then
+          raise (Texture_error "Insufficient data for initialization");
+        size, (Some data)
+      | `Empty size ->
+        size, None
+    in
+    let levels = 
+      let max_levels = Common.max_mipmaps size in
+      match mipmaps with
+      | `AllGenerated | `AllEmpty    -> max_levels
+      | `Empty i      | `Generated i -> max 1 (min max_levels i)
+      | `None -> 1
+    in
+    (* Check that the size is allowed *)
+    let capabilities = Context.capabilities context in
+    let max_size = capabilities.Context.max_texture_size in
+    if size.Vector2i.x > max_size || size.Vector2i.y > max_size then
+      raise (Texture_error "Maximal texture size exceeded");
+    (* Create the internal texture *)
+    let common = Common.create context levels GLTypes.TextureTarget.Texture2D in
+    let format = DepthFormat.to_texture_format format in
+    let tex = {common; size; format} in
+    (* Bind the texture *)
+    Common.bind tex.common 0;
+    (* Allocate the texture *)
+    GL.Texture.storage2D
+      GLTypes.TextureTarget.Texture2D
+      levels 
+      format
+      (size.Vector2i.x, size.Vector2i.y);
+    (* Load the corresponding image in each mipmap if requested *)
+    let load_level lvl = 
+      match data with
+      | Some data -> 
+        let mipmap_x, mipmap_y = 
+          (size.Vector2i.x lsr lvl, size.Vector2i.y lsr lvl) 
+        in
+        let mipmap_data = Bytes.create (mipmap_x * mipmap_y * bytesize) in 
+        for i = 0 to mipmap_x - 1 do
+          for j = 0 to mipmap_y - 1 do
+            let offset = bytesize * mipmap_x * (j lsl lvl) + bytesize * (i lsl lvl) in
+            let mipmap_offset = bytesize * mipmap_x * j + bytesize * i in
+            for k = 0 to bytesize - 1 do
+              Bytes.set mipmap_data (mipmap_offset + k) (Bytes.get data (offset + k))
+            done;
+          done;
+        done;
+        GL.Texture.subimage2D
+          GLTypes.TextureTarget.Texture2D 
+          lvl (0,0)
+          (size.Vector2i.x lsr lvl, size.Vector2i.y lsr lvl)
+          GLTypes.PixelFormat.Depth
+          data
+      | None -> ()
+    in
+    begin match mipmaps with
+    | `AllGenerated | `Generated _ ->
+      for lvl = 0 to levels -1 do
+        load_level lvl
+      done
+    | `None | `AllEmpty | `Empty _ -> 
+      load_level 0
+    end;
+    (* Return the texture *)
+    tex
+
+  let size tex = tex.size
+
+  let minify tex filter = Common.minify tex.common filter
+
+  let magnify tex filter = Common.magnify tex.common filter
+
+  let wrap tex func = Common.wrap tex.common func
+
+  let mipmap_levels tex = tex.common.Common.mipmaps
+
+  let mipmap tex i = 
+    if i >= tex.common.Common.mipmaps || i < 0 then
+      raise (Invalid_argument (Printf.sprintf "Mipmap level out of bounds"))
+    else
+      {DepthTexture2DMipmap.common = tex.common; 
+       size = Vector2i.({x = tex.size.x lsr i; y = tex.size.y lsr i});
+       level = i}
+
+  let bind tex uid = Common.bind tex.common uid
+
+  let to_depth_attachment tex = 
+    Attachment.DepthAttachment.Texture2D (tex.common.Common.internal, 0)
 
 end
 
@@ -727,6 +899,13 @@ module Cubemap = struct
 
 end
 
+
+(*************************************************************)
+(*                                                           *)
+(*                    3D Textures                            *)
+(*                                                           *)
+(*                                                           *)
+(*************************************************************)
 
 module Texture3DMipmap = struct
 

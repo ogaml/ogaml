@@ -380,12 +380,18 @@ GLenum TextureFormat_val(value fmt)
       return GL_RGBA8;
 
     case 4:
-      return GL_DEPTH_COMPONENT24;
+      return GL_DEPTH_COMPONENT16;
 
     case 5:
-      return GL_DEPTH24_STENCIL8;
+      return GL_DEPTH_COMPONENT24;
 
     case 6:
+      return GL_DEPTH_COMPONENT32;
+
+    case 7:
+      return GL_DEPTH24_STENCIL8;
+
+    case 8:
       return GL_STENCIL_INDEX8;
 
     default:
@@ -601,7 +607,52 @@ GLenum Parameter_val(value par)
     case 12:
       return GL_MAX_COLOR_ATTACHMENTS;
 
+    case 13:
+      return GL_MAX_DRAW_BUFFERS;
+
     default:
       caml_failwith("Caml variant error in Parameter_val (1)");
+  }
+}
+
+
+GLenum FBOOutputBuffer_val(value out)
+{
+  if(Int_val(out) == 0) 
+  {
+    return GL_NONE;
+  }
+  else if(Tag_val(out) == 0)
+  {
+    return (GL_COLOR_ATTACHMENT0 + Int_val(Field(out,0)));
+  }
+  else
+  {
+    caml_failwith("Caml variant error in FBOOutputBuffer_val");
+  }
+}
+
+
+GLenum WindowOutputBuffer_val(value out)
+{
+  switch(Int_val(out))
+  {
+    case 0:
+      return GL_FRONT_LEFT;
+
+    case 1:
+      return GL_FRONT_RIGHT;
+
+    case 2:
+      return GL_BACK_LEFT;
+
+    case 3:
+      return GL_BACK_RIGHT;
+
+    case 4:
+      return GL_NONE;
+
+    default:
+      caml_failwith("Caml variant error in WindowOutputBuffer_val");
   }
 }

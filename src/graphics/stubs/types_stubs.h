@@ -52,4 +52,8 @@ GLenum Attachment_val(value att);
 
 GLenum Parameter_val(value par);
 
+GLenum WindowOutputBuffer_val(value par);
+
+GLenum FBOOutputBuffer_val(value par);
+
 #endif

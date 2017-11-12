@@ -2,11 +2,28 @@ open OgamlCore
 open OgamlUtils
 open OgamlMath
 
+exception Window_Error of string
+
+module OutputBuffer = struct
+
+  include GLTypes.WindowOutputBuffer
+
+  let index_of_buffer = function
+    | FrontLeft -> 0
+    | FrontRight -> 1
+    | BackLeft -> 2
+    | BackRight -> 3
+    | None -> 4
+
+end
+
 type t = {
   context : Context.t;
   internal : LL.Window.t;
   settings : ContextSettings.t;
   mutable min_spf  : float;
+  bound_buffers : OutputBuffer.t array;
+  mutable n_bound_buffers : int;
   clock : Clock.t
 }
 
@@ -19,12 +36,17 @@ let create ?width:(width=800) ?height:(height=600) ?title:(title="")
     | None   -> 0.
     | Some i -> 1. /. (float_of_int i)
   in
+  let maxbufs = (Context.capabilities context).Context.max_draw_buffers in
+  let bound_buffers = Array.make maxbufs OutputBuffer.None in
+  bound_buffers.(0) <- OutputBuffer.BackLeft;
   Context.LL.set_viewport context OgamlMath.IntRect.({x = 0; y = 0; width; height});
   {
     context;
     internal;
     settings;
     min_spf;
+    bound_buffers;
+    n_bound_buffers = 1;
     clock = Clock.create ()
   }
 
@@ -64,7 +86,35 @@ let display win =
     Clock.restart win.clock
   end 
 
-let clear ?color:(color=Some (`RGB Color.RGB.black))
+let activate_buffers win buffers = 
+  let max_buffers = Array.length win.bound_buffers in
+  let active_buffers = Array.make 5 false in
+  let length, changed = 
+    List.fold_left (fun (idx, changed) buf ->
+      if idx >= max_buffers then
+        raise (Window_Error "Cannot bind more than MAX_DRAW_BUFFERS buffers");
+      let changed = changed 
+        || win.bound_buffers.(idx) <> buf 
+        || idx >= win.n_bound_buffers
+      in
+      if buf <> OutputBuffer.None then begin
+        let i = OutputBuffer.index_of_buffer buf in
+        if active_buffers.(i) then
+          raise (Window_Error "Trying to bind same output buffer twice")
+        else
+          active_buffers.(i) <- true;
+      end;
+      win.bound_buffers.(idx) <- buf;
+      (idx + 1, changed)
+    ) (0, false) buffers
+  in
+  if changed || length <> win.n_bound_buffers then begin
+    win.n_bound_buffers <- length;
+    GL.FBO.draw_default_buffers length win.bound_buffers
+  end
+
+let clear ?buffers:(buffers = [OutputBuffer.BackLeft])
+          ?color:(color=Some (`RGB Color.RGB.black))
           ?depth:(depth=true) 
           ?stencil:(stencil=true) win =
   let depth = (ContextSettings.depth_bits win.settings > 0) && depth in
@@ -74,14 +124,16 @@ let clear ?color:(color=Some (`RGB Color.RGB.black))
     GL.Pervasives.depth_mask true
   end;
   RenderTarget.bind_fbo win.context 0 None;
+  activate_buffers win buffers;
   RenderTarget.clear ?color ~depth ~stencil win.context
 
 let show_cursor win b = LL.Window.show_cursor win.internal b
 
 let context win = win.context
 
-let bind win params = 
+let bind win ?buffers:(buffers = [OutputBuffer.BackLeft]) params = 
   RenderTarget.bind_fbo win.context 0 None;
+  activate_buffers win buffers;
   RenderTarget.bind_draw_parameters win.context (size win)
     (ContextSettings.aa_level win.settings) params
 
