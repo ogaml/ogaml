@@ -37,6 +37,7 @@ setup.log
 
 # Vim
 *.swp
+tags
 
 # OS X files
 .DS_Store
