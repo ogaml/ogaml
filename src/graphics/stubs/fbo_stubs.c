@@ -152,7 +152,8 @@ caml_fbo_drawbuffers(value nbufs, value val_bufs)
   CAMLparam2(nbufs, val_bufs);
 
   int i;
-  GLenum bufs[Int_val(nbufs)];
+  GLenum* bufs;
+          bufs = (GLenum*) malloc(Int_val(nbufs)*sizeof(GLenum));
 
   for(i = 0; i < Int_val(nbufs); i++)
   {
@@ -160,6 +161,8 @@ caml_fbo_drawbuffers(value nbufs, value val_bufs)
   }
 
   glDrawBuffers(Int_val(nbufs), bufs);
+
+  free(bufs);
   
   CAMLreturn(Val_unit);
 }
@@ -171,7 +174,8 @@ caml_fbo_drawwindowbuffers(value nbufs, value val_bufs)
   CAMLparam2(nbufs, val_bufs);
 
   int i;
-  GLenum bufs[Int_val(nbufs)];
+  GLenum* bufs;
+          bufs = (GLenum*) malloc(Int_val(nbufs)*sizeof(GLenum));
 
   for(i = 0; i < Int_val(nbufs); i++)
   {
@@ -180,5 +184,7 @@ caml_fbo_drawwindowbuffers(value nbufs, value val_bufs)
 
   glDrawBuffers(Int_val(nbufs), bufs);
   
+  free(bufs);
+
   CAMLreturn(Val_unit);
 }
