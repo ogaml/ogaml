@@ -115,12 +115,11 @@ let resume source =
     source.start <- Unix.gettimeofday ()
   | _ -> ()
 
-let play source ?pitch ?gain ?loop ?force:(force = false) sound =
+let play source ?pitch ?gain ?loop ?force:(force = false) buff =
   let src_status = status source in
   (* We request a source to the context. *)
-  match sound with
-  | `Stream str when src_status = `Stopped -> () (* TODO *)
-  | `Sound buff when src_status = `Stopped ->
+  match src_status with
+  | `Stopped ->
     let duration = SoundBuffer.duration buff in
     allocate_source source force (SoundBuffer.channels buff) duration;
     begin match source.source with

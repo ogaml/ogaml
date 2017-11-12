@@ -4,4 +4,4 @@ module SoundBuffer = SoundBuffer
 
 module AudioStream = AudioStream
 
-module AudioSource = AudioSource
+module SoundSource = SoundSource

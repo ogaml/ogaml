@@ -73,7 +73,7 @@ module AudioStream : sig
 end
 
 
-module AudioSource : sig
+module SoundSource : sig
 
   exception NoSourceAvailable
 
@@ -90,7 +90,7 @@ module AudioSource : sig
     ?gain:float ->
     ?loop:bool ->
     ?force:bool -> 
-    [`Stream of AudioStream.t | `Sound of SoundBuffer.t] -> unit
+    SoundBuffer.t -> unit
 
   val stop : t -> unit
 

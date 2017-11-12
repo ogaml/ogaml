@@ -16,7 +16,7 @@ val play : t ->
   ?gain:float ->
   ?loop:bool ->
   ?force:bool -> (* NOTE : if [force] is true, then a source *must* be allocated *)
-  [`Stream of AudioStream.t | `Sound of SoundBuffer.t] -> unit
+  SoundBuffer.t -> unit
 
 val stop : t -> unit
 
