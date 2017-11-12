@@ -10,6 +10,24 @@
 #include "utils.h"
 #include "stb_vorbis.h"
 
+
+#define VORBIS(_a) ((stb_vorbis*) Data_custom_val(_a))
+
+void finalise_vorbis(value v)
+{
+  stb_vorbis_close(VORBIS(v));
+}
+
+static struct custom_operations stb_vorbis_custom_ops = {
+  identifier  : "stb_vorbis GC handling",
+  finalize    : finalise_vorbis,
+  compare     : custom_compare_default,
+  hash        : custom_hash_default,
+  serialize   : custom_serialize_default,
+  deserialize : custom_deserialize_default
+};
+
+
 CAMLprim value
 caml_stb_decode_file(value filename)
 {
