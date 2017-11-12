@@ -81,3 +81,40 @@ caml_stb_open_filename(value filename)
 
   CAMLreturn(res);
 }
+
+CAMLprim value
+caml_stb_seek_frame(value vorbis, value frame)
+{
+  CAMLparam2(vorbis, frame);
+  
+  stb_vorbis_seek_frame(VORBIS(vorbis), Int_val(frame));
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value
+caml_stb_stream_length_samples(value vorbis)
+{
+  CAMLparam1(vorbis);
+
+  int samples = stb_vorbis_stream_length_in_samples(VORBIS(vorbis));
+
+  CAMLreturn(Val_int(samples));
+}
+
+CAMLprim value
+caml_stb_channels(value vorbis)
+{
+  CAMLparam1(vorbis);
+
+  CAMLreturn(Val_int((VORBIS(vorbis))->channels));
+}
+
+CAMLprim value
+caml_stb_sample_rate(value vorbis)
+{
+  CAMLparam1(vorbis);
+
+  CAMLreturn(Val_int((VORBIS(vorbis))->sample_rate));
+}
+

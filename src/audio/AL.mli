@@ -234,4 +234,12 @@ module Vorbis : sig
 
   val open_file : string -> (decoder, int) result
 
+  val seek_frame : decoder -> int -> unit
+
+  val stream_length_samples : decoder -> int
+
+  val channels : decoder -> int
+
+  val sample_rate : decoder -> int
+
 end

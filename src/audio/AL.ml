@@ -315,4 +315,12 @@ module Vorbis = struct
 
   external open_file : string -> (decoder, int) result = "caml_stb_open_filename"
 
+  external seek_frame : decoder -> int -> unit = "caml_stb_seek_frame"
+
+  external stream_length_samples : decoder -> int = "caml_stb_stream_length_samples"
+
+  external channels : decoder -> int = "caml_stb_channels"
+
+  external sample_rate : decoder -> int = "caml_stb_sample_rate"
+
 end
