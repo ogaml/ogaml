@@ -152,6 +152,7 @@ module Event : sig
     | ButtonReleased  of ButtonEvent.t (* A mouse button has been released *)
     | MouseMoved      of OgamlMath.Vector2i.t (* The mouse has been moved *)
     | MouseWheelMoved of float (* The mouse wheel has been moved of $delta$ *)
+    | TextEntered     of char (* A character has been entered *)
 
 end
 
