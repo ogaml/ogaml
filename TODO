@@ -36,7 +36,9 @@ Audio (see NOTES for more info):
     ✔ stop/pause/resume @done(2017-08-21 20:07) @project(Audio (see NOTES for more info) / ☐ SoundBuffer module)
 
 Windows specific:
-  ☐ Implement canonical_path
+  ✔ Implement canonical_path @done(2017-11-12 13:41) @project(Windows specific)
+  ☐ Implement text events
+  ☐ Implement opengl profiles
 
 Interface changes:
   Window:
