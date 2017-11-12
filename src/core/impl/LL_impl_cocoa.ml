@@ -63,10 +63,23 @@ module Window = struct
     if ContextSettings.fullscreen settings then
       Cocoa.OGWindowController.toggle_fullscreen win_ctrl ;
 
+    (* We need to solve the version number following the given constraints *)
+    let opengGLProfile = Cocoa.NSOpenGLPixelFormat.(
+      match ContextSettings.(major_version settings, minor_version settings) with
+      | None, _
+      | Some 0, _
+      | Some 1, _
+      | Some 2, _
+      | Some 3, Some 0 -> NSOpenGLProfileVersionLegacy
+      | Some 3, Some 1
+      | Some 3, Some 2 -> NSOpenGLProfileVersion3_2Core
+      | _, _ -> NSOpenGLProfileVersion4_1Core
+    ) in
+
     (* But first we create and apply a new openGL context *)
     let attr = Cocoa.NSOpenGLPixelFormat.(
       [
-        NSOpenGLPFAOpenGLProfile NSOpenGLProfileVersion3_2Core ;
+        NSOpenGLPFAOpenGLProfile opengGLProfile ;
         NSOpenGLPFAColorSize 24 ;
         NSOpenGLPFAAlphaSize 8  ;
         NSOpenGLPFADepthSize (ContextSettings.depth_bits settings) ;

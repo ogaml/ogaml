@@ -2,8 +2,8 @@
 
 #include "utils.h"
 
-static struct custom_operations XVisualInfo_custom_ops = {
-  identifier  : "XVisualInfo handling",
+static struct custom_operations GLXFBConfig_custom_ops = {
+  identifier  : "GLXFBConfig handling",
   finalize    : custom_finalize_default,
   compare     : custom_compare_default,
   hash        : custom_hash_default,

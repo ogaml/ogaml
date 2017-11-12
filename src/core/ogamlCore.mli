@@ -214,6 +214,11 @@ module ContextSettings : sig
                ?resizable:bool ->
                ?fullscreen:bool ->
                ?framerate_limit:int ->
+               ?major_version:int ->
+               ?minor_version:int ->
+               ?forward_compatible:bool ->
+               ?core_profile:bool ->
+               ?compatibility_profile:bool ->
                unit -> t
 
   (** Returns the requested AA level *)
@@ -225,14 +230,29 @@ module ContextSettings : sig
   (** Returns the requested number of stencil buffer bits *)
   val stencil_bits : t -> int
 
-  (** Returns true iff the settings require a resizable window *)
+  (** Returns $true$ iff the settings require a resizable window *)
   val resizable : t -> bool
 
-  (** Returns true iff the settings require fullscreen mode *)
+  (** Returns $true$ iff the settings require fullscreen mode *)
   val fullscreen : t -> bool
 
   (** Returns the requested framerate limit, if any *)
   val framerate_limit : t -> int option
+
+  (** Returns the requested major version, if any *)
+  val major_version : t -> int option
+
+  (** Returns the requested minor version, if any *)
+  val minor_version : t -> int option
+  
+  (** Returns $true$ if a forward compatible context is requested (defaults to false) *)
+  val forward_compatible : t -> bool
+   
+  (** Returns $true$ if a core profile context is requested (defaults to false) *)
+  val core_profile : t -> bool
+   
+  (** Returns $true$ if a compatibility profile context is requested (defaults to false) *)
+  val compatibility_profile : t -> bool
 
 end
 
