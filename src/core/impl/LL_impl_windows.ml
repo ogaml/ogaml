@@ -354,7 +354,7 @@ module Window = struct
     | Windows.Event.CharEntered ccode ->
       if ccode >= 0 && ccode <= 255 then begin
         let chr = Char.chr ccode in
-        Queue.push (Event.TextEntered ccode) win.event_queue
+        Queue.push (Event.TextEntered chr) win.event_queue
       end
 
   let rec poll_event win =
