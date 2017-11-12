@@ -257,6 +257,14 @@ value processEvent(UINT message, WPARAM wParam, LPARAM lParam)
             break;
         }
 
+        case WM_CHAR:
+        {
+            res = caml_alloc(1,8);
+        
+            Store_field(res, 0, Val_int(wParam));
+            break;
+        }
+
         default:
         {
             res = Val_int(0);
