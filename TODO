@@ -37,7 +37,7 @@ Audio (see NOTES for more info):
 
 Windows specific:
   ✔ Implement canonical_path @done(2017-11-12 13:41) @project(Windows specific)
-  ☐ Implement text events
+  ✔ Implement text events @done(2017-11-12 13:50) @project(Windows specific)
   ☐ Implement opengl profiles
 
 Interface changes:
