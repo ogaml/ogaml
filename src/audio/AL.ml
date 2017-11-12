@@ -323,4 +323,6 @@ module Vorbis = struct
 
   external sample_rate : decoder -> int = "caml_stb_sample_rate"
 
+  external get_frame : decoder -> int -> data -> int = "caml_stb_get_frame"
+
 end

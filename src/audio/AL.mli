@@ -242,4 +242,6 @@ module Vorbis : sig
 
   val sample_rate : decoder -> int
 
+  val get_frame : decoder -> int -> data -> int
+
 end

@@ -118,3 +118,17 @@ caml_stb_sample_rate(value vorbis)
   CAMLreturn(Val_int((VORBIS(vorbis))->sample_rate));
 }
 
+CAMLprim value
+caml_stb_get_frame(value vorbis, value chans, value buffer)
+{
+  CAMLparam3(vorbis, chans, buffer);
+
+  int samples = stb_vorbis_get_frame_short_interleaved(
+    VORBIS(vorbis), 
+    Int_val(chans),
+    (short*)Caml_ba_data_val(buffer),
+    Caml_ba_array_val(buffer)->dim[0]
+  );
+
+  CAMLreturn(Val_int(samples));
+}
