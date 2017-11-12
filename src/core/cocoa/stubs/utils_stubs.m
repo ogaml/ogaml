@@ -106,6 +106,9 @@ void warpCursor(NSPoint loc)
                                              0);
   CGEventPost(kCGHIDEventTap, event);
   CFRelease(event);
+
+  // Other solution (too strict!)
+  // CGWarpMouseCursorPosition(newCursorPosition);
 }
 
 CAMLprim value

@@ -40,7 +40,7 @@ else
     TEST_CMD = $(OCAMLFIND) $(OCAMLOPT) -thread -linkpkg $(TEST_INCLUDES) $(TEST_MODULES) -package unix,bigarray
 endif
 
-TEST_OUT = main.out 
+TEST_OUT = main.out
 
 ifeq ($(OS_NAME), WIN)
     LAUNCH_CMD = $(TEST_OUT)
@@ -55,7 +55,7 @@ endif
 ifeq ($(OS_NAME), WIN)
     INSTALL_DIR = $(shell ocamlc -where)
     INSTALL_CMD = cp $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES) $(UTILS_FILES) $(INSTALL_DIR)
-    UNINSTALL_CMD = 
+    UNINSTALL_CMD =
 else
     INSTALL_CMD = $(OCAMLFIND) install ogaml META $(CORE_FILES) $(MATH_FILES) $(GRAPH_FILES) $(UTILS_FILES)
     UNINSTALL_CMD = $(OCAMLFIND) remove "ogaml"
@@ -66,7 +66,7 @@ endif
 
 # Compilation
 
-default: depend math_lib utils_lib core_lib graphics_lib 
+default: depend math_lib utils_lib core_lib graphics_lib
 
 utils_lib:
 	make -C src/utils/ default
@@ -82,6 +82,7 @@ graphics_lib: math_lib core_lib utils_lib
 
 examples:
 	$(EXAMPLE_CMD) examples/cube.ml -o cube.out &&\
+	$(EXAMPLE_CMD) examples/cursor.ml -o cursor.out &&\
 	$(EXAMPLE_CMD) examples/tut01.ml -o tut01.out &&\
 	$(EXAMPLE_CMD) examples/tut02.ml -o tut02.out &&\
 	$(EXAMPLE_CMD) examples/tut_tex.ml -o tut_tex.out &&\
@@ -93,7 +94,7 @@ examples:
 	$(EXAMPLE_CMD) examples/text.ml -o text.out &&\
 	$(EXAMPLE_CMD) examples/noise.ml -o noise.out &&\
 	$(EXAMPLE_CMD) examples/shoot.ml -o shoot.out
-	
+
 tests: math_lib core_lib graphics_lib utils_lib
 	$(TEST_CMD) tests/programs.ml -o main.out && $(LAUNCH_CMD) &&\
 	$(TEST_CMD) tests/vertexarrays.ml -o main.out && $(LAUNCH_CMD) &&\
@@ -126,7 +127,7 @@ clean:
 	make -C src/utils clean &\
 	make -C src/graphics clean &\
 	make -C tests/ clean &\
-	make -C examples/ clean 
+	make -C examples/ clean
 
 depend:
 	make -C src/core depend &\

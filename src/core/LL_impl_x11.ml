@@ -10,7 +10,8 @@ module Window = struct
     mutable closed : bool;
     mutable size : OgamlMath.Vector2i.t;
     mutable position : OgamlMath.Vector2i.t;
-    mutable cursor_shown : bool
+    mutable cursor_shown : bool;
+    mutable pending_events : Event.t Queue.t
   }
 
   let create ~width ~height ~title ~settings =
@@ -68,7 +69,8 @@ module Window = struct
     {display; window; context; closed = false; 
      position = OgamlMath.Vector2i.{x;y}; 
      size = OgamlMath.Vector2i.({x = width; y = height});
-     cursor_shown = true}
+     cursor_shown = true;
+     pending_events = Queue.create ()}
 
   let set_title win title =
     X11.Window.set_title win.display win.window title
@@ -202,6 +204,8 @@ module Window = struct
 
   let poll_event win =
     if win.closed then None
+    else if not (Queue.is_empty win.pending_events) then
+      Some (Queue.pop win.pending_events)
     else begin
       match X11.Event.next win.display win.window with
       |Some e -> begin
@@ -213,7 +217,11 @@ module Window = struct
               Some Event.Closed
           | _ -> None
         end
-        | X11.Event.KeyPress      (key,modif) ->
+        | X11.Event.KeyPress      (key,charc,modif) ->
+          if charc >= 0 && charc <= 255 then begin
+            let ev = Event.TextEntered (Char.chr charc) in
+            Queue.push ev win.pending_events
+          end;
           Some Event.(KeyPressed {
                 KeyEvent.key = keysym_to_key key;
                 KeyEvent.shift = modif.X11.Event.shift || modif.X11.Event.lock;

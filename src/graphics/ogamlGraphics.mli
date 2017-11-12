@@ -266,6 +266,9 @@ module DrawParameter : sig
     (** Soft additive blending mode *)
     val soft_additive : t
 
+    (** Premutliplied alpha blending mode *)
+    val premultiplied_alpha : t
+
   end
 
   (** Depth testing functions enumeration *)
