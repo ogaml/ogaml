@@ -60,7 +60,7 @@ caml_stb_free_data(value data)
 }
 
 CAMLprim value
-caml_stb_vorbis_open_filename(value filename)
+caml_stb_open_filename(value filename)
 {
   CAMLparam1(filename);
   CAMLlocal2(res,v);

@@ -225,9 +225,13 @@ module Vorbis : sig
 
   type data = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
 
+  type decoder
+
   (* Returns channels * rate * data *)
   val decode_file : string -> (int * int * data)
 
   val free_data : data -> unit
+
+  val open_file : string -> (decoder, int) result
 
 end

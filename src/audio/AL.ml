@@ -307,8 +307,12 @@ module Vorbis = struct
 
   type data = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
 
+  type decoder
+
   external decode_file : string -> (int * int * data) = "caml_stb_decode_file"
 
   external free_data : data -> unit = "caml_stb_free_data"
+
+  external open_file : string -> (decoder, int) result = "caml_stb_open_filename"
 
 end
