@@ -39,12 +39,13 @@ let load s =
   AL.Vorbis.free_data samples;
   sound
 
-let play ?pitch ?gain ?loop ?force buff source = 
+let play ?pitch ?gain ?loop ?force ?on_stop buff source = 
   AudioSource.LL.play
     ?pitch
     ?gain
     ?loop
     ?force
+    ?on_stop
     ~duration:buff.duration
     ~channels:buff.channels
     ~buffer:buff.buffer

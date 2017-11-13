@@ -12,6 +12,7 @@ type t = {
   mutable channels    : [`Mono | `Stereo];
   mutable duration    : float;
   mutable start       : float;
+  mutable on_stop      : unit -> unit
 }
 
 let create ?position:(position = Vector3f.zero)
@@ -25,7 +26,8 @@ let create ?position:(position = Vector3f.zero)
   source = None ;
   channels = `Mono ;
   duration = 0. ;
-  start = 0. 
+  start = 0. ;
+  on_stop = (fun () -> ())
 }
 
 (* Utility for options *)
@@ -75,13 +77,15 @@ let stop source =
   | `Stereo -> may (AudioContext.LL.deallocate_stereo_source source.context) source.source;
   end;
   source.source <- None;
-  source.status <- `Stopped
+  source.status <- `Stopped;
+  source.on_stop ()
 
 let update_status source = 
   match source.status with
   | `Playing ->
-    if Unix.gettimeofday () -. source.start >= source.duration then
-      stop source
+    if Unix.gettimeofday () -. source.start >= source.duration then begin
+      stop source;
+    end
   | _ -> ()
 
 let status source = 
@@ -150,7 +154,8 @@ let set_orientation source ori =
 
 module LL = struct
 
-  let play ?pitch ?gain ?loop ?(force = false) ~duration ~channels ~buffer source = 
+  let play ?pitch ?gain ?loop ?(force = false) ?(on_stop = fun () -> ()) 
+    ~duration ~channels ~buffer source = 
     let src_status = status source in
     (* We request a source to the context. *)
     match src_status with
@@ -166,12 +171,13 @@ module LL = struct
           AL.Source.set_3f s AL.Source.Position (vec3f source.position) ;
           AL.Source.set_3f s AL.Source.Velocity (vec3f source.velocity) ;
           AL.Source.set_3f s AL.Source.Direction (vec3f source.orientation) ;
-          AL.Source.set_buffer s buffer;
+          AL.Source.set_buffer s buffer ;
           AL.Source.play s ;
           source.duration <- duration ;
           source.status <- `Playing ;
           source.channels <- channels ;
-          source.start <- Unix.gettimeofday ()
+          source.start <- Unix.gettimeofday () ;
+          source.on_stop <- on_stop
         end
       | _ -> ()
 

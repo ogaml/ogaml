@@ -97,6 +97,7 @@ module SoundBuffer : sig
     ?gain:float ->
     ?loop:bool ->
     ?force:bool ->
+    ?on_stop:(unit -> unit) ->
     t -> AudioSource.t -> unit
 
   val duration : t -> float

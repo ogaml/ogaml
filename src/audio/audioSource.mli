@@ -36,6 +36,7 @@ module LL : sig
     ?gain:float ->
     ?loop:bool ->
     ?force:bool ->
+    ?on_stop:(unit -> unit) ->
     duration:float ->
     channels:[`Mono | `Stereo] ->
     buffer:AL.Buffer.t ->
