@@ -42,37 +42,6 @@ module AudioContext : sig
 end
 
 
-module SoundBuffer : sig
-
-  exception Error of string
-
-  type t
-
-  type samples = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
-
-  val load : string -> t
-
-  val create :
-    samples:samples ->
-    channels:[`Stereo | `Mono] ->
-    rate:int -> t
-
-  val duration : t -> float
-
-  val samples : t -> samples
-
-  val channels : t -> [`Stereo | `Mono]
-
-end
-
-
-module AudioStream : sig
-
-  type t
-
-end
-
-
 module AudioSource : sig
 
   exception NoSourceAvailable
@@ -84,13 +53,6 @@ module AudioSource : sig
     ?velocity:OgamlMath.Vector3f.t ->
     ?orientation:OgamlMath.Vector3f.t ->
     AudioContext.t -> t
-
-  val play : t ->
-    ?pitch:float ->
-    ?gain:float ->
-    ?loop:bool ->
-    ?force:bool -> 
-    SoundBuffer.t -> unit
 
   val stop : t -> unit
 
@@ -113,3 +75,42 @@ module AudioSource : sig
   val set_orientation : t -> OgamlMath.Vector3f.t -> unit
 
 end
+
+
+module SoundBuffer : sig
+
+  exception Error of string
+
+  type t
+
+  type samples = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
+
+  val load : string -> t
+
+  val create :
+    samples:samples ->
+    channels:[`Stereo | `Mono] ->
+    rate:int -> t
+
+  val play : 
+    ?pitch:float ->
+    ?gain:float ->
+    ?loop:bool ->
+    ?force:bool ->
+    t -> AudioSource.t -> unit
+
+  val duration : t -> float
+
+  val samples : t -> samples
+
+  val channels : t -> [`Stereo | `Mono]
+
+end
+
+
+module AudioStream : sig
+
+  type t
+
+end
+

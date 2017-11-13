@@ -39,14 +39,19 @@ let load s =
   AL.Vorbis.free_data samples;
   sound
 
+let play ?pitch ?gain ?loop ?force buff source = 
+  AudioSource.LL.play
+    ?pitch
+    ?gain
+    ?loop
+    ?force
+    ~duration:buff.duration
+    ~channels:buff.channels
+    ~buffer:buff.buffer
+    source
+
 let duration buff = buff.duration
 
 let samples buff = buff.samples
 
 let channels buff = buff.channels
-
-module LL = struct
-
-  let buffer buff = buff.buffer
-
-end

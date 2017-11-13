@@ -12,15 +12,16 @@ val create :
   channels:[`Stereo | `Mono] ->
   rate:int -> t
 
+val play : 
+  ?pitch:float ->
+  ?gain:float ->
+  ?loop:bool ->
+  ?force:bool ->
+  t -> AudioSource.t -> unit
+
 val duration : t -> float
 
 val samples : t -> samples
 
 val channels : t -> [`Stereo | `Mono]
 
-
-module LL : sig
-
-  val buffer : t -> AL.Buffer.t
-
-end

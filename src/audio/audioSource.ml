@@ -115,32 +115,6 @@ let resume source =
     source.start <- Unix.gettimeofday ()
   | _ -> ()
 
-let play source ?pitch ?gain ?loop ?force:(force = false) buff =
-  let src_status = status source in
-  (* We request a source to the context. *)
-  match src_status with
-  | `Stopped ->
-    let duration = SoundBuffer.duration buff in
-    allocate_source source force (SoundBuffer.channels buff) duration;
-    begin match source.source with
-    | None -> ()
-    | Some s ->
-        may (fun p -> AL.Source.set_f s AL.Source.Pitch p) pitch ;
-        may (fun g -> AL.Source.set_f s AL.Source.Gain g) gain ;
-        may (fun l -> AL.Source.set_i s AL.Source.Looping (if l then 1 else 0))
-            loop ;
-        AL.Source.set_3f s AL.Source.Position (vec3f source.position) ;
-        AL.Source.set_3f s AL.Source.Velocity (vec3f source.velocity) ;
-        AL.Source.set_3f s AL.Source.Direction (vec3f source.orientation) ;
-        AL.Source.set_buffer s (SoundBuffer.LL.buffer buff) ;
-        AL.Source.play s ;
-        source.duration <- duration ;
-        source.status <- `Playing ;
-        source.channels <- (SoundBuffer.channels buff) ;
-        source.start <- Unix.gettimeofday ()
-      end
-    | _ -> ()
-
 let position source = source.position
 
 let set_position source pos =
@@ -173,3 +147,32 @@ let set_orientation source ori =
       (fun s -> AL.Source.set_3f s AL.Source.Direction (vec3f ori))
       source.source
   | _ -> ()
+
+module LL = struct
+
+  let play ?pitch ?gain ?loop ?(force = false) ~duration ~channels ~buffer source = 
+    let src_status = status source in
+    (* We request a source to the context. *)
+    match src_status with
+    | `Stopped ->
+      allocate_source source force channels duration;
+      begin match source.source with
+      | None -> ()
+      | Some s ->
+          may (fun p -> AL.Source.set_f s AL.Source.Pitch p) pitch ;
+          may (fun g -> AL.Source.set_f s AL.Source.Gain g) gain ;
+          may (fun l -> AL.Source.set_i s AL.Source.Looping (if l then 1 else 0))
+              loop ;
+          AL.Source.set_3f s AL.Source.Position (vec3f source.position) ;
+          AL.Source.set_3f s AL.Source.Velocity (vec3f source.velocity) ;
+          AL.Source.set_3f s AL.Source.Direction (vec3f source.orientation) ;
+          AL.Source.set_buffer s buffer;
+          AL.Source.play s ;
+          source.duration <- duration ;
+          source.status <- `Playing ;
+          source.channels <- channels ;
+          source.start <- Unix.gettimeofday ()
+        end
+      | _ -> ()
+
+end
