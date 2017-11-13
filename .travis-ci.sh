@@ -11,7 +11,7 @@ sudo apt-get update -qq
 sudo apt-get install -qq ocaml ocaml-native-compilers camlp4-extra opam
 
 export OPAMYES=1
-opam init
+opam init --compiler=$OCAML_VERSION
 
 eval `opam config env`
 opam install ${OPAM_DEPEND}
