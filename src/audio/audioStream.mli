@@ -1,6 +1,6 @@
 type t
 
-val load : string -> t
+val load : string -> (t, unit) result
 
 val play :
   ?pitch:float ->
@@ -23,7 +23,5 @@ val resume : t -> unit
 val status : t -> [`Playing | `Stopped | `Paused]
 
 val detach : t -> unit
-
-val attach : t -> AudioSource.t -> unit
 
 val stop : t -> unit
