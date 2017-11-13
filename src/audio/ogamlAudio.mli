@@ -73,7 +73,7 @@ module AudioStream : sig
 end
 
 
-module SoundSource : sig
+module AudioSource : sig
 
   exception NoSourceAvailable
 
