@@ -82,9 +82,11 @@ let display win =
   LL.Window.display win.internal;
   if win.min_spf <> 0. then begin
     let dt = win.min_spf -. (Clock.time win.clock) in
-    if dt > 0. then Thread.delay dt;
+    if dt > 0. then Thread.delay dt
+    else Thread.delay 0.00001;
     Clock.restart win.clock
   end 
+  else Thread.delay 0.00001
 
 let activate_buffers win buffers = 
   let max_buffers = Array.length win.bound_buffers in
