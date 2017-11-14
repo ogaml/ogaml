@@ -120,3 +120,12 @@ caml_al_get_buffer_property(value buf, value prop)
   CAMLreturn(Val_int(cres));
 }
 
+CAMLprim value
+caml_al_buffer_equals(value b1, value b2)
+{
+  CAMLparam2(b1, b2);
+  ALuint i1 = BUFFER(b1);
+  ALuint i2 = BUFFER(b2);
+  CAMLreturn(Val_bool(i1 == i2));
+}
+

@@ -41,6 +41,8 @@ static struct custom_operations source_custom_ops = {
   custom_deserialize_default
 };
 
+static struct custom_operations buffer_custom_ops;
+
 ALenum ALSourcePropertyf_val(value v)
 {
   switch(Int_val(v))
@@ -232,6 +234,17 @@ caml_al_get_source_i(value src, value prop)
 }
 
 CAMLprim value
+caml_al_source_playing(value src)
+{
+  CAMLparam1(src);
+
+  int alres;
+  alGetSourcei(SOURCE(src), AL_SOURCE_STATE, &alres);
+
+  CAMLreturn(Val_bool(alres == AL_PLAYING));
+}
+
+CAMLprim value
 caml_al_play_source(value src)
 {
   CAMLparam1(src);
@@ -272,7 +285,7 @@ caml_al_rewind_source(value src)
 }
 
 CAMLprim value
-caml_al_queue_source(value src, value n, value bufs)
+caml_al_queue_buffers(value src, value n, value bufs)
 {
   CAMLparam3(src,n,bufs);
 
@@ -291,16 +304,19 @@ caml_al_queue_source(value src, value n, value bufs)
 }
 
 CAMLprim value
-caml_al_unqueue_source(value src, value n)
+caml_al_unqueue_buffer(value src)
 {
-  CAMLparam2(src, n);
+  CAMLparam1(src);
+  CAMLlocal1(res);
 
-  ALuint* buffers = malloc(Int_val(n) * sizeof(ALuint));
+  ALuint buf[1];
+  alGenBuffers(1, buf);
 
-  alSourceUnqueueBuffers(SOURCE(src), Int_val(n), buffers);
+  alSourceUnqueueBuffers(SOURCE(src), 1, buf);
 
-  free(buffers);
+  res = caml_alloc_custom( &buffer_custom_ops, sizeof(ALuint), 0, 1);
+  memcpy( Data_custom_val(res), buf, sizeof(ALuint) );
 
-  CAMLreturn(Val_unit);
+  CAMLreturn(res);
 }
 

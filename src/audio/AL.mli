@@ -155,6 +155,8 @@ module Buffer : sig
 
   val get : t -> property -> int
 
+  val equals : t -> t -> bool
+
 end
 
 
@@ -206,6 +208,8 @@ module Source : sig
 
   val get_i : t -> property_i -> int 
 
+  val playing : t -> bool
+
   val play : t -> unit
 
   val pause : t -> unit
@@ -216,7 +220,7 @@ module Source : sig
 
   val queue : t -> int -> Buffer.t array -> unit
 
-  val unqueue : t -> int -> unit
+  val unqueue : t -> Buffer.t
 
 end
 
@@ -242,6 +246,6 @@ module Vorbis : sig
 
   val sample_rate : decoder -> int
 
-  val get_frame : decoder -> int -> data -> int
+  val get_samples : decoder -> int -> data -> int
 
 end

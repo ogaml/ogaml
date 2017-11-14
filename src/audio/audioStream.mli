@@ -5,7 +5,6 @@ val load : string -> (t, unit) result
 val play :
   ?pitch:float ->
   ?gain:float ->
-  ?loop:bool ->
   ?force:bool ->
   ?on_stop:(unit -> unit) ->
   t -> AudioSource.t -> unit

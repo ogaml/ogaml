@@ -40,6 +40,9 @@ module LL : sig
     duration:float ->
     channels:[`Mono | `Stereo] ->
     buffer:AL.Buffer.t ->
+    stream:bool ->
     t -> unit
+
+  val source : t -> AL.Source.t option
 
 end

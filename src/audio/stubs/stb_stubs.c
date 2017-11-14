@@ -71,7 +71,7 @@ caml_stb_open_filename(value filename)
   if (vorbis != NULL) {
     res = caml_alloc(1,0);
     v = caml_alloc_custom(&stb_vorbis_custom_ops, sizeof(stb_vorbis*), 0, 1);
-    memcpy(Data_custom_val(v), vorbis, sizeof(stb_vorbis*));
+    memcpy(Data_custom_val(v), &vorbis, sizeof(stb_vorbis*));
     Store_field(res, 0, v);
   } 
   else {
@@ -119,11 +119,11 @@ caml_stb_sample_rate(value vorbis)
 }
 
 CAMLprim value
-caml_stb_get_frame(value vorbis, value chans, value buffer)
+caml_stb_get_samples(value vorbis, value chans, value buffer)
 {
   CAMLparam3(vorbis, chans, buffer);
 
-  int samples = stb_vorbis_get_frame_short_interleaved(
+  int samples = stb_vorbis_get_samples_short_interleaved(
     VORBIS(vorbis), 
     Int_val(chans),
     (short*)Caml_ba_data_val(buffer),

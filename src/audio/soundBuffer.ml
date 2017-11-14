@@ -49,6 +49,7 @@ let play ?pitch ?gain ?loop ?force ?on_stop buff source =
     ~duration:buff.duration
     ~channels:buff.channels
     ~buffer:buff.buffer
+    ~stream:false
     source
 
 let duration buff = buff.duration

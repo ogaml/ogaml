@@ -223,6 +223,8 @@ module Buffer = struct
 
   external get : t -> property -> int = "caml_al_get_buffer_property"
 
+  external equals : t -> t -> bool = "caml_al_buffer_equals"
+
 end
 
 
@@ -282,6 +284,9 @@ module Source = struct
   external get_i : t -> property_i -> int 
                  = "caml_al_get_source_i"
 
+  external playing : t -> bool
+                   = "caml_al_source_playing"
+
   external play : t -> unit
                 = "caml_al_play_source"
 
@@ -295,10 +300,10 @@ module Source = struct
                   = "caml_al_rewind_source"
 
   external queue : t -> int -> Buffer.t array -> unit
-                 = "caml_al_queue_source"
+                 = "caml_al_queue_buffers"
 
-  external unqueue : t -> int -> unit
-                   = "caml_al_unqueue_source"
+  external unqueue : t -> Buffer.t
+                   = "caml_al_unqueue_buffer"
 
 end
 
@@ -323,6 +328,6 @@ module Vorbis = struct
 
   external sample_rate : decoder -> int = "caml_stb_sample_rate"
 
-  external get_frame : decoder -> int -> data -> int = "caml_stb_get_frame"
+  external get_samples : decoder -> int -> data -> int = "caml_stb_get_samples"
 
 end

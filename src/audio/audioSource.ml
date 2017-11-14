@@ -155,7 +155,7 @@ let set_orientation source ori =
 module LL = struct
 
   let play ?pitch ?gain ?loop ?(force = false) ?(on_stop = fun () -> ()) 
-    ~duration ~channels ~buffer source = 
+    ~duration ~channels ~buffer ~stream source = 
     let src_status = status source in
     (* We request a source to the context. *)
     match src_status with
@@ -171,7 +171,11 @@ module LL = struct
           AL.Source.set_3f s AL.Source.Position (vec3f source.position) ;
           AL.Source.set_3f s AL.Source.Velocity (vec3f source.velocity) ;
           AL.Source.set_3f s AL.Source.Direction (vec3f source.orientation) ;
-          AL.Source.set_buffer s buffer ;
+          if not stream then begin
+            AL.Source.set_buffer s buffer ;
+          end else begin
+            AL.Source.queue s 1 [|buffer|];
+          end;
           AL.Source.play s ;
           source.duration <- duration ;
           source.status <- `Playing ;
@@ -180,5 +184,8 @@ module LL = struct
           source.on_stop <- on_stop
         end
       | _ -> ()
+
+  let source source = 
+    source.source
 
 end
