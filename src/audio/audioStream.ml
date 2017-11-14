@@ -138,7 +138,8 @@ let fill_push_buffer stream llsource =
   match decode_buffer stream with
   | None -> None
   | Some (buf, qty) ->
-    AL.Source.queue llsource 1 [|buf|];
+    if qty <> 0 then
+      AL.Source.queue llsource 1 [|buf|];
     Some qty
 
 let play_step stream = 
