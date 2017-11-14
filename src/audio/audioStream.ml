@@ -7,7 +7,6 @@ type t = {
   duration  : float;
   s_rate    : int;
   channels  : [`Stereo | `Mono];
-  temp_buffer : AL.Buffer.t; (* For retrieving buffers in sources *)
   alloc_buffers : AL.Buffer.t list;
   mutable free_buffers : AL.Buffer.t list;
   mutable sample : int;
@@ -15,11 +14,11 @@ type t = {
   mutable thread : Thread.t option;
 }
 
-let load filename = 
+let load ?(buffers=3) ?(buffer_size=32768) filename = 
   match AL.Vorbis.open_file filename with
   | Ok decoder ->
     let n_channels = max (min (AL.Vorbis.channels decoder) 2) 1 in
-    let data_buf = Array1.create int16_signed c_layout (32768 * n_channels) in
+    let data_buf = Array1.create int16_signed c_layout (buffer_size * n_channels) in
     let channels = 
       match n_channels with
       | 1 -> `Mono
@@ -29,8 +28,10 @@ let load filename =
     let samples = AL.Vorbis.stream_length_samples decoder in
     let s_rate = AL.Vorbis.sample_rate decoder in
     let duration = (float_of_int samples /. float_of_int s_rate) in
-    let back_buf = AL.Buffer.create () in
-    let front_buf = AL.Buffer.create () in
+    let buffers = 
+      Array.init buffers (fun _ -> AL.Buffer.create ())
+      |> Array.to_list
+    in
     let sample = 0 in
     AL.Vorbis.seek_frame decoder 0;
     Ok {
@@ -40,9 +41,8 @@ let load filename =
       duration;
       s_rate;
       channels;
-      temp_buffer = AL.Buffer.create ();
-      free_buffers = [back_buf; front_buf];
-      alloc_buffers = [back_buf; front_buf];
+      free_buffers = buffers;
+      alloc_buffers = buffers;
       sample;
       source = None;
       thread = None;

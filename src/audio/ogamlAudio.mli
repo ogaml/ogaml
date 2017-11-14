@@ -113,7 +113,10 @@ module AudioStream : sig
 
   type t
   
-  val load : string -> (t, unit) result
+  val load : 
+    ?buffers:int ->
+    ?buffer_size:int ->
+    string -> (t, unit) result
   
   val play :
     ?pitch:float ->
