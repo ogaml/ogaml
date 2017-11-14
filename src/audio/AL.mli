@@ -155,7 +155,7 @@ module Buffer : sig
 
   val get : t -> property -> int
 
-  val equals : t -> t -> bool
+  val id : t -> int
 
 end
 
@@ -220,7 +220,7 @@ module Source : sig
 
   val queue : t -> int -> Buffer.t array -> unit
 
-  val unqueue : t -> Buffer.t
+  val unqueue_id : t -> int
 
 end
 

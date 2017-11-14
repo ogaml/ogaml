@@ -7,6 +7,7 @@ type t = {
   duration  : float;
   s_rate    : int;
   channels  : [`Stereo | `Mono];
+  temp_buffer : AL.Buffer.t; (* For retrieving buffers in sources *)
   alloc_buffers : AL.Buffer.t list;
   mutable free_buffers : AL.Buffer.t list;
   mutable sample : int;
@@ -39,6 +40,7 @@ let load filename =
       duration;
       s_rate;
       channels;
+      temp_buffer = AL.Buffer.create ();
       free_buffers = [back_buf; front_buf];
       alloc_buffers = [back_buf; front_buf];
       sample;
@@ -106,9 +108,12 @@ let exit stream =
 let unqueue_buffers stream llsource = 
   let n_free_bufs = AL.Source.get_i llsource AL.Source.BuffersProcessed in
   for i = 0 to n_free_bufs - 1 do
-    let buf = AL.Source.unqueue llsource in
-    if List.exists (fun b -> AL.Buffer.equals b buf) stream.alloc_buffers then
+    let bufid = AL.Source.unqueue_id llsource in
+    try 
+      let buf = List.find (fun b -> AL.Buffer.id b = bufid) stream.alloc_buffers in
       stream.free_buffers <- buf :: stream.free_buffers
+    with
+      Not_found -> ()
   done
 
 let decode_buffer stream = 

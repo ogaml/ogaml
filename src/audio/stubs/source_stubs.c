@@ -304,19 +304,13 @@ caml_al_queue_buffers(value src, value n, value bufs)
 }
 
 CAMLprim value
-caml_al_unqueue_buffer(value src)
+caml_al_unqueue_buffer_id(value src)
 {
   CAMLparam1(src);
-  CAMLlocal1(res);
 
-  ALuint buf[1];
-  alGenBuffers(1, buf);
+  ALuint buf;
+  alSourceUnqueueBuffers(SOURCE(src), 1, &buf);
 
-  alSourceUnqueueBuffers(SOURCE(src), 1, buf);
-
-  res = caml_alloc_custom( &buffer_custom_ops, sizeof(ALuint), 0, 1);
-  memcpy( Data_custom_val(res), buf, sizeof(ALuint) );
-
-  CAMLreturn(res);
+  CAMLreturn(Val_int(buf));
 }
 

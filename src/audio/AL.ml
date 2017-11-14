@@ -223,7 +223,7 @@ module Buffer = struct
 
   external get : t -> property -> int = "caml_al_get_buffer_property"
 
-  external equals : t -> t -> bool = "caml_al_buffer_equals"
+  external id : t -> int = "caml_al_buffer_id"
 
 end
 
@@ -302,8 +302,8 @@ module Source = struct
   external queue : t -> int -> Buffer.t array -> unit
                  = "caml_al_queue_buffers"
 
-  external unqueue : t -> Buffer.t
-                   = "caml_al_unqueue_buffer"
+  external unqueue_id : t -> int
+                   = "caml_al_unqueue_buffer_id"
 
 end
 
