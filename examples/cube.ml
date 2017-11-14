@@ -91,27 +91,27 @@ let handle_keys () =
     if is_pressed Z || is_pressed Up then
       position := Vector3f.(add
         !position
-        {x = -. 0.15 *. (sin !view_theta);
+        {x = +. 0.15 *. (sin !view_theta);
          y = 0.;
          z = -. 0.15 *. (cos !view_theta)}) ;
     if is_pressed S || is_pressed Down then
       position := Vector3f.(add
         !position
-        {x = 0.15 *. (sin !view_theta);
+        {x = -. 0.15 *. (sin !view_theta);
          y = 0.;
-         z = 0.15 *. (cos !view_theta)}) ;
+         z = +. 0.15 *. (cos !view_theta)}) ;
     if is_pressed Q || is_pressed Left then
       position := Vector3f.(add
         !position
         {x = -. 0.15 *. (cos !view_theta);
          y = 0.;
-         z = 0.15 *. (sin !view_theta)}) ;
+         z = -. 0.15 *. (sin !view_theta)}) ;
     if is_pressed D || is_pressed Right then
       position := Vector3f.(add
         !position
-        {x = 0.15 *. (cos !view_theta);
+        {x = +. 0.15 *. (cos !view_theta);
          y = 0.;
-         z = -. 0.15 *. (sin !view_theta)});
+         z = +. 0.15 *. (sin !view_theta)});
     if is_pressed LShift then
       position := Vector3f.(add
         !position
