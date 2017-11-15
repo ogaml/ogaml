@@ -1,6 +1,4 @@
 
-exception Vector2f_exception of string
-
 type t = {x : float; y : float}
 
 let make x y = {x; y}
@@ -28,7 +26,7 @@ let prop f v = {
 
 let div f v = 
   if f = 0. then 
-    raise (Vector2f_exception "Division by zero")
+    raise (Invalid_argument "Division by zero")
   else 
     {x = v.x /. f; y = v.y /. f}
 
@@ -73,7 +71,7 @@ let dist v1 v2 = norm (sub v2 v1)
 let normalize v = 
   let n = norm v in
   if n = 0. then
-    raise (Vector2f_exception "Cannot normalize zero vector")
+    raise (Invalid_argument "Cannot normalize zero vector")
   else 
     div n v
 
@@ -104,7 +102,7 @@ let direction u v =
   let dir = sub v u in
   let n = norm dir in
   if n = 0. then
-    raise (Vector2f_exception "Cannot get normalized direction from identical points")
+    raise (Invalid_argument "Cannot get normalized direction from identical points")
   else
     div n dir
 

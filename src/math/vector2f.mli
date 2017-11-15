@@ -1,7 +1,5 @@
 (* Operations on immutable 2 floats vectors *)
 
-exception Vector2f_exception of string
-
 type t = {x : float; y : float}
 
 val make : float -> float -> t

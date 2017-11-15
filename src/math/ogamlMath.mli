@@ -42,9 +42,6 @@ module Vector2i : sig
 
   (** This module defines the vector2i type and various operations on it. *)
 
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Vector2i_exception of string
-
   (*** Vector operations *)
 
   (** Type of immutable vectors of 2 integers *)
@@ -71,7 +68,7 @@ module Vector2i : sig
   (** Multiplies a vector by a scalar *)
   val prop : int -> t -> t
 
-  (** Divides a vector by a scalar. Raises Vector2i_exception if the scalar is zero. *)
+  (** Divides a vector by a scalar. Raises Invalid_argument if the scalar is zero. *)
   val div : int -> t -> t
 
   (** Computes the pointwise product of two vectors. *)
@@ -134,9 +131,6 @@ module Vector2f : sig
 
   (** This module defines the vector2f type and various operations on it. *)
 
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Vector2f_exception of string
-
   (*** Vector operations *)
 
   (** Type of immutable vectors of 2 floats *)
@@ -163,7 +157,7 @@ module Vector2f : sig
   (** Multiplies a vector by a scalar *)
   val prop : float -> t -> t
 
-  (** Divides a vector by a scalar. Raises Vector2f_exception if the scalar is zero. *)
+  (** Divides a vector by a scalar. Raises Invalid_argument if the scalar is zero. *)
   val div : float -> t -> t
 
   (** Computes the pointwise product of two vectors. *)
@@ -199,7 +193,7 @@ module Vector2f : sig
   (** Computes the distance between two points *)
   val dist : t -> t -> float
 
-  (** Normalizes a vector. Raises Vector2f_exception if the vector is zero. *)
+  (** Normalizes a vector. Raises Invalid_argument if the vector is zero. *)
   val normalize : t -> t
 
   (** $clamp v a b$ returns the vector whose coordinates are the coordinates of $v$
@@ -222,7 +216,7 @@ module Vector2f : sig
   val to_string : t -> string
 
   (** $direction u v$ returns the normalized direction vector from $u$ to $v$.
-    * Raises Vector2f_exception if $u = v$. *)
+    * Raises Invalid_argument if $u = v$. *)
   val direction : t -> t -> t
 
   (** $endpoint a v t$ returns the point $a + tv$ *)
@@ -253,9 +247,6 @@ module Vector3i : sig
 
   (** This module defines the vector3i type and various operations on it. *)
 
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Vector3i_exception of string
-
   (*** Vector operations *)
 
   (** Type of immutable vectors of 3 ints *)
@@ -285,7 +276,7 @@ module Vector3i : sig
   (** Multiplies a vector by a scalar *)
   val prop : int -> t -> t
 
-  (** Divides a vector by a scalar. Raises Vector3i_exception if the scalar is zero. *)
+  (** Divides a vector by a scalar. Raises Invalid_argument if the scalar is zero. *)
   val div : int -> t -> t
 
   (** Computes the pointwise product of two vectors. *)
@@ -354,9 +345,6 @@ module Vector3f : sig
 
   (** This module defines the vector3f type and various operations on it. *)
 
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Vector3f_exception of string
-
   (*** Vector operations *)
 
   (** Type of immutable vectors of 3 floats *)
@@ -386,7 +374,7 @@ module Vector3f : sig
   (** Multiplies a vector by a scalar *)
   val prop : float -> t -> t
 
-  (** Divides a vector by a scalar. Raises Vector3f_exception if the scalar is zero. *)
+  (** Divides a vector by a scalar. Raises Invalid_argument if the scalar is zero. *)
   val div : float -> t -> t
 
   (** Computes the pointwise product of two vectors. *)
@@ -428,7 +416,7 @@ module Vector3f : sig
   (** Computes the distance between two points *)
   val dist : t -> t -> float
 
-  (** Normalizes a vector. Raises Vector3f_exception if the vector is zero. *)
+  (** Normalizes a vector. Raises Invalid_argument if the vector is zero. *)
   val normalize : t -> t
 
   (** $clamp v a b$ returns the vector whose coordinates are the coordinates of $v$
@@ -451,7 +439,7 @@ module Vector3f : sig
   val to_string : t -> string
 
   (** $direction u v$ returns the normalized direction vector from $u$ to $v$.
-    * Raises Vector3f_exception if $u = v$. *)
+    * Raises Invalid_argument if $u = v$. *)
   val direction : t -> t -> t
 
   (** $endpoint a v t$ returns the point $a + tv$ *)

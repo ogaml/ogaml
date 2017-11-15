@@ -64,7 +64,7 @@ module Face = struct
       Vector3f.cross (Vector3f.sub v2 v1) (Vector3f.sub v3 v1)
       |> Vector3f.normalize
     with
-      Vector3f.Vector3f_exception _ -> Vector3f.zero
+      Invalid_argument _ -> Vector3f.zero
 
   let transform (v1,v2,v3) mat = 
     (Vertex.transform v1 mat, Vertex.transform v2 mat, Vertex.transform v3 mat)

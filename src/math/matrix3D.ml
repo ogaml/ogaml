@@ -62,7 +62,7 @@ let rotation v t =
   let s = sin t in
   let vn = 
     try normalize v 
-    with Vector3f_exception _ -> raise (Matrix3D_exception "Cannot get rotation matrix : zero axis")
+    with Invalid_argument _ -> raise (Matrix3D_exception "Cannot get rotation matrix : zero axis")
   in
   let (x,y,z) = (vn.x, vn.y, vn.z) in
   set 0 0 m (x *. x +. (1. -. x *. x) *. c);
@@ -143,11 +143,11 @@ let look_at ~from ~at ~up =
   let dir = direction from at in
   let up = 
     try normalize up 
-    with Vector3f_exception _ -> raise (Matrix3D_exception "Cannot get look_at matrix : zero up direction")
+    with Invalid_argument _ -> raise (Matrix3D_exception "Cannot get look_at matrix : zero up direction")
   in
   let right = 
     try normalize (cross dir up) 
-    with Vector3f_exception _ -> raise (Matrix3D_exception "Cannot get look_at matrix : up and (at - from) are parallel or zero")
+    with Invalid_argument _ -> raise (Matrix3D_exception "Cannot get look_at matrix : up and (at - from) are parallel or zero")
   in
   let up = cross right dir in
   let m = identity () in
@@ -171,11 +171,11 @@ let ilook_at ~from ~at ~up =
   let dir = direction from at in
   let up = 
     try normalize up 
-    with Vector3f_exception _ -> raise (Matrix3D_exception "Cannot get look_at matrix : zero up direction")
+    with Invalid_argument _ -> raise (Matrix3D_exception "Cannot get look_at matrix : zero up direction")
   in
   let right = 
     try normalize (cross dir up) 
-    with Vector3f_exception _ -> raise (Matrix3D_exception "Cannot get look_at matrix : up and (at - from) are parallel or zero")
+    with Invalid_argument _ -> raise (Matrix3D_exception "Cannot get look_at matrix : up and (at - from) are parallel or zero")
   in
   let up = cross right dir in
   let trl = translation from in

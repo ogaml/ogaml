@@ -1,7 +1,5 @@
 (* Operations on immutable 3 floats vectors *)
 
-exception Vector3f_exception of string
-
 type t = {x : float; y : float; z : float}
 
 val make : float -> float -> float -> t

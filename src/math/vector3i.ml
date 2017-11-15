@@ -1,6 +1,4 @@
 
-exception Vector3i_exception of string
-
 type t = {x : int; y : int; z : int}
 
 let make x y z = {x; y; z}
@@ -33,7 +31,7 @@ let prop k u = {
 
 let div k u = 
   if k = 0 then 
-    raise (Vector3i_exception "Division by zero")
+    raise (Invalid_argument "Division by zero")
   else
     {
       x = u.x / k;
