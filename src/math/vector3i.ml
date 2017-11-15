@@ -31,7 +31,7 @@ let prop k u = {
 
 let div k u = 
   if k = 0 then 
-    raise (Invalid_argument "Division by zero")
+    raise (Invalid_argument "Vector3i.div: division by zero")
   else
     {
       x = u.x / k;

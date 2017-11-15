@@ -1,6 +1,4 @@
 
-exception Matrix3D_exception of string
-
 type t = (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t
 
 (* Utils, not exposed *)
@@ -62,7 +60,7 @@ let rotation v t =
   let s = sin t in
   let vn = 
     try normalize v 
-    with Invalid_argument _ -> raise (Matrix3D_exception "Cannot get rotation matrix : zero axis")
+    with Invalid_argument _ -> raise (Invalid_argument "Matrix3D.rotation: zero axis")
   in
   let (x,y,z) = (vn.x, vn.y, vn.z) in
   set 0 0 m (x *. x +. (1. -. x *. x) *. c);
@@ -143,11 +141,11 @@ let look_at ~from ~at ~up =
   let dir = direction from at in
   let up = 
     try normalize up 
-    with Invalid_argument _ -> raise (Matrix3D_exception "Cannot get look_at matrix : zero up direction")
+    with Invalid_argument _ -> raise (Invalid_argument "Matrix3D.look_at: zero up direction")
   in
   let right = 
     try normalize (cross dir up) 
-    with Invalid_argument _ -> raise (Matrix3D_exception "Cannot get look_at matrix : up and (at - from) are parallel or zero")
+    with Invalid_argument _ -> raise (Invalid_argument "Matrix3D.look_at: up and (at - from) are parallel or zero")
   in
   let up = cross right dir in
   let m = identity () in
@@ -171,11 +169,11 @@ let ilook_at ~from ~at ~up =
   let dir = direction from at in
   let up = 
     try normalize up 
-    with Invalid_argument _ -> raise (Matrix3D_exception "Cannot get look_at matrix : zero up direction")
+    with Invalid_argument _ -> raise (Invalid_argument "Matrix3D.ilook_at: zero up direction")
   in
   let right = 
     try normalize (cross dir up) 
-    with Invalid_argument _ -> raise (Matrix3D_exception "Cannot get look_at matrix : up and (at - from) are parallel or zero")
+    with Invalid_argument _ -> raise (Invalid_argument "Matrix3D.ilook_at: up and (at - from) are parallel or zero")
   in
   let up = cross right dir in
   let trl = translation from in
@@ -209,9 +207,9 @@ let ilook_at_eulerian ~from ~theta ~phi =
 
 let orthographic ~right ~left ~near ~far ~top ~bottom =
   let m = identity () in
-  if right = left   then raise (Matrix3D_exception "Cannot get orthographic matrix : right = left");
-  if near  = far    then raise (Matrix3D_exception "Cannot get orthographic matrix : near = far");
-  if top   = bottom then raise (Matrix3D_exception "Cannot get orthographic matrix : top = bottom");
+  if right = left   then raise (Invalid_argument "Matrix3D.orthographic: right = left");
+  if near  = far    then raise (Invalid_argument "Matrix3D.orthographic: near = far");
+  if top   = bottom then raise (Invalid_argument "Matrix3D.orthographic: top = bottom");
   set 0 0 m (2. /. (right -. left));
   set 1 1 m (2. /. (top -. bottom));
   set 2 2 m (2. /. (near -. far));
@@ -231,7 +229,7 @@ let iorthographic ~right ~left ~near ~far ~top ~bottom =
   m
 
 let perspective ~near ~far ~width ~height ~fov =
-  if near  = far then raise (Matrix3D_exception "Cannot get perspective matrix : near = far");
+  if near  = far then raise (Invalid_argument "Matrix3D.perspective: near = far");
   let aspect = width /. height in
   let top = (tan (fov /. 2.)) *. near in
   let right = top *. aspect in 

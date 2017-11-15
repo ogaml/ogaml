@@ -1,7 +1,5 @@
 (* Optimized operations on 2D (3x3) float matrices *)
 
-exception Matrix2D_exception of string
-
 (* Type of 3x3 matrices stored in a flat column major array *)
 type t
 
@@ -56,5 +54,4 @@ val transformation :
 
 (* Returns the matrix as a bigarray *)
 val to_bigarray : t -> (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t
-
 

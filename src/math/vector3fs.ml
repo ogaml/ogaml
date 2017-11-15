@@ -1,6 +1,4 @@
 
-exception Vector3fs_exception of string
-
 type t = {r : float; t : float; p : float}
 
 let zero = {r = 0.; t = 0.; p = 0.}
@@ -35,7 +33,7 @@ let prop f v =
 
 let div f v = 
   if f = 0. then
-    raise (Vector3fs_exception "Division by zero")
+    raise (Invalid_argument "Vector3fs.div: division by zero")
   else
     prop (1. /. f) v
 
@@ -59,7 +57,7 @@ let norm v =
 let normalize v = 
   let n = norm v in
   if n = 0. then
-    raise (Vector3fs_exception "Cannot normalize zero vector")
+    raise (Invalid_argument "Vector3fs.normalize: zero vector")
   else 
     div n v
 

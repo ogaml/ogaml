@@ -1,6 +1,4 @@
 
-exception Matrix2D_exception of string
-
 type t = (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t
 
 (* Utils, not exposed *)
@@ -97,7 +95,7 @@ let times m v =
 let projection ~size = 
   let m = identity () in
   if size.Vector2f.x = 0. || size.Vector2f.y = 0. then
-    raise (Matrix2D_exception "Invalid projection vector");
+    raise (Invalid_argument "Matrix2D.projection: invalid projection vector (0 coordinate)");
   set 0 2 m (-1.);
   set 1 2 m 1.;
   set 0 0 m (2. /. size.Vector2f.x);

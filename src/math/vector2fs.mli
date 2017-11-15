@@ -1,7 +1,5 @@
 (* Operations on immutable 2 floats vectors in spherical coordinates*)
 
-exception Vector2fs_exception of string
-
 type t = {r : float; t : float}
 
 val zero : t

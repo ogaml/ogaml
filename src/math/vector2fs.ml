@@ -1,6 +1,4 @@
 
-exception Vector2fs_exception of string
-
 type t = {r : float; t : float}
 
 let zero = {r = 0.; t = 0.}
@@ -25,7 +23,7 @@ let prop f v =
 
 let div f v = 
   if f = 0. then
-    raise (Vector2fs_exception "Division by zero")
+    raise (Invalid_argument "Vector2fs.div: division by zero")
   else
     prop (1. /. f) v
 
@@ -47,7 +45,7 @@ let norm v =
 let normalize v = 
   let n = norm v in
   if n = 0. then
-    raise (Vector2fs_exception "Cannot normalize zero vector")
+    raise (Invalid_argument "Vector2fs.normalize: zero vector")
   else 
     div n v
 

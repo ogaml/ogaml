@@ -471,9 +471,6 @@ module Vector2fs : sig
 
   (** This module defines the vector2fs type and various operations on it. *)
 
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Vector2fs_exception of string
-
   (*** Vector operations *)
 
   (** Type of immutable vectors of 2 floats represented in polar coordinates *)
@@ -493,7 +490,7 @@ module Vector2fs : sig
   (** Multiplies a vector by a scalar *)
   val prop : float -> t -> t
 
-  (** Divides a vector by a scalar. Raises Vector2fs_exception if the scalar is zero. *)
+  (** Divides a vector by a scalar. Raises Invalid_argument if the scalar is zero. *)
   val div : float -> t -> t
 
   (** Converts a vector represented in polar coordinates to a vector represented in cartesian coordinates 
@@ -507,7 +504,7 @@ module Vector2fs : sig
   (** Computes the norm of a vector *)
   val norm : t -> float
 
-  (** Normalizes a vector. Raises Vector2fs_exception if the vector is zero. *)
+  (** Normalizes a vector. Raises Invalid_argument if the vector is zero. *)
   val normalize : t -> t
 
   (** Returns a pretty-printed string (not for serialization) *)
@@ -520,9 +517,6 @@ end
 module Vector3fs : sig
 
   (** This module defines the vector3fs type and various operations on it. *)
-
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Vector3fs_exception of string
 
   (*** Vector operations *)
 
@@ -547,7 +541,7 @@ module Vector3fs : sig
   (** Multiplies a vector by a scalar *)
   val prop : float -> t -> t
 
-  (** Divides a vector by a scalar. Raises Vector3fs_exception if the scalar is zero. *)
+  (** Divides a vector by a scalar. Raises Invalid_argument if the scalar is zero. *)
   val div : float -> t -> t
 
   (** Converts a vector represented in spherical coordinates to a vector represented in cartesian coordinates 
@@ -561,7 +555,7 @@ module Vector3fs : sig
   (** Computes the norm of a vector *)
   val norm : t -> float
 
-  (** Normalizes a vector. Raises Vector3fs_exception if the vector is zero. *)
+  (** Normalizes a vector. Raises Invalid_argument if the vector is zero. *)
   val normalize : t -> t
 
   (** Returns a pretty-printed string (not for serialization) *)
@@ -919,9 +913,6 @@ module Quaternion : sig
 
   (** This module defines the quaternion type and various operations on it *)
 
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Quaternion_exception of string
-
   (** Type of quaternions *)
   type t = {r : float; i : float; j : float; k : float}
 
@@ -953,7 +944,7 @@ module Quaternion : sig
   (** Returns the conjugate of a quaternion *)
   val conj : t -> t
 
-  (** Returns the inverse of a quaternion. Raises Quaternion_exception if the quaternion is zero *)
+  (** Returns the inverse of a quaternion. Raises Invalid_argument if the quaternion is zero *)
   val inverse : t -> t
 
   (** Returns the squared norm of a quaternion *)
@@ -962,7 +953,7 @@ module Quaternion : sig
   (** Returns the norm of a quaternion *)
   val norm : t -> float
 
-  (** Normalizes a quaternion. Raises Quaternion_exception if the quaternion is zero *)
+  (** Normalizes a quaternion. Raises Invalid_argument if the quaternion is zero *)
   val normalize : t -> t 
 
 end
@@ -972,10 +963,6 @@ end
 module Matrix3D : sig
 
   (** Optimized operations on 3D (4x4) float matrices *)
-
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Matrix3D_exception of string
-
 
   (*** Simple Matrices *)
 
@@ -1036,12 +1023,12 @@ module Matrix3D : sig
   (*** Rendering Matrices Creation *)
 
   (** Builds a "look-at" view matrix.
-    * Raises Matrix3D_exception if $up = zero$.
+    * Raises Invalid_argument if $up = zero$.
     * @see:OgamlMath.Vector3f *)
   val look_at : from:Vector3f.t -> at:Vector3f.t -> up:Vector3f.t -> t
 
   (** Builds the inverse of a "look-at" view matrix.
-    * Raises Matrix3D_exception if $up = zero$.
+    * Raises Invalid_argument if $up = zero$.
     * @see:OgamlMath.Vector3f *)
   val ilook_at : from:Vector3f.t -> at:Vector3f.t -> up:Vector3f.t -> t
 
@@ -1058,7 +1045,7 @@ module Matrix3D : sig
   val ilook_at_eulerian : from:Vector3f.t -> theta:float -> phi:float -> t
 
   (** Builds an orthographic projection matrix englobing a volume defined by six planes. 
-    * Raises Matrix3D_exception if $right = left$ or $near = far$ or $top = bottom$ *)
+    * Raises Invalid_argument if $right = left$ or $near = far$ or $top = bottom$ *)
   val orthographic : right:float -> left:float -> near:float -> far:float ->
       top:float -> bottom:float -> t
 
@@ -1072,7 +1059,7 @@ module Matrix3D : sig
     * the dimensions of the screen in pixels. Fov corresponds to the view 
     * angle, and is given in radians.
     *
-    * Raises Matrix3D_exception if $near = far$. *)
+    * Raises Invalid_argument if $near = far$. *)
   val perspective : near:float -> far:float -> width:float -> height:float ->
       fov:float -> t
 
@@ -1094,10 +1081,6 @@ end
 module Matrix2D : sig
 
   (** Optimized operations on 2D (3x3) float matrices *)
-
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Matrix2D_exception of string
-
 
   (*** Simple Matrices *)
 
