@@ -66,13 +66,12 @@ module Window = struct
     (* We need to solve the version number following the given constraints *)
     let opengGLProfile = Cocoa.NSOpenGLPixelFormat.(
       match ContextSettings.(major_version settings, minor_version settings) with
-      | None, _
       | Some 0, _
       | Some 1, _
       | Some 2, _
       | Some 3, Some 0 -> NSOpenGLProfileVersionLegacy
-      | Some 3, Some 1
-      | Some 3, Some 2 -> NSOpenGLProfileVersion3_2Core
+      | None  , _
+      | Some 3, _ -> NSOpenGLProfileVersion3_2Core
       | _, _ -> NSOpenGLProfileVersion4_1Core
     ) in
 
