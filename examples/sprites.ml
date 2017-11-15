@@ -4,7 +4,9 @@ open OgamlMath
 let settings = OgamlCore.ContextSettings.create ()
 
 let window =
-  Window.create ~width:900 ~height:600 ~settings ~title:"Sprite Example" ()
+  match Window.create ~width:900 ~height:600 ~settings ~title:"Sprite Example" () with
+  | Ok win -> win
+  | Error s -> failwith s
 
 let texture = Texture.Texture2D.create (module Window) window (`File "examples/mario-block.bmp")
 

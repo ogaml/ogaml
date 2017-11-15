@@ -9,7 +9,9 @@ let settings =
     ()
 
 let window =
-  Window.create ~width:900 ~height:600 ~settings ~title:"Flat Example" ()
+  match Window.create ~width:900 ~height:600 ~settings ~title:"Flat Example" () with
+  | Ok win -> win
+  | Error s -> failwith s
 
 let rectangle1 =
   Shape.create_rectangle
@@ -158,7 +160,7 @@ let rec handle_events () =
         | B -> do_all gothicker true
         (* Resizing the window *)
         | M -> Window.resize window Vector2i.({ x = 500 ; y = 400 })
-        | L -> Window.toggle_fullscreen window
+        | L -> Window.toggle_fullscreen window |> ignore
         | _ -> ()
       )
       | _      -> ()

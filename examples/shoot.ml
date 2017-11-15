@@ -161,7 +161,10 @@ module GameState = struct
     
 end
 
-let window = Window.create ~width:800 ~height:600 ~title:"Shoot !" ()
+let window = 
+  match Window.create ~width:800 ~height:600 ~title:"Shoot !" () with
+  | Ok win -> win
+  | Error s -> failwith s
 
 let state = GameState.create ()
 

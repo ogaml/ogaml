@@ -29,26 +29,31 @@ type t = {
 
 let create ?width:(width=800) ?height:(height=600) ?title:(title="") 
            ?settings:(settings=OgamlCore.ContextSettings.create ()) () =
-  let internal = LL.Window.create ~width ~height ~title ~settings in
-  let context = Context.LL.create () in
-  let min_spf = 
-    match ContextSettings.framerate_limit settings with
-    | None   -> 0.
-    | Some i -> 1. /. (float_of_int i)
+  let internal = 
+    try Ok (LL.Window.create ~width ~height ~title ~settings)
+    with Failure s -> Error s
   in
-  let maxbufs = (Context.capabilities context).Context.max_draw_buffers in
-  let bound_buffers = Array.make maxbufs OutputBuffer.None in
-  bound_buffers.(0) <- OutputBuffer.BackLeft;
-  Context.LL.set_viewport context OgamlMath.IntRect.({x = 0; y = 0; width; height});
-  {
-    context;
-    internal;
-    settings;
-    min_spf;
-    bound_buffers;
-    n_bound_buffers = 1;
-    clock = Clock.create ()
-  }
+  Utils.bind internal (fun internal ->
+    let context = Context.LL.create () in
+    let min_spf = 
+      match ContextSettings.framerate_limit settings with
+      | None   -> 0.
+      | Some i -> 1. /. (float_of_int i)
+    in
+    let maxbufs = (Context.capabilities context).Context.max_draw_buffers in
+    let bound_buffers = Array.make maxbufs OutputBuffer.None in
+    bound_buffers.(0) <- OutputBuffer.BackLeft;
+    Context.LL.set_viewport context OgamlMath.IntRect.({x = 0; y = 0; width; height});
+    {
+      context;
+      internal;
+      settings;
+      min_spf;
+      bound_buffers;
+      n_bound_buffers = 1;
+      clock = Clock.create ()
+    }
+  )
 
 let set_title win title = LL.Window.set_title win.internal title
 

@@ -5,7 +5,10 @@ let () =
 
 let settings = OgamlCore.ContextSettings.create ~core_profile:true ()
 
-let window = Window.create ~width:100 ~height:100 ~settings ~title:"" ()
+let window = 
+  match Window.create ~width:100 ~height:100 ~settings ~title:"" () with
+  | Ok win -> win
+  | Error s -> failwith s
 
 let context = Window.context window
 

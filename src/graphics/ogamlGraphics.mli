@@ -1608,7 +1608,7 @@ module Window : sig
     ?width:int ->
     ?height:int ->
     ?title:string ->
-    ?settings:OgamlCore.ContextSettings.t -> unit -> t
+    ?settings:OgamlCore.ContextSettings.t -> unit -> (t, string) result
 
   (** Returns the settings used at the creation of the window *)
   val settings : t -> OgamlCore.ContextSettings.t
@@ -1634,8 +1634,8 @@ module Window : sig
     * @see:OgamlMath.Vector2i *)
   val resize : t -> OgamlMath.Vector2i.t -> unit
 
-  (** Toggles the full screen mode of a window. *)
-  val toggle_fullscreen : t -> unit
+  (** Toggles the full screen mode of a window. Returns $true$ if successful. *)
+  val toggle_fullscreen : t -> bool
 
   (** Returns the rectangle associated to a window, in screen coordinates
     * @see:OgamlMath.IntRect *)

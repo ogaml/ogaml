@@ -11,7 +11,9 @@ open OgamlGraphics
 let settings = OgamlCore.ContextSettings.create ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°01" ()
+  match Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°01" () with
+  | Ok win -> win
+  | Error s -> failwith s
 
 let rec event_loop () =
   match Window.poll_event window with

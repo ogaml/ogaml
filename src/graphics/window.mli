@@ -18,7 +18,7 @@ val create :
   ?width:int ->
   ?height:int ->
   ?title:string ->
-  ?settings:OgamlCore.ContextSettings.t -> unit -> t
+  ?settings:OgamlCore.ContextSettings.t -> unit -> (t, string) result
 
 (** Changes the title of the window. *)
 val set_title : t -> string -> unit
@@ -40,7 +40,7 @@ val destroy : t -> unit
 val resize : t -> OgamlMath.Vector2i.t -> unit
 
 (** Toggles the full screen mode of a window. *)
-val toggle_fullscreen : t -> unit
+val toggle_fullscreen : t -> bool
 
 (** Returns the rectangle associated to a window, in screen coordinates *)
 val rect : t -> OgamlMath.IntRect.t

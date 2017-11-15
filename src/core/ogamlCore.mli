@@ -274,7 +274,8 @@ module LL : sig
     (** Type of a window *)
     type t
 
-    (** Creates a window of a given size *)
+    (** Creates a window of a given size. Might raise Failure if something
+      * goes wrong. *)
     val create : width:int -> height:int -> title:string -> settings:ContextSettings.t -> t
 
     (** Sets the tite of the window. *)
@@ -299,8 +300,8 @@ module LL : sig
       * @see:OgamlMath.Vector2i *)
     val resize : t -> OgamlMath.Vector2i.t -> unit
 
-    (** Toggle the full screen mode of a window *)
-    val toggle_fullscreen : t -> unit
+    (** Toggle the full screen mode of a window. Returns $true$ if successful. *)
+    val toggle_fullscreen : t -> bool
 
     (** Returns $true$ iff the window is open *)
     val is_open : t -> bool

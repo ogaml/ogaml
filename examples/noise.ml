@@ -9,7 +9,9 @@ let settings =
     ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~settings ~title:"Noise Example" ()
+  match Window.create ~width:800 ~height:600 ~settings ~title:"Noise Example" () with
+  | Ok win -> win
+  | Error s -> failwith s
 
 let img = 
   Image.create (`Empty (Vector2i.({x = 800; y = 600}), `RGB Color.RGB.white))

@@ -5,7 +5,10 @@ open OgamlGraphics
 
 let settings = ContextSettings.create ~msaa:8 ()
 
-let window = Window.create ~width:800 ~height:600 ~title:"Interpolators" ~settings ()
+let window = 
+  match Window.create ~width:800 ~height:600 ~title:"Interpolators" ~settings () with
+  | Ok win -> win
+  | Error s -> failwith s
 
 let rec draw_curve color = function
   |(x1,y1)::(x2,y2)::t -> 

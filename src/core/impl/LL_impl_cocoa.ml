@@ -1,8 +1,6 @@
 
 module Window = struct
 
-  exception Error of string
-
   type t = {
     ctrl : Cocoa.OGWindowController.t ;
     pending_events : Event.t Queue.t
@@ -148,7 +146,8 @@ module Window = struct
     OGWindowController.resize win.ctrl frame
 
   let toggle_fullscreen win =
-    Cocoa.OGWindowController.toggle_fullscreen win.ctrl
+    Cocoa.OGWindowController.toggle_fullscreen win.ctrl;
+    true
 
   let is_open win =
     Cocoa.OGWindowController.is_window_open win.ctrl

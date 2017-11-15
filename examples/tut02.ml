@@ -15,7 +15,9 @@ let settings = OgamlCore.ContextSettings.create ()
 
 (* Window creation with default settings *)
 let window =
-  Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°02" ()
+  match Window.create ~width:800 ~height:600 ~settings ~title:"Tutorial n°02" () with
+  | Ok win -> win
+  | Error s -> failwith s
 
 (* Source of GLSL vertex shader.
  * We do not add a version number as the program preprocessor will

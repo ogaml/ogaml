@@ -5,7 +5,9 @@ open OgamlUtils
 let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~settings ~title:"Font sets tests" ()
+  match Window.create ~width:800 ~height:600 ~settings ~title:"Font sets tests" () with
+  | Ok win -> win
+  | Error s -> failwith s
 
 let fps_clock = 
   Clock.create ()
