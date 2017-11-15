@@ -365,9 +365,6 @@ module PriorityQueue : sig
 
     (** This module provides a basic implementation of priority queues *)
 
-    (** Raised when a queue is empty *)
-    exception Empty
-
     (** Priorities used by the queue *)
     type priority
 
@@ -389,21 +386,15 @@ module PriorityQueue : sig
     (** Inserts an element with a given priority *)
     val insert : 'a t -> priority -> 'a -> 'a t
 
-    (** Returns the top element of a queue
-      *
-      * Raises $Empty$ if the queue is empty *)
-    val top : 'a t -> 'a
+    (** Returns the top element of a queue *)
+    val top : 'a t -> ('a, unit) result
 
-    (** Removes the top element of a queue
-      *
-      * Raises $Empty$ if the queue is empty *)
-    val pop : 'a t -> 'a t
+    (** Removes the top element of a queue *)
+    val pop : 'a t -> ('a t, unit) result
 
     (** Returns the top element of a queue and the queue without its
-      * first element
-      *
-      * Raises $Empty$ if the queue is empty *)
-    val extract : 'a t -> ('a * 'a t)
+      * first element *)
+    val extract : 'a t -> ('a * 'a t, unit) result
 
   end
 
