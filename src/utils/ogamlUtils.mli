@@ -90,26 +90,23 @@ module UTF8String : sig
   (** Type of a UTF-8 encoded string *)
   type t
 
-  (** Raised when a string is not correctly encoded *)
-  exception UTF8_error of string
-
-  (** Raised when an operation violates the bounds of the string *)
-  exception Out_of_bounds of string
-
   (** Empty UTF-8 string *)
   val empty : unit -> t
 
   (** Makes a UTF-8 string filled with one character
     * 
-    * Raises UTF8_error if the code is not a valid UTF-8 character code *)
+    * Raises Invalid_argument if the code is not a valid UTF-8 character code *)
   val make : int -> code -> t
 
-  (** Returns the ith character of a UTF-8 string *)
+  (** Returns the ith character of a UTF-8 string.
+    * 
+    * Raises Invalid_argument if $i$ is not a valid index *)
   val get : t -> int -> code
 
   (** Sets the ith character of a UTF-8 string.
     *
-    * Raises UTF8_error if the code is not a valid UTF-8 character code *)
+    * Raises Invalid_argument if $i$ is not a valid index or if the code is
+    * not a valid UTF-8 code *)
   val set : t -> int -> code -> unit
 
   (** Returns the length of a UTF-8 string *)
@@ -121,7 +118,7 @@ module UTF8String : sig
 
   (** Returns a UTF-8 encoded string from a string.
     * 
-    * Raises UTF8_error if the string is not a valid UTF-8 encoding *)
+    * Raises Invalid_argument if the string is not a valid UTF-8 encoding *)
   val from_string : string -> t
 
   (** Returns a string from a UTF-8 encoded string *)
@@ -135,7 +132,7 @@ module UTF8String : sig
 
   (** Maps a UTF-8 string
     *
-    * Raises UTF8_error if the function returns an invalid UTF-8 code *)
+    * Raises Invalid_argument if the function returns an invalid UTF-8 code *)
   val map : t -> (code -> code) -> t
 
 end
@@ -153,10 +150,6 @@ module Interpolator : sig
 
   (** Type of an interpolator returning type 'a *)
   type 'a t
-
-  (** Raised when an error occurs during the creation of an interpolator *)
-  exception Invalid_interpolator of string
-
 
   (*** Accessors and modifiers *)
 

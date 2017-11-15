@@ -3,10 +3,6 @@ type code = int
 
 type t
 
-exception UTF8_error of string
-
-exception Out_of_bounds of string
-
 val empty : unit -> t
 
 val make : int -> code -> t

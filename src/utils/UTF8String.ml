@@ -3,28 +3,24 @@ type code = int
 
 type t = code array
 
-exception UTF8_error of string
-
-exception Out_of_bounds of string
-
 let empty () = [||]
 
 let make l c = 
   if c < 0 || c > 0b1111111111111111111111111111111 then
-    raise (UTF8_error "Make : invalid code")
+    raise (Invalid_argument "UTF8String.make: invalid code")
   else Array.make l c
 
 let get s i = 
   if i >= Array.length s || i < 0 then
-    raise (Out_of_bounds (Printf.sprintf "Accessing %i, length %i" i (Array.length s)))
+    raise (Invalid_argument "UTF8String.get: index out of bounds") 
   else
     s.(i)
 
 let set s i c = 
   if i >= Array.length s || i < 0 then
-    raise (Out_of_bounds (Printf.sprintf "Setting %i, length %i" i (Array.length s)))
+    raise (Invalid_argument "UTF8String.set: index out of bounds")
   else if c < 0 || c > 0b1111111111111111111111111111111 then
-    raise (UTF8_error "Set : invalid code")
+    raise (Invalid_argument "UTF8String.set: invalid code")
   else
     s.(i) <- c
 
@@ -44,7 +40,7 @@ let from_string s =
   let rec get_6bit_values i j = 
     if i > j then 0
     else if i >= String.length s || ((Char.code s.[i]) land 0b11000000 <> 0b10000000) then
-      raise (UTF8_error "Bad UTF-8 format, invalid byte sequence")
+      raise (Invalid_argument "UTF8String.from_string: invalid byte sequence")
     else begin
       (((Char.code s.[i]) land 0b00111111) lsl ((j-i)*6)) + (get_6bit_values (i+1) j)
     end
@@ -64,7 +60,7 @@ let from_string s =
         (((c land 0b00000011) lsl 24) + (get_6bit_values (i+1) (i+4))) :: (iter (i+5))
       else if c land 0b11111110 = 0b11111100 then
         (((c land 0b00000001) lsl 30) + (get_6bit_values (i+1) (i+5))) :: (iter (i+6))
-      else raise (UTF8_error "Bad UTF-8 format, invalid leading byte")
+      else raise (Invalid_argument "UTF8String.from_string: invalid leading byte")
     end
   in
   Array.of_list (iter 0)
@@ -126,7 +122,7 @@ let map s f =
   Array.map (fun c -> 
     let c' = f c in
     if c' < 0 || c' > 0b1111111111111111111111111111111 then
-      raise (UTF8_error "Map : invalid code")
+      raise (Invalid_argument "UTF8String.map: invalid code")
     else c'
   ) s
 
