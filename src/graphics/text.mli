@@ -58,11 +58,13 @@ val draw :
   target : 'a ->
   unit -> unit
 
-val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> unit
+val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> 
+    (unit, [> `Missing_attribute of string]) result
 
 val map_to_source : t -> 
                     (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
-                    'b VertexArray.Source.t -> unit
+                    'b VertexArray.Source.t -> 
+                    (unit, [> `Missing_attribute of string]) result
 
 val advance : t -> OgamlMath.Vector2f.t
 

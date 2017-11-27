@@ -49,9 +49,9 @@ module Vertex : sig
     val attribute : string -> ?divisor:int -> 'a AttributeType.s ->
       (('a, s) Attribute.s, [> `Sealed_vertex | `Duplicate_attribute]) result
 
-    val seal : unit -> (unit, unit) result
+    val seal : unit -> (unit, [> `Sealed_vertex]) result
 
-    val create : unit -> (s t, unit) result
+    val create : unit -> (s t, [> `Unsealed_vertex]) result
 
     val copy : s t -> s t
 

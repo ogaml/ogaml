@@ -1894,16 +1894,16 @@ module VertexArray : sig
         * $divisor$ corresponds to the attribute's divisor for instanced rendering,
         * and defaults to $0$ (non-instanced) *)
       val attribute : string -> ?divisor:int -> 'a AttributeType.s ->
-        (('a, s) Attribute.s, [`Sealed_vertex | `Duplicate_attribute]) result
+        (('a, s) Attribute.s, [> `Sealed_vertex | `Duplicate_attribute]) result
 
       (** Seals this structure. Once sealed, the structure can be used to
         * create vertices but cannot receive new attributes.
         * Returns $Error$ if the structure is already sealed. *)
-      val seal : unit -> (unit, unit) result
+      val seal : unit -> (unit, [> `Sealed_vertex]) result
 
       (** Creates a vertex following this structure.
         * Returns $Error$ if the structure is not sealed. *)
-      val create : unit -> (s t, unit) result
+      val create : unit -> (s t, [>`Unsealed_vertex]) result
 
       (** Creates a copy of a vertex *)
       val copy : s t -> s t
@@ -2531,14 +2531,16 @@ module Sprite : sig
     * and position attributes.
     *
     * Use DrawMode.Triangles with this source. *)
-  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> unit
+  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t ->
+    (unit, [> `Missing_attribute of string]) result
 
   (** Outputs a sprite to a vertex array source by mapping its vertices.
     *
     * See $to_source$ for more information. *)
   val map_to_source : t -> 
                       (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
-                      'b VertexArray.Source.t -> unit
+                      'b VertexArray.Source.t ->
+                      (unit, [> `Missing_attribute of string]) result
 
 end
 
@@ -2661,14 +2663,16 @@ module Text : sig
     *
     * Use DrawMode.Triangles with this source and bind the
     * correct font before use. *)
-  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> unit
+  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> 
+    (unit, [> `Missing_attribute of string]) result
 
   (** Outputs text vertices to a vertex array source by mapping its vertices.
     *
     * See $to_source$ for more information. *)
   val map_to_source : t -> 
                       (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
-                      'b VertexArray.Source.t -> unit
+                      'b VertexArray.Source.t ->
+                      (unit, [> `Missing_attribute of string]) result
 end
 
 

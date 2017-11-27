@@ -13,7 +13,7 @@ val create :
   ?color    : Color.t ->
   ?size     : OgamlMath.Vector2f.t ->
   ?rotation : float ->
-  unit -> (t, [`Invalid_subrect]) result
+  unit -> (t, [> `Invalid_subrect]) result
 
 (** Draws a sprite. *)
 val draw : 
@@ -21,7 +21,7 @@ val draw :
   ?parameters:DrawParameter.t -> target:'a -> sprite:t -> unit -> unit
 
 val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> 
-  (unit, [`Missing_attribute of string]) result
+  (unit, [> `Missing_attribute of string]) result
 
 (** Outputs a sprite to a vertex array source by mapping its vertices.
   *
@@ -29,7 +29,7 @@ val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t ->
 val map_to_source : t -> 
                     (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
                     'b VertexArray.Source.t -> 
-                    (unit, [`Missing_attribute of string]) result
+                    (unit, [> `Missing_attribute of string]) result
 
 (** Sets the position of the origin of the sprite in the window. *)
 val set_position : t -> OgamlMath.Vector2f.t -> unit

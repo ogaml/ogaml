@@ -1,6 +1,7 @@
 open OgamlMath
 open OgamlCore
 open OgamlUtils
+open Utils
 
 module Fx = struct
 
@@ -169,24 +170,20 @@ module Fx = struct
                ~color
                ()
            in
-           VertexArray.Source.(
-             source << v1 << v2 << v3
-                    << v3 << v1 << v4
-           ),
+           VertexArray.Source.(source <<< v1 <<< v2 <<< v3 <<< v3 <<< v1 <<< v4),
            Vector2f.(
              add advance_vec { x = Font.Glyph.advance glyph +. kern ; y = 0. }
            ),
            line_width
         )
         (
-          VertexArray.Source.empty 
-              ~size:((UTF8String.length utf8) * 6)
-              (),
+          Ok (VertexArray.Source.empty ~size:((UTF8String.length utf8) * 6) ()),
           Vector2f.zero,
           0.
         )
         chars
       |> fun (source, advance, line_width) -> 
+          let source = assert_result source in
           let vbo = VertexArray.Buffer.static (module M) target source in 
           (VertexArray.create (module M) target [VertexArray.Buffer.unpack vbo],
           advance,
@@ -241,6 +238,7 @@ module Fx = struct
           ~parameters
           ~uniform
           ~mode:DrawMode.Triangles ()
+    |> assert_result
 
   let advance text = text.advance
 
@@ -394,7 +392,7 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
     let src = VertexArray.Source.empty
       ~size:32 () 
     in
-    List.iter (VertexArray.Source.add src) vtx;
+    iter_result (VertexArray.Source.add src) vtx |> assert_result;
     let vbo = VertexArray.Buffer.(unpack (static (module M) target src)) in
     VertexArray.create (module M) target [vbo]
   in
@@ -406,12 +404,13 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
         ~parameters
         ~uniform
         ~mode:DrawMode.Triangles ()
+  |> assert_result
 
 let to_source text src = 
-  List.iter (VertexArray.Source.add src) text.vertices
+  iter_result (VertexArray.Source.add src) text.vertices
 
 let map_to_source text f src = 
-  List.iter (fun v -> VertexArray.Source.add src (f v)) text.vertices
+  iter_result (fun v -> VertexArray.Source.add src (f v)) text.vertices
 
 let advance text = text.advance
 

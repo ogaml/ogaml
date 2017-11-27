@@ -1,4 +1,5 @@
 open OgamlMath
+open Utils
 
 module Vertex = struct
 
@@ -194,9 +195,9 @@ module Vertex = struct
     val attribute : string -> ?divisor:int -> 'a AttributeType.s -> 
       (('a, s) Attribute.s, [> `Sealed_vertex | `Duplicate_attribute]) result
 
-    val seal : unit -> (unit, unit) result
+    val seal : unit -> (unit, [> `Sealed_vertex]) result
 
-    val create : unit -> (s t, unit) result
+    val create : unit -> (s t, [> `Unsealed_vertex]) result
 
     val copy : s t -> s t
 
@@ -236,7 +237,7 @@ module Vertex = struct
 
       let seal () = 
         if vertex.sealed then 
-          Error ()
+          Error `Sealed_vertex
         else begin
           vertex.attribs <- (List.rev vertex.attribs);
           vertex.sealed <- true;
@@ -245,7 +246,7 @@ module Vertex = struct
 
       let create () = 
         if not vertex.sealed then 
-          Error ()
+          Error `Unsealed_vertex
         else
           Ok {vertex; data = Array.make vertex.total_size AttributeVal.Unset}
 
@@ -691,17 +692,17 @@ module Buffer = struct
       Ok ()
     end
 
-  exception Wrong_attribute_type of string (* Internal exception *)
-
   let bind_to_attrib context t (prog, program_loc) (attribute, offset) = 
     if Context.LL.bound_vbo context <> Some t.id then begin
       GL.VBO.bind (Some t.buffer);
       Context.LL.set_bound_vbo context (Some (t.buffer, t.id));
     end;
     let typ = Vertex.type_of attribute in
-    if typ <> Program.Attribute.kind program_loc then
-      raise (Wrong_attribute_type (* Internal raise *)
-          (Program.Attribute.name program_loc));
+    begin if typ <> Program.Attribute.kind program_loc then
+      Error (`Wrong_attribute_type (Program.Attribute.name program_loc))
+    else
+      Ok ()
+    end >>>= fun () ->
     GL.VAO.enable_attrib (Program.Attribute.location program_loc);
     GL.VAO.attrib_divisor (Program.Attribute.location program_loc) 
                           (Vertex.divisor_of attribute);
@@ -781,27 +782,26 @@ let max_instances t =
       end
     ) None t.buffers
 
-exception Missing_attribute of string (* Internal exception *)
-
 let bind context vao program = 
   if vao.bound <> Some program then begin
     GL.VAO.bind (Some vao.vao);
     Context.LL.set_bound_vao context (Some (vao.vao, vao.id));
-    List.iter (fun program_attrib ->
+    iter_result (fun program_attrib ->
       let aname = Program.Attribute.name program_attrib in 
       if not (Hashtbl.mem vao.attributes aname) then
-        raise (Missing_attribute aname); (* Internal raise *)
-      let (vbo, att, offset) = Hashtbl.find vao.attributes aname in
-      Buffer.bind_to_attrib context vbo (program, program_attrib) (att, offset)
-    ) (Program.LL.attributes program);
+        Error (`Missing_attribute aname)
+      else begin
+        let (vbo, att, offset) = Hashtbl.find vao.attributes aname in
+        Buffer.bind_to_attrib context vbo (program, program_attrib) (att, offset)
+      end
+    ) (Program.LL.attributes program) >>>= fun () ->
     Context.LL.set_bound_vbo context None;
     GL.VBO.bind None;
   end else if Context.LL.bound_vao context <> Some vao.id then begin
     GL.VAO.bind (Some vao.vao);
-    Context.LL.set_bound_vao context (Some (vao.vao, vao.id))
-  end
-
-exception Out_of_bounds of [`Slice | `Instances] (* Internal exception *)
+    Context.LL.set_bound_vao context (Some (vao.vao, vao.id));
+    Ok ()
+  end else Ok ()
 
 let draw (type s) (type buf) 
          (module M : RenderTarget.T with type t = s and type OutputBuffer.t = buf)
@@ -830,54 +830,49 @@ let draw (type s) (type buf)
     M.bind target ?buffers parameters;
     Program.LL.use context (Some program);
     Uniform.LL.bind context uniform (Program.LL.uniforms program);
-    try 
-      bind context vertices program;
-      begin match indices with
-      |None -> 
-        if start < 0 || start + length > v_length || length < 0 then
-          raise (Out_of_bounds `Slice) (* Internal raise *)
-        else begin
-          match max_instances with
-          | None   -> GL.VAO.draw mode start length
-          | Some max_n -> 
-            let n_instances = 
-              match instances with
-              | None   -> max_n
-              | Some i -> 
-                if i > max_n || i < 0 then
-                  raise (Out_of_bounds `Instances) (* Internal raise *)
-                else
-                  i
-            in
-            GL.VAO.draw_instanced mode start length n_instances
-        end
-      |Some ebo ->
-        if start < 0 || start + length > (IndexArray.length ebo) || length < 0 then
-          raise (Out_of_bounds `Slice) (* Internal raise *)
-        else begin
-          match max_instances with
+    bind context vertices program >>= fun () ->
+    begin match indices with
+    |None -> 
+      if start < 0 || start + length > v_length || length < 0 then
+        Error `Invalid_slice
+      else begin
+        match max_instances with
+        | None   -> 
+          Ok (GL.VAO.draw mode start length)
+        | Some max_n -> 
+          begin match instances with
           | None   -> 
-            IndexArray.LL.bind context ebo;
-            GL.VAO.draw_elements mode start length
-          | Some max_n -> 
-            let n_instances = 
-              match instances with
-              | None   -> max_n
-              | Some i -> 
-                if i > max_n || i < 0 then
-                  raise (Out_of_bounds `Instances) (* Internal raise *)
-                else
-                  i
-            in
-            IndexArray.LL.bind context ebo;
-            GL.VAO.draw_instanced mode start length n_instances
-        end
-      end;
-      Ok ()
-    with
-      | Buffer.Wrong_attribute_type s -> Error (`Wrong_attribute_type s)
-      | Missing_attribute s -> Error (`Missing_attribute s)
-      | Out_of_bounds `Slice -> Error `Invalid_slice
-      | Out_of_bounds `Instances -> Error `Invalid_instance_count
+            Ok max_n
+          | Some i -> 
+            if i > max_n || i < 0 then
+              Error `Invalid_instance_count
+            else
+              Ok i
+          end >>>= fun n_instances ->
+          GL.VAO.draw_instanced mode start length n_instances
+      end
+    |Some ebo ->
+      if start < 0 || start + length > (IndexArray.length ebo) || length < 0 then
+        Error `Invalid_slice
+      else begin
+        match max_instances with
+        | None   -> 
+          IndexArray.LL.bind context ebo;
+          GL.VAO.draw_elements mode start length;
+          Ok ()
+        | Some max_n -> 
+          begin match instances with
+          | None   -> 
+            Ok max_n
+          | Some i -> 
+            if i > max_n || i < 0 then
+              Error `Invalid_instance_count 
+            else
+              Ok i
+          end >>>= fun n_instances ->
+          IndexArray.LL.bind context ebo;
+          GL.VAO.draw_instanced mode start length n_instances
+      end
+    end
   end else
     Ok ()
