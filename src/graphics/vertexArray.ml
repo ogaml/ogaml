@@ -192,7 +192,7 @@ module Vertex = struct
     type s
 
     val attribute : string -> ?divisor:int -> 'a AttributeType.s -> 
-      (('a, s) Attribute.s, [`Sealed_vertex | `Duplicate_attribute]) result
+      (('a, s) Attribute.s, [> `Sealed_vertex | `Duplicate_attribute]) result
 
     val seal : unit -> (unit, unit) result
 

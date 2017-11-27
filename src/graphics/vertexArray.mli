@@ -31,7 +31,7 @@ module Vertex : sig
 
     val set : 'b t -> ('a, 'b) s -> 'a -> unit
 
-    val get : 'b t -> ('a, 'b) s -> ('a, [`Unbound_attribute of string]) result
+    val get : 'b t -> ('a, 'b) s -> ('a, [> `Unbound_attribute of string]) result
 
     val name : ('a, 'b) s -> string
 
@@ -47,7 +47,7 @@ module Vertex : sig
     type s
 
     val attribute : string -> ?divisor:int -> 'a AttributeType.s ->
-      (('a, s) Attribute.s, [`Sealed_vertex | `Duplicate_attribute]) result
+      (('a, s) Attribute.s, [> `Sealed_vertex | `Duplicate_attribute]) result
 
     val seal : unit -> (unit, unit) result
 
@@ -90,9 +90,9 @@ module Source : sig
 
   val empty : ?size:int -> unit -> 'a t
 
-  val add : 'a t -> 'a Vertex.t -> (unit, [`Missing_attribute of string]) result
+  val add : 'a t -> 'a Vertex.t -> (unit, [> `Missing_attribute of string]) result
 
-  val (<<) : 'a t -> 'a Vertex.t -> ('a t, [`Missing_attribute of string]) result
+  val (<<) : 'a t -> 'a Vertex.t -> ('a t, [> `Missing_attribute of string]) result
 
   val (<<<) : ('a t, [> `Missing_attribute of string] as 'b) result -> 'a Vertex.t -> 
     ('a t, 'b) result
@@ -101,15 +101,15 @@ module Source : sig
 
   val clear : 'a t -> unit
 
-  val append : 'a t -> 'a t -> (unit, [`Incompatible_fields]) result
+  val append : 'a t -> 'a t -> (unit, [> `Incompatible_fields]) result
 
   val iter : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> unit) -> unit
 
   val map : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 
-    ('b t, [`Missing_attribute of string]) result
+    ('b t, [> `Missing_attribute of string]) result
 
   val map_to : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t -> 
-    (unit, [`Missing_attribute of string]) result
+    (unit, [> `Missing_attribute of string]) result
 
 end
 
@@ -136,7 +136,7 @@ module Buffer : sig
                  'a -> (dynamic, 'b) t ->
                  ?first:int -> ?length:int ->
                  'b Source.t -> 
-                 (unit, [`Invalid_start | `Invalid_length | `Incompatible_sources]) result
+                 (unit, [> `Invalid_start | `Invalid_length | `Incompatible_sources]) result
 
   val unpack : (_, _) t -> unpacked
 
@@ -165,5 +165,5 @@ val draw :
   ?start     : int ->
   ?length    : int ->
   ?mode      : DrawMode.t ->
-  unit -> (unit, [`Wrong_attribute_type of string | `Missing_attribute of string 
+  unit -> (unit, [> `Wrong_attribute_type of string | `Missing_attribute of string 
                  | `Invalid_slice | `Invalid_instance_count]) result

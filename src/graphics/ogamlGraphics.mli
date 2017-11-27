@@ -2211,9 +2211,32 @@ module Model : sig
 
   end
 
+  (** Represents the location of a parsing error *)
+  module Location : sig
 
-  (** Raised if an OBJ file is ill-formed or if a model has a wrong type *)
-  exception Error of string
+    (** Modules that stores a representation of the location of a parsing
+      * error for OBJ files *)
+ 
+    (** Location type *)
+    type t
+ 
+    (** First line of the error *)
+    val first_line : t -> int
+  
+    (** Last line of the error *)
+    val last_line : t -> int
+  
+    (** First char of the error *)
+    val first_char : t -> int
+  
+    (** Last char of the error *)
+    val last_char : t -> int
+  
+    (** Returns a pretty-printed string of the location *)
+    val to_string : t -> string
+  
+  end
+
 
   (** Type of a model *)
   type t
@@ -2224,7 +2247,9 @@ module Model : sig
   val empty : t
 
   (** Returns the model associated to an OBJ file *)
-  val from_obj : string -> t
+  val from_obj : string -> (t, [> `Syntax_error of (Location.t * string) 
+                               | `Parsing_error of Location.t]) result
+
 
   (** Creates a cube from two endpoints *)
   val cube : OgamlMath.Vector3f.t -> OgamlMath.Vector3f.t -> t
@@ -2269,7 +2294,7 @@ module Model : sig
     * @see:OgamlGraphics.VertexArray.Source *)
   val source : t -> ?index_source:IndexArray.Source.t 
                  -> vertex_source:VertexArray.SimpleVertex.T.s VertexArray.Source.t 
-                 -> unit -> unit
+                 -> unit -> (unit, [> `Missing_attribute]) result
 
 
   (*** Iterators *)
@@ -2353,7 +2378,9 @@ module Shape : sig
     * @see:OgamlGraphics.DrawParameter
     * @see:OgamlGraphics.Window *)
   val draw : (module RenderTarget.T with type t = 'a) ->
-             ?parameters:DrawParameter.t -> target:'a -> shape:t -> unit -> unit
+             ?parameters:DrawParameter.t -> target:'a -> shape:t -> unit ->
+            (unit, [> `Wrong_attribute_type of string | `Missing_attribute of string 
+                    | `Invalid_slice | `Invalid_instance_count]) result
 
   (** Sets the position of the origin in the window. *)
   val set_position : t -> OgamlMath.Vector2f.t -> unit
@@ -2410,14 +2437,16 @@ module Shape : sig
     * and color attributes.
     *
     * Use DrawMode.Triangles with this source. *)
-  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> unit
+  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t ->
+    (unit, [> `Missing_attribute of string]) result
 
   (** Outputs a shape to a vertex array source by mapping its vertices.
     *
     * See $to_source$ for more information. *)
   val map_to_source : t -> 
-                      (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
-                      'b VertexArray.Source.t -> unit
+    (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
+    'b VertexArray.Source.t -> 
+    (unit, [> `Missing_attribute of string]) result
 
 end
 

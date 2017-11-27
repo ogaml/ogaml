@@ -1,5 +1,5 @@
-
 open OgamlMath
+open Utils
 
 
 module Vertex = struct
@@ -113,9 +113,6 @@ module Location = struct
 end
 
 
-exception Error of string
-
-
 type t = Face.t list
 
 
@@ -184,33 +181,34 @@ let simplify t =
 let source (t : t) ?index_source ~vertex_source () =
   let source_vertex v = 
     let va = Vertex.to_vao v in
-    try VertexArray.Source.add vertex_source va
-    with VertexArray.Source.Uninitialized_field s -> raise (Error s)
+    VertexArray.Source.add vertex_source va
   in
   let indices = Hashtbl.create 97 in
   let get_index v = 
-    try Hashtbl.find indices v 
+    try Ok (Hashtbl.find indices v)
     with Not_found -> 
       let ind = VertexArray.Source.length vertex_source in
-      source_vertex v;
+      source_vertex v >>>= (fun () ->
       Hashtbl.add indices v ind;
-      ind
+      ind)
   in
   match index_source with
   | None -> 
-      List.iter (fun f ->
+      iter_result (fun f ->
         let (v1,v2,v3) = Face.vertices f in
-        source_vertex v1;
-        source_vertex v2;
-        source_vertex v3
+        (source_vertex v1) >>= (fun () ->
+        (source_vertex v2) >>= (fun () ->
+        (source_vertex v3)))
       ) t
   | Some idx ->
-      List.iter (fun f ->
+      iter_result (fun f ->
         let (v1,v2,v3) = Face.vertices f in
-        let (i1,i2,i3) = get_index v1, get_index v2, get_index v3 in
+        get_index v1 >>= (fun i1 ->
+        get_index v2 >>= (fun i2 ->
+        get_index v3 >>>= (fun i3 ->
         IndexArray.Source.add idx i1;
         IndexArray.Source.add idx i2;
-        IndexArray.Source.add idx i3
+        IndexArray.Source.add idx i3)))
       ) t
 
 (* Creation *)
@@ -218,20 +216,18 @@ let empty = []
 
 let parse_with_errors lexbuf =
   try
-    ObjParser.file ObjLexer.token lexbuf
+    Ok (ObjParser.file ObjLexer.token lexbuf)
   with
     |ObjLexer.SyntaxError msg ->
         let loc = Location.create lexbuf.Lexing.lex_start_p
                                   lexbuf.Lexing.lex_curr_p
         in
-        let msg' = Printf.sprintf "Syntax error %s : %s\n%!" (Location.to_string loc) msg in
-        raise (Error msg')
+        Error (`Syntax_error (loc, msg))
     |Parsing.Parse_error ->
         let loc = Location.create lexbuf.Lexing.lex_start_p
                                   lexbuf.Lexing.lex_curr_p
         in
-        let msg' = Printf.sprintf "Syntax error %s\n%!" (Location.to_string loc) in
-        raise (Error msg')
+        Error (`Parsing_error (loc))
 
 let parse_file f = 
   let input = open_in f in
@@ -358,10 +354,10 @@ let from_ast tblv tbluv tbln model ast =
   | ObjAST.Smooth _ -> model
 
 let from_obj s = 
-  let ast = parse_file s in
+  parse_file s >>>= (fun ast ->
   let tblv  = IndexTable.make Vector3f.zero in
   let tbluv = IndexTable.make Vector2f.zero in
   let tbln  = IndexTable.make Vector3f.zero in
-  List.fold_left (from_ast tblv tbluv tbln) empty ast
+  List.fold_left (from_ast tblv tbluv tbln) empty ast)
 
 

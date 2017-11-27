@@ -1,4 +1,5 @@
 open OgamlMath
+open Utils
 
 type shape_vals = {
   points    : Vector2f.t list ;
@@ -342,19 +343,15 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
     Uniform.empty
     |> Uniform.vector2f "size" (Vector2f.from_int size)
   in
-  let vertices = 
-    let src = VertexArray.Source.empty
-      ~size:8 ()
-    in
-    let vtcs, outline = compute_vertices shape in
-    List.iter (VertexArray.Source.add src) vtcs;
-    begin match outline with
-    | None -> ()
-    | Some vtcs -> List.iter (VertexArray.Source.add src) vtcs
-    end;
-    let vbo = VertexArray.Buffer.(unpack (static (module M) target src)) in
-    VertexArray.create (module M) target [vbo]
-  in
+  let src = VertexArray.Source.empty ~size:8 () in
+  let vtcs, outline = compute_vertices shape in
+  iter_result (VertexArray.Source.add src) vtcs >>= fun () ->
+  begin match outline with
+  | None -> Ok ()
+  | Some vtcs -> iter_result (VertexArray.Source.add src) vtcs
+  end >>= fun () ->
+  let vbo = VertexArray.Buffer.(unpack (static (module M) target src)) in
+  let vertices = VertexArray.create (module M) target [vbo] in
   VertexArray.draw (module M)
         ~target
         ~vertices
@@ -365,17 +362,17 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
 
 let map_to_source shape f src = 
   let vtcs, outline = compute_vertices shape in
-  List.iter (fun v -> VertexArray.Source.add src (f v)) vtcs;
+  iter_result (fun v -> VertexArray.Source.add src (f v)) vtcs >>= fun () ->
   begin match outline with
-  | None -> ()
-  | Some vtcs -> List.iter (fun v -> VertexArray.Source.add src (f v)) vtcs
+  | None -> Ok ()
+  | Some vtcs -> iter_result (fun v -> VertexArray.Source.add src (f v)) vtcs
   end
 
 let to_source shape src = 
   let vtcs, outline = compute_vertices shape in
-  List.iter (VertexArray.Source.add src) vtcs;
+  iter_result (VertexArray.Source.add src) vtcs >>= fun () ->
   begin match outline with
-  | None -> ()
-  | Some vtcs -> List.iter (VertexArray.Source.add src) vtcs
+  | None -> Ok ()
+  | Some vtcs -> iter_result (VertexArray.Source.add src) vtcs
   end
 

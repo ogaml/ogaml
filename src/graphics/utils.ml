@@ -16,3 +16,7 @@ let assert_result res =
   match res with
   | Ok e -> e
   | Error _ -> assert false
+
+let rec iter_result f = function
+  | [] -> Ok ()
+  | h::t -> f h >>= (fun () -> iter_result f t)
