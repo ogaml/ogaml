@@ -91,7 +91,7 @@ val simplify : t -> t
 
 val source : t -> ?index_source:IndexArray.Source.t 
                -> vertex_source:VertexArray.SimpleVertex.T.s VertexArray.Source.t 
-               -> unit -> (unit, [> `Missing_attribute]) result
+               -> unit -> (unit, [> `Missing_attribute of string]) result
 
 
 

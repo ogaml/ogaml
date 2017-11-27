@@ -60,9 +60,7 @@ val create_line :
 (** Draws a shape. *)
 val draw : 
     (module RenderTarget.T with type t = 'a) ->
-    ?parameters:DrawParameter.t -> target:'a -> shape:t -> unit -> 
-    (unit, [> `Wrong_attribute_type of string | `Missing_attribute of string 
-            | `Invalid_slice | `Invalid_instance_count]) result
+    ?parameters:DrawParameter.t -> target:'a -> shape:t -> unit -> unit
 
 val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> 
     (unit, [> `Missing_attribute of string]) result

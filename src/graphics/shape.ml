@@ -345,7 +345,7 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
   in
   let src = VertexArray.Source.empty ~size:8 () in
   let vtcs, outline = compute_vertices shape in
-  iter_result (VertexArray.Source.add src) vtcs >>= fun () ->
+  (iter_result (VertexArray.Source.add src) vtcs >>= fun () ->
   begin match outline with
   | None -> Ok ()
   | Some vtcs -> iter_result (VertexArray.Source.add src) vtcs
@@ -358,7 +358,8 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
         ~program
         ~parameters
         ~uniform
-        ~mode:DrawMode.Triangles () 
+        ~mode:DrawMode.Triangles () )
+  |> assert_result
 
 let map_to_source shape f src = 
   let vtcs, outline = compute_vertices shape in

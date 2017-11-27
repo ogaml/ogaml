@@ -20,3 +20,8 @@ let assert_result res =
 let rec iter_result f = function
   | [] -> Ok ()
   | h::t -> f h >>= (fun () -> iter_result f t)
+
+let handle_error err f = 
+  match err with
+  | Ok r -> r
+  | Error e -> f e

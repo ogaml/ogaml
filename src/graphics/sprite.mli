@@ -1,7 +1,5 @@
 (** Creation and manipulation of 2D sprites *)
 
-exception Sprite_error of string
-
 (** Type of sprites *)
 type t
 
@@ -15,21 +13,23 @@ val create :
   ?color    : Color.t ->
   ?size     : OgamlMath.Vector2f.t ->
   ?rotation : float ->
-  unit -> t
+  unit -> (t, [`Invalid_subrect]) result
 
 (** Draws a sprite. *)
 val draw : 
   (module RenderTarget.T with type t = 'a) ->
   ?parameters:DrawParameter.t -> target:'a -> sprite:t -> unit -> unit
 
-val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> unit
+val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> 
+  (unit, [`Missing_attribute of string]) result
 
 (** Outputs a sprite to a vertex array source by mapping its vertices.
   *
   * See $to_source$ for more information. *)
 val map_to_source : t -> 
                     (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
-                    'b VertexArray.Source.t -> unit
+                    'b VertexArray.Source.t -> 
+                    (unit, [`Missing_attribute of string]) result
 
 (** Sets the position of the origin of the sprite in the window. *)
 val set_position : t -> OgamlMath.Vector2f.t -> unit

@@ -1868,7 +1868,7 @@ module VertexArray : sig
 
       (** Gets the value of a vertex's attribute.
         * Returns $Error$ if the attribute is not initialized. *)
-      val get : 'b t -> ('a, 'b) s -> ('a, string) result
+      val get : 'b t -> ('a, 'b) s -> ('a, [> `Unbound_attribute of string]) result
 
       (** Returns the divisor of the attribute used during instanced rendering. *)
       val divisor : ('a, 'b) s -> int
@@ -2294,7 +2294,7 @@ module Model : sig
     * @see:OgamlGraphics.VertexArray.Source *)
   val source : t -> ?index_source:IndexArray.Source.t 
                  -> vertex_source:VertexArray.SimpleVertex.T.s VertexArray.Source.t 
-                 -> unit -> (unit, [> `Missing_attribute]) result
+                 -> unit -> (unit, [> `Missing_attribute of string]) result
 
 
   (*** Iterators *)
@@ -2378,9 +2378,7 @@ module Shape : sig
     * @see:OgamlGraphics.DrawParameter
     * @see:OgamlGraphics.Window *)
   val draw : (module RenderTarget.T with type t = 'a) ->
-             ?parameters:DrawParameter.t -> target:'a -> shape:t -> unit ->
-            (unit, [> `Wrong_attribute_type of string | `Missing_attribute of string 
-                    | `Invalid_slice | `Invalid_instance_count]) result
+             ?parameters:DrawParameter.t -> target:'a -> shape:t -> unit -> unit
 
   (** Sets the position of the origin in the window. *)
   val set_position : t -> OgamlMath.Vector2f.t -> unit
@@ -2467,7 +2465,7 @@ module Sprite : sig
     ?color    : Color.t ->
     ?size     : OgamlMath.Vector2f.t ->
     ?rotation : float ->
-    unit -> t
+    unit -> (t, [`Invalid_subrect]) result
 
   (** Draws a sprite on a window using the given parameters.
     *
