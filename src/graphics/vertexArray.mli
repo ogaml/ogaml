@@ -1,12 +1,6 @@
 
 module Vertex : sig
 
-  exception Sealed_vertex of string
-
-  exception Unsealed_vertex of string
-
-  exception Unbound_attribute of string
-
   type 'a t
 
 
@@ -37,7 +31,7 @@ module Vertex : sig
 
     val set : 'b t -> ('a, 'b) s -> 'a -> unit
 
-    val get : 'b t -> ('a, 'b) s -> 'a
+    val get : 'b t -> ('a, 'b) s -> ('a, [`Unbound_attribute of string]) result
 
     val name : ('a, 'b) s -> string
 
@@ -52,11 +46,12 @@ module Vertex : sig
 
     type s
 
-    val attribute : string -> ?divisor:int -> 'a AttributeType.s -> ('a, s) Attribute.s
+    val attribute : string -> ?divisor:int -> 'a AttributeType.s ->
+      (('a, s) Attribute.s, [`Sealed_vertex | `Duplicate_attribute]) result
 
-    val seal : unit -> unit
+    val seal : unit -> (unit, unit) result
 
-    val create : unit -> s t
+    val create : unit -> (s t, unit) result
 
     val copy : s t -> s t
 
@@ -91,39 +86,36 @@ end
 
 module Source : sig
 
-  exception Uninitialized_field of string
-
-  exception Incompatible_sources 
-
   type 'a t
 
   val empty : ?size:int -> unit -> 'a t
 
-  val add : 'a t -> 'a Vertex.t -> unit
+  val add : 'a t -> 'a Vertex.t -> (unit, [`Missing_attribute of string]) result
 
-  val (<<) : 'a t -> 'a Vertex.t -> 'a t
+  val (<<) : 'a t -> 'a Vertex.t -> ('a t, [`Missing_attribute of string]) result
+
+  val (<<<) : ('a t, [> `Missing_attribute of string] as 'b) result -> 'a Vertex.t -> 
+    ('a t, 'b) result
 
   val length : 'a t -> int
 
   val clear : 'a t -> unit
 
-  val append : 'a t -> 'a t -> unit
+  val append : 'a t -> 'a t -> (unit, [`Incompatible_fields]) result
 
   val iter : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> unit) -> unit
 
-  val map : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t
+  val map : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 
+    ('b t, [`Missing_attribute of string]) result
 
-  val map_to : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t -> unit
+  val map_to : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t -> 
+    (unit, [`Missing_attribute of string]) result
 
 end
 
 
 module Buffer : sig
 
-  exception Invalid_attribute of string
-  
-  exception Out_of_bounds of string
- 
   type static
   
   type dynamic
@@ -143,15 +135,12 @@ module Buffer : sig
   val blit    : (module RenderTarget.T with type t = 'a) ->
                  'a -> (dynamic, 'b) t ->
                  ?first:int -> ?length:int ->
-                 'b Source.t -> unit
+                 'b Source.t -> 
+                 (unit, [`Invalid_start | `Invalid_length | `Incompatible_sources]) result
 
   val unpack : (_, _) t -> unpacked
 
 end
-
-exception Missing_attribute of string
-
-exception Multiple_definition of string
 
 type t
 
@@ -176,4 +165,5 @@ val draw :
   ?start     : int ->
   ?length    : int ->
   ?mode      : DrawMode.t ->
-  unit -> unit
+  unit -> (unit, [`Wrong_attribute_type of string | `Missing_attribute of string 
+                 | `Invalid_slice | `Invalid_instance_count]) result

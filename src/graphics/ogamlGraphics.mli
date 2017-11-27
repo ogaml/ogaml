@@ -1818,15 +1818,6 @@ module VertexArray : sig
       * A vertex is a collection attributes, and a vertex structure 
       * creates vertices that have the same attributes. *)
 
-    (** Raised when trying to add an attribute to a sealed structure *)
-    exception Sealed_vertex of string
-
-    (** Raised when trying to create a vertex from an unsealed structure *)
-    exception Unsealed_vertex of string
-
-    (** Raised when trying to get the value of an unset attribute *)
-    exception Unbound_attribute of string
-
     (** Type of a vertex *)
     type 'a t
 
@@ -1876,8 +1867,8 @@ module VertexArray : sig
       val set : 'b t -> ('a, 'b) s -> 'a -> unit
 
       (** Gets the value of a vertex's attribute.
-        * Raises $Unbound_attribute$ if the attribute is not initialized. *)
-      val get : 'b t -> ('a, 'b) s -> 'a
+        * Returns $Error$ if the attribute is not initialized. *)
+      val get : 'b t -> ('a, 'b) s -> ('a, string) result
 
       (** Returns the divisor of the attribute used during instanced rendering. *)
       val divisor : ('a, 'b) s -> int
@@ -1901,19 +1892,18 @@ module VertexArray : sig
       (** Adds an attribute to this structure.
         *
         * $divisor$ corresponds to the attribute's divisor for instanced rendering,
-        * and defaults to $0$ (non-instanced) 
-        *
-        * Raises $Sealed_vertex$ if the structure is sealed. *)
-      val attribute : string -> ?divisor:int -> 'a AttributeType.s -> ('a, s) Attribute.s
+        * and defaults to $0$ (non-instanced) *)
+      val attribute : string -> ?divisor:int -> 'a AttributeType.s ->
+        (('a, s) Attribute.s, [`Sealed_vertex | `Duplicate_attribute]) result
 
       (** Seals this structure. Once sealed, the structure can be used to
         * create vertices but cannot receive new attributes.
-        * Raises $Sealed_vertex$ if the structure is already sealed. *)
-      val seal : unit -> unit
+        * Returns $Error$ if the structure is already sealed. *)
+      val seal : unit -> (unit, unit) result
 
       (** Creates a vertex following this structure.
-        * Raises $Unsealed_vertex$ if the structure is not sealed. *)
-      val create : unit -> s t
+        * Returns $Error$ if the structure is not sealed. *)
+      val create : unit -> (s t, unit) result
 
       (** Creates a copy of a vertex *)
       val copy : s t -> s t
@@ -1995,13 +1985,6 @@ module VertexArray : sig
       * Note that the type of a source is reinitialized if the source is
       * cleared. *)
 
-    (** Raised if a vertex is missing some of the attributes required by
-      * the source. *)
-    exception Uninitialized_field of string
-
-    (** Raised when trying to concatenate incompatible sources. *)
-    exception Incompatible_sources 
-
     (** Type of a vertex source *)
     type 'a t
 
@@ -2012,10 +1995,15 @@ module VertexArray : sig
     (** Adds a vertex to a source. If the source is not empty, the vertex must 
       * have at least the same initialized fields as the first vertex put into
       * the source. *)
-    val add : 'a t -> 'a Vertex.t -> unit
+    val add : 'a t -> 'a Vertex.t -> (unit, [`Missing_attribute of string]) result
 
     (** Convenient operator to add vertices to a source. *)
-    val (<<) : 'a t -> 'a Vertex.t -> 'a t
+    val (<<) : 'a t -> 'a Vertex.t -> ('a t, [`Missing_attribute of string]) result
+
+    (** Convenient operator to add vertices to a source that can easily
+      * be chained. *)
+    val (<<<) : ('a t, [> `Missing_attribute of string] as 'b) result -> 'a Vertex.t -> 
+      ('a t, 'b) result
 
     (** Returns the length (in vertices) of a source. *)
     val length : 'a t -> int
@@ -2025,17 +2013,21 @@ module VertexArray : sig
       * This avoids reallocation and garbage collection. *)
     val clear : 'a t -> unit
 
-    (** $append s1 s2$ appends the source $s2$ to $s1$. $s2$ is not modified. *) 
-    val append : 'a t -> 'a t -> unit
+    (** $append s1 s2$ appends the source $s2$ to $s1$. $s2$ is not modified. 
+      *
+      * Returns $Error$ if both sources do not contain the same fields. *) 
+    val append : 'a t -> 'a t -> (unit, [`Incompatible_fields]) result
 
     (** Iterates through all the vertices of a source. *)
     val iter : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> unit) -> unit
 
     (** Maps all the vertices of a source to a new source. *)
-    val map : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t
+    val map : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) ->
+      ('b t, [`Missing_attribute of string]) result
 
     (** Maps all the vertices of a source to an existing source. *)
-    val map_to : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t -> unit
+    val map_to : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t ->
+      (unit, [`Missing_attribute of string]) result
 
   end
 
@@ -2054,12 +2046,6 @@ module VertexArray : sig
       * Buffers can also be unpacked using $unpack$ which unprotects the type 
       * but allows the user to build lists of buffers. *)
 
-    (** Raised if the type of an attribute is not the one requested by the GLSL program *)
-    exception Invalid_attribute of string
-   
-    (** Raised when trying to access an invalid index *)
-    exception Out_of_bounds of string
-  
     (** Phantom type for static buffers *)
     type static
     
@@ -2092,25 +2078,18 @@ module VertexArray : sig
       *
       * $first$ defaults to $0$
       *
-      * $length$ defaults to the length of $source$
-      *
-      * Raises $Out_of_bounds$ if $first$ or $length$ are invalid. *)
+      * $length$ defaults to the length of $source$ *)
     val blit    : (module RenderTarget.T with type t = 'a) ->
                    'a -> (dynamic, 'b) t ->
                    ?first:int -> ?length:int ->
-                   'b Source.t -> unit
+                   'b Source.t ->
+                   (unit, [`Invalid_start | `Invalid_length | `Incompatible_sources]) result
  
     (** Unprotect a buffer so that it is possible to build lists of buffers. *)
     val unpack : (_, _) t -> unpacked
   
   end
 
-  (** Raised if an attribute required by the program is not provided in the array *)
-  exception Missing_attribute of string
- 
-  (** Raised if the array contains multiple definitions of the same attribute *)
-  exception Multiple_definition of string
- 
   (** Type of a vertex array *)
   type t
  
@@ -2147,14 +2126,6 @@ module VertexArray : sig
     *
     * $mode$ defaults to $DrawMode.Triangles$
     *
-    * Raises $Invalid_argument$ if $start$ or $length$ is invalid. 
-    *
-    * Raises $Missing_attribute$ if an attribute required by the program is
-    * not provided by one of $vertices$'s buffers.
-    *
-    * Raises $Source.Invalid_attribute$ if an attribute required by the program
-    * is provided by a buffer but is not of the required type.
-    *
     * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.Window
     * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
@@ -2171,7 +2142,8 @@ module VertexArray : sig
     ?start     : int ->
     ?length    : int ->
     ?mode      : DrawMode.t ->
-    unit -> unit
+    unit -> (unit, [`Wrong_attribute_type of string | `Missing_attribute of string
+                   | `Invalid_slice | `Invalid_instance_count]) result
 
 end
 

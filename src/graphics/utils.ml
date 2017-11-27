@@ -11,3 +11,8 @@ let bind res f =
   | Error e -> Error e
 
 let (>>>=) = bind
+
+let assert_result res = 
+  match res with
+  | Ok e -> e
+  | Error _ -> assert false

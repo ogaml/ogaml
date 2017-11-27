@@ -2,12 +2,6 @@ open OgamlMath
 
 module Vertex = struct
 
-  exception Sealed_vertex of string
-
-  exception Unsealed_vertex of string
-
-  exception Unbound_attribute of string
-
   module AttributeVal = struct
 
     type s = 
@@ -177,10 +171,10 @@ module Vertex = struct
     let set (vtx : 'b t) (attr : ('a, 'b) s) (vl : 'a) : unit = 
       vtx.data.(attr.aoffset) <- (AttributeType.value_of vl attr.atype)
 
-    let get (vtx : 'b t) (attr : ('a, 'b) s) : 'a =
+    let get (vtx : 'b t) (attr : ('a, 'b) s) =
       match vtx.data.(attr.aoffset) with
-      | AttributeVal.Unset -> raise (Unbound_attribute attr.aname)
-      | v -> AttributeType.unbox v attr.atype
+      | AttributeVal.Unset -> Error (`Unbound_attribute attr.aname)
+      | v -> Ok (AttributeType.unbox v attr.atype)
 
     let name attr = 
       attr.aname
@@ -197,11 +191,12 @@ module Vertex = struct
 
     type s
 
-    val attribute : string -> ?divisor:int -> 'a AttributeType.s -> ('a, s) Attribute.s
+    val attribute : string -> ?divisor:int -> 'a AttributeType.s -> 
+      (('a, s) Attribute.s, [`Sealed_vertex | `Duplicate_attribute]) result
 
-    val seal : unit -> unit
+    val seal : unit -> (unit, unit) result
 
-    val create : unit -> s t
+    val create : unit -> (s t, unit) result
 
     val copy : s t -> s t
 
@@ -216,31 +211,43 @@ module Vertex = struct
         {attribs = []; sealed = false; total_size = 0}
 
       let attribute s ?divisor:(adivisor=0) attr =
-        if vertex.sealed then 
-          Printf.ksprintf (fun s -> raise (Sealed_vertex s))
-            "Cannot add attribute %s to sealed vertex structure" s;
-        let attrib = 
-          {
-            aname = s;
-            atype = attr;
-            aoffset = vertex.total_size;
-            adivisor
-          }
+        let exists_attrib =
+          List.exists (function
+            | Boxed_Attrib {aname; _} -> aname = s
+          ) vertex.attribs
         in
-        vertex.attribs <- (Boxed_Attrib attrib) :: vertex.attribs;
-        vertex.total_size <- vertex.total_size + 1;
-        attrib
+        if vertex.sealed then 
+          Error `Sealed_vertex
+        else if exists_attrib then 
+          Error `Duplicate_attribute
+        else begin
+          let attrib = 
+            {
+              aname = s;
+              atype = attr;
+              aoffset = vertex.total_size;
+              adivisor
+            }
+          in
+          vertex.attribs <- (Boxed_Attrib attrib) :: vertex.attribs;
+          vertex.total_size <- vertex.total_size + 1;
+          Ok attrib
+        end
 
       let seal () = 
         if vertex.sealed then 
-          raise (Sealed_vertex "Cannot seal already sealed vertex structure");
-        vertex.attribs <- (List.rev vertex.attribs);
-        vertex.sealed <- true
+          Error ()
+        else begin
+          vertex.attribs <- (List.rev vertex.attribs);
+          vertex.sealed <- true;
+          Ok ()
+        end
 
       let create () = 
         if not vertex.sealed then 
-          raise (Unsealed_vertex "Cannot create vertices from unsealed vertex structure");
-        {vertex; data = Array.make vertex.total_size AttributeVal.Unset}
+          Error ()
+        else
+          Ok {vertex; data = Array.make vertex.total_size AttributeVal.Unset}
 
       let copy v = 
         {vertex; data = Array.copy v.data}
@@ -256,21 +263,29 @@ module SimpleVertex = struct
 
   let position =
     T.attribute "position" Vertex.AttributeType.vector3f
+    |> Utils.assert_result
 
   let color =
     T.attribute "color" Vertex.AttributeType.color
+    |> Utils.assert_result
 
   let uv =
     T.attribute "uv" Vertex.AttributeType.vector2f
+    |> Utils.assert_result
 
   let normal = 
     T.attribute "normal" Vertex.AttributeType.vector3f
+    |> Utils.assert_result
 
   let () = 
     T.seal ()
+    |> Utils.assert_result
 
   let create ?position:pp ?color:cl ?uv:tc ?normal:nr () = 
-    let vtx = T.create () in
+    let vtx = 
+      T.create ()
+      |> Utils.assert_result
+    in
     begin match pp with
     | None   -> ()
     | Some p -> Vertex.Attribute.set vtx position p
@@ -293,10 +308,6 @@ end
 
 
 module Source = struct
-
-  exception Uninitialized_field of string
-
-  exception Incompatible_sources
 
   type 'a t = {
     mutable initialized : bool;
@@ -351,33 +362,44 @@ module Source = struct
       src.initialized <- true;
       src.layout <- Some vtx.Vertex.vertex;
     end;
-    List.iter (fun (att, _) ->
-      let i = Vertex.offset_of att in
-      match vtx.Vertex.data.(i) with
-      | Vertex.AttributeVal.Unset ->
-        let open Vertex in
-        begin match List.nth vtx.vertex.attribs i with
-        | Boxed_Attrib f -> raise (Uninitialized_field f.Vertex.aname)
-        end
-      | Vertex.AttributeVal.Float v ->
-        GL.Data.add_float src.fdata v
-      | Vertex.AttributeVal.Vec2f v ->
-        GL.Data.add_2f src.fdata v
-      | Vertex.AttributeVal.Vec3f v ->
-        GL.Data.add_3f src.fdata v
-      | Vertex.AttributeVal.Int v ->
-        GL.Data.add_int src.idata v
-      | Vertex.AttributeVal.Vec2i v ->
-        GL.Data.add_2i src.idata v
-      | Vertex.AttributeVal.Vec3i v ->
-        GL.Data.add_3i src.idata v
-      | Vertex.AttributeVal.Color v ->
-        GL.Data.add_color src.fdata v
-    ) src.init_fields;
-    src.length <- src.length + 1
+    try 
+      List.iter (fun (att, _) ->
+        let i = Vertex.offset_of att in
+        match vtx.Vertex.data.(i) with
+        | Vertex.AttributeVal.Unset ->
+          let open Vertex in
+          begin match List.nth vtx.vertex.attribs i with
+          | Boxed_Attrib f -> raise (Failure f.Vertex.aname) (* Internal raise *)
+          end
+        | Vertex.AttributeVal.Float v ->
+          GL.Data.add_float src.fdata v
+        | Vertex.AttributeVal.Vec2f v ->
+          GL.Data.add_2f src.fdata v
+        | Vertex.AttributeVal.Vec3f v ->
+          GL.Data.add_3f src.fdata v
+        | Vertex.AttributeVal.Int v ->
+          GL.Data.add_int src.idata v
+        | Vertex.AttributeVal.Vec2i v ->
+          GL.Data.add_2i src.idata v
+        | Vertex.AttributeVal.Vec3i v ->
+          GL.Data.add_3i src.idata v
+        | Vertex.AttributeVal.Color v ->
+          GL.Data.add_color src.fdata v
+      ) src.init_fields;
+      src.length <- src.length + 1;
+      Ok ()
+    with
+      Failure s -> Error (`Missing_attribute s)
 
   let (<<) src vtx = 
-    add src vtx; src
+    match add src vtx with
+    | Error s -> Error s
+    | Ok () -> Ok src
+
+  let (<<<) src vtx = 
+    match src with
+    | Ok src -> src << vtx
+    | Error s -> Error s
 
   let length src =
     src.length
@@ -391,11 +413,14 @@ module Source = struct
   let append src1 src2 =
     if src2.length <> 0 then begin
       if src1.init_fields <> src2.init_fields then
-        raise Incompatible_sources;
-      src1.length <- src1.length + src2.length;
-      GL.Data.append src1.fdata src2.fdata;
-      GL.Data.append src1.idata src2.idata
-    end
+        Error (`Incompatible_fields)
+      else begin
+        src1.length <- src1.length + src2.length;
+        GL.Data.append src1.fdata src2.fdata;
+        GL.Data.append src1.idata src2.idata;
+        Ok ()
+      end
+    end else Ok ()
 
   let get (src : 'a t) (i : int) : 'a Vertex.t =
     let i_offset, f_offset = 
@@ -495,36 +520,43 @@ module Source = struct
       f (get s i)
     done
 
-  let map (s : 'a t) ?start:(start = 0) ?length (f : 'a Vertex.t -> 'b Vertex.t) : 'b t = 
+  let map (s : 'a t) ?start:(start = 0) ?length (f : 'a Vertex.t -> 'b Vertex.t) =
     let newsrc = empty () in
     let last = 
       match length with
       | None   -> s.length - 1
       | Some l -> min (start + l - 1) (s.length - 1)
     in
-    for i = start to last do
-      add newsrc (f (get s i))
-    done;
-    newsrc
+    let rec loop i = 
+      if i > last then Ok newsrc
+      else begin
+        match add newsrc (f (get s i)) with
+        | Ok () -> loop (i+1)
+        | Error s -> Error s
+      end
+    in
+    loop start
 
-  let map_to (s : 'a t) ?start:(start = 0) ?length (f : 'a Vertex.t -> 'b Vertex.t) (d : 'b t) : unit = 
+  let map_to (s : 'a t) ?start:(start = 0) ?length (f : 'a Vertex.t -> 'b Vertex.t) (d : 'b t) =
     let last = 
       match length with
       | None   -> s.length - 1
       | Some l -> min (start + l - 1) (s.length - 1)
     in
-    for i = start to last do
-      add d (f (get s i))
-    done
+    let rec loop i = 
+      if i > last then Ok ()
+      else begin
+        match add d (f (get s i)) with
+        | Ok () -> loop (i+1)
+        | Error s -> Error s
+      end
+    in
+    loop start
 
 end
 
 
 module Buffer = struct
-
-  exception Invalid_attribute of string
-
-  exception Out_of_bounds of string
 
   type static
 
@@ -615,46 +647,51 @@ module Buffer = struct
   let unpack : 'a 'b. ('a, 'b) t -> unpacked = fun t ->
     {t with init_fields = List.map (fun (a,i) -> (Vertex.boxed_magic a, i)) t.init_fields}
 
-  let blit (type s) (module M : RenderTarget.T with type t = s) target t ?(first=0) ?length src =
-    if first < 0 then
-      raise (Out_of_bounds "Invalid first vertex");
+  let blit (type s) (module M : RenderTarget.T with type t = s) target t ?(first=0) ?length src =   
     let length = 
       match length with
       | None -> src.Source.length
       | Some i -> i
     in
-    if length < 0 || length > src.Source.length then
-      raise (Out_of_bounds "Invalid blit length");
-    let dataf = src.Source.fdata in
-    let datai = src.Source.idata in
-    let lengthf = src.Source.stridef * length in
-    let lengthi = src.Source.stridei * length in
-    let start_f = t.stride_f * first in
-    let start_i = t.stride_i * first in
-    if t.init_fields <> src.Source.init_fields then
-      raise Source.Incompatible_sources;
-    let new_buffer = 
-      if first + length > t.length then begin
-        let buf = GL.VBO.create () in
-        GL.VBO.bind (Some buf);
-        GL.VBO.data ((lengthf + lengthi + start_f + start_i) * 4) None 
-                    (GLTypes.VBOKind.DynamicDraw);
-        GL.VBO.bind None;
-        GL.VBO.copy_subdata t.buffer buf 0 0 (start_f * 4); 
-        GL.VBO.copy_subdata t.buffer buf (t.size_f * 4) ((lengthf + start_f) * 4) (start_i * 4); 
-        buf
-      end else 
-        t.buffer
-    in
-    GL.VBO.bind (Some new_buffer);
-    GL.VBO.subdata (start_f * 4) (lengthf * 4) dataf;
-    GL.VBO.subdata ((lengthf + start_f + start_i) * 4) (lengthi * 4) datai;
-    GL.VBO.bind None;
-    Context.LL.set_bound_vbo (M.context target) None;
-    t.buffer <- new_buffer;
-    t.size_f <- max (lengthf + start_f) t.size_f;
-    t.size_i <- max (lengthi + start_i) t.size_i;
-    t.length <- first + length
+    if first < 0 then
+      Error (`Invalid_start)
+    else if length < 0 || length > src.Source.length then
+      Error (`Invalid_length) 
+    else if t.init_fields <> src.Source.init_fields then
+      Error (`Incompatible_sources)
+    else begin
+      let dataf = src.Source.fdata in
+      let datai = src.Source.idata in
+      let lengthf = src.Source.stridef * length in
+      let lengthi = src.Source.stridei * length in
+      let start_f = t.stride_f * first in
+      let start_i = t.stride_i * first in
+      let new_buffer = 
+        if first + length > t.length then begin
+          let buf = GL.VBO.create () in
+          GL.VBO.bind (Some buf);
+          GL.VBO.data ((lengthf + lengthi + start_f + start_i) * 4) None 
+                      (GLTypes.VBOKind.DynamicDraw);
+          GL.VBO.bind None;
+          GL.VBO.copy_subdata t.buffer buf 0 0 (start_f * 4); 
+          GL.VBO.copy_subdata t.buffer buf (t.size_f * 4) ((lengthf + start_f) * 4) (start_i * 4); 
+          buf
+        end else 
+          t.buffer
+      in
+      GL.VBO.bind (Some new_buffer);
+      GL.VBO.subdata (start_f * 4) (lengthf * 4) dataf;
+      GL.VBO.subdata ((lengthf + start_f + start_i) * 4) (lengthi * 4) datai;
+      GL.VBO.bind None;
+      Context.LL.set_bound_vbo (M.context target) None;
+      t.buffer <- new_buffer;
+      t.size_f <- max (lengthf + start_f) t.size_f;
+      t.size_i <- max (lengthi + start_i) t.size_i;
+      t.length <- first + length;
+      Ok ()
+    end
+
+  exception Wrong_attribute_type of string (* Internal exception *)
 
   let bind_to_attrib context t (prog, program_loc) (attribute, offset) = 
     if Context.LL.bound_vbo context <> Some t.id then begin
@@ -663,10 +700,8 @@ module Buffer = struct
     end;
     let typ = Vertex.type_of attribute in
     if typ <> Program.Attribute.kind program_loc then
-      raise (Invalid_attribute
-        (Printf.sprintf "Attribute %s has invalid type"
-          (Program.Attribute.name program_loc)
-        ));
+      raise (Wrong_attribute_type (* Internal raise *)
+          (Program.Attribute.name program_loc));
     GL.VAO.enable_attrib (Program.Attribute.location program_loc);
     GL.VAO.attrib_divisor (Program.Attribute.location program_loc) 
                           (Vertex.divisor_of attribute);
@@ -690,10 +725,6 @@ module Buffer = struct
 
 end
 
-exception Missing_attribute of string
-
-exception Multiple_definition of string
-
 type t = {
   vao        : GL.VAO.t;
   buffers    : Buffer.unpacked list;
@@ -712,9 +743,9 @@ let create (type s) (module M : RenderTarget.T with type t = s)
   List.iter (fun b -> 
     List.iter (fun (att,off) ->
       let n = Vertex.name_of att in
-      if Hashtbl.mem attributes n then
-        raise (Multiple_definition n);
-      Hashtbl.add attributes n (b,att,off)
+      (* There should not be duplicates as they should have been taken
+       * care of in VERTEX *)
+      Hashtbl.replace attributes n (b,att,off)
     ) b.Buffer.init_fields;
   ) buffers;
   let finalize _ = 
@@ -750,6 +781,8 @@ let max_instances t =
       end
     ) None t.buffers
 
+exception Missing_attribute of string (* Internal exception *)
+
 let bind context vao program = 
   if vao.bound <> Some program then begin
     GL.VAO.bind (Some vao.vao);
@@ -757,7 +790,7 @@ let bind context vao program =
     List.iter (fun program_attrib ->
       let aname = Program.Attribute.name program_attrib in 
       if not (Hashtbl.mem vao.attributes aname) then
-        raise (Missing_attribute aname);
+        raise (Missing_attribute aname); (* Internal raise *)
       let (vbo, att, offset) = Hashtbl.find vao.attributes aname in
       Buffer.bind_to_attrib context vbo (program, program_attrib) (att, offset)
     ) (Program.LL.attributes program);
@@ -767,7 +800,9 @@ let bind context vao program =
     GL.VAO.bind (Some vao.vao);
     Context.LL.set_bound_vao context (Some (vao.vao, vao.id))
   end
- 
+
+exception Out_of_bounds of [`Slice | `Instances] (* Internal exception *)
+
 let draw (type s) (type buf) 
          (module M : RenderTarget.T with type t = s and type OutputBuffer.t = buf)
          ~vertices ~target ?instances ?indices ~program
@@ -795,45 +830,54 @@ let draw (type s) (type buf)
     M.bind target ?buffers parameters;
     Program.LL.use context (Some program);
     Uniform.LL.bind context uniform (Program.LL.uniforms program);
-    bind context vertices program;
-    match indices with
-    |None -> 
-      if start < 0 || start + length > v_length || length < 0 then
-        raise (Invalid_argument "Invalid vertex array bounds")
-      else begin
-        match max_instances with
-        | None   -> GL.VAO.draw mode start length
-        | Some max_n -> 
-          let n_instances = 
-            match instances with
-            | None   -> max_n
-            | Some i -> 
-              if i > max_n || i < 0 then
-                raise (Invalid_argument "Invalid number of instances")
-              else
-                i
-          in
-          GL.VAO.draw_instanced mode start length n_instances
-      end
-    |Some ebo ->
-      if start < 0 || start + length > (IndexArray.length ebo) || length < 0 then
-        raise (Invalid_argument "Invalid index array bounds")
-      else begin
-        match max_instances with
-        | None   -> 
-          IndexArray.LL.bind context ebo;
-          GL.VAO.draw_elements mode start length
-        | Some max_n -> 
-          let n_instances = 
-            match instances with
-            | None   -> max_n
-            | Some i -> 
-              if i > max_n || i < 0 then
-                raise (Invalid_argument "Invalid number of instances")
-              else
-                i
-          in
-          IndexArray.LL.bind context ebo;
-          GL.VAO.draw_instanced mode start length n_instances
-      end
-  end
+    try 
+      bind context vertices program;
+      begin match indices with
+      |None -> 
+        if start < 0 || start + length > v_length || length < 0 then
+          raise (Out_of_bounds `Slice) (* Internal raise *)
+        else begin
+          match max_instances with
+          | None   -> GL.VAO.draw mode start length
+          | Some max_n -> 
+            let n_instances = 
+              match instances with
+              | None   -> max_n
+              | Some i -> 
+                if i > max_n || i < 0 then
+                  raise (Out_of_bounds `Instances) (* Internal raise *)
+                else
+                  i
+            in
+            GL.VAO.draw_instanced mode start length n_instances
+        end
+      |Some ebo ->
+        if start < 0 || start + length > (IndexArray.length ebo) || length < 0 then
+          raise (Out_of_bounds `Slice) (* Internal raise *)
+        else begin
+          match max_instances with
+          | None   -> 
+            IndexArray.LL.bind context ebo;
+            GL.VAO.draw_elements mode start length
+          | Some max_n -> 
+            let n_instances = 
+              match instances with
+              | None   -> max_n
+              | Some i -> 
+                if i > max_n || i < 0 then
+                  raise (Out_of_bounds `Instances) (* Internal raise *)
+                else
+                  i
+            in
+            IndexArray.LL.bind context ebo;
+            GL.VAO.draw_instanced mode start length n_instances
+        end
+      end;
+      Ok ()
+    with
+      | Buffer.Wrong_attribute_type s -> Error (`Wrong_attribute_type s)
+      | Missing_attribute s -> Error (`Missing_attribute s)
+      | Out_of_bounds `Slice -> Error `Invalid_slice
+      | Out_of_bounds `Instances -> Error `Invalid_instance_count
+  end else
+    Ok ()
