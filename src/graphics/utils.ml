@@ -21,7 +21,13 @@ let rec iter_result f = function
   | [] -> Ok ()
   | h::t -> f h >>= (fun () -> iter_result f t)
 
+let rec fold_result f acc = function
+  | [] -> Ok acc
+  | h::t -> f acc h >>= (fun acc' -> fold_result f acc' t)
+
 let handle_error err f = 
   match err with
   | Ok r -> r
   | Error e -> f e
+
+let (>==) = handle_error

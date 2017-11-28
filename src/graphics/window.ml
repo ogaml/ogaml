@@ -1,8 +1,7 @@
 open OgamlCore
 open OgamlUtils
 open OgamlMath
-
-exception Window_Error of string
+open Utils
 
 module OutputBuffer = struct
 
@@ -29,31 +28,30 @@ type t = {
 
 let create ?width:(width=800) ?height:(height=600) ?title:(title="") 
            ?settings:(settings=OgamlCore.ContextSettings.create ()) () =
-  let internal = 
+  let internal =
     try Ok (LL.Window.create ~width ~height ~title ~settings)
-    with Failure s -> Error s
+    with Failure s -> Error (`Window_creation_error s)
   in
-  Utils.bind internal (fun internal ->
-    let context = Context.LL.create () in
-    let min_spf = 
-      match ContextSettings.framerate_limit settings with
-      | None   -> 0.
-      | Some i -> 1. /. (float_of_int i)
-    in
-    let maxbufs = (Context.capabilities context).Context.max_draw_buffers in
-    let bound_buffers = Array.make maxbufs OutputBuffer.None in
-    bound_buffers.(0) <- OutputBuffer.BackLeft;
-    Context.LL.set_viewport context OgamlMath.IntRect.({x = 0; y = 0; width; height});
-    {
-      context;
-      internal;
-      settings;
-      min_spf;
-      bound_buffers;
-      n_bound_buffers = 1;
-      clock = Clock.create ()
-    }
-  )
+  internal >>= fun internal ->
+  Context.LL.create () >>>= fun context ->
+  let min_spf = 
+    match ContextSettings.framerate_limit settings with
+    | None   -> 0.
+    | Some i -> 1. /. (float_of_int i)
+  in
+  let maxbufs = (Context.capabilities context).Context.max_draw_buffers in
+  let bound_buffers = Array.make maxbufs OutputBuffer.None in
+  bound_buffers.(0) <- OutputBuffer.BackLeft;
+  Context.LL.set_viewport context OgamlMath.IntRect.({x = 0; y = 0; width; height});
+  {
+    context;
+    internal;
+    settings;
+    min_spf;
+    bound_buffers;
+    n_bound_buffers = 1;
+    clock = Clock.create ()
+  }
 
 let set_title win title = LL.Window.set_title win.internal title
 
@@ -94,25 +92,27 @@ let display win =
 let activate_buffers win buffers = 
   let max_buffers = Array.length win.bound_buffers in
   let active_buffers = Array.make 5 false in
-  let length, changed = 
-    List.fold_left (fun (idx, changed) buf ->
-      if idx >= max_buffers then
-        raise (Window_Error "Cannot bind more than MAX_DRAW_BUFFERS buffers");
-      let changed = changed 
-        || win.bound_buffers.(idx) <> buf 
-        || idx >= win.n_bound_buffers
-      in
-      if buf <> OutputBuffer.None then begin
-        let i = OutputBuffer.index_of_buffer buf in
-        if active_buffers.(i) then
-          raise (Window_Error "Trying to bind same output buffer twice")
-        else
-          active_buffers.(i) <- true;
-      end;
-      win.bound_buffers.(idx) <- buf;
-      (idx + 1, changed)
-    ) (0, false) buffers
-  in
+  fold_result (fun (idx, changed) buf ->
+    (if idx >= max_buffers then
+      Error `Invalid_draw_buffer
+    else Ok ()) >>= fun () ->
+    let changed = changed 
+      || win.bound_buffers.(idx) <> buf 
+      || idx >= win.n_bound_buffers
+    in
+    (if buf <> OutputBuffer.None then begin
+      let i = OutputBuffer.index_of_buffer buf in
+      if active_buffers.(i) then
+        Error `Duplicate_draw_buffer
+      else begin
+        active_buffers.(i) <- true;
+        Ok ()
+      end
+    end else Ok ()) >>>= fun () ->
+    win.bound_buffers.(idx) <- buf;
+    (idx + 1, changed)
+  ) (0, false) buffers
+  >>>= fun (length, changed) ->
   if changed || length <> win.n_bound_buffers then begin
     win.n_bound_buffers <- length;
     GL.FBO.draw_default_buffers length win.bound_buffers
@@ -129,8 +129,8 @@ let clear ?buffers:(buffers = [OutputBuffer.BackLeft])
     GL.Pervasives.depth_mask true
   end;
   RenderTarget.bind_fbo win.context 0 None;
-  activate_buffers win buffers;
-  RenderTarget.clear ?color ~depth ~stencil win.context
+  activate_buffers win buffers >>>= (fun () -> 
+  RenderTarget.clear ?color ~depth ~stencil win.context)
 
 let show_cursor win b = LL.Window.show_cursor win.internal b
 
@@ -138,9 +138,9 @@ let context win = win.context
 
 let bind win ?buffers:(buffers = [OutputBuffer.BackLeft]) params = 
   RenderTarget.bind_fbo win.context 0 None;
-  activate_buffers win buffers;
+  activate_buffers win buffers >>>= (fun () ->
   RenderTarget.bind_draw_parameters win.context (size win)
-    (ContextSettings.aa_level win.settings) params
+    (ContextSettings.aa_level win.settings) params)
 
 let internal win = win.internal
 

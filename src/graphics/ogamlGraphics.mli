@@ -331,10 +331,6 @@ module Context : sig
     * To get an instance of a Context.t, create a GL context (via a window) and
     * use Window.context *)
 
-  (** Raised when trying to perform an invalid state change 
-    * (for example, binding a texture to an invalid texture unit) *)
-  exception Invalid_context of string
-
   (** Rendering capabilities of a context *)
   type capabilities = {
     max_3D_texture_size       : int; (* Maximal 3D texture size *)
@@ -372,8 +368,10 @@ module Context : sig
   (** Returns true iff the given GLSL version is supported by this context *)
   val is_glsl_version_supported : t -> int -> bool
 
-  (** Asserts that no openGL error occured internally. Used for debugging and testing. *)
-  val assert_no_error : t -> unit
+  (** Checks that no openGL error occurred internally. Used for debugging and testing. *)
+  val check_errors : t -> 
+    (unit, [> `Invalid_value | `Invalid_enum | `Invalid_op | `Invalid_fbop
+            | `Out_of_memory | `Stack_overflow | `Stack_underflow]) result
 
   (** Flushes the GL buffer *)
   val flush : t -> unit
@@ -1573,9 +1571,6 @@ module Window : sig
 
   (*** Window creation *)
 
-  (** Raised if an error occurs in this module *)
-  exception Window_Error of string
-
   (** The type of a window *)
   type t
 
@@ -1608,7 +1603,9 @@ module Window : sig
     ?width:int ->
     ?height:int ->
     ?title:string ->
-    ?settings:OgamlCore.ContextSettings.t -> unit -> (t, string) result
+    ?settings:OgamlCore.ContextSettings.t -> unit -> 
+    (t, [> `Window_creation_error of string
+         | `Context_initialization_error of string]) result
 
   (** Returns the settings used at the creation of the window *)
   val settings : t -> OgamlCore.ContextSettings.t
@@ -1667,13 +1664,15 @@ module Window : sig
     * Clears the depth buffer and the stencil buffer by default. 
     *
     * $buffers$ defaults to $[BackLeft]$ *)
-  val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+  val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t ->
+              (unit, [> `Invalid_draw_buffer | `Duplicate_draw_buffer]) result
 
   (** Show or hide the cursor *)
   val show_cursor : t -> bool -> unit
 
   (** Binds the window for drawing. This function is for internal use only. *)
-  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
+  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> 
+             (unit, [> `Invalid_draw_buffer | `Duplicate_draw_buffer]) result
 
   (** Takes a screenshot of the window *)
   val screenshot : t -> Image.t 
@@ -1995,10 +1994,10 @@ module VertexArray : sig
     (** Adds a vertex to a source. If the source is not empty, the vertex must 
       * have at least the same initialized fields as the first vertex put into
       * the source. *)
-    val add : 'a t -> 'a Vertex.t -> (unit, [`Missing_attribute of string]) result
+    val add : 'a t -> 'a Vertex.t -> (unit, [> `Missing_attribute of string]) result
 
     (** Convenient operator to add vertices to a source. *)
-    val (<<) : 'a t -> 'a Vertex.t -> ('a t, [`Missing_attribute of string]) result
+    val (<<) : 'a t -> 'a Vertex.t -> ('a t, [> `Missing_attribute of string]) result
 
     (** Convenient operator to add vertices to a source that can easily
       * be chained. *)
@@ -2016,18 +2015,18 @@ module VertexArray : sig
     (** $append s1 s2$ appends the source $s2$ to $s1$. $s2$ is not modified. 
       *
       * Returns $Error$ if both sources do not contain the same fields. *) 
-    val append : 'a t -> 'a t -> (unit, [`Incompatible_fields]) result
+    val append : 'a t -> 'a t -> (unit, [> `Incompatible_fields]) result
 
     (** Iterates through all the vertices of a source. *)
     val iter : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> unit) -> unit
 
     (** Maps all the vertices of a source to a new source. *)
     val map : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) ->
-      ('b t, [`Missing_attribute of string]) result
+      ('b t, [> `Missing_attribute of string]) result
 
     (** Maps all the vertices of a source to an existing source. *)
     val map_to : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t ->
-      (unit, [`Missing_attribute of string]) result
+      (unit, [> `Missing_attribute of string]) result
 
   end
 
@@ -2083,7 +2082,7 @@ module VertexArray : sig
                    'a -> (dynamic, 'b) t ->
                    ?first:int -> ?length:int ->
                    'b Source.t ->
-                   (unit, [`Invalid_start | `Invalid_length | `Incompatible_sources]) result
+                   (unit, [> `Invalid_start | `Invalid_length | `Incompatible_sources]) result
  
     (** Unprotect a buffer so that it is possible to build lists of buffers. *)
     val unpack : (_, _) t -> unpacked
@@ -2142,7 +2141,7 @@ module VertexArray : sig
     ?start     : int ->
     ?length    : int ->
     ?mode      : DrawMode.t ->
-    unit -> (unit, [`Wrong_attribute_type of string | `Missing_attribute of string
+    unit -> (unit, [> `Wrong_attribute_type of string | `Missing_attribute of string
                    | `Invalid_slice | `Invalid_instance_count]) result
 
 end
@@ -2465,7 +2464,7 @@ module Sprite : sig
     ?color    : Color.t ->
     ?size     : OgamlMath.Vector2f.t ->
     ?rotation : float ->
-    unit -> (t, [`Invalid_subrect]) result
+    unit -> (t, [> `Invalid_subrect]) result
 
   (** Draws a sprite on a window using the given parameters.
     *

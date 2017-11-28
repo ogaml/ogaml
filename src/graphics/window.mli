@@ -18,7 +18,9 @@ val create :
   ?width:int ->
   ?height:int ->
   ?title:string ->
-  ?settings:OgamlCore.ContextSettings.t -> unit -> (t, string) result
+  ?settings:OgamlCore.ContextSettings.t -> unit -> 
+  (t, [> `Window_creation_error of string
+       | `Context_initialization_error of string]) result
 
 (** Changes the title of the window. *)
 val set_title : t -> string -> unit
@@ -64,7 +66,8 @@ val display : t -> unit
 
 (** Clears the window *)
 val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> 
-            ?depth:bool -> ?stencil:bool -> t -> unit
+            ?depth:bool -> ?stencil:bool -> t -> 
+            (unit, [> `Invalid_draw_buffer | `Duplicate_draw_buffer]) result
 
 (** Returns the internal GL context of the window *)
 val context : t -> Context.t
@@ -73,7 +76,8 @@ val context : t -> Context.t
 val show_cursor : t -> bool -> unit
 
 (** System-only, binds the window for drawing *)
-val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
+val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> 
+  (unit, [> `Invalid_draw_buffer | `Duplicate_draw_buffer]) result
 
 (** Returns the internal window of this window.
   * Used internally, hidden from the global interface. *)
