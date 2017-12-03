@@ -25,6 +25,12 @@ let rec fold_result f acc = function
   | [] -> Ok acc
   | h::t -> f acc h >>= (fun acc' -> fold_result f acc' t)
 
+let rec fold_right_result f l acc =
+  match l with
+  | [] -> Ok acc
+  | h::t -> 
+    fold_right_result f t acc >>= (fun acc' -> f h acc')
+
 let handle_error err f = 
   match err with
   | Ok r -> r

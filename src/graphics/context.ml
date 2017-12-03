@@ -258,28 +258,17 @@ module LL = struct
     s.texture_pool
 
   let bound_texture s i = 
-    if i >= s.capabilities.max_texture_image_units || i < 0 then
-      Error (`Invalid_texture_unit i)
-    else
-      match s.bound_texture.(i) with
-      | None       -> Ok None
-      | Some (_,t,_) -> Ok (Some t)
+    match s.bound_texture.(i) with
+    | None       -> None
+    | Some (_,t,_) -> Some t
 
   let bound_target s i = 
-    if i >= s.capabilities.max_texture_image_units || i < 0 then
-      Error (`Invalid_texture_unit i)
-    else 
-      match s.bound_texture.(i) with
-      | None       -> Ok None
-      | Some (_,_,t) -> Ok (Some t)
+    match s.bound_texture.(i) with
+    | None       -> None
+    | Some (_,_,t) -> Some t
 
   let set_bound_texture s i t = 
-    if i >= s.capabilities.max_texture_image_units || i < 0 then
-      Error (`Invalid_texture_unit i)
-    else begin 
-      s.bound_texture.(i) <- t;
-      Ok ()
-    end
+    s.bound_texture.(i) <- t
 
   let pooled_texture_array s = 
     s.pooled_tex_array

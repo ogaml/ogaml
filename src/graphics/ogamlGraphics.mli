@@ -758,11 +758,6 @@ module Texture : sig
   (** This module provides wrappers around different kinds
     * of OpenGL textures *)
 
-
-  (** Raised if an error occurs while manipulating a texture *)
-  exception Texture_error of string
-
-
   (** Common signature for all texture types *)
   module type T = sig
 
@@ -866,14 +861,13 @@ module Texture : sig
     (** Creates a texture from a source (a file or an image), or an empty texture.
       * Generates all mipmaps by default.
       *
-      * Raises $Texture_error$ if the requested size exceeds the maximal texture size
-      * allowed by the context.
       * @see:OgamlGraphics.RenderTarget.T 
       * @see:OgamlMath.Vector2i 
       * @see:OgamlGraphics.Context *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a -> 
                  ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None] ->
-                 [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] -> t
+                 [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] -> 
+                 (t, [> `Texture_too_large]) result
 
     (** Returns the size of a texture 
       * @see:OgamlMath.Vector2i *)
@@ -891,9 +885,8 @@ module Texture : sig
     (** Returns the number of mipmap levels of a texture *)
     val mipmap_levels : t -> int
 
-    (** Returns a mipmap level of a texture.
-      * Raises $Invalid_argument$ if the requested level is out of bounds *)
-    val mipmap : t -> int -> Texture2DMipmap.t
+    (** Returns a mipmap level of a texture. *)
+    val mipmap : t -> int -> (Texture2DMipmap.t, [> `Invalid_mipmap]) result
 
     (** System only function, binds a texture to a texture unit for drawing *)
     val bind : t -> int -> unit
@@ -948,15 +941,14 @@ module Texture : sig
       * bottom left corner), or an empty texture.
       * Generates all mipmaps by default.
       *
-      * Raises $Texture_error$ if the requested size exceeds the maximal texture size
-      * allowed by the context, or if the given data is too small.
       * @see:OgamlGraphics.RenderTarget.T 
       * @see:OgamlMath.Vector2i 
       * @see:OgamlGraphics.Context *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a -> 
                  ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None] ->
                  DepthFormat.t ->
-                 [< `Data of (OgamlMath.Vector2i.t * Bytes.t) | `Empty of OgamlMath.Vector2i.t] -> t
+                 [< `Data of (OgamlMath.Vector2i.t * Bytes.t) | `Empty of OgamlMath.Vector2i.t] ->
+                 (t, [> `Insufficient_data | `Texture_too_large]) result
 
     (** Returns the size of a texture 
       * @see:OgamlMath.Vector2i *)
@@ -974,9 +966,8 @@ module Texture : sig
     (** Returns the number of mipmap levels of a texture *)
     val mipmap_levels : t -> int
 
-    (** Returns a mipmap level of a texture.
-      * Raises $Invalid_argument$ if the requested level is out of bounds *)
-    val mipmap : t -> int -> DepthTexture2DMipmap.t
+    (** Returns a mipmap level of a texture. *)
+    val mipmap : t -> int -> (DepthTexture2DMipmap.t, [> `Invalid_mipmap]) result
 
     (** System only function, binds a texture to a texture unit for drawing *)
     val bind : t -> int -> unit
@@ -1036,9 +1027,8 @@ module Texture : sig
     (** Returns the mipmap's level *)
     val level : t -> int
 
-    (** Returns the mipmap of a particular layer 
-      * Raises $Invalid_argument$ if the layer does not exist. *)
-    val layer : t -> int -> Texture2DArrayLayerMipmap.t
+    (** Returns the mipmap of a particular layer *)
+    val layer : t -> int -> (Texture2DArrayLayerMipmap.t, [> `Invalid_layer]) result
 
   end
 
@@ -1061,9 +1051,8 @@ module Texture : sig
     (** Returns the number of mipmap levels of a layer *)
     val mipmap_levels : t -> int
 
-    (** Returns a particular mipmap level of a layer
-      * Raises $Invalid_argument$ if the mipmap level does not exist. *)
-    val mipmap : t -> int -> Texture2DArrayLayerMipmap.t
+    (** Returns a particular mipmap level of a layer *)
+    val mipmap : t -> int -> (Texture2DArrayLayerMipmap.t, [> `Invalid_mipmap]) result
 
     (** System only : binds the original texture array for drawing *)
     val bind : t -> int -> unit
@@ -1085,16 +1074,14 @@ module Texture : sig
 
     (** Creates a texture array from a list of files, images, or empty
       * layers of given dimensions.
-      * Generates all mipmaps by default for every layer by default.
-      *
-      * Raises $Texture_error$ if the requested size exceeds the maximal texture 
-      * size allowed by the context.
-      *
-      * Also raises $Texture_error$ if the list of layers is empty, or
-      * if all the layers do not have the same dimensions. *)
+      * Generates all mipmaps by default for every layer by default. *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a
                  -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
-                 -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list -> t
+                 -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list ->
+                 (t, [> `No_input_files
+                      | `Non_equal_input_sizes
+                      | `Texture_too_large
+                      | `Texture_too_deep]) result
 
     (** Returns the size of a texture array *)
     val size : t -> OgamlMath.Vector3i.t
@@ -1114,13 +1101,11 @@ module Texture : sig
     (** Returns the number of mipmap levels of a texture. *)
     val mipmap_levels : t -> int
 
-    (** Returns a particular layer of a texture array.
-      * Raises $Invalid_argument$ if the layer does not exist. *)
-    val layer : t -> int -> Texture2DArrayLayer.t
+    (** Returns a particular layer of a texture array. *)
+    val layer : t -> int -> (Texture2DArrayLayer.t, [> `Invalid_layer]) result
 
-    (** Returns a particular mipmap of a texture array. 
-      * Raises $Invalid_argument$ if the mipmap level does not exist. *)
-    val mipmap : t -> int -> Texture2DArrayMipmap.t
+    (** Returns a particular mipmap of a texture array. *)
+    val mipmap : t -> int -> (Texture2DArrayMipmap.t, [> `Invalid_mipmap]) result
 
   end
 
@@ -1169,7 +1154,7 @@ module Texture : sig
     val mipmap_levels : t -> int
 
     (** Returns a particular mipmap level of this face *)
-    val mipmap : t -> int -> CubemapMipmapFace.t
+    val mipmap : t -> int -> (CubemapMipmapFace.t, [> `Invalid_mipmap]) result
 
     (** Returns the face corresponding to this texture *)
     val face : t -> [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ] 
@@ -1217,13 +1202,7 @@ module Texture : sig
 
     (** Creates a cubemap texture from 6 textures, images or empty layers of
       * a given dimension.
-      * Generates all mipmaps by default.
-      *
-      * Raises $Texture_error$ if the requested size exceeds the maximal texture 
-      * size allowed by the context.
-      *
-      * Also raises $Texture_error$ if the 6 textures, images or empty layers
-      * do not have the same dimensions. *)
+      * Generates all mipmaps by default. *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a
                  -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
                  -> positive_x:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
@@ -1232,7 +1211,9 @@ module Texture : sig
                  -> negative_x:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                  -> negative_y:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                  -> negative_z:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
-                 -> unit -> t
+                 -> unit ->
+                 (t, [> `Texture_too_large
+                      | `Non_equal_input_sizes]) result
 
     (** Size of a face of a cubemap texture *)
     val size : t -> OgamlMath.Vector2i.t
@@ -1250,7 +1231,7 @@ module Texture : sig
     val mipmap_levels : t -> int
 
     (** Returns a particular mipmap level of a texture *)
-    val mipmap : t -> int -> CubemapMipmap.t
+    val mipmap : t -> int -> (CubemapMipmap.t, [> `Invalid_mipmap]) result
 
     (** Returns a particular face of a texture *)
     val face : t -> [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ] 
@@ -1278,7 +1259,7 @@ module Texture : sig
     val level : t -> int
 
     (** Focuses a particular layer of the 3D texture's mipmap *)
-    val layer : t -> int -> t
+    val layer : t -> int -> (t, [> `Invalid_layer]) result
 
     (** Returns the currently focused layer of the 3D texture's mipmap *)
     val current_layer : t -> int
@@ -1306,16 +1287,13 @@ module Texture : sig
 
     (** Creates a 3D texture from a list of files, images, or empty
       * layers of given dimensions.
-      * Generates all mipmaps by default.
-      *
-      * Raises $Texture_error$ if the requested size exceeds the maximal texture 
-      * size allowed by the context.
-      *
-      * Also raises $Texture_error$ if the list of layers is empty, or
-      * if all the layers do not have the same dimensions. *)
+      * Generates all mipmaps by default. *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a
                  -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
-                 -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list -> t
+                 -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list ->
+                 (t, [> `Texture_too_large
+                      | `Non_equal_input_sizes
+                      | `No_input_files]) result
 
     (** Returns the size of a 3D texture *)
     val size : t -> OgamlMath.Vector3i.t
@@ -1332,9 +1310,8 @@ module Texture : sig
     (** Returns the number of mipmap levels of a texture. *)
     val mipmap_levels : t -> int
 
-    (** Returns a particular mipmap of a 3D texture. 
-      * Raises $Invalid_argument$ if the mipmap level does not exist. *)
-    val mipmap : t -> int -> Texture3DMipmap.t
+    (** Returns a particular mipmap of a 3D texture. *)
+    val mipmap : t -> int -> (Texture3DMipmap.t, [> `Invalid_mipmap]) result
 
   end
 
