@@ -1348,9 +1348,6 @@ module Font : sig
   (** This module stores a font and dynamically
     * loads sizes and glyphs as requested by the user *)
 
-  (** Raised when an error occur in this module *)
-  exception Font_error of string
-
   (** Type of a font *)
   type t
 
@@ -1358,7 +1355,7 @@ module Font : sig
   type code = [`Char of char | `Code of int]
 
   (** Loads a font from a file *)
-  val load : string -> t
+  val load : string -> (t, [> `File_not_found | `Invalid_font_file]) result
 
   (** $glyph font code size bold$ returns the glyph
     * representing the character $code$ in $font$
@@ -1391,11 +1388,13 @@ module Font : sig
     * Use $Font.size_index$ to get the layer associated to a font size. 
     * This texture is not mipmapped. *)
   val texture : (module RenderTarget.T with type t = 'a) -> 'a -> 
-                t -> Texture.Texture2DArray.t
+                t -> 
+                (Texture.Texture2DArray.t,
+                  [> `Font_texture_size_overflow
+                   | `Font_texture_depth_overflow]) result
 
-  (** Returns the index associated to a font size in the font's texture.
-    * Raises Font_error if the font size has not been loaded yet. *)
-  val size_index : t -> int -> int
+  (** Returns the index associated to a font size in the font's texture. *)
+  val size_index : t -> int -> (int, [> `Invalid_font_size]) result
 
 end
 

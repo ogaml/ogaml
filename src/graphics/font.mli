@@ -17,14 +17,12 @@ module Glyph : sig
 
 end
 
-exception Font_error of string
-
 type t
 
 type code = [`Char of char | `Code of int]
 
 (** Loads a font from a file *)
-val load : string -> t
+val load : string -> (t, [> `File_not_found | `Invalid_font_file]) result
 
 (** Preloads a glyph *)
 val load_glyph : t -> code -> int -> bool -> unit
@@ -51,10 +49,13 @@ val spacing : t -> int -> float
 
 (** Returns the texture of a font *)
 val texture : (module RenderTarget.T with type t = 'a) -> 'a 
-              -> t -> Texture.Texture2DArray.t
+              -> t -> 
+              (Texture.Texture2DArray.t,
+                [> `Font_texture_size_overflow
+                 | `Font_texture_depth_overflow]) result
 
 (** Returns the index associated to a font size in the font's texture *)
-val size_index : t -> int -> int
+val size_index : t -> int -> (int, [> `Invalid_font_size]) result
 
 
 

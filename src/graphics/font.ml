@@ -1,5 +1,5 @@
 open OgamlMath
-
+open Utils
 
 module IntMap = Map.Make (struct
 
@@ -35,8 +35,6 @@ module Glyph = struct
   let uv t = t.uv
 
 end
-
-exception Font_error of string
 
 module Shelf = struct
 
@@ -78,8 +76,6 @@ module Shelf = struct
                 y = s.height + s.pad;
                 width  = w;
                 height = h})
-    end else if s.height + s.row_height + s.pad >= 2048 then begin
-      raise (Font_error "Font texture overflow")
     end else begin
       let new_full = 
         Image.create 
@@ -263,17 +259,20 @@ let oversampling_of_size s = min 4 ((80 + s - 1)/s)
 (** Exposed functions *)
 let load s =
   if not (Sys.file_exists s) then
-    raise (Font_error (Printf.sprintf "File not found : %s" s));
+    Error `File_not_found
+  else
+    Ok () >>= fun () ->
   let internal = Internal.load s in
   if not (Internal.is_valid internal) then
-    raise (Font_error (Printf.sprintf "Invalid font file : %s" s));
-  {
-    pages  = IntMap.empty;
-    nindex = 0;
-    height = 0;
-    texture = None;
-    internal
-  }
+    Error `Invalid_font_file
+  else
+    Ok {
+      pages  = IntMap.empty;
+      nindex = 0;
+      height = 0;
+      texture = None;
+      internal
+    }
 
 
 let glyph (t : t) c size bold =
@@ -317,10 +316,13 @@ let rebuild_page_texture (type s) (module M : RenderTarget.T with type t = s) ta
   let layer = 
     match t.texture with
     | None   -> assert false
-    | Some t -> Texture.Texture2DArray.layer t i_layer
+    | Some t -> 
+      Texture.Texture2DArray.layer t i_layer
+      |> assert_result
   in
   let mipmap = 
     Texture.Texture2DArrayLayer.mipmap layer 0
+    |> assert_result
   in
   Texture.Texture2DArrayLayerMipmap.write
     mipmap
@@ -339,14 +341,13 @@ let rebuild_full_texture (type s) (module M : RenderTarget.T with type t = s) ta
     insert (index, img) l) t.pages []
   in
   let l_imgs_strip = List.map (fun (_,i) -> `Image i) l_imgs in
-  let texture = 
-    if l_imgs_strip = [] then 
-      Texture.Texture2DArray.create (module M) target 
-        ~mipmaps:`None [`Empty Vector2i.zero]
-    else 
-      Texture.Texture2DArray.create (module M) target 
-        ~mipmaps:`None l_imgs_strip
-  in
+  begin if l_imgs_strip = [] then 
+    Texture.Texture2DArray.create (module M) target 
+      ~mipmaps:`None [`Empty Vector2i.zero]
+  else 
+    Texture.Texture2DArray.create (module M) target 
+      ~mipmaps:`None l_imgs_strip
+  end >>>= fun texture ->
   Texture.Texture2DArray.minify  texture Texture.MinifyFilter.Linear;
   Texture.Texture2DArray.magnify texture Texture.MagnifyFilter.Linear;
   t.texture <- Some texture
@@ -359,20 +360,27 @@ let texture (type s) (module M : RenderTarget.T with type t = s) target t =
     end else (l, h)
   ) t.pages ([], t.height)
   in
-  if t.height < max_height || t.texture = None then begin
-    rebuild_full_texture (module M) target t max_height;
-    t.height <- max_height
-  end else if mod_pages <> [] then begin
-    List.iter (fun p -> rebuild_page_texture (module M) target t max_height p) mod_pages
-  end;
-  match t.texture with
-  | None -> assert false
-  | Some t -> t
+  let result = 
+    if t.height < max_height || t.texture = None then begin
+      rebuild_full_texture (module M) target t max_height >>>= fun () ->
+      t.height <- max_height
+    end else if mod_pages <> [] then begin
+      List.iter (fun p -> rebuild_page_texture (module M) target t max_height p) mod_pages;
+      Ok ()
+    end else Ok ()
+  in
+  match result, t.texture with
+  | Ok (), None -> assert false
+  | Ok (), Some t -> Ok t
+  | Error `No_input_files, _ -> assert false
+  | Error `Non_equal_input_sizes, _ -> assert false
+  | Error `Texture_too_large, _ -> Error `Font_texture_size_overflow
+  | Error `Texture_too_deep, _ -> Error `Font_texture_depth_overflow
 
 let size_index t s = 
   try 
     let page = IntMap.find s t.pages in
-    page.index
+    Ok page.index
   with
-    Not_found -> raise (Font_error "Font size's index not found")
+    Not_found -> Error `Invalid_font_size
     
