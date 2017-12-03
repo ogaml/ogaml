@@ -1429,9 +1429,6 @@ module Program : sig
   (** This module provides a high-level wrapper around GL shader programs
     * and can be used to compile shaders. *)
 
-  (** Raised when an error occurs during the manipulation of a program *)
-  exception Program_error of string
-
   (** Type of a program *)
   type t
 
@@ -1444,9 +1441,12 @@ module Program : sig
     * The source must begin with a version assigment $#version xxx$ 
     * @see:OgamlUtils.Log *)
   val from_source : (module RenderTarget.T with type t = 'a) -> 
-                    ?log:OgamlUtils.Log.t ->
-                    context:'a -> 
-                    vertex_source:src -> fragment_source:src -> unit -> t
+    context:'a -> vertex_source:src -> fragment_source:src ->
+    (t, [> `Context_failure 
+         | `Vertex_compilation_error of (string * string)
+         | `Fragment_compilation_error of (string * string)
+         | `Linking_failure
+         | `Unsupported_GLSL_type]) result
 
   (** Compiles a program from a rendering context and
     * a list of sources paired with their required GLSL version.
@@ -1455,10 +1455,13 @@ module Program : sig
     * @see:OgamlGraphics.Context
     * @see:OgamlUtils.Log *)
   val from_source_list : (module RenderTarget.T with type t = 'a) ->
-                         ?log:OgamlUtils.Log.t ->
-                         context:'a  ->
-                         vertex_source:(int * src) list ->
-                         fragment_source:(int * src) list -> unit -> t
+    context:'a  -> vertex_source:(int * src) list -> fragment_source:(int * src) list ->
+    (t, [> `Context_failure 
+         | `Vertex_compilation_error of string
+         | `Fragment_compilation_error of string
+         | `Linking_failure
+         | `Unsupported_GLSL_version
+         | `Unsupported_GLSL_type]) result
 
   (** Compiles a program from a rendering context and a source.
     * The source should not begin with a $#version xxx$ assignment,
@@ -1468,10 +1471,12 @@ module Program : sig
     * @see:OgamlGraphics.Context 
     * @see:OgamlUtils.Log *)
   val from_source_pp : (module RenderTarget.T with type t = 'a) ->
-                       ?log:OgamlUtils.Log.t ->
-                       context:'a ->
-                       vertex_source:src ->
-                       fragment_source:src -> unit -> t
+    context:'a -> vertex_source:src -> fragment_source:src -> 
+    (t, [> `Context_failure 
+         | `Vertex_compilation_error of string
+         | `Fragment_compilation_error of string
+         | `Linking_failure
+         | `Unsupported_GLSL_type]) result
 
 end
 

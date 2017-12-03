@@ -121,9 +121,9 @@ module LL = struct
     | Ok prog -> Ok prog
     | Error `Context_failure ->
       mk_init_error "GLSL not supported"
-    | Error `Fragment_compilation_error (code, log) ->
+    | Error `Fragment_compilation_error (log) ->
       mk_init_error "Failed to compile internal fragment shader: %s" log
-    | Error `Vertex_compilation_error (code, log) ->
+    | Error `Vertex_compilation_error (log) ->
       mk_init_error "Failed to compile internal vertex shader: %s" log
     | Error `Linking_failure ->
       mk_init_error "Failed to link internal shader"

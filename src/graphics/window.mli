@@ -1,5 +1,3 @@
-exception Window_Error of string
-
 module OutputBuffer : sig
 
   type t = 

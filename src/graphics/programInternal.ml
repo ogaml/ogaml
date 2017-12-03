@@ -52,9 +52,9 @@ let create ~vertex ~fragment ~id =
   GL.Shader.compile vshader;
   GL.Shader.compile fshader;
   if GL.Shader.status vshader = false then 
-    Error (`Vertex_compilation_error (vertex, (GL.Shader.log vshader)))
+    Error (`Vertex_compilation_error (GL.Shader.log vshader))
   else if GL.Shader.status fshader = false then 
-    Error (`Fragment_compilation_error (fragment, (GL.Shader.log fshader)))
+    Error (`Fragment_compilation_error (GL.Shader.log fshader))
   else
     Ok () 
   >>= fun () ->
@@ -127,7 +127,7 @@ let create_list ~vertex ~fragment ~id ~version =
       List.find (fun (v,_) -> v <= version) list_fshader
       |> snd
     in
-    Ok (create ~vertex:best_vshader ~fragment:best_fshader ~id)
+    create ~vertex:best_vshader ~fragment:best_fshader ~id
   with Not_found -> 
     Error `Unsupported_GLSL_version
 
