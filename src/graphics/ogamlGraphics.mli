@@ -1419,8 +1419,8 @@ module Program : sig
   val from_source : (module RenderTarget.T with type t = 'a) -> 
     context:'a -> vertex_source:src -> fragment_source:src ->
     (t, [> `Context_failure 
-         | `Vertex_compilation_error of (string * string)
-         | `Fragment_compilation_error of (string * string)
+         | `Vertex_compilation_error of string
+         | `Fragment_compilation_error of string
          | `Linking_failure
          | `Unsupported_GLSL_type]) result
 
@@ -2592,7 +2592,8 @@ module Text : sig
       ?parameters : DrawParameter.t ->
       text : t ->
       target : 'a ->
-      unit -> unit
+      unit ->
+      (unit, [> `Font_texture_size_overflow | `Font_texture_depth_overflow]) result
 
     (** The global advance of the text.
       * Basically it is a vector such that if you add it to the position of
@@ -2624,7 +2625,8 @@ module Text : sig
     ?parameters : DrawParameter.t ->
     text : t ->
     target : 'a ->
-    unit -> unit
+    unit -> 
+    (unit, [> `Font_texture_size_overflow | `Font_texture_depth_overflow]) result
 
   (** The global advance of the text.
     * Basically it is a vector such that if you add it to the position of

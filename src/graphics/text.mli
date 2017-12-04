@@ -32,7 +32,8 @@ module Fx : sig
     ?parameters : DrawParameter.t ->
     text : t ->
     target : 'a ->
-    unit -> unit
+    unit -> 
+    (unit, [> `Font_texture_size_overflow | `Font_texture_depth_overflow]) result
 
   val advance : t -> OgamlMath.Vector2f.t
 
@@ -56,7 +57,8 @@ val draw :
   ?parameters : DrawParameter.t ->
   text : t ->
   target : 'a ->
-  unit -> unit
+  unit -> 
+  (unit, [> `Font_texture_size_overflow | `Font_texture_depth_overflow]) result
 
 val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> 
     (unit, [> `Missing_attribute of string]) result
