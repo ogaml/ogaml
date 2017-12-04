@@ -215,9 +215,9 @@ module Fx = struct
            ~text ~target () =
     let context = M.context target in
     let program = Context.LL.text_drawing context in
-    let texture = Font.texture (module M) target text.font in
+    Font.texture (module M) target text.font >>>= fun texture ->
     let size = Vector2f.from_int (M.size target) in
-    let index = Font.size_index text.font text.size in
+    let index = Font.size_index text.font text.size |> assert_result in
     let tsize = 
       Texture.Texture2DArray.size texture
       |> Vector3i.project
@@ -372,9 +372,9 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
          ~text ~target () =
   let context = M.context target in
   let program = Context.LL.text_drawing context in
-  let texture = Font.texture (module M) target text.font in
+  Font.texture (module M) target text.font >>>= fun texture ->
   let size = Vector2f.from_int (M.size target) in
-  let index = Font.size_index text.font text.size in
+  let index = Font.size_index text.font text.size |> assert_result in
   let tsize = 
     Texture.Texture2DArray.size texture
     |> Vector3i.project
