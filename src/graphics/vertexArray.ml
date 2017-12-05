@@ -363,34 +363,30 @@ module Source = struct
       src.initialized <- true;
       src.layout <- Some vtx.Vertex.vertex;
     end;
-    try 
-      List.iter (fun (att, _) ->
-        let i = Vertex.offset_of att in
-        match vtx.Vertex.data.(i) with
-        | Vertex.AttributeVal.Unset ->
-          let open Vertex in
-          begin match List.nth vtx.vertex.attribs i with
-          | Boxed_Attrib f -> raise (Failure f.Vertex.aname) (* Internal raise *)
-          end
-        | Vertex.AttributeVal.Float v ->
-          GL.Data.add_float src.fdata v
-        | Vertex.AttributeVal.Vec2f v ->
-          GL.Data.add_2f src.fdata v
-        | Vertex.AttributeVal.Vec3f v ->
-          GL.Data.add_3f src.fdata v
-        | Vertex.AttributeVal.Int v ->
-          GL.Data.add_int src.idata v
-        | Vertex.AttributeVal.Vec2i v ->
-          GL.Data.add_2i src.idata v
-        | Vertex.AttributeVal.Vec3i v ->
-          GL.Data.add_3i src.idata v
-        | Vertex.AttributeVal.Color v ->
-          GL.Data.add_color src.fdata v
-      ) src.init_fields;
-      src.length <- src.length + 1;
-      Ok ()
-    with
-      Failure s -> Error (`Missing_attribute s)
+    iter_result (fun (att, _) ->
+      let i = Vertex.offset_of att in
+      match vtx.Vertex.data.(i) with
+      | Vertex.AttributeVal.Unset ->
+        let open Vertex in
+        begin match List.nth vtx.vertex.attribs i with
+        | Boxed_Attrib f -> Error (`Missing_attribute f.Vertex.aname)
+        end
+      | Vertex.AttributeVal.Float v ->
+        GL.Data.add_float src.fdata v; Ok ()
+      | Vertex.AttributeVal.Vec2f v ->
+        GL.Data.add_2f src.fdata v; Ok ()
+      | Vertex.AttributeVal.Vec3f v ->
+        GL.Data.add_3f src.fdata v; Ok ()
+      | Vertex.AttributeVal.Int v ->
+        GL.Data.add_int src.idata v; Ok ()
+      | Vertex.AttributeVal.Vec2i v ->
+        GL.Data.add_2i src.idata v; Ok ()
+      | Vertex.AttributeVal.Vec3i v ->
+        GL.Data.add_3i src.idata v; Ok ()
+      | Vertex.AttributeVal.Color v ->
+        GL.Data.add_color src.fdata v; Ok ()
+    ) src.init_fields >>>= fun () ->
+    src.length <- src.length + 1
 
   let (<<) src vtx = 
     match add src vtx with
@@ -829,7 +825,7 @@ let draw (type s) (type buf)
     let max_instances = max_instances vertices in
     M.bind target ?buffers parameters;
     Program.LL.use context (Some program);
-    Uniform.LL.bind context uniform (Program.LL.uniforms program);
+    Uniform.LL.bind context uniform (Program.LL.uniforms program) >>= fun () ->
     bind context vertices program >>= fun () ->
     begin match indices with
     |None -> 

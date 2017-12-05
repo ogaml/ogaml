@@ -132,9 +132,10 @@ let draw (type s) (module Target : RenderTarget.T with type t = s)
   let sizei = Target.size target in
   let size = Vector2f.from_int sizei in
   let uniform =
-    Uniform.empty
-    |> Uniform.vector2f "size" size
-    |> Uniform.texture2D "utexture" sprite.texture
+    Ok Uniform.empty
+    >>= Uniform.vector2f "size" size
+    >>= Uniform.texture2D "utexture" sprite.texture
+    |> assert_result
   in
   let sprite_source = VertexArray.Source.empty ~size:6 () in
   (iter_result (VertexArray.Source.add sprite_source) (get_vertices sprite) >>= fun () ->

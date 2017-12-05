@@ -224,11 +224,12 @@ module Fx = struct
       |> Vector2f.from_int
     in
     let uniform =
-      Uniform.empty
-      |> Uniform.vector2f "window_size" size
-      |> Uniform.vector2f "atlas_size" tsize
-      |> Uniform.texture2Darray "atlas" texture
-      |> Uniform.int "atlas_offset" index
+      Ok (Uniform.empty)
+      >>= Uniform.vector2f "window_size" size
+      >>= Uniform.vector2f "atlas_size" tsize
+      >>= Uniform.texture2Darray "atlas" texture
+      >>= Uniform.int "atlas_offset" index
+      |> assert_result
     in
     let vertices = text.vertices in
     VertexArray.draw (module M)
@@ -381,11 +382,12 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
     |> Vector2f.from_int
   in
   let uniform =
-    Uniform.empty
-    |> Uniform.vector2f "window_size" size
-    |> Uniform.vector2f "atlas_size" tsize
-    |> Uniform.texture2Darray "atlas" texture
-    |> Uniform.int "atlas_offset" index
+    Ok Uniform.empty
+    >>= Uniform.vector2f "window_size" size
+    >>= Uniform.vector2f "atlas_size" tsize
+    >>= Uniform.texture2Darray "atlas" texture
+    >>= Uniform.int "atlas_offset" index
+    |> assert_result
   in
   let vertices = 
     let vtx = text.vertices in

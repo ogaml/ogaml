@@ -165,5 +165,12 @@ val draw :
   ?start     : int ->
   ?length    : int ->
   ?mode      : DrawMode.t ->
-  unit -> (unit, [> `Wrong_attribute_type of string | `Missing_attribute of string 
-                 | `Invalid_slice | `Invalid_instance_count]) result
+  unit -> (unit, [> `Wrong_attribute_type of string 
+                 | `Missing_attribute of string 
+                 | `Invalid_slice 
+                 | `Invalid_instance_count
+                 | `Invalid_uniform_type of string
+                 | `Invalid_texture_unit of int
+                 | `Missing_uniform of string
+                 | `Too_many_textures]) result
+

@@ -1463,11 +1463,6 @@ module Uniform : sig
   (** This module encapsulates a set of uniforms that
     * can be passed to GLSL programs. *)
 
-  (** Raised when an error occurs while creating or when drawing using
-    * a uniform. *)
-  exception Invalid_uniform of string
-
-
   (** Type of a set of uniforms *)
   type t
 
@@ -1476,34 +1471,33 @@ module Uniform : sig
 
   (** $vector3f name vec set$ adds the uniform $vec$ to $set$.
     * the uniform should be refered to as $name$ in a glsl program.
-    * Raises $Invalid_uniform$ if $name$ is already bound in $set$.
     * Type : vec3.
     * @see:OgamlMath.Vector3f *)
-  val vector3f : string -> OgamlMath.Vector3f.t -> t -> t
+  val vector3f : string -> OgamlMath.Vector3f.t -> t -> (t, [> `Duplicate_uniform of string]) result
 
   (** See vector3f. Type : vec2. @see:OgamlMath.Vector2f *)
-  val vector2f : string -> OgamlMath.Vector2f.t -> t -> t
+  val vector2f : string -> OgamlMath.Vector2f.t -> t -> (t, [> `Duplicate_uniform of string]) result
 
   (** See vector3f. Type : vec3i. @see:OgamlMath.Vector3i *)
-  val vector3i : string -> OgamlMath.Vector3i.t -> t -> t
+  val vector3i : string -> OgamlMath.Vector3i.t -> t -> (t, [> `Duplicate_uniform of string]) result
 
   (** See vector3f. Type : vec2i. @see:OgamlMath.Vector2i *)
-  val vector2i : string -> OgamlMath.Vector2i.t -> t -> t
+  val vector2i : string -> OgamlMath.Vector2i.t -> t -> (t, [> `Duplicate_uniform of string]) result
 
   (** See vector3f. Type : int. *)
-  val int : string -> int -> t -> t
+  val int : string -> int -> t -> (t, [> `Duplicate_uniform of string]) result
 
   (** See vector3f. Type : float. *)
-  val float : string -> float -> t -> t
+  val float : string -> float -> t -> (t, [> `Duplicate_uniform of string]) result
 
   (** See vector3f. Type : mat3. @see:OgamlMath.Matrix3D *)
-  val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> t
+  val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> (t, [> `Duplicate_uniform of string]) result
 
   (** See vector3f. Type : mat2. @see:OgamlMath.Matrix2D *)
-  val matrix2D : string -> OgamlMath.Matrix2D.t -> t -> t
+  val matrix2D : string -> OgamlMath.Matrix2D.t -> t -> (t, [> `Duplicate_uniform of string]) result
 
   (** See vector3f. Type : vec4. @see:OgamlGraphics.Color *)
-  val color : string -> Color.t -> t -> t
+  val color : string -> Color.t -> t -> (t, [> `Duplicate_uniform of string]) result
 
   (** See vector3f. Type : sampler2D.
    *
@@ -1516,27 +1510,32 @@ module Uniform : sig
     * See $Context.capabilities$ for the number of available units.
     * @see:OgamlGraphics.Texture.Texture2D
     * @see:OgamlGraphics.Context *)
-  val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
+  val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> 
+    (t, [> `Duplicate_uniform of string]) result
 
   (** See texture2D. Type : sampler2D.
     *
     * @see:OgamlGraphics.Texture.Texture3D *)
-  val depthtexture2D : string -> ?tex_unit:int -> Texture.DepthTexture2D.t -> t -> t
+  val depthtexture2D : string -> ?tex_unit:int -> Texture.DepthTexture2D.t -> t -> 
+    (t, [> `Duplicate_uniform of string]) result
 
   (** See texture2D. Type : sampler3D.
     *
     * @see:OgamlGraphics.Texture.Texture3D *)
-  val texture3D : string -> ?tex_unit:int -> Texture.Texture3D.t -> t -> t
+  val texture3D : string -> ?tex_unit:int -> Texture.Texture3D.t -> t ->
+    (t, [> `Duplicate_uniform of string]) result
 
   (** See texture2D. Type : sampler2Darray.
     *
     * @see:OgamlGraphics.Texture.Texture2DArray *)
-  val texture2Darray : string -> ?tex_unit:int -> Texture.Texture2DArray.t -> t -> t
+  val texture2Darray : string -> ?tex_unit:int -> Texture.Texture2DArray.t -> t -> 
+    (t, [> `Duplicate_uniform of string]) result
 
   (** See texture2D. Type : samplerCube. 
     *
     * @see:OgamlGraphics.Texture.Cubemap *)
-  val cubemap : string -> ?tex_unit:int -> Texture.Cubemap.t -> t -> t
+  val cubemap : string -> ?tex_unit:int -> Texture.Cubemap.t -> t -> 
+    (t, [> `Duplicate_uniform of string]) result
 
 end
 
@@ -2122,8 +2121,14 @@ module VertexArray : sig
     ?start     : int ->
     ?length    : int ->
     ?mode      : DrawMode.t ->
-    unit -> (unit, [> `Wrong_attribute_type of string | `Missing_attribute of string
-                   | `Invalid_slice | `Invalid_instance_count]) result
+    unit -> (unit, [> `Wrong_attribute_type of string 
+                   | `Missing_attribute of string 
+                   | `Invalid_slice 
+                   | `Invalid_instance_count
+                   | `Invalid_uniform_type of string
+                   | `Invalid_texture_unit of int
+                   | `Missing_uniform of string
+                   | `Too_many_textures]) result
 
 end
 

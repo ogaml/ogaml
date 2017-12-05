@@ -342,6 +342,7 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
   let uniform =
     Uniform.empty
     |> Uniform.vector2f "size" (Vector2f.from_int size)
+    |> assert_result
   in
   let src = VertexArray.Source.empty ~size:8 () in
   let vtcs, outline = compute_vertices shape in
