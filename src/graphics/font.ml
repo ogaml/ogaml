@@ -49,8 +49,8 @@ module Shelf = struct
   }
 
   let create width = {
-    full   = Image.create (`Empty (Vector2i.zero,(`RGB Color.RGB.transparent)));
-    row    = Image.create (`Empty (Vector2i.zero,(`RGB Color.RGB.transparent)));
+    full   = Image.empty Vector2i.zero (`RGB Color.RGB.transparent);
+    row    = Image.empty Vector2i.zero (`RGB Color.RGB.transparent);
     width;
     height = 0;
     row_width  = 0;
@@ -63,12 +63,15 @@ module Shelf = struct
     let w,h  = size.Vector2i.x, size.Vector2i.y in
     if s.row_width + w + s.pad <= s.width then begin
       let new_height = max s.row_height h in
-      let new_row = 
-        Image.create 
-          (`Empty (Vector2i.({x = s.row_width + w + s.pad; y = new_height}),`RGB Color.RGB.transparent)) 
+      let new_row =
+        Image.empty
+          Vector2i.({x = s.row_width + w + s.pad; y = new_height}) 
+          (`RGB Color.RGB.transparent)
       in
-      Image.blit s.row new_row Vector2i.({x = 0; y = new_height - s.row_height});
-      Image.blit glyph new_row Vector2i.({x = s.row_width + s.pad; y = new_height - h});
+      Image.blit s.row new_row Vector2i.({x = 0; y = new_height - s.row_height}) 
+      |> assert_result;
+      Image.blit glyph new_row Vector2i.({x = s.row_width + s.pad; y = new_height - h})
+      |> assert_result;
       s.row <- new_row;
       s.row_height <- new_height;
       s.row_width <- s.row_width + w + s.pad;
@@ -78,11 +81,14 @@ module Shelf = struct
                 height = h})
     end else begin
       let new_full = 
-        Image.create 
-          (`Empty (Vector2i.({x = s.width; y = s.height + s.row_height + s.pad}),(`RGB Color.RGB.transparent))) 
+        Image.empty
+          Vector2i.({x = s.width; y = s.height + s.row_height + s.pad})
+          (`RGB Color.RGB.transparent)
       in
-      Image.blit s.full new_full Vector2i.({x = 0; y = s.row_height + s.pad});
-      Image.blit s.row new_full Vector2i.zero;
+      Image.blit s.full new_full Vector2i.({x = 0; y = s.row_height + s.pad})
+      |> assert_result;
+      Image.blit s.row new_full Vector2i.zero
+      |> assert_result;
       s.full <- new_full;
       s.row  <- glyph;
       s.height <- (s.height + s.row_height + s.pad);
@@ -98,9 +104,15 @@ module Shelf = struct
     s.height + s.row_height + s.pad
 
   let image height s =
-    let global = Image.create (`Empty (Vector2i.({x = s.width; y = height}), `RGB Color.RGB.transparent)) in
-    Image.blit s.full global Vector2i.({x = 0; y = s.row_height + s.pad});
-    Image.blit s.row global Vector2i.zero;
+    let global = 
+      Image.empty 
+        Vector2i.({x = s.width; y = height}) 
+        (`RGB Color.RGB.transparent)
+    in
+    Image.blit s.full global Vector2i.({x = 0; y = s.row_height + s.pad})
+    |> assert_result;
+    Image.blit s.row global Vector2i.zero
+    |> assert_result;
     global
 
 end
@@ -222,7 +234,9 @@ let load_glyph_return (t : t) s c b oversampling =
     let rect = Internal.char_box t.internal c in
     let (bmp,w,h) = Internal.render_bitmap t.internal c oversampling page.scale in
     let bmp = Internal.convert_1chan_bitmap bmp in
-    let uv = Shelf.add page.shelf (Image.create (`Data (Vector2i.({x = w; y = h}),bmp))) in
+    let uv = Shelf.add page.shelf 
+      (Image.create (`Data (Vector2i.({x = w; y = h}),bmp)) |> assert_result)
+    in
     {
       Glyph.advance = scale_int advance page.scale;
       Glyph.bearing = Vector2f.({x = scale_int lbear page.scale;
@@ -374,6 +388,8 @@ let texture (type s) (module M : RenderTarget.T with type t = s) target t =
   | Ok (), Some t -> Ok t
   | Error `No_input_files, _ -> assert false
   | Error `Non_equal_input_sizes, _ -> assert false
+  | Error `Loading_error _, _ -> assert false
+  | Error `File_not_found, _ -> assert false
   | Error `Texture_too_large, _ -> Error `Font_texture_size_overflow
   | Error `Texture_too_deep, _ -> Error `Font_texture_depth_overflow
 

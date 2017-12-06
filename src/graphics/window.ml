@@ -156,5 +156,5 @@ let screenshot win =
   for i = 0 to size.Vector2i.y - 1 do
     Bytes.blit data (i * size.Vector2i.x * 4) rev_data ((size.Vector2i.y - 1 - i) * size.Vector2i.x * 4) (size.Vector2i.x * 4)
   done;
-  Image.create (`Data (size, rev_data))
+  Image.create (`Data (size, rev_data)) |> assert_result
 

@@ -52,7 +52,9 @@ module Texture2D : sig
   val create : (module RenderTarget.T with type t = 'a) -> 'a 
                -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
                -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] -> 
-               (t, [> `Texture_too_large]) result
+               (t, [> `Texture_too_large
+                    | `File_not_found
+                    | `Loading_error of string]) result
 
   val size : t -> OgamlMath.Vector2i.t
 
@@ -98,7 +100,10 @@ module DepthTexture2D : sig
                -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
                -> DepthFormat.t
                -> [< `Data of (OgamlMath.Vector2i.t * Bytes.t) | `Empty of OgamlMath.Vector2i.t] -> 
-               (t, [> `Insufficient_data | `Texture_too_large]) result
+               (t, [> `Insufficient_data 
+                    | `Texture_too_large
+                    | `File_not_found
+                    | `Loading_error of string]) result
 
   val size : t -> OgamlMath.Vector2i.t
 
@@ -184,7 +189,9 @@ module Texture2DArray : sig
                (t, [> `No_input_files
                     | `Non_equal_input_sizes
                     | `Texture_too_large
-                    | `Texture_too_deep]) result
+                    | `Texture_too_deep
+                    | `File_not_found
+                    | `Loading_error of string]) result
 
   val size : t -> OgamlMath.Vector3i.t
 
@@ -275,7 +282,9 @@ module Cubemap : sig
                -> negative_z:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                -> unit -> 
                (t, [> `Texture_too_large
-                    | `Non_equal_input_sizes]) result
+                    | `Non_equal_input_sizes
+                    | `File_not_found
+                    | `Loading_error of string]) result
 
   val size : t -> OgamlMath.Vector2i.t
 
@@ -327,7 +336,9 @@ module Texture3D : sig
                -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list -> 
                (t, [> `Texture_too_large
                     | `Non_equal_input_sizes
-                    | `No_input_files]) result
+                    | `No_input_files
+                    | `File_not_found
+                    | `Loading_error of string]) result
 
   val size : t -> OgamlMath.Vector3i.t
 

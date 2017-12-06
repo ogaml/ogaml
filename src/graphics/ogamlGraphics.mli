@@ -705,18 +705,25 @@ module Image : sig
     * Images stored this way are uncompressed arrays of bytes and are therefore
     * not meant to be stored in large quantities. *)
 
-  (** Raised when an error occur in this module *)
-  exception Image_error of string
-
   (** Type of an image stored in the RAM *)
   type t
+
+  (** Creates an empty image filled with a default color *)
+  val empty : OgamlMath.Vector2i.t -> Color.t -> t
+
+  (** Loads an image from a file *)
+  val load : string -> (t, [> `File_not_found | `Loading_error of string]) result
 
   (** Creates an image from a file, some RGBA-formatted data, or an empty one
     * filled with a default color
     *
-    * Raises $Image_error$ if the loading fails 
     * @see:OgamlGraphics.Color *)
-  val create : [`File of string | `Empty of OgamlMath.Vector2i.t * Color.t | `Data of OgamlMath.Vector2i.t * Bytes.t] -> t
+  val create : [`File of string 
+               | `Empty of OgamlMath.Vector2i.t * Color.t 
+               | `Data of OgamlMath.Vector2i.t * Bytes.t] -> 
+               (t, [> `File_not_found
+                    | `Loading_error of string
+                    | `Wrong_data_length]) result
 
   (** Saves an image to a file.
     *
@@ -728,18 +735,19 @@ module Image : sig
 
   (** Sets a pixel of an image
     * @see:OgamlGraphics.Color *)
-  val set : t -> OgamlMath.Vector2i.t -> Color.t -> unit
+  val set : t -> OgamlMath.Vector2i.t -> Color.t -> (unit, [> `Out_of_bounds]) result
 
   (** Gets the color of a pixel of an image
     * @see:OgamlGraphics.Color.RGB *)
-  val get : t -> OgamlMath.Vector2i.t -> Color.RGB.t
+  val get : t -> OgamlMath.Vector2i.t -> (Color.RGB.t, [> `Out_of_bounds]) result
 
   (** $blit src ~rect dest offset$ blits the subimage of $src$ defined by $rect$
     * on the image $dest$ at position $offset$ (relative to the top-left pixel).
     *
     * If $rect$ is not provided then the whole image $src$ is used.
     * @see:OgamlMath.IntRect @see:OgamlMath.Vector2i *)
-  val blit : t -> ?rect:OgamlMath.IntRect.t -> t -> OgamlMath.Vector2i.t -> unit
+  val blit : t -> ?rect:OgamlMath.IntRect.t -> t -> OgamlMath.Vector2i.t ->
+             (unit, [> `Out_of_bounds]) result
 
   (** $mipmap img lvl$ returns a new, fresh image that is the $lvl$-th reduction 
     * of the image $img$ *)
@@ -750,6 +758,7 @@ module Image : sig
     * are filled with $color$ *)
   val pad : t -> ?offset:OgamlMath.Vector2i.t -> ?color:Color.t -> 
                  OgamlMath.Vector2i.t -> t
+
 end
 
 

@@ -214,18 +214,16 @@ module Texture2D = struct
     ?mipmaps:(mipmaps=`AllGenerated) src = 
     let context = M.context target in
     (* Extract the texture parameters *)
-    let size, img = 
-      match src with
-      | `File s -> 
-        let img = Image.create (`File s) in
-        let v = Image.size img in
-        v, (Some img)
-      | `Image img ->
-        let v = Image.size img in
-        v, (Some img)
-      | `Empty size ->
-        size, None
-    in
+    begin match src with
+    | `File s -> 
+      (Image.load s) >>>= fun img -> 
+      (Image.size img, Some img)
+    | `Image img ->
+      let v = Image.size img in
+      Ok (v, (Some img))
+    | `Empty size ->
+      Ok (size, None)
+    end >>= fun (size, img) ->
     let levels = 
       let max_levels = Common.max_mipmaps size in
       match mipmaps with
@@ -567,14 +565,14 @@ module Texture2DArray = struct
     let context = M.context target in
     (* Extract the texture parameters *)
     let extract_params = function
-      | `File s ->
-        let img = Image.create (`File s) in
-        let size = Image.size img in
-        (size, Some img)
-      | `Image i ->
-        (Image.size i, Some i)
-      | `Empty s ->
-        (s, None)
+      | `File s -> 
+        (Image.load s) >>>= fun img -> 
+        (Image.size img, Some img)
+      | `Image img ->
+        let v = Image.size img in
+        Ok (v, (Some img))
+      | `Empty size ->
+        Ok (size, None)
     in
     if src = [] then 
       Error `No_input_files
@@ -583,8 +581,9 @@ module Texture2DArray = struct
     let lparams = 
       List.map extract_params src
     in
-    let (size, _) = List.hd lparams in
-    fold_right_result (fun (img_size, img) (n, l_imgs) -> 
+    List.hd lparams >>= fun (size, _) ->
+    fold_right_result (fun params (n, l_imgs) -> 
+      params >>= fun (img_size, img) ->
       if img_size <> size then 
         Error `Non_equal_input_sizes
       else
@@ -812,23 +811,21 @@ module Cubemap = struct
     let context = M.context target in
     (* Extract the texture parameters *)
     let extract_params = function
-      | `File s ->
-        let img = Image.create (`File s) in
-        let size = Image.size img in
-        (size, Some img)
-      | `Image i ->
-        (Image.size i, Some i)
-      | `Empty s ->
-        (s, None)
+      | `File s -> 
+        (Image.load s) >>>= fun img -> 
+        (Image.size img, Some img)
+      | `Image img ->
+        let v = Image.size img in
+        Ok (v, (Some img))
+      | `Empty size ->
+        Ok (size, None)
     in
-    let ((spx, ipx), (spy,ipy), (spz, ipz), (snx, inx), (sny, iny), (snz, inz)) =
-      extract_params positive_x,
-      extract_params positive_y,
-      extract_params positive_z,
-      extract_params negative_x,
-      extract_params negative_y,
-      extract_params negative_z
-    in
+    extract_params positive_x >>= fun (spx, ipx) ->
+    extract_params positive_y >>= fun (spy, ipy) ->
+    extract_params positive_z >>= fun (spz, ipz) ->
+    extract_params negative_x >>= fun (snx, inx) ->
+    extract_params negative_y >>= fun (sny, iny) ->
+    extract_params negative_z >>= fun (snz, inz) ->
     if not (List.for_all (fun s -> s = spx) [spy; spz; snx; sny; snz]) then
       Error `Non_equal_input_sizes
     else
@@ -974,14 +971,14 @@ module Texture3D = struct
     let context = M.context target in
     (* Extract the texture parameters *)
     let extract_params = function
-      | `File s ->
-        let img = Image.create (`File s) in
-        let size = Image.size img in
-        (size, Some img)
-      | `Image i ->
-        (Image.size i, Some i)
-      | `Empty s ->
-        (s, None)
+      | `File s -> 
+        (Image.load s) >>>= fun img -> 
+        (Image.size img, Some img)
+      | `Image img ->
+        let v = Image.size img in
+        Ok (v, (Some img))
+      | `Empty size ->
+        Ok (size, None)
     in
     if src = [] then 
       Error `No_input_files
@@ -990,8 +987,9 @@ module Texture3D = struct
     let lparams =
       List.map extract_params src
     in
-    let (size2D, _) = List.hd lparams in
-    fold_right_result (fun (img_size, img) (n, l_imgs) -> 
+    List.hd lparams >>= fun (size2D, _) ->
+    fold_right_result (fun params (n, l_imgs) -> 
+      params >>= fun (img_size, img) ->
       if img_size <> size2D then 
         Error `Non_equal_input_sizes
       else
