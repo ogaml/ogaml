@@ -612,9 +612,6 @@ module Framebuffer : sig
   (** This module provides a safe way to create framebuffer objects (FBO) and 
     * attach textures to them. *)
 
-  (** Raised if an error occurs at creation or during an attachment *)
-  exception FBO_Error of string
-
   (** Type of a framebuffer object *)
   type t
 
@@ -632,41 +629,42 @@ module Framebuffer : sig
   val create : (module RenderTarget.T with type t = 'a) -> 'a -> t
 
   (** Attaches a valid color attachment to a framebuffer at a given index.
-    * Raises $Error$ if the index is greater than the maximum number of color
+    * Returns an error if the index is greater than the maximum number of color
     * attachments allowed by the context, or if the attachment is larger
     * than the maximum size allowed by the context.
     *
     * @see:OgamlGraphics.Attachment.ColorAttachable
     * @see:OgamlGraphics.Context *)
   val attach_color : (module Attachment.ColorAttachable with type t = 'a) 
-                      -> t -> int -> 'a -> unit
+                      -> t -> int -> 'a ->
+                      (unit, [> `Attachment_too_large | `Too_many_color_attachments]) result
 
   (** Attaches a valid depth attachment to a framebuffer.
-    * Raises $Error$ if the attachment is larger than the maximum size 
+    * Returns an error if the attachment is larger than the maximum size 
     * allowed by the context.
     *
     * @see:OgamlGraphics.Attachment.DepthAttachable
     * @see:OgamlGraphics.Context *)
   val attach_depth : (module Attachment.DepthAttachable with type t = 'a)
-                      -> t -> 'a -> unit
+                      -> t -> 'a -> (unit, [> `Attachment_too_large]) result
 
   (** Attaches a valid stencil attachment to a framebuffer.
-    * Raises $Error$ if the attachment is larger than the maximum size 
+    * Returns an error if the attachment is larger than the maximum size 
     * allowed by the context.
     *
     * @see:OgamlGraphics.Attachment.StencilAttachable
     * @see:OgamlGraphics.Context *)
   val attach_stencil : (module Attachment.StencilAttachable with type t = 'a)
-                      -> t -> 'a -> unit
+                      -> t -> 'a -> (unit, [> `Attachment_too_large]) result
 
   (** Attaches a valid depth and stencil attachment to a framebuffer.
-    * Raises $Error$ if the attachment is larger than the maximum size 
+    * Returns an error if the attachment is larger than the maximum size 
     * allowed by the context.
     *
     * @see:OgamlGraphics.Attachment.DepthStencilAttachable
     * @see:OgamlGraphics.Context *)
   val attach_depthstencil : (module Attachment.DepthStencilAttachable with type t = 'a)
-                      -> t -> 'a -> unit
+                            -> t -> 'a -> (unit, [> `Attachment_too_large]) result
 
   (** Returns true iff the FBO has a color attachment *)
   val has_color : t -> bool
@@ -688,10 +686,13 @@ module Framebuffer : sig
   (** Clears the FBO 
     * 
     * $buffers$ defaults to $[Color 0]$ *)
-  val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+  val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> 
+              ?depth:bool -> ?stencil:bool -> t -> 
+              (unit, [> `Duplicate_color_buffer | `Invalid_color_buffer | `Too_many_draw_buffers]) result
 
   (** Binds the FBO for drawing. Internal use only. *)
-  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
+  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> 
+             (unit, [> `Duplicate_color_buffer | `Invalid_color_buffer | `Too_many_draw_buffers]) result
 
 end
 
