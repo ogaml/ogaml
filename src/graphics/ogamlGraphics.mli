@@ -521,9 +521,6 @@ module Renderbuffer : sig
   (** This module provides several implementations of Renderbuffer Objects (RBO)
     * that can be attached to framebuffer objects. *)
 
-  (** Raised if an error occurs while manipulating a renderbuffer. *)
-  exception RBO_Error of string
-
   (** Color Renderbuffer *)
   module ColorBuffer : sig
 
@@ -531,9 +528,10 @@ module Renderbuffer : sig
     type t
 
     (** Creates a color renderbuffer from a context and a size 
-      * Raises $RBO_Error$ if the requested size exceeds the maximum size
+      * Returns $Error$ if the requested size exceeds the maximum size
       * allowed by the context. *)
-    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t ->
+      (t, [> `RBO_too_large]) result
 
     (** ColorBuffer implements the interface ColorAttachable *)
     val to_color_attachment : t -> Attachment.ColorAttachment.t
@@ -551,9 +549,10 @@ module Renderbuffer : sig
     type t
 
     (** Creates a depth renderbuffer from a context and a size
-      * Raises $RBO_Error$ if the requested size exceeds the maximum size
+      * Returns $Error$ if the requested size exceeds the maximum size
       * allowed by the context. *)
-    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t ->
+      (t, [> `RBO_too_large]) result
 
     (** DepthBuffer implements the interface DepthAttachable *)
     val to_depth_attachment : t -> Attachment.DepthAttachment.t
@@ -571,9 +570,10 @@ module Renderbuffer : sig
     type t
 
     (** Creates a stencil renderbuffer from a context and a size 
-      * Raises $RBO_Error$ if the requested size exceeds the maximum size
+      * Returns $Error$ if the requested size exceeds the maximum size
       * allowed by the context. *)
-    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t ->
+      (t, [> `RBO_too_large]) result
 
     (** StencilBuffer implements the interface StencilAttachable *)
     val to_stencil_attachment : t -> Attachment.StencilAttachment.t
@@ -591,9 +591,10 @@ module Renderbuffer : sig
     type t
 
     (** Creates a depth stencil renderbuffer from a context and a size 
-      * Raises $RBO_Error$ if the requested size exceeds the maximum size
+      * Returns $Error$ if the requested size exceeds the maximum size
       * allowed by the context. *)
-    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t ->
+      (t, [> `RBO_too_large]) result
 
     (** DepthStencilBuffer implements the interface DepthStencilAttachable *)
     val to_depth_stencil_attachment : t -> Attachment.DepthStencilAttachment.t
