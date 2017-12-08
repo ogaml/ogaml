@@ -1529,7 +1529,7 @@ module Uniform : sig
     * unit that is used to bind this texture. If not provided, it
     * defaults to the next available unit. If no additional units
     * are available, or if a unit is explicitly bound twice, drawing
-    * with the uniform will raise $Invalid_uniform$.
+    * with the uniform will return $Error$.
     *
     * See $Context.capabilities$ for the number of available units.
     * @see:OgamlGraphics.Texture.Texture2D
@@ -1720,8 +1720,7 @@ module IndexArray : sig
     val length : t -> int
 
     (** $append s1 s2$ appends the source $s2$ at the end of the source $s1$ (in place),
-      * and returns $s1$.
-      * Raises Invalid_source if types are incompatible. *)
+      * and returns $s1$. *)
     val append : t -> t -> t
 
   end
@@ -2096,9 +2095,7 @@ module VertexArray : sig
   (** Type of a vertex array *)
   type t
  
-  (** Creates a vertex array from a list of vertex buffers.
-    * 
-    * Raises $Multiple_definition$ if the same attribute is bound twice in the buffers. *)
+  (** Creates a vertex array from a list of vertex buffers. *)
   val create : (module RenderTarget.T with type t = 'a) -> 'a -> Buffer.unpacked list -> t
   
   (** Returns the maximal number of vertices that can be drawn with the array. *)

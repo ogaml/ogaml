@@ -16,7 +16,6 @@ module Fx : sig
     (Font.code list -> 'a) -> 'a ->
     (Font.code, 'a list * Font.code list, 'a list) full_it
 
-  (* TODO: Exception when the iterator doesn't return list of right size *)
   val create :
     (module RenderTarget.T with type t = 'a) ->
     target : 'a ->

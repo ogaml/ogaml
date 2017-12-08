@@ -145,7 +145,6 @@ let outline_of_points points thickness color =
             v1 :: v2 :: v3 :: v3 :: v4 :: v1 :: lst
         )
         []
-        (* It shouldn't raise Invalid_argument *)
         (List.combine points bisectors)
       |> fun x -> Some (x)
     end
