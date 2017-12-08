@@ -53,7 +53,7 @@ module Texture2D : sig
                -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
                -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] -> 
                (t, [> `Texture_too_large
-                    | `File_not_found
+                    | `File_not_found of string
                     | `Loading_error of string]) result
 
   val size : t -> OgamlMath.Vector2i.t
@@ -102,7 +102,7 @@ module DepthTexture2D : sig
                -> [< `Data of (OgamlMath.Vector2i.t * Bytes.t) | `Empty of OgamlMath.Vector2i.t] -> 
                (t, [> `Insufficient_data 
                     | `Texture_too_large
-                    | `File_not_found
+                    | `File_not_found of string
                     | `Loading_error of string]) result
 
   val size : t -> OgamlMath.Vector2i.t
@@ -190,7 +190,7 @@ module Texture2DArray : sig
                     | `Non_equal_input_sizes
                     | `Texture_too_large
                     | `Texture_too_deep
-                    | `File_not_found
+                    | `File_not_found of string
                     | `Loading_error of string]) result
 
   val size : t -> OgamlMath.Vector3i.t
@@ -283,7 +283,7 @@ module Cubemap : sig
                -> unit -> 
                (t, [> `Texture_too_large
                     | `Non_equal_input_sizes
-                    | `File_not_found
+                    | `File_not_found of string
                     | `Loading_error of string]) result
 
   val size : t -> OgamlMath.Vector2i.t
@@ -337,7 +337,7 @@ module Texture3D : sig
                (t, [> `Texture_too_large
                     | `Non_equal_input_sizes
                     | `No_input_files
-                    | `File_not_found
+                    | `File_not_found of string
                     | `Loading_error of string]) result
 
   val size : t -> OgamlMath.Vector3i.t

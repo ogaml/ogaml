@@ -712,7 +712,7 @@ module Image : sig
   val empty : OgamlMath.Vector2i.t -> Color.t -> t
 
   (** Loads an image from a file *)
-  val load : string -> (t, [> `File_not_found | `Loading_error of string]) result
+  val load : string -> (t, [> `File_not_found of string | `Loading_error of string]) result
 
   (** Creates an image from a file, some RGBA-formatted data, or an empty one
     * filled with a default color
@@ -721,7 +721,7 @@ module Image : sig
   val create : [`File of string 
                | `Empty of OgamlMath.Vector2i.t * Color.t 
                | `Data of OgamlMath.Vector2i.t * Bytes.t] -> 
-               (t, [> `File_not_found
+               (t, [> `File_not_found of string
                     | `Loading_error of string
                     | `Wrong_data_length]) result
 
@@ -877,7 +877,9 @@ module Texture : sig
     val create : (module RenderTarget.T with type t = 'a) -> 'a -> 
                  ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None] ->
                  [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] -> 
-                 (t, [> `Texture_too_large]) result
+                 (t, [> `Texture_too_large
+                      | `File_not_found of string
+                      | `Loading_error of string]) result
 
     (** Returns the size of a texture 
       * @see:OgamlMath.Vector2i *)
@@ -958,7 +960,10 @@ module Texture : sig
                  ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None] ->
                  DepthFormat.t ->
                  [< `Data of (OgamlMath.Vector2i.t * Bytes.t) | `Empty of OgamlMath.Vector2i.t] ->
-                 (t, [> `Insufficient_data | `Texture_too_large]) result
+                 (t, [> `Insufficient_data 
+                      | `Texture_too_large
+                      | `File_not_found of string
+                      | `Loading_error of string]) result
 
     (** Returns the size of a texture 
       * @see:OgamlMath.Vector2i *)
@@ -1091,7 +1096,10 @@ module Texture : sig
                  (t, [> `No_input_files
                       | `Non_equal_input_sizes
                       | `Texture_too_large
-                      | `Texture_too_deep]) result
+                      | `Texture_too_deep
+                      | `File_not_found of string
+                      | `Loading_error of string]) result
+
 
     (** Returns the size of a texture array *)
     val size : t -> OgamlMath.Vector3i.t
@@ -1223,7 +1231,9 @@ module Texture : sig
                  -> negative_z:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                  -> unit ->
                  (t, [> `Texture_too_large
-                      | `Non_equal_input_sizes]) result
+                      | `Non_equal_input_sizes
+                      | `File_not_found of string
+                      | `Loading_error of string]) result
 
     (** Size of a face of a cubemap texture *)
     val size : t -> OgamlMath.Vector2i.t
@@ -1303,7 +1313,10 @@ module Texture : sig
                  -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list ->
                  (t, [> `Texture_too_large
                       | `Non_equal_input_sizes
-                      | `No_input_files]) result
+                      | `No_input_files
+                      | `File_not_found of string
+                      | `Loading_error of string]) result
+
 
     (** Returns the size of a 3D texture *)
     val size : t -> OgamlMath.Vector3i.t
@@ -1365,7 +1378,7 @@ module Font : sig
   type code = [`Char of char | `Code of int]
 
   (** Loads a font from a file *)
-  val load : string -> (t, [> `File_not_found | `Invalid_font_file]) result
+  val load : string -> (t, [> `File_not_found of string | `Invalid_font_file]) result
 
   (** $glyph font code size bold$ returns the glyph
     * representing the character $code$ in $font$

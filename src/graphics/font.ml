@@ -273,7 +273,7 @@ let oversampling_of_size s = min 4 ((80 + s - 1)/s)
 (** Exposed functions *)
 let load s =
   if not (Sys.file_exists s) then
-    Error `File_not_found
+    Error (`File_not_found s)
   else
     Ok () >>= fun () ->
   let internal = Internal.load s in
@@ -389,7 +389,7 @@ let texture (type s) (module M : RenderTarget.T with type t = s) target t =
   | Error `No_input_files, _ -> assert false
   | Error `Non_equal_input_sizes, _ -> assert false
   | Error `Loading_error _, _ -> assert false
-  | Error `File_not_found, _ -> assert false
+  | Error `File_not_found _, _ -> assert false
   | Error `Texture_too_large, _ -> Error `Font_texture_size_overflow
   | Error `Texture_too_deep, _ -> Error `Font_texture_depth_overflow
 

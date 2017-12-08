@@ -22,7 +22,7 @@ type t
 type code = [`Char of char | `Code of int]
 
 (** Loads a font from a file *)
-val load : string -> (t, [> `File_not_found | `Invalid_font_file]) result
+val load : string -> (t, [> `File_not_found of string | `Invalid_font_file]) result
 
 (** Preloads a glyph *)
 val load_glyph : t -> code -> int -> bool -> unit

@@ -2,12 +2,12 @@ type t
 
 val empty : OgamlMath.Vector2i.t -> Color.t -> t
 
-val load : string -> (t, [> `File_not_found | `Loading_error of string]) result
+val load : string -> (t, [> `File_not_found of string | `Loading_error of string]) result
 
 val create : [`File of string | 
               `Empty of OgamlMath.Vector2i.t * Color.t | 
               `Data of OgamlMath.Vector2i.t * Bytes.t] -> 
-             (t, [> `File_not_found
+             (t, [> `File_not_found of string
                   | `Loading_error of string
                   | `Wrong_data_length]) result
 

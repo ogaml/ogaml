@@ -50,7 +50,7 @@ let load filename =
   (* stb_image automatically flips the image so that it is stored in 
    * the correct order *)
   begin if not (Sys.file_exists filename) then
-    Error `File_not_found
+    Error (`File_not_found filename)
   else
     Ok ()
   end >>= fun () ->
