@@ -18,11 +18,11 @@ val rotation : Vector3f.t -> float -> t
 
 val conj : t -> t
 
-val inverse : t -> t
+val inverse : t -> (t, [> `Division_by_zero]) result
 
 val squared_norm : t -> float
 
 val norm : t -> float
 
-val normalize : t -> t 
+val normalize : t -> (t, [> `Division_by_zero]) result
 

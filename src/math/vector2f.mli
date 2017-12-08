@@ -16,7 +16,7 @@ val sub : t -> t -> t
 
 val prop : float -> t -> t
 
-val div : float -> t -> t
+val div : float -> t -> (t, [> `Division_by_zero]) result
 
 val pointwise_product : t -> t -> t
 
@@ -52,11 +52,11 @@ val max : t -> float
 
 val min : t -> float
 
-val normalize : t -> t
+val normalize : t -> (t, [> `Division_by_zero]) result
 
 val to_string : t -> string
 
-val direction : t -> t -> t
+val direction : t -> t -> (t, [> `Division_by_zero]) result
 
 val endpoint : t -> t -> float -> t
 

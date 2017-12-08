@@ -26,9 +26,9 @@ let prop k u = {
 
 let div k u = 
   if k = 0 then 
-    raise (Invalid_argument "Vector2i.div: division by zero")
+    Error `Division_by_zero
   else
-    {
+    Ok {
       x = u.x / k;
       y = u.y / k;
     }

@@ -18,7 +18,7 @@ val sub : t -> t -> t
 
 val prop : int -> t -> t
 
-val div : int -> t -> t
+val div : int -> t -> (t, [> `Division_by_zero]) result
 
 val pointwise_product : t -> t -> t
 

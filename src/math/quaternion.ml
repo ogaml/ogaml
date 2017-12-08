@@ -50,12 +50,12 @@ let norm q = sqrt (squared_norm q)
 
 let normalize q = 
   let n = norm q in
-  if n = 0. then raise (Invalid_argument "Quaternion.normalize: zero quaternion")
-  else prop (1. /. n) q
+  if n = 0. then Error `Division_by_zero
+  else Ok (prop (1. /. n) q)
 
 let inverse q = 
   let nq = squared_norm q in
-  if nq = 0. then raise (Invalid_argument "Quaternion.inverse: zero quaternion")
-  else prop (1. /. nq) (conj q)
+  if nq = 0. then Error `Division_by_zero
+  else Ok (prop (1. /. nq) (conj q))
 
 

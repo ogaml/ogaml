@@ -31,9 +31,9 @@ let prop f v = {
 
 let div f v = 
   if f = 0. then
-    raise (Invalid_argument "Vector3f.div: division by zero")
+    Error `Division_by_zero
   else
-    {
+    Ok {
       x = v.x /. f;
       y = v.y /. f;
       z = v.z /. f
@@ -97,10 +97,7 @@ let dist v1 v2 = norm (sub v2 v1)
 
 let normalize v = 
   let n = norm v in
-  if n = 0. then
-    raise (Invalid_argument "Vector3f.normalize: zero vector")
-  else 
-    div n v
+  div n v
 
 let clamp u a b = {
   x = min b.x (max u.x a.x);
@@ -129,10 +126,7 @@ let to_string u =
 let direction u v = 
   let dir = sub v u in
   let n = norm dir in
-  if n = 0. then
-    raise (Invalid_argument "Vector3f.direction: identical points")
-  else
-    div n dir
+  div n dir
 
 let endpoint u v t =
   prop t v

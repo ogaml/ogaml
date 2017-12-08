@@ -23,9 +23,9 @@ let prop f v =
 
 let div f v = 
   if f = 0. then
-    raise (Invalid_argument "Vector2fs.div: division by zero")
+    Error `Division_by_zero
   else
-    prop (1. /. f) v
+    Ok (prop (1. /. f) v)
 
 let to_cartesian v = 
   Vector2f.({
@@ -44,10 +44,7 @@ let norm v =
 
 let normalize v = 
   let n = norm v in
-  if n = 0. then
-    raise (Invalid_argument "Vector2fs.normalize: zero vector")
-  else 
-    div n v
+  div n v
 
 let to_string u = 
   Printf.sprintf "(r = %f; t = %f)" u.r u.t

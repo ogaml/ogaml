@@ -40,10 +40,10 @@ val rotate : float -> t -> t
 val times : t -> Vector2f.t -> Vector2f.t
 
 (* Screen projection matrix *)
-val projection : size:Vector2f.t -> t
+val projection : size:Vector2f.t -> (t, [> `Invalid_projection]) result
 
 (* Inverse screen projection matrix *)
-val iprojection : size:Vector2f.t -> t
+val iprojection : size:Vector2f.t -> (t, [> `Invalid_projection]) result
 
 (* Transformation matrix *)
 val transformation : 
