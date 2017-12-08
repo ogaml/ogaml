@@ -2610,7 +2610,7 @@ module Text : sig
       font : Font.t ->
       colors : (Font.code,'b,Color.t list) full_it ->
       size : int ->
-      unit -> t
+      unit -> (t, [> `Invalid_UTF8_bytes | `Invalid_UTF8_leader]) result
 
     (** Draws a Fx.t. *)
     val draw :
@@ -2643,7 +2643,7 @@ module Text : sig
     ?color : Color.t ->
     size : int ->
     ?bold : bool ->
-    unit -> t
+    unit -> (t, [> `Invalid_UTF8_bytes | `Invalid_UTF8_leader]) result
 
   (** Draws text on the screen. *)
   val draw :

@@ -94,18 +94,18 @@ module Fx = struct
              ~(colors : (Font.code,'b,Color.t list) full_it)
              ~size
              () =
-    let utf8 = UTF8String.from_string text in
+    UTF8String.from_string text >>>= fun utf8 ->
     let length = UTF8String.length utf8 in
     let rec fold i =
       if i >= length then []
       else if i = length - 1 then begin
-        let code = (`Code (UTF8String.get utf8 i)) in
+        let code = (`Code (UTF8String.get utf8 i |> assert_result)) in
         let glyph = Font.glyph font code size false in
         [0.,code,glyph]
       end
       else begin
-        let code = (`Code (UTF8String.get utf8 i)) in
-        let code' = (`Code (UTF8String.get utf8 (i+1))) in
+        let code = (`Code (UTF8String.get utf8 i |> assert_result)) in
+        let code' = (`Code (UTF8String.get utf8 (i+1) |> assert_result)) in
         let glyph = Font.glyph font code size false in
         let kern = Font.kerning font code code' size in
         (kern,code,glyph) :: (fold (i+1))
@@ -257,18 +257,18 @@ type t = {
 }
 
 let create ~text ~position ~font ?color:(color=(`RGB Color.RGB.black)) ~size ?bold:(bold = false) () =
-  let utf8 = UTF8String.from_string text in
+  UTF8String.from_string text >>>= fun utf8 ->
   let length = UTF8String.length utf8 in
   let rec iter i =
     if i >= length then []
     else if i = length - 1 then begin
-      let code = (`Code (UTF8String.get utf8 i)) in
+      let code = (`Code (UTF8String.get utf8 i |> assert_result)) in
       let glyph = Font.glyph font code size bold in
       [0.,code,glyph]
     end
     else begin
-      let code = (`Code (UTF8String.get utf8 i)) in
-      let code' = (`Code (UTF8String.get utf8 (i+1))) in
+      let code = (`Code (UTF8String.get utf8 i |> assert_result)) in
+      let code' = (`Code (UTF8String.get utf8 (i+1) |> assert_result)) in
       let glyph = Font.glyph font code size bold in
       let kern = Font.kerning font code code' size in
       (kern,code,glyph) :: (iter (i+1))

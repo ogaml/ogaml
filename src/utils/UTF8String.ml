@@ -1,3 +1,4 @@
+open Utils
 
 type code = int
 
@@ -7,22 +8,23 @@ let empty () = [||]
 
 let make l c = 
   if c < 0 || c > 0b1111111111111111111111111111111 then
-    raise (Invalid_argument "UTF8String.make: invalid code")
-  else Array.make l c
+    Error `Invalid_UTF8_code
+  else Ok (Array.make l c)
 
 let get s i = 
   if i >= Array.length s || i < 0 then
-    raise (Invalid_argument "UTF8String.get: index out of bounds") 
+    Error `Out_of_bounds
   else
-    s.(i)
+    Ok s.(i)
 
 let set s i c = 
   if i >= Array.length s || i < 0 then
-    raise (Invalid_argument "UTF8String.set: index out of bounds")
+    Error `Out_of_bounds
   else if c < 0 || c > 0b1111111111111111111111111111111 then
-    raise (Invalid_argument "UTF8String.set: invalid code")
-  else
-    s.(i) <- c
+    Error `Invalid_UTF8_code
+  else begin
+    s.(i) <- c; Ok ()
+  end
 
 let length s = Array.length s
 
@@ -38,32 +40,38 @@ let byte_length s =
 
 let from_string s = 
   let rec get_6bit_values i j = 
-    if i > j then 0
+    if i > j then Ok 0
     else if i >= String.length s || ((Char.code s.[i]) land 0b11000000 <> 0b10000000) then
-      raise (Invalid_argument "UTF8String.from_string: invalid byte sequence")
+      Error `Invalid_UTF8_bytes
     else begin
-      (((Char.code s.[i]) land 0b00111111) lsl ((j-i)*6)) + (get_6bit_values (i+1) j)
+      get_6bit_values (i+1) j >>>= fun vl ->
+      (((Char.code s.[i]) land 0b00111111) lsl ((j-i)*6)) + vl 
     end
+  in
+  let get_char_at i = 
+    let c = Char.code s.[i] in
+    if c <= 127 then Ok (c, i+1)
+    else if c land 0b11100000 = 0b11000000 then 
+      ((get_6bit_values (i+1) (i+1)) >>>= fun v -> (c land 0b00011111) lsl 6 + v, i+2)
+    else if c land 0b11110000 = 0b11100000 then
+      ((get_6bit_values (i+1) (i+2)) >>>= fun v -> (c land 0b00001111) lsl 12 + v, i+3)
+    else if c land 0b11111000 = 0b11110000 then
+      ((get_6bit_values (i+1) (i+3)) >>>= fun v -> (c land 0b00000111) lsl 18 + v, i+4)
+    else if c land 0b11111100 = 0b11111000 then
+      ((get_6bit_values (i+1) (i+4)) >>>= fun v -> (c land 0b00000011) lsl 24 + v, i+5)
+    else if c land 0b11111110 = 0b11111100 then
+      ((get_6bit_values (i+1) (i+5)) >>>= fun v -> (c land 0b00000001) lsl 30 + v, i+6)
+    else Error `Invalid_UTF8_leader
   in
   let rec iter i = 
-    if i >= String.length s then []
+    if i >= String.length s then Ok []
     else begin
-      let c = Char.code s.[i] in
-      if c <= 127 then c :: (iter (i+1))
-      else if c land 0b11100000 = 0b11000000 then 
-        (((c land 0b00011111) lsl 6)  + (get_6bit_values (i+1) (i+1))) :: (iter (i+2))
-      else if c land 0b11110000 = 0b11100000 then
-        (((c land 0b00001111) lsl 12) + (get_6bit_values (i+1) (i+2))) :: (iter (i+3))
-      else if c land 0b11111000 = 0b11110000 then
-        (((c land 0b00000111) lsl 18) + (get_6bit_values (i+1) (i+3))) :: (iter (i+4))
-      else if c land 0b11111100 = 0b11111000 then
-        (((c land 0b00000011) lsl 24) + (get_6bit_values (i+1) (i+4))) :: (iter (i+5))
-      else if c land 0b11111110 = 0b11111100 then
-        (((c land 0b00000001) lsl 30) + (get_6bit_values (i+1) (i+5))) :: (iter (i+6))
-      else raise (Invalid_argument "UTF8String.from_string: invalid leading byte")
+      get_char_at i >>= fun (c,nxt) ->
+      iter nxt >>>= fun tail ->
+      c :: tail
     end
   in
-  Array.of_list (iter 0)
+  iter 0 >>>= Array.of_list
 
 let to_string s = 
   let str = Bytes.create (byte_length s) in
@@ -119,11 +127,19 @@ let iter s f = Array.iter f s
 let fold s f v = Array.fold_left (fun a c -> f c a) v s
 
 let map s f = 
-  Array.map (fun c -> 
-    let c' = f c in
-    if c' < 0 || c' > 0b1111111111111111111111111111111 then
-      raise (Invalid_argument "UTF8String.map: invalid code")
-    else c'
-  ) s
+  let arr = Array.make (Array.length s) 0 in
+  let rec aux i = 
+    if i >= Array.length s then Ok ()
+    else begin
+      let c' = f s.(i) in
+      if c' < 0 || c' > 0b1111111111111111111111111111111 then
+        Error `Invalid_UTF8_code
+      else begin
+        arr.(i) <- c';
+        aux (i+1)
+      end
+    end
+  in
+  aux 0 >>>= fun () -> arr
 
 

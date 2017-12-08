@@ -24,7 +24,7 @@ module Fx : sig
     font : Font.t ->
     colors : (Font.code,'b,Color.t list) full_it ->
     size : int ->
-    unit -> t
+    unit -> (t, [> `Invalid_UTF8_bytes | `Invalid_UTF8_leader]) result
 
   val draw :
     (module RenderTarget.T with type t = 'a) ->
@@ -49,7 +49,7 @@ val create :
   ?color : Color.t ->
   size  : int ->
   ?bold : bool ->
-  unit -> t
+  unit -> (t, [> `Invalid_UTF8_bytes | `Invalid_UTF8_leader]) result
 
 val draw :
   (module RenderTarget.T with type t = 'a) ->

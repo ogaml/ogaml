@@ -95,19 +95,19 @@ module UTF8String : sig
 
   (** Makes a UTF-8 string filled with one character
     * 
-    * Raises Invalid_argument if the code is not a valid UTF-8 character code *)
-  val make : int -> code -> t
+    * Returns $Error$ if the code is not a valid UTF-8 character code *)
+  val make : int -> code -> (t, [> `Invalid_UTF8_code]) result
 
   (** Returns the ith character of a UTF-8 string.
     * 
-    * Raises Invalid_argument if $i$ is not a valid index *)
-  val get : t -> int -> code
+    * Returns $Error$ if $i$ is not a valid index *)
+  val get : t -> int -> (code, [> `Out_of_bounds]) result
 
   (** Sets the ith character of a UTF-8 string.
     *
-    * Raises Invalid_argument if $i$ is not a valid index or if the code is
+    * Returns $Error$ if $i$ is not a valid index or if the code is
     * not a valid UTF-8 code *)
-  val set : t -> int -> code -> unit
+  val set : t -> int -> code -> (unit, [> `Out_of_bounds | `Invalid_UTF8_code]) result
 
   (** Returns the length of a UTF-8 string *)
   val length : t -> int
@@ -118,8 +118,8 @@ module UTF8String : sig
 
   (** Returns a UTF-8 encoded string from a string.
     * 
-    * Raises Invalid_argument if the string is not a valid UTF-8 encoding *)
-  val from_string : string -> t
+    * Returns $Error$ if the string is not a valid UTF-8 encoding *)
+  val from_string : string -> (t, [> `Invalid_UTF8_bytes | `Invalid_UTF8_leader]) result
 
   (** Returns a string from a UTF-8 encoded string *)
   val to_string : t -> string
@@ -132,8 +132,8 @@ module UTF8String : sig
 
   (** Maps a UTF-8 string
     *
-    * Raises Invalid_argument if the function returns an invalid UTF-8 code *)
-  val map : t -> (code -> code) -> t
+    * Returns $Error$ if the mapping function returns an invalid UTF-8 code *)
+  val map : t -> (code -> code) -> (t, [> `Invalid_UTF8_code]) result
 
 end
 
