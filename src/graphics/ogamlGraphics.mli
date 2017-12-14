@@ -2128,6 +2128,41 @@ module VertexArray : sig
     *
     * $mode$ defaults to $DrawMode.Triangles$
     *
+    * Quite a lot of errors can occur here. Here is a summary of all of them:
+    *
+    *   - $`Wrong_attribute_type str$ occurs when the attribute $str$ in $vertices$ does
+    * not have the type required by $program$.
+    *
+    *   - $`Missing_attribute str$ occurs when the attribute $str$ is required by
+    * $program$ but is not present in $vertices$.
+    *
+    *   - $`Invalid_slice$ occurs when $start$ and $length$ do not define a valid 
+    * slice of $vertices$.
+    *
+    *   - $`Invalid_instance_count$ occurs when $instances$ does not define a
+    * valid number of instances for $indices$.
+    *
+    *   - $`Invalid_uniform_type str$ occurs when the uniform $str$ does not have
+    * the type required by $program$.
+    *
+    *   - $`Invalid_texture_unit i$ occurs if $uniform$ binds a texture with
+    * an invalid unit $i$.
+    *
+    *   - $`Missing_uniform str$ occurs if $program$ requires a uniform $str$ that
+    * is not available in $uniform$.
+    *
+    *   - $`Too_many_textures$ occurs if $uniform$ tries to bind more textures
+    * than the number of available units.
+    *
+    *   - $`Duplicate_draw_buffer$ occurs if the same draw buffer is bound twice
+    * in $parameters$.
+    *
+    *   - $`Too_many_draw_buffers$ occurs if $parameters$ tries to bind more
+    * draw buffers than supported by the context.
+    *
+    *   - $`Invalid_color_buffer$ occurs if $parameters$ tries to bind an
+    * invalid color buffer unit.
+    *
     * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.Window
     * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
