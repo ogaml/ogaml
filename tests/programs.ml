@@ -1,24 +1,24 @@
 open OgamlGraphics
+open OgamlUtils
 
 let () =
-  Printf.printf "Beginning program tests...\n%!"
+  Log.info Log.stdout "Beginning program tests..."
 
 let settings = OgamlCore.ContextSettings.create ()
 
 let window = 
-  match Window.create ~width:100 ~height:100 ~settings ~title:"" () with
-  | Ok win -> win
-  | Error s -> failwith s
+  Window.create ~width:100 ~height:100 ~settings ~title:"" ()
+  |> Utils.handle_window_creation
 
 let context = Window.context window
 
 let test_program0 () =
   let (a,b) = Context.version context in
-  Printf.printf "GL version : %i.%i\n" a b;
-  Printf.printf "GLSL version : %i\n%!" (Context.glsl_version context)
+  Log.info Log.stdout "GL version : %i.%i\n" a b;
+  Log.info Log.stdout "GLSL version : %i" (Context.glsl_version context)
 
 let test_program1 () =
-  let prog = Program.from_source_list
+  Program.from_source_list
     (module Window) 
     ~context:window
     ~vertex_source:[
@@ -66,12 +66,12 @@ let test_program1 () =
                color = vec4(1.0, 1.0, 1.0, 1.0);
 
              }"))
-    ] ()
-  in
-  ignore prog
+    ]
+  |> Utils.handle_program_creation
+  |> ignore
 
 let test_program2 () =
-  let prog = Program.from_source_list
+  Program.from_source_list
     (module Window)
     ~context:window
     ~vertex_source: [
@@ -147,13 +147,13 @@ let test_program2 () =
 
                color = vec4(1.0, 1.0, 1.0, 1.0);
 
-             }")] ()
-  in
-  ignore prog
+             }")] 
+  |> Utils.handle_program_creation
+  |> ignore
 
 let () =
   test_program0 ();
   test_program1 ();
-  Printf.printf "\tTest 1 passed\n%!";
+  Log.info Log.stdout "Test 1 passed";
   test_program2 ();
-  Printf.printf "\tTest 2 passed\n%!";
+  Log.info Log.stdout "Test 2 passed";

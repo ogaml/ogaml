@@ -1,37 +1,31 @@
 open OgamlGraphics
 open OgamlMath
+open OgamlUtils
 
 let () =
-  Printf.printf "Beginning capabilities tests...\n%!"
+  Log.info Log.stdout "Beginning capabilities tests..."
 
 let settings = OgamlCore.ContextSettings.create ()
 
 let window = 
-  match Window.create ~width:100 ~height:100 ~settings ~title:"" () with
-  | Ok win -> win
-  | Error s -> failwith s
+  Window.create ~width:100 ~height:100 ~settings ~title:"" () 
+  |> Utils.handle_window_creation
 
 let context = Window.context window
 
 let capabilities = Context.capabilities context
 
-let print_opt ppf o = 
-  match o with
-  | None -> Printf.printf "unsupported"
-  | Some v -> Printf.printf "%i" v
-
 let () = 
-  Printf.printf "Capabilities : \n";
-  Printf.printf "\tMaximal 3D texture size : %i\n%!" capabilities.Context.max_3D_texture_size;
-  Printf.printf "\tMaximal array texture layers : %i\n%!" capabilities.Context.max_array_texture_layers;
-  Printf.printf "\tMaximal color texture samples : %i\n%!" capabilities.Context.max_color_texture_samples; 
-  Printf.printf "\tMaximal cubemap texture size : %i\n%!" capabilities.Context.max_cube_map_texture_size; 
-  Printf.printf "\tMaximal depth texture samples : %i\n%!" capabilities.Context.max_depth_texture_samples; 
-  Printf.printf "\tMaximal elements indices : %i\n%!" capabilities.Context.max_elements_indices; 
-  Printf.printf "\tMaximal elements vertices : %i\n%!" capabilities.Context.max_elements_vertices; 
-  Printf.printf "\tMaximal integer samples : %i\n%!" capabilities.Context.max_integer_samples; 
-  Printf.printf "\tMaximal renderbuffer size : %i\n%!" capabilities.Context.max_renderbuffer_size; 
-  Printf.printf "\tMaximal texture buffer size : %i\n%!" capabilities.Context.max_texture_buffer_size; 
-  Printf.printf "\tMaximal texture image units : %i\n%!" capabilities.Context.max_texture_image_units; 
-  Printf.printf "\tMaximal texture size : %i\n%!" capabilities.Context.max_texture_size;
-  Printf.printf "\tMaximal color attachments : %i\n%!" capabilities.Context.max_color_attachments; 
+  Log.info Log.stdout "Maximal 3D texture size: %i" capabilities.Context.max_3D_texture_size;
+  Log.info Log.stdout "Maximal array texture layers: %i" capabilities.Context.max_array_texture_layers;
+  Log.info Log.stdout "Maximal color texture samples: %i" capabilities.Context.max_color_texture_samples; 
+  Log.info Log.stdout "Maximal cubemap texture size: %i" capabilities.Context.max_cube_map_texture_size; 
+  Log.info Log.stdout "Maximal depth texture samples: %i" capabilities.Context.max_depth_texture_samples; 
+  Log.info Log.stdout "Maximal elements indices: %i" capabilities.Context.max_elements_indices; 
+  Log.info Log.stdout "Maximal elements vertices: %i" capabilities.Context.max_elements_vertices; 
+  Log.info Log.stdout "Maximal integer samples: %i" capabilities.Context.max_integer_samples; 
+  Log.info Log.stdout "Maximal renderbuffer size: %i" capabilities.Context.max_renderbuffer_size; 
+  Log.info Log.stdout "Maximal texture buffer size: %i" capabilities.Context.max_texture_buffer_size; 
+  Log.info Log.stdout "Maximal texture image units: %i" capabilities.Context.max_texture_image_units; 
+  Log.info Log.stdout "Maximal texture size: %i" capabilities.Context.max_texture_size;
+  Log.info Log.stdout "Maximal color attachments: %i" capabilities.Context.max_color_attachments
