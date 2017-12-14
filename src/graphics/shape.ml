@@ -85,7 +85,7 @@ let bisectors_of_points points =
   foralltwo
     (fun l a b ->
       let open Vector3f in
-      let ab = direction a b in
+      let ab = direction a b |> assert_result in
       (cross ab v) :: l
     )
     []
@@ -128,7 +128,7 @@ let outline_of_points points thickness color =
           fun lst (a,ba) (b,bb) ->
             (* Normal to the direction (a b) *)
             let n =
-              let u = direction a b in
+              let u = direction a b |> assert_result in
               cross u v
             in
             (* The local thickness *)
@@ -244,7 +244,7 @@ let create_line ~thickness
   let a3 = Vector3f.lift top 
   and b3 = Vector3f.lift tip in
   let n = Vector3f.(
-    let u = direction a3 b3 in
+    let u = direction a3 b3 |> assert_result in
     let v = { x = 0. ; y = 0. ; z = 1. } in
     let n = cross u v in
     project n

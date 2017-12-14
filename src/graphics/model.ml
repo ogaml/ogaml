@@ -60,11 +60,13 @@ module Face = struct
       Vertex.position v2,
       Vertex.position v3
     in
-    try 
+    let n = 
       Vector3f.cross (Vector3f.sub v2 v1) (Vector3f.sub v3 v1)
       |> Vector3f.normalize
-    with
-      Invalid_argument _ -> Vector3f.zero
+    in
+    match n with
+    | Ok v -> v
+    | Error _ -> Vector3f.zero
 
   let transform (v1,v2,v3) mat = 
     (Vertex.transform v1 mat, Vertex.transform v2 mat, Vertex.transform v3 mat)
