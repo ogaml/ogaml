@@ -68,8 +68,8 @@ module Vector2i : sig
   (** Multiplies a vector by a scalar *)
   val prop : int -> t -> t
 
-  (** Divides a vector by a scalar. Raises Invalid_argument if the scalar is zero. *)
-  val div : int -> t -> t
+  (** Divides a vector by a scalar. Returns $Error$ if the scalar is zero. *)
+  val div : int -> t -> (t, [> `Division_by_zero]) result
 
   (** Computes the pointwise product of two vectors. *)
   val pointwise_product : t -> t -> t
@@ -157,8 +157,8 @@ module Vector2f : sig
   (** Multiplies a vector by a scalar *)
   val prop : float -> t -> t
 
-  (** Divides a vector by a scalar. Raises Invalid_argument if the scalar is zero. *)
-  val div : float -> t -> t
+  (** Divides a vector by a scalar. Returns $Error$ if the scalar is zero. *)
+  val div : float -> t -> (t, [> `Division_by_zero]) result
 
   (** Computes the pointwise product of two vectors. *)
   val pointwise_product : t -> t -> t
@@ -193,8 +193,8 @@ module Vector2f : sig
   (** Computes the distance between two points *)
   val dist : t -> t -> float
 
-  (** Normalizes a vector. Raises Invalid_argument if the vector is zero. *)
-  val normalize : t -> t
+  (** Normalizes a vector. Returns $Error$ if the vector is zero. *)
+  val normalize : t -> (t, [> `Division_by_zero]) result
 
   (** $clamp v a b$ returns the vector whose coordinates are the coordinates of $v$
     * clamped between the coordinates of $a$ and $b$ *)
@@ -216,8 +216,8 @@ module Vector2f : sig
   val to_string : t -> string
 
   (** $direction u v$ returns the normalized direction vector from $u$ to $v$.
-    * Raises Invalid_argument if $u = v$. *)
-  val direction : t -> t -> t
+    * Returns $Error$ if $u = v$. *)
+  val direction : t -> t -> (t, [> `Division_by_zero]) result
 
   (** $endpoint a v t$ returns the point $a + tv$ *)
   val endpoint : t -> t -> float -> t
@@ -276,8 +276,8 @@ module Vector3i : sig
   (** Multiplies a vector by a scalar *)
   val prop : int -> t -> t
 
-  (** Divides a vector by a scalar. Raises Invalid_argument if the scalar is zero. *)
-  val div : int -> t -> t
+  (** Divides a vector by a scalar. Returns $Error$ if the scalar is zero. *)
+  val div : int -> t -> (t, [> `Division_by_zero]) result
 
   (** Computes the pointwise product of two vectors. *)
   val pointwise_product : t -> t -> t
@@ -374,8 +374,8 @@ module Vector3f : sig
   (** Multiplies a vector by a scalar *)
   val prop : float -> t -> t
 
-  (** Divides a vector by a scalar. Raises Invalid_argument if the scalar is zero. *)
-  val div : float -> t -> t
+  (** Divides a vector by a scalar. Returns $Error$ if the scalar is zero. *)
+  val div : float -> t -> (t, [> `Division_by_zero]) result
 
   (** Computes the pointwise product of two vectors. *)
   val pointwise_product : t -> t -> t
@@ -416,8 +416,8 @@ module Vector3f : sig
   (** Computes the distance between two points *)
   val dist : t -> t -> float
 
-  (** Normalizes a vector. Raises Invalid_argument if the vector is zero. *)
-  val normalize : t -> t
+  (** Normalizes a vector. Returns $Error$ if the vector is zero. *)
+  val normalize : t -> (t, [> `Division_by_zero]) result
 
   (** $clamp v a b$ returns the vector whose coordinates are the coordinates of $v$
     * clamped between the coordinates of $a$ and $b$ *)
@@ -439,8 +439,8 @@ module Vector3f : sig
   val to_string : t -> string
 
   (** $direction u v$ returns the normalized direction vector from $u$ to $v$.
-    * Raises Invalid_argument if $u = v$. *)
-  val direction : t -> t -> t
+    * Returns $Error$ if $u = v$. *)
+  val direction : t -> t -> (t, [> `Division_by_zero]) result
 
   (** $endpoint a v t$ returns the point $a + tv$ *)
   val endpoint : t -> t -> float -> t
