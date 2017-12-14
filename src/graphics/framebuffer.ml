@@ -217,7 +217,7 @@ let activate_buffers fbo buffers =
       if i < 0 || i >= max_colors then
         Error `Invalid_color_buffer
       else if active_buffers.(i) then
-        Error `Duplicate_color_buffer
+        Error `Duplicate_draw_buffer
       else begin
         active_buffers.(i) <- true;
         Ok ()

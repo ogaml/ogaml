@@ -19,11 +19,13 @@ module type T = sig
 
   (* Clears a render target *)
   val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> 
-    ?depth:bool -> ?stencil:bool -> t -> unit
+    ?depth:bool -> ?stencil:bool -> t -> 
+    (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer | `Invalid_color_buffer]) result
 
   (* Binds a render target for drawing. System-only function, usually done
    * automatically. *)
-  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
+  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t ->
+    (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer | `Invalid_color_buffer]) result
 
 end
 

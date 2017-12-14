@@ -65,7 +65,7 @@ val display : t -> unit
 (** Clears the window *)
 val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> 
             ?depth:bool -> ?stencil:bool -> t -> 
-            (unit, [> `Invalid_draw_buffer | `Duplicate_draw_buffer]) result
+            (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer]) result
 
 (** Returns the internal GL context of the window *)
 val context : t -> Context.t
@@ -75,7 +75,7 @@ val show_cursor : t -> bool -> unit
 
 (** System-only, binds the window for drawing *)
 val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> 
-  (unit, [> `Invalid_draw_buffer | `Duplicate_draw_buffer]) result
+           (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer]) result
 
 (** Returns the internal window of this window.
   * Used internally, hidden from the global interface. *)

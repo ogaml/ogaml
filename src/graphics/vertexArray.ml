@@ -799,7 +799,7 @@ let bind context vao program =
     Ok ()
   end else Ok ()
 
-let draw (type s) (type buf) 
+let draw (type s) (type buf) (type err)
          (module M : RenderTarget.T with type t = s and type OutputBuffer.t = buf)
          ~vertices ~target ?instances ?indices ~program
          ?uniform:(uniform = Uniform.empty) 
@@ -823,7 +823,7 @@ let draw (type s) (type buf)
       |Some l, _ -> l
     in
     let max_instances = max_instances vertices in
-    M.bind target ?buffers parameters;
+    M.bind target ?buffers parameters >>= fun () ->
     Program.LL.use context (Some program);
     Uniform.LL.bind context uniform (Program.LL.uniforms program) >>= fun () ->
     bind context vertices program >>= fun () ->

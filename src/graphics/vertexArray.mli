@@ -172,5 +172,8 @@ val draw :
                  | `Invalid_uniform_type of string
                  | `Invalid_texture_unit of int
                  | `Missing_uniform of string
-                 | `Too_many_textures]) result
+                 | `Too_many_textures
+                 | `Duplicate_draw_buffer
+                 | `Too_many_draw_buffers
+                 | `Invalid_color_buffer]) result
 

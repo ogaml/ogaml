@@ -15,9 +15,11 @@ module type T = sig
   val context : t -> Context.t
 
   val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> 
-    ?depth:bool -> ?stencil:bool -> t -> unit
+    ?depth:bool -> ?stencil:bool -> t -> 
+    (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer | `Invalid_color_buffer]) result
 
-  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
+  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> 
+    (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer | `Invalid_color_buffer]) result
 
 end
 

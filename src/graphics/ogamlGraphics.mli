@@ -410,11 +410,13 @@ module RenderTarget : sig
     val context : t -> Context.t
 
     (** Clears a render target *)
-    val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+    val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t ->
+                (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer | `Invalid_color_buffer]) result
 
     (** Binds a render target for drawing. System-only function, usually done
       * automatically. *)
-    val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
+    val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> 
+               (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer | `Invalid_color_buffer]) result
 
   end
 
@@ -689,11 +691,11 @@ module Framebuffer : sig
     * $buffers$ defaults to $[Color 0]$ *)
   val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> 
               ?depth:bool -> ?stencil:bool -> t -> 
-              (unit, [> `Duplicate_color_buffer | `Invalid_color_buffer | `Too_many_draw_buffers]) result
+              (unit, [> `Duplicate_draw_buffer | `Invalid_color_buffer | `Too_many_draw_buffers]) result
 
   (** Binds the FBO for drawing. Internal use only. *)
   val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> 
-             (unit, [> `Duplicate_color_buffer | `Invalid_color_buffer | `Too_many_draw_buffers]) result
+             (unit, [> `Duplicate_draw_buffer | `Invalid_color_buffer | `Too_many_draw_buffers]) result
 
 end
 
@@ -1669,14 +1671,14 @@ module Window : sig
     *
     * $buffers$ defaults to $[BackLeft]$ *)
   val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t ->
-              (unit, [> `Invalid_draw_buffer | `Duplicate_draw_buffer]) result
+              (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer]) result
 
   (** Show or hide the cursor *)
   val show_cursor : t -> bool -> unit
 
   (** Binds the window for drawing. This function is for internal use only. *)
   val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> 
-             (unit, [> `Invalid_draw_buffer | `Duplicate_draw_buffer]) result
+             (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer]) result
 
   (** Takes a screenshot of the window *)
   val screenshot : t -> Image.t 
@@ -2149,7 +2151,10 @@ module VertexArray : sig
                    | `Invalid_uniform_type of string
                    | `Invalid_texture_unit of int
                    | `Missing_uniform of string
-                   | `Too_many_textures]) result
+                   | `Too_many_textures
+                   | `Duplicate_draw_buffer
+                   | `Too_many_draw_buffers
+                   | `Invalid_color_buffer]) result
 
 end
 

@@ -94,7 +94,7 @@ let activate_buffers win buffers =
   let active_buffers = Array.make 5 false in
   fold_result (fun (idx, changed) buf ->
     (if idx >= max_buffers then
-      Error `Invalid_draw_buffer
+      Error `Too_many_draw_buffers
     else Ok ()) >>= fun () ->
     let changed = changed 
       || win.bound_buffers.(idx) <> buf 
