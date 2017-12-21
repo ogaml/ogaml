@@ -104,8 +104,8 @@ let rec update_camera () =
   let vmouse = Mouse.relative_position window in
   let dv = Vector2i.sub vmouse center in
   let lim = Constants.pi /. 2. -. 0.1 in
-  view_theta := !view_theta -. 0.005 *. (float_of_int dv.OgamlMath.Vector2i.x);
-  view_phi   := !view_phi   -. 0.005 *. (float_of_int dv.OgamlMath.Vector2i.y);
+  view_theta := !view_theta +. 0.005 *. (float_of_int dv.OgamlMath.Vector2i.x);
+  view_phi   := !view_phi   +. 0.005 *. (float_of_int dv.OgamlMath.Vector2i.y);
   view_phi   := min (max !view_phi (-.lim)) lim;
   Mouse.set_relative_position window center
 

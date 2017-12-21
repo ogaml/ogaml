@@ -1,12 +1,16 @@
 open OgamlGraphics
 open OgamlMath
+open Utils
 
 let settings = OgamlCore.ContextSettings.create ()
 
 let window =
   match Window.create ~width:800 ~height:600 ~settings ~title:"Texture Tutorial" () with
   | Ok win -> win
-  | Error s -> failwith s
+  | Error (`Context_initialization_error msg) -> 
+    fail ~msg "Failed to create context"
+  | Error (`Window_creation_error msg) -> 
+    fail ~msg "Failed to create window"
 
 let vertex_shader_source = "
   in vec3 position;
@@ -40,11 +44,20 @@ let fragment_shader_source = "
 "
 
 let program =
-  Program.from_source_pp
+  let res = Program.from_source_pp
     (module Window)
     ~context:window
     ~vertex_source:(`String vertex_shader_source)
-    ~fragment_source:(`String fragment_shader_source) ()
+    ~fragment_source:(`String fragment_shader_source) 
+  in
+  match res with
+  | Ok prog -> prog
+  | Error `Fragment_compilation_error msg -> fail ~msg "Failed to compile fragment shader"
+  | Error `Vertex_compilation_error msg -> fail ~msg "Failed to compile vertex shader"
+  | Error `Context_failure -> fail "GL context failure"
+  | Error `Unsupported_GLSL_version -> fail "Unsupported GLSL version"
+  | Error `Unsupported_GLSL_type -> fail "Unsupported GLSL type"
+  | Error `Linking_failure -> fail "GLSL linking failure"
 
 let vertex1 =
   VertexArray.SimpleVertex.create
@@ -67,11 +80,12 @@ let vertex4 =
     ~uv:Vector2f.({x = 1.; y = 0.}) ()
 
 let vertex_source = VertexArray.Source.(
-    empty ~size:4 ()
-    << vertex1
-    << vertex2
-    << vertex3
-    << vertex4
+    Ok (empty ~size:4 ())
+    <<< vertex1
+    <<< vertex2
+    <<< vertex3
+    <<< vertex4
+    |> assert_ok
 )
 
 let vbo = VertexArray.Buffer.static (module Window) window vertex_source
@@ -79,11 +93,20 @@ let vbo = VertexArray.Buffer.static (module Window) window vertex_source
 let vertices = 
   VertexArray.(create (module Window) window [Buffer.unpack vbo])
 
-let texture = Texture.Texture2D.create (module Window) window (`File "examples/mario-block.bmp")
+let texture = 
+  let res = 
+    Texture.Texture2D.create (module Window) window (`File "examples/mario-block.bmp")
+  in
+  match res with
+  | Ok tex -> tex
+  | Error `File_not_found s -> fail ("Cannot find texture " ^ s)
+  | Error `Loading_error msg -> fail ~msg "Error loading texture"
+  | Error `Texture_too_large -> fail "Texture too large"
 
 let uniform =
   Uniform.empty
   |> Uniform.texture2D "my_texture" texture
+  |> assert_ok
 
 let rec event_loop () =
   match Window.poll_event window with
@@ -96,8 +119,9 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.white)) window;
-    VertexArray.draw (module Window) ~target:window ~vertices ~program ~uniform ~mode:DrawMode.TriangleStrip ();
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> assert_ok;
+    VertexArray.draw (module Window) ~target:window ~vertices ~program ~uniform ~mode:DrawMode.TriangleStrip () 
+    |> assert_ok;
     Window.display window;
     event_loop ();
     main_loop ();

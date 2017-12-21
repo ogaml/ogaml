@@ -1,5 +1,6 @@
 open OgamlGraphics
 open OgamlMath
+open Utils
 
 let settings =
   OgamlCore.ContextSettings.create
@@ -11,7 +12,10 @@ let settings =
 let window =
   match Window.create ~width:900 ~height:600 ~settings ~title:"Flat Example" () with
   | Ok win -> win
-  | Error s -> failwith s
+  | Error (`Context_initialization_error msg) -> 
+    fail ~msg "Failed to create context"
+  | Error (`Window_creation_error msg) -> 
+    fail ~msg "Failed to create window"
 
 let rectangle1 =
   Shape.create_rectangle
@@ -169,7 +173,7 @@ let rec handle_events () =
 
 let rec each_frame () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.white)) window ;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> assert_ok;
     draw () ;
     Window.display window ;
     handle_events () ;

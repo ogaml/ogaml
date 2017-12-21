@@ -16,3 +16,7 @@ let (>>=) res f =
 let assert_ok = function
   | Ok v -> v
   | Error e -> assert false
+
+let handle_error f = function
+  | Ok v -> v
+  | Error e -> f e

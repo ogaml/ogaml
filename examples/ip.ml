@@ -2,13 +2,17 @@ open OgamlMath
 open OgamlUtils
 open OgamlCore
 open OgamlGraphics
+open Utils
 
 let settings = ContextSettings.create ~msaa:8 ()
 
 let window = 
   match Window.create ~width:800 ~height:600 ~title:"Interpolators" ~settings () with
   | Ok win -> win
-  | Error s -> failwith s
+  | Error (`Context_initialization_error msg) -> 
+    fail ~msg "Failed to create context"
+  | Error (`Window_creation_error msg) -> 
+    fail ~msg "Failed to create window"
 
 let rec draw_curve color = function
   |(x1,y1)::(x2,y2)::t -> 
@@ -104,7 +108,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.white)) window ;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> assert_ok;
     draw ();
     Window.display window ;
     event_loop () ;

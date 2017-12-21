@@ -1,13 +1,17 @@
 open OgamlGraphics
 open OgamlUtils
 open OgamlMath
+open Utils
 
 let settings = OgamlCore.ContextSettings.create ()
 
 let window =
   match Window.create ~width:800 ~height:600 ~settings ~title:"Cursor tests" () with
   | Ok win -> win
-  | Error s -> failwith s
+  | Error (`Context_initialization_error msg) -> 
+    fail ~msg "Failed to create context"
+  | Error (`Window_creation_error msg) -> 
+    fail ~msg "Failed to create window"
 
 let rec event_loop () =
   match Window.poll_event window with
@@ -38,7 +42,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear window;
+    Window.clear window |> assert_ok;
     (* Display here *)
     Window.display window;
     event_loop ();
