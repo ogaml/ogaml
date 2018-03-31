@@ -12,6 +12,10 @@ val (>>>=) : ('a, 'b) result -> ('a -> 'c) -> ('c, 'b) result
 
 val assert_ok : ('a, 'b) result -> 'a
 
+val throw : ('a, exn) result -> 'a
+
+val catch : ('a -> 'b) -> 'a -> ('b, exn) result
+
 val handle : ('a, 'b) result -> ('b -> 'a) -> 'a
 
 val iter : ('a -> (unit, 'b) result) -> 'a list -> (unit, 'b) result

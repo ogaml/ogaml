@@ -22,10 +22,17 @@ let apply res f =
 let (>>>=) res f = 
   apply res f
 
-let assert_ok res = 
-  match res with
+let assert_ok res = function
   | Ok r -> r
   | Error _ -> assert false
+
+let throw = function
+  | Ok r -> r
+  | Error e -> raise e
+
+let catch f arg = 
+  try Ok (f arg)
+  with exc -> Error exc
 
 let handle res f = 
   match res with

@@ -1,5 +1,66 @@
 (** High-level helper functions and data structures *)
 
+(** Result utilities *)
+module Result : sig
+
+  (** This module provides some common utility functions to work on result types.
+    * Its aim is not to replace a fully-featured library. It is mostly there to
+    * make the examples and tests self-contained. *)
+
+  (** Makes a result from an option and an error value. *)
+  val make : ?result:'a -> 'b -> ('a, 'b) result
+
+  (** Composition operator with reversed parameters. Useful to handle certain
+    * return values. *)
+  val (||>) : 'a -> ('b -> 'a -> 'c) -> ('b -> 'c)
+
+  (** Bind function on results. *)
+  val bind : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
+
+  (** Infix operator corresponding to $bind$. *)
+  val (>>=) : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
+
+  (** Applies a function to a result. *)
+  val apply : ('a, 'b) result -> ('a -> 'c) -> ('c, 'b) result
+
+  (** Infix operator corresponding to $apply$. *)
+  val (>>>=) : ('a, 'b) result -> ('a -> 'c) -> ('c, 'b) result
+
+  (** Returns the value of a result if $Ok$ and raises $Assertion_failure$ otherwise. *)
+  val assert_ok : ('a, 'b) result -> 'a
+
+  (** Returns the value of a result if $Ok$ and raises the exception contained in
+    * $Error$ otherwise. *)
+  val throw : ('a, exn) result -> 'a
+
+  (** $catch f v$ applies $f$ to $v$ and catches any exception it may produce. *)
+  val catch : ('a -> 'b) -> 'a -> ('b, exn) result
+
+  (** Applies an error handler to a result. *)
+  val handle : ('a, 'b) result -> ('b -> 'a) -> 'a
+
+  (** $iter f l$ applies $f$ to every element of $l$ but stops as soon as
+    * $f$ returns an error. *)
+  val iter : ('a -> (unit, 'b) result) -> 'a list -> (unit, 'b) result
+
+  (** Same as $List.map$ but stops as soon as the function returns an error. *)
+  val map : ('a -> ('b, 'c) result) -> 'a list -> ('b list, 'c) result
+
+  (** Same as $List.fold_left$ but stops as soon as the function returns an error. *)
+  val fold : ('a -> 'b -> ('a, 'c) result) -> 'a -> 'b list -> ('a, 'c) result
+
+  (** Same as $List.fold_right$ but stops as soon as the function returns an error. *)
+  val fold_r : ('a -> 'b -> ('b, 'c) result) -> 'a list -> 'b -> ('b, 'c) result
+
+  (** Returns an option from a result by mapping $Error$ to $None$. *)
+  val opt : ('a, 'b) result -> 'a option
+
+  (** Returns a result from an option by mapping $None$ to $Error ()$. *)
+  val from_opt : 'a option -> ('a, unit) result
+
+end
+
+
 (** Log system *)
 module Log : sig
 
