@@ -1,8 +1,16 @@
 open OgamlGraphics
 open OgamlCore
-open OgamlUtils
 open OgamlMath
-open Utils
+open OgamlUtils
+open OgamlUtils.Result
+
+let fail ?msg err = 
+  Log.fatal Log.stdout "%s" err;
+  begin match msg with
+  | None -> ()
+  | Some e -> Log.fatal Log.stderr "%s" e
+  end;
+  exit 2
 
 module GameState = struct
 
@@ -82,9 +90,9 @@ module GameState = struct
     end
 
   let text_handler txt = 
-    handle_error (function
+    Result.handle txt (function
       | `Invalid_UTF8_bytes -> fail "Invalid UTF8 sequence"
-      | `Invalid_UTF8_leader -> fail "Invalid UTF8") txt
+      | `Invalid_UTF8_leader -> fail "Invalid UTF8") 
 
   let display win s font = 
     let rule_text1 = 

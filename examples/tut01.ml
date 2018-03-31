@@ -7,7 +7,16 @@
 (******************************************************************)
 
 open OgamlGraphics
-open Utils
+open OgamlUtils
+open OgamlUtils.Result
+
+let fail ?msg err = 
+  Log.fatal Log.stdout "%s" err;
+  begin match msg with
+  | None -> ()
+  | Some e -> Log.fatal Log.stderr "%s" e
+  end;
+  exit 2
 
 let settings = OgamlCore.ContextSettings.create ()
 

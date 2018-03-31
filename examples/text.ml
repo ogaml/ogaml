@@ -1,7 +1,15 @@
 open OgamlGraphics
 open OgamlMath
 open OgamlUtils
-open Utils
+open OgamlUtils.Result
+
+let fail ?msg err = 
+  Log.fatal Log.stdout "%s" err;
+  begin match msg with
+  | None -> ()
+  | Some e -> Log.fatal Log.stderr "%s" e
+  end;
+  exit 2
 
 let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 
@@ -25,9 +33,9 @@ let font =
 let size = 25
 
 let text_handler txt = 
-  handle_error (function
+  Result.handle txt (function
     | `Invalid_UTF8_bytes -> fail "Invalid UTF8 sequence"
-    | `Invalid_UTF8_leader -> fail "Invalid UTF8") txt
+    | `Invalid_UTF8_leader -> fail "Invalid UTF8")
 
 let txt = Text.create
   ~text:"Hello, World ! Coucou ! gAV@#"
@@ -147,7 +155,7 @@ let fxpos3 = Vector2f.add (Text.Fx.advance fxtxt2) fxpos2
 
 let aa = ref false
 
-let draw_handler = handle_error (function
+let draw_handler arg = Result.handle arg (function
   | `Font_texture_depth_overflow -> fail "Font texture overflow (depth)"
   | `Font_texture_size_overflow -> fail "Font texture overflow (height)")
 
