@@ -1,6 +1,7 @@
 open OgamlMath
+open OgamlUtils
+open OgamlUtils.Result
 
-exception Sprite_error of string
 
 type t = {
   texture : Texture.Texture2D.t ;
@@ -12,8 +13,6 @@ type t = {
   mutable scale    : Vector2f.t;
   mutable color    : Color.t;
 }
-
-let error msg = raise (Sprite_error msg)
 
 (* Applies transformations to a point *)
 let apply_transformations position origin rotation scale point =
@@ -87,23 +86,24 @@ let create ~texture
     | None  , Some r -> Vector2f.from_int (IntRect.abs_size r)
     | Some s, _      -> s
   in
-  let subrect = 
-    match subrect with
-    | None -> FloatRect.one
-    | Some {IntRect.x; y; width; height} -> 
-        let {Vector2f.x = sx; y = sy} = base_size in
-        let fr = FloatRect.({x = float_of_int x /. sx;
-                             y = float_of_int y /. sy;
-                             width  = float_of_int width /. sx;
-                             height = float_of_int height /. sy}) 
-        in
-        let open FloatRect in
-        if fr.x >= 0. && fr.x <= 1. 
-        && fr.y >= 0. && fr.y <= 1.
-        && fr.x +. fr.width  >= 0. && fr.x +. fr.width  <= 1.
-        && fr.y +. fr.height >= 0. && fr.y +. fr.height <= 1. then fr
-        else raise (Sprite_error "invalid texture sub-rectangle")
-  in
+  begin match subrect with
+  | None -> Ok FloatRect.one
+  | Some {IntRect.x; y; width; height} -> 
+      let {Vector2f.x = sx; y = sy} = base_size in
+      let fr = FloatRect.({x = float_of_int x /. sx;
+                           y = float_of_int y /. sy;
+                           width  = float_of_int width /. sx;
+                           height = float_of_int height /. sy}) 
+      in
+      let open FloatRect in
+      if fr.x >= 0. && fr.x <= 1. 
+      && fr.y >= 0. && fr.y <= 1.
+      && fr.x +. fr.width  >= 0. && fr.x +. fr.width  <= 1.
+      && fr.y +. fr.height >= 0. && fr.y +. fr.height <= 1. then 
+        Ok fr
+      else 
+        Error (`Invalid_subrect)
+  end >>>= fun subrect ->
   {
     texture  = texture ;
     subrect  = subrect ;
@@ -116,13 +116,13 @@ let create ~texture
   }
 
 let map_to_source sprite f src = 
-  List.iter (fun v -> VertexArray.Source.add src (f v)) (get_vertices sprite)
+  Result.iter (fun v -> VertexArray.Source.add src (f v)) (get_vertices sprite)
 
 let to_source sprite src = 
-  List.iter (VertexArray.Source.add src) (get_vertices sprite)
+  Result.iter (VertexArray.Source.add src) (get_vertices sprite)
 
 let map_to_custom_source sprite f src = 
-  List.iter (fun v -> VertexArray.Source.add src (f v)) (get_vertices sprite)
+  Result.iter (fun v -> VertexArray.Source.add src (f v)) (get_vertices sprite)
 
 let draw (type s) (module Target : RenderTarget.T with type t = s)
          ?parameters:(parameters = DrawParameter.make
@@ -134,25 +134,25 @@ let draw (type s) (module Target : RenderTarget.T with type t = s)
   let sizei = Target.size target in
   let size = Vector2f.from_int sizei in
   let uniform =
-    Uniform.empty
-    |> Uniform.vector2f "size" size
-    |> Uniform.texture2D "utexture" sprite.texture
+    Ok Uniform.empty
+    >>= Uniform.vector2f "size" size
+    >>= Uniform.texture2D "utexture" sprite.texture
+    |> assert_ok
   in
-  let vertices = 
-    let sprite_source = VertexArray.Source.empty ~size:6 () in
-    List.iter (VertexArray.Source.add sprite_source) (get_vertices sprite);
-    let vao = 
-      VertexArray.Buffer.static (module Target) target sprite_source 
-      |> VertexArray.Buffer.unpack
-    in
-    VertexArray.create (module Target) target [vao]
+  let sprite_source = VertexArray.Source.empty ~size:6 () in
+  (Result.iter (VertexArray.Source.add sprite_source) (get_vertices sprite) >>= fun () ->
+  let vao = 
+    VertexArray.Buffer.static (module Target) target sprite_source 
+    |> VertexArray.Buffer.unpack
   in
+  let vertices = VertexArray.create (module Target) target [vao] in
   VertexArray.draw (module Target)
         ~target
         ~vertices
         ~program
         ~parameters
-        ~uniform ()
+        ~uniform ())
+  |> assert_ok
 
 let set_position sprite position =
   sprite.position <- position 

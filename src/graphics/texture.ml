@@ -1,6 +1,7 @@
 open OgamlMath
+open OgamlUtils
+open OgamlUtils.Result
 
-exception Texture_error of string
 
 module type T = sig
 
@@ -215,18 +216,16 @@ module Texture2D = struct
     ?mipmaps:(mipmaps=`AllGenerated) src = 
     let context = M.context target in
     (* Extract the texture parameters *)
-    let size, img = 
-      match src with
-      | `File s -> 
-        let img = Image.create (`File s) in
-        let v = Image.size img in
-        v, (Some img)
-      | `Image img ->
-        let v = Image.size img in
-        v, (Some img)
-      | `Empty size ->
-        size, None
-    in
+    begin match src with
+    | `File s -> 
+      (Image.load s) >>>= fun img -> 
+      (Image.size img, Some img)
+    | `Image img ->
+      let v = Image.size img in
+      Ok (v, (Some img))
+    | `Empty size ->
+      Ok (size, None)
+    end >>= fun (size, img) ->
     let levels = 
       let max_levels = Common.max_mipmaps size in
       match mipmaps with
@@ -238,7 +237,9 @@ module Texture2D = struct
     let capabilities = Context.capabilities context in
     let max_size = capabilities.Context.max_texture_size in
     if size.Vector2i.x > max_size || size.Vector2i.y > max_size then
-      raise (Texture_error "Maximal texture size exceeded");
+      Error `Texture_too_large
+    else
+      Ok () >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.Texture2D in
     let tex = {common; size} in
@@ -286,9 +287,9 @@ module Texture2D = struct
 
   let mipmap tex i = 
     if i >= tex.common.Common.mipmaps || i < 0 then
-      raise (Invalid_argument (Printf.sprintf "Mipmap level out of bounds"))
+      Error `Invalid_mipmap
     else
-      {Texture2DMipmap.common = tex.common; 
+      Ok {Texture2DMipmap.common = tex.common; 
        size = Vector2i.({x = tex.size.x lsr i; y = tex.size.y lsr i});
        level = i}
 
@@ -357,15 +358,15 @@ module DepthTexture2D = struct
     let context = M.context target in
     (* Extract the texture parameters *)
     let bytesize = DepthFormat.byte_size format in
-    let size, data = 
-      match src with
-      | `Data (size, data) ->
-        if size.Vector2i.x * size.Vector2i.y * bytesize > Bytes.length data then
-          raise (Texture_error "Insufficient data for initialization");
-        size, (Some data)
-      | `Empty size ->
-        size, None
-    in
+    begin match src with
+    | `Data (size, data) ->
+      if size.Vector2i.x * size.Vector2i.y * bytesize > Bytes.length data then
+        Error `Insufficient_data
+      else
+        Ok (size, (Some data))
+    | `Empty size ->
+      Ok (size, None)
+    end >>= fun (size, data) ->
     let levels = 
       let max_levels = Common.max_mipmaps size in
       match mipmaps with
@@ -377,7 +378,9 @@ module DepthTexture2D = struct
     let capabilities = Context.capabilities context in
     let max_size = capabilities.Context.max_texture_size in
     if size.Vector2i.x > max_size || size.Vector2i.y > max_size then
-      raise (Texture_error "Maximal texture size exceeded");
+      Error `Texture_too_large
+    else
+      Ok () >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.Texture2D in
     let format = DepthFormat.to_texture_format format in
@@ -438,9 +441,9 @@ module DepthTexture2D = struct
 
   let mipmap tex i = 
     if i >= tex.common.Common.mipmaps || i < 0 then
-      raise (Invalid_argument (Printf.sprintf "Mipmap level out of bounds"))
+      Error `Invalid_mipmap 
     else
-      {DepthTexture2DMipmap.common = tex.common; 
+      Ok {DepthTexture2DMipmap.common = tex.common; 
        size = Vector2i.({x = tex.size.x lsr i; y = tex.size.y lsr i});
        level = i}
 
@@ -508,11 +511,12 @@ module Texture2DArrayMipmap = struct
 
   let layer t i = 
     if i < 0 || i >= t.depth then 
-      raise (Invalid_argument "Texture 2D array : layer out of bounds");
-    {Texture2DArrayLayerMipmap.common = t.common;
-                               size   = t.size;
-                               level  = t.level;
-                               layer  = i}
+      Error `Invalid_layer
+    else
+     Ok {Texture2DArrayLayerMipmap.common = t.common;
+         size  = t.size;
+         level = t.level;
+         layer = i}
 
   let bind t uid = Common.bind t.common uid
 
@@ -535,11 +539,12 @@ module Texture2DArrayLayer = struct
 
   let mipmap t i = 
     if i < 0 || i >= t.common.Common.mipmaps then 
-      raise (Invalid_argument "Texture 2D array : mipmap level out of bounds");
-    {Texture2DArrayLayerMipmap.common = t.common;
-                               size   = Vector2i.({x = t.size.x lsr i; y = t.size.y lsr i});
-                               level  = i;
-                               layer  = t.layer}
+      Error `Invalid_mipmap 
+    else
+      Ok {Texture2DArrayLayerMipmap.common = t.common;
+          size  = Vector2i.({x = t.size.x lsr i; y = t.size.y lsr i});
+          level = i;
+          layer = t.layer}
 
   let bind t uid = Common.bind t.common uid
 
@@ -562,28 +567,30 @@ module Texture2DArray = struct
     let context = M.context target in
     (* Extract the texture parameters *)
     let extract_params = function
-      | `File s ->
-        let img = Image.create (`File s) in
-        let size = Image.size img in
-        (size, Some img)
-      | `Image i ->
-        (Image.size i, Some i)
-      | `Empty s ->
-        (s, None)
+      | `File s -> 
+        (Image.load s) >>>= fun img -> 
+        (Image.size img, Some img)
+      | `Image img ->
+        let v = Image.size img in
+        Ok (v, (Some img))
+      | `Empty size ->
+        Ok (size, None)
     in
     if src = [] then 
-      raise (Texture_error "Texture 2D array : empty file list");
+      Error `No_input_files
+    else
+      Ok () >>= fun () ->
     let lparams = 
       List.map extract_params src
     in
-    let (size, _) = List.hd lparams in
-    let depth, imgs = 
-      List.fold_right (fun (img_size, img) (n, l_imgs) -> 
-        if img_size <> size then 
-          raise (Texture_error "Texture 2D array : images of different sizes");
-        (n+1, img :: l_imgs)
-      ) lparams (0, []) 
-    in
+    List.hd lparams >>= fun (size, _) ->
+    Result.fold_r (fun params (n, l_imgs) -> 
+      params >>= fun (img_size, img) ->
+      if img_size <> size then 
+        Error `Non_equal_input_sizes
+      else
+        Ok (n+1, img :: l_imgs)
+    ) lparams (0, []) >>= fun (depth, imgs) ->
     let levels = 
       let max_levels = Common.max_mipmaps size in
       match mipmaps with
@@ -596,9 +603,11 @@ module Texture2DArray = struct
     let max_size = capabilities.Context.max_texture_size in
     let max_depth = capabilities.Context.max_array_texture_layers in
     if size.Vector2i.x > max_size || size.Vector2i.y > max_size then
-      raise (Texture_error "Maximal texture size exceeded");
-    if depth > max_depth then
-      raise (Texture_error "Maximal texture depth exceeded");
+      Error `Texture_too_large
+    else if depth > max_depth then
+      Error `Texture_too_deep
+    else 
+      Ok () >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.Texture2DArray in
     let tex = {common; size; depth} in
@@ -650,18 +659,20 @@ module Texture2DArray = struct
 
   let layer t i = 
     if i < 0 || i >= t.depth then 
-      raise (Invalid_argument "Texture 2D array : layer out of bounds");
-    {Texture2DArrayLayer.common = t.common;
-                         size   = t.size;
-                         layer  = i}
+      Error `Invalid_layer
+    else
+      Ok {Texture2DArrayLayer.common = t.common;
+          size  = t.size;
+          layer = i}
 
   let mipmap t i = 
     if i < 0 || i >= t.common.Common.mipmaps then 
-      raise (Invalid_argument "Texture 2D array : mipmap level out of bounds");
-    {Texture2DArrayMipmap.common = t.common;
-                          size   = Vector2i.({x = t.size.x lsr i; y = t.size.y lsr i});
-                          depth  = t.depth;
-                          level  = i}
+      Error `Invalid_mipmap
+    else
+      Ok {Texture2DArrayMipmap.common = t.common;
+           size  = Vector2i.({x = t.size.x lsr i; y = t.size.y lsr i});
+           depth = t.depth;
+           level = i}
 
   let bind t uid = Common.bind t.common uid
 
@@ -739,11 +750,12 @@ module CubemapFace = struct
 
   let mipmap t i = 
     if i < 0 || i >= t.common.Common.mipmaps then 
-      raise (Invalid_argument "Cubemap texture : mipmap level out of bounds");
-    {CubemapMipmapFace.common = t.common;
-                       size   = Vector2i.map t.size (fun v -> v lsr i);
-                       face   = t.face;
-                       level  = i}
+      Error `Invalid_mipmap
+    else 
+      Ok {CubemapMipmapFace.common = t.common;
+          size  = Vector2i.map t.size (fun v -> v lsr i);
+          face  = t.face;
+          level = i}
 
   let face t = t.face
 
@@ -801,25 +813,25 @@ module Cubemap = struct
     let context = M.context target in
     (* Extract the texture parameters *)
     let extract_params = function
-      | `File s ->
-        let img = Image.create (`File s) in
-        let size = Image.size img in
-        (size, Some img)
-      | `Image i ->
-        (Image.size i, Some i)
-      | `Empty s ->
-        (s, None)
+      | `File s -> 
+        (Image.load s) >>>= fun img -> 
+        (Image.size img, Some img)
+      | `Image img ->
+        let v = Image.size img in
+        Ok (v, (Some img))
+      | `Empty size ->
+        Ok (size, None)
     in
-    let ((spx, ipx), (spy,ipy), (spz, ipz), (snx, inx), (sny, iny), (snz, inz)) =
-      extract_params positive_x,
-      extract_params positive_y,
-      extract_params positive_z,
-      extract_params negative_x,
-      extract_params negative_y,
-      extract_params negative_z
-    in
+    extract_params positive_x >>= fun (spx, ipx) ->
+    extract_params positive_y >>= fun (spy, ipy) ->
+    extract_params positive_z >>= fun (spz, ipz) ->
+    extract_params negative_x >>= fun (snx, inx) ->
+    extract_params negative_y >>= fun (sny, iny) ->
+    extract_params negative_z >>= fun (snz, inz) ->
     if not (List.for_all (fun s -> s = spx) [spy; spz; snx; sny; snz]) then
-      raise (Texture_error "Texture cubemap : images of different sizes");
+      Error `Non_equal_input_sizes
+    else
+      Ok () >>= fun () ->
     let levels = 
       let max_levels = Common.max_mipmaps spx in
       match mipmaps with
@@ -831,7 +843,9 @@ module Cubemap = struct
     let capabilities = Context.capabilities context in
     let max_size = capabilities.Context.max_cube_map_texture_size in
     if spx.Vector2i.x > max_size || spx.Vector2i.y > max_size then
-      raise (Texture_error "Maximal cubemap texture size exceeded");
+      Error `Texture_too_large
+    else
+      Ok () >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.CubemapTexture in
     let tex = {common; size = spx} in
@@ -885,10 +899,11 @@ module Cubemap = struct
 
   let mipmap t i = 
     if i < 0 || i >= t.common.Common.mipmaps then 
-      raise (Invalid_argument "Cubemap texture : mipmap level out of bounds");
-    {CubemapMipmap.common = t.common;
-                   size   = Vector2i.map t.size (fun v -> v lsr i);
-                   level  = i}
+      Error `Invalid_mipmap
+    else
+      Ok {CubemapMipmap.common = t.common;
+          size  = Vector2i.map t.size (fun v -> v lsr i);
+          level = i}
 
   let face t f = 
     {CubemapFace.common = t.common;
@@ -924,8 +939,9 @@ module Texture3DMipmap = struct
 
   let layer t i = 
     if i < 0 || i >= t.size.Vector3i.z then
-      raise (Invalid_argument "Texture 3D array : layer out of bounds");
-    {t with layer = i}
+      Error `Invalid_layer
+    else 
+      Ok {t with layer = i}
 
   let current_layer t =
     t.layer
@@ -957,28 +973,30 @@ module Texture3D = struct
     let context = M.context target in
     (* Extract the texture parameters *)
     let extract_params = function
-      | `File s ->
-        let img = Image.create (`File s) in
-        let size = Image.size img in
-        (size, Some img)
-      | `Image i ->
-        (Image.size i, Some i)
-      | `Empty s ->
-        (s, None)
+      | `File s -> 
+        (Image.load s) >>>= fun img -> 
+        (Image.size img, Some img)
+      | `Image img ->
+        let v = Image.size img in
+        Ok (v, (Some img))
+      | `Empty size ->
+        Ok (size, None)
     in
     if src = [] then 
-      raise (Texture_error "Texture 3D: empty file list");
+      Error `No_input_files
+    else
+      Ok () >>= fun () ->
     let lparams =
       List.map extract_params src
     in
-    let (size2D, _) = List.hd lparams in
-    let depth, imgs = 
-      List.fold_right (fun (img_size, img) (n, l_imgs) -> 
-        if img_size <> size2D then 
-          raise (Texture_error "Texture 3D: images of different sizes");
-        (n+1, img :: l_imgs)
-      ) lparams (0, []) 
-    in
+    List.hd lparams >>= fun (size2D, _) ->
+    Result.fold_r (fun params (n, l_imgs) -> 
+      params >>= fun (img_size, img) ->
+      if img_size <> size2D then 
+        Error `Non_equal_input_sizes
+      else
+        Ok (n+1, img :: l_imgs)
+    ) lparams (0, []) >>= fun (depth, imgs) ->
     let size = {Vector3i.x = size2D.Vector2i.x; y = size2D.Vector2i.y; z = depth} in
     let levels = 
       let max_levels = Common.max_mipmaps_3D size in
@@ -991,7 +1009,9 @@ module Texture3D = struct
     let capabilities = Context.capabilities context in
     let max_size = capabilities.Context.max_3D_texture_size in
     if size.Vector3i.x > max_size || size.Vector3i.y > max_size || size.Vector3i.z > max_size then
-      raise (Texture_error "Maximal 3D texture size exceeded");
+      Error `Texture_too_large
+    else
+      Ok () >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.Texture3D in
     let tex = {common; size} in
@@ -1041,11 +1061,12 @@ module Texture3D = struct
 
   let mipmap t i = 
     if i < 0 || i >= t.common.Common.mipmaps then 
-      raise (Invalid_argument "Texture 3D: mipmap level out of bounds");
-    {Texture3DMipmap.common = t.common;
-                     size   = Vector3i.({x = t.size.x lsr i; y = t.size.y lsr i; z = t.size.z lsr i});
-                     level  = i;
-                     layer  = 0}
+      Error `Invalid_mipmap
+    else
+      Ok {Texture3DMipmap.common = t.common;
+          size   = Vector3i.({x = t.size.x lsr i; y = t.size.y lsr i; z = t.size.z lsr i});
+          level  = i;
+          layer  = 0}
 
   let bind t uid = Common.bind t.common uid
 

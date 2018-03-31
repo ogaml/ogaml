@@ -1,11 +1,26 @@
 open OgamlMath
-open OgamlUtils
 open OgamlCore
 open OgamlGraphics
+open OgamlUtils
+open OgamlUtils.Result
+
+let fail ?msg err = 
+  Log.fatal Log.stdout "%s" err;
+  begin match msg with
+  | None -> ()
+  | Some e -> Log.fatal Log.stderr "%s" e
+  end;
+  exit 2
 
 let settings = ContextSettings.create ~msaa:8 ()
 
-let window = Window.create ~width:800 ~height:600 ~title:"Interpolators" ~settings ()
+let window = 
+  match Window.create ~width:800 ~height:600 ~title:"Interpolators" ~settings () with
+  | Ok win -> win
+  | Error (`Context_initialization_error msg) -> 
+    fail ~msg "Failed to create context"
+  | Error (`Window_creation_error msg) -> 
+    fail ~msg "Failed to create window"
 
 let rec draw_curve color = function
   |(x1,y1)::(x2,y2)::t -> 
@@ -101,7 +116,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.white)) window ;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> assert_ok;
     draw ();
     Window.display window ;
     event_loop () ;

@@ -1,6 +1,4 @@
 
-exception Matrix2D_exception of string
-
 type t = (float, Bigarray.float32_elt, Bigarray.c_layout) Bigarray.Array1.t
 
 (* Utils, not exposed *)
@@ -97,20 +95,26 @@ let times m v =
 let projection ~size = 
   let m = identity () in
   if size.Vector2f.x = 0. || size.Vector2f.y = 0. then
-    raise (Matrix2D_exception "Invalid projection vector");
-  set 0 2 m (-1.);
-  set 1 2 m 1.;
-  set 0 0 m (2. /. size.Vector2f.x);
-  set 1 1 m (-. 2. /. size.Vector2f.y);
-  m
+    Error `Invalid_projection
+  else begin
+    set 0 2 m (-1.);
+    set 1 2 m 1.;
+    set 0 0 m (2. /. size.Vector2f.x);
+    set 1 1 m (-. 2. /. size.Vector2f.y);
+    Ok m
+  end
 
 let iprojection ~size = 
   let m = identity () in
-  set 0 0 m (size.Vector2f.x /. 2.);
-  set 1 1 m (-. size.Vector2f.y /. 2.);
-  set 0 2 m (size.Vector2f.x /. 2.);
-  set 1 2 m (size.Vector2f.y /. 2.);
-  m
+  if size.Vector2f.x = 0. || size.Vector2f.y = 0. then
+    Error `Invalid_projection
+  else begin
+    set 0 0 m (size.Vector2f.x /. 2.);
+    set 1 1 m (-. size.Vector2f.y /. 2.);
+    set 0 2 m (size.Vector2f.x /. 2.);
+    set 1 2 m (size.Vector2f.y /. 2.);
+    Ok m
+  end
 
 let transformation ~translation ~rotation ~scale ~origin =
   let m = zero () in

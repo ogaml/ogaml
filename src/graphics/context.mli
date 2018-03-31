@@ -7,9 +7,6 @@
   * NOTE : setters are intended for internal use only
 **)
 
-(** GL context exception *)
-exception Invalid_context of string
-
 (** Capabilities of the context *)
 type capabilities = {
   max_3D_texture_size       : int;
@@ -58,8 +55,10 @@ val glsl_version : t -> int
 (** Returns true iff the GLSL version passed as parameter is supported *)
 val is_glsl_version_supported : t -> int -> bool
 
-(** Asserts that no GL error occured *)
-val assert_no_error : t -> unit
+(** Checks that no GL error occurred *)
+val check_errors : t -> 
+  (unit, [> `Invalid_value | `Invalid_enum | `Invalid_op | `Invalid_fbop
+          | `Out_of_memory | `Stack_overflow | `Stack_underflow]) result
 
 (** Flushes the GL buffer *)
 val flush : t -> unit
@@ -71,7 +70,8 @@ val finish : t -> unit
 module LL : sig
 
   (** Creates a new, default-initialized GL context *)
-  val create : unit -> t
+  val create : unit -> 
+    (t, [> `Context_initialization_error of string]) result
 
   (** Returns the internal sprite-drawing program *)
   val sprite_drawing : t -> ProgramInternal.t

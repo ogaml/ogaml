@@ -1,18 +1,47 @@
 open OgamlGraphics
 open OgamlMath
+open OgamlUtils
+open OgamlUtils.Result
+
+let fail ?msg err = 
+  Log.fatal Log.stdout "%s" err;
+  begin match msg with
+  | None -> ()
+  | Some e -> Log.fatal Log.stderr "%s" e
+  end;
+  exit 2
 
 let settings = OgamlCore.ContextSettings.create ()
 
 let window =
-  Window.create ~width:900 ~height:600 ~settings ~title:"Sprite Example" ()
+  match Window.create ~width:900 ~height:600 ~settings ~title:"Sprite Example" () with
+  | Ok win -> win
+  | Error (`Context_initialization_error msg) -> 
+    fail ~msg "Failed to create context"
+  | Error (`Window_creation_error msg) -> 
+    fail ~msg "Failed to create window"
 
-let texture = Texture.Texture2D.create (module Window) window (`File "examples/mario-block.bmp")
+let handle_texture_load = function
+  | Ok txt -> txt
+  | Error (`File_not_found s) -> fail ("File not found " ^ s)
+  | Error `Texture_too_large -> fail "Texture too large"
+  | Error (`Loading_error msg) -> fail ~msg "Texture loading error"
 
-let texture_png = Texture.Texture2D.create (module Window) window (`File "examples/test.png")
+let texture = 
+  Texture.Texture2D.create (module Window) window (`File "examples/mario-block.bmp") 
+  |> handle_texture_load
+  
+let texture_png = 
+  Texture.Texture2D.create (module Window) window (`File "examples/test.png")
+  |> handle_texture_load
 
-let sprite = Sprite.create ~texture ~size:(Vector2f.({x = 50.; y = 50.})) ~origin:(Vector2f.({x=25.;y=25.})) ()
+let sprite = 
+  Sprite.create ~texture ~size:(Vector2f.({x = 50.; y = 50.})) ~origin:(Vector2f.({x=25.;y=25.})) ()
+  |> assert_ok
 
-let sprite2 = Sprite.create ~texture:texture_png ~position:(Vector2f.({x = 50.; y = 50.})) ()
+let sprite2 = 
+  Sprite.create ~texture:texture_png ~position:(Vector2f.({x = 50.; y = 50.})) ()
+  |> assert_ok
 
 let draw () =
   Sprite.draw (module Window) ~target:window ~sprite ();
@@ -51,7 +80,7 @@ let rec handle_events () =
 
 let rec each_frame () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.white)) window ;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> assert_ok;
     draw () ;
     Window.display window ;
     handle_events () ;

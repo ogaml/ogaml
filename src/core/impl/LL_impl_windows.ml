@@ -2,8 +2,6 @@ open OgamlMath
 
 module Window = struct
 
-  exception Error of string
-
   type t = {
     handle : Windows.WindowHandle.t;
     glcontext : Windows.GlContext.t;
@@ -35,8 +33,6 @@ module Window = struct
   (** Now we can implement Window ! *)
   let toggle_fullscreen win = 
     if win.fullscreen then begin 
-      win.fullscreen <- false;
-      win.size <- win.old_size;
       let style = Windows.WindowStyle.(create 
         [WS_Visible; WS_Popup; WS_Thickframe;
         WS_MaximizeBox; WS_MinimizeBox; WS_Caption; WS_Sysmenu])
@@ -49,11 +45,13 @@ module Window = struct
         Windows.WindowHandle.adjust_rect win.handle rect style 
       in
       Windows.WindowHandle.move win.handle adjusted_rect false false;
-      if not (Windows.WindowHandle.unset_fullscreen_devmode win.handle) then 
-        raise (Error "Failed to unset fullscreen mode")
+      if (Windows.WindowHandle.unset_fullscreen_devmode win.handle) then begin
+        win.fullscreen <- false;
+        win.size <- win.old_size;
+        true
+      end else
+        false
     end else begin
-      win.fullscreen <- true;
-      win.old_size <- win.size;
       let style = Windows.WindowStyle.(create 
         [WS_Visible; WS_Popup; WS_Sysmenu; WS_ClipChildren; WS_ClipSiblings])
       in
@@ -70,8 +68,12 @@ module Window = struct
       Windows.WindowHandle.move win.handle adjusted_rect false false;
       let (_,_,w,h) = adjusted_rect in
       win.size <- Vector2i.({x = w; y = h});
-      if not (Windows.WindowHandle.set_fullscreen_devmode win.handle w h) then 
-        raise (Error "Failed to set fullscreen mode")
+      if (Windows.WindowHandle.set_fullscreen_devmode win.handle w h) then begin
+        win.fullscreen <- true;
+        win.old_size <- win.size;
+        true
+      end else
+        false
     end
 
   let create ~width ~height ~title ~settings =
@@ -114,11 +116,11 @@ module Window = struct
       GlContext.create handle 
     in
     if GlContext.is_null glcontext then
-      raise (Error "Cannot initialize GL context");
+      failwith "LL.Window.create: cannot initialize GL context";
     GlContext.make_current handle glcontext;
     let glewinit = Glew.init () in
     if glewinit <> "" then 
-      raise (Error ("Cannot initialize Glew : " ^ glewinit));
+      failwith (Printf.sprintf "LL.Window.create: cannot initialize glew (%s)" glewinit);
     let (x,y,width,height) = WindowHandle.get_rect handle in
     let event_queue = Queue.create () in
     let window = 
@@ -137,7 +139,7 @@ module Window = struct
     in
     Hashtbl.replace window_table uid window;
     if ContextSettings.fullscreen settings then 
-      toggle_fullscreen window;
+      toggle_fullscreen window |> ignore;
     window
 	
   let set_title win s = 

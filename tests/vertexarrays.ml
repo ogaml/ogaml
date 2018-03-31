@@ -1,12 +1,15 @@
 open OgamlGraphics
 open OgamlMath
+open OgamlUtils
 
-let () =
-  Printf.printf "Beginning vertex array tests...\n%!"
+let () = 
+  Log.info Log.stdout "Beginning vertex array tests..."
 
 let settings = OgamlCore.ContextSettings.create ()
 
-let window = Window.create ~width:100 ~height:100 ~settings ~title:"" ()
+let window = 
+  Window.create ~width:100 ~height:100 ~settings ~title:"" ()
+  |> Utils.handle_window_creation
 
 let context = Window.context window
 
@@ -74,169 +77,172 @@ let program = Program.from_source_list
                color = vec4(1.0, 1.0, 1.0, 1.0);
 
              }");
-    ] ()
+    ]
+  |> Utils.handle_program_creation
 
 let test_vao1 () =
   let vsource = VertexArray.(Source.(
-    empty ~size:4 ()
-    << SimpleVertex.create ~position:Vector3f.unit_z ()
-    << SimpleVertex.create ~position:Vector3f.unit_y ()
-    << SimpleVertex.create ~position:Vector3f.unit_x ()
-  )) in
+    Ok (empty ~size:4 ())
+    <<< SimpleVertex.create ~position:Vector3f.unit_z ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_y ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_x ())) 
+    |> Utils.assert_ok 
+  in
   let vbo = VertexArray.Buffer.dynamic (module Window) window vsource in
   let vao = VertexArray.(create (module Window) window [Buffer.unpack vbo]) in
   assert (VertexArray.length vao = 3)
 
 let test_vao2 () =
   let vsource = VertexArray.(Source.(
-    empty ~size:4 ()
-    << SimpleVertex.create ~position:Vector3f.unit_z ()
-    << SimpleVertex.create ~position:Vector3f.unit_y ()
-    << SimpleVertex.create ~position:Vector3f.unit_x ()
-    << SimpleVertex.create ~position:Vector3f.unit_x ()
-    << SimpleVertex.create ~position:Vector3f.unit_x ()
-    << SimpleVertex.create ~position:Vector3f.unit_x ()
-  )) in
+    Ok (empty ~size:4 ())
+    <<< SimpleVertex.create ~position:Vector3f.unit_z ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_y ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_x ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_x ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_x ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_x ())) 
+    |> Utils.assert_ok
+  in
   let vbo = VertexArray.Buffer.dynamic (module Window) window vsource in
   let vao = VertexArray.(create (module Window) window [Buffer.unpack vbo]) in
   assert (VertexArray.length vao = 6)
 
 let test_vao3 () =
-  try
-    let vsource = VertexArray.(Source.(
-      empty ~size:4 ()
-      << SimpleVertex.create ~position:Vector3f.unit_z ()
-      << SimpleVertex.create ()
-    )) in
-    ignore vsource;
-    assert false
-  with
-    |VertexArray.Source.Uninitialized_field _ -> ()
+  let vsource = VertexArray.(Source.(
+    Ok (empty ~size:4 ())
+    <<< SimpleVertex.create ~position:Vector3f.unit_z ()
+    <<< SimpleVertex.create ())) 
+  in
+  match vsource with
+  | Ok _ -> assert false
+  | Error (`Missing_attribute s) -> assert (s = "position")
 
 let test_vao4 () =
-  try
-    let vsource = VertexArray.(Source.(
-      empty ~size:4 ()
-      << SimpleVertex.create ~position:Vector3f.unit_z ()
-      << SimpleVertex.create ~position:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
-    )) in
-    ignore vsource
-  with
-    |VertexArray.Source.Uninitialized_field _ -> assert false
+  let vsource = VertexArray.(Source.(
+    Ok (empty ~size:4 ())
+    <<< SimpleVertex.create ~position:Vector3f.unit_z ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ())) 
+  in
+  match vsource with
+  | Ok _ -> ()
+  | Error _ -> assert false
 
 let test_vao5 () =
   let vsource = VertexArray.(Source.(
-    empty ~size:4 ()
-    << SimpleVertex.create ~position:Vector3f.unit_z ~uv:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
-    << SimpleVertex.create ~position:Vector3f.unit_y ~uv:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
-    << SimpleVertex.create ~position:Vector3f.unit_x ~uv:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
-    << SimpleVertex.create ~position:Vector3f.unit_x ~uv:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
-  )) in
+    Ok (empty ~size:4 ())
+    <<< SimpleVertex.create ~position:Vector3f.unit_z ~uv:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_y ~uv:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_x ~uv:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_x ~uv:Vector2f.({x = 1.; y = 1.}) ~normal:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ())) 
+    |> Utils.assert_ok
+  in
   let vbo = VertexArray.Buffer.dynamic (module Window) window vsource in
   let vao = VertexArray.(create (module Window) window [Buffer.unpack vbo]) in
   assert (VertexArray.length vao = 4)
 
 let test_vao6 () =
   let vsource = VertexArray.(Source.(
-    empty ~size:4 ()
-    << SimpleVertex.create ~position:Vector3f.unit_z ()
-    << SimpleVertex.create ~position:Vector3f.unit_y ()
-    << SimpleVertex.create ~position:Vector3f.unit_x ()
-  )) in
+    Ok (empty ~size:4 ())
+    <<< SimpleVertex.create ~position:Vector3f.unit_z ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_y ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_x ())) 
+    |> Utils.assert_ok
+  in
   let vbo = VertexArray.Buffer.dynamic (module Window) window vsource in
   let vao = VertexArray.(create (module Window) window [Buffer.unpack vbo]) in
   VertexArray.draw (module Window) ~target:window 
                    ~vertices:vao ~program ~parameters ~mode ~uniform ()
+  |> Utils.assert_ok
 
 let test_vao7 () =
   let vsource = VertexArray.(Source.(
-    empty ~size:4 ()
-    << SimpleVertex.create ~normal:Vector3f.unit_z ()
-    << SimpleVertex.create ~normal:Vector3f.unit_y ()
-    << SimpleVertex.create ~normal:Vector3f.unit_x ()
-  )) in
+    Ok (empty ~size:4 ())
+    <<< SimpleVertex.create ~normal:Vector3f.unit_z ()
+    <<< SimpleVertex.create ~normal:Vector3f.unit_y ()
+    <<< SimpleVertex.create ~normal:Vector3f.unit_x ())) 
+    |> Utils.assert_ok
+  in
   let vbo = VertexArray.Buffer.dynamic (module Window) window vsource in
   let vao = VertexArray.(create (module Window) window [Buffer.unpack vbo]) in
-  try
-    VertexArray.draw (module Window) ~target:window ~vertices:vao ~program ~parameters ~mode ~uniform ();
-    assert false
-  with
-    VertexArray.Missing_attribute _ -> ()
+  let res = 
+    VertexArray.draw (module Window) ~target:window ~vertices:vao ~program ~parameters ~mode ~uniform ()
+  in
+  match res with
+  | Error (`Missing_attribute s) -> assert (s = "position")
+  | _ -> assert false
 
 
 let test_vao8 () =
   let vsource = VertexArray.(Source.(
-    empty ~size:4 ()
-    << SimpleVertex.create ~position:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
-    << SimpleVertex.create ~position:Vector3f.unit_y ~color:(`RGB Color.RGB.white) ()
-    << SimpleVertex.create ~position:Vector3f.unit_x ~color:(`RGB Color.RGB.white) ()
-  )) in
-  let vbo = VertexArray.Buffer.dynamic (module Window) window vsource in
-  let vao = VertexArray.(create (module Window) window [Buffer.unpack vbo]) in
-  try
-    VertexArray.draw (module Window) ~target:window ~vertices:vao ~program ~parameters ~mode ~uniform ();
-  with
-    VertexArray.Buffer.Invalid_attribute _ -> assert false
-
-let test_vao9 () = 
-  let vsource = VertexArray.(Source.(
-    empty ~size:4 ()
-    << SimpleVertex.create ~normal:Vector3f.unit_z ()
-    << SimpleVertex.create ~normal:Vector3f.unit_y ()
-    << SimpleVertex.create ~normal:Vector3f.unit_x ()
-  )) in
-  let vsource = 
-    VertexArray.Source.map vsource 
-      (fun vtx -> 
-        VertexArray.SimpleVertex.create 
-          ~position:(VertexArray.Vertex.Attribute.get vtx VertexArray.SimpleVertex.normal)
-          ()
-      )
+    Ok (empty ~size:4 ())
+    <<< SimpleVertex.create ~position:Vector3f.unit_z ~color:(`RGB Color.RGB.white) ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_y ~color:(`RGB Color.RGB.white) ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_x ~color:(`RGB Color.RGB.white) ())) 
+    |> Utils.assert_ok
   in
   let vbo = VertexArray.Buffer.dynamic (module Window) window vsource in
   let vao = VertexArray.(create (module Window) window [Buffer.unpack vbo]) in
-  try
-    VertexArray.draw (module Window) ~target:window ~vertices:vao ~program ~parameters ~mode ~uniform ();
-  with
-    VertexArray.Missing_attribute _ -> ()
+  VertexArray.draw (module Window) ~target:window ~vertices:vao ~program ~parameters ~mode ~uniform ()
+  |> Utils.assert_ok
+
+let test_vao9 () = 
+  let vsource = VertexArray.(Source.(
+    Ok (empty ~size:4 ())
+    <<< SimpleVertex.create ~normal:Vector3f.unit_z ()
+    <<< SimpleVertex.create ~normal:Vector3f.unit_y ()
+    <<< SimpleVertex.create ~normal:Vector3f.unit_x ())) 
+    |> Utils.assert_ok
+  in
+  let vsource = 
+    VertexArray.Source.map vsource 
+      (fun vtx -> 
+        let position = 
+          VertexArray.Vertex.Attribute.get vtx VertexArray.SimpleVertex.normal
+          |> Utils.assert_ok
+        in
+        VertexArray.SimpleVertex.create ~position ()
+      )
+    |> Utils.assert_ok
+  in
+  let vbo = VertexArray.Buffer.dynamic (module Window) window vsource in
+  let vao = VertexArray.(create (module Window) window [Buffer.unpack vbo]) in
+  VertexArray.draw (module Window) ~target:window ~vertices:vao ~program ~parameters ~mode ~uniform ()
+  |> Utils.assert_ok
 
 let test_vao10 () = 
   let vsource = VertexArray.(Source.(
-    empty ~size:4 ()
-    << SimpleVertex.create ~position:Vector3f.unit_z ~normal:Vector3f.unit_y ()
-    << SimpleVertex.create ~position:Vector3f.unit_z ~normal:Vector3f.unit_y ~color:(`RGB Color.RGB.black) ()
-  )) in
+    Ok (empty ~size:4 ())
+    <<< SimpleVertex.create ~position:Vector3f.unit_z ~normal:Vector3f.unit_y ()
+    <<< SimpleVertex.create ~position:Vector3f.unit_z ~normal:Vector3f.unit_y 
+          ~color:(`RGB Color.RGB.black) ())) 
+    |> Utils.assert_ok
+  in
   VertexArray.Source.iter vsource
     (fun vtx ->
       let open VertexArray in
-      assert (Vertex.Attribute.get vtx SimpleVertex.position = Vector3f.unit_z);
-      assert (Vertex.Attribute.get vtx SimpleVertex.normal   = Vector3f.unit_y);
-      begin try
-        Vertex.Attribute.get vtx SimpleVertex.color |> ignore;
-        assert false
-      with
-        Vertex.Unbound_attribute _ -> ()
-      end
+      assert (Vertex.Attribute.get vtx SimpleVertex.position = Ok Vector3f.unit_z);
+      assert (Vertex.Attribute.get vtx SimpleVertex.normal   = Ok Vector3f.unit_y);
+      assert (Vertex.Attribute.get vtx SimpleVertex.color = Error (`Unbound_attribute "color"))
     )
 
 let () =
   test_vao1 ();
-  Printf.printf "\tTest 1 passed\n%!";
+  Log.info Log.stdout "Test 1 passed";
   test_vao2 ();
-  Printf.printf "\tTest 2 passed\n%!";
+  Log.info Log.stdout "Test 2 passed";
   test_vao3 ();
-  Printf.printf "\tTest 3 passed\n%!";
+  Log.info Log.stdout "Test 3 passed";
   test_vao4 ();
-  Printf.printf "\tTest 4 passed\n%!";
+  Log.info Log.stdout "Test 4 passed";
   test_vao5 ();
-  Printf.printf "\tTest 5 passed\n%!";
+  Log.info Log.stdout "Test 5 passed";
   test_vao6 ();
-  Printf.printf "\tTest 6 passed\n%!";
+  Log.info Log.stdout "Test 6 passed";
   test_vao7 ();
-  Printf.printf "\tTest 7 passed\n%!";
+  Log.info Log.stdout "Test 7 passed";
   test_vao8 ();
-  Printf.printf "\tTest 8 passed\n%!";
+  Log.info Log.stdout "Test 8 passed";
   test_vao9 ();
-  Printf.printf "\tTest 9 passed\n%!";
+  Log.info Log.stdout "Test 9 passed";
   test_vao10 ();
-  Printf.printf "\tTest 10 passed\n%!";
+  Log.info Log.stdout "Test 10 passed";

@@ -1,5 +1,3 @@
-exception Window_Error of string
-
 module OutputBuffer : sig
 
   type t = 
@@ -18,7 +16,9 @@ val create :
   ?width:int ->
   ?height:int ->
   ?title:string ->
-  ?settings:OgamlCore.ContextSettings.t -> unit -> t
+  ?settings:OgamlCore.ContextSettings.t -> unit -> 
+  (t, [> `Window_creation_error of string
+       | `Context_initialization_error of string]) result
 
 (** Changes the title of the window. *)
 val set_title : t -> string -> unit
@@ -40,7 +40,7 @@ val destroy : t -> unit
 val resize : t -> OgamlMath.Vector2i.t -> unit
 
 (** Toggles the full screen mode of a window. *)
-val toggle_fullscreen : t -> unit
+val toggle_fullscreen : t -> bool
 
 (** Returns the rectangle associated to a window, in screen coordinates *)
 val rect : t -> OgamlMath.IntRect.t
@@ -64,7 +64,8 @@ val display : t -> unit
 
 (** Clears the window *)
 val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> 
-            ?depth:bool -> ?stencil:bool -> t -> unit
+            ?depth:bool -> ?stencil:bool -> t -> 
+            (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer]) result
 
 (** Returns the internal GL context of the window *)
 val context : t -> Context.t
@@ -73,7 +74,8 @@ val context : t -> Context.t
 val show_cursor : t -> bool -> unit
 
 (** System-only, binds the window for drawing *)
-val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> unit
+val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t -> 
+           (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer]) result
 
 (** Returns the internal window of this window.
   * Used internally, hidden from the global interface. *)

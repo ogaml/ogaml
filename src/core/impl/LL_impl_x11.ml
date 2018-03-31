@@ -1,8 +1,6 @@
 
 module Window = struct
 
-  exception Error of string
-
   type t = {
     display : X11.Display.t;
     window  : X11.Window.t;
@@ -76,7 +74,7 @@ module Window = struct
       let prop = X11.Atom.intern display "_NET_WM_STATE" true in
       let atom_fs = X11.Atom.intern display "_NET_WM_STATE_FULLSCREEN" true in
       match prop, atom_fs with
-      |None, _ |_, None -> failwith "fullscreen not supported"
+      |None, _ |_, None -> ()
       |Some prop, Some atom -> X11.Atom.send_event display window prop [X11.Atom.wm_toggle;atom]
     end;
     X11.Display.flush display;
@@ -112,8 +110,10 @@ module Window = struct
     let (width, height) = X11.Window.size win.display win.window in
     win.size <- OgamlMath.Vector2i.({x = width; y = height});
     match prop, atom_fs with
-    |None, _ |_, None -> failwith "fullscreen not supported"
-    |Some prop, Some atom -> X11.Atom.send_event win.display win.window prop [X11.Atom.wm_toggle;atom]
+    |None, _ |_, None -> false
+    |Some prop, Some atom -> 
+      X11.Atom.send_event win.display win.window prop [X11.Atom.wm_toggle;atom];
+      true
 
   let size win =
     win.size

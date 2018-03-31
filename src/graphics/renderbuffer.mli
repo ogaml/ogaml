@@ -1,12 +1,9 @@
-
-exception RBO_Error of string
-
-
 module ColorBuffer : sig
 
   type t
 
-  val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+  val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> 
+    (t, [> `RBO_too_large]) result
 
   val to_color_attachment : t -> Attachment.ColorAttachment.t
 
@@ -19,7 +16,8 @@ module DepthBuffer : sig
 
   type t
 
-  val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+  val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> 
+    (t, [> `RBO_too_large]) result
 
   val to_depth_attachment : t -> Attachment.DepthAttachment.t
 
@@ -32,7 +30,8 @@ module DepthStencilBuffer : sig
 
   type t
 
-  val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+  val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> 
+    (t, [> `RBO_too_large]) result
 
   val to_depth_stencil_attachment : t -> Attachment.DepthStencilAttachment.t
 
@@ -45,7 +44,8 @@ module StencilBuffer : sig
 
   type t
 
-  val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+  val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> 
+    (t, [> `RBO_too_large]) result
 
   val to_stencil_attachment : t -> Attachment.StencilAttachment.t
 

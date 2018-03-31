@@ -2,10 +2,6 @@
   * way to manipulate programs (groups of GLSL shaders).
 **)
 
-(** Thrown at GLSL failure *)
-exception Program_error of string
-
-
 (** This module provides a low-level access to uniforms *)
 module Uniform : sig 
 
@@ -54,24 +50,37 @@ type src = [`File of string | `String of string]
 
 (** Creates a program from two shader sources. *)
 val from_source : (module RenderTarget.T with type t = 'a) -> 
-  ?log:OgamlUtils.Log.t -> 
-  context:'a -> vertex_source:src -> fragment_source:src -> unit -> t
+  context:'a -> vertex_source:src -> fragment_source:src ->
+  (t, [> `Context_failure 
+       | `Vertex_compilation_error of string
+       | `Fragment_compilation_error of string
+       | `Linking_failure
+       | `Unsupported_GLSL_type]) result
 
 (** Creates a program from a list of shader sources
   * and version numbers. Choses the best source for 
   * the current hardware. *)
 val from_source_list : (module RenderTarget.T with type t = 'a)
-  -> ?log:OgamlUtils.Log.t 
   -> context:'a 
   -> vertex_source:(int * src) list 
-  -> fragment_source:(int * src) list -> unit -> t
+  -> fragment_source:(int * src) list ->
+  (t, [> `Context_failure 
+       | `Vertex_compilation_error of string
+       | `Fragment_compilation_error of string
+       | `Linking_failure
+       | `Unsupported_GLSL_version
+       | `Unsupported_GLSL_type]) result
 
 (** Creates a program from a source by prepending 
   * #version v where v is the best GLSL version supported
   * by the given context. *)
 val from_source_pp : (module RenderTarget.T with type t = 'a) -> 
-  ?log:OgamlUtils.Log.t ->
-  context:'a -> vertex_source:src -> fragment_source:src -> unit -> t
+  context:'a -> vertex_source:src -> fragment_source:src ->
+  (t, [> `Context_failure 
+       | `Vertex_compilation_error of string
+       | `Fragment_compilation_error of string
+       | `Linking_failure
+       | `Unsupported_GLSL_type]) result
 
 (* Non-exposed functions *)
 module LL : sig

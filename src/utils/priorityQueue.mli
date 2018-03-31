@@ -10,8 +10,6 @@ end
 
 module type Q = sig
 
-  exception Empty
-
   type priority
 
   type 'a t
@@ -26,11 +24,11 @@ module type Q = sig
 
   val insert : 'a t -> priority -> 'a -> 'a t
 
-  val top : 'a t -> 'a
+  val top : 'a t -> ('a, unit) result
 
-  val pop : 'a t -> 'a t
+  val pop : 'a t -> ('a t, unit) result
 
-  val extract : 'a t -> ('a * 'a t)
+  val extract : 'a t -> ('a * 'a t, unit) result
 
 end
 

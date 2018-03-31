@@ -221,5 +221,5 @@ module FBOOutputBuffer = struct
   type t = 
     | Color of int
     | None
-
+            
 end
