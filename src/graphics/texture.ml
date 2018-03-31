@@ -1,5 +1,7 @@
 open OgamlMath
-open Utils
+open OgamlUtils
+open OgamlUtils.Result
+
 
 module type T = sig
 
@@ -582,7 +584,7 @@ module Texture2DArray = struct
       List.map extract_params src
     in
     List.hd lparams >>= fun (size, _) ->
-    fold_right_result (fun params (n, l_imgs) -> 
+    Result.fold_r (fun params (n, l_imgs) -> 
       params >>= fun (img_size, img) ->
       if img_size <> size then 
         Error `Non_equal_input_sizes
@@ -988,7 +990,7 @@ module Texture3D = struct
       List.map extract_params src
     in
     List.hd lparams >>= fun (size2D, _) ->
-    fold_right_result (fun params (n, l_imgs) -> 
+    Result.fold_r (fun params (n, l_imgs) -> 
       params >>= fun (img_size, img) ->
       if img_size <> size2D then 
         Error `Non_equal_input_sizes

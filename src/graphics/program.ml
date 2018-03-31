@@ -1,4 +1,5 @@
-open Utils
+open OgamlUtils
+open OgamlUtils.Result
 
 module Uniform = ProgramInternal.Uniform
 

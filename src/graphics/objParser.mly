@@ -38,7 +38,7 @@ normal:
   |NORMAL float_lit float_lit float_lit 
     {ObjAST.Normal OgamlMath.Vector3f.({x = $2; y = $3; z = $4} 
      |> normalize
-     |> Utils.assert_result)}
+     |> OgamlUtils.Result.assert_ok)}
   ;
 
 param:

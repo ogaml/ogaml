@@ -1,5 +1,7 @@
 open OgamlMath
-open Utils
+open OgamlUtils
+open OgamlUtils.Result
+
 
 module Vertex = struct
 
@@ -264,28 +266,28 @@ module SimpleVertex = struct
 
   let position =
     T.attribute "position" Vertex.AttributeType.vector3f
-    |> Utils.assert_result
+    |> assert_ok
 
   let color =
     T.attribute "color" Vertex.AttributeType.color
-    |> Utils.assert_result
+    |> assert_ok
 
   let uv =
     T.attribute "uv" Vertex.AttributeType.vector2f
-    |> Utils.assert_result
+    |> assert_ok
 
   let normal = 
     T.attribute "normal" Vertex.AttributeType.vector3f
-    |> Utils.assert_result
+    |> assert_ok
 
   let () = 
     T.seal ()
-    |> Utils.assert_result
+    |> assert_ok
 
   let create ?position:pp ?color:cl ?uv:tc ?normal:nr () = 
     let vtx = 
       T.create ()
-      |> Utils.assert_result
+      |> assert_ok
     in
     begin match pp with
     | None   -> ()
@@ -363,7 +365,7 @@ module Source = struct
       src.initialized <- true;
       src.layout <- Some vtx.Vertex.vertex;
     end;
-    iter_result (fun (att, _) ->
+    Result.iter (fun (att, _) ->
       let i = Vertex.offset_of att in
       match vtx.Vertex.data.(i) with
       | Vertex.AttributeVal.Unset ->
@@ -782,7 +784,7 @@ let bind context vao program =
   if vao.bound <> Some program then begin
     GL.VAO.bind (Some vao.vao);
     Context.LL.set_bound_vao context (Some (vao.vao, vao.id));
-    iter_result (fun program_attrib ->
+    Result.iter (fun program_attrib ->
       let aname = Program.Attribute.name program_attrib in 
       if not (Hashtbl.mem vao.attributes aname) then
         Error (`Missing_attribute aname)

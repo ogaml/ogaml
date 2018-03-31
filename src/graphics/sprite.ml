@@ -1,5 +1,7 @@
 open OgamlMath
-open Utils
+open OgamlUtils
+open OgamlUtils.Result
+
 
 type t = {
   texture : Texture.Texture2D.t ;
@@ -114,13 +116,13 @@ let create ~texture
   }
 
 let map_to_source sprite f src = 
-  iter_result (fun v -> VertexArray.Source.add src (f v)) (get_vertices sprite)
+  Result.iter (fun v -> VertexArray.Source.add src (f v)) (get_vertices sprite)
 
 let to_source sprite src = 
-  iter_result (VertexArray.Source.add src) (get_vertices sprite)
+  Result.iter (VertexArray.Source.add src) (get_vertices sprite)
 
 let map_to_custom_source sprite f src = 
-  iter_result (fun v -> VertexArray.Source.add src (f v)) (get_vertices sprite)
+  Result.iter (fun v -> VertexArray.Source.add src (f v)) (get_vertices sprite)
 
 let draw (type s) (module Target : RenderTarget.T with type t = s)
          ?parameters:(parameters = DrawParameter.make
@@ -135,10 +137,10 @@ let draw (type s) (module Target : RenderTarget.T with type t = s)
     Ok Uniform.empty
     >>= Uniform.vector2f "size" size
     >>= Uniform.texture2D "utexture" sprite.texture
-    |> assert_result
+    |> assert_ok
   in
   let sprite_source = VertexArray.Source.empty ~size:6 () in
-  (iter_result (VertexArray.Source.add sprite_source) (get_vertices sprite) >>= fun () ->
+  (Result.iter (VertexArray.Source.add sprite_source) (get_vertices sprite) >>= fun () ->
   let vao = 
     VertexArray.Buffer.static (module Target) target sprite_source 
     |> VertexArray.Buffer.unpack
@@ -150,7 +152,7 @@ let draw (type s) (module Target : RenderTarget.T with type t = s)
         ~program
         ~parameters
         ~uniform ())
-  |> assert_result
+  |> assert_ok
 
 let set_position sprite position =
   sprite.position <- position 

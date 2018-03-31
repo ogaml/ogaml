@@ -22,7 +22,7 @@ let apply res f =
 let (>>>=) res f = 
   apply res f
 
-let assert_ok res = function
+let assert_ok = function
   | Ok r -> r
   | Error _ -> assert false
 
@@ -64,7 +64,7 @@ let rec fold_r f l acc =
     fold_r f t acc >>= fun v ->
     f h v
 
-let opt res = function
+let opt = function
   | Ok v -> Some v
   | Error _ -> None
 

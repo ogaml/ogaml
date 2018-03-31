@@ -1,5 +1,6 @@
 open OgamlMath
-open Utils
+open OgamlUtils
+open OgamlUtils.Result
 
 module IntMap = Map.Make (struct
 
@@ -69,9 +70,9 @@ module Shelf = struct
           (`RGB Color.RGB.transparent)
       in
       Image.blit s.row new_row Vector2i.({x = 0; y = new_height - s.row_height}) 
-      |> assert_result;
+      |> assert_ok;
       Image.blit glyph new_row Vector2i.({x = s.row_width + s.pad; y = new_height - h})
-      |> assert_result;
+      |> assert_ok;
       s.row <- new_row;
       s.row_height <- new_height;
       s.row_width <- s.row_width + w + s.pad;
@@ -86,9 +87,9 @@ module Shelf = struct
           (`RGB Color.RGB.transparent)
       in
       Image.blit s.full new_full Vector2i.({x = 0; y = s.row_height + s.pad})
-      |> assert_result;
+      |> assert_ok;
       Image.blit s.row new_full Vector2i.zero
-      |> assert_result;
+      |> assert_ok;
       s.full <- new_full;
       s.row  <- glyph;
       s.height <- (s.height + s.row_height + s.pad);
@@ -110,9 +111,9 @@ module Shelf = struct
         (`RGB Color.RGB.transparent)
     in
     Image.blit s.full global Vector2i.({x = 0; y = s.row_height + s.pad})
-    |> assert_result;
+    |> assert_ok;
     Image.blit s.row global Vector2i.zero
-    |> assert_result;
+    |> assert_ok;
     global
 
 end
@@ -235,7 +236,7 @@ let load_glyph_return (t : t) s c b oversampling =
     let (bmp,w,h) = Internal.render_bitmap t.internal c oversampling page.scale in
     let bmp = Internal.convert_1chan_bitmap bmp in
     let uv = Shelf.add page.shelf 
-      (Image.create (`Data (Vector2i.({x = w; y = h}),bmp)) |> assert_result)
+      (Image.create (`Data (Vector2i.({x = w; y = h}),bmp)) |> assert_ok)
     in
     {
       Glyph.advance = scale_int advance page.scale;
@@ -332,11 +333,11 @@ let rebuild_page_texture (type s) (module M : RenderTarget.T with type t = s) ta
     | None   -> assert false
     | Some t -> 
       Texture.Texture2DArray.layer t i_layer
-      |> assert_result
+      |> assert_ok
   in
   let mipmap = 
     Texture.Texture2DArrayLayer.mipmap layer 0
-    |> assert_result
+    |> assert_ok
   in
   Texture.Texture2DArrayLayerMipmap.write
     mipmap

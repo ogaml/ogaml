@@ -1,5 +1,6 @@
 open OgamlMath
-open Utils
+open OgamlUtils
+open OgamlUtils.Result
 
 module OutputBuffer = GLTypes.FBOOutputBuffer
 
@@ -202,7 +203,7 @@ let activate_buffers fbo buffers =
   let max_colors = Array.length fbo.color_attachments in
   let active_buffers = Array.make max_colors false in
   let max_buffers = Array.length fbo.bound_attachments in
-  fold_result (fun (idx, changed) buf ->
+  Result.fold (fun (idx, changed) buf ->
     begin if idx >= max_buffers then
       Error `Too_many_draw_buffers
     else

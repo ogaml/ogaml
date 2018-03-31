@@ -1,4 +1,6 @@
-open Utils
+open OgamlUtils
+open OgamlUtils.Result
+
 
 type uniform = 
   | Vector3f  of OgamlMath.Vector3f.t
@@ -201,6 +203,6 @@ module LL = struct
       | _ -> 
         Error (`Invalid_uniform_type name)
     in
-    iter_result bind_aux unifs
+    Result.iter bind_aux unifs
 
 end

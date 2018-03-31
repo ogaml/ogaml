@@ -1,5 +1,5 @@
 open OgamlMath
-open Utils
+open OgamlUtils.Result
 
 (* Note : data is stored in row-major order, starting from the bottom-left 
  * corner to avoid having to flip the image when creating a texture.
@@ -105,8 +105,8 @@ let mirror_data img =
   let img_rev = empty (size img) (`RGB Color.RGB.black) in
   for x = 0 to img.width - 1 do
     for y = 0 to img.height - 1 do
-      let c = get img Vector2i.({x; y}) |> assert_result in
-      set img_rev Vector2i.({x; y = img.height - 1 - y}) (`RGB c) |> assert_result;
+      let c = get img Vector2i.({x; y}) |> assert_ok in
+      set img_rev Vector2i.({x; y = img.height - 1 - y}) (`RGB c) |> assert_ok;
     done
   done;
   img_rev
@@ -127,8 +127,8 @@ let mipmap img lvl =
   in
   for x = 0 to new_width - 1 do
     for y = 0 to new_height - 1 do
-      let c = get img {Vector2i.x = x lsl lvl; y = y lsl lvl} |> assert_result in
-      set new_img {Vector2i.x; y} (`RGB c) |> assert_result
+      let c = get img {Vector2i.x = x lsl lvl; y = y lsl lvl} |> assert_ok in
+      set new_img {Vector2i.x; y} (`RGB c) |> assert_ok
     done;
   done;
   new_img
@@ -153,10 +153,10 @@ let pad img ?offset:(offset = Vector2i.zero) ?color:(color = `RGB Color.RGB.blac
   for i = offset.Vector2i.x to size.Vector2i.x - 1 do
     for j = offset.Vector2i.y to size.Vector2i.y - 1 do
       get new_img Vector2i.({x = i - offset.Vector2i.x; y = j - offset.Vector2i.y})
-      |> assert_result
+      |> assert_ok
       |> (fun c -> `RGB c)
       |> set new_img Vector2i.({x = i; y = j})
-      |> assert_result
+      |> assert_ok
     done;
   done;
   new_img

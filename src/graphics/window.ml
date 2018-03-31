@@ -1,7 +1,7 @@
 open OgamlCore
 open OgamlUtils
 open OgamlMath
-open Utils
+open Result
 
 module OutputBuffer = struct
 
@@ -92,7 +92,7 @@ let display win =
 let activate_buffers win buffers = 
   let max_buffers = Array.length win.bound_buffers in
   let active_buffers = Array.make 5 false in
-  fold_result (fun (idx, changed) buf ->
+  Result.fold (fun (idx, changed) buf ->
     (if idx >= max_buffers then
       Error `Too_many_draw_buffers
     else Ok ()) >>= fun () ->
@@ -156,5 +156,5 @@ let screenshot win =
   for i = 0 to size.Vector2i.y - 1 do
     Bytes.blit data (i * size.Vector2i.x * 4) rev_data ((size.Vector2i.y - 1 - i) * size.Vector2i.x * 4) (size.Vector2i.x * 4)
   done;
-  Image.create (`Data (size, rev_data)) |> assert_result
+  Image.create (`Data (size, rev_data)) |> assert_ok
 
