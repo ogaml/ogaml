@@ -10,10 +10,6 @@ module Result : sig
   (** Makes a result from an option and an error value. *)
   val make : ?result:'a -> 'b -> ('a, 'b) result
 
-  (** Composition operator with reversed parameters. Useful to handle certain
-    * return values. *)
-  val (||>) : 'a -> ('b -> 'a -> 'c) -> ('b -> 'c)
-
   (** Bind function on results. *)
   val bind : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
 
@@ -38,6 +34,9 @@ module Result : sig
 
   (** Applies an error handler to a result. *)
   val handle : ('a, 'b) result -> ('b -> 'a) -> 'a
+
+  (** Equivalent to $handle$ but with parameters reversed. *)
+  val handle_r : ('b -> 'a) -> ('a, 'b) result -> 'a
 
   (** $iter f l$ applies $f$ to every element of $l$ but stops as soon as
     * $f$ returns an error. *)

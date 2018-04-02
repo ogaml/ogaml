@@ -18,6 +18,8 @@ val catch : ('a -> 'b) -> 'a -> ('b, exn) result
 
 val handle : ('a, 'b) result -> ('b -> 'a) -> 'a
 
+val handle_r : ('b -> 'a) -> ('a, 'b) result -> 'a
+
 val iter : ('a -> (unit, 'b) result) -> 'a list -> (unit, 'b) result
 
 val map : ('a -> ('b, 'c) result) -> 'a list -> ('b list, 'c) result

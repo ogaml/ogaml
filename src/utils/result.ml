@@ -39,6 +39,11 @@ let handle res f =
   | Ok r -> r 
   | Error e -> f e
 
+let handle_r f res = 
+  match res with
+  | Ok r -> r 
+  | Error e -> f e
+
 let rec iter f = function
   | [] -> Ok ()
   | h::t -> 
