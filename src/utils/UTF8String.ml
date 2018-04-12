@@ -120,7 +120,7 @@ let to_string s =
     end
   in 
   iter 0 0;
-  str
+  Bytes.to_string str
 
 let iter s f = Array.iter f s
 

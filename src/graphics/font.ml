@@ -150,7 +150,7 @@ module Internal = struct
       Bytes.set bts (4*i+0) '\255';
       Bytes.set bts (4*i+1) '\255';
       Bytes.set bts (4*i+2) '\255';
-      Bytes.set bts (4*i+3) bmp.[i]
+      Bytes.set bts (4*i+3) (Bytes.get bmp i)
     done;
     bts
 

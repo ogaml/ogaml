@@ -14,7 +14,8 @@ let read_file filename =
   let len = in_channel_length chan in
   let str = Bytes.create len in
   really_input chan str 0 len;
-  close_in chan; str
+  close_in chan; 
+  Bytes.to_string str
 
 let to_source = function
   | `File   s -> read_file s

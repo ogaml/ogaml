@@ -58,7 +58,7 @@ let load filename =
   |None -> 
     Error (`Loading_error (stbi_load_error ()))
   |Some (s,x,y) ->
-    Ok {width = x; height = y; data = s}
+    Ok {width = x; height = y; data = Bytes.of_string s}
 
 let create = function
   |`File s -> load s
@@ -94,10 +94,10 @@ let get img v =
   let open Vector2i in
   try 
     Ok Color.RGB.(
-    {r = inverse img.data.[(img.height - v.y - 1) * 4 * img.width + v.x * 4 + 0];
-     g = inverse img.data.[(img.height - v.y - 1) * 4 * img.width + v.x * 4 + 1];
-     b = inverse img.data.[(img.height - v.y - 1) * 4 * img.width + v.x * 4 + 2];
-     a = inverse img.data.[(img.height - v.y - 1) * 4 * img.width + v.x * 4 + 3]})
+    {r = inverse (Bytes.get img.data ((img.height - v.y - 1) * 4 * img.width + v.x * 4 + 0));
+     g = inverse (Bytes.get img.data ((img.height - v.y - 1) * 4 * img.width + v.x * 4 + 1));
+     b = inverse (Bytes.get img.data ((img.height - v.y - 1) * 4 * img.width + v.x * 4 + 2));
+     a = inverse (Bytes.get img.data ((img.height - v.y - 1) * 4 * img.width + v.x * 4 + 3))})
   with
     Invalid_argument _ -> Error `Out_of_bounds
 
