@@ -271,7 +271,7 @@ let preprocess_file file =
     let dot = String.rindex file '.' in
     let sls = String.rindex file '/' in
     String.sub file (sls+1) (dot-sls-1)
-    |> String.capitalize
+    |> String.capitalize_ascii
   in
   let ast = parse_from_file file in
   preprocess modulename ast
@@ -290,7 +290,7 @@ let rec comment_to_html root ppf comment =
     Format.fprintf ppf "%a" (comment_to_html root) t
   | (PP_Related s)::t -> 
     let link = 
-      String.lowercase s 
+      String.lowercase_ascii s 
       |> Str.split (Str.regexp "\\.")
       |> String.concat "/"
     in
@@ -567,7 +567,7 @@ let gen_main_pp ppf modl root =
   let rec print_submodules_aux ppf = function
     | []   -> ()
     | h::t -> 
-      let link = h.hierarchy @ [h.modulename] |> String.concat "/" |> String.lowercase in
+      let link = h.hierarchy @ [h.modulename] |> String.concat "/" |> String.lowercase_ascii in
       Format.fprintf ppf "<tr><td><a href=\"%sdoc/%s.html\">%s</a></td><td>%a</td></tr>@\n%a"
         root link h.modulename (comment_to_html root) h.description print_submodules_aux t
   in
@@ -601,7 +601,7 @@ let gen_main root modl =
   Format.flush_str_formatter ()
 
 let gen_index_entry root modl = 
-  let link = modl.ASTpp.modulename |> String.lowercase in
+  let link = modl.ASTpp.modulename |> String.lowercase_ascii in
   let comm = comment_to_string root modl.ASTpp.description in
   Printf.sprintf "<li>\n\t<p>\n\t\t<a href=\"%s.html\">%s</a>\n\t%s\n\t</p>\n</li>"
     link modl.ASTpp.modulename comm
@@ -645,7 +645,7 @@ let rec tree_mem cur mdl =
 let rec gen_aside_module root curr mdl = 
   let link = mdl.hierarchy @ [mdl.modulename] 
              |> String.concat "/" 
-             |> String.lowercase in
+             |> String.lowercase_ascii in
   Printf.sprintf 
   "<li>
     <span class=\"arrow-right arrow shownav\"></span>
