@@ -163,17 +163,19 @@ and process_module = function
   | [] -> []
 
 and process_expr = function
+  | NoType ->
+    PP_NoType
   | ModuleType (s, te) -> 
     PP_ModType (s, process_expr te)
   | AtomType s -> 
     PP_AtomType s
   | Record l -> 
     PP_Record (List.map (fun (mut,_,a,b) -> (mut, a, process_expr b)) l)
-  | PolyVariant (v, sl) -> 
+  | PolyVariant (v, sl, opt) -> 
     PP_PolyVariant (v, List.map (fun (a,b) -> 
                                  match b with
                                  | None   -> (a, None)
-                                 | Some v -> (a, Some (process_expr v))) sl)
+                                 | Some v -> (a, Some (process_expr v))) sl, opt)
   | PolyType s -> 
     PP_PolyType s
   | Arrow (te, te') -> 
@@ -192,7 +194,7 @@ and process_expr = function
   | ParamType (l, e) ->
     PP_ParamType (List.map process_expr l, process_expr e)
   | FCModule (t, e) ->
-    PP_FCModule (process_expr t, List.map (fun (s,e) -> (s,process_expr e)) e)
+    PP_FCModule (process_expr t, List.map (fun (s,e) -> (process_expr s,process_expr e)) e)
 
 and get_members = function
   | Record l ->
@@ -222,7 +224,7 @@ and process_functor {name; args; sign; constr} =
     fname = name;
     fargs = args;
     fsign = sign;
-    fcons = List.map (fun (s,e) -> (s,process_expr e)) constr
+    fcons = List.map (fun (s,e) -> (process_expr s,process_expr e)) constr
   }
 
 and pp hierarchy modulename ast : ASTpp.module_data = 
@@ -427,7 +429,7 @@ and module_to_html root ppf mdl =
       |> String.concat " "
     in
     let constraints = 
-      List.map (fun (s,e) -> Printf.sprintf "%s = %s" s (type_expr_to_string e)) 
+      List.map (fun (s,e) -> Printf.sprintf "%s = %s" (type_expr_to_string s) (type_expr_to_string e)) 
         fdata.fcons
       |> String.concat " and "
     in
@@ -454,6 +456,7 @@ and type_params_to_string = function
     "'" ^ s
 
 and type_expr_to_string = function
+  | PP_NoType -> "_"
   | PP_ModType (s,e) -> 
     Printf.sprintf "%s.%s" s (type_expr_to_string e)
   | PP_AtomType s ->
@@ -465,12 +468,19 @@ and type_expr_to_string = function
         s (type_expr_to_string e)) l
     |> String.concat "; "
     |> Printf.sprintf "{%s}"
-  | PP_PolyVariant (v, l) ->
-    List.map (function
-              | (s,Some e) -> Printf.sprintf "`%s of %s" s (type_expr_to_string e)
-              | (s,None)   -> Printf.sprintf "`%s" s) l
-    |> String.concat " | "
-    |> Printf.sprintf "[%s %s]" (variance_to_string v)
+  | PP_PolyVariant (v, l, opt) ->
+    let res = 
+      List.map (function
+                | (s,Some e) -> Printf.sprintf "`%s of %s" s (type_expr_to_string e)
+                | (s,None)   -> Printf.sprintf "`%s" s) l
+      |> String.concat " | "
+    in
+    let as_type = 
+      match opt with
+      | Some t -> Printf.sprintf " as '%s" t
+      | None -> ""
+    in
+    Printf.sprintf "[%s %s]%s" (variance_to_string v) res as_type
   | PP_PolyType s -> 
     Printf.sprintf "'%s" s
   | PP_Arrow (te1, te2) ->
@@ -499,7 +509,7 @@ and type_expr_to_string = function
     Printf.sprintf "(module %s)" (type_expr_to_string t)
   | PP_FCModule (t, l) ->
     let constraints = 
-      List.map (fun (s,e) -> Printf.sprintf "%s = %s" s (type_expr_to_string e)) l
+      List.map (fun (s,e) -> Printf.sprintf "%s = %s" (type_expr_to_string s) (type_expr_to_string e)) l
       |> String.concat " and "
     in
     Printf.sprintf "(module %s with type %s)" (type_expr_to_string t) constraints

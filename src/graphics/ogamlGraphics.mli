@@ -2036,7 +2036,7 @@ module VertexArray : sig
   end
 
 
-  (* Vertex buffer *)
+  (** Vertex buffer *)
   module Buffer : sig
 
     (** This module represents vertex buffers, which are vertex sources that
