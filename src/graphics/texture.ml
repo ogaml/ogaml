@@ -37,6 +37,47 @@ module DepthFormat = struct
 end
 
 
+module TextureFormat = struct
+
+  type t = 
+    | R8
+    | RG8
+    | RGB8
+    | RGBA8
+    | R16
+    | RG16
+    | RGB16
+    | RGBA16
+    | R16F
+    | RG16F
+    | RGB16F
+    | RGBA16F
+    | R32F
+    | RG32F
+    | RGB32F
+    | RGBA32F
+
+  let to_texture_format = function
+    | R8 -> GLTypes.TextureFormat.R8
+    | RG8 -> GLTypes.TextureFormat.RG8
+    | RGB8 -> GLTypes.TextureFormat.RGB8
+    | RGBA8 -> GLTypes.TextureFormat.RGBA8
+    | R16 -> GLTypes.TextureFormat.R16
+    | RG16 -> GLTypes.TextureFormat.RG16
+    | RGB16 -> GLTypes.TextureFormat.RGB16
+    | RGBA16 -> GLTypes.TextureFormat.RGBA16
+    | R16F -> GLTypes.TextureFormat.R16F
+    | RG16F -> GLTypes.TextureFormat.RG16F
+    | RGB16F -> GLTypes.TextureFormat.RGB16F
+    | RGBA16F -> GLTypes.TextureFormat.RGBA16F
+    | R32F -> GLTypes.TextureFormat.R32F
+    | RG32F -> GLTypes.TextureFormat.RG32F
+    | RGB32F -> GLTypes.TextureFormat.RGB32F
+    | RGBA32F -> GLTypes.TextureFormat.RGBA32F
+
+end
+
+
 (*************************************************************)
 (*                                                           *)
 (*            Common interface to OpenGL Textures            *)

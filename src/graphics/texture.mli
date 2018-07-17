@@ -28,6 +28,29 @@ module DepthFormat : sig
 end
 
 
+module TextureFormat : sig
+
+  type t = 
+    | R8
+    | RG8
+    | RGB8
+    | RGBA8
+    | R16
+    | RG16
+    | RGB16
+    | RGBA16
+    | R16F
+    | RG16F
+    | RGB16F
+    | RGBA16F
+    | R32F
+    | RG32F
+    | RGB32F
+    | RGBA32F
+
+end
+
+
 module Texture2DMipmap : sig
 
   type t
