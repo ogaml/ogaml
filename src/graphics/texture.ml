@@ -29,11 +29,6 @@ module DepthFormat = struct
     | Int24 -> GLTypes.TextureFormat.Depth24
     | Int32 -> GLTypes.TextureFormat.Depth32
 
-  let byte_size = function
-    | Int16 -> 2
-    | Int24 -> 3
-    | Int32 -> 4
-
 end
 
 
@@ -400,10 +395,9 @@ module DepthTexture2D = struct
     ?mipmaps:(mipmaps=`AllGenerated) format src = 
     let context = M.context target in
     (* Extract the texture parameters *)
-    let bytesize = DepthFormat.byte_size format in
     begin match src with
     | `Data (size, data) ->
-      if size.Vector2i.x * size.Vector2i.y * bytesize > Bytes.length data then
+      if size.Vector2i.x * size.Vector2i.y > Bytes.length data then
         Error `Insufficient_data
       else
         Ok (size, (Some data))
@@ -443,14 +437,12 @@ module DepthTexture2D = struct
         let mipmap_x, mipmap_y = 
           (size.Vector2i.x lsr lvl, size.Vector2i.y lsr lvl) 
         in
-        let mipmap_data = Bytes.create (mipmap_x * mipmap_y * bytesize) in 
+        let mipmap_data = Bytes.create (mipmap_x * mipmap_y) in 
         for i = 0 to mipmap_x - 1 do
           for j = 0 to mipmap_y - 1 do
-            let offset = bytesize * mipmap_x * (j lsl lvl) + bytesize * (i lsl lvl) in
-            let mipmap_offset = bytesize * mipmap_x * j + bytesize * i in
-            for k = 0 to bytesize - 1 do
-              Bytes.set mipmap_data (mipmap_offset + k) (Bytes.get data (offset + k))
-            done;
+            let offset = mipmap_x * (j lsl lvl) + (i lsl lvl) in
+            let mipmap_offset = mipmap_x * j + i in
+            Bytes.set mipmap_data mipmap_offset (Bytes.get data offset)
           done;
         done;
         GL.Texture.subimage2D
