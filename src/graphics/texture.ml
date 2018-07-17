@@ -277,10 +277,11 @@ module Texture2D = struct
     (* Check that the size is allowed *)
     let capabilities = Context.capabilities context in
     let max_size = capabilities.Context.max_texture_size in
-    if size.Vector2i.x > max_size || size.Vector2i.y > max_size then
+    begin if size.Vector2i.x > max_size || size.Vector2i.y > max_size then
       Error `Texture_too_large
     else
-      Ok () >>>= fun () ->
+      Ok () 
+    end >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.Texture2D in
     let tex = {common; size} in
@@ -418,10 +419,11 @@ module DepthTexture2D = struct
     (* Check that the size is allowed *)
     let capabilities = Context.capabilities context in
     let max_size = capabilities.Context.max_texture_size in
-    if size.Vector2i.x > max_size || size.Vector2i.y > max_size then
+    begin if size.Vector2i.x > max_size || size.Vector2i.y > max_size then
       Error `Texture_too_large
     else
-      Ok () >>>= fun () ->
+      Ok () 
+    end >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.Texture2D in
     let format = DepthFormat.to_texture_format format in
@@ -643,12 +645,13 @@ module Texture2DArray = struct
     let capabilities = Context.capabilities context in
     let max_size = capabilities.Context.max_texture_size in
     let max_depth = capabilities.Context.max_array_texture_layers in
-    if size.Vector2i.x > max_size || size.Vector2i.y > max_size then
+    begin if size.Vector2i.x > max_size || size.Vector2i.y > max_size then
       Error `Texture_too_large
     else if depth > max_depth then
       Error `Texture_too_deep
     else 
-      Ok () >>>= fun () ->
+      Ok ()
+    end >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.Texture2DArray in
     let tex = {common; size; depth} in
@@ -883,10 +886,11 @@ module Cubemap = struct
     (* Check that the size is allowed *)
     let capabilities = Context.capabilities context in
     let max_size = capabilities.Context.max_cube_map_texture_size in
-    if spx.Vector2i.x > max_size || spx.Vector2i.y > max_size then
+    begin if spx.Vector2i.x > max_size || spx.Vector2i.y > max_size then
       Error `Texture_too_large
     else
-      Ok () >>>= fun () ->
+      Ok ()
+    end >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.CubemapTexture in
     let tex = {common; size = spx} in
@@ -1049,10 +1053,11 @@ module Texture3D = struct
     (* Check that the size is allowed *)
     let capabilities = Context.capabilities context in
     let max_size = capabilities.Context.max_3D_texture_size in
-    if size.Vector3i.x > max_size || size.Vector3i.y > max_size || size.Vector3i.z > max_size then
+    begin if size.Vector3i.x > max_size || size.Vector3i.y > max_size || size.Vector3i.z > max_size then
       Error `Texture_too_large
     else
-      Ok () >>>= fun () ->
+      Ok () 
+    end >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.Texture3D in
     let tex = {common; size} in
