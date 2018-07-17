@@ -249,12 +249,13 @@ end
 module Texture2D = struct
 
   type t = {
-    common  : Common.t;
-    size    : Vector2i.t;
+    common : Common.t;
+    size   : Vector2i.t;
+    format : TextureFormat.t;
   }
 
   let create (type s) (module M : RenderTarget.T with type t = s) target 
-    ?mipmaps:(mipmaps=`AllGenerated) src = 
+    ?mipmaps:(mipmaps=`AllGenerated) ?(format=TextureFormat.RGBA8) src = 
     let context = M.context target in
     (* Extract the texture parameters *)
     begin match src with
@@ -284,14 +285,14 @@ module Texture2D = struct
     end >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.Texture2D in
-    let tex = {common; size} in
+    let tex = {common; size; format} in
     (* Bind the texture *)
     Common.bind tex.common 0;
     (* Allocate the texture *)
+    let glformat = TextureFormat.to_texture_format format in
     GL.Texture.storage2D
       GLTypes.TextureTarget.Texture2D 
-      levels 
-      GLTypes.TextureFormat.RGBA8
+      levels glformat
       (size.Vector2i.x, size.Vector2i.y);
     (* Load the corresponding image in each mipmap if requested *)
     let load_level lvl = 
@@ -392,7 +393,7 @@ module DepthTexture2D = struct
   type t = {
     common  : Common.t;
     size    : Vector2i.t;
-    format  : GLTypes.TextureFormat.t
+    format  : DepthFormat.t
   }
 
   let create (type s) (module M : RenderTarget.T with type t = s) target 
@@ -426,15 +427,14 @@ module DepthTexture2D = struct
     end >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.Texture2D in
-    let format = DepthFormat.to_texture_format format in
     let tex = {common; size; format} in
     (* Bind the texture *)
     Common.bind tex.common 0;
     (* Allocate the texture *)
+    let glformat = DepthFormat.to_texture_format format in
     GL.Texture.storage2D
       GLTypes.TextureTarget.Texture2D
-      levels 
-      format
+      levels glformat
       (size.Vector2i.x, size.Vector2i.y);
     (* Load the corresponding image in each mipmap if requested *)
     let load_level lvl = 
@@ -602,11 +602,12 @@ module Texture2DArray = struct
   type t = {
     common : Common.t;
     size   : Vector2i.t;
-    depth  : int
+    depth  : int;
+    format : TextureFormat.t;
   }
 
   let create (type a) (module M : RenderTarget.T with type t = a) target
-    ?mipmaps:(mipmaps = `AllGenerated) src =
+    ?mipmaps:(mipmaps = `AllGenerated) ?(format=TextureFormat.RGBA8) src =
     let context = M.context target in
     (* Extract the texture parameters *)
     let extract_params = function
@@ -654,14 +655,14 @@ module Texture2DArray = struct
     end >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.Texture2DArray in
-    let tex = {common; size; depth} in
+    let tex = {common; size; depth; format} in
     (* Bind the texture *)
     Common.bind tex.common 0;
     (* Allocate the texture *)
+    let glformat = TextureFormat.to_texture_format format in
     GL.Texture.storage3D
       GLTypes.TextureTarget.Texture2DArray
-      levels 
-      GLTypes.TextureFormat.RGBA8
+      levels glformat
       (size.Vector2i.x, size.Vector2i.y, depth);
     (* Load the corresponding image in each mipmap if requested *)
     let load_level lvl = 
@@ -848,10 +849,11 @@ module Cubemap = struct
   type t = {
     common : Common.t;
     size   : Vector2i.t;
+    format : TextureFormat.t;
   }
 
   let create (type a) (module M : RenderTarget.T with type t = a) target
-    ?mipmaps:(mipmaps = `AllGenerated) 
+    ?mipmaps:(mipmaps = `AllGenerated) ?(format=TextureFormat.RGBA8)
     ~positive_x ~positive_y ~positive_z 
     ~negative_x ~negative_y ~negative_z () =
     let context = M.context target in
@@ -893,14 +895,14 @@ module Cubemap = struct
     end >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.CubemapTexture in
-    let tex = {common; size = spx} in
+    let tex = {common; size = spx; format} in
     (* Bind the texture *)
     Common.bind tex.common 0;
     (* Allocate the texture *)
+    let glformat = TextureFormat.to_texture_format format in
     GL.Texture.storage2D
       GLTypes.TextureTarget.CubemapTexture
-      levels 
-      GLTypes.TextureFormat.RGBA8
+      levels glformat
       (spx.Vector2i.x, spx.Vector2i.y);
     (* Load the corresponding image in each mipmap if requested *)
     let load_img target lvl img = 
@@ -1011,10 +1013,11 @@ module Texture3D = struct
   type t = {
     common : Common.t;
     size   : Vector3i.t;
+    format : TextureFormat.t;
   }
 
   let create (type a) (module M : RenderTarget.T with type t = a) target
-    ?mipmaps:(mipmaps = `AllGenerated) src =
+    ?mipmaps:(mipmaps = `AllGenerated) ?(format=TextureFormat.RGBA8) src =
     let context = M.context target in
     (* Extract the texture parameters *)
     let extract_params = function
@@ -1060,14 +1063,14 @@ module Texture3D = struct
     end >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.Texture3D in
-    let tex = {common; size} in
+    let tex = {common; size; format} in
     (* Bind the texture *)
     Common.bind tex.common 0;
     (* Allocate the texture *)
+    let glformat = TextureFormat.to_texture_format format in
     GL.Texture.storage3D
       GLTypes.TextureTarget.Texture3D
-      levels 
-      GLTypes.TextureFormat.RGBA8
+      levels glformat
       (size.Vector3i.x, size.Vector3i.y, size.Vector3i.z);
     (* Load the corresponding image in each mipmap if requested *)
     let load_level lvl = 
