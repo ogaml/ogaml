@@ -28,6 +28,29 @@ module DepthFormat : sig
 end
 
 
+module TextureFormat : sig
+
+  type t = 
+    | R8
+    | RG8
+    | RGB8
+    | RGBA8
+    | R16
+    | RG16
+    | RGB16
+    | RGBA16
+    | R16F
+    | RG16F
+    | RGB16F
+    | RGBA16F
+    | R32F
+    | RG32F
+    | RGB32F
+    | RGBA32F
+
+end
+
+
 module Texture2DMipmap : sig
 
   type t
@@ -51,6 +74,7 @@ module Texture2D : sig
 
   val create : (module RenderTarget.T with type t = 'a) -> 'a 
                -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+               -> ?format:TextureFormat.t 
                -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] -> 
                (t, [> `Texture_too_large
                     | `File_not_found of string
@@ -185,6 +209,7 @@ module Texture2DArray : sig
 
   val create : (module RenderTarget.T with type t = 'a) -> 'a
                -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+               -> ?format:TextureFormat.t 
                -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list ->
                (t, [> `No_input_files
                     | `Non_equal_input_sizes
@@ -274,6 +299,7 @@ module Cubemap : sig
 
   val create : (module RenderTarget.T with type t = 'a) -> 'a
                -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+               -> ?format:TextureFormat.t 
                -> positive_x:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                -> positive_y:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                -> positive_z:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
@@ -333,6 +359,7 @@ module Texture3D : sig
 
   val create : (module RenderTarget.T with type t = 'a) -> 'a
                -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+               -> ?format:TextureFormat.t 
                -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list -> 
                (t, [> `Texture_too_large
                     | `Non_equal_input_sizes

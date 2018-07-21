@@ -820,6 +820,31 @@ module Texture : sig
   end
 
 
+  (** Module containing an enumeration of the color texture formats *)
+  module TextureFormat : sig
+  
+    (** Enumeration of the color texture formats *)
+    type t = 
+      | R8
+      | RG8
+      | RGB8
+      | RGBA8
+      | R16
+      | RG16
+      | RGB16
+      | RGBA16
+      | R16F
+      | RG16F
+      | RGB16F
+      | RGBA16F
+      | R32F
+      | RG32F
+      | RGB32F
+      | RGBA32F
+  
+  end
+
+
   (** Module containing an enumeration of the depth texture formats *)
   module DepthFormat : sig
  
@@ -872,13 +897,14 @@ module Texture : sig
     type t
 
     (** Creates a texture from a source (a file or an image), or an empty texture.
-      * Generates all mipmaps by default.
+      * Generates all mipmaps by default. The default format is RGBA8.
       *
       * @see:OgamlGraphics.RenderTarget.T 
       * @see:OgamlMath.Vector2i 
       * @see:OgamlGraphics.Context *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a -> 
                  ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None] ->
+                 ?format:TextureFormat.t ->
                  [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] -> 
                  (t, [> `Texture_too_large
                       | `File_not_found of string
@@ -1092,9 +1118,11 @@ module Texture : sig
 
     (** Creates a texture array from a list of files, images, or empty
       * layers of given dimensions.
-      * Generates all mipmaps by default for every layer by default. *)
+      * Generates all mipmaps by default for every layer by default. 
+      * The default format is RGBA8 *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a
                  -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+                 -> ?format:TextureFormat.t
                  -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list ->
                  (t, [> `No_input_files
                       | `Non_equal_input_sizes
@@ -1223,9 +1251,11 @@ module Texture : sig
 
     (** Creates a cubemap texture from 6 textures, images or empty layers of
       * a given dimension.
-      * Generates all mipmaps by default. *)
+      * Generates all mipmaps by default. 
+      * The default format is RGBA8. *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a
                  -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+                 -> ?format:TextureFormat.t
                  -> positive_x:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                  -> positive_y:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                  -> positive_z:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
@@ -1310,9 +1340,11 @@ module Texture : sig
 
     (** Creates a 3D texture from a list of files, images, or empty
       * layers of given dimensions.
-      * Generates all mipmaps by default. *)
+      * Generates all mipmaps by default.
+      * The default format is RGBA8. *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a
                  -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+                 -> ?format:TextureFormat.t
                  -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list ->
                  (t, [> `Texture_too_large
                       | `Non_equal_input_sizes

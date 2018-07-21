@@ -83,6 +83,18 @@ module TextureFormat = struct
     | Depth32
     | Depth24Stencil8
     | Stencil8
+    | R16
+    | RG16
+    | RGB16
+    | RGBA16
+    | R16F
+    | RG16F
+    | RGB16F
+    | RGBA16F
+    | R32F
+    | RG32F
+    | RGB32F
+    | RGBA32F
 
 end
 
