@@ -34,6 +34,10 @@ let bind_fbo context id fbo =
   end
 
 let clear ?color ~depth ~stencil context = 
+  if depth && not (Context.LL.depth_writing context) then begin
+    Context.LL.set_depth_writing context true;
+    GL.Pervasives.depth_mask true;
+  end;
   match color with
   | None -> GL.Pervasives.clear false depth stencil
   | Some color ->
