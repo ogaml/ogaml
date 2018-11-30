@@ -1,7 +1,7 @@
 open OgamlGraphics
 open OgamlMath
 open OgamlUtils
-open OgamlUtils.Result
+open Result.Operators
 
 let fail ?msg err = 
   Log.fatal Log.stdout "%s" err;
@@ -47,17 +47,17 @@ let () =
       maxi := max !maxi v;
       let v = (v +. 1.) /. 2. in
       Image.set img Vector2i.({x = i; y = j}) (`RGB Color.RGB.({r = v; g = v; b = v; a = 1.}))
-      |> assert_ok
+      |> Result.assert_ok
     done;
   done;
   Printf.printf "Noise min : %f, noise max : %f\n%!" !mini !maxi
 
 let tex = 
   Texture.Texture2D.create (module Window) window (`Image img)
-  |> assert_ok
+  |> Result.assert_ok
 
 let draw = 
-  let sprite = Sprite.create ~texture:tex () |> assert_ok in
+  let sprite = Sprite.create ~texture:tex () |> Result.assert_ok in
   Sprite.draw (module Window) ~target:window ~sprite
 
 let rec handle_events () =
@@ -72,7 +72,7 @@ let rec handle_events () =
 
 let rec each_frame () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> assert_ok;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> Result.assert_ok;
     draw () ;
     Window.display window ;
     handle_events () ;

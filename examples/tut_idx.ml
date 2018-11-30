@@ -1,8 +1,7 @@
-
 open OgamlGraphics
 open OgamlMath
 open OgamlUtils
-open OgamlUtils.Result
+open Result.Operators
 
 let fail ?msg err = 
   Log.fatal Log.stdout "%s" err;
@@ -102,7 +101,7 @@ let vertex_source = VertexArray.Source.(
     <<< vertex0 <<< vertex1 <<< vertex2
     <<< vertex3 <<< vertex4 <<< vertex5
     <<< vertex6 <<< vertex7) 
-  |> assert_ok
+  |> Result.assert_ok
 
 let index_source = IndexArray.Source.(
     empty 36
@@ -123,11 +122,11 @@ let indices  = IndexArray.static (module Window) window index_source
 (* Displaying *)
 let proj = 
   Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
-  |> assert_ok
+  |> Result.assert_ok
 
 let view = 
   Matrix3D.look_at ~from:Vector3f.({x = 1.5; y = 0.5; z = 0.9}) ~up:Vector3f.unit_y ~at:Vector3f.zero
-  |> assert_ok
+  |> Result.assert_ok
 
 let matrixVP = Matrix3D.product proj view
 
@@ -137,7 +136,7 @@ let display () =
   let t = Unix.gettimeofday () in
   rot_angle := !rot_angle +. (abs_float (cos t /. 10.)) /. 3.;
   let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
-  let model = Matrix3D.rotation rot_vector !rot_angle |> assert_ok in
+  let model = Matrix3D.rotation rot_vector !rot_angle |> Result.assert_ok in
   let matrixMVP = Matrix3D.product matrixVP model in
   (* Cube *)
   let parameters = DrawParameter.(make ~culling:CullingMode.CullCounterClockwise ()) in
@@ -146,10 +145,10 @@ let display () =
     Ok empty 
     >>= matrix3D "MVP" matrixMVP 
     >>= color "color" (`RGB Color.RGB.red)
-    |> assert_ok
+    |> Result.assert_ok
   in
   VertexArray.draw (module Window) ~target:window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ()
-  |> assert_ok;
+  |> Result.assert_ok;
   (* Edges *)
   let parameters = DrawParameter.(make ~polygon:PolygonMode.DrawLines ()) in
   let uniform = 
@@ -157,10 +156,10 @@ let display () =
     Ok empty 
     >>= matrix3D "MVP" matrixMVP 
     >>= color "color" (`RGB Color.RGB.black)
-    |> assert_ok
+    |> Result.assert_ok
   in
   VertexArray.draw (module Window) ~target:window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ()
-  |> assert_ok
+  |> Result.assert_ok
 
 let rec event_loop () =
   match Window.poll_event window with
@@ -173,7 +172,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> assert_ok;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> Result.assert_ok;
     display ();
     Window.display window;
     event_loop ();

@@ -1,6 +1,6 @@
 open OgamlMath
 open OgamlUtils
-open OgamlUtils.Result
+open Result.Operators
 
 
 type shape_vals = {
@@ -87,7 +87,7 @@ let bisectors_of_points points =
   foralltwo
     (fun l a b ->
       let open Vector3f in
-      let ab = direction a b |> assert_ok in
+      let ab = direction a b |> Result.assert_ok in
       (cross ab v) :: l
     )
     []
@@ -130,7 +130,7 @@ let outline_of_points points thickness color =
           fun lst (a,ba) (b,bb) ->
             (* Normal to the direction (a b) *)
             let n =
-              let u = direction a b |> assert_ok in
+              let u = direction a b |> Result.assert_ok in
               cross u v
             in
             (* The local thickness *)
@@ -246,7 +246,7 @@ let create_line ~thickness
   let a3 = Vector3f.lift top 
   and b3 = Vector3f.lift tip in
   let n = Vector3f.(
-    let u = direction a3 b3 |> assert_ok in
+    let u = direction a3 b3 |> Result.assert_ok in
     let v = { x = 0. ; y = 0. ; z = 1. } in
     let n = cross u v in
     project n
@@ -343,14 +343,14 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
   let uniform =
     Uniform.empty
     |> Uniform.vector2f "size" (Vector2f.from_int size)
-    |> assert_ok
+    |> Result.assert_ok
   in
   let src = VertexArray.Source.empty ~size:8 () in
   let vtcs, outline = compute_vertices shape in
-  (Result.iter (VertexArray.Source.add src) vtcs >>= fun () ->
+  (Result.List.iter (VertexArray.Source.add src) vtcs >>= fun () ->
   begin match outline with
   | None -> Ok ()
-  | Some vtcs -> Result.iter (VertexArray.Source.add src) vtcs
+  | Some vtcs -> Result.List.iter (VertexArray.Source.add src) vtcs
   end >>= fun () ->
   let vbo = VertexArray.Buffer.(unpack (static (module M) target src)) in
   let vertices = VertexArray.create (module M) target [vbo] in
@@ -361,21 +361,21 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
         ~parameters
         ~uniform
         ~mode:DrawMode.Triangles () )
-  |> assert_ok
+  |> Result.assert_ok
 
 let map_to_source shape f src = 
   let vtcs, outline = compute_vertices shape in
-  Result.iter (fun v -> VertexArray.Source.add src (f v)) vtcs >>= fun () ->
+  Result.List.iter (fun v -> VertexArray.Source.add src (f v)) vtcs >>= fun () ->
   begin match outline with
   | None -> Ok ()
-  | Some vtcs -> Result.iter (fun v -> VertexArray.Source.add src (f v)) vtcs
+  | Some vtcs -> Result.List.iter (fun v -> VertexArray.Source.add src (f v)) vtcs
   end
 
 let to_source shape src = 
   let vtcs, outline = compute_vertices shape in
-  Result.iter (VertexArray.Source.add src) vtcs >>= fun () ->
+  Result.List.iter (VertexArray.Source.add src) vtcs >>= fun () ->
   begin match outline with
   | None -> Ok ()
-  | Some vtcs -> Result.iter (VertexArray.Source.add src) vtcs
+  | Some vtcs -> Result.List.iter (VertexArray.Source.add src) vtcs
   end
 

@@ -9,7 +9,7 @@
 open OgamlGraphics
 open OgamlMath
 open OgamlUtils
-open OgamlUtils.Result
+open Result.Operators
 
 let fail ?msg err = 
   Log.fatal Log.stdout "%s" err;
@@ -95,7 +95,7 @@ let vertex_source = VertexArray.Source.(
     <<< vertex1
     <<< vertex2
     <<< vertex3
-    |> assert_ok
+    |> Result.assert_ok
 )
 
 (* Compute and load the VBO (Vertex Buffer Object)
@@ -134,7 +134,7 @@ let rec main_loop () =
     Window.clear
       ~color:(Some (`RGB Color.RGB.white))
       window
-    |> assert_ok;
+    |> Result.assert_ok;
 
     (* Draw our triangle on the window.
      * The drawing function is polymorphic and the render target must
@@ -144,7 +144,7 @@ let rec main_loop () =
       ~vertices
       ~program
       ~mode:DrawMode.Triangles ()
-    |> assert_ok;
+    |> Result.assert_ok;
 
     (* Update the window renderbuffer *)
     Window.display window;

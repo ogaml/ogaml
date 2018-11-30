@@ -1,7 +1,7 @@
 open OgamlGraphics
 open OgamlMath
 open OgamlUtils
-open OgamlUtils.Result
+open Result.Operators
 
 let fail ?msg err = 
   Log.fatal Log.stdout "%s" err;
@@ -94,7 +94,7 @@ let vertex_source = VertexArray.Source.(
     <<< vertex2
     <<< vertex3
     <<< vertex4
-    |> assert_ok
+    |> Result.assert_ok
 )
 
 let vbo = VertexArray.Buffer.static (module Window) window vertex_source
@@ -115,7 +115,7 @@ let texture =
 let uniform =
   Uniform.empty
   |> Uniform.texture2D "my_texture" texture
-  |> assert_ok
+  |> Result.assert_ok
 
 let rec event_loop () =
   match Window.poll_event window with
@@ -128,9 +128,9 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> assert_ok;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> Result.assert_ok;
     VertexArray.draw (module Window) ~target:window ~vertices ~program ~uniform ~mode:DrawMode.TriangleStrip () 
-    |> assert_ok;
+    |> Result.assert_ok;
     Window.display window;
     event_loop ();
     main_loop ();

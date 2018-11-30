@@ -7,20 +7,52 @@ module Result : sig
     * Its aim is not to replace a fully-featured library. It is mostly there to
     * make the examples and tests self-contained. *)
 
+  (** Module containing operators. *)
+  module Operators : sig
+
+    (** Operators are contained in this submodule so that $Result.Operators$
+      * can be opened without polluting the namespace. *)
+
+    (** Infix operator corresponding to $bind$. *)
+    val (>>=) : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
+ 
+    (** Infix operator corresponding to $apply$. *)
+    val (>>>=) : ('a, 'b) result -> ('a -> 'c) -> ('c, 'b) result
+  
+  end
+ 
+  (** Module containing functions on lists. *)
+  module List : sig
+
+    (** $iter f l$ applies $f$ to every element of $l$ but stops as soon as
+      * $f$ returns an error. *)
+    val iter : ('a -> (unit, 'b) result) -> 'a list -> (unit, 'b) result
+  
+    (** Same as $List.map$ but stops as soon as the function returns an error. *)
+    val map : ('a -> ('b, 'c) result) -> 'a list -> ('b list, 'c) result
+  
+    (** Same as $List.fold_left$ but stops as soon as the function returns an error. *)
+    val fold_left : ('a -> 'b -> ('a, 'c) result) -> 'a -> 'b list -> ('a, 'c) result
+  
+    (** Same as $List.fold_right$ but stops as soon as the function returns an error. *)
+    val fold_right : ('a -> 'b -> ('b, 'c) result) -> 'a list -> 'b -> ('b, 'c) result
+  
+  end
+    
   (** Makes a result from an option and an error value. *)
   val make : ?result:'a -> 'b -> ('a, 'b) result
 
   (** Bind function on results. *)
   val bind : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
 
-  (** Infix operator corresponding to $bind$. *)
-  val (>>=) : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
+  (** Returns $true$ iff the result is $Ok$ *)
+  val is_ok : ('a, 'b) result -> bool
+  
+  (** Returns $true$ iff the result is $Error$ *)
+  val is_error : ('a, 'b) result -> bool
 
   (** Applies a function to a result. *)
   val apply : ('a, 'b) result -> ('a -> 'c) -> ('c, 'b) result
-
-  (** Infix operator corresponding to $apply$. *)
-  val (>>>=) : ('a, 'b) result -> ('a -> 'c) -> ('c, 'b) result
 
   (** Returns the value of a result if $Ok$ and raises $Assertion_failure$ otherwise. *)
   val assert_ok : ('a, 'b) result -> 'a
@@ -33,23 +65,13 @@ module Result : sig
   val catch : ('a -> 'b) -> 'a -> ('b, exn) result
 
   (** Applies an error handler to a result. *)
-  val handle : ('a, 'b) result -> ('b -> 'a) -> 'a
+  val handle : ('b -> 'a) -> ('a, 'b) result -> 'a
 
-  (** Equivalent to $handle$ but with parameters reversed. *)
-  val handle_r : ('b -> 'a) -> ('a, 'b) result -> 'a
+  (** Maps the $Ok$ part of a result. *)
+  val map : ('a -> 'c) -> ('a, 'b) result -> ('c, 'b) result
 
-  (** $iter f l$ applies $f$ to every element of $l$ but stops as soon as
-    * $f$ returns an error. *)
-  val iter : ('a -> (unit, 'b) result) -> 'a list -> (unit, 'b) result
-
-  (** Same as $List.map$ but stops as soon as the function returns an error. *)
-  val map : ('a -> ('b, 'c) result) -> 'a list -> ('b list, 'c) result
-
-  (** Same as $List.fold_left$ but stops as soon as the function returns an error. *)
-  val fold : ('a -> 'b -> ('a, 'c) result) -> 'a -> 'b list -> ('a, 'c) result
-
-  (** Same as $List.fold_right$ but stops as soon as the function returns an error. *)
-  val fold_r : ('a -> 'b -> ('b, 'c) result) -> 'a list -> 'b -> ('b, 'c) result
+  (** Maps the $Error$ part of a result. *)
+  val map_error : ('b -> 'c) -> ('a, 'b) result -> ('a, 'c) result
 
   (** Returns an option from a result by mapping $Error$ to $None$. *)
   val opt : ('a, 'b) result -> 'a option

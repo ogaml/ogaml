@@ -1,5 +1,5 @@
 open OgamlUtils
-open OgamlUtils.Result
+open Result.Operators
 
 module Uniform = ProgramInternal.Uniform
 

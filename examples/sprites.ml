@@ -1,7 +1,7 @@
 open OgamlGraphics
 open OgamlMath
 open OgamlUtils
-open OgamlUtils.Result
+open Result.Operators
 
 let fail ?msg err = 
   Log.fatal Log.stdout "%s" err;
@@ -37,11 +37,11 @@ let texture_png =
 
 let sprite = 
   Sprite.create ~texture ~size:(Vector2f.({x = 50.; y = 50.})) ~origin:(Vector2f.({x=25.;y=25.})) ()
-  |> assert_ok
+  |> Result.assert_ok
 
 let sprite2 = 
   Sprite.create ~texture:texture_png ~position:(Vector2f.({x = 50.; y = 50.})) ()
-  |> assert_ok
+  |> Result.assert_ok
 
 let draw () =
   Sprite.draw (module Window) ~target:window ~sprite ();
@@ -80,7 +80,7 @@ let rec handle_events () =
 
 let rec each_frame () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> assert_ok;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> Result.assert_ok;
     draw () ;
     Window.display window ;
     handle_events () ;

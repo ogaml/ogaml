@@ -1,4 +1,4 @@
-open Result
+open Result.Operators
 
 type 'a t = ('a list * 'a list)
 

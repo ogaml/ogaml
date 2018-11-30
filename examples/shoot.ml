@@ -2,7 +2,7 @@ open OgamlGraphics
 open OgamlCore
 open OgamlMath
 open OgamlUtils
-open OgamlUtils.Result
+open Result.Operators
 
 let fail ?msg err = 
   Log.fatal Log.stdout "%s" err;
@@ -90,9 +90,9 @@ module GameState = struct
     end
 
   let text_handler txt = 
-    Result.handle txt (function
+    Result.handle (function
       | `Invalid_UTF8_bytes -> fail "Invalid UTF8 sequence"
-      | `Invalid_UTF8_leader -> fail "Invalid UTF8") 
+      | `Invalid_UTF8_leader -> fail "Invalid UTF8") txt
 
   let display win s font = 
     let rule_text1 = 
@@ -169,14 +169,14 @@ module GameState = struct
         ()
     in
     Shape.draw (module Window) ~target:win ~shape:rule_square1 ();
-    OgamlGraphics.Text.draw  (module Window) ~target:win ~text:rule_text1 () |> assert_ok;
+    OgamlGraphics.Text.draw  (module Window) ~target:win ~text:rule_text1 () |> Result.assert_ok;
     Shape.draw (module Window) ~target:win ~shape:rule_square2 ();
-    OgamlGraphics.Text.draw  (module Window) ~target:win ~text:rule_text2 () |> assert_ok;
+    OgamlGraphics.Text.draw  (module Window) ~target:win ~text:rule_text2 () |> Result.assert_ok;
     Shape.draw (module Window) ~target:win ~shape:click_square ();
-    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text1 () |> assert_ok;
-    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text2 () |> assert_ok;
-    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text3 () |> assert_ok;
-    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text4 () |> assert_ok;
+    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text1 () |> Result.assert_ok;
+    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text2 () |> Result.assert_ok;
+    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text3 () |> Result.assert_ok;
+    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text4 () |> Result.assert_ok;
     s.last_hits <- List.filter (display_hit win) s.last_hits
     
 end
@@ -212,7 +212,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> assert_ok;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> Result.assert_ok;
     GameState.display window state font;
     Window.display window;
     event_loop ();

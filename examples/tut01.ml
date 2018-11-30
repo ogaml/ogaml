@@ -8,7 +8,7 @@
 
 open OgamlGraphics
 open OgamlUtils
-open OgamlUtils.Result
+open Result.Operators
 
 let fail ?msg err = 
   Log.fatal Log.stdout "%s" err;
@@ -39,7 +39,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear window |> assert_ok;
+    Window.clear window |> Result.assert_ok;
     (* Display here *)
     Window.display window;
     event_loop ();

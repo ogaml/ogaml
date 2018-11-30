@@ -1,6 +1,7 @@
 open OgamlGraphics
 open OgamlMath
 open OgamlUtils
+open Result.Operators
 
 let () = 
   Log.info Log.stdout "Beginning vertex array tests..."

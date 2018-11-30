@@ -1,4 +1,4 @@
-open Result
+open Result.Operators
 
 type code = int
 

@@ -1,6 +1,6 @@
 open OgamlMath
 open OgamlUtils
-open OgamlUtils.Result
+open Result.Operators
 
 module Vertex = struct
 
@@ -196,14 +196,14 @@ let source (t : t) ?index_source ~vertex_source () =
   in
   match index_source with
   | None -> 
-      Result.iter (fun f ->
+      Result.List.iter (fun f ->
         let (v1,v2,v3) = Face.vertices f in
         (source_vertex v1) >>= (fun () ->
         (source_vertex v2) >>= (fun () ->
         (source_vertex v3)))
       ) t
   | Some idx ->
-      Result.iter (fun f ->
+      Result.List.iter (fun f ->
         let (v1,v2,v3) = Face.vertices f in
         get_index v1 >>= (fun i1 ->
         get_index v2 >>= (fun i2 ->

@@ -1,6 +1,6 @@
 open OgamlMath
 open OgamlUtils
-open OgamlUtils.Result
+open Result.Operators
 
 module ColorBuffer = struct
 

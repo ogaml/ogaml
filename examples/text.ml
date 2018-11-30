@@ -1,7 +1,7 @@
 open OgamlGraphics
 open OgamlMath
 open OgamlUtils
-open OgamlUtils.Result
+open Result.Operators
 
 let fail ?msg err = 
   Log.fatal Log.stdout "%s" err;
@@ -33,9 +33,9 @@ let font =
 let size = 25
 
 let text_handler txt = 
-  Result.handle txt (function
+  Result.handle (function
     | `Invalid_UTF8_bytes -> fail "Invalid UTF8 sequence"
-    | `Invalid_UTF8_leader -> fail "Invalid UTF8")
+    | `Invalid_UTF8_leader -> fail "Invalid UTF8") txt
 
 let txt = Text.create
   ~text:"Hello, World ! Coucou ! gAV@#"
@@ -155,9 +155,9 @@ let fxpos3 = Vector2f.add (Text.Fx.advance fxtxt2) fxpos2
 
 let aa = ref false
 
-let draw_handler arg = Result.handle arg (function
+let draw_handler arg = Result.handle (function
   | `Font_texture_depth_overflow -> fail "Font texture overflow (depth)"
-  | `Font_texture_size_overflow -> fail "Font texture overflow (height)")
+  | `Font_texture_size_overflow -> fail "Font texture overflow (height)") arg
 
 let draw () =
   (* Trying computing each frame *)
@@ -205,7 +205,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.magenta)) window |> assert_ok;
+    Window.clear ~color:(Some (`RGB Color.RGB.magenta)) window |> Result.assert_ok;
     draw () ;
     Window.display window ;
     event_loop () ;

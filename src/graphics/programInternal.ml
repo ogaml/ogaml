@@ -1,5 +1,5 @@
 open OgamlUtils
-open Result
+open Result.Operators
 
 
 module Uniform = struct

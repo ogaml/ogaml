@@ -1,4 +1,5 @@
-open OgamlUtils.Result
+open OgamlUtils
+open Result.Operators
 
 type capabilities = {
   max_3D_texture_size       : int;

@@ -1,7 +1,7 @@
 open OgamlGraphics
 open OgamlMath
 open OgamlUtils
-open OgamlUtils.Result
+open Result.Operators
 
 let fail ?msg err = 
   Log.fatal Log.stdout "%s" err;
@@ -28,7 +28,7 @@ let cube_source =
   let src = VertexArray.Source.empty ~size:36 () in
   let cmod = Model.cube Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) in
   Model.source cmod ~vertex_source:src ()
-  |> assert_ok;
+  |> Result.assert_ok;
   src
 
 let cube_vbo = 
@@ -54,7 +54,7 @@ let normal_program =
 (* Display computations *)
 let proj = 
   Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
-  |> assert_ok
+  |> Result.assert_ok
 
 let position = ref Vector3f.({x = 1.; y = 0.6; z = 1.4})
 
@@ -73,7 +73,7 @@ let display () =
   let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
   let model = 
     Matrix3D.rotation rot_vector !rot_angle 
-    |> assert_ok
+    |> Result.assert_ok
   in
   let vp = Matrix3D.product proj view in
   let mv = Matrix3D.product view model in
@@ -94,15 +94,15 @@ let display () =
     >>= Uniform.float    "Light.SunIntensity" 1.6
     >>= Uniform.float    "Light.MaxIntensity" 1.9
     >>= Uniform.float    "Light.Gamma"  1.2
-    |> assert_ok
+    |> Result.assert_ok
   in
   VertexArray.draw (module Window) ~target:window
     ~vertices:cube ~uniform ~program:normal_program ~parameters 
     ~mode:DrawMode.Triangles ()
-  |> assert_ok
+  |> Result.assert_ok
 
 (* Camera *)
-let center = Vector2i.div 2 (Window.size window) |> assert_ok
+let center = Vector2i.div 2 (Window.size window) |> Result.assert_ok
 
 let () =
   Mouse.set_relative_position window center
@@ -178,7 +178,7 @@ let rec event_loop () =
 (* Main loop *)
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> assert_ok;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> Result.assert_ok;
     display ();
     Window.display window;
     (* We only capture the mouse and listen to the keyboard when focused *)
