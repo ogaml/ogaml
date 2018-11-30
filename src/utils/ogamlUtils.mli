@@ -87,8 +87,8 @@ module Log : sig
 
   (** This module provides a very simple log system to use with Ogaml *)
 
-  (** Enumeration of log message levels *)
-  type level = Debug | Warn | Error | Info | Fatal
+  (** Enumeration of log message levels by priority *)
+  type level = Trace | Debug | Info | Warn | Error | Fatal
 
   (** Type of a log *)
   type t
@@ -97,12 +97,12 @@ module Log : sig
     *
     * - output : output channel of log messages (defaults to stderr)
     *
-    * - debug : if false, debug messages will be ignored (defaults to true)
+    * - level : messages below this level will be ignored (defaults to Trace)
     *
     * - color : if false, messages will not be colored (defaults to true)
     *
     * - short : if true, timestamps will be shortened (defaults to false) *)
-  val create : ?output:out_channel -> ?debug:bool -> ?color:bool -> ?short:bool -> unit -> t
+  val create : ?output:out_channel -> ?level:level -> ?color:bool -> ?short:bool -> unit -> t
 
   (** Log to the standard output, that would be obtained by calling $create ~output:stdout ()$ *)
   val stdout : t
@@ -110,20 +110,26 @@ module Log : sig
   (** Log to the standard error, that would be obtained by calling $create ()$ *)
   val stderr : t
 
+  (** Sets the level threshold *)
+  val set_level : t -> level -> unit
+
   (** Logs a message *)
   val log : t -> level -> ('a, out_channel, unit) format -> 'a
 
+  (** Logs a trace message *)
+  val trace : t -> ('a, out_channel, unit) format -> 'a
+
   (** Logs a debug message *)
   val debug : t -> ('a, out_channel, unit) format -> 'a
+
+  (** Logs an info message *)
+  val info  : t -> ('a, out_channel, unit) format -> 'a
 
   (** Logs a warn message *)
   val warn  : t -> ('a, out_channel, unit) format -> 'a
 
   (** Logs an error message *)
   val error : t -> ('a, out_channel, unit) format -> 'a
-
-  (** Logs an info message *)
-  val info  : t -> ('a, out_channel, unit) format -> 'a
 
   (** Logs a fatal error message *)
   val fatal : t -> ('a, out_channel, unit) format -> 'a
