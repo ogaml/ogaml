@@ -103,3 +103,22 @@ let opt = function
 let from_opt = function
   | Some v -> Ok v
   | None -> Error ()
+
+let iteri first last f = 
+  let open Operators in
+  let rec aux_incr i = 
+    if i > last then Ok ()
+    else begin
+      f i >>= fun () ->
+      aux_incr (i+1)
+    end
+  in
+  let rec aux_decr i = 
+    if i < last then Ok ()
+    else begin
+      f i >>= fun () ->
+      aux_decr (i-1)
+    end
+  in
+  if last >= first then aux_incr first
+  else aux_decr first

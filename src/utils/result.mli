@@ -45,3 +45,5 @@ val map_error : ('b -> 'c) -> ('a, 'b) result -> ('a, 'c) result
 val opt : ('a, 'b) result -> 'a option
 
 val from_opt : 'a option -> ('a, unit) result
+
+val iteri : int -> int -> (int -> (unit, 'a) result) -> (unit, 'a) result
