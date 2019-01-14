@@ -10,6 +10,9 @@ type face_point = {
   uv     : int
 }
 
+let mkfp vertex normal uv = { vertex ; normal ; uv }
+let v3ifp v = Vector3i.(mkfp v.x v.y v.z)
+
 type face = face_point * face_point * face_point
 
 (* For now we only deal with vertices, normals, texture coordinates and faces.
@@ -52,3 +55,45 @@ let rec lengths vn nn uvn fn ast =
   | Group  _ :: ast
   | Smooth _  :: ast -> lengths vn nn uvn fn ast
   | [] -> (vn, nn, uvn, fn)
+
+type 'a partial_array = {
+  table : 'a array ;
+  mutable length : int
+}
+
+let mkpa table = {
+  table ;
+  length = 0
+}
+
+let addpa v pa =
+  pa.table.(pa.length) <- v ;
+  pa.length <- pa.length + 1
+
+let fill_from_ast va na uva fa ast =
+  let va = mkpa va in
+  let na = mkpa na in
+  let uva = mkpa uva in
+  let fa = mkpa fa in
+  let open ObjAST in
+  let rec aux o =
+    match o with
+    | Vertex v -> addpa v va
+    | UV v -> addpa v uva
+    | Normal v -> addpa v na
+    (* TODO Perhaps, parsing should be conistent here *)
+    | Tri (v1, v2, v3) -> addpa (v3ifp v1, v3ifp v2, v3ifp v3) fa
+    (* TODO Handle other things, particularly Quad? *)
+    | _ -> ()
+  in
+  List.iter aux ast
+
+let from_ast ast : t =
+  let (vn, nn, uvn, fn) = lengths 0 0 0 0 ast in
+  let vertices = Array.make vn Vector3f.zero in
+  let normals = Array.make nn Vector3f.zero in
+  let uv = Array.make uvn Vector2f.zero in
+  let dummy_fp = mkfp 0 0 0 in
+  let faces = Array.make fn (dummy_fp, dummy_fp, dummy_fp) in
+  fill_from_ast vertices normals uv faces ast ;
+  { vertices ; normals ; uv ; faces }
