@@ -97,3 +97,34 @@ let from_ast ast : t =
   let faces = Array.make fn (dummy_fp, dummy_fp, dummy_fp) in
   fill_from_ast vertices normals uv faces ast ;
   { vertices ; normals ; uv ; faces }
+
+(* let add_to_vertex_array src obj va =
+  (* We add the faces *)
+  Array.fold_left src (fun src (p1, p2, p3) ->
+    let open VertexArray in
+    let open Source in
+    src
+    <<
+    SimpleVertex.create
+      ~position: obj.vertices.(p1.vertex)
+      ~uv: obj.uv.(p1.uv)
+      ~normal: obj.normals.(p1.normal)
+      ()
+    <<
+    SimpleVertex.create
+      ~position: obj.vertices.(p2.vertex)
+      ~uv: obj.uv.(p2.uv)
+      ~normal: obj.normals.(p2.normal)
+      ()
+    <<
+    SimpleVertex.create
+      ~position: obj.vertices.(p3.vertex)
+      ~uv: obj.uv.(p3.uv)
+      ~normal: obj.normals.(p3.normal)
+      ()
+    |> Result.handle_r (function
+    | `Missing_attribute s ->
+      Log.fatal Log.stdout "Missing attribute %s during vertices construction" s;
+      exit 2)
+    |> ignore
+  ) obj.faces *)
