@@ -28,4 +28,8 @@ val from_obj : string -> (t, [> `Syntax_error of (Location.t * string)
                               | `Parsing_error of Location.t]) result
 
 val add_to_source :
-  VertexArray.SimpleVertex.T.s VertexArray.Source.t -> t -> unit
+  VertexArray.SimpleVertex.T.s VertexArray.Source.t ->
+  t ->
+  (VertexArray.SimpleVertex.T.s VertexArray.Source.t,
+   [> `Missing_attribute of string ]
+  ) result

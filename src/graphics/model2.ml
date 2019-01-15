@@ -176,16 +176,9 @@ let mksv obj p =
 
 let add_to_source src obj =
   (* We add the faces *)
-  Array.fold_left src (fun src (p1, p2, p3) ->
+  Array.fold_left (fun src (p1, p2, p3) ->
     let open VertexArray.Source in
-    src << mksv obj p1
+    src <<< mksv obj p1
         <<< mksv obj p2
         <<< mksv obj p3
-    (* TODO Not handle *)
-    |> Result.handle (function
-    | `Missing_attribute s ->
-      Log.fatal Log.stdout "Missing attribute %s during vertices construction" s;
-      exit 2)
-    |> ignore ;
-    src
-  ) obj.faces
+  ) (Ok src) obj.faces
