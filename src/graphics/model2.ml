@@ -167,10 +167,14 @@ let from_obj s =
   parse_file s >>>= from_ast
 
 let mksv obj p =
+  (* Log.debug Log.stdout "vertex %d" p.vertex ;
+  Log.debug Log.stdout "uv     %d" p.uv ;
+  Log.debug Log.stdout "normal %d" p.normal ; *)
   let open VertexArray in
+  let uv = if p.uv = 0 then None else Some obj.uvs.(p.uv-1) in
   SimpleVertex.create
     ~position: obj.vertices.(p.vertex-1)
-    ~uv: obj.uvs.(p.uv-1)
+    ?uv
     ~normal: obj.normals.(p.normal-1)
     ()
 

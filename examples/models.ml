@@ -27,8 +27,11 @@ let fps_clock =
 let cube_source =
   let src = VertexArray.Source.empty ~size:36 () in
   let obj =
-    Model2.from_obj "examples/cube.obj"
-    |> Result.assert_ok
+    Model2.from_obj "examples/example.obj"
+    |> Result.handle (function
+      | `Parsing_error loc -> fail ~msg:(Model2.Location.to_string loc) "Parsing error"
+      | `Syntax_error (_, msg) -> fail ~msg "SyntaxError"
+      )
   in
   Model2.add_to_source src obj
   |> Result.assert_ok
@@ -41,7 +44,7 @@ let cube =
 
 let normal_program =
   let res = Program.from_source_pp (module Window) ~context:window
-    ~vertex_source:(`File (OgamlCore.OS.resources_dir ^ "examples/normals_shader.vert"))
+    ~vertex_source:(`File (OgamlCore.OS.resources_dir ^ "examples/normals_shader_colored.vert"))
     ~fragment_source:(`File (OgamlCore.OS.resources_dir ^ "examples/normals_shader.frag"))
   in
   match res with

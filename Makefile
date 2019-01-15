@@ -40,7 +40,7 @@ examples:
 	jbuilder build examples/sprites.exe &&\
 	jbuilder build examples/tut_idx.exe &&\
 	jbuilder build examples/cube.exe &&\
-	jbuilder build examples/model.exe &&\
+	jbuilder build examples/models.exe &&\
 	jbuilder build examples/ip.exe &&\
 	jbuilder build examples/text.exe &&\
 	jbuilder build examples/tut_tex.exe &&\
