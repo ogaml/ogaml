@@ -32,6 +32,8 @@ module VertexArray = VertexArray
 
 module Model = Model
 
+module Model2 = Model2
+
 module Shape = Shape
 
 module Sprite = Sprite
