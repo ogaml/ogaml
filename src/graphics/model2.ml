@@ -46,7 +46,7 @@ type face_point = {
   uv     : int
 }
 
-let mkfp vertex normal uv = { vertex ; normal ; uv }
+let mkfp vertex uv normal = { vertex ; normal ; uv }
 let v3ifp v = Vector3i.(mkfp v.x v.y v.z)
 
 type face = face_point * face_point * face_point
@@ -168,9 +168,6 @@ let from_obj s =
 
 let mksv obj p =
   let open VertexArray in
-  Log.debug Log.stdout "vertex %d" p.vertex ;
-  Log.debug Log.stdout "uv     %d" p.uv ;
-  Log.debug Log.stdout "normal %d" p.normal ;
   SimpleVertex.create
     ~position: obj.vertices.(p.vertex-1)
     ~uv: obj.uvs.(p.uv-1)
