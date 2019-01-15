@@ -2,6 +2,7 @@
 
 open OgamlMath
 open OgamlUtils
+open Result.Operators
 
 type face_point = {
   vertex : int ;
@@ -95,6 +96,68 @@ let from_ast ast : t =
   fill_from_ast vertices normals uv faces ast ;
   { vertices ; normals ; uv ; faces }
 
+module Location = struct
+
+  type t = {
+    file : string;
+    first_line : int;
+    last_line  : int;
+    first_char : int;
+    last_char  : int;
+  }
+
+  let create first_pos last_pos =
+    let open Lexing in
+    {
+    file = first_pos.pos_fname;
+    first_line = first_pos.pos_lnum;
+    last_line  = last_pos.pos_lnum;
+    first_char = first_pos.pos_cnum - first_pos.pos_bol;
+    last_char  = last_pos.pos_cnum - last_pos.pos_bol;
+    }
+
+  let dummy = create Lexing.dummy_pos Lexing.dummy_pos
+
+  let first_line t = t.first_line
+
+  let last_line t = t.last_line
+
+  let first_char t = t.first_char
+
+  let last_char t = t.last_char
+
+  let to_string t =
+    Printf.sprintf "lines %i-%i, characters %i-%i"
+      t.first_line t.last_line t.first_char t.last_char
+
+end
+
+let parse_with_errors lexbuf =
+  try
+    Ok (ObjParser.file ObjLexer.token lexbuf)
+  with
+    |ObjLexer.SyntaxError msg ->
+        let loc = Location.create lexbuf.Lexing.lex_start_p
+                                  lexbuf.Lexing.lex_curr_p
+        in
+        Error (`Syntax_error (loc, msg))
+    |Parsing.Parse_error ->
+        let loc = Location.create lexbuf.Lexing.lex_start_p
+                                  lexbuf.Lexing.lex_curr_p
+        in
+        Error (`Parsing_error (loc))
+
+let parse_file f =
+  let input = open_in f in
+  let lexbuf = Lexing.from_channel input in
+  lexbuf.Lexing.lex_curr_p <- {lexbuf.Lexing.lex_curr_p with Lexing.pos_fname = f};
+  let ast = parse_with_errors lexbuf in
+  close_in input;
+  ast
+
+let from_obj s =
+  parse_file s >>>= from_ast
+
 let mksv obj p =
   let open VertexArray in
   SimpleVertex.create
@@ -110,6 +173,7 @@ let add_to_source src obj =
     src << mksv obj p1
         <<< mksv obj p2
         <<< mksv obj p3
+    (* TODO Not handle *)
     |> Result.handle (function
     | `Missing_attribute s ->
       Log.fatal Log.stdout "Missing attribute %s during vertices construction" s;
