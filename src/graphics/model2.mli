@@ -2,10 +2,6 @@
 
 open OgamlMath
 
-type t
-
-val transform : Matrix3D.t -> t -> t
-
 module Location : sig
 
   type t
@@ -22,6 +18,12 @@ module Location : sig
 
 end
 
+type t
+
+val transform : Matrix3D.t -> t -> t
+val scale : OgamlMath.Vector3f.t -> t -> t
+val translate : OgamlMath.Vector3f.t -> t -> t
+val rotate : OgamlMath.Quaternion.t -> t -> t
 val from_obj : string -> (t, [> `Syntax_error of (Location.t * string)
                               | `Parsing_error of Location.t]) result
 

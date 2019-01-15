@@ -4,6 +4,42 @@ open OgamlMath
 open OgamlUtils
 open Result.Operators
 
+module Location = struct
+
+  type t = {
+    file : string;
+    first_line : int;
+    last_line  : int;
+    first_char : int;
+    last_char  : int;
+  }
+
+  let create first_pos last_pos =
+    let open Lexing in
+    {
+    file = first_pos.pos_fname;
+    first_line = first_pos.pos_lnum;
+    last_line  = last_pos.pos_lnum;
+    first_char = first_pos.pos_cnum - first_pos.pos_bol;
+    last_char  = last_pos.pos_cnum - last_pos.pos_bol;
+    }
+
+  let dummy = create Lexing.dummy_pos Lexing.dummy_pos
+
+  let first_line t = t.first_line
+
+  let last_line t = t.last_line
+
+  let first_char t = t.first_char
+
+  let last_char t = t.last_char
+
+  let to_string t =
+    Printf.sprintf "lines %i-%i, characters %i-%i"
+      t.first_line t.last_line t.first_char t.last_char
+
+end
+
 type face_point = {
   vertex : int ;
   normal : int ;
@@ -36,6 +72,14 @@ let transform m obj = {
 }
 
 (* TODO More efficient rotate/scale/translate? *)
+let scale f t =
+  transform (Matrix3D.scaling f) t
+
+let translate v t =
+  transform (Matrix3D.translation v) t
+
+let rotate q t =
+  transform (Matrix3D.from_quaternion q) t
 
 (* Building from an OBJ file *)
 let rec lengths vn nn uvn fn ast =
@@ -95,42 +139,6 @@ let from_ast ast : t =
   let faces = Array.make fn (dummy_fp, dummy_fp, dummy_fp) in
   fill_from_ast vertices normals uv faces ast ;
   { vertices ; normals ; uv ; faces }
-
-module Location = struct
-
-  type t = {
-    file : string;
-    first_line : int;
-    last_line  : int;
-    first_char : int;
-    last_char  : int;
-  }
-
-  let create first_pos last_pos =
-    let open Lexing in
-    {
-    file = first_pos.pos_fname;
-    first_line = first_pos.pos_lnum;
-    last_line  = last_pos.pos_lnum;
-    first_char = first_pos.pos_cnum - first_pos.pos_bol;
-    last_char  = last_pos.pos_cnum - last_pos.pos_bol;
-    }
-
-  let dummy = create Lexing.dummy_pos Lexing.dummy_pos
-
-  let first_line t = t.first_line
-
-  let last_line t = t.last_line
-
-  let first_char t = t.first_char
-
-  let last_char t = t.last_char
-
-  let to_string t =
-    Printf.sprintf "lines %i-%i, characters %i-%i"
-      t.first_line t.last_line t.first_char t.last_char
-
-end
 
 let parse_with_errors lexbuf =
   try
