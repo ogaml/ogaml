@@ -2,7 +2,6 @@
 
 open OgamlMath
 open OgamlUtils
-open Result.Operators
 
 type face_point = {
   vertex : int ;
@@ -37,15 +36,13 @@ let transform m obj = {
 
 (* TODO More efficient rotate/scale/translate? *)
 
-(* TODO to_vertex_array or add_to_vertex_array perhaps *)
-
 (* Building from an OBJ file *)
 let rec lengths vn nn uvn fn ast =
   let open ObjAST in
   match ast with
-  | Vertex v :: ast -> lengths (vn + 1) nn uvn fn ast
-  | UV v :: ast -> lengths vn nn (uvn + 1) fn ast
-  | Normal v :: ast -> lengths vn (nn + 1) uvn fn ast
+  | Vertex _ :: ast -> lengths (vn + 1) nn uvn fn ast
+  | UV _ :: ast -> lengths vn nn (uvn + 1) fn ast
+  | Normal _ :: ast -> lengths vn (nn + 1) uvn fn ast
   | Tri _ :: ast -> lengths vn nn uvn (fn + 1) ast
   | Quad _ :: ast (* TODO perhaps? *)
   | Param :: ast
@@ -76,7 +73,7 @@ let fill_from_ast va na uva fa ast =
   let uva = mkpa uva in
   let fa = mkpa fa in
   let open ObjAST in
-  let rec aux o =
+  let aux o =
     match o with
     | Vertex v -> addpa v va
     | UV v -> addpa v uva
@@ -98,33 +95,25 @@ let from_ast ast : t =
   fill_from_ast vertices normals uv faces ast ;
   { vertices ; normals ; uv ; faces }
 
-(* let add_to_vertex_array src obj va =
+let mksv obj p =
+  let open VertexArray in
+  SimpleVertex.create
+    ~position: obj.vertices.(p.vertex)
+    ~uv: obj.uv.(p.uv)
+    ~normal: obj.normals.(p.normal)
+    ()
+
+let add_to_source src obj =
   (* We add the faces *)
   Array.fold_left src (fun src (p1, p2, p3) ->
-    let open VertexArray in
-    let open Source in
-    src
-    <<
-    SimpleVertex.create
-      ~position: obj.vertices.(p1.vertex)
-      ~uv: obj.uv.(p1.uv)
-      ~normal: obj.normals.(p1.normal)
-      ()
-    <<
-    SimpleVertex.create
-      ~position: obj.vertices.(p2.vertex)
-      ~uv: obj.uv.(p2.uv)
-      ~normal: obj.normals.(p2.normal)
-      ()
-    <<
-    SimpleVertex.create
-      ~position: obj.vertices.(p3.vertex)
-      ~uv: obj.uv.(p3.uv)
-      ~normal: obj.normals.(p3.normal)
-      ()
-    |> Result.handle_r (function
+    let open VertexArray.Source in
+    src << mksv obj p1
+        <<< mksv obj p2
+        <<< mksv obj p3
+    |> Result.handle (function
     | `Missing_attribute s ->
       Log.fatal Log.stdout "Missing attribute %s during vertices construction" s;
       exit 2)
-    |> ignore
-  ) obj.faces *)
+    |> ignore ;
+    src
+  ) obj.faces
