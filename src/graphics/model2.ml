@@ -61,7 +61,7 @@ type face = face_point * face_point * face_point
 type t = {
   vertices : Vector3f.t array ;
   normals  : Vector3f.t array ;
-  uv       : Vector2f.t array ;
+  uvs      : Vector2f.t array ;
   faces    : face array
 }
 
@@ -134,11 +134,11 @@ let from_ast ast : t =
   let (vn, nn, uvn, fn) = lengths 0 0 0 0 ast in
   let vertices = Array.make vn Vector3f.zero in
   let normals = Array.make nn Vector3f.zero in
-  let uv = Array.make uvn Vector2f.zero in
+  let uvs = Array.make uvn Vector2f.zero in
   let dummy_fp = mkfp 0 0 0 in
   let faces = Array.make fn (dummy_fp, dummy_fp, dummy_fp) in
-  fill_from_ast vertices normals uv faces ast ;
-  { vertices ; normals ; uv ; faces }
+  fill_from_ast vertices normals uvs faces ast ;
+  { vertices ; normals ; uvs ; faces }
 
 let parse_with_errors lexbuf =
   try
@@ -168,10 +168,13 @@ let from_obj s =
 
 let mksv obj p =
   let open VertexArray in
+  Log.debug Log.stdout "vertex %d" p.vertex ;
+  Log.debug Log.stdout "uv     %d" p.uv ;
+  Log.debug Log.stdout "normal %d" p.normal ;
   SimpleVertex.create
-    ~position: obj.vertices.(p.vertex)
-    ~uv: obj.uv.(p.uv)
-    ~normal: obj.normals.(p.normal)
+    ~position: obj.vertices.(p.vertex-1)
+    ~uv: obj.uvs.(p.uv-1)
+    ~normal: obj.normals.(p.normal-1)
     ()
 
 let add_to_source src obj =
