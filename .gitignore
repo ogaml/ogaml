@@ -66,3 +66,5 @@ src/math/.merlin
 src/utils/.merlin
 tests/.merlin
 
+# ide-reason
+*.log
