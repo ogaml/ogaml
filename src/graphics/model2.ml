@@ -81,38 +81,44 @@ let translate v t =
 let rotate q t =
   transform (Matrix3D.from_quaternion q) t
 
+let missing_normals v1 v2 v3 =
+  let open Vector3i in
+  v1.z = 0 || v2.z = 0 || v3.z = 0
+
 (* Building from an OBJ file *)
-let rec lengths vn nn uvn fn ast =
+let rec lengths cn vn nn mnn uvn fn ast =
   let open ObjAST in
   match ast with
-  | Vertex _ :: ast -> lengths (vn + 1) nn uvn fn ast
-  | UV _ :: ast -> lengths vn nn (uvn + 1) fn ast
-  | Normal _ :: ast -> lengths vn (nn + 1) uvn fn ast
-  | Tri _ :: ast -> lengths vn nn uvn (fn + 1) ast
+  | Vertex _ :: ast -> lengths cn (vn + 1) nn mnn uvn fn ast
+  | UV _ :: ast -> lengths cn vn nn mnn (uvn + 1) fn ast
+  | Normal _ :: ast -> lengths cn vn (nn + 1) mnn uvn fn ast
+  | Tri (v1, v2, v3) :: ast when cn && missing_normals v1 v2 v3 ->
+    lengths cn vn nn (mnn + 1) uvn (fn + 1) ast
+  | Tri _ :: ast -> lengths cn vn nn mnn uvn (fn + 1) ast
   | Quad _ :: ast (* TODO perhaps? *)
   | Param :: ast
   | Mtllib _ :: ast
   | Usemtl _ :: ast
   | Object _ :: ast
   | Group  _ :: ast
-  | Smooth _  :: ast -> lengths vn nn uvn fn ast
-  | [] -> (vn, nn, uvn, fn)
+  | Smooth _  :: ast -> lengths cn vn nn mnn uvn fn ast
+  | [] -> (vn, nn, mnn, uvn, fn)
 
 type 'a partial_array = {
   table : 'a array ;
   mutable length : int
 }
 
-let mkpa table = {
+let mkpa ?start:(length=0) table = {
   table ;
-  length = 0
+  length
 }
 
 let addpa v pa =
   pa.table.(pa.length) <- v ;
   pa.length <- pa.length + 1
 
-let fill_from_ast va na uva fa ast =
+let fill_from_ast compute_normals va na uva fa ast =
   let va = mkpa va in
   let na = mkpa na in
   let uva = mkpa uva in
@@ -123,22 +129,50 @@ let fill_from_ast va na uva fa ast =
     | Vertex v -> addpa v va
     | UV v -> addpa v uva
     | Normal v -> addpa v na
-    (* TODO Perhaps, parsing should be conistent here *)
+    (* TODO Perhaps, parsing should be consistent here *)
     | Tri (v1, v2, v3) -> addpa (v3ifp v1, v3ifp v2, v3ifp v3) fa
     (* TODO Handle other things, particularly Quad? *)
     | _ -> ()
   in
   List.iter aux ast
 
-let from_ast ast : t =
-  let (vn, nn, uvn, fn) = lengths 0 0 0 0 ast in
+let missing_normals_f f1 f2 f3 =
+  f1.normal = 0 || f2.normal = 0 || f3.normal = 0
+
+let from_ast compute_normals ast : t =
+  let (vn, nn, mnn, uvn, fn) = lengths compute_normals 0 0 0 0 0 ast in
   let vertices = Array.make vn Vector3f.zero in
-  let normals = Array.make nn Vector3f.zero in
+  let normals = Array.make (nn + mnn) Vector3f.zero in
   let uvs = Array.make uvn Vector2f.zero in
   let dummy_fp = mkfp 0 0 0 in
   let faces = Array.make fn (dummy_fp, dummy_fp, dummy_fp) in
-  fill_from_ast vertices normals uvs faces ast ;
-  { vertices ; normals ; uvs ; faces }
+  fill_from_ast compute_normals vertices normals uvs faces ast ;
+  let normals = mkpa ~start:nn normals in
+  let faces =
+    Array.map (fun (f1, f2, f3) ->
+      if missing_normals_f f1 f2 f3 then begin
+        let pv1, pv2, pv3 =
+          vertices.(f1.vertex),
+          vertices.(f2.vertex),
+          vertices.(f3.vertex)
+        in
+        let n =
+          let open Vector3f in
+          cross (sub pv2 pv1) (sub pv3 pv1)
+          |> normalize
+          |> function Ok v -> v | Error _ -> zero
+        in
+        let ni = normals.length in
+        addpa n normals ;
+        let r f =
+          if f.normal = 0 then { f with normal = ni } else f
+        in
+        (r f1, r f2, r f3)
+      end
+      else (f1,f2,f3)
+    ) faces
+  in
+  { vertices ; normals = normals.table ; uvs ; faces }
 
 let parse_with_errors lexbuf =
   try
@@ -163,8 +197,8 @@ let parse_file f =
   close_in input;
   ast
 
-let from_obj s =
-  parse_file s >>>= from_ast
+let from_obj ?(compute_normals=false) s =
+  parse_file s >>>= from_ast compute_normals
 
 let mksv obj p =
   (* Log.debug Log.stdout "vertex %d" p.vertex ;

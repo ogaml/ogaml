@@ -24,8 +24,11 @@ val transform : Matrix3D.t -> t -> t
 val scale : OgamlMath.Vector3f.t -> t -> t
 val translate : OgamlMath.Vector3f.t -> t -> t
 val rotate : OgamlMath.Quaternion.t -> t -> t
-val from_obj : string -> (t, [> `Syntax_error of (Location.t * string)
-                              | `Parsing_error of Location.t]) result
+val from_obj :
+  ?compute_normals: bool ->
+  string ->
+  (t, [> `Syntax_error of (Location.t * string)
+       | `Parsing_error of Location.t]) result
 
 val add_to_source :
   VertexArray.SimpleVertex.T.s VertexArray.Source.t ->
