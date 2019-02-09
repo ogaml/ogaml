@@ -61,7 +61,7 @@ let proj =
   Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
   |> Result.assert_ok
 
-let position = ref Vector3f.({x = 1.; y = 0.6; z = 1.4})
+let position = ref Vector3f.({x = 1.; y = 1.6; z = 8.})
 
 let rot_angle = ref 0.
 
@@ -75,7 +75,7 @@ let display () =
   (* Compute model matrix *)
   let t = Unix.gettimeofday () in
   let view = Matrix3D.look_at_eulerian ~from:!position ~theta:!view_theta ~phi:!view_phi in
-  let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
+  let rot_vector = Vector3f.({x = 0.; y = t; z = 0.}) in
   let model =
     Matrix3D.rotation rot_vector !rot_angle
     |> Result.assert_ok
@@ -119,18 +119,6 @@ let display () =
 
 (* Camera *)
 let center = Vector2i.div 2 (Window.size window) |> Result.assert_ok
-
-let () =
-  Mouse.set_relative_position window center
-
-let rec update_camera () =
-  let vmouse = Mouse.relative_position window in
-  let dv = Vector2i.sub vmouse center in
-  let lim = Constants.pi /. 2. -. 0.1 in
-  view_theta := !view_theta +. 0.005 *. (float_of_int dv.OgamlMath.Vector2i.x);
-  view_phi   := !view_phi   +. 0.005 *. (float_of_int dv.OgamlMath.Vector2i.y);
-  view_phi   := min (max !view_phi (-.lim)) lim;
-  Mouse.set_relative_position window center
 
 (* Handle keys directly by polling the keyboard *)
 let handle_keys () =
@@ -199,7 +187,6 @@ let rec main_loop () =
     Window.display window;
     (* We only capture the mouse and listen to the keyboard when focused *)
     if Window.has_focus window then (
-      update_camera () ;
       handle_keys ()
     ) ;
     event_loop ();
