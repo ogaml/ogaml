@@ -1,5 +1,15 @@
 open OgamlGraphics
 open OgamlMath
+open OgamlUtils
+open Result.Operators
+
+let fail ?msg err = 
+  Log.fatal Log.stdout "%s" err;
+  begin match msg with
+  | None -> ()
+  | Some e -> Log.fatal Log.stderr "%s" e
+  end;
+  exit 2
 
 let cube_shader = "
 
@@ -36,7 +46,12 @@ void main() {
 let settings = OgamlCore.ContextSettings.create ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~settings ~title:"VertexMap Example" ()
+  match Window.create ~width:800 ~height:600 ~settings ~title:"VertexMap Example" () with
+  | Ok win -> win
+  | Error (`Context_initialization_error msg) -> 
+    fail ~msg "Failed to create context"
+  | Error (`Window_creation_error msg) -> 
+    fail ~msg "Failed to create window"
 
 let initial_time = ref 0.
 
@@ -51,17 +66,18 @@ module MyVertex = (val VertexArray.Vertex.make ())
 (** Add 3 attributes to the layout *)
 let normal, color, position = 
   let open VertexArray.Vertex in
-  MyVertex.attribute "normal"   AttributeType.vector3i,
-  MyVertex.attribute "color"    AttributeType.int,
-  MyVertex.attribute "position" AttributeType.vector3f
+  MyVertex.attribute "normal"   AttributeType.vector3i |> Result.assert_ok,
+  MyVertex.attribute "color"    AttributeType.int |> Result.assert_ok,
+  MyVertex.attribute "position" AttributeType.vector3f |> Result.assert_ok
 
 (** Seal the layout *)
 let () = 
   MyVertex.seal ()
+  |> Result.assert_ok
 
 (* Now we can create vertices with this layout *)
 let make_vertex nm pos (r,g,b) =
-  let v = MyVertex.create () in
+  let v = MyVertex.create () |> Result.assert_ok in
   VertexArray.Vertex.Attribute.set v normal nm;
   VertexArray.Vertex.Attribute.set v color (color_bitmask (r,g,b));
   VertexArray.Vertex.Attribute.set v position pos;
@@ -69,31 +85,32 @@ let make_vertex nm pos (r,g,b) =
 
 let cube_source =
   VertexArray.Source.(
-    empty ()
-    << make_vertex Vector3i.unit_x Vector3f.({x =  0.5; y =  0.5; z =  0.5}) (255, 0, 0)
-    << make_vertex Vector3i.unit_x Vector3f.({x =  0.5; y = -0.5; z =  0.5}) (255, 0, 0)
-    << make_vertex Vector3i.unit_x Vector3f.({x =  0.5; y = -0.5; z = -0.5}) (255, 0, 0)
-    << make_vertex Vector3i.unit_x Vector3f.({x =  0.5; y =  0.5; z = -0.5}) (255, 0, 0)
-    << make_vertex Vector3i.unit_y Vector3f.({x =  0.5; y =  0.5; z =  0.5}) (0, 255, 0)
-    << make_vertex Vector3i.unit_y Vector3f.({x = -0.5; y =  0.5; z =  0.5}) (0, 255, 0)
-    << make_vertex Vector3i.unit_y Vector3f.({x = -0.5; y =  0.5; z = -0.5}) (0, 255, 0)
-    << make_vertex Vector3i.unit_y Vector3f.({x =  0.5; y =  0.5; z = -0.5}) (0, 255, 0)
-    << make_vertex Vector3i.unit_z Vector3f.({x =  0.5; y =  0.5; z =  0.5}) (0, 0, 255)
-    << make_vertex Vector3i.unit_z Vector3f.({x =  0.5; y = -0.5; z =  0.5}) (0, 0, 255)
-    << make_vertex Vector3i.unit_z Vector3f.({x = -0.5; y = -0.5; z =  0.5}) (0, 0, 255)
-    << make_vertex Vector3i.unit_z Vector3f.({x = -0.5; y =  0.5; z =  0.5}) (0, 0, 255)
-    << make_vertex Vector3i.(prop (-1) unit_x) Vector3f.({x = -0.5; y =  0.5; z =  0.5}) (255, 255, 0)
-    << make_vertex Vector3i.(prop (-1) unit_x) Vector3f.({x = -0.5; y = -0.5; z =  0.5}) (255, 255, 0)
-    << make_vertex Vector3i.(prop (-1) unit_x) Vector3f.({x = -0.5; y = -0.5; z = -0.5}) (255, 255, 0)
-    << make_vertex Vector3i.(prop (-1) unit_x) Vector3f.({x = -0.5; y =  0.5; z = -0.5}) (255, 255, 0)
-    << make_vertex Vector3i.(prop (-1) unit_y) Vector3f.({x =  0.5; y = -0.5; z =  0.5}) (255, 0, 255)
-    << make_vertex Vector3i.(prop (-1) unit_y) Vector3f.({x = -0.5; y = -0.5; z =  0.5}) (255, 0, 255)
-    << make_vertex Vector3i.(prop (-1) unit_y) Vector3f.({x = -0.5; y = -0.5; z = -0.5}) (255, 0, 255)
-    << make_vertex Vector3i.(prop (-1) unit_y) Vector3f.({x =  0.5; y = -0.5; z = -0.5}) (255, 0, 255)
-    << make_vertex Vector3i.(prop (-1) unit_z) Vector3f.({x =  0.5; y =  0.5; z = -0.5}) (0, 255, 255)
-    << make_vertex Vector3i.(prop (-1) unit_z) Vector3f.({x =  0.5; y = -0.5; z = -0.5}) (0, 255, 255)
-    << make_vertex Vector3i.(prop (-1) unit_z) Vector3f.({x = -0.5; y = -0.5; z = -0.5}) (0, 255, 255)
-    << make_vertex Vector3i.(prop (-1) unit_z) Vector3f.({x = -0.5; y =  0.5; z = -0.5}) (0, 255, 255)
+    Ok (empty ())
+    <<< make_vertex Vector3i.unit_x Vector3f.({x =  0.5; y =  0.5; z =  0.5}) (255, 0, 0)
+    <<< make_vertex Vector3i.unit_x Vector3f.({x =  0.5; y = -0.5; z =  0.5}) (255, 0, 0)
+    <<< make_vertex Vector3i.unit_x Vector3f.({x =  0.5; y = -0.5; z = -0.5}) (255, 0, 0)
+    <<< make_vertex Vector3i.unit_x Vector3f.({x =  0.5; y =  0.5; z = -0.5}) (255, 0, 0)
+    <<< make_vertex Vector3i.unit_y Vector3f.({x =  0.5; y =  0.5; z =  0.5}) (0, 255, 0)
+    <<< make_vertex Vector3i.unit_y Vector3f.({x = -0.5; y =  0.5; z =  0.5}) (0, 255, 0)
+    <<< make_vertex Vector3i.unit_y Vector3f.({x = -0.5; y =  0.5; z = -0.5}) (0, 255, 0)
+    <<< make_vertex Vector3i.unit_y Vector3f.({x =  0.5; y =  0.5; z = -0.5}) (0, 255, 0)
+    <<< make_vertex Vector3i.unit_z Vector3f.({x =  0.5; y =  0.5; z =  0.5}) (0, 0, 255)
+    <<< make_vertex Vector3i.unit_z Vector3f.({x =  0.5; y = -0.5; z =  0.5}) (0, 0, 255)
+    <<< make_vertex Vector3i.unit_z Vector3f.({x = -0.5; y = -0.5; z =  0.5}) (0, 0, 255)
+    <<< make_vertex Vector3i.unit_z Vector3f.({x = -0.5; y =  0.5; z =  0.5}) (0, 0, 255)
+    <<< make_vertex Vector3i.(prop (-1) unit_x) Vector3f.({x = -0.5; y =  0.5; z =  0.5}) (255, 255, 0)
+    <<< make_vertex Vector3i.(prop (-1) unit_x) Vector3f.({x = -0.5; y = -0.5; z =  0.5}) (255, 255, 0)
+    <<< make_vertex Vector3i.(prop (-1) unit_x) Vector3f.({x = -0.5; y = -0.5; z = -0.5}) (255, 255, 0)
+    <<< make_vertex Vector3i.(prop (-1) unit_x) Vector3f.({x = -0.5; y =  0.5; z = -0.5}) (255, 255, 0)
+    <<< make_vertex Vector3i.(prop (-1) unit_y) Vector3f.({x =  0.5; y = -0.5; z =  0.5}) (255, 0, 255)
+    <<< make_vertex Vector3i.(prop (-1) unit_y) Vector3f.({x = -0.5; y = -0.5; z =  0.5}) (255, 0, 255)
+    <<< make_vertex Vector3i.(prop (-1) unit_y) Vector3f.({x = -0.5; y = -0.5; z = -0.5}) (255, 0, 255)
+    <<< make_vertex Vector3i.(prop (-1) unit_y) Vector3f.({x =  0.5; y = -0.5; z = -0.5}) (255, 0, 255)
+    <<< make_vertex Vector3i.(prop (-1) unit_z) Vector3f.({x =  0.5; y =  0.5; z = -0.5}) (0, 255, 255)
+    <<< make_vertex Vector3i.(prop (-1) unit_z) Vector3f.({x =  0.5; y = -0.5; z = -0.5}) (0, 255, 255)
+    <<< make_vertex Vector3i.(prop (-1) unit_z) Vector3f.({x = -0.5; y = -0.5; z = -0.5}) (0, 255, 255)
+    <<< make_vertex Vector3i.(prop (-1) unit_z) Vector3f.({x = -0.5; y =  0.5; z = -0.5}) (0, 255, 255)
+    |> Result.assert_ok
   )
 
 let cube_indices =
@@ -114,13 +131,24 @@ let cube = VertexArray.(create (module Window) window [Buffer.unpack cube_vbo])
 let indices = IndexArray.static (module Window) window cube_indices
 
 let cube_program =
-  Program.from_source_pp (module Window)
+  let res = Program.from_source_pp (module Window)
     ~context:window
     ~vertex_source:(`String cube_shader)
-    ~fragment_source:(`File "examples/normals_shader.frag") ()
+    ~fragment_source:(`File "examples/normals_shader.frag")
+  in
+  match res with
+  | Ok prog -> prog
+  | Error `Fragment_compilation_error msg -> fail ~msg "Failed to compile fragment shader"
+  | Error `Vertex_compilation_error msg -> fail ~msg "Failed to compile vertex shader"
+  | Error `Context_failure -> fail "GL context failure"
+  | Error `Unsupported_GLSL_version -> fail "Unsupported GLSL version"
+  | Error `Unsupported_GLSL_type -> fail "Unsupported GLSL type"
+  | Error `Linking_failure -> fail "GLSL linking failure"
 
 (* Display computations *)
-let proj = Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
+let proj = 
+  Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
+  |> Result.assert_ok
 
 let position = ref Vector3f.({x = 1.; y = 0.6; z = 1.4})
 
@@ -135,7 +163,7 @@ let display () =
   let t = Unix.gettimeofday () in
   let view = Matrix3D.look_at_eulerian ~from:!position ~theta:!view_theta ~phi:!view_phi in
   let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
-  let model = Matrix3D.rotation rot_vector !rot_angle in
+  let model = Matrix3D.rotation rot_vector !rot_angle |> Result.assert_ok in
   let vp = Matrix3D.product proj view in
   let mv = Matrix3D.product view model in
   let mvp = Matrix3D.product vp model in
@@ -145,21 +173,23 @@ let display () =
       ~culling:CullingMode.CullClockwise ())
   in
   let uniform =
-    Uniform.empty
-    |> Uniform.matrix3D "MVPMatrix" mvp
-    |> Uniform.matrix3D "MVMatrix" mv
-    |> Uniform.matrix3D "VMatrix" view
-    |> Uniform.vector3f "Light.LightDir" Vector3f.{x = -4.; y = -2.; z = -3.}
-    |> Uniform.vector3f "Light.AmbientIntensity" Vector3f.{x = 0.3; y = 0.3; z = 0.3}
-    |> Uniform.float    "Light.SunIntensity" 1.6
-    |> Uniform.float    "Light.MaxIntensity" 1.9
-    |> Uniform.float    "Light.Gamma"  1.2
+    Ok Uniform.empty
+    >>= Uniform.matrix3D "MVPMatrix" mvp
+    >>= Uniform.matrix3D "MVMatrix" mv
+    >>= Uniform.matrix3D "VMatrix" view
+    >>= Uniform.vector3f "Light.LightDir" Vector3f.{x = -4.; y = -2.; z = -3.}
+    >>= Uniform.vector3f "Light.AmbientIntensity" Vector3f.{x = 0.3; y = 0.3; z = 0.3}
+    >>= Uniform.float    "Light.SunIntensity" 1.6
+    >>= Uniform.float    "Light.MaxIntensity" 1.9
+    >>= Uniform.float    "Light.Gamma"  1.2
+    |> Result.assert_ok
   in
   VertexArray.draw (module Window) ~target:window ~vertices:cube ~indices ~uniform ~program:cube_program ~parameters ~mode:DrawMode.Triangles ()
+  |> Result.assert_ok
 
 
 (* Camera *)
-let center = Vector2i.div 2 (Window.size window)
+let center = Vector2i.div 2 (Window.size window) |> Result.assert_ok
 
 let () = Mouse.set_relative_position window center
 
@@ -232,7 +262,7 @@ let rec event_loop () =
 (* Main loop *)
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.white)) window;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> Result.assert_ok;
     display ();
     Window.display window;
     (* We only capture the mouse and listen to the keyboard when focused *)

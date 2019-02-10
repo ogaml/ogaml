@@ -1,5 +1,6 @@
 open OgamlMath
-
+open OgamlUtils
+open Result.Operators
 
 module IntMap = Map.Make (struct
 
@@ -36,8 +37,6 @@ module Glyph = struct
 
 end
 
-exception Font_error of string
-
 module Shelf = struct
 
   type t = {
@@ -51,8 +50,8 @@ module Shelf = struct
   }
 
   let create width = {
-    full   = Image.create (`Empty (Vector2i.zero,(`RGB Color.RGB.transparent)));
-    row    = Image.create (`Empty (Vector2i.zero,(`RGB Color.RGB.transparent)));
+    full   = Image.empty Vector2i.zero (`RGB Color.RGB.transparent);
+    row    = Image.empty Vector2i.zero (`RGB Color.RGB.transparent);
     width;
     height = 0;
     row_width  = 0;
@@ -65,12 +64,15 @@ module Shelf = struct
     let w,h  = size.Vector2i.x, size.Vector2i.y in
     if s.row_width + w + s.pad <= s.width then begin
       let new_height = max s.row_height h in
-      let new_row = 
-        Image.create 
-          (`Empty (Vector2i.({x = s.row_width + w + s.pad; y = new_height}),`RGB Color.RGB.transparent)) 
+      let new_row =
+        Image.empty
+          Vector2i.({x = s.row_width + w + s.pad; y = new_height}) 
+          (`RGB Color.RGB.transparent)
       in
-      Image.blit s.row new_row Vector2i.({x = 0; y = new_height - s.row_height});
-      Image.blit glyph new_row Vector2i.({x = s.row_width + s.pad; y = new_height - h});
+      Image.blit s.row new_row Vector2i.({x = 0; y = new_height - s.row_height}) 
+      |> Result.assert_ok;
+      Image.blit glyph new_row Vector2i.({x = s.row_width + s.pad; y = new_height - h})
+      |> Result.assert_ok;
       s.row <- new_row;
       s.row_height <- new_height;
       s.row_width <- s.row_width + w + s.pad;
@@ -78,15 +80,16 @@ module Shelf = struct
                 y = s.height + s.pad;
                 width  = w;
                 height = h})
-    end else if s.height + s.row_height + s.pad >= 2048 then begin
-      raise (Font_error "Font texture overflow")
     end else begin
       let new_full = 
-        Image.create 
-          (`Empty (Vector2i.({x = s.width; y = s.height + s.row_height + s.pad}),(`RGB Color.RGB.transparent))) 
+        Image.empty
+          Vector2i.({x = s.width; y = s.height + s.row_height + s.pad})
+          (`RGB Color.RGB.transparent)
       in
-      Image.blit s.full new_full Vector2i.({x = 0; y = s.row_height + s.pad});
-      Image.blit s.row new_full Vector2i.zero;
+      Image.blit s.full new_full Vector2i.({x = 0; y = s.row_height + s.pad})
+      |> Result.assert_ok;
+      Image.blit s.row new_full Vector2i.zero
+      |> Result.assert_ok;
       s.full <- new_full;
       s.row  <- glyph;
       s.height <- (s.height + s.row_height + s.pad);
@@ -102,9 +105,15 @@ module Shelf = struct
     s.height + s.row_height + s.pad
 
   let image height s =
-    let global = Image.create (`Empty (Vector2i.({x = s.width; y = height}), `RGB Color.RGB.transparent)) in
-    Image.blit s.full global Vector2i.({x = 0; y = s.row_height + s.pad});
-    Image.blit s.row global Vector2i.zero;
+    let global = 
+      Image.empty 
+        Vector2i.({x = s.width; y = height}) 
+        (`RGB Color.RGB.transparent)
+    in
+    Image.blit s.full global Vector2i.({x = 0; y = s.row_height + s.pad})
+    |> Result.assert_ok;
+    Image.blit s.row global Vector2i.zero
+    |> Result.assert_ok;
     global
 
 end
@@ -141,7 +150,7 @@ module Internal = struct
       Bytes.set bts (4*i+0) '\255';
       Bytes.set bts (4*i+1) '\255';
       Bytes.set bts (4*i+2) '\255';
-      Bytes.set bts (4*i+3) bmp.[i]
+      Bytes.set bts (4*i+3) (Bytes.get bmp i)
     done;
     bts
 
@@ -226,7 +235,9 @@ let load_glyph_return (t : t) s c b oversampling =
     let rect = Internal.char_box t.internal c in
     let (bmp,w,h) = Internal.render_bitmap t.internal c oversampling page.scale in
     let bmp = Internal.convert_1chan_bitmap bmp in
-    let uv = Shelf.add page.shelf (Image.create (`Data (Vector2i.({x = w; y = h}),bmp))) in
+    let uv = Shelf.add page.shelf 
+      (Image.create (`Data (Vector2i.({x = w; y = h}),bmp)) |> Result.assert_ok)
+    in
     {
       Glyph.advance = scale_int advance page.scale;
       Glyph.bearing = Vector2f.({x = scale_int lbear page.scale;
@@ -263,17 +274,20 @@ let oversampling_of_size s = min 4 ((80 + s - 1)/s)
 (** Exposed functions *)
 let load s =
   if not (Sys.file_exists s) then
-    raise (Font_error (Printf.sprintf "File not found : %s" s));
+    Error (`File_not_found s)
+  else
+    Ok () >>= fun () ->
   let internal = Internal.load s in
   if not (Internal.is_valid internal) then
-    raise (Font_error (Printf.sprintf "Invalid font file : %s" s));
-  {
-    pages  = IntMap.empty;
-    nindex = 0;
-    height = 0;
-    texture = None;
-    internal
-  }
+    Error `Invalid_font_file
+  else
+    Ok {
+      pages  = IntMap.empty;
+      nindex = 0;
+      height = 0;
+      texture = None;
+      internal
+    }
 
 
 let glyph (t : t) c size bold =
@@ -317,10 +331,13 @@ let rebuild_page_texture (type s) (module M : RenderTarget.T with type t = s) ta
   let layer = 
     match t.texture with
     | None   -> assert false
-    | Some t -> Texture.Texture2DArray.layer t i_layer
+    | Some t -> 
+      Texture.Texture2DArray.layer t i_layer
+      |> Result.assert_ok
   in
   let mipmap = 
     Texture.Texture2DArrayLayer.mipmap layer 0
+    |> Result.assert_ok
   in
   Texture.Texture2DArrayLayerMipmap.write
     mipmap
@@ -339,14 +356,13 @@ let rebuild_full_texture (type s) (module M : RenderTarget.T with type t = s) ta
     insert (index, img) l) t.pages []
   in
   let l_imgs_strip = List.map (fun (_,i) -> `Image i) l_imgs in
-  let texture = 
-    if l_imgs_strip = [] then 
-      Texture.Texture2DArray.create (module M) target 
-        ~mipmaps:`None [`Empty Vector2i.zero]
-    else 
-      Texture.Texture2DArray.create (module M) target 
-        ~mipmaps:`None l_imgs_strip
-  in
+  begin if l_imgs_strip = [] then 
+    Texture.Texture2DArray.create (module M) target 
+      ~mipmaps:`None [`Empty Vector2i.zero]
+  else 
+    Texture.Texture2DArray.create (module M) target 
+      ~mipmaps:`None l_imgs_strip
+  end >>>= fun texture ->
   Texture.Texture2DArray.minify  texture Texture.MinifyFilter.Linear;
   Texture.Texture2DArray.magnify texture Texture.MagnifyFilter.Linear;
   t.texture <- Some texture
@@ -359,20 +375,29 @@ let texture (type s) (module M : RenderTarget.T with type t = s) target t =
     end else (l, h)
   ) t.pages ([], t.height)
   in
-  if t.height < max_height || t.texture = None then begin
-    rebuild_full_texture (module M) target t max_height;
-    t.height <- max_height
-  end else if mod_pages <> [] then begin
-    List.iter (fun p -> rebuild_page_texture (module M) target t max_height p) mod_pages
-  end;
-  match t.texture with
-  | None -> assert false
-  | Some t -> t
+  let result = 
+    if t.height < max_height || t.texture = None then begin
+      rebuild_full_texture (module M) target t max_height >>>= fun () ->
+      t.height <- max_height
+    end else if mod_pages <> [] then begin
+      List.iter (fun p -> rebuild_page_texture (module M) target t max_height p) mod_pages;
+      Ok ()
+    end else Ok ()
+  in
+  match result, t.texture with
+  | Ok (), None -> assert false
+  | Ok (), Some t -> Ok t
+  | Error `No_input_files, _ -> assert false
+  | Error `Non_equal_input_sizes, _ -> assert false
+  | Error `Loading_error _, _ -> assert false
+  | Error `File_not_found _, _ -> assert false
+  | Error `Texture_too_large, _ -> Error `Font_texture_size_overflow
+  | Error `Texture_too_deep, _ -> Error `Font_texture_depth_overflow
 
 let size_index t s = 
   try 
     let page = IntMap.find s t.pages in
-    page.index
+    Ok page.index
   with
-    Not_found -> raise (Font_error "Font size's index not found")
+    Not_found -> Error `Invalid_font_size
     

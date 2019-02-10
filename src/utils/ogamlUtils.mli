@@ -1,12 +1,98 @@
 (** High-level helper functions and data structures *)
 
+(** Result utilities *)
+module Result : sig
+
+  (** This module provides some common utility functions to work on result types.
+    * Its aim is not to replace a fully-featured library. It is mostly there to
+    * make the examples and tests self-contained. *)
+
+  (** Module containing operators. *)
+  module Operators : sig
+
+    (** Operators are contained in this submodule so that $Result.Operators$
+      * can be opened without polluting the namespace. *)
+
+    (** Infix operator corresponding to $bind$. *)
+    val (>>=) : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
+ 
+    (** Infix operator corresponding to $apply$. *)
+    val (>>>=) : ('a, 'b) result -> ('a -> 'c) -> ('c, 'b) result
+  
+  end
+ 
+  (** Module containing functions on lists. *)
+  module List : sig
+
+    (** $iter f l$ applies $f$ to every element of $l$ but stops as soon as
+      * $f$ returns an error. *)
+    val iter : ('a -> (unit, 'b) result) -> 'a list -> (unit, 'b) result
+  
+    (** Same as $List.map$ but stops as soon as the function returns an error. *)
+    val map : ('a -> ('b, 'c) result) -> 'a list -> ('b list, 'c) result
+  
+    (** Same as $List.fold_left$ but stops as soon as the function returns an error. *)
+    val fold_left : ('a -> 'b -> ('a, 'c) result) -> 'a -> 'b list -> ('a, 'c) result
+  
+    (** Same as $List.fold_right$ but stops as soon as the function returns an error. *)
+    val fold_right : ('a -> 'b -> ('b, 'c) result) -> 'a list -> 'b -> ('b, 'c) result
+  
+  end
+    
+  (** Makes a result from an option and an error value. *)
+  val make : ?result:'a -> 'b -> ('a, 'b) result
+
+  (** Bind function on results. *)
+  val bind : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
+
+  (** Returns $true$ iff the result is $Ok$ *)
+  val is_ok : ('a, 'b) result -> bool
+  
+  (** Returns $true$ iff the result is $Error$ *)
+  val is_error : ('a, 'b) result -> bool
+
+  (** Applies a function to a result. *)
+  val apply : ('a, 'b) result -> ('a -> 'c) -> ('c, 'b) result
+
+  (** Returns the value of a result if $Ok$ and raises $Assertion_failure$ otherwise. *)
+  val assert_ok : ('a, 'b) result -> 'a
+
+  (** Returns the value of a result if $Ok$ and raises the exception contained in
+    * $Error$ otherwise. *)
+  val throw : ('a, exn) result -> 'a
+
+  (** $catch f v$ applies $f$ to $v$ and catches any exception it may produce. *)
+  val catch : ('a -> 'b) -> 'a -> ('b, exn) result
+
+  (** Applies an error handler to a result. *)
+  val handle : ('b -> 'a) -> ('a, 'b) result -> 'a
+
+  (** Maps the $Ok$ part of a result. *)
+  val map : ('a -> 'c) -> ('a, 'b) result -> ('c, 'b) result
+
+  (** Maps the $Error$ part of a result. *)
+  val map_error : ('b -> 'c) -> ('a, 'b) result -> ('a, 'c) result
+
+  (** Returns an option from a result by mapping $Error$ to $None$. *)
+  val opt : ('a, 'b) result -> 'a option
+
+  (** Returns a result from an option by mapping $None$ to $Error ()$. *)
+  val from_opt : 'a option -> ('a, unit) result
+
+  (** $iteri first last f$ applies $f$ to every integer between $first$ and
+    * $last$ (both included) but stops as soon as $f$ returns an error. *)
+  val iteri : int -> int -> (int -> (unit, 'a) result) -> (unit, 'a) result
+
+end
+
+
 (** Log system *)
 module Log : sig
 
   (** This module provides a very simple log system to use with Ogaml *)
 
-  (** Enumeration of log message levels *)
-  type level = Debug | Warn | Error | Info | Fatal
+  (** Enumeration of log message levels by priority *)
+  type level = Trace | Debug | Info | Warn | Error | Fatal
 
   (** Type of a log *)
   type t
@@ -15,12 +101,12 @@ module Log : sig
     *
     * - output : output channel of log messages (defaults to stderr)
     *
-    * - debug : if false, debug messages will be ignored (defaults to true)
+    * - level : messages below this level will be ignored (defaults to Trace)
     *
     * - color : if false, messages will not be colored (defaults to true)
     *
     * - short : if true, timestamps will be shortened (defaults to false) *)
-  val create : ?output:out_channel -> ?debug:bool -> ?color:bool -> ?short:bool -> unit -> t
+  val create : ?output:out_channel -> ?level:level -> ?color:bool -> ?short:bool -> unit -> t
 
   (** Log to the standard output, that would be obtained by calling $create ~output:stdout ()$ *)
   val stdout : t
@@ -28,20 +114,26 @@ module Log : sig
   (** Log to the standard error, that would be obtained by calling $create ()$ *)
   val stderr : t
 
+  (** Sets the level threshold *)
+  val set_level : t -> level -> unit
+
   (** Logs a message *)
   val log : t -> level -> ('a, out_channel, unit) format -> 'a
 
+  (** Logs a trace message *)
+  val trace : t -> ('a, out_channel, unit) format -> 'a
+
   (** Logs a debug message *)
   val debug : t -> ('a, out_channel, unit) format -> 'a
+
+  (** Logs an info message *)
+  val info  : t -> ('a, out_channel, unit) format -> 'a
 
   (** Logs a warn message *)
   val warn  : t -> ('a, out_channel, unit) format -> 'a
 
   (** Logs an error message *)
   val error : t -> ('a, out_channel, unit) format -> 'a
-
-  (** Logs an info message *)
-  val info  : t -> ('a, out_channel, unit) format -> 'a
 
   (** Logs a fatal error message *)
   val fatal : t -> ('a, out_channel, unit) format -> 'a
@@ -90,27 +182,24 @@ module UTF8String : sig
   (** Type of a UTF-8 encoded string *)
   type t
 
-  (** Raised when a string is not correctly encoded *)
-  exception UTF8_error of string
-
-  (** Raised when an operation violates the bounds of the string *)
-  exception Out_of_bounds of string
-
   (** Empty UTF-8 string *)
   val empty : unit -> t
 
   (** Makes a UTF-8 string filled with one character
     * 
-    * Raises UTF8_error if the code is not a valid UTF-8 character code *)
-  val make : int -> code -> t
+    * Returns $Error$ if the code is not a valid UTF-8 character code *)
+  val make : int -> code -> (t, [> `Invalid_UTF8_code]) result
 
-  (** Returns the ith character of a UTF-8 string *)
-  val get : t -> int -> code
+  (** Returns the ith character of a UTF-8 string.
+    * 
+    * Returns $Error$ if $i$ is not a valid index *)
+  val get : t -> int -> (code, [> `Out_of_bounds]) result
 
   (** Sets the ith character of a UTF-8 string.
     *
-    * Raises UTF8_error if the code is not a valid UTF-8 character code *)
-  val set : t -> int -> code -> unit
+    * Returns $Error$ if $i$ is not a valid index or if the code is
+    * not a valid UTF-8 code *)
+  val set : t -> int -> code -> (unit, [> `Out_of_bounds | `Invalid_UTF8_code]) result
 
   (** Returns the length of a UTF-8 string *)
   val length : t -> int
@@ -121,8 +210,8 @@ module UTF8String : sig
 
   (** Returns a UTF-8 encoded string from a string.
     * 
-    * Raises UTF8_error if the string is not a valid UTF-8 encoding *)
-  val from_string : string -> t
+    * Returns $Error$ if the string is not a valid UTF-8 encoding *)
+  val from_string : string -> (t, [> `Invalid_UTF8_bytes | `Invalid_UTF8_leader]) result
 
   (** Returns a string from a UTF-8 encoded string *)
   val to_string : t -> string
@@ -135,8 +224,8 @@ module UTF8String : sig
 
   (** Maps a UTF-8 string
     *
-    * Raises UTF8_error if the function returns an invalid UTF-8 code *)
-  val map : t -> (code -> code) -> t
+    * Returns $Error$ if the mapping function returns an invalid UTF-8 code *)
+  val map : t -> (code -> code) -> (t, [> `Invalid_UTF8_code]) result
 
 end
 
@@ -153,10 +242,6 @@ module Interpolator : sig
 
   (** Type of an interpolator returning type 'a *)
   type 'a t
-
-  (** Raised when an error occurs during the creation of an interpolator *)
-  exception Invalid_interpolator of string
-
 
   (*** Accessors and modifiers *)
 
@@ -365,9 +450,6 @@ module PriorityQueue : sig
 
     (** This module provides a basic implementation of priority queues *)
 
-    (** Raised when a queue is empty *)
-    exception Empty
-
     (** Priorities used by the queue *)
     type priority
 
@@ -389,21 +471,15 @@ module PriorityQueue : sig
     (** Inserts an element with a given priority *)
     val insert : 'a t -> priority -> 'a -> 'a t
 
-    (** Returns the top element of a queue
-      *
-      * Raises $Empty$ if the queue is empty *)
-    val top : 'a t -> 'a
+    (** Returns the top element of a queue *)
+    val top : 'a t -> ('a, unit) result
 
-    (** Removes the top element of a queue
-      *
-      * Raises $Empty$ if the queue is empty *)
-    val pop : 'a t -> 'a t
+    (** Removes the top element of a queue *)
+    val pop : 'a t -> ('a t, unit) result
 
     (** Returns the top element of a queue and the queue without its
-      * first element
-      *
-      * Raises $Empty$ if the queue is empty *)
-    val extract : 'a t -> ('a * 'a t)
+      * first element *)
+    val extract : 'a t -> ('a * 'a t, unit) result
 
   end
 

@@ -1,6 +1,5 @@
-
-exception Invalid_context of string
-
+open OgamlUtils
+open Result.Operators
 
 type capabilities = {
   max_3D_texture_size       : int;
@@ -80,8 +79,6 @@ type t = {
   mutable viewport         : OgamlMath.IntRect.t
 }
 
-let error msg = raise (Invalid_context msg)
-
 let capabilities t = t.capabilities
 
 let version s = 
@@ -99,16 +96,16 @@ let glsl_version s =
 let is_glsl_version_supported s v = 
   v <= s.glsl
 
-let assert_no_error s = 
+let check_errors s = 
   match GL.Pervasives.error () with
- | Some GLTypes.GlError.Invalid_enum    -> error "Invalid enum"
- | Some GLTypes.GlError.Invalid_value   -> error "Invalid value"
- | Some GLTypes.GlError.Invalid_op      -> error "Invalid op"
- | Some GLTypes.GlError.Invalid_fbop    -> error "Invalid fbop"
- | Some GLTypes.GlError.Out_of_memory   -> error "Out of memory"
- | Some GLTypes.GlError.Stack_overflow  -> error "Stack overflow"
- | Some GLTypes.GlError.Stack_underflow -> error "Stack underflow"
- | None -> ()
+  | Some GLTypes.GlError.Invalid_enum    -> Error `Invalid_enum
+  | Some GLTypes.GlError.Invalid_value   -> Error `Invalid_value
+  | Some GLTypes.GlError.Invalid_op      -> Error `Invalid_op
+  | Some GLTypes.GlError.Invalid_fbop    -> Error `Invalid_fbop
+  | Some GLTypes.GlError.Out_of_memory   -> Error `Out_of_memory
+  | Some GLTypes.GlError.Stack_overflow  -> Error `Stack_overflow
+  | Some GLTypes.GlError.Stack_underflow -> Error `Stack_underflow
+  | None -> Ok ()
 
 let flush s = 
   GL.Pervasives.flush ()
@@ -117,6 +114,22 @@ let finish s =
   GL.Pervasives.finish ()
 
 module LL = struct
+  
+  let mk_init_error fmt = 
+    Printf.ksprintf (fun s -> Error (`Context_initialization_error s)) fmt
+
+  let handle_program_error = function
+    | Ok prog -> Ok prog
+    | Error `Context_failure ->
+      mk_init_error "GLSL not supported"
+    | Error `Fragment_compilation_error (log) ->
+      mk_init_error "Failed to compile internal fragment shader: %s" log
+    | Error `Vertex_compilation_error (log) ->
+      mk_init_error "Failed to compile internal vertex shader: %s" log
+    | Error `Linking_failure ->
+      mk_init_error "Failed to link internal shader"
+    | Error `Unsupported_GLSL_type ->
+      mk_init_error "Unsupported GLSL features in internal shader"
   
   let create () =
     let convert v = 
@@ -150,14 +163,20 @@ module LL = struct
     in
     (* A bit ugly, but Invalid_enum occurs sometimes even if a feature is supported... *)
     ignore (GL.Pervasives.error ());
+    ProgramInternal.Sources.create_sprite (-3) glsl |> handle_program_error >>= 
+    fun sprite_program ->
+    ProgramInternal.Sources.create_shape (-2) glsl |> handle_program_error >>= 
+    fun shape_program ->
+    ProgramInternal.Sources.create_text (-1) glsl |> handle_program_error >>>= 
+    fun text_program ->
     {
       capabilities;
       major   ;
       minor   ;
       glsl    ;
-      sprite_program   = ProgramInternal.Sources.create_sprite (-3) glsl;
-      shape_program    = ProgramInternal.Sources.create_shape  (-2) glsl;
-      text_program     = ProgramInternal.Sources.create_text   (-1) glsl;
+      sprite_program;
+      shape_program ;
+      text_program  ;
       msaa             = false;
       culling_mode     = DrawParameter.CullingMode.CullNone;
       polygon_mode     = DrawParameter.PolygonMode.DrawFill;
@@ -240,22 +259,16 @@ module LL = struct
     s.texture_pool
 
   let bound_texture s i = 
-    if i >= s.capabilities.max_texture_image_units || i < 0 then
-      Printf.ksprintf error "Invalid texture unit %i" i;
     match s.bound_texture.(i) with
     | None       -> None
     | Some (_,t,_) -> Some t
 
   let bound_target s i = 
-    if i >= s.capabilities.max_texture_image_units || i < 0 then
-      Printf.ksprintf error "Invalid texture unit %i" i;
     match s.bound_texture.(i) with
     | None       -> None
     | Some (_,_,t) -> Some t
 
   let set_bound_texture s i t = 
-    if i >= s.capabilities.max_texture_image_units || i < 0 then
-      Printf.ksprintf error "Invalid texture unit %i" i;
     s.bound_texture.(i) <- t
 
   let pooled_texture_array s = 

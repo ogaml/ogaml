@@ -1,11 +1,25 @@
-
 open OgamlGraphics
 open OgamlMath
+open OgamlUtils
+open Result.Operators
+
+let fail ?msg err = 
+  Log.fatal Log.stdout "%s" err;
+  begin match msg with
+  | None -> ()
+  | Some e -> Log.fatal Log.stderr "%s" e
+  end;
+  exit 2
 
 let settings = OgamlCore.ContextSettings.create ()
 
 let window =
-  Window.create ~width:800 ~height:600 ~settings ~title:"Indexing Tutorial" ()
+  match Window.create ~width:800 ~height:600 ~settings ~title:"Indexing Tutorial" () with
+  | Ok win -> win
+  | Error (`Context_initialization_error msg) -> 
+    fail ~msg "Failed to create context"
+  | Error (`Window_creation_error msg) -> 
+    fail ~msg "Failed to create window"
 
 let vertex_shader_source = "
 
@@ -35,12 +49,20 @@ let fragment_shader_source = "
 let log = OgamlUtils.Log.create ()
 
 let program =
-  Program.from_source_pp
+  let res = Program.from_source_pp
     (module Window)
-    ~log
     ~context:window
     ~vertex_source:(`String vertex_shader_source)
-    ~fragment_source:(`String fragment_shader_source) ()
+    ~fragment_source:(`String fragment_shader_source)
+  in
+  match res with
+  | Ok prog -> prog
+  | Error `Fragment_compilation_error msg -> fail ~msg "Failed to compile fragment shader"
+  | Error `Vertex_compilation_error msg -> fail ~msg "Failed to compile vertex shader"
+  | Error `Context_failure -> fail "GL context failure"
+  | Error `Unsupported_GLSL_version -> fail "Unsupported GLSL version"
+  | Error `Unsupported_GLSL_type -> fail "Unsupported GLSL type"
+  | Error `Linking_failure -> fail "GLSL linking failure"
 
 let vertex0 =
   VertexArray.SimpleVertex.create
@@ -75,11 +97,11 @@ let vertex7 =
     ~position:(Vector3f.({x =  0.5; y =  0.5; z = 0.5})) ()
 
 let vertex_source = VertexArray.Source.(
-    empty ~size:8 ()
-    << vertex0 << vertex1 << vertex2
-    << vertex3 << vertex4 << vertex5
-    << vertex6 << vertex7
-)
+    Ok (empty ~size:8 ())
+    <<< vertex0 <<< vertex1 <<< vertex2
+    <<< vertex3 <<< vertex4 <<< vertex5
+    <<< vertex6 <<< vertex7) 
+  |> Result.assert_ok
 
 let index_source = IndexArray.Source.(
     empty 36
@@ -98,9 +120,13 @@ let vertices = VertexArray.(create (module Window) window [Buffer.unpack vbo])
 let indices  = IndexArray.static (module Window) window index_source
 
 (* Displaying *)
-let proj = Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
+let proj = 
+  Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
+  |> Result.assert_ok
 
-let view = Matrix3D.look_at ~from:Vector3f.({x = 1.5; y = 0.5; z = 0.9}) ~up:Vector3f.unit_y ~at:Vector3f.zero
+let view = 
+  Matrix3D.look_at ~from:Vector3f.({x = 1.5; y = 0.5; z = 0.9}) ~up:Vector3f.unit_y ~at:Vector3f.zero
+  |> Result.assert_ok
 
 let matrixVP = Matrix3D.product proj view
 
@@ -110,16 +136,30 @@ let display () =
   let t = Unix.gettimeofday () in
   rot_angle := !rot_angle +. (abs_float (cos t /. 10.)) /. 3.;
   let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
-  let model = Matrix3D.rotation rot_vector !rot_angle in
+  let model = Matrix3D.rotation rot_vector !rot_angle |> Result.assert_ok in
   let matrixMVP = Matrix3D.product matrixVP model in
   (* Cube *)
   let parameters = DrawParameter.(make ~culling:CullingMode.CullCounterClockwise ()) in
-  let uniform = Uniform.(empty |> matrix3D "MVP" matrixMVP |> color "color" (`RGB Color.RGB.red)) in
-  VertexArray.draw (module Window) ~target:window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ();
+  let uniform = 
+    let open Uniform in
+    Ok empty 
+    >>= matrix3D "MVP" matrixMVP 
+    >>= color "color" (`RGB Color.RGB.red)
+    |> Result.assert_ok
+  in
+  VertexArray.draw (module Window) ~target:window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ()
+  |> Result.assert_ok;
   (* Edges *)
   let parameters = DrawParameter.(make ~polygon:PolygonMode.DrawLines ()) in
-  let uniform = Uniform.(empty |> matrix3D "MVP" matrixMVP |> color "color" (`RGB Color.RGB.black)) in
+  let uniform = 
+    let open Uniform in 
+    Ok empty 
+    >>= matrix3D "MVP" matrixMVP 
+    >>= color "color" (`RGB Color.RGB.black)
+    |> Result.assert_ok
+  in
   VertexArray.draw (module Window) ~target:window ~indices ~vertices ~program ~parameters ~uniform ~mode:DrawMode.Triangles ()
+  |> Result.assert_ok
 
 let rec event_loop () =
   match Window.poll_event window with
@@ -132,7 +172,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.white)) window;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> Result.assert_ok;
     display ();
     Window.display window;
     event_loop ();

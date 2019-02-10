@@ -1,6 +1,5 @@
 open OgamlUtils
-
-exception Program_internal_error of string
+open Result.Operators
 
 
 module Uniform = struct
@@ -37,8 +36,6 @@ type t =
     attributes : Attribute.t list
   }
 
-let last_log = ref ""
-
 let create ~vertex ~fragment ~id =
   let program = GL.Program.create () in
   let vshader = GL.Shader.create GLTypes.ShaderType.Vertex   in
@@ -46,21 +43,21 @@ let create ~vertex ~fragment ~id =
   if not (GL.Shader.valid vshader) ||
      not (GL.Shader.valid fshader) ||
      not (GL.Program.valid program) then begin
-    last_log := "Context initialization failure";
-    raise (Program_internal_error "Failed to create a GLSL program , the GL context may not be correctly initialized");
-  end;
+     Error (`Context_failure)
+  end else 
+    Ok () 
+  >>= fun () ->
   GL.Shader.source vshader vertex;
   GL.Shader.source fshader fragment;
   GL.Shader.compile vshader;
   GL.Shader.compile fshader;
-  if GL.Shader.status vshader = false then begin
-    last_log := "Vertex shader : " ^ (GL.Shader.log vshader);
-    raise (Program_internal_error "GLSL compilation failure")
-  end;
-  if GL.Shader.status fshader = false then begin
-    last_log := "Fragment shader : " ^ (GL.Shader.log fshader);
-    raise (Program_internal_error "GLSL compilation failure")
-  end;
+  if GL.Shader.status vshader = false then 
+    Error (`Vertex_compilation_error (GL.Shader.log vshader))
+  else if GL.Shader.status fshader = false then 
+    Error (`Fragment_compilation_error (GL.Shader.log fshader))
+  else
+    Ok () 
+  >>= fun () ->
   GL.Program.attach program vshader;
   GL.Program.attach program fshader;
   GL.Program.link program;
@@ -68,23 +65,29 @@ let create ~vertex ~fragment ~id =
   GL.Program.detach program fshader;
   GL.Shader.delete vshader;
   GL.Shader.delete fshader;
-  if GL.Program.status program = false then begin
-    last_log := GL.Program.log program;
-    raise (Program_internal_error "GLSL linking failure")
-  end;
+  if GL.Program.status program = false then
+    Error `Linking_failure
+  else
+    Ok () 
+  >>= fun () ->
   let rec uniforms = function
-    |0 -> []
+    |0 -> Ok []
     |n -> begin
       let name = GL.Program.uname program (n - 1) in
       let kind = GL.Program.utype program (n - 1) in
       let location = GL.Program.uloc program name in
+      let uniform = 
+        {
+          Uniform.name = name; 
+          Uniform.kind = kind; 
+          Uniform.location = location
+        } 
+      in
+      uniforms (n-1) >>= fun lst ->
       if kind = GLTypes.GlslType.Unknown then
-        raise (Program_internal_error "Unsupported GLSL type");
-      {
-        Uniform.name = name; 
-        Uniform.kind = kind; 
-        Uniform.location = location
-      } :: (uniforms (n-1))
+        Error `Unsupported_GLSL_type
+      else
+        Ok (uniform :: lst)
     end
   in
   let rec attributes = function
@@ -100,10 +103,11 @@ let create ~vertex ~fragment ~id =
       } :: (attributes (n-1))
     end
   in
+  uniforms (GL.Program.ucount program) >>>= fun uniforms ->
   {
     program;
     id;
-    uniforms = uniforms (GL.Program.ucount program);
+    uniforms;
     attributes = attributes (GL.Program.acount program);
   }
 
@@ -125,8 +129,7 @@ let create_list ~vertex ~fragment ~id ~version =
     in
     create ~vertex:best_vshader ~fragment:best_fshader ~id
   with Not_found -> 
-    last_log := "No supported GLSL version provided";
-    raise (Program_internal_error "No supported GLSL version provided")
+    Error `Unsupported_GLSL_version
 
 let create_pp ~vertex ~fragment ~id ~version =
   let vsource = Printf.sprintf "#version %i\n\n%s" version vertex in
@@ -172,14 +175,8 @@ module Sources = struct
   "
 
   let create_shape id version =
-    try
-      create_pp ~version ~id ~vertex:vertex_shader_source_130
-                             ~fragment:fragment_shader_source_130
-    with
-      Program_internal_error s ->
-        Log.fatal Log.stderr "%s" s;
-        Log.fatal Log.stderr "%s" !last_log;
-        exit 2
+    create_pp ~version ~id ~vertex:vertex_shader_source_130
+                           ~fragment:fragment_shader_source_130
 
   (* Sprite drawing program *)
   let vertex_shader_source_tex_130 = "
@@ -222,14 +219,8 @@ module Sources = struct
   "
 
   let create_sprite id version =
-    try
-      create_pp ~version ~id ~vertex:vertex_shader_source_tex_130
-                             ~fragment:fragment_shader_source_tex_130
-    with
-      Program_internal_error s ->
-        Log.fatal Log.stderr "%s" s;
-        Log.fatal Log.stderr "%s" !last_log;
-        exit 2
+    create_pp ~version ~id ~vertex:vertex_shader_source_tex_130
+                           ~fragment:fragment_shader_source_tex_130
 
   (* Text drawing program *)
   let vertex_shader_source_text_130 = "
@@ -275,13 +266,7 @@ module Sources = struct
   "
 
   let create_text id version =
-    try
-      create_pp ~version ~id ~vertex:vertex_shader_source_text_130
-                             ~fragment:fragment_shader_source_text_130
-    with
-      Program_internal_error s ->
-        Log.fatal Log.stderr "%s" s;
-        Log.fatal Log.stderr "%s" !last_log;
-        exit 2
+    create_pp ~version ~id ~vertex:vertex_shader_source_text_130
+                           ~fragment:fragment_shader_source_text_130
 
 end

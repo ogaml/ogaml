@@ -1,3 +1,4 @@
+module Result = Result
 
 module Log = Log
 
@@ -12,4 +13,3 @@ module Noise = Noise
 module PriorityQueue = PriorityQueue
 
 module Graph = Graph
-

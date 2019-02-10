@@ -3,7 +3,7 @@ type mfunctor =
     name :  string;
     args : (string * string) list;
     sign :  string;
-    constr : (string * type_expr) list
+    constr : (type_expr * type_expr) list
   }
 
 and module_field = 
@@ -29,10 +29,11 @@ and type_param =
   | Polymorphic of string
 
 and type_expr = 
+  | NoType
   | ModuleType of string * type_expr
   | AtomType of string
   | Record of (bool * string option * string * type_expr) list
-  | PolyVariant of variance * ((string * type_expr option) list)
+  | PolyVariant of variance * ((string * type_expr option) list) * string option
   | PolyType of string
   | Arrow of type_expr * type_expr
   | TypeTuple of type_expr list
@@ -40,5 +41,5 @@ and type_expr =
   | OptionalParam of string * type_expr
   | Variant of (string option * string * type_expr option) list
   | ParamType of (type_expr list * type_expr)
-  | FCModule of type_expr * (string * type_expr) list 
+  | FCModule of type_expr * (type_expr * type_expr) list 
 

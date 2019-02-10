@@ -1,8 +1,7 @@
 open OgamlCore
 open OgamlUtils
 open OgamlMath
-
-exception Window_Error of string
+open Result.Operators
 
 module OutputBuffer = struct
 
@@ -29,8 +28,12 @@ type t = {
 
 let create ?width:(width=800) ?height:(height=600) ?title:(title="") 
            ?settings:(settings=OgamlCore.ContextSettings.create ()) () =
-  let internal = LL.Window.create ~width ~height ~title ~settings in
-  let context = Context.LL.create () in
+  let internal =
+    try Ok (LL.Window.create ~width ~height ~title ~settings)
+    with Failure s -> Error (`Window_creation_error s)
+  in
+  internal >>= fun internal ->
+  Context.LL.create () >>>= fun context ->
   let min_spf = 
     match ContextSettings.framerate_limit settings with
     | None   -> 0.
@@ -91,25 +94,27 @@ let display win =
 let activate_buffers win buffers = 
   let max_buffers = Array.length win.bound_buffers in
   let active_buffers = Array.make 5 false in
-  let length, changed = 
-    List.fold_left (fun (idx, changed) buf ->
-      if idx >= max_buffers then
-        raise (Window_Error "Cannot bind more than MAX_DRAW_BUFFERS buffers");
-      let changed = changed 
-        || win.bound_buffers.(idx) <> buf 
-        || idx >= win.n_bound_buffers
-      in
-      if buf <> OutputBuffer.None then begin
-        let i = OutputBuffer.index_of_buffer buf in
-        if active_buffers.(i) then
-          raise (Window_Error "Trying to bind same output buffer twice")
-        else
-          active_buffers.(i) <- true;
-      end;
-      win.bound_buffers.(idx) <- buf;
-      (idx + 1, changed)
-    ) (0, false) buffers
-  in
+  Result.List.fold_left (fun (idx, changed) buf ->
+    (if idx >= max_buffers then
+      Error `Too_many_draw_buffers
+    else Ok ()) >>= fun () ->
+    let changed = changed 
+      || win.bound_buffers.(idx) <> buf 
+      || idx >= win.n_bound_buffers
+    in
+    (if buf <> OutputBuffer.None then begin
+      let i = OutputBuffer.index_of_buffer buf in
+      if active_buffers.(i) then
+        Error `Duplicate_draw_buffer
+      else begin
+        active_buffers.(i) <- true;
+        Ok ()
+      end
+    end else Ok ()) >>>= fun () ->
+    win.bound_buffers.(idx) <- buf;
+    (idx + 1, changed)
+  ) (0, false) buffers
+  >>>= fun (length, changed) ->
   if changed || length <> win.n_bound_buffers then begin
     win.n_bound_buffers <- length;
     GL.FBO.draw_default_buffers length win.bound_buffers
@@ -126,8 +131,8 @@ let clear ?buffers:(buffers = [OutputBuffer.BackLeft])
     GL.Pervasives.depth_mask true
   end;
   RenderTarget.bind_fbo win.context 0 None;
-  activate_buffers win buffers;
-  RenderTarget.clear ?color ~depth ~stencil win.context
+  activate_buffers win buffers >>>= (fun () -> 
+  RenderTarget.clear ?color ~depth ~stencil win.context)
 
 let show_cursor win b = LL.Window.show_cursor win.internal b
 
@@ -135,9 +140,9 @@ let context win = win.context
 
 let bind win ?buffers:(buffers = [OutputBuffer.BackLeft]) params = 
   RenderTarget.bind_fbo win.context 0 None;
-  activate_buffers win buffers;
+  activate_buffers win buffers >>>= (fun () ->
   RenderTarget.bind_draw_parameters win.context (size win)
-    (ContextSettings.aa_level win.settings) params
+    (ContextSettings.aa_level win.settings) params)
 
 let internal win = win.internal
 
@@ -153,5 +158,5 @@ let screenshot win =
   for i = 0 to size.Vector2i.y - 1 do
     Bytes.blit data (i * size.Vector2i.x * 4) rev_data ((size.Vector2i.y - 1 - i) * size.Vector2i.x * 4) (size.Vector2i.x * 4)
   done;
-  Image.create (`Data (size, rev_data))
+  Image.create (`Data (size, rev_data)) |> Result.assert_ok
 

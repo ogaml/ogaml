@@ -394,6 +394,42 @@ GLenum TextureFormat_val(value fmt)
     case 8:
       return GL_STENCIL_INDEX8;
 
+    case 9:
+      return GL_R16;
+
+    case 10:
+      return GL_RG16;
+
+    case 11:
+      return GL_RGB16;
+
+    case 12:
+      return GL_RGBA16;
+
+    case 13:
+      return GL_R16F;
+
+    case 14:
+      return GL_RG16F;
+
+    case 15:
+      return GL_RGB16F;
+
+    case 16:
+      return GL_RGBA16F;
+
+    case 17:
+      return GL_R32F;
+
+    case 18:
+      return GL_RG32F;
+
+    case 19:
+      return GL_RGB32F;
+
+    case 20:
+      return GL_RGBA32F;
+
     default:
       caml_failwith("Caml variant error in TextureFormat_val(1)");
   }

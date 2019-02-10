@@ -1,6 +1,8 @@
 open OgamlMath
 open OgamlCore
 open OgamlUtils
+open Result.Operators
+
 
 module Fx = struct
 
@@ -93,18 +95,18 @@ module Fx = struct
              ~(colors : (Font.code,'b,Color.t list) full_it)
              ~size
              () =
-    let utf8 = UTF8String.from_string text in
+    UTF8String.from_string text >>>= fun utf8 ->
     let length = UTF8String.length utf8 in
     let rec fold i =
       if i >= length then []
       else if i = length - 1 then begin
-        let code = (`Code (UTF8String.get utf8 i)) in
+        let code = (`Code (UTF8String.get utf8 i |> Result.assert_ok)) in
         let glyph = Font.glyph font code size false in
         [0.,code,glyph]
       end
       else begin
-        let code = (`Code (UTF8String.get utf8 i)) in
-        let code' = (`Code (UTF8String.get utf8 (i+1))) in
+        let code = (`Code (UTF8String.get utf8 i |> Result.assert_ok)) in
+        let code' = (`Code (UTF8String.get utf8 (i+1) |> Result.assert_ok)) in
         let glyph = Font.glyph font code size false in
         let kern = Font.kerning font code code' size in
         (kern,code,glyph) :: (fold (i+1))
@@ -169,24 +171,20 @@ module Fx = struct
                ~color
                ()
            in
-           VertexArray.Source.(
-             source << v1 << v2 << v3
-                    << v3 << v1 << v4
-           ),
+           VertexArray.Source.(source <<< v1 <<< v2 <<< v3 <<< v3 <<< v1 <<< v4),
            Vector2f.(
              add advance_vec { x = Font.Glyph.advance glyph +. kern ; y = 0. }
            ),
            line_width
         )
         (
-          VertexArray.Source.empty 
-              ~size:((UTF8String.length utf8) * 6)
-              (),
+          Ok (VertexArray.Source.empty ~size:((UTF8String.length utf8) * 6) ()),
           Vector2f.zero,
           0.
         )
         chars
       |> fun (source, advance, line_width) -> 
+          let source = Result.assert_ok source in
           let vbo = VertexArray.Buffer.static (module M) target source in 
           (VertexArray.create (module M) target [VertexArray.Buffer.unpack vbo],
           advance,
@@ -218,20 +216,21 @@ module Fx = struct
            ~text ~target () =
     let context = M.context target in
     let program = Context.LL.text_drawing context in
-    let texture = Font.texture (module M) target text.font in
+    Font.texture (module M) target text.font >>>= fun texture ->
     let size = Vector2f.from_int (M.size target) in
-    let index = Font.size_index text.font text.size in
+    let index = Font.size_index text.font text.size |> Result.assert_ok in
     let tsize = 
       Texture.Texture2DArray.size texture
       |> Vector3i.project
       |> Vector2f.from_int
     in
     let uniform =
-      Uniform.empty
-      |> Uniform.vector2f "window_size" size
-      |> Uniform.vector2f "atlas_size" tsize
-      |> Uniform.texture2Darray "atlas" texture
-      |> Uniform.int "atlas_offset" index
+      Ok (Uniform.empty)
+      >>= Uniform.vector2f "window_size" size
+      >>= Uniform.vector2f "atlas_size" tsize
+      >>= Uniform.texture2Darray "atlas" texture
+      >>= Uniform.int "atlas_offset" index
+      |> Result.assert_ok
     in
     let vertices = text.vertices in
     VertexArray.draw (module M)
@@ -241,6 +240,7 @@ module Fx = struct
           ~parameters
           ~uniform
           ~mode:DrawMode.Triangles ()
+    |> Result.assert_ok
 
   let advance text = text.advance
 
@@ -258,18 +258,18 @@ type t = {
 }
 
 let create ~text ~position ~font ?color:(color=(`RGB Color.RGB.black)) ~size ?bold:(bold = false) () =
-  let utf8 = UTF8String.from_string text in
+  UTF8String.from_string text >>>= fun utf8 ->
   let length = UTF8String.length utf8 in
   let rec iter i =
     if i >= length then []
     else if i = length - 1 then begin
-      let code = (`Code (UTF8String.get utf8 i)) in
+      let code = (`Code (UTF8String.get utf8 i |> Result.assert_ok)) in
       let glyph = Font.glyph font code size bold in
       [0.,code,glyph]
     end
     else begin
-      let code = (`Code (UTF8String.get utf8 i)) in
-      let code' = (`Code (UTF8String.get utf8 (i+1))) in
+      let code = (`Code (UTF8String.get utf8 i |> Result.assert_ok)) in
+      let code' = (`Code (UTF8String.get utf8 (i+1) |> Result.assert_ok)) in
       let glyph = Font.glyph font code size bold in
       let kern = Font.kerning font code code' size in
       (kern,code,glyph) :: (iter (i+1))
@@ -374,27 +374,28 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
          ~text ~target () =
   let context = M.context target in
   let program = Context.LL.text_drawing context in
-  let texture = Font.texture (module M) target text.font in
+  Font.texture (module M) target text.font >>>= fun texture ->
   let size = Vector2f.from_int (M.size target) in
-  let index = Font.size_index text.font text.size in
+  let index = Font.size_index text.font text.size |> Result.assert_ok in
   let tsize = 
     Texture.Texture2DArray.size texture
     |> Vector3i.project
     |> Vector2f.from_int
   in
   let uniform =
-    Uniform.empty
-    |> Uniform.vector2f "window_size" size
-    |> Uniform.vector2f "atlas_size" tsize
-    |> Uniform.texture2Darray "atlas" texture
-    |> Uniform.int "atlas_offset" index
+    Ok Uniform.empty
+    >>= Uniform.vector2f "window_size" size
+    >>= Uniform.vector2f "atlas_size" tsize
+    >>= Uniform.texture2Darray "atlas" texture
+    >>= Uniform.int "atlas_offset" index
+    |> Result.assert_ok
   in
   let vertices = 
     let vtx = text.vertices in
     let src = VertexArray.Source.empty
       ~size:32 () 
     in
-    List.iter (VertexArray.Source.add src) vtx;
+    Result.List.iter (VertexArray.Source.add src) vtx |> Result.assert_ok;
     let vbo = VertexArray.Buffer.(unpack (static (module M) target src)) in
     VertexArray.create (module M) target [vbo]
   in
@@ -406,12 +407,13 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
         ~parameters
         ~uniform
         ~mode:DrawMode.Triangles ()
+  |> Result.assert_ok
 
 let to_source text src = 
-  List.iter (VertexArray.Source.add src) text.vertices
+  Result.List.iter (VertexArray.Source.add src) text.vertices
 
 let map_to_source text f src = 
-  List.iter (fun v -> VertexArray.Source.add src (f v)) text.vertices
+  Result.List.iter (fun v -> VertexArray.Source.add src (f v)) text.vertices
 
 let advance text = text.advance
 

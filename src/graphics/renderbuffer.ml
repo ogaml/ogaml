@@ -1,7 +1,6 @@
 open OgamlMath
-
-exception RBO_Error of string
-
+open OgamlUtils
+open Result.Operators
 
 module ColorBuffer = struct
 
@@ -17,9 +16,12 @@ module ColorBuffer = struct
     let idpool = Context.LL.rbo_pool context in
     let id = Context.ID_Pool.get_next idpool in
     let capabilities = Context.capabilities context in
-    if size.Vector2i.x >= capabilities.Context.max_renderbuffer_size 
+    begin if size.Vector2i.x >= capabilities.Context.max_renderbuffer_size 
     || size.Vector2i.y >= capabilities.Context.max_renderbuffer_size then
-      raise (RBO_Error "Max renderbuffer size exceeded");
+      Error `RBO_too_large
+    else
+      Ok ()
+    end >>>= fun () ->
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.RGBA8 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
@@ -50,9 +52,12 @@ module DepthBuffer = struct
     let idpool = Context.LL.rbo_pool context in
     let id = Context.ID_Pool.get_next idpool in
     let capabilities = Context.capabilities context in
-    if size.Vector2i.x >= capabilities.Context.max_renderbuffer_size 
+    begin if size.Vector2i.x >= capabilities.Context.max_renderbuffer_size 
     || size.Vector2i.y >= capabilities.Context.max_renderbuffer_size then
-      raise (RBO_Error "Max renderbuffer size exceeded");
+      Error `RBO_too_large
+    else
+      Ok ()
+    end >>>= fun () ->
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.Depth24 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
@@ -83,9 +88,12 @@ module DepthStencilBuffer = struct
     let idpool = Context.LL.rbo_pool context in
     let id = Context.ID_Pool.get_next idpool in
     let capabilities = Context.capabilities context in
-    if size.Vector2i.x >= capabilities.Context.max_renderbuffer_size
+    begin if size.Vector2i.x >= capabilities.Context.max_renderbuffer_size
     || size.Vector2i.y >= capabilities.Context.max_renderbuffer_size then
-      raise (RBO_Error "Max renderbuffer size exceeded");
+      Error `RBO_too_large
+    else
+      Ok ()
+    end >>>= fun () ->
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.Depth24Stencil8 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;
@@ -116,9 +124,12 @@ module StencilBuffer = struct
     let idpool = Context.LL.rbo_pool context in
     let id = Context.ID_Pool.get_next idpool in
     let capabilities = Context.capabilities context in
-    if size.Vector2i.x >= capabilities.Context.max_renderbuffer_size 
+    begin if size.Vector2i.x >= capabilities.Context.max_renderbuffer_size 
     || size.Vector2i.y >= capabilities.Context.max_renderbuffer_size then
-      raise (RBO_Error "Max renderbuffer size exceeded");
+      Error `RBO_too_large
+    else
+      Ok ()
+    end >>>= fun () ->
     GL.RBO.bind (Some internal);
     GL.RBO.storage GLTypes.TextureFormat.Stencil8 size.Vector2i.x size.Vector2i.y;
     GL.RBO.bind None;

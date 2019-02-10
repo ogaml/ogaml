@@ -16,7 +16,6 @@ module Fx : sig
     (Font.code list -> 'a) -> 'a ->
     (Font.code, 'a list * Font.code list, 'a list) full_it
 
-  (* TODO: Exception when the iterator doesn't return list of right size *)
   val create :
     (module RenderTarget.T with type t = 'a) ->
     target : 'a ->
@@ -25,14 +24,15 @@ module Fx : sig
     font : Font.t ->
     colors : (Font.code,'b,Color.t list) full_it ->
     size : int ->
-    unit -> t
+    unit -> (t, [> `Invalid_UTF8_bytes | `Invalid_UTF8_leader]) result
 
   val draw :
     (module RenderTarget.T with type t = 'a) ->
     ?parameters : DrawParameter.t ->
     text : t ->
     target : 'a ->
-    unit -> unit
+    unit -> 
+    (unit, [> `Font_texture_size_overflow | `Font_texture_depth_overflow]) result
 
   val advance : t -> OgamlMath.Vector2f.t
 
@@ -49,20 +49,23 @@ val create :
   ?color : Color.t ->
   size  : int ->
   ?bold : bool ->
-  unit -> t
+  unit -> (t, [> `Invalid_UTF8_bytes | `Invalid_UTF8_leader]) result
 
 val draw :
   (module RenderTarget.T with type t = 'a) ->
   ?parameters : DrawParameter.t ->
   text : t ->
   target : 'a ->
-  unit -> unit
+  unit -> 
+  (unit, [> `Font_texture_size_overflow | `Font_texture_depth_overflow]) result
 
-val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> unit
+val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t -> 
+    (unit, [> `Missing_attribute of string]) result
 
 val map_to_source : t -> 
                     (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
-                    'b VertexArray.Source.t -> unit
+                    'b VertexArray.Source.t -> 
+                    (unit, [> `Missing_attribute of string]) result
 
 val advance : t -> OgamlMath.Vector2f.t
 

@@ -5,8 +5,6 @@ type 'a t = {
   duration : float
 }
 
-exception Invalid_interpolator of string
-
 let mod_neg t =
   let vt = mod_float t 1. in
   if vt < 0. then vt +. 1.
