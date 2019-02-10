@@ -24,7 +24,7 @@ let window =
 let fps_clock =
   Clock.create ()
 
-let cube_source =
+let obj_source =
   let src = VertexArray.Source.empty ~size:36 () in
   let obj =
     Model2.from_obj "examples/dice.obj"
@@ -36,11 +36,11 @@ let cube_source =
   Model2.add_to_source src obj
   |> Result.assert_ok
 
-let cube_vbo =
-  VertexArray.Buffer.static (module Window) window cube_source
+let obj_vbo =
+  VertexArray.Buffer.static (module Window) window obj_source
 
-let cube =
-  VertexArray.create (module Window) window [VertexArray.Buffer.unpack cube_vbo]
+let obj =
+  VertexArray.create (module Window) window [VertexArray.Buffer.unpack obj_vbo]
 
 let normal_program =
   let res = Program.from_source_pp (module Window) ~context:window
@@ -71,6 +71,16 @@ let view_phi = ref 0.
 
 let msaa = ref true
 
+let texture =
+  let res =
+    Texture.Texture2D.create (module Window) window (`File "examples/dice.png")
+  in
+  match res with
+  | Ok tex -> tex
+  | Error `File_not_found s -> fail ("Cannot find texture " ^ s)
+  | Error `Loading_error msg -> fail ~msg "Error loading texture"
+  | Error `Texture_too_large -> fail "Texture too large"
+
 let display () =
   (* Compute model matrix *)
   let t = Unix.gettimeofday () in
@@ -89,16 +99,6 @@ let display () =
       ~culling:CullingMode.CullClockwise
       ~antialiasing:!msaa ())
   in
-  let texture =
-    let res =
-      Texture.Texture2D.create (module Window) window (`File "examples/dice.png")
-    in
-    match res with
-    | Ok tex -> tex
-    | Error `File_not_found s -> fail ("Cannot find texture " ^ s)
-    | Error `Loading_error msg -> fail ~msg "Error loading texture"
-    | Error `Texture_too_large -> fail "Texture too large"
-  in
   let uniform =
     Ok (Uniform.empty)
     >>= Uniform.matrix3D "MVPMatrix" mvp
@@ -113,7 +113,7 @@ let display () =
     |> Result.assert_ok
   in
   VertexArray.draw (module Window) ~target:window
-    ~vertices:cube ~uniform ~program:normal_program ~parameters
+    ~vertices:obj ~uniform ~program:normal_program ~parameters
     ~mode:DrawMode.Triangles ()
   |> Result.assert_ok
 
@@ -197,7 +197,7 @@ let rec main_loop () =
 
 (* Start *)
 let () =
-  Printf.printf "Rendering %i vertices\n%!" (VertexArray.length cube);
+  Printf.printf "Rendering %i vertices\n%!" (VertexArray.length obj);
   Clock.restart fps_clock;
   main_loop ();
   Printf.printf "Avg FPS: %f\n%!" (Clock.tps fps_clock);
