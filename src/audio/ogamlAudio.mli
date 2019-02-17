@@ -1,19 +1,16 @@
 
 module AudioContext : sig
 
-  exception Creation_error of string
-
-  exception Destruction_error of string
-
   type t
 
-  val create : 
-    ?position:OgamlMath.Vector3f.t -> 
+  val create :
+    ?position:OgamlMath.Vector3f.t ->
     ?velocity:OgamlMath.Vector3f.t ->
     ?look_at:OgamlMath.Vector3f.t ->
-    ?up_dir:OgamlMath.Vector3f.t -> unit -> t
+    ?up_dir:OgamlMath.Vector3f.t -> unit ->
+    (t, [> `Creation_error of string ]) result
 
-  val destroy : t -> unit
+  val destroy : t -> (unit, [> `Destruction_error of string ]) result
 
   val position : t -> OgamlMath.Vector3f.t
 
