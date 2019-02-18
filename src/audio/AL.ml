@@ -223,6 +223,8 @@ module Buffer = struct
 
   external get : t -> property -> int = "caml_al_get_buffer_property"
 
+  external id : t -> int = "caml_al_buffer_id"
+
 end
 
 
@@ -282,6 +284,9 @@ module Source = struct
   external get_i : t -> property_i -> int 
                  = "caml_al_get_source_i"
 
+  external playing : t -> bool
+                   = "caml_al_source_playing"
+
   external play : t -> unit
                 = "caml_al_play_source"
 
@@ -295,10 +300,10 @@ module Source = struct
                   = "caml_al_rewind_source"
 
   external queue : t -> int -> Buffer.t array -> unit
-                 = "caml_al_queue_source"
+                 = "caml_al_queue_buffers"
 
-  external unqueue : t -> int -> unit
-                   = "caml_al_unqueue_source"
+  external unqueue_id : t -> int
+                   = "caml_al_unqueue_buffer_id"
 
 end
 
@@ -307,8 +312,22 @@ module Vorbis = struct
 
   type data = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
 
+  type decoder
+
   external decode_file : string -> (int * int * data) = "caml_stb_decode_file"
 
   external free_data : data -> unit = "caml_stb_free_data"
+
+  external open_file : string -> (decoder, int) result = "caml_stb_open_filename"
+
+  external seek_frame : decoder -> int -> unit = "caml_stb_seek_frame"
+
+  external stream_length_samples : decoder -> int = "caml_stb_stream_length_samples"
+
+  external channels : decoder -> int = "caml_stb_channels"
+
+  external sample_rate : decoder -> int = "caml_stb_sample_rate"
+
+  external get_samples : decoder -> int -> data -> int = "caml_stb_get_samples"
 
 end

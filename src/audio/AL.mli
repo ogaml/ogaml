@@ -155,6 +155,8 @@ module Buffer : sig
 
   val get : t -> property -> int
 
+  val id : t -> int
+
 end
 
 
@@ -206,6 +208,8 @@ module Source : sig
 
   val get_i : t -> property_i -> int 
 
+  val playing : t -> bool
+
   val play : t -> unit
 
   val pause : t -> unit
@@ -216,7 +220,7 @@ module Source : sig
 
   val queue : t -> int -> Buffer.t array -> unit
 
-  val unqueue : t -> int -> unit
+  val unqueue_id : t -> int
 
 end
 
@@ -225,9 +229,23 @@ module Vorbis : sig
 
   type data = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
 
+  type decoder
+
   (* Returns channels * rate * data *)
   val decode_file : string -> (int * int * data)
 
   val free_data : data -> unit
+
+  val open_file : string -> (decoder, int) result
+
+  val seek_frame : decoder -> int -> unit
+
+  val stream_length_samples : decoder -> int
+
+  val channels : decoder -> int
+
+  val sample_rate : decoder -> int
+
+  val get_samples : decoder -> int -> data -> int
 
 end

@@ -1,6 +1,3 @@
-
-exception NoSourceAvailable
-
 type t
 
 val create :
@@ -8,15 +5,6 @@ val create :
   ?velocity:OgamlMath.Vector3f.t ->
   ?orientation:OgamlMath.Vector3f.t ->
   AudioContext.t -> t
-
-(* Will raise NoSourceAvailable if force is true and no source is available,
-   this could still happen in extreme cases. *)
-val play : t ->
-  ?pitch:float ->
-  ?gain:float ->
-  ?loop:bool ->
-  ?force:bool -> (* NOTE : if [force] is true, then a source *must* be allocated *)
-  [`Stream of AudioStream.t | `Sound of SoundBuffer.t] -> unit
 
 val stop : t -> unit
 
@@ -37,3 +25,22 @@ val set_velocity : t -> OgamlMath.Vector3f.t -> unit
 val orientation : t -> OgamlMath.Vector3f.t
 
 val set_orientation : t -> OgamlMath.Vector3f.t -> unit
+
+module LL : sig
+
+  val play :
+    ?pitch:float ->
+    ?gain:float ->
+    ?loop:bool ->
+    ?force:bool ->
+    ?on_stop:(unit -> unit) ->
+    duration:float ->
+    channels:[`Mono | `Stereo] ->
+    buffer:AL.Buffer.t ->
+    stream:bool ->
+    t ->
+    (unit, [> `NoSourceAvailable]) result
+
+  val source : t -> AL.Source.t option
+
+end
