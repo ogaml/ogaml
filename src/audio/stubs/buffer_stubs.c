@@ -120,3 +120,11 @@ caml_al_get_buffer_property(value buf, value prop)
   CAMLreturn(Val_int(cres));
 }
 
+CAMLprim value
+caml_al_buffer_id(value b1)
+{
+  CAMLparam1(b1);
+  ALuint i1 = BUFFER(b1);
+  CAMLreturn(Val_int(i1));
+}
+

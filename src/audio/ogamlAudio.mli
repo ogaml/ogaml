@@ -1,19 +1,16 @@
 
 module AudioContext : sig
 
-  exception Creation_error of string
-
-  exception Destruction_error of string
-
   type t
 
-  val create : 
-    ?position:OgamlMath.Vector3f.t -> 
+  val create :
+    ?position:OgamlMath.Vector3f.t ->
     ?velocity:OgamlMath.Vector3f.t ->
     ?look_at:OgamlMath.Vector3f.t ->
-    ?up_dir:OgamlMath.Vector3f.t -> unit -> t
+    ?up_dir:OgamlMath.Vector3f.t -> unit ->
+    (t, [> `Creation_error of string ]) result
 
-  val destroy : t -> unit
+  val destroy : t -> (unit, [> `Destruction_error of string ]) result
 
   val position : t -> OgamlMath.Vector3f.t
 
@@ -42,40 +39,7 @@ module AudioContext : sig
 end
 
 
-module SoundBuffer : sig
-
-  exception Error of string
-
-  type t
-
-  type samples = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
-
-  val load : string -> t
-
-  val create :
-    samples:samples ->
-    channels:[`Stereo | `Mono] ->
-    rate:int -> t
-
-  val duration : t -> float
-
-  val samples : t -> samples
-
-  val channels : t -> [`Stereo | `Mono]
-
-end
-
-
-module AudioStream : sig
-
-  type t
-
-end
-
-
 module AudioSource : sig
-
-  exception NoSourceAvailable
 
   type t
 
@@ -84,13 +48,6 @@ module AudioSource : sig
     ?velocity:OgamlMath.Vector3f.t ->
     ?orientation:OgamlMath.Vector3f.t ->
     AudioContext.t -> t
-
-  val play : t ->
-    ?pitch:float ->
-    ?gain:float ->
-    ?loop:bool ->
-    ?force:bool -> 
-    [`Stream of AudioStream.t | `Sound of SoundBuffer.t] -> unit
 
   val stop : t -> unit
 
@@ -111,5 +68,73 @@ module AudioSource : sig
   val orientation : t -> OgamlMath.Vector3f.t
 
   val set_orientation : t -> OgamlMath.Vector3f.t -> unit
+
+end
+
+
+module SoundBuffer : sig
+
+  type t
+
+  type samples = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
+
+  val load :
+    string ->
+    (t, [> `FileNotFound of string | `UnsupportedNumberOfChannels]) result
+
+  val create :
+    samples:samples ->
+    channels:[`Stereo | `Mono] ->
+    rate:int -> t
+
+  val play :
+    ?pitch:float ->
+    ?gain:float ->
+    ?loop:bool ->
+    ?force:bool ->
+    ?on_stop:(unit -> unit) ->
+    t -> AudioSource.t ->
+    (unit, [> `NoSourceAvailable]) result
+
+  val duration : t -> float
+
+  val samples : t -> samples
+
+  val channels : t -> [`Stereo | `Mono]
+
+end
+
+
+module AudioStream : sig
+
+  type t
+
+  val load :
+    ?buffers:int ->
+    ?buffer_size:int ->
+    string -> (t, unit) result
+
+  val play :
+    ?pitch:float ->
+    ?gain:float ->
+    ?force:bool ->
+    ?on_stop:(unit -> unit) ->
+    t -> AudioSource.t -> unit
+
+  val duration : t -> float
+
+  val seek : t -> float -> unit
+
+  val current : t -> float
+
+  val pause : t -> unit
+
+  val resume : t -> unit
+
+  val status : t -> [`Playing | `Stopped | `Paused]
+
+  val detach : t -> unit
+
+  val stop : t -> unit
 
 end

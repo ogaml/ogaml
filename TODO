@@ -29,7 +29,7 @@ Audio (see NOTES for more info):
     ✔ load (from .ogg file) @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
     ✔ create : data -> sampleCount -> channelCount -> sampleRate -> t @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
     ✔ duration : t -> int @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
-  ☐ AudioStream module
+  ✔ AudioStream module @done(2017-11-15 00:46) @project(Audio (see NOTES for more info))
   ✔ AudioSource module: @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
     ✔ create (with context) @done(2017-08-21 20:07) @project(Audio (see NOTES for more info) / ☐ SoundBuffer module)
     ✔ play : t -> [`Stream of AudioStream.t | `Sound of SoundBuffer.t] -> ... sound parameters ... -> unit @done(2017-08-21 20:07) @project(Audio (see NOTES for more info) / ☐ SoundBuffer module)

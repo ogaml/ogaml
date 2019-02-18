@@ -1,6 +1,6 @@
 open OgamlMath
 
-exception NoSourceAvailable
+open OgamlUtils.Result.Operators
 
 type t = {
   mutable context     : AudioContext.t ;
@@ -12,6 +12,7 @@ type t = {
   mutable channels    : [`Mono | `Stereo];
   mutable duration    : float;
   mutable start       : float;
+  mutable on_stop      : unit -> unit
 }
 
 let create ?position:(position = Vector3f.zero)
@@ -25,7 +26,8 @@ let create ?position:(position = Vector3f.zero)
   source = None ;
   channels = `Mono ;
   duration = 0. ;
-  start = 0. 
+  start = 0. ;
+  on_stop = (fun () -> ())
 }
 
 (* Utility for options *)
@@ -39,7 +41,7 @@ let vec3f v = Vector3f.(v.x, v.y, v.z)
 let allocate_source source force channels duration =
   match source.source with
   | None -> begin
-    let src_candidate = 
+    let src_candidate =
       match channels with
       | `Stereo ->
         AudioContext.LL.get_available_stereo_source ~force source.context
@@ -47,25 +49,25 @@ let allocate_source source force channels duration =
         AudioContext.LL.get_available_mono_source ~force source.context
     in
     match src_candidate with
-    | None when force -> raise NoSourceAvailable
-    | None -> ()
+    | None when force -> Error `NoSourceAvailable
+    | None -> Ok ()
     | Some s -> begin
       source.source <- Some s;
       match channels with
       | `Stereo ->
-        AudioContext.LL.allocate_stereo_source source.context s duration
-          (fun () -> source.source <- None)
+        Ok (AudioContext.LL.allocate_stereo_source source.context s duration
+            (fun () -> source.source <- None))
       | `Mono ->
-        AudioContext.LL.allocate_mono_source source.context s duration
-          (fun () -> source.source <- None)
+        Ok (AudioContext.LL.allocate_mono_source source.context s duration
+            (fun () -> source.source <- None))
     end
   end
   | Some s -> begin
     match channels with
     | `Stereo ->
-      AudioContext.LL.reallocate_stereo_source source.context s duration
+      Ok (AudioContext.LL.reallocate_stereo_source source.context s duration)
     | `Mono ->
-      AudioContext.LL.reallocate_mono_source source.context s duration
+      Ok (AudioContext.LL.reallocate_mono_source source.context s duration)
   end
 
 let stop source =
@@ -75,17 +77,19 @@ let stop source =
   | `Stereo -> may (AudioContext.LL.deallocate_stereo_source source.context) source.source;
   end;
   source.source <- None;
-  source.status <- `Stopped
+  source.status <- `Stopped;
+  source.on_stop ()
 
-let update_status source = 
+let update_status source =
   match source.status with
   | `Playing ->
-    if Unix.gettimeofday () -. source.start >= source.duration then
-      stop source
+    if Unix.gettimeofday () -. source.start >= source.duration then begin
+      stop source;
+    end
   | _ -> ()
 
-let status source = 
-  update_status source; 
+let status source =
+  update_status source;
   source.status
 
 let pause source =
@@ -102,7 +106,7 @@ let pause source =
 
 let resume source =
   match source.source with
-  | Some s when status source = `Paused -> 
+  | Some s when status source = `Paused ->
     begin match source.channels with
     | `Mono -> AudioContext.LL.reallocate_mono_source source.context s source.duration
     | `Stereo -> AudioContext.LL.reallocate_stereo_source source.context s source.duration
@@ -114,33 +118,6 @@ let resume source =
     source.status <- `Playing;
     source.start <- Unix.gettimeofday ()
   | _ -> ()
-
-let play source ?pitch ?gain ?loop ?force:(force = false) sound =
-  let src_status = status source in
-  (* We request a source to the context. *)
-  match sound with
-  | `Stream str when src_status = `Stopped -> () (* TODO *)
-  | `Sound buff when src_status = `Stopped ->
-    let duration = SoundBuffer.duration buff in
-    allocate_source source force (SoundBuffer.channels buff) duration;
-    begin match source.source with
-    | None -> ()
-    | Some s ->
-        may (fun p -> AL.Source.set_f s AL.Source.Pitch p) pitch ;
-        may (fun g -> AL.Source.set_f s AL.Source.Gain g) gain ;
-        may (fun l -> AL.Source.set_i s AL.Source.Looping (if l then 1 else 0))
-            loop ;
-        AL.Source.set_3f s AL.Source.Position (vec3f source.position) ;
-        AL.Source.set_3f s AL.Source.Velocity (vec3f source.velocity) ;
-        AL.Source.set_3f s AL.Source.Direction (vec3f source.orientation) ;
-        AL.Source.set_buffer s (SoundBuffer.LL.buffer buff) ;
-        AL.Source.play s ;
-        source.duration <- duration ;
-        source.status <- `Playing ;
-        source.channels <- (SoundBuffer.channels buff) ;
-        source.start <- Unix.gettimeofday ()
-      end
-    | _ -> ()
 
 let position source = source.position
 
@@ -174,3 +151,42 @@ let set_orientation source ori =
       (fun s -> AL.Source.set_3f s AL.Source.Direction (vec3f ori))
       source.source
   | _ -> ()
+
+module LL = struct
+
+  let play ?pitch ?gain ?loop ?(force = false) ?(on_stop = fun () -> ())
+    ~duration ~channels ~buffer ~stream source =
+    let src_status = status source in
+    (* We request a source to the context. *)
+    match src_status with
+    | `Stopped ->
+      allocate_source source force channels duration >>
+      begin match source.source with
+      | None -> Ok ()
+      | Some s ->
+          may (fun p -> AL.Source.set_f s AL.Source.Pitch p) pitch ;
+          may (fun g -> AL.Source.set_f s AL.Source.Gain g) gain ;
+          may (fun l -> AL.Source.set_i s AL.Source.Looping (if l then 1 else 0))
+              loop ;
+          AL.Source.set_3f s AL.Source.Position (vec3f source.position) ;
+          AL.Source.set_3f s AL.Source.Velocity (vec3f source.velocity) ;
+          AL.Source.set_3f s AL.Source.Direction (vec3f source.orientation) ;
+          if not stream then begin
+            AL.Source.set_buffer s buffer ;
+          end else begin
+            AL.Source.queue s 1 [|buffer|];
+          end;
+          AL.Source.play s ;
+          source.duration <- duration ;
+          source.status <- `Playing ;
+          source.channels <- channels ;
+          source.start <- Unix.gettimeofday () ;
+          source.on_stop <- on_stop ;
+          Ok ()
+        end
+      | _ -> Ok ()
+
+  let source source =
+    source.source
+
+end
