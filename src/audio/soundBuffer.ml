@@ -1,5 +1,4 @@
-
-exception Error of string
+open OgamlUtils.Result.Operators
 
 type samples = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
 
@@ -27,17 +26,20 @@ let create ~samples ~channels ~rate =
 
 let load s =
   if (not (Sys.file_exists s)) || (Sys.is_directory s) then
-    raise (Error ("File not found : " ^ s));
-  let (channels_nb, rate, samples) = AL.Vorbis.decode_file s in
-  let channels =
-    match channels_nb with
-    | 1 -> `Mono
-    | 2 -> `Stereo
-    | _ -> raise (Error "unsupported number of channels (>2)")
-  in
-  let sound = create ~samples ~rate ~channels in
-  AL.Vorbis.free_data samples;
-  sound
+    Error (`FileNotFound s)
+  else begin
+    let (channels_nb, rate, samples) = AL.Vorbis.decode_file s in
+    let channels =
+      match channels_nb with
+      | 1 -> Ok `Mono
+      | 2 -> Ok `Stereo
+      | _ -> Error `UnsupportedNumberOfChannels
+    in
+    channels >>= fun channels ->
+    let sound = create ~samples ~rate ~channels in
+    AL.Vorbis.free_data samples;
+    Ok sound
+  end
 
 let play ?pitch ?gain ?loop ?force ?on_stop buff source =
   AudioSource.LL.play

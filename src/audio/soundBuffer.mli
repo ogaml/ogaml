@@ -1,11 +1,10 @@
-
-exception Error of string
-
 type t
 
 type samples = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Array1.t
 
-val load : string -> t
+val load :
+  string ->
+  (t, [> `FileNotFound of string | `UnsupportedNumberOfChannels]) result
 
 val create :
   samples:samples ->
