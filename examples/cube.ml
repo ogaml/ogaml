@@ -3,7 +3,7 @@ open OgamlMath
 open OgamlUtils
 open Result.Operators
 
-let fail ?msg err = 
+let fail ?msg err =
   Log.fatal Log.stdout "%s" err;
   begin match msg with
   | None -> ()
@@ -16,25 +16,35 @@ let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 let window =
   match Window.create ~width:800 ~height:600 ~title:"Cube Example" ~settings () with
   | Ok win -> win
-  | Error (`Context_initialization_error msg) -> 
+  | Error (`Context_initialization_error msg) ->
     fail ~msg "Failed to create context"
-  | Error (`Window_creation_error msg) -> 
+  | Error (`Window_creation_error msg) ->
     fail ~msg "Failed to create window"
 
-let fps_clock = 
+let fps_clock =
   Clock.create ()
 
 let cube_source =
   let src = VertexArray.Source.empty ~size:36 () in
-  let cmod = Model.cube Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) in
+  (* TODO Perhaps it doesn't correspond to what was meant for this example *)
+  (* let cmod = Model.cube Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) in
   Model.source cmod ~vertex_source:src ()
   |> Result.assert_ok;
-  src
+  src *)
+  let obj =
+    Model.from_obj "examples/cube.obj"
+    |> Result.handle (function
+      | `Parsing_error loc -> fail ~msg:(Model.Location.to_string loc) "Parsing error"
+      | `Syntax_error (_, msg) -> fail ~msg "SyntaxError"
+      )
+  in
+  Model.add_to_source src obj
+  |> Result.assert_ok
 
-let cube_vbo = 
+let cube_vbo =
   VertexArray.Buffer.static (module Window) window cube_source
 
-let cube = 
+let cube =
   VertexArray.create (module Window) window [VertexArray.Buffer.unpack cube_vbo]
 
 let normal_program =
@@ -52,7 +62,7 @@ let normal_program =
   | Error `Linking_failure -> fail "GLSL linking failure"
 
 (* Display computations *)
-let proj = 
+let proj =
   Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
   |> Result.assert_ok
 
@@ -71,8 +81,8 @@ let display () =
   let t = Unix.gettimeofday () in
   let view = Matrix3D.look_at_eulerian ~from:!position ~theta:!view_theta ~phi:!view_phi in
   let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
-  let model = 
-    Matrix3D.rotation rot_vector !rot_angle 
+  let model =
+    Matrix3D.rotation rot_vector !rot_angle
     |> Result.assert_ok
   in
   let vp = Matrix3D.product proj view in
@@ -97,7 +107,7 @@ let display () =
     |> Result.assert_ok
   in
   VertexArray.draw (module Window) ~target:window
-    ~vertices:cube ~uniform ~program:normal_program ~parameters 
+    ~vertices:cube ~uniform ~program:normal_program ~parameters
     ~mode:DrawMode.Triangles ()
   |> Result.assert_ok
 

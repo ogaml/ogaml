@@ -2232,62 +2232,9 @@ module Model : sig
   (** This module provides helpers to manipulate and load
     * immutable 3D models in the RAM.
     *
-    * Moreover, the operations provided in this module are generally costly
-    * and should not be used in performance-sensitive code.
-    *
-    * Models stored in that form are not RAM-friendly, and
-    * should not be stored in large numbers. Use vertex arrays
-    * instead. *)
+    * TODO *)
 
-  (** Represents a particular vertex of a model *)
-  module Vertex : sig
-
-    (** Type of a model vertex *)
-    type t
-
-    (** Creates a model vertex *)
-    val create : position:OgamlMath.Vector3f.t ->
-                ?normal:OgamlMath.Vector3f.t   ->
-                ?uv:OgamlMath.Vector2f.t       ->
-                ?color:Color.t -> unit -> t
-
-    (** Returns the position of a model vertex *)
-    val position : t -> OgamlMath.Vector3f.t
-
-    (** Returns the normal of a model vertex *)
-    val normal : t -> OgamlMath.Vector3f.t option
-
-    (** Returns the UV coordinates associated to a model vertex *)
-    val uv : t -> OgamlMath.Vector2f.t option
-
-    (** Returns the color of a model vertex *)
-    val color : t -> Color.t option
-
-  end
-
-
-  (** Represents a face of a model *)
-  module Face : sig
-
-    (** Type of a face *)
-    type t
-
-    (** Creates a face from 3 vertices *)
-    val create : Vertex.t -> Vertex.t -> Vertex.t -> t
-
-    (** Returns the two triangles associated to 4 vertices *)
-    val quad : Vertex.t -> Vertex.t -> Vertex.t -> Vertex.t -> (t * t)
-
-    (** Returns the 3 vertices of a face *)
-    val vertices : t -> (Vertex.t * Vertex.t * Vertex.t)
-
-    (** Returns a new face painted with a given color *)
-    val paint : t -> Color.t -> t
-
-    (** Returns the normal of a face *)
-    val normal : t -> OgamlMath.Vector3f.t
-
-  end
+  open OgamlMath
 
   (** Represents the location of a parsing error *)
   module Location : sig
@@ -2315,114 +2262,35 @@ module Model : sig
 
   end
 
-
   (** Type of a model *)
   type t
 
+  (*** Operations on models *)
+
+  (** Premultiply every point a model to yield a new one *)
+  val transform : Matrix3D.t -> t -> t
+
+  (** Scale a model *)
+  val scale : Vector3f.t -> t -> t
+
+  (** Tranlation of a model *)
+  val translate : Vector3f.t -> t -> t
+
+  (** Rotation of a model *)
+  val rotate : Quaternion.t -> t -> t
+
   (*** Model creation *)
 
-  (** Empty model *)
-  val empty : t
-
-  (** Returns the model associated to an OBJ file *)
-  val from_obj : string -> (t, [> `Syntax_error of (Location.t * string)
-                               | `Parsing_error of Location.t]) result
-
-
-  (** Creates a cube from two endpoints *)
-  val cube : OgamlMath.Vector3f.t -> OgamlMath.Vector3f.t -> t
-
-
-  (*** Transformations *)
-
-  (** Applies a transformation to a 3D model *)
-  val transform : t -> OgamlMath.Matrix3D.t -> t
-
-  (** Scales a 3D model *)
-  val scale : t -> OgamlMath.Vector3f.t -> t
-
-  (** Translates a 3D model *)
-  val translate : t -> OgamlMath.Vector3f.t -> t
-
-  (** Rotates a 3D model *)
-  val rotate : t -> OgamlMath.Quaternion.t -> t
-
-
-  (*** Model modification *)
-
-  (** Adds a face to a model *)
-  val add_face : t -> Face.t -> t
-
-  (** Paints the whole model with a given color *)
-  val paint : t -> Color.t -> t
-
-  (** Merges two models *)
-  val merge : t -> t -> t
-
-  (** (Re-)computes the normals of a model. If $smooth$ is $true$,
-    * then the normals are computed per-vertex instead of per-face *)
-  val compute_normals : ?smooth:bool -> t -> t
-
-  (** Simpifies a model (removes all redundant faces) *)
-  val simplify : t -> t
-
-  (** Appends a model to a vertex source. Uses indexing if an index source is provided.
-    * Use Triangles as DrawMode with this source.
-    * @see:OgamlGraphics.IndexArray.Source
-    * @see:OgamlGraphics.VertexArray.Source *)
-  val source : t -> ?index_source:IndexArray.Source.t
-                 -> vertex_source:VertexArray.SimpleVertex.T.s VertexArray.Source.t
-                 -> unit -> (unit, [> `Missing_attribute of string]) result
-
-
-  (*** Iterators *)
-
-  (** Iterates through all faces of a model *)
-  val iter : t -> (Face.t -> unit) -> unit
-
-  (** Folds through all faces of a model *)
-  val fold : t -> ('a -> Face.t -> 'a) -> 'a -> 'a
-
-  (** Maps a model face by face *)
-  val map : t -> (Face.t -> Face.t) -> t
-
-end
-
-
-
-(** TODO WIP Model Alternative *)
-module Model2 : sig
-
-  open OgamlMath
-
-  module Location : sig
-
-    type t
-
-    val first_line : t -> int
-
-    val last_line : t -> int
-
-    val first_char : t -> int
-
-    val last_char : t -> int
-
-    val to_string : t -> string
-
-  end
-
-  type t
-
-  val transform : Matrix3D.t -> t -> t
-  val scale : OgamlMath.Vector3f.t -> t -> t
-  val translate : OgamlMath.Vector3f.t -> t -> t
-  val rotate : OgamlMath.Quaternion.t -> t -> t
+  (** Read a file in Wavefront (.obj) format to create a model *)
   val from_obj :
     ?compute_normals: bool ->
     string ->
     (t, [> `Syntax_error of (Location.t * string)
          | `Parsing_error of Location.t]) result
 
+  (*** Usage *)
+
+  (** Add the model vertices to a VertexArray *)
   val add_to_source :
     VertexArray.SimpleVertex.T.s VertexArray.Source.t ->
     t ->

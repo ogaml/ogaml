@@ -27,13 +27,13 @@ let fps_clock =
 let obj_source =
   let src = VertexArray.Source.empty ~size:36 () in
   let obj =
-    Model2.from_obj "examples/dice.obj"
+    Model.from_obj "examples/dice.obj"
     |> Result.handle (function
-      | `Parsing_error loc -> fail ~msg:(Model2.Location.to_string loc) "Parsing error"
+      | `Parsing_error loc -> fail ~msg:(Model.Location.to_string loc) "Parsing error"
       | `Syntax_error (_, msg) -> fail ~msg "SyntaxError"
       )
   in
-  Model2.add_to_source src obj
+  Model.add_to_source src obj
   |> Result.assert_ok
 
 let obj_vbo =
