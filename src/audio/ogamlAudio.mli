@@ -41,8 +41,6 @@ end
 
 module AudioSource : sig
 
-  exception NoSourceAvailable
-
   type t
 
   val create :
@@ -89,13 +87,14 @@ module SoundBuffer : sig
     channels:[`Stereo | `Mono] ->
     rate:int -> t
 
-  val play : 
+  val play :
     ?pitch:float ->
     ?gain:float ->
     ?loop:bool ->
     ?force:bool ->
     ?on_stop:(unit -> unit) ->
-    t -> AudioSource.t -> unit
+    t -> AudioSource.t ->
+    (unit, [> `NoSourceAvailable]) result
 
   val duration : t -> float
 
@@ -109,34 +108,33 @@ end
 module AudioStream : sig
 
   type t
-  
-  val load : 
+
+  val load :
     ?buffers:int ->
     ?buffer_size:int ->
     string -> (t, unit) result
-  
+
   val play :
     ?pitch:float ->
     ?gain:float ->
     ?force:bool ->
     ?on_stop:(unit -> unit) ->
     t -> AudioSource.t -> unit
-  
+
   val duration : t -> float
-  
+
   val seek : t -> float -> unit
-  
+
   val current : t -> float
-  
+
   val pause : t -> unit
-  
+
   val resume : t -> unit
-  
+
   val status : t -> [`Playing | `Stopped | `Paused]
-  
+
   val detach : t -> unit
-  
+
   val stop : t -> unit
 
 end
-

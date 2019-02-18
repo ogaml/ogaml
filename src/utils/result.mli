@@ -1,5 +1,7 @@
 module Operators : sig
 
+  val (>>) : ('a, 'b) result -> ('c, 'b) result -> ('c, 'b) result
+
   val (||>) : 'a -> ('b -> 'a -> 'c) -> ('b -> 'c)
 
   val (>>=) : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
@@ -19,7 +21,7 @@ module List : sig
   val fold_right : ('a -> 'b -> ('b, 'c) result) -> 'a list -> 'b -> ('b, 'c) result
 
 end
-  
+
 val make : ?result:'a -> 'b -> ('a, 'b) result
 
 val bind : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result

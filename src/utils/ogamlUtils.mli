@@ -13,32 +13,36 @@ module Result : sig
     (** Operators are contained in this submodule so that $Result.Operators$
       * can be opened without polluting the namespace. *)
 
+    (** Infix operator corresponding to $bind$ but where the second argument
+      * doesn't depend on the first. *)
+    val (>>) : ('a, 'b) result -> ('c, 'b) result -> ('c, 'b) result
+
     (** Infix operator corresponding to $bind$. *)
     val (>>=) : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
- 
+
     (** Infix operator corresponding to $apply$. *)
     val (>>>=) : ('a, 'b) result -> ('a -> 'c) -> ('c, 'b) result
-  
+
   end
- 
+
   (** Module containing functions on lists. *)
   module List : sig
 
     (** $iter f l$ applies $f$ to every element of $l$ but stops as soon as
       * $f$ returns an error. *)
     val iter : ('a -> (unit, 'b) result) -> 'a list -> (unit, 'b) result
-  
+
     (** Same as $List.map$ but stops as soon as the function returns an error. *)
     val map : ('a -> ('b, 'c) result) -> 'a list -> ('b list, 'c) result
-  
+
     (** Same as $List.fold_left$ but stops as soon as the function returns an error. *)
     val fold_left : ('a -> 'b -> ('a, 'c) result) -> 'a -> 'b list -> ('a, 'c) result
-  
+
     (** Same as $List.fold_right$ but stops as soon as the function returns an error. *)
     val fold_right : ('a -> 'b -> ('b, 'c) result) -> 'a list -> 'b -> ('b, 'c) result
-  
+
   end
-    
+
   (** Makes a result from an option and an error value. *)
   val make : ?result:'a -> 'b -> ('a, 'b) result
 
@@ -47,7 +51,7 @@ module Result : sig
 
   (** Returns $true$ iff the result is $Ok$ *)
   val is_ok : ('a, 'b) result -> bool
-  
+
   (** Returns $true$ iff the result is $Error$ *)
   val is_error : ('a, 'b) result -> bool
 
@@ -186,12 +190,12 @@ module UTF8String : sig
   val empty : unit -> t
 
   (** Makes a UTF-8 string filled with one character
-    * 
+    *
     * Returns $Error$ if the code is not a valid UTF-8 character code *)
   val make : int -> code -> (t, [> `Invalid_UTF8_code]) result
 
   (** Returns the ith character of a UTF-8 string.
-    * 
+    *
     * Returns $Error$ if $i$ is not a valid index *)
   val get : t -> int -> (code, [> `Out_of_bounds]) result
 
@@ -209,7 +213,7 @@ module UTF8String : sig
   val byte_length : t -> int
 
   (** Returns a UTF-8 encoded string from a string.
-    * 
+    *
     * Returns $Error$ if the string is not a valid UTF-8 encoding *)
   val from_string : string -> (t, [> `Invalid_UTF8_bytes | `Invalid_UTF8_leader]) result
 
@@ -231,7 +235,7 @@ end
 
 
 (** Interpolation between multiple values *)
-module Interpolator : sig 
+module Interpolator : sig
 
   (** This module defines interpolators between two values.
     *
@@ -248,13 +252,13 @@ module Interpolator : sig
   (** Those functions provide a way to modify the behaviour
     * of interpolators.
     *
-    * Unless otherwise specified, the modifiers applied to 
-    * an interpolator are kept by all subsequent operations. 
-    * This means that, for example, passing a time-based 
-    * interpolator to $map$ will return a new time-based 
+    * Unless otherwise specified, the modifiers applied to
+    * an interpolator are kept by all subsequent operations.
+    * This means that, for example, passing a time-based
+    * interpolator to $map$ will return a new time-based
     * interpolator. *)
 
-  (** $get ip t$ returns the value of the interpolator $ip$ 
+  (** $get ip t$ returns the value of the interpolator $ip$
     * at time $t$ in [0;1] *)
   val get : 'a t -> float -> 'a
 
@@ -264,14 +268,14 @@ module Interpolator : sig
     * If $ip$ is not time-based then the result is $ip(0)$. *)
   val current : 'a t -> 'a
 
-  (** $start ip t dt$ returns a new time-based interpolator 
+  (** $start ip t dt$ returns a new time-based interpolator
     * $tip$ such that :
     *
     * $current tip$ = $ip(0)$ at time $t$
     *
     * $current tip$ = $ip(1)$ at time $t + dt$
     *
-    * $t$ and $dt$ are given in seconds. 
+    * $t$ and $dt$ are given in seconds.
     * $t = Unix.gettimeofday()$ means that $tip$ starts immediately.
     *
     * If $dt = 0$ then $current$ will always return $ip(0)$
@@ -285,7 +289,7 @@ module Interpolator : sig
 
   (** $loop ip$ returns a repeating interpolator $lip$ from $ip$ such that :
     *
-    * $lip(x)$ = $ip(x)$ for $x$ in [0;1] 
+    * $lip(x)$ = $ip(x)$ for $x$ in [0;1]
     *
     * $lip(x)$ = $ip(2-x)$ for $x$ in [1;2]
     *
@@ -300,20 +304,20 @@ module Interpolator : sig
     *
     * Unless otherwise specified, parameters are clamped to
     * [0;1], that is ip(x) for x < 0 equals ip(0) and ip(x) for
-    * x > 1 equals ip(1) 
+    * x > 1 equals ip(1)
     *
     * Most constructors require a list of points of the form $(dt, v)$
     * such that the created interpolator will take the value $v$
     * at time $dt$.
     *
-    * The $cst_*$ variants create constant-speed interpolators 
+    * The $cst_*$ variants create constant-speed interpolators
     * so the $dt$ parameter is not required. *)
 
-  (** $custom f start stop$ returns a custom interpolator $ip$ that coincides with  
+  (** $custom f start stop$ returns a custom interpolator $ip$ that coincides with
     * the function $f$ such that $ip(0) = f(start)$, $ip(1) = f(stop)$. *)
   val custom : (float -> 'a) -> float -> float -> 'a t
 
-  (** $copy f$ returns a custom interpolator that coincides with  
+  (** $copy f$ returns a custom interpolator that coincides with
     * the function $f$ everywhere *)
   val copy : (float -> 'a) -> 'a t
 
@@ -325,8 +329,8 @@ module Interpolator : sig
     * $(dt, pos)$ of $steps$ at time $dt < 1.0$ *)
   val linear : float -> (float * float) list -> float -> float t
 
-  (** $cst_linear start steps endt$ creates a linear interpolator 
-    * going from $start$ to $endt$ passing through each point 
+  (** $cst_linear start steps endt$ creates a linear interpolator
+    * going from $start$ to $endt$ passing through each point
     * of $steps$ at constant speed *)
   val cst_linear : float -> float list -> float -> float t
 
@@ -356,12 +360,12 @@ module Interpolator : sig
   (** $map_right$ is an alias for $map$ *)
   val map_right : 'a t -> ('a -> 'b) -> 'b t
 
-  (** $map_left f ip$ returns a function $g$ such that 
+  (** $map_left f ip$ returns a function $g$ such that
     * $g(x) = ip(f(x))$ *)
   val map_left : ('a -> float) -> 'b t -> ('a -> 'b)
 
   (** Returns a pair-interpolator from a pair of interpolators.
-    * 
+    *
     * The new interpolator will not have any modifiers. *)
   val pair : 'a t -> 'b t -> ('a * 'b) t
 
@@ -370,12 +374,12 @@ module Interpolator : sig
     * The new interpolator will not have any modifiers. *)
   val collapse : ('a t) list -> ('a list) t
 
-  (** Returns a vector3f interpolator from three float interpolators. 
+  (** Returns a vector3f interpolator from three float interpolators.
     *
     * The new interpolator will not have any modifiers. *)
   val vector3f : float t -> float t -> float t -> OgamlMath.Vector3f.t t
 
-  (** Returns a vector2f interpolator from two float interpolators. 
+  (** Returns a vector2f interpolator from two float interpolators.
     *
     * The new interpolator will not have any modifiers. *)
   val vector2f : float t -> float t -> OgamlMath.Vector2f.t t
@@ -384,7 +388,7 @@ end
 
 
 (** Various noises *)
-module Noise : sig 
+module Noise : sig
 
   (** This module provides various 2D and 3D noises *)
 
@@ -560,11 +564,11 @@ module Graph : sig
     (** Merges two graphs *)
     val merge : t -> t -> t
 
-    (** $dfs g s f$ iterates $f$ through all the accessible vertices of $g$, 
+    (** $dfs g s f$ iterates $f$ through all the accessible vertices of $g$,
       * starting from $s$ using a dfs *)
     val dfs : t -> vertex -> (vertex -> unit) -> unit
 
-    (** $bfs g s f$ iterates $f$ through all the accessible vertices of $g$, 
+    (** $bfs g s f$ iterates $f$ through all the accessible vertices of $g$,
       * starting from $s$ using a bfs *)
     val bfs : t -> vertex -> (vertex -> unit) -> unit
 
@@ -574,7 +578,7 @@ module Graph : sig
     val dijkstra : t -> vertex -> vertex -> (float * vertex list) option
 
     (** $astar g v1 v2 f$ runs the A* algorithm on $g$ from $v1$ to $v2$
-      * with the heuristic $f$ and returns the minimal path as well as the 
+      * with the heuristic $f$ and returns the minimal path as well as the
       * distance between $v1$ and $v2$, or $None$ if $v1$ and $v2$ are not connected *)
     val astar : t -> vertex -> vertex -> (vertex -> float) -> (float * vertex list) option
 

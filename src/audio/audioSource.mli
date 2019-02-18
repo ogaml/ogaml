@@ -1,6 +1,3 @@
-
-exception NoSourceAvailable
-
 type t
 
 val create :
@@ -31,7 +28,7 @@ val set_orientation : t -> OgamlMath.Vector3f.t -> unit
 
 module LL : sig
 
-  val play : 
+  val play :
     ?pitch:float ->
     ?gain:float ->
     ?loop:bool ->
@@ -41,7 +38,8 @@ module LL : sig
     channels:[`Mono | `Stereo] ->
     buffer:AL.Buffer.t ->
     stream:bool ->
-    t -> unit
+    t ->
+    (unit, [> `NoSourceAvailable]) result
 
   val source : t -> AL.Source.t option
 

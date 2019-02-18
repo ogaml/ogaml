@@ -12,17 +12,17 @@ val create :
   channels:[`Stereo | `Mono] ->
   rate:int -> t
 
-val play : 
+val play :
   ?pitch:float ->
   ?gain:float ->
   ?loop:bool ->
   ?force:bool ->
   ?on_stop:(unit -> unit) ->
-  t -> AudioSource.t -> unit
+  t -> AudioSource.t ->
+  (unit, [> `NoSourceAvailable]) result
 
 val duration : t -> float
 
 val samples : t -> samples
 
 val channels : t -> [`Stereo | `Mono]
-

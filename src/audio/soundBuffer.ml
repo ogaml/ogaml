@@ -25,11 +25,11 @@ let create ~samples ~channels ~rate =
   in
   { buffer ; duration ; samples ; channels }
 
-let load s = 
-  if (not (Sys.file_exists s)) || (Sys.is_directory s) then 
+let load s =
+  if (not (Sys.file_exists s)) || (Sys.is_directory s) then
     raise (Error ("File not found : " ^ s));
   let (channels_nb, rate, samples) = AL.Vorbis.decode_file s in
-  let channels = 
+  let channels =
     match channels_nb with
     | 1 -> `Mono
     | 2 -> `Stereo
@@ -39,7 +39,7 @@ let load s =
   AL.Vorbis.free_data samples;
   sound
 
-let play ?pitch ?gain ?loop ?force ?on_stop buff source = 
+let play ?pitch ?gain ?loop ?force ?on_stop buff source =
   AudioSource.LL.play
     ?pitch
     ?gain

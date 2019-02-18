@@ -1,6 +1,6 @@
 open OgamlMath
 
-exception NoSourceAvailable
+open OgamlUtils.Result.Operators
 
 type t = {
   mutable context     : AudioContext.t ;
@@ -41,7 +41,7 @@ let vec3f v = Vector3f.(v.x, v.y, v.z)
 let allocate_source source force channels duration =
   match source.source with
   | None -> begin
-    let src_candidate = 
+    let src_candidate =
       match channels with
       | `Stereo ->
         AudioContext.LL.get_available_stereo_source ~force source.context
@@ -49,25 +49,25 @@ let allocate_source source force channels duration =
         AudioContext.LL.get_available_mono_source ~force source.context
     in
     match src_candidate with
-    | None when force -> raise NoSourceAvailable
-    | None -> ()
+    | None when force -> Error `NoSourceAvailable
+    | None -> Ok ()
     | Some s -> begin
       source.source <- Some s;
       match channels with
       | `Stereo ->
-        AudioContext.LL.allocate_stereo_source source.context s duration
-          (fun () -> source.source <- None)
+        Ok (AudioContext.LL.allocate_stereo_source source.context s duration
+            (fun () -> source.source <- None))
       | `Mono ->
-        AudioContext.LL.allocate_mono_source source.context s duration
-          (fun () -> source.source <- None)
+        Ok (AudioContext.LL.allocate_mono_source source.context s duration
+            (fun () -> source.source <- None))
     end
   end
   | Some s -> begin
     match channels with
     | `Stereo ->
-      AudioContext.LL.reallocate_stereo_source source.context s duration
+      Ok (AudioContext.LL.reallocate_stereo_source source.context s duration)
     | `Mono ->
-      AudioContext.LL.reallocate_mono_source source.context s duration
+      Ok (AudioContext.LL.reallocate_mono_source source.context s duration)
   end
 
 let stop source =
@@ -80,7 +80,7 @@ let stop source =
   source.status <- `Stopped;
   source.on_stop ()
 
-let update_status source = 
+let update_status source =
   match source.status with
   | `Playing ->
     if Unix.gettimeofday () -. source.start >= source.duration then begin
@@ -88,8 +88,8 @@ let update_status source =
     end
   | _ -> ()
 
-let status source = 
-  update_status source; 
+let status source =
+  update_status source;
   source.status
 
 let pause source =
@@ -106,7 +106,7 @@ let pause source =
 
 let resume source =
   match source.source with
-  | Some s when status source = `Paused -> 
+  | Some s when status source = `Paused ->
     begin match source.channels with
     | `Mono -> AudioContext.LL.reallocate_mono_source source.context s source.duration
     | `Stereo -> AudioContext.LL.reallocate_stereo_source source.context s source.duration
@@ -154,15 +154,15 @@ let set_orientation source ori =
 
 module LL = struct
 
-  let play ?pitch ?gain ?loop ?(force = false) ?(on_stop = fun () -> ()) 
-    ~duration ~channels ~buffer ~stream source = 
+  let play ?pitch ?gain ?loop ?(force = false) ?(on_stop = fun () -> ())
+    ~duration ~channels ~buffer ~stream source =
     let src_status = status source in
     (* We request a source to the context. *)
     match src_status with
     | `Stopped ->
-      allocate_source source force channels duration;
+      allocate_source source force channels duration >>
       begin match source.source with
-      | None -> ()
+      | None -> Ok ()
       | Some s ->
           may (fun p -> AL.Source.set_f s AL.Source.Pitch p) pitch ;
           may (fun g -> AL.Source.set_f s AL.Source.Gain g) gain ;
@@ -181,11 +181,12 @@ module LL = struct
           source.status <- `Playing ;
           source.channels <- channels ;
           source.start <- Unix.gettimeofday () ;
-          source.on_stop <- on_stop
+          source.on_stop <- on_stop ;
+          Ok ()
         end
-      | _ -> ()
+      | _ -> Ok ()
 
-  let source source = 
+  let source source =
     source.source
 
 end
