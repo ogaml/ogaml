@@ -15,6 +15,7 @@ opam init --compiler=$OCAML_VERSION
 
 eval `opam config env`
 opam install ${OPAM_DEPEND}
+opam upgrade
 
 make
 make install
