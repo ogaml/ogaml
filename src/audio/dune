@@ -1,5 +1,3 @@
-(jbuild_version 1)
-
 (rule (copy stubs/audio_stubs.c       audio_stubs.c))
 (rule (copy stubs/buffer_stubs.c      buffer_stubs.c))
 (rule (copy stubs/context_stubs.c     context_stubs.c))
@@ -12,11 +10,11 @@
 (rule (copy stubs/utils.h             utils.h))
 
 (library
-  ((name        OgamlAudio)
-   (public_name ogaml.audio)
-   (libraries   (OgamlMath OgamlUtils threads))
-   (c_names     (utils audio_stubs buffer_stubs context_stubs device_stubs 
-                 listener_stubs source_stubs stb_stubs))
-   (c_flags     (:standard (:include ../../c_flags.os)))
-   (install_c_headers (stb_vorbis))
-   (c_library_flags (:standard (:include ../../c_libs.os)))))
+  (name        OgamlAudio)
+  (public_name ogaml.audio)
+  (libraries   OgamlMath OgamlUtils threads)
+  (c_names     utils audio_stubs buffer_stubs context_stubs device_stubs 
+               listener_stubs source_stubs stb_stubs)
+  (c_flags     (:standard (:include ../../c_flags.os)))
+  (install_c_headers stb_vorbis)
+  (c_library_flags (:standard (:include ../../c_libs.os))))

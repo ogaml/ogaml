@@ -1,5 +1,3 @@
-(jbuild_version 1)
-
 (rule (copy stubs/shader_stubs.c       shader_stubs.c))
 (rule (copy stubs/program_stubs.c      program_stubs.c))
 (rule (copy stubs/texture_stubs.c      texture_stubs.c))
@@ -21,16 +19,16 @@
 (rule (copy stubs/stb_image_write.h    stb_image_write.h))
 (rule (copy stubs/stb_truetype.h       stb_truetype.h))
 
-(ocamlyacc (objParser))
-(ocamllex (objLexer))
+(ocamlyacc objParser)
+(ocamllex objLexer)
 
 (library
-  ((name        OgamlGraphics)
-   (public_name ogaml.graphics)
-   (libraries   (OgamlMath OgamlCore OgamlUtils threads bigarray str))
-   (c_names     (utils shader_stubs program_stubs texture_stubs vao_stubs
-                 vbo_stubs uniform_stubs text_stubs render_stubs ebo_stubs
-                 image_stubs blending_stubs fbo_stubs rbo_stubs types_stubs))
-   (c_flags     (:standard (:include ../../c_flags.os)))
-   (install_c_headers (stb_image stb_image_write stb_truetype))
-   (c_library_flags (:standard (:include ../../c_libs.os)))))
+  (name        OgamlGraphics)
+  (public_name ogaml.graphics)
+  (libraries   OgamlMath OgamlCore OgamlUtils threads bigarray str)
+  (c_names     utils shader_stubs program_stubs texture_stubs vao_stubs
+               vbo_stubs uniform_stubs text_stubs render_stubs ebo_stubs
+               image_stubs blending_stubs fbo_stubs rbo_stubs types_stubs)
+  (c_flags     (:standard (:include ../../c_flags.os)))
+  (install_c_headers stb_image stb_image_write stb_truetype)
+  (c_library_flags (:standard (:include ../../c_libs.os))))

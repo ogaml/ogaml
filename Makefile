@@ -16,13 +16,13 @@ configure:
 	cp $(CFLAGS_FILE) c_flags.os
 
 build: configure
-	jbuilder build @install
+	dune build @install --profile release
 
 install:
-	jbuilder install
+	dune install
 
 clean:
-	jbuilder clean &&\
+	dune clean &&\
 	rm -rf html/ &&\
 	rm -f src/core/jbuild &&\
 	rm -f c_flags.os &&\
@@ -30,13 +30,13 @@ clean:
 	rm -f *.exe
 
 uninstall:
-	jbuilder uninstall
+	dune uninstall
 
 tests:
-	jbuilder runtest tests
+	dune build @tests/runtest --profile release
 
 examples:
-	jbuilder build @examples/all &&\
+	dune build @examples/all --profile release &&\
 	mv $(JBUILD_EXAMPLES_DIR)/*.exe .
 
 doc:

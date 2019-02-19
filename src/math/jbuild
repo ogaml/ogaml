@@ -1,6 +1,0 @@
-(jbuild_version 1)
-
-(library
-  ((name        OgamlMath)
-   (libraries (bigarray))
-   (public_name ogaml.math)))

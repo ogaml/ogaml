@@ -1,0 +1,28 @@
+(executables
+ (names capabilities version vertexarrays graphs programs)
+ (libraries ogaml.graphics))
+
+(alias
+ (name    runtest)
+ (deps    version.exe)
+ (action  (run ./version.exe)))
+
+(alias
+ (name    runtest)
+ (deps    vertexarrays.exe)
+ (action  (run ./vertexarrays.exe)))
+
+(alias
+ (name    runtest)
+ (deps    graphs.exe)
+ (action  (run ./graphs.exe)))
+
+(alias
+ (name    runtest)
+ (deps    capabilities.exe)
+ (action  (run ./capabilities.exe)))
+
+(alias
+ (name    runtest)
+ (deps    programs.exe)
+ (action  (run ./programs.exe)))
