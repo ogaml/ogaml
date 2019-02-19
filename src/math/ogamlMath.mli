@@ -1160,3 +1160,51 @@ module Matrix2D : sig
 
 
 end
+
+
+(** Provides operations to manipulate simple 2D transforms *)
+module Transform2D : sig
+
+  (** Manipulate simple 2D transforms. One transform consists of one 
+    * rescaling, one rotation, and one translation, in this order. *)
+
+  (** Type of immutable 2D transforms *)
+  type t
+ 
+  (** Creates a transform *)
+  val create : ?position:Vector2f.t -> ?origin:Vector2f.t -> ?rotation:float ->
+    ?scale:Vector2f.t -> unit -> t
+ 
+  (** Returns the translation component of a transform *)
+  val position : t -> Vector2f.t
+  
+  (** Returns the origin of a transform *)
+  val origin : t -> Vector2f.t
+  
+  (** Returns the rotation component of a transform *)
+  val rotation : t -> float
+  
+  (** Returns the scaling component of a transform *)
+  val scale : t -> Vector2f.t
+  
+  (** Component-wise composition of transforms *)
+  val compose : ?translation:Vector2f.t -> ?rotation:float -> 
+    ?scaling:Vector2f.t -> t -> t
+ 
+  (** Adds to the transation component of a transform *)
+  val translate : Vector2f.t -> t -> t
+  
+  (** Adds to the rotation component of a transform *)
+  val rotate : float -> t -> t
+  
+  (** Multiplies the scaling component of a transform *)
+  val rescale : Vector2f.t -> t -> t
+  
+  (** Sets components of a transform *)
+  val set : ?position:Vector2f.t -> ?origin:Vector2f.t -> ?rotation:float ->
+    ?scale:Vector2f.t -> t -> t
+  
+  (** Applies a 2D transform to a point *)
+  val apply : t -> Vector2f.t -> Vector2f.t
+
+end

@@ -26,3 +26,5 @@ module Quaternion = Quaternion
 module Matrix3D = Matrix3D
 
 module Matrix2D = Matrix2D
+
+module Transform2D = Transform2D

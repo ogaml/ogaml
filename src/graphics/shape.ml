@@ -2,219 +2,114 @@ open OgamlMath
 open OgamlUtils
 open Result.Operators
 
-
-type shape_vals = {
-  points    : Vector2f.t list ;
-  mutable position  : Vector2f.t ;
-  mutable origin    : Vector2f.t ;
-  mutable rotation  : float ;
-  mutable scale     : Vector2f.t ;
-  mutable thickness : float ;
-  mutable color     : Color.t ;
-  mutable out_color : Color.t
-}
-
 type t = {
-  mutable vertices : VertexArray.SimpleVertex.T.s VertexArray.Vertex.t list option ;
-  mutable outline  : VertexArray.SimpleVertex.T.s VertexArray.Vertex.t list option ;
-  shape_vals       : shape_vals
+  vertices : VertexArray.SimpleVertex.T.s VertexArray.Source.t;
+  mutable vao : VertexArray.t option;
 }
 
-(* Utility *)
-
-(* foreachtwo : ('a -> 'b -> 'b -> 'a) -> 'a -> 'b list -> 'a *)
-let rec foreachtwo f res = function
-  | a :: b :: r -> foreachtwo f (f res a b) (b :: r)
-  | _ -> res
-
-(* foralltwo : ('a -> 'b -> 'b -> 'a) -> 'a -> 'b list -> 'a *)
-let foralltwo f res =
-  let rec aux first res = function
-    | a :: b :: r -> aux first (f res a b) (b :: r)
-    | a :: []     -> f res a first
-    | []          -> res
+let fold_pairs f acc l = 
+  let rec aux first = function
+    | [] -> acc
+    | [e] -> f acc e first
+    | e1::e2::tail -> f (aux first (e2::tail)) e1 e2
   in
-  function
-  | [] -> res
-  | first :: r -> aux first res (first :: r)
+  match l with
+  | [] -> acc
+  | [_] -> acc
+  | e::_::_ -> aux e l
 
-
-(* Applies transformations to a point *)
-let apply_transformations position origin rotation scale point =
-  (* Position offset *)
-  Vector2f.({
-    x = point.x +. position.x -. origin.x ;
-    y = point.y +. position.y -. origin.y
-  })
-  |> fun point ->
-  (* Scale *)
-  Vector2f.({
-    x = (point.x -. position.x) *. scale.x +. position.x ;
-    y = (point.y -. position.y) *. scale.y +. position.y
-  })
-  |> fun point ->
-  (* Rotation *)
-  Vector2f.({
-    x = cos(rotation) *. (point.x-.position.x) -.
-        sin(rotation) *. (point.y-.position.y) +. position.x ;
-    y = sin(rotation) *. (point.x-.position.x) +.
-        cos(rotation) *. (point.y-.position.y) +. position.y
-  })
-
-(* Computes the actual points of a shape from its vals *)
-let actual_points vals =
-  List.map
-    (apply_transformations
-      vals.position vals.origin vals.rotation vals.scale)
-    vals.points
-  |> List.map Vector3f.lift
-
-(* Turns actual points to a vertices for the shape *)
-let vertices_of_points points color =
-  List.map (fun v ->
-    VertexArray.SimpleVertex.create ~position:v ~color ()
-  ) points
-  |> function
-  | [] -> []
-  | edge :: vertices ->
-    foreachtwo
-      (fun l a b -> edge :: a :: b :: l) [] vertices
-
-(* Producing bisectors out of actual points *)
-let bisectors_of_points points =
-  (* First compute the normals *)
-  let v = Vector3f.({ x = 0. ; y = 0. ; z = 1. }) in
-  foralltwo
-    (fun l a b ->
-      let open Vector3f in
-      let ab = direction a b |> Result.assert_ok in
-      (cross ab v) :: l
-    )
-    []
-    points
-  (* Then we can finally get the bisectors *)
-  |>
-  foralltwo
-    (fun l n1 n2 ->
-      Vector3f.(
-        prop 0.5 (add n1 n2)
-      ) :: l
-    )
-    []
-  (* The last thing is to put all that in order *)
-  (* |> List.rev
-  |> function
-     | []     -> []
-     | a :: r -> a :: (List.rev r) *)
-
-(* Takes the actual points and computes the outline *)
-let outline_of_points points thickness color =
-  match points with
-  | [] -> None
-  | head :: _ ->
-    if thickness = 0. then None
-    (* We'll deal with thickness of 1 later *)
-    (* In the last case, we just draw a rectangle for each line *)
-    else begin
-      (* First the bisectors *)
-      let bisectors = bisectors_of_points points in
-      (* Then the outline *)
-      let tovtx v =
-        VertexArray.SimpleVertex.create ~position:v ~color ()
-      in
-      (* Then we compute the outline *)
-      foralltwo
-        (
-          let open Vector3f in
-          let v = { x = 0. ; y = 0. ; z = 1. } in
-          fun lst (a,ba) (b,bb) ->
-            (* Normal to the direction (a b) *)
-            let n =
-              let u = direction a b |> Result.assert_ok in
-              cross u v
-            in
-            (* The local thickness *)
-            let xa = thickness /. (dot n ba)
-            and xb = thickness /. (dot n bb) in
-            (* The vector for this thickness *)
-            let vxa = prop xa ba
-            and vxb = prop xb bb in
-            (* Finally the vertices *)
-            let v1 = tovtx (add a vxa)
-            and v2 = tovtx (add b vxb)
-            and v3 = tovtx b
-            and v4 = tovtx a in
-            v1 :: v2 :: v3 :: v3 :: v4 :: v1 :: lst
-        )
-        []
-        (List.combine points bisectors)
-      |> fun x -> Some (x)
-    end
-
-let compute_vertices poly = 
-  match poly.vertices with
-  | None -> 
-    let points = actual_points poly.shape_vals in
-    let vertices = vertices_of_points points poly.shape_vals.color in
-    let outline = outline_of_points points poly.shape_vals.thickness poly.shape_vals.out_color in
-    poly.vertices <- Some vertices;
-    poly.outline  <- outline;
-    (vertices, outline)
-  | Some v -> (v, poly.outline)
-
-let create_polygon ~points
-                   ~color
-                   ?origin:(origin=Vector2f.zero)
-                   ?position:(position=Vector2f.zero)
-                   ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
-                   ?rotation:(rotation=0.)
-                   ?thickness:(thickness=0.)
-                   ?border_color:(out_color=(`RGB Color.RGB.black)) () =
-  let vals = {
-   points    = points ;
-   position  = position ;
-   origin    = origin ;
-   rotation  = rotation ;
-   scale     = scale ;
-   thickness = thickness ;
-   color     = color ;
-   out_color = out_color
-  }
+let fold_triplets f acc l = 
+  let rec aux first second = function
+    | [] -> acc
+    | [e] -> f acc e first second
+    | [e1; e2] -> f (aux first second [e2]) e1 e2 first
+    | e1::e2::e3::tail -> f (aux first second (e2::e3::tail)) e1 e2 e3
   in
-  {
-   vertices   = None;
-   outline    = None;
-   shape_vals = vals
-  }
+  match l with
+  | [] -> acc
+  | [_] -> acc
+  | [_;_] -> acc
+  | e1::e2::_::_ -> aux e1 e2 l
 
-let create_rectangle ~position
-                     ~size
-                     ~color
-                     ?origin:(origin=Vector2f.zero)
-                     ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
-                     ?rotation:(rotation=0.)
-                     ?thickness:(thickness=0.)
-                     ?border_color:(border_color=(`RGB Color.RGB.black)) () =
-  let w = Vector2f.({ x = size.x ; y = 0. })
-  and h = Vector2f.({ x = 0. ; y = size.y }) in
-  create_polygon ~points:Vector2f.([zero ; w ; size ; h])
-                 ~color
-                 ~origin
-                 ~position
-                 ~scale
-                 ~rotation
-                 ~thickness
-                 ~border_color ()
+(* Computes the outline vertex corresponding to a vertex of the shape
+ * given its two neighbours *)
+let extrude point ngh1 ngh2 distance = 
+  let d1, d2 = Vector2f.sub ngh1 point, Vector2f.sub ngh2 point in
+  let nd1, nd2 = Vector2f.norm d1, Vector2f.norm d2 in
+  let ud1, ud2 = 
+    (if nd1 = 0. then Vector2f.zero
+    else Vector2f.div nd1 d1 |> Result.assert_ok),
+    (if nd2 = 0. then Vector2f.zero
+    else Vector2f.div nd2 d2 |> Result.assert_ok)
+  in
+  let bisector = Vector2f.add ud1 ud2 in
+  let length = Vector2f.norm bisector in
+  if length = 0. then point
+  else begin
+    Vector2f.prop (distance /. length) bisector
+    |> Vector2f.sub point
+  end
 
-let create_regular ~position
-                   ~radius
-                   ~amount
-                   ~color
-                   ?origin:(origin=Vector2f.zero)
-                   ?scale:(scale=Vector2f.({ x = 1. ; y = 1.}))
-                   ?rotation:(rotation=0.)
-                   ?thickness:(thickness=0.)
-                   ?border_color:(border_color=(`RGB Color.RGB.black)) () =
+let outline points thickness = 
+  fold_triplets 
+    (fun outline prev cur next -> extrude cur prev next thickness :: outline)
+    [] points
+
+let add_points source center points color = 
+  let barycenter = 
+    VertexArray.SimpleVertex.create ~position:(Vector3f.lift center) ~color ()
+  in
+  fold_pairs (fun _ cur next ->
+    let pos_cur, pos_next = Vector3f.lift cur, Vector3f.lift next in
+    let cur_vertex, next_vertex = 
+      VertexArray.SimpleVertex.create ~position:pos_cur ~color (),
+      VertexArray.SimpleVertex.create ~position:pos_next ~color ()
+    in
+    VertexArray.Source.add source barycenter |> Result.assert_ok;
+    VertexArray.Source.add source cur_vertex |> Result.assert_ok;
+    VertexArray.Source.add source next_vertex |> Result.assert_ok)
+    () points
+
+let create_polygon 
+  ~points
+  ~color
+  ?(transform=Transform2D.create ())
+  ?thickness
+  ?(border_color=`RGB Color.RGB.black) () =
+  let size = List.length points in
+  let points = List.map (Transform2D.apply transform) points in
+  let barycenter = 
+    List.fold_left Vector2f.add Vector2f.zero points 
+    |> Vector2f.div (float (max size 1))
+    |> Result.assert_ok
+  in
+  let vertices = VertexArray.Source.empty ~size () in
+  begin match thickness with
+  | None -> ()
+  | Some thickness ->
+    add_points vertices barycenter (outline points thickness) border_color
+  end;
+  add_points vertices barycenter points color;
+  {vertices; vao = None}
+
+let create_rectangle 
+  ~size
+  ~color
+  ?transform
+  ?thickness
+  ?border_color () =
+  let w = Vector2f.({x = size.x; y = 0.})
+  and h = Vector2f.({x = 0.; y = size.y}) in
+  create_polygon ~points:Vector2f.([zero; w; size; h]) ~color ?transform
+                 ?thickness ?border_color ()
+
+let create_regular
+  ~radius
+  ~amount
+  ~color
+  ?transform
+  ?thickness
+  ?border_color () =
   let rec vertices k l =
     if k >= amount then l
     else begin
@@ -227,110 +122,32 @@ let create_regular ~position
       |> vertices (k+1)
     end
   in
-  create_polygon ~points:(List.rev (vertices 0 []))
-               ~color
-               ~origin
-               ~position
-               ~scale
-               ~rotation
-               ~thickness
-               ~border_color ()
+  create_polygon ~points:(vertices 0 []) ~color ?transform ?thickness
+                 ?border_color ()
 
-let create_line ~thickness
-                ~color
-                ?top:(top=Vector2f.zero)
-                ~tip
-                ?position:(position=Vector2f.zero)
-                ?origin:(origin=Vector2f.zero)
-                ?rotation:(rotation=0.) () =
-  let a3 = Vector3f.lift top 
-  and b3 = Vector3f.lift tip in
-  let n = Vector3f.(
-    let u = direction a3 b3 |> Result.assert_ok in
-    let v = { x = 0. ; y = 0. ; z = 1. } in
-    let n = cross u v in
-    project n
-  ) in
-  let points = Vector2f.(
-    let delta = prop (thickness /. 2.) n in
-    [
-      add top delta ;
-      add tip delta ;
-      sub tip delta ;
-      sub top delta
-    ]
-  ) in
-  create_polygon ~points
-               ~color
-               ~origin
-               ~position
-               ~rotation
-                 ()
-
-(* Applies the modifications to shape_vals *)
-let update shape =
-  shape.vertices <- None;
-  shape.outline  <- None
-
-let set_position shape position =
-  shape.shape_vals.position <- position ;
-  update shape
-
-let set_origin shape origin =
-  shape.shape_vals.origin <- origin ;
-  update shape
-
-let set_rotation shape rotation =
-  shape.shape_vals.rotation <- rotation ;
-  update shape
-
-let set_scale shape scale =
-  shape.shape_vals.scale <- scale ;
-  update shape
-
-let set_thickness shape thickness =
-  shape.shape_vals.thickness <- thickness ;
-  update shape
-
-let set_color shape color =
-  shape.shape_vals.color <- color ;
-  update shape
-
-let set_border_color shape color =
-  shape.shape_vals.out_color <- color ;
-  update shape
-
-let translate shape delta =
-  shape.shape_vals.position
-    <- Vector2f.(add delta shape.shape_vals.position) ;
-  update shape
-
-let rotate shape delta =
-  mod_float (shape.shape_vals.rotation +. delta) (2. *. Constants.pi)
-  |> set_rotation shape
-
-let scale shape scale =
-  let mul v w =
-    Vector2f.({
-      x = v.x *. w.x ;
-      y = v.y *. w.y
-    })
+let create_segment
+  ~thickness
+  ~color
+  ~segment
+  ?transform () =
+  let length = Vector2f.norm segment in
+  let segment3D = Vector3f.lift segment in
+  let points = 
+    if length <> 0. then begin
+      let open Vector3f in
+      let normal = 
+        let u = normalize segment3D |> Result.assert_ok in
+        let v = { x = 0. ; y = 0. ; z = 1. } in
+        let n = cross u v in
+        project n
+      in
+      let open Vector2f in
+      let delta = prop (thickness /. 2.) normal in
+      [delta ; add segment delta ; sub segment delta ; prop (-1.) delta]
+    end else 
+     []
   in
-  set_scale shape (mul scale shape.shape_vals.scale)
-
-let position shape = shape.shape_vals.position
-
-let origin shape = shape.shape_vals.origin
-
-let rotation shape = shape.shape_vals.rotation
-
-let get_scale shape = shape.shape_vals.scale
-
-let thickness shape = shape.shape_vals.thickness
-
-let color shape = shape.shape_vals.color
-
-let border_color shape = shape.shape_vals.out_color
+  create_polygon ~points ~color ?transform ()
 
 let draw (type s) (module M : RenderTarget.T with type t = s)
          ?parameters:(parameters = DrawParameter.make
@@ -345,37 +162,23 @@ let draw (type s) (module M : RenderTarget.T with type t = s)
     |> Uniform.vector2f "size" (Vector2f.from_int size)
     |> Result.assert_ok
   in
-  let src = VertexArray.Source.empty ~size:8 () in
-  let vtcs, outline = compute_vertices shape in
-  (Result.List.iter (VertexArray.Source.add src) vtcs >>= fun () ->
-  begin match outline with
-  | None -> Ok ()
-  | Some vtcs -> Result.List.iter (VertexArray.Source.add src) vtcs
-  end >>= fun () ->
-  let vbo = VertexArray.Buffer.(unpack (static (module M) target src)) in
-  let vertices = VertexArray.create (module M) target [vbo] in
+  let vertices = 
+    match shape.vao with
+    | None ->
+      let vbo = VertexArray.Buffer.(unpack (static (module M) target shape.vertices)) in
+      let vao = VertexArray.create (module M) target [vbo] in
+      shape.vao <- Some vao;
+      vao
+    | Some v -> v
+  in
   VertexArray.draw (module M)
         ~target
         ~vertices
         ~program
         ~parameters
         ~uniform
-        ~mode:DrawMode.Triangles () )
+        ~mode:DrawMode.Triangles ()
   |> Result.assert_ok
 
-let map_to_source shape f src = 
-  let vtcs, outline = compute_vertices shape in
-  Result.List.iter (fun v -> VertexArray.Source.add src (f v)) vtcs >>= fun () ->
-  begin match outline with
-  | None -> Ok ()
-  | Some vtcs -> Result.List.iter (fun v -> VertexArray.Source.add src (f v)) vtcs
-  end
-
-let to_source shape src = 
-  let vtcs, outline = compute_vertices shape in
-  Result.List.iter (VertexArray.Source.add src) vtcs >>= fun () ->
-  begin match outline with
-  | None -> Ok ()
-  | Some vtcs -> Result.List.iter (VertexArray.Source.add src) vtcs
-  end
-
+let source shape = 
+  shape.vertices

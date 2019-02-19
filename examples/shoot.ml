@@ -78,10 +78,11 @@ module GameState = struct
       in
       let circle = 
         Shape.create_regular
-          ~position:(Vector2f.from_int p)
+          ~transform:(Transform2D.create 
+            ~position:(Vector2f.from_int p)
+            ~origin:(Vector2f.{x = 2.; y = 2.}) ())
           ~amount:20
           ~radius:2.
-          ~origin:(Vector2f.{x = 2.; y = 2.})
           ~color:(`RGB Color.RGB.({r = 1.; g = 0.; b = 0.; a = alpha}))
           ()
       in
@@ -115,13 +116,13 @@ module GameState = struct
     in
     let rule_square1 = 
       Shape.create_rectangle 
-        ~position:Vector2f.({x = 10.; y = 10.})
+        ~transform:(Transform2D.create ~position:Vector2f.({x = 10.; y = 10.}) ())
         ~size:Vector2f.({x = 20.; y = 20.}) 
         ~color:(`RGB Color.RGB.blue) ()
     in
     let rule_square2 = 
       Shape.create_rectangle 
-        ~position:Vector2f.({x = 10.; y = 40.})
+        ~transform:(Transform2D.create ~position:Vector2f.({x = 10.; y = 40.}) ())
         ~size:Vector2f.({x = 20.; y = 20.}) 
         ~color:(`RGB Color.RGB.green) ()
     in
@@ -163,7 +164,8 @@ module GameState = struct
     in
     let click_square = 
       Shape.create_rectangle
-        ~position:(IntRect.position s.curr_rect |> Vector2f.from_int)
+        ~transform:(Transform2D.create 
+          ~position:(IntRect.position s.curr_rect |> Vector2f.from_int) ())
         ~size:(IntRect.size s.curr_rect |> Vector2f.from_int)
         ~color:(`RGB (if s.right_click then Color.RGB.blue else Color.RGB.green))
         ()

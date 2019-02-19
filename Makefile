@@ -36,20 +36,7 @@ tests:
 	jbuilder runtest tests
 
 examples:
-	jbuilder build examples/instancing.exe &&\
-	jbuilder build examples/sprites.exe &&\
-	jbuilder build examples/tut_idx.exe &&\
-	jbuilder build examples/cube.exe &&\
-	jbuilder build examples/ip.exe &&\
-	jbuilder build examples/text.exe &&\
-	jbuilder build examples/tut_tex.exe &&\
-	jbuilder build examples/cursor.exe &&\
-	jbuilder build examples/noise.exe &&\
-	jbuilder build examples/tut01.exe &&\
-	jbuilder build examples/vertexmaps.exe &&\
-	jbuilder build examples/flat.exe &&\
-	jbuilder build examples/shoot.exe &&\
-	jbuilder build examples/tut02.exe &&\
+	jbuilder build @examples/all &&\
 	mv $(JBUILD_EXAMPLES_DIR)/*.exe .
 
 doc:

@@ -92,14 +92,14 @@ let small_text = Text.create
 let boundaries4 = Text.boundaries txt4
 
 let border4 = Shape.create_rectangle
-  ~position:(FloatRect.position boundaries4)
+  ~transform:(Transform2D.create ~position:(FloatRect.position boundaries4) ())
   ~size:(FloatRect.size boundaries4)
   ~color:(`RGB Color.RGB.transparent)
   ~border_color:(`RGB Color.RGB.blue)
   ~thickness:2. ()
 
 let border = Shape.create_rectangle
-  ~position:Vector2f.({x = 50.; y = 50.})
+  ~transform:(Transform2D.create ~position:Vector2f.{x = 50.; y = 50.} ())
   ~size:Vector2f.({x = 600.; y = 50.})
   ~color:(`RGB Color.RGB.transparent)
   ~border_color:(`RGB Color.RGB.red)
