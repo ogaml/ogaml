@@ -26,11 +26,6 @@ let fps_clock =
 
 let cube_source =
   let src = VertexArray.Source.empty ~size:36 () in
-  (* TODO Perhaps it doesn't correspond to what was meant for this example *)
-  (* let cmod = Model.cube Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) in
-  Model.source cmod ~vertex_source:src ()
-  |> Result.assert_ok;
-  src *)
   let obj =
     Model.from_obj "examples/cube.obj"
     |> Result.handle (function

@@ -27,11 +27,6 @@ let fps_clock =
 (* Create the VBO for one cube *)
 let cube_source =
   let src = VertexArray.Source.empty ~size:36 () in
-  (* TODO Perhaps it doesn't correspond to what was meant for this example *)
-  (* let cmod = Model.cube Vector3f.({x = -0.5; y = -0.5; z = -0.5}) Vector3f.({x = 1.; y = 1.; z = 1.}) in
-  Model.source cmod ~vertex_source:src ()
-  |> Result.assert_ok;
-  src *)
   let obj =
     Model.from_obj "examples/cube.obj"
     |> Result.handle (function
@@ -96,8 +91,6 @@ let vertex_shader = "
 
   in vec3 normal;
 
-  in vec4 color;
-
   out vec3 out_normal;
 
   out vec4 out_color;
@@ -109,7 +102,7 @@ let vertex_shader = "
 
     out_normal = normal;
 
-    out_color = color;
+    out_color = vec4(normal, 1.0);
 
   }
 "
