@@ -24,6 +24,9 @@ val transform : Matrix3D.t -> t -> t
 val scale : OgamlMath.Vector3f.t -> t -> t
 val translate : OgamlMath.Vector3f.t -> t -> t
 val rotate : OgamlMath.Quaternion.t -> t -> t
+
+val compute_normals : t -> t
+
 val from_obj :
   ?compute_normals: bool ->
   string ->

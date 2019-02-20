@@ -157,6 +157,17 @@ let fill_from_ast compute_normals va na uva fa ast =
 let missing_normals_f f1 f2 f3 =
   f1.normal = 0 || f2.normal = 0 || f3.normal = 0
 
+let face_normal vertices f1 f2 f3 =
+  let pv1, pv2, pv3 =
+    vertices.(f1.vertex),
+    vertices.(f2.vertex),
+    vertices.(f3.vertex)
+  in
+  let open Vector3f in
+  cross (sub pv2 pv1) (sub pv3 pv1)
+  |> normalize
+  |> function Ok v -> v | Error _ -> zero
+
 let from_ast compute_normals ast : t =
   let (vn, nn, mnn, uvn, fn) = lengths compute_normals count_zero ast in
   let vertices = Array.make vn Vector3f.zero in
@@ -169,17 +180,7 @@ let from_ast compute_normals ast : t =
   let faces =
     Array.map (fun (f1, f2, f3) ->
       if missing_normals_f f1 f2 f3 then begin
-        let pv1, pv2, pv3 =
-          vertices.(f1.vertex),
-          vertices.(f2.vertex),
-          vertices.(f3.vertex)
-        in
-        let n =
-          let open Vector3f in
-          cross (sub pv2 pv1) (sub pv3 pv1)
-          |> normalize
-          |> function Ok v -> v | Error _ -> zero
-        in
+        let n = face_normal vertices f1 f2 f3 in
         let ni = normals.length in
         addpa n normals ;
         let r f =
@@ -217,6 +218,32 @@ let parse_file f =
 
 let from_obj ?(compute_normals=false) s =
   parse_file s >>>= from_ast compute_normals
+
+(* TODO smooth?? *)
+(* TODO Factorise more with from_obj *)
+let compute_normals obj =
+  let mnn =
+    Array.fold_left
+      (fun n (f1,f2,f3) -> if missing_normals_f f1 f2 f3 then n + 1 else n)
+      0
+      obj.faces
+  in
+  let newnormals = Array.make mnn Vector3f.zero in
+  let newnormals = mkpa newnormals in
+  let newfaces = Array.copy obj.faces in
+  Array.iteri (fun i (f1,f2,f3) ->
+    if missing_normals_f f1 f2 f3 then begin
+      let n = face_normal obj.vertices f1 f2 f3 in
+      let ni = newnormals.length in
+      addpa n newnormals ;
+      let r f =
+        if f.normal = 0 then { f with normal = ni } else f
+      in
+      newfaces.(i) <- (r f1, r f2, r f3)
+    end
+  ) obj.faces ;
+  let newnormals = Array.append obj.normals newnormals.table in
+  { obj with faces = newfaces ; normals = newnormals }
 
 let mksv obj p =
   let open VertexArray in

@@ -2280,6 +2280,9 @@ module Model : sig
   (** Rotation of a model *)
   val rotate : Quaternion.t -> t -> t
 
+  (** Create a copy of the object with computed normals (where missing) *)
+  val compute_normals : t -> t
+
   (*** Model creation *)
 
   (** Read a file in Wavefront (.obj) format to create a model *)
