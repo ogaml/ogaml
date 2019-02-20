@@ -56,7 +56,6 @@ type face = face_point * face_point * face_point
   The idea is to stick as close as possible to OBJ file.
 
   TODO: Lines, materials, groups, object names, colors(?).
-  TODO: Quads?
 *)
 type t = {
   vertices : Vector3f.t array ;
@@ -197,16 +196,16 @@ let parse_with_errors lexbuf =
   try
     Ok (ObjParser.file ObjLexer.token lexbuf)
   with
-    |ObjLexer.SyntaxError msg ->
-        let loc = Location.create lexbuf.Lexing.lex_start_p
-                                  lexbuf.Lexing.lex_curr_p
-        in
-        Error (`Syntax_error (loc, msg))
-    |Parsing.Parse_error ->
-        let loc = Location.create lexbuf.Lexing.lex_start_p
-                                  lexbuf.Lexing.lex_curr_p
-        in
-        Error (`Parsing_error (loc))
+  | ObjLexer.SyntaxError msg ->
+    let loc = Location.create lexbuf.Lexing.lex_start_p
+                              lexbuf.Lexing.lex_curr_p
+    in
+    Error (`Syntax_error (loc, msg))
+  | Parsing.Parse_error ->
+    let loc = Location.create lexbuf.Lexing.lex_start_p
+                              lexbuf.Lexing.lex_curr_p
+    in
+    Error (`Parsing_error (loc))
 
 let parse_file f =
   let input = open_in f in
@@ -220,9 +219,6 @@ let from_obj ?(compute_normals=false) s =
   parse_file s >>>= from_ast compute_normals
 
 let mksv obj p =
-  (* Log.debug Log.stdout "vertex %d" p.vertex ;
-  Log.debug Log.stdout "uv     %d" p.uv ;
-  Log.debug Log.stdout "normal %d" p.normal ; *)
   let open VertexArray in
   let uv = if p.uv = 0 then None else Some obj.uvs.(p.uv-1) in
   SimpleVertex.create
