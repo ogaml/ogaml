@@ -2232,7 +2232,8 @@ module Model : sig
   (** This module provides helpers to manipulate and load
     * immutable 3D models in the RAM.
     *
-    * TODO *)
+    * All faces are assumed to be triangles.
+    * Square faces are stored as two triangles. *)
 
   open OgamlMath
 

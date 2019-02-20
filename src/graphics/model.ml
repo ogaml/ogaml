@@ -95,7 +95,7 @@ let rec lengths cn vn nn mnn uvn fn ast =
   | Tri (v1, v2, v3) :: ast when cn && missing_normals v1 v2 v3 ->
     lengths cn vn nn (mnn + 1) uvn (fn + 1) ast
   | Tri _ :: ast -> lengths cn vn nn mnn uvn (fn + 1) ast
-  | Quad _ :: ast (* TODO perhaps? *)
+  | Quad _ :: ast -> lengths cn vn nn mnn uvn (fn + 2) ast
   | Param :: ast
   | Mtllib _ :: ast
   | Usemtl _ :: ast
@@ -131,7 +131,10 @@ let fill_from_ast compute_normals va na uva fa ast =
     | Normal v -> addpa v na
     (* TODO Perhaps, parsing should be consistent here *)
     | Tri (v1, v2, v3) -> addpa (v3ifp v1, v3ifp v2, v3ifp v3) fa
-    (* TODO Handle other things, particularly Quad? *)
+    | Quad (v1, v2, v3, v4) ->
+      addpa (v3ifp v1, v3ifp v2, v3ifp v3) fa ;
+      addpa (v3ifp v1, v3ifp v3, v3ifp v4) fa
+    (* TODO Handle other things? *)
     | _ -> ()
   in
   List.iter aux ast
