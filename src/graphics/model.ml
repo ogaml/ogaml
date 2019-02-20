@@ -86,23 +86,39 @@ let missing_normals v1 v2 v3 =
   v1.z = 0 || v2.z = 0 || v3.z = 0
 
 (* Building from an OBJ file *)
-let rec lengths cn vn nn mnn uvn fn ast =
+type counters = {
+  vn  : int ; (* vertices *)
+  nn  : int ; (* normals *)
+  mnn : int ; (* missing normals *)
+  uvn : int ; (* uvs *)
+  fn  : int   (* faces *)
+}
+
+let count_zero = {
+  vn  = 0 ;
+  nn  = 0 ;
+  mnn = 0 ;
+  uvn = 0 ;
+  fn  = 0
+}
+
+let rec lengths cn c ast =
   let open ObjAST in
   match ast with
-  | Vertex _ :: ast -> lengths cn (vn + 1) nn mnn uvn fn ast
-  | UV _ :: ast -> lengths cn vn nn mnn (uvn + 1) fn ast
-  | Normal _ :: ast -> lengths cn vn (nn + 1) mnn uvn fn ast
+  | Vertex _ :: ast -> lengths cn { c with vn = c.vn + 1 } ast
+  | UV _ :: ast -> lengths cn { c with uvn = c.uvn + 1 } ast
+  | Normal _ :: ast -> lengths cn { c with nn = c.nn + 1 } ast
   | Tri (v1, v2, v3) :: ast when cn && missing_normals v1 v2 v3 ->
-    lengths cn vn nn (mnn + 1) uvn (fn + 1) ast
-  | Tri _ :: ast -> lengths cn vn nn mnn uvn (fn + 1) ast
-  | Quad _ :: ast -> lengths cn vn nn mnn uvn (fn + 2) ast
+    lengths cn { c with mnn = c.mnn + 1 ; fn = c.fn + 1 } ast
+  | Tri _ :: ast -> lengths cn { c with fn = c.fn + 1 } ast
+  | Quad _ :: ast -> lengths cn { c with fn = c.fn + 2 } ast
   | Param :: ast
   | Mtllib _ :: ast
   | Usemtl _ :: ast
   | Object _ :: ast
   | Group  _ :: ast
-  | Smooth _  :: ast -> lengths cn vn nn mnn uvn fn ast
-  | [] -> (vn, nn, mnn, uvn, fn)
+  | Smooth _  :: ast -> lengths cn c ast
+  | [] -> (c.vn, c.nn, c.mnn, c.uvn, c.fn)
 
 type 'a partial_array = {
   table : 'a array ;
@@ -143,7 +159,7 @@ let missing_normals_f f1 f2 f3 =
   f1.normal = 0 || f2.normal = 0 || f3.normal = 0
 
 let from_ast compute_normals ast : t =
-  let (vn, nn, mnn, uvn, fn) = lengths compute_normals 0 0 0 0 0 ast in
+  let (vn, nn, mnn, uvn, fn) = lengths compute_normals count_zero ast in
   let vertices = Array.make vn Vector3f.zero in
   let normals = Array.make (nn + mnn) Vector3f.zero in
   let uvs = Array.make uvn Vector2f.zero in
