@@ -4,7 +4,7 @@ type samples = (int, Bigarray.int16_signed_elt, Bigarray.c_layout) Bigarray.Arra
 
 val load :
   string ->
-  (t, [> `FileNotFound of string | `UnsupportedNumberOfChannels]) result
+  (t, [> `File_not_found of string | `Unsupported_number_of_channels]) result
 
 val create :
   samples:samples ->
@@ -18,7 +18,7 @@ val play :
   ?force:bool ->
   ?on_stop:(unit -> unit) ->
   t -> AudioSource.t ->
-  (unit, [> `NoSourceAvailable]) result
+  (unit, [> `No_source_available]) result
 
 val duration : t -> float
 

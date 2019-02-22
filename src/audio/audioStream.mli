@@ -3,14 +3,15 @@ type t
 val load : 
   ?buffers:int ->
   ?buffer_size:int -> 
-  string -> (t, unit) result
+  string -> (t, [> `Loading_error]) result
 
 val play :
   ?pitch:float ->
   ?gain:float ->
   ?force:bool ->
   ?on_stop:(unit -> unit) ->
-  t -> AudioSource.t -> unit
+  t -> AudioSource.t -> 
+  (unit, [> `No_source_available]) result
 
 val duration : t -> float
 

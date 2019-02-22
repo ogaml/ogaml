@@ -39,7 +39,7 @@ module LL : sig
     buffer:AL.Buffer.t ->
     stream:bool ->
     t ->
-    (unit, [> `NoSourceAvailable]) result
+    (unit, [> `No_source_available]) result
 
   val source : t -> AL.Source.t option
 

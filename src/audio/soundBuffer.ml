@@ -26,14 +26,14 @@ let create ~samples ~channels ~rate =
 
 let load s =
   if (not (Sys.file_exists s)) || (Sys.is_directory s) then
-    Error (`FileNotFound s)
+    Error (`File_not_found s)
   else begin
     let (channels_nb, rate, samples) = AL.Vorbis.decode_file s in
     let channels =
       match channels_nb with
       | 1 -> Ok `Mono
       | 2 -> Ok `Stereo
-      | _ -> Error `UnsupportedNumberOfChannels
+      | _ -> Error `Unsupported_number_of_channels
     in
     channels >>= fun channels ->
     let sound = create ~samples ~rate ~channels in

@@ -49,7 +49,7 @@ let allocate_source source force channels duration =
         AudioContext.LL.get_available_mono_source ~force source.context
     in
     match src_candidate with
-    | None when force -> Error `NoSourceAvailable
+    | None when force -> Error `No_source_available
     | None -> Ok ()
     | Some s -> begin
       source.source <- Some s;

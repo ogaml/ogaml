@@ -80,7 +80,7 @@ module SoundBuffer : sig
 
   val load :
     string ->
-    (t, [> `FileNotFound of string | `UnsupportedNumberOfChannels]) result
+    (t, [> `File_not_found of string | `Unsupported_number_of_channels]) result
 
   val create :
     samples:samples ->
@@ -94,7 +94,7 @@ module SoundBuffer : sig
     ?force:bool ->
     ?on_stop:(unit -> unit) ->
     t -> AudioSource.t ->
-    (unit, [> `NoSourceAvailable]) result
+    (unit, [> `No_source_available]) result
 
   val duration : t -> float
 
@@ -112,14 +112,15 @@ module AudioStream : sig
   val load :
     ?buffers:int ->
     ?buffer_size:int ->
-    string -> (t, unit) result
+    string -> (t, [> `Loading_error]) result
 
   val play :
     ?pitch:float ->
     ?gain:float ->
     ?force:bool ->
     ?on_stop:(unit -> unit) ->
-    t -> AudioSource.t -> unit
+    t -> AudioSource.t ->
+    (unit, [> `No_source_available]) result
 
   val duration : t -> float
 

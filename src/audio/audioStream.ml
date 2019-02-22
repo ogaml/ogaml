@@ -1,3 +1,4 @@
+open OgamlUtils.Result.Operators
 open Bigarray
 
 type t = {
@@ -48,7 +49,7 @@ let load ?(buffers=3) ?(buffer_size=32768) filename =
       thread = None;
     }
   | Error _ ->
-    Error ()
+    Error `Loading_error
 
 let duration stream = 
   stream.duration
@@ -168,16 +169,17 @@ let rec loop_play stream =
 let play ?pitch ?gain ?force ?on_stop
   stream source = 
   match status stream with
-  | `Playing | `Paused -> ()
+  | `Playing | `Paused -> Ok ()
   | `Stopped -> begin
     match decode_buffer stream with
-    | None -> ()
+    | None -> Ok ()
     | Some (buffer, _) -> begin
       stream.source <- Some source;
+      AudioSource.LL.play ?pitch ?gain ~loop:false ?force ?on_stop 
+        ~duration:infinity ~channels:stream.channels ~buffer ~stream:true 
+        source >>>= fun () ->
       let thd = 
         Thread.create (fun stream -> 
-          AudioSource.LL.play ?pitch ?gain ~loop:false ?force ?on_stop ~duration:infinity 
-            ~channels:stream.channels ~buffer ~stream:true source;
           loop_play stream
         ) stream
       in
