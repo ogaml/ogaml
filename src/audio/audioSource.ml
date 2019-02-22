@@ -160,7 +160,7 @@ module LL = struct
     (* We request a source to the context. *)
     match src_status with
     | `Stopped ->
-      allocate_source source force channels duration >>
+      allocate_source source force channels duration >>= fun () ->
       begin match source.source with
       | None -> Ok ()
       | Some s ->

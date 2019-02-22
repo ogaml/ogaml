@@ -14,7 +14,8 @@ module Result : sig
       * can be opened without polluting the namespace. *)
 
     (** Infix operator corresponding to $bind$ but where the second argument
-      * doesn't depend on the first. *)
+      * doesn't depend on the first.
+      * Be careful as $a >> b$ will first evaluate $b$ before $a$. *)
     val (>>) : ('a, 'b) result -> ('c, 'b) result -> ('c, 'b) result
 
     (** Infix operator corresponding to $bind$. *)
