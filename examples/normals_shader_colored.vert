@@ -15,6 +15,6 @@ void main() {
 
   out_normal = normal;
 
-  out_color = vec4(normal,1.0);
+  out_color = vec4(1.0, 0, 1.0, 1.0);
 
 }

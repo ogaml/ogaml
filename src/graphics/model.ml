@@ -1,82 +1,8 @@
+(* WIP Replacement for Model *)
+
 open OgamlMath
 open OgamlUtils
 open Result.Operators
-
-module Vertex = struct
-
-  type t = {
-    position : Vector3f.t;
-    normal   : Vector3f.t option;
-    uv       : Vector2f.t option;
-    color    : Color.t option;
-  }
-
-  let create ~position ?normal ?uv ?color () =
-    {position; normal; uv; color}
-
-  let position t = t.position
-
-  let normal t = t.normal
-
-  let uv t = t.uv
-
-  let color t = t.color
-
-  let paint t color : t = {t with color = Some color}
-
-  let transform t mat = 
-    {t with position = Matrix3D.times mat t.position}
-
-  let set_normal t n =
-    {t with normal = Some n}
-
-  let to_vao t = 
-    VertexArray.SimpleVertex.create 
-      ~position:t.position
-      ?normal:t.normal
-      ?uv:t.uv
-      ?color:t.color ()
-
-end
-
-
-module Face = struct
-
-  type t = Vertex.t * Vertex.t * Vertex.t
-
-  let create v1 v2 v3 = (v1,v2,v3)
-
-  let quad v1 v2 v3 v4 = (v1,v2,v3),(v1,v3,v4)
-
-  let vertices f = f
-
-  let paint (v1,v2,v3) col = 
-    let open Vertex in
-    (paint v1 col, paint v2 col, paint v3 col)
-
-  let normal (v1,v2,v3) =
-    let v1,v2,v3 = 
-      Vertex.position v1,
-      Vertex.position v2,
-      Vertex.position v3
-    in
-    let n = 
-      Vector3f.cross (Vector3f.sub v2 v1) (Vector3f.sub v3 v1)
-      |> Vector3f.normalize
-    in
-    match n with
-    | Ok v -> v
-    | Error _ -> Vector3f.zero
-
-  let transform (v1,v2,v3) mat = 
-    (Vertex.transform v1 mat, Vertex.transform v2 mat, Vertex.transform v3 mat)
-
-  let set_normal (v1,v2,v3) n = 
-    (Vertex.set_normal v1 n,
-     Vertex.set_normal v2 n,
-     Vertex.set_normal v3 n)
-end
-
 
 module Location = struct
 
@@ -108,258 +34,231 @@ module Location = struct
 
   let last_char t = t.last_char
 
-  let to_string t = 
-    Printf.sprintf "lines %i-%i, characters %i-%i" 
+  let to_string t =
+    Printf.sprintf "lines %i-%i, characters %i-%i"
       t.first_line t.last_line t.first_char t.last_char
 
 end
 
+type face_point = {
+  vertex : int ;
+  normal : int ;
+  uv     : int
+}
 
-type t = Face.t list
+let mkfp vertex uv normal = { vertex ; normal ; uv }
+let v3ifp v = Vector3i.(mkfp v.x v.y v.z)
 
+type face = face_point * face_point * face_point
 
-(* Iterators *)
-let iter (t : t) (f : Face.t -> unit) = 
-  List.iter f t
+(* For now we only deal with vertices, normals, texture coordinates and faces.
 
-let fold (t : t) (f : 'a -> Face.t -> 'a) (i : 'a) : 'a =
-  List.fold_left f i t
+  The idea is to stick as close as possible to OBJ file.
 
-let map (t : t) (f : Face.t -> Face.t) = 
-  List.map f t
+  TODO: Lines, materials, groups, object names, colors(?).
+*)
+type t = {
+  vertices : Vector3f.t array ;
+  normals  : Vector3f.t array ;
+  uvs      : Vector2f.t array ;
+  faces    : face array
+}
 
+let transform m obj = {
+  obj with
+  vertices = Array.map (Matrix3D.times m) obj.vertices ;
+  normals  = Array.map (Matrix3D.times m) obj.normals
+}
 
-(* Transformation *)
-let transform (t : t) mat = 
-  map t (fun f -> Face.transform f mat)
+(* TODO More efficient rotate/scale/translate? *)
+let scale f t =
+  transform (Matrix3D.scaling f) t
 
-let scale t f = 
-  transform t (Matrix3D.scaling f)
+let translate v t =
+  transform (Matrix3D.translation v) t
 
-let translate t v = 
-  transform t (Matrix3D.translation v)
+let rotate q t =
+  transform (Matrix3D.from_quaternion q) t
 
-let rotate t q = 
-  transform t (Matrix3D.from_quaternion q)
-   
+let missing_normals v1 v2 v3 =
+  let open Vector3i in
+  v1.z = 0 || v2.z = 0 || v3.z = 0
 
-(* Modification *)
-let add_face t f = f :: t
+(* Building from an OBJ file *)
+type counters = {
+  vn  : int ; (* vertices *)
+  nn  : int ; (* normals *)
+  mnn : int ; (* missing normals *)
+  uvn : int ; (* uvs *)
+  fn  : int   (* faces *)
+}
 
-let paint t c = 
-  map t (fun f -> Face.paint f c)
+let count_zero = {
+  vn  = 0 ;
+  nn  = 0 ;
+  mnn = 0 ;
+  uvn = 0 ;
+  fn  = 0
+}
 
-let merge t1 t2 = t1 @ t2
+let rec lengths cn c ast =
+  let open ObjAST in
+  match ast with
+  | Vertex _ :: ast -> lengths cn { c with vn = c.vn + 1 } ast
+  | UV _ :: ast -> lengths cn { c with uvn = c.uvn + 1 } ast
+  | Normal _ :: ast -> lengths cn { c with nn = c.nn + 1 } ast
+  | Tri (v1, v2, v3) :: ast when cn && missing_normals v1 v2 v3 ->
+    lengths cn { c with mnn = c.mnn + 1 ; fn = c.fn + 1 } ast
+  | Tri _ :: ast -> lengths cn { c with fn = c.fn + 1 } ast
+  | Quad _ :: ast -> lengths cn { c with fn = c.fn + 2 } ast
+  | Param :: ast
+  | Mtllib _ :: ast
+  | Usemtl _ :: ast
+  | Object _ :: ast
+  | Group  _ :: ast
+  | Smooth _  :: ast -> lengths cn c ast
+  | [] -> (c.vn, c.nn, c.mnn, c.uvn, c.fn)
 
-let compute_normals ?smooth:(smooth=false) t = 
-  if not smooth then 
-    map t (fun f -> Face.set_normal f (Face.normal f))
-  else begin
-    let partial_sums = Hashtbl.create 97 in
-    let add_sum v n = 
-      try 
-        let n' = Hashtbl.find partial_sums v in
-        Hashtbl.replace partial_sums v (Vector3f.add n n')
-      with
-        Not_found -> Hashtbl.add partial_sums v n
-    in
-    iter t (fun f -> 
-      let (v1,v2,v3) = Face.vertices f in
-      let n = Face.normal f in
-      add_sum v1 n; add_sum v2 n; add_sum v3 n
-    );
-    map t (fun f ->
-      let (v1,v2,v3) = Face.vertices f in 
-      Face.create 
-        (Vertex.set_normal v1 (Hashtbl.find partial_sums v1))
-        (Vertex.set_normal v2 (Hashtbl.find partial_sums v2))
-        (Vertex.set_normal v3 (Hashtbl.find partial_sums v3))
-    )
-  end
+type 'a partial_array = {
+  table : 'a array ;
+  mutable length : int
+}
 
-let simplify t = 
-  List.sort_uniq compare t
+let mkpa ?start:(length=0) table = {
+  table ;
+  length
+}
 
-let source (t : t) ?index_source ~vertex_source () =
-  let source_vertex v = 
-    let va = Vertex.to_vao v in
-    VertexArray.Source.add vertex_source va
+let addpa v pa =
+  pa.table.(pa.length) <- v ;
+  pa.length <- pa.length + 1
+
+let fill_from_ast compute_normals va na uva fa ast =
+  let va = mkpa va in
+  let na = mkpa na in
+  let uva = mkpa uva in
+  let fa = mkpa fa in
+  let open ObjAST in
+  let aux o =
+    match o with
+    | Vertex v -> addpa v va
+    | UV v -> addpa v uva
+    | Normal v -> addpa v na
+    (* TODO Perhaps, parsing should be consistent here *)
+    | Tri (v1, v2, v3) -> addpa (v3ifp v1, v3ifp v2, v3ifp v3) fa
+    | Quad (v1, v2, v3, v4) ->
+      addpa (v3ifp v1, v3ifp v2, v3ifp v3) fa ;
+      addpa (v3ifp v1, v3ifp v3, v3ifp v4) fa
+    (* TODO Handle other things? *)
+    | _ -> ()
   in
-  let indices = Hashtbl.create 97 in
-  let get_index v = 
-    try Ok (Hashtbl.find indices v)
-    with Not_found -> 
-      let ind = VertexArray.Source.length vertex_source in
-      source_vertex v >>>= (fun () ->
-      Hashtbl.add indices v ind;
-      ind)
-  in
-  match index_source with
-  | None -> 
-      Result.List.iter (fun f ->
-        let (v1,v2,v3) = Face.vertices f in
-        (source_vertex v1) >>= (fun () ->
-        (source_vertex v2) >>= (fun () ->
-        (source_vertex v3)))
-      ) t
-  | Some idx ->
-      Result.List.iter (fun f ->
-        let (v1,v2,v3) = Face.vertices f in
-        get_index v1 >>= (fun i1 ->
-        get_index v2 >>= (fun i2 ->
-        get_index v3 >>>= (fun i3 ->
-        IndexArray.Source.add idx i1;
-        IndexArray.Source.add idx i2;
-        IndexArray.Source.add idx i3)))
-      ) t
+  List.iter aux ast
 
-(* Creation *)
-let empty = []
+let missing_normals_f f1 f2 f3 =
+  f1.normal = 0 || f2.normal = 0 || f3.normal = 0
+
+let face_normal vertices f1 f2 f3 =
+  let pv1, pv2, pv3 =
+    vertices.(f1.vertex),
+    vertices.(f2.vertex),
+    vertices.(f3.vertex)
+  in
+  let open Vector3f in
+  cross (sub pv2 pv1) (sub pv3 pv1)
+  |> normalize
+  |> function Ok v -> v | Error _ -> zero
+
+let from_ast compute_normals ast : t =
+  let (vn, nn, mnn, uvn, fn) = lengths compute_normals count_zero ast in
+  let vertices = Array.make vn Vector3f.zero in
+  let normals = Array.make (nn + mnn) Vector3f.zero in
+  let uvs = Array.make uvn Vector2f.zero in
+  let dummy_fp = mkfp 0 0 0 in
+  let faces = Array.make fn (dummy_fp, dummy_fp, dummy_fp) in
+  fill_from_ast compute_normals vertices normals uvs faces ast ;
+  let normals = mkpa ~start:nn normals in
+  let faces =
+    Array.map (fun (f1, f2, f3) ->
+      if missing_normals_f f1 f2 f3 then begin
+        let n = face_normal vertices f1 f2 f3 in
+        let ni = normals.length in
+        addpa n normals ;
+        let r f =
+          if f.normal = 0 then { f with normal = ni } else f
+        in
+        (r f1, r f2, r f3)
+      end
+      else (f1,f2,f3)
+    ) faces
+  in
+  { vertices ; normals = normals.table ; uvs ; faces }
 
 let parse_with_errors lexbuf =
   try
     Ok (ObjParser.file ObjLexer.token lexbuf)
   with
-    |ObjLexer.SyntaxError msg ->
-        let loc = Location.create lexbuf.Lexing.lex_start_p
-                                  lexbuf.Lexing.lex_curr_p
-        in
-        Error (`Syntax_error (loc, msg))
-    |Parsing.Parse_error ->
-        let loc = Location.create lexbuf.Lexing.lex_start_p
-                                  lexbuf.Lexing.lex_curr_p
-        in
-        Error (`Parsing_error (loc))
+  | ObjLexer.SyntaxError msg ->
+    let loc = Location.create lexbuf.Lexing.lex_start_p
+                              lexbuf.Lexing.lex_curr_p
+    in
+    Error (`Syntax_error (loc, msg))
+  | Parsing.Parse_error ->
+    let loc = Location.create lexbuf.Lexing.lex_start_p
+                              lexbuf.Lexing.lex_curr_p
+    in
+    Error (`Parsing_error (loc))
 
-let parse_file f = 
+let parse_file f =
   let input = open_in f in
   let lexbuf = Lexing.from_channel input in
   lexbuf.Lexing.lex_curr_p <- {lexbuf.Lexing.lex_curr_p with Lexing.pos_fname = f};
   let ast = parse_with_errors lexbuf in
   close_in input;
-  ast 
+  ast
 
-let cube corner size = 
-  let open Vector3f in
-  let bdl, bul, bur, bdr, 
-      fdl, ful, fur, fdr 
-      =
-      corner,
-      add corner {x = 0.; y = size.y; z = 0.},
-      add corner {x = size.x; y = size.y; z = 0.},
-      add corner {x = size.x; y = 0.; z = 0.},
-      add corner {x = 0.; y = 0.; z = size.z},
-      add corner {x = 0.; y = size.y; z = size.z},
-      add corner {x = size.x; y = size.y; z = size.z},
-      add corner {x = size.x; y = 0.; z = size.z}
+let from_obj ?(compute_normals=false) s =
+  parse_file s >>>= from_ast compute_normals
+
+(* TODO smooth?? *)
+(* TODO Factorise more with from_obj *)
+let compute_normals obj =
+  let mnn =
+    Array.fold_left
+      (fun n (f1,f2,f3) -> if missing_normals_f f1 f2 f3 then n + 1 else n)
+      0
+      obj.faces
   in
-  let nx, ny, nz, nmx, nmy, nmz =
-    unit_x, unit_y, unit_z,
-    prop (-1.) unit_x,
-    prop (-1.) unit_y,
-    prop (-1.) unit_z
-  in
-  let uv1, uv2, uv3, uv4 = 
-    Vector2f.({x = 0.; y = 0.}),
-    Vector2f.({x = 0.; y = 1.}),
-    Vector2f.({x = 1.; y = 1.}),
-    Vector2f.({x = 1.; y = 0.})
-  in
-  let cx, cy, cz, cmx, cmy, cmz = 
-    `RGB Color.RGB.blue,
-    `RGB Color.RGB.green,
-    `RGB Color.RGB.yellow,
-    `RGB Color.RGB.red,
-    `RGB Color.RGB.magenta,
-    `RGB Color.RGB.cyan
-  in
-  let make_face p1 p2 p3 p4 n c model = 
-    let v1 = Vertex.create ~position:p1 ~normal:n ~color:c ~uv:uv1 () in
-    let v2 = Vertex.create ~position:p2 ~normal:n ~color:c ~uv:uv2 () in
-    let v3 = Vertex.create ~position:p3 ~normal:n ~color:c ~uv:uv3 () in
-    let v4 = Vertex.create ~position:p4 ~normal:n ~color:c ~uv:uv4 () in
-    let f1, f2 = Face.quad v1 v4 v3 v2 in
-    add_face model f1
-    |> fun m -> add_face m f2
-  in
-  make_face fdl ful fur fdr nz cz empty
-  |> make_face ful bul bur fur ny cy
-  |> make_face bul bdl bdr bur nmz cmz
-  |> make_face bdl fdl fdr bdr nmy cmy
-  |> make_face fdr fur bur bdr nx cx
-  |> make_face bdl bul ful fdl nmx cmx
+  let newnormals = Array.make mnn Vector3f.zero in
+  let newnormals = mkpa newnormals in
+  let newfaces = Array.copy obj.faces in
+  Array.iteri (fun i (f1,f2,f3) ->
+    if missing_normals_f f1 f2 f3 then begin
+      let n = face_normal obj.vertices f1 f2 f3 in
+      let ni = newnormals.length in
+      addpa n newnormals ;
+      let r f =
+        if f.normal = 0 then { f with normal = ni } else f
+      in
+      newfaces.(i) <- (r f1, r f2, r f3)
+    end
+  ) obj.faces ;
+  let newnormals = Array.append obj.normals newnormals.table in
+  { obj with faces = newfaces ; normals = newnormals }
 
+let mksv obj p =
+  let open VertexArray in
+  let uv = if p.uv = 0 then None else Some obj.uvs.(p.uv-1) in
+  SimpleVertex.create
+    ~position: obj.vertices.(p.vertex-1)
+    ?uv
+    ~normal: obj.normals.(p.normal-1)
+    ()
 
-module IndexTable = struct
-
-  type 'a t = {
-    mutable length : int;
-    mutable data   : 'a array
-  }
-
-  let double t = 
-    let newarr = Array.make (t.length * 2) t.data.(0) in
-    Array.blit t.data 0 newarr 0 t.length;
-    t.data <- newarr
-
-  let make i = {
-    length = 0;
-    data   = Array.make 64 i
-  }
-
-  let push t v = 
-    if t.length >= Array.length t.data then 
-      double t;
-    t.data.(t.length) <- v;
-    t.length <- t.length + 1
-
-  let get t i = 
-    if i < 0 then t.data.(t.length + i)
-    else t.data.(i-1)
-     
-end
-
-    
-let from_ast tblv tbluv tbln model ast = 
-  let make_vertex v = 
-    Vertex.create 
-      ~position:(IndexTable.get tblv v.Vector3i.x)
-      ?uv:(if v.Vector3i.y = 0 then None 
-           else Some (IndexTable.get tbluv v.Vector3i.y))
-      ?normal:(if v.Vector3i.z = 0 then None 
-               else Some (IndexTable.get tbln v.Vector3i.z))
-      ()
-  in
-  match ast with
-  | ObjAST.Vertex v -> 
-      IndexTable.push tblv v;
-      model
-  | ObjAST.UV     v -> 
-      IndexTable.push tbluv v;
-      model
-  | ObjAST.Normal v -> 
-      IndexTable.push tbln v;
-      model
-  | ObjAST.Tri  (v1,v2,v3) -> 
-      let f = Face.create (make_vertex v1) (make_vertex v2) (make_vertex v3) in
-      add_face model f
-  | ObjAST.Quad (v1,v2,v3,v4) -> 
-      let f1,f2 = Face.quad (make_vertex v1) (make_vertex v2) 
-                            (make_vertex v3) (make_vertex v4) in
-      let model = add_face model f1 in
-      add_face model f2
-  | ObjAST.Param  
-  | ObjAST.Mtllib _
-  | ObjAST.Usemtl _ 
-  | ObjAST.Object _
-  | ObjAST.Group  _
-  | ObjAST.Smooth _ -> model
-
-let from_obj s = 
-  parse_file s >>>= (fun ast ->
-  let tblv  = IndexTable.make Vector3f.zero in
-  let tbluv = IndexTable.make Vector2f.zero in
-  let tbln  = IndexTable.make Vector3f.zero in
-  List.fold_left (from_ast tblv tbluv tbln) empty ast)
-
-
+let add_to_source src obj =
+  (* We add the faces *)
+  Array.fold_left (fun src (p1, p2, p3) ->
+    let open VertexArray.Source in
+    src <<< mksv obj p1
+        <<< mksv obj p2
+        <<< mksv obj p3
+  ) (Ok src) obj.faces

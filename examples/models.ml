@@ -14,7 +14,7 @@ let fail ?msg err =
 let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 
 let window =
-  match Window.create ~width:800 ~height:600 ~title:"Cube Example" ~settings () with
+  match Window.create ~width:800 ~height:600 ~title:"Model Example" ~settings () with
   | Ok win -> win
   | Error (`Context_initialization_error msg) ->
     fail ~msg "Failed to create context"
@@ -27,7 +27,7 @@ let fps_clock =
 let cube_source =
   let src = VertexArray.Source.empty ~size:36 () in
   let obj =
-    Model.from_obj "examples/cube.obj"
+    Model.from_obj "examples/example.obj"
     |> Result.handle (function
       | `Parsing_error loc -> fail ~msg:(Model.Location.to_string loc) "Parsing error"
       | `Syntax_error (_, msg) -> fail ~msg "SyntaxError"
@@ -44,7 +44,7 @@ let cube =
 
 let normal_program =
   let res = Program.from_source_pp (module Window) ~context:window
-    ~vertex_source:(`File (OgamlCore.OS.resources_dir ^ "examples/normals_shader.vert"))
+    ~vertex_source:(`File (OgamlCore.OS.resources_dir ^ "examples/normals_shader_colored.vert"))
     ~fragment_source:(`File (OgamlCore.OS.resources_dir ^ "examples/normals_shader.frag"))
   in
   match res with

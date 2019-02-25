@@ -14,7 +14,7 @@ let fail ?msg err =
 let settings = OgamlCore.ContextSettings.create ~msaa:8 ()
 
 let window =
-  match Window.create ~width:800 ~height:600 ~title:"Cube Example" ~settings () with
+  match Window.create ~width:800 ~height:600 ~title:"Model Example" ~settings () with
   | Ok win -> win
   | Error (`Context_initialization_error msg) ->
     fail ~msg "Failed to create context"
@@ -24,10 +24,10 @@ let window =
 let fps_clock =
   Clock.create ()
 
-let cube_source =
+let obj_source =
   let src = VertexArray.Source.empty ~size:36 () in
   let obj =
-    Model.from_obj "examples/cube.obj"
+    Model.from_obj "examples/dice.obj"
     |> Result.handle (function
       | `Parsing_error loc -> fail ~msg:(Model.Location.to_string loc) "Parsing error"
       | `Syntax_error (_, msg) -> fail ~msg "SyntaxError"
@@ -36,16 +36,16 @@ let cube_source =
   Model.add_to_source src obj
   |> Result.assert_ok
 
-let cube_vbo =
-  VertexArray.Buffer.static (module Window) window cube_source
+let obj_vbo =
+  VertexArray.Buffer.static (module Window) window obj_source
 
-let cube =
-  VertexArray.create (module Window) window [VertexArray.Buffer.unpack cube_vbo]
+let obj =
+  VertexArray.create (module Window) window [VertexArray.Buffer.unpack obj_vbo]
 
 let normal_program =
   let res = Program.from_source_pp (module Window) ~context:window
-    ~vertex_source:(`File (OgamlCore.OS.resources_dir ^ "examples/normals_shader.vert"))
-    ~fragment_source:(`File (OgamlCore.OS.resources_dir ^ "examples/normals_shader.frag"))
+    ~vertex_source:(`File (OgamlCore.OS.resources_dir ^ "examples/normals_shader_textured.vert"))
+    ~fragment_source:(`File (OgamlCore.OS.resources_dir ^ "examples/normals_shader_textured.frag"))
   in
   match res with
   | Ok prog -> prog
@@ -61,7 +61,7 @@ let proj =
   Matrix3D.perspective ~near:0.01 ~far:1000. ~width:800. ~height:600. ~fov:(90. *. 3.141592 /. 180.)
   |> Result.assert_ok
 
-let position = ref Vector3f.({x = 1.; y = 0.6; z = 1.4})
+let position = ref Vector3f.({x = 1.; y = 1.6; z = 8.})
 
 let rot_angle = ref 0.
 
@@ -71,11 +71,21 @@ let view_phi = ref 0.
 
 let msaa = ref true
 
+let texture =
+  let res =
+    Texture.Texture2D.create (module Window) window (`File "examples/dice.png")
+  in
+  match res with
+  | Ok tex -> tex
+  | Error `File_not_found s -> fail ("Cannot find texture " ^ s)
+  | Error `Loading_error msg -> fail ~msg "Error loading texture"
+  | Error `Texture_too_large -> fail "Texture too large"
+
 let display () =
   (* Compute model matrix *)
   let t = Unix.gettimeofday () in
   let view = Matrix3D.look_at_eulerian ~from:!position ~theta:!view_theta ~phi:!view_phi in
-  let rot_vector = Vector3f.({x = (cos t); y = (sin t); z = (cos t) *. (sin t)}) in
+  let rot_vector = Vector3f.({x = 0.; y = t; z = 0.}) in
   let model =
     Matrix3D.rotation rot_vector !rot_angle
     |> Result.assert_ok
@@ -99,27 +109,16 @@ let display () =
     >>= Uniform.float    "Light.SunIntensity" 1.6
     >>= Uniform.float    "Light.MaxIntensity" 1.9
     >>= Uniform.float    "Light.Gamma"  1.2
+    >>= Uniform.texture2D "my_texture" texture
     |> Result.assert_ok
   in
   VertexArray.draw (module Window) ~target:window
-    ~vertices:cube ~uniform ~program:normal_program ~parameters
+    ~vertices:obj ~uniform ~program:normal_program ~parameters
     ~mode:DrawMode.Triangles ()
   |> Result.assert_ok
 
 (* Camera *)
 let center = Vector2i.div 2 (Window.size window) |> Result.assert_ok
-
-let () =
-  Mouse.set_relative_position window center
-
-let rec update_camera () =
-  let vmouse = Mouse.relative_position window in
-  let dv = Vector2i.sub vmouse center in
-  let lim = Constants.pi /. 2. -. 0.1 in
-  view_theta := !view_theta +. 0.005 *. (float_of_int dv.OgamlMath.Vector2i.x);
-  view_phi   := !view_phi   +. 0.005 *. (float_of_int dv.OgamlMath.Vector2i.y);
-  view_phi   := min (max !view_phi (-.lim)) lim;
-  Mouse.set_relative_position window center
 
 (* Handle keys directly by polling the keyboard *)
 let handle_keys () =
@@ -188,7 +187,6 @@ let rec main_loop () =
     Window.display window;
     (* We only capture the mouse and listen to the keyboard when focused *)
     if Window.has_focus window then (
-      update_camera () ;
       handle_keys ()
     ) ;
     event_loop ();
@@ -199,7 +197,7 @@ let rec main_loop () =
 
 (* Start *)
 let () =
-  Printf.printf "Rendering %i vertices\n%!" (VertexArray.length cube);
+  Printf.printf "Rendering %i vertices\n%!" (VertexArray.length obj);
   Clock.restart fps_clock;
   main_loop ();
   Printf.printf "Avg FPS: %f\n%!" (Clock.tps fps_clock);
