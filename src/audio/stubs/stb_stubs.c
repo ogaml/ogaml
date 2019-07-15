@@ -107,7 +107,7 @@ caml_stb_channels(value vorbis)
 {
   CAMLparam1(vorbis);
 
-  CAMLreturn(Val_int((VORBIS(vorbis))->channels));
+  CAMLreturn(Val_int(stb_vorbis_get_info((VORBIS(vorbis))).channels));
 }
 
 CAMLprim value
@@ -115,7 +115,7 @@ caml_stb_sample_rate(value vorbis)
 {
   CAMLparam1(vorbis);
 
-  CAMLreturn(Val_int((VORBIS(vorbis))->sample_rate));
+  CAMLreturn(Val_int(stb_vorbis_get_info((VORBIS(vorbis))).sample_rate));
 }
 
 CAMLprim value

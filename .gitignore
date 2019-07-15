@@ -68,3 +68,4 @@ tests/.merlin
 
 # ide-reason
 *.log
+glew32.dll

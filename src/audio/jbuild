@@ -7,6 +7,7 @@
 (rule (copy stubs/listener_stubs.c    listener_stubs.c))
 (rule (copy stubs/source_stubs.c      source_stubs.c))
 (rule (copy stubs/stb_stubs.c         stb_stubs.c))
+(rule (copy stubs/stb_vorbis.c        stb_vorbis.c))
 (rule (copy stubs/stb_vorbis.h        stb_vorbis.h))
 (rule (copy stubs/utils.c             utils.c))
 (rule (copy stubs/utils.h             utils.h))
@@ -16,7 +17,7 @@
    (public_name ogaml.audio)
    (libraries   (OgamlMath OgamlUtils threads))
    (c_names     (utils audio_stubs buffer_stubs context_stubs device_stubs 
-                 listener_stubs source_stubs stb_stubs))
+                 listener_stubs source_stubs stb_stubs stb_vorbis))
    (c_flags     (:standard (:include ../../c_flags.os)))
    (install_c_headers (stb_vorbis))
    (c_library_flags (:standard (:include ../../c_libs.os)))))

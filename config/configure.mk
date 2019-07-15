@@ -23,4 +23,9 @@ ifeq ($(UNAME), windows32)
   CLIBS_FILE = config/c_libs.win
   CFLAGS_FILE = config/c_flags.win
 endif
- 
+ifeq ($(UNAME), CYGWIN_NT-10.0)
+  OS_NAME = WIN
+  CORE_JBUILD_FILE = src/core/jbuild.win
+  CLIBS_FILE = config/c_libs.win
+  CFLAGS_FILE = config/c_flags.win
+endif
