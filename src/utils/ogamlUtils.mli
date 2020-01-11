@@ -85,7 +85,8 @@ module Result : sig
   val from_opt : 'a option -> ('a, unit) result
 
   (** $iteri first last f$ applies $f$ to every integer between $first$ and
-    * $last$ (both included) but stops as soon as $f$ returns an error. *)
+    * $last$ (both included) in increasing order but stops as soon as $f$ 
+    * returns an error. *)
   val iteri : int -> int -> (int -> (unit, 'a) result) -> (unit, 'a) result
 
 end

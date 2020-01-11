@@ -118,12 +118,4 @@ let iteri first last f =
       aux_incr (i+1)
     end
   in
-  let rec aux_decr i =
-    if i < last then Ok ()
-    else begin
-      f i >>= fun () ->
-      aux_decr (i-1)
-    end
-  in
-  if last >= first then aux_incr first
-  else aux_decr first
+  aux_incr first
