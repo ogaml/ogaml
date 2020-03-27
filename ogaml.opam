@@ -23,3 +23,8 @@ build: [
   [make "Makefile" "configure"]
   ["dune" "build" "-p" name "-j" jobs]
 ]
+
+depexts: [
+  ["mesa"] {os-distribution = "alpine"}
+  ["openal-soft-dev"] {os-distribution = "alpine"}
+]
