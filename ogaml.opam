@@ -20,6 +20,6 @@ depends: [
 ]
 
 build: [
-  [make "configure"]
+  [make "Makefile" "configure"]
   ["dune" "build" "-p" name "-j" jobs]
 ]
