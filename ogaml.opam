@@ -13,7 +13,6 @@ authors: ["Théo Winterhalter" "Victor Lanvin <victor.lanvin@irif.fr>"]
 license: "MIT"
 homepage: "https://ogaml.github.io"
 bug-reports: "https://github.com/ogaml/ogaml/issues"
-dev-repo: "https://github.com/ogaml/ogaml.git"
 
 depends: [
   "dune"
@@ -21,5 +20,6 @@ depends: [
 ]
 
 build: [
+  [make "configure"]
   ["dune" "build" "-p" name "-j" jobs]
 ]

@@ -51,7 +51,7 @@ src/graphics/objParser.mli
 ogaml.install
 
 # Configuration files
-src/core/jbuild
+src/core/dune
 c_flags.os
 c_libs.os
 flags.os   # For retrocompatibility
