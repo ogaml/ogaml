@@ -1,0 +1,23 @@
+(copy_files cocoa/*)
+(copy_files cocoa/stubs/*)
+
+(rule (copy cocoa/Makefile Makefile))
+
+(rule (copy impl/LL_impl_cocoa.ml LL.ml))
+(rule (copy impl/OS_impl_osx.ml OS.ml))
+
+(library
+  (name        OgamlCore)
+  (public_name ogaml.core)
+  (libraries   OgamlMath)
+  (self_build_stubs_archive OgamlCore)
+  (install_c_headers cocoa_stubs)
+  (c_flags     (:standard (:include ../../c_flags.os)))
+  (c_library_flags (:include ../../c_libs.os)))
+
+(rule
+  (targets libOgamlCore_stubs.a dllOgamlCore_stubs.so)
+  (deps Makefile application_delegate_stubs.m window_stubs.m event_stubs.m
+        application_stubs.m glcontext_stubs.m utils_stubs.m cocoa_stubs.h
+        opengl_stubs.m window_controller_stubs.m utils.h utils.c)
+  (action (bash "make cocoa_lib_stubs")))

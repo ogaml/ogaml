@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OPAM_DEPEND="menhir jbuilder"
+OPAM_DEPEND="menhir dune"
 
 sh -e /etc/init.d/xvfb start
 

@@ -1,0 +1,14 @@
+(copy_files windows/*)
+(copy_files windows/stubs/*)
+
+(rule (copy impl/LL_impl_windows.ml LL.ml))
+(rule (copy impl/OS_impl_windows.ml OS.ml))
+
+(library
+  (name        OgamlCore)
+  (public_name ogaml.core)
+  (libraries   OgamlMath)
+  (c_names     context_stubs glew_stubs pixelformat_stubs style_stubs
+               utils window_stubs)
+  (c_flags     (:standard (:include ../../c_flags.os)))
+  (c_library_flags (:include ../../c_libs.os)))

@@ -1,12 +1,25 @@
-opam-version: "1.2"
+opam-version: "2.0"
+
 name: "OGaml"
 version: "0.1"
-maintainer: ["Théo Winterhalter" "Victor Lanvin victor.lanvin@ens-cachan.fr"]
-author: ["Théo Winterhalter" "Victor Lanvin victor.lanvin@ens-cachan.fr"]
+
+synopsis: "A multimedia library for OCaml"
+description: """
+A multimedia library for OCaml
+"""
+
+maintainer: ["Théo Winterhalter" "Victor Lanvin <victor.lanvin@irif.fr>"]
+authors: ["Théo Winterhalter" "Victor Lanvin <victor.lanvin@irif.fr>"]
+license: "MIT"
 homepage: "https://ogaml.github.io"
 bug-reports: "https://github.com/ogaml/ogaml/issues"
-license: "MIT"
-dev-repo: "https://github.com/ogaml/ogaml"
+dev-repo: "https://github.com/ogaml/ogaml.git"
+
+depends: [
+  "dune"
+  "menhir"
+]
+
 build: [
-  ["jbuilder" "build" "-p" name "-j" jobs]
+  ["dune" "build" "-p" name "-j" jobs]
 ]
