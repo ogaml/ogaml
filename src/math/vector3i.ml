@@ -156,9 +156,9 @@ let raster v1 v2 =
       {x;y;z}::(aux_z x' y' z' xd'' yd'')
     end
   in
-  if a.x >= Pervasives.max a.y a.z then
+  if a.x >= Stdlib.max a.y a.z then
     aux_x v1.x v1.y v1.z (a.y - a.x/2) (a.z - a.x/2)
-  else if a.y >= Pervasives.max a.x a.z then
+  else if a.y >= Stdlib.max a.x a.z then
     aux_y v1.x v1.y v1.z (a.x - a.y/2) (a.z - a.y/2)
   else 
     aux_z v1.x v1.y v1.z (a.x - a.z/2) (a.y - a.z/2)

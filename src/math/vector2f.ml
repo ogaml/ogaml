@@ -107,8 +107,8 @@ let endpoint u v t =
 let raytrace_points p1 p2 = 
   let intersects a b mark = 
     let s   = if a < b then 1. else -1. in
-    let fst = if a < b then ceil a  else Pervasives.floor a in
-    let lst = if a < b then Pervasives.floor b else ceil  b in
+    let fst = if a < b then ceil a  else Stdlib.floor a in
+    let lst = if a < b then Stdlib.floor b else ceil  b in
     let idx = 1. /. (b -. a) in
     let rec aux v = 
       if (a  < b && v > lst +. 0.00001) 
@@ -121,7 +121,7 @@ let raytrace_points p1 p2 =
     aux fst
   in
   let rebuild l = 
-    let fst = {x = Pervasives.floor p1.x; y = Pervasives.floor p1.y} in
+    let fst = {x = Stdlib.floor p1.x; y = Stdlib.floor p1.y} in
     let fstface = 
       if abs_float (p2.x -. p1.x) >= abs_float (p2.y -. p1.y) then begin
         if p2.x >= p1.x then {x = -1.; y = 0.}
