@@ -25,6 +25,6 @@ build: [
 ]
 
 depexts: [
-  ["mesa"] {os-distribution = "alpine"}
+  ["mesa-dev"] {os-distribution = "alpine"}
   ["openal-soft-dev"] {os-distribution = "alpine"}
 ]
