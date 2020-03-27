@@ -2,5 +2,6 @@
 -Wno-pointer-sign -Wno-unused-function 
 -Wno-unused-variable
 -Wno-misleading-indentation
+-Wno-discarded-qualifiers
 -Wno-maybe-uninitialized
 -Wno-int-conversion)
