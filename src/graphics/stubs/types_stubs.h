@@ -56,4 +56,6 @@ GLenum WindowOutputBuffer_val(value par);
 
 GLenum FBOOutputBuffer_val(value par);
 
+GLenum Query_val(value query);
+
 #endif

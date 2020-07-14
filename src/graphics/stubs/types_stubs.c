@@ -692,3 +692,25 @@ GLenum WindowOutputBuffer_val(value out)
       caml_failwith("Caml variant error in WindowOutputBuffer_val");
   }
 }
+
+
+GLenum Query_val(value query)
+{
+  switch(Int_val(query))
+  {
+    case 0:
+      return GL_SAMPLES_PASSED;
+
+    case 1:
+      return GL_ANY_SAMPLES_PASSED;
+
+    case 2:
+      return GL_PRIMITIVES_GENERATED;
+
+    case 3:
+      return GL_TIME_ELAPSED;
+
+    default:
+      caml_failwith("Caml variant error in Query_val");
+  }
+}

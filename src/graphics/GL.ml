@@ -507,6 +507,3 @@ module Uniform = struct
   let mat43 i m = abst_mat43 i m.Data.data
 
 end
-
-
-

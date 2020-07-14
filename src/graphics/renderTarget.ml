@@ -169,6 +169,18 @@ let bind_blend_mode context parameters =
     end
   )
 
+let begin_queries parameters =
+  Option.iter DrawParameter.Query.LL.begin_ (DrawParameter.samples_query parameters);
+  Option.iter DrawParameter.Query.LL.begin_ (DrawParameter.any_samples_query parameters);
+  Option.iter DrawParameter.Query.LL.begin_ (DrawParameter.primitives_query parameters);
+  Option.iter DrawParameter.Query.LL.begin_ (DrawParameter.time_query parameters)
+
+let end_queries parameters =
+  Option.iter DrawParameter.Query.LL.end_ (DrawParameter.samples_query parameters);
+  Option.iter DrawParameter.Query.LL.end_ (DrawParameter.any_samples_query parameters);
+  Option.iter DrawParameter.Query.LL.end_ (DrawParameter.primitives_query parameters);
+  Option.iter DrawParameter.Query.LL.end_ (DrawParameter.time_query parameters)
+
 let bind_draw_parameters context size aa parameters =
   let context = context in
   bind_culling_mode context parameters;
@@ -178,5 +190,3 @@ let bind_draw_parameters context size aa parameters =
   bind_antialiasing context aa parameters;
   bind_viewport context size parameters;
   bind_blend_mode context parameters
-
-

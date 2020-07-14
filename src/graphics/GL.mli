@@ -504,5 +504,3 @@ module Uniform : sig
   val mat4  : Program.u_location -> (float, Data.float_32) Data.t -> unit
 
 end
-
-

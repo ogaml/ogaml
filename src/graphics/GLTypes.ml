@@ -235,3 +235,14 @@ module FBOOutputBuffer = struct
     | None
             
 end
+
+(** Query types *)
+module Query = struct
+
+  type t =
+    | SamplesPassed
+    | AnySamplesPassed
+    | PrimitivesGenerated
+    | TimeElapsed
+
+end
