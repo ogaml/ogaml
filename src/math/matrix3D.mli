@@ -37,7 +37,7 @@ val scale : Vector3f.t -> t -> t
 val rotate : Vector3f.t -> float -> t -> (t, [> `Invalid_axis]) result
 
 (* Vector right-product *)
-val times : t -> ?perspective:bool -> Vector3f.t -> Vector3f.t
+val times : t -> ?normalize:bool -> ?perspective:bool -> Vector3f.t -> Vector3f.t
 
 (* Rotation matrix from a quaternion *)
 val from_quaternion : Quaternion.t -> t
