@@ -94,6 +94,9 @@ module LL : sig
   (** Returns if depth writing is currently activated or not *)
   val depth_writing : t -> bool
 
+  (** Returns if color writing is currently activated or not (RGBA components) *)
+  val color_writing : t -> (bool * bool * bool * bool)
+
   (** Returns the current depth function *)
   val depth_function : t -> DrawParameter.DepthTest.t
 
@@ -111,6 +114,9 @@ module LL : sig
 
   (** Sets the current value of depth writing*)
   val set_depth_writing : t -> bool -> unit
+
+  (** Sets the current value of color writing*)
+  val set_color_writing : t -> (bool * bool * bool * bool) -> unit
 
   (** Sets the current value of the depth function *)
   val set_depth_function : t -> DrawParameter.DepthTest.t -> unit

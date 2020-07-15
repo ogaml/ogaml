@@ -385,6 +385,8 @@ module DrawParameter : sig
     *
     * $depth_write$ specifies whether depth should be written to the depth buffer (defaults to $true$)
     *
+    * $color_write$ specifies which color components should be written to the color buffer (defaults to $true$ for all components)
+    *
     * $blend_mode$ specifies the blending equation (defaults to $BlendingMode.default$)
     *
     * $viewport$ specifies the viewport (defaults to $Full$)
@@ -402,6 +404,7 @@ module DrawParameter : sig
              ?polygon:PolygonMode.t ->
              ?depth_test:DepthTest.t ->
              ?depth_write:bool ->
+             ?color_write:bool * bool * bool * bool ->
              ?blend_mode:BlendMode.t ->
              ?viewport:Viewport.t ->
              ?antialiasing:bool ->

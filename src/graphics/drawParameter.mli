@@ -158,6 +158,7 @@ val make : ?culling:CullingMode.t ->
            ?polygon:PolygonMode.t ->
            ?depth_test:DepthTest.t ->
            ?depth_write:bool ->
+           ?color_write:(bool * bool * bool * bool) ->
            ?blend_mode:BlendMode.t -> 
            ?viewport:Viewport.t ->
            ?antialiasing:bool ->
@@ -178,6 +179,8 @@ val depth_test : t -> DepthTest.t
 
 (** Returns true iff depth writing is enabled *)
 val depth_write : t -> bool
+
+val color_write : t -> (bool * bool * bool * bool)
 
 val blend_mode : t -> BlendMode.t
 

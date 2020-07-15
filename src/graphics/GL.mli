@@ -113,6 +113,9 @@ module Pervasives : sig
 
   (** Sets the current depth mask value *)
   val depth_mask : bool -> unit
+  
+  (** Sets the current color mask value *)
+  val color_mask : bool -> bool -> bool -> bool -> unit
 
   (** Sets the current depth function *)
   val depthfunction : DrawParameter.DepthTest.t -> unit
