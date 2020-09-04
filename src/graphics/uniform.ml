@@ -39,56 +39,98 @@ let vector3f s v m =
   assert_free m s >>>= fun () ->
   UniformMap.add s (Vector3f v) m
 
+let vector3f_r s v m = 
+  UniformMap.add s (Vector3f v) m
+
 let vector2f s v m = 
   assert_free m s >>>= fun () ->
+  UniformMap.add s (Vector2f v) m
+
+let vector2f_r s v m = 
   UniformMap.add s (Vector2f v) m
 
 let vector3i s v m = 
   assert_free m s >>>= fun () ->
   UniformMap.add s (Vector3i v) m
 
+let vector3i_r s v m = 
+  UniformMap.add s (Vector3i v) m
+
 let vector2i s v m = 
   assert_free m s >>>= fun () ->
+  UniformMap.add s (Vector2i v) m
+
+let vector2i_r s v m = 
   UniformMap.add s (Vector2i v) m
 
 let matrix3D s mat m = 
   assert_free m s >>>= fun () ->
   UniformMap.add s (Matrix3D mat) m
 
+let matrix3D_r s mat m = 
+  UniformMap.add s (Matrix3D mat) m
+
 let matrix2D s mat m = 
   assert_free m s >>>= fun () ->
+  UniformMap.add s (Matrix2D mat) m
+
+let matrix2D_r s mat m = 
   UniformMap.add s (Matrix2D mat) m
 
 let color s c m = 
   assert_free m s >>>= fun () ->
   UniformMap.add s (Color (Color.to_rgb c)) m
 
+let color_r s c m = 
+  UniformMap.add s (Color (Color.to_rgb c)) m
+
 let texture2D s ?tex_unit t m = 
   assert_free m s >>>= fun () ->
+  UniformMap.add s (Texture2D (tex_unit,t)) m
+
+let texture2D_r s ?tex_unit t m = 
   UniformMap.add s (Texture2D (tex_unit,t)) m
 
 let texture3D s ?tex_unit t m = 
   assert_free m s >>>= fun () ->
   UniformMap.add s (Texture3D (tex_unit,t)) m
 
+let texture3D_r s ?tex_unit t m = 
+  UniformMap.add s (Texture3D (tex_unit,t)) m
+
 let texture2Darray s ?tex_unit t m = 
   assert_free m s >>>= fun () ->
+  UniformMap.add s (Texture2DArray (tex_unit,t)) m
+
+let texture2Darray_r s ?tex_unit t m = 
   UniformMap.add s (Texture2DArray (tex_unit,t)) m
 
 let depthtexture2D s ?tex_unit t m = 
   assert_free m s >>>= fun () ->
   UniformMap.add s (DepthTexture2D (tex_unit,t)) m
 
+let depthtexture2D_r s ?tex_unit t m = 
+  UniformMap.add s (DepthTexture2D (tex_unit,t)) m
+
 let int s i m = 
   assert_free m s >>>= fun () ->
+  UniformMap.add s (Int i) m
+
+let int_r s i m = 
   UniformMap.add s (Int i) m
 
 let float s f m = 
   assert_free m s >>>= fun () ->
   UniformMap.add s (Float f) m
 
+let float_r s f m = 
+  UniformMap.add s (Float f) m
+
 let cubemap s ?tex_unit t m = 
   assert_free m s >>>= fun () ->
+  UniformMap.add s (Cubemap (tex_unit,t)) m
+
+let cubemap_r s ?tex_unit t m = 
   UniformMap.add s (Cubemap (tex_unit,t)) m
 
 

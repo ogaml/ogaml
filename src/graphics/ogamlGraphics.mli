@@ -1533,29 +1533,57 @@ module Uniform : sig
     * @see:OgamlMath.Vector3f *)
   val vector3f : string -> OgamlMath.Vector3f.t -> t -> (t, [> `Duplicate_uniform of string]) result
 
+  (** Same as vector3f except any previously existing uniform with the same name
+    * is replaced. *)
+  val vector3f_r : string -> OgamlMath.Vector3f.t -> t -> t
+
   (** See vector3f. Type : vec2. @see:OgamlMath.Vector2f *)
   val vector2f : string -> OgamlMath.Vector2f.t -> t -> (t, [> `Duplicate_uniform of string]) result
+
+  (** See vector3f_r. Type : vec2. @see:OgamlMath.Vector2f *)
+  val vector2f_r : string -> OgamlMath.Vector2f.t -> t -> t
 
   (** See vector3f. Type : vec3i. @see:OgamlMath.Vector3i *)
   val vector3i : string -> OgamlMath.Vector3i.t -> t -> (t, [> `Duplicate_uniform of string]) result
 
+  (** See vector3f_r. Type : vec3i. @see:OgamlMath.Vector3i *)
+  val vector3i_r : string -> OgamlMath.Vector3i.t -> t -> t
+
   (** See vector3f. Type : vec2i. @see:OgamlMath.Vector2i *)
   val vector2i : string -> OgamlMath.Vector2i.t -> t -> (t, [> `Duplicate_uniform of string]) result
+
+  (** See vector3f_r. Type : vec2i. @see:OgamlMath.Vector2i *)
+  val vector2i_r : string -> OgamlMath.Vector2i.t -> t -> t
 
   (** See vector3f. Type : int. *)
   val int : string -> int -> t -> (t, [> `Duplicate_uniform of string]) result
 
+  (** See vector3f_r. Type : int. *)
+  val int_r : string -> int -> t -> t
+
   (** See vector3f. Type : float. *)
   val float : string -> float -> t -> (t, [> `Duplicate_uniform of string]) result
 
-  (** See vector3f. Type : mat3. @see:OgamlMath.Matrix3D *)
+  (** See vector3f_r. Type : float. *)
+  val float_r : string -> float -> t -> t
+
+  (** See vector3f. Type : mat4. @see:OgamlMath.Matrix3D *)
   val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> (t, [> `Duplicate_uniform of string]) result
 
-  (** See vector3f. Type : mat2. @see:OgamlMath.Matrix2D *)
+  (** See vector3f_r. Type : mat4. @see:OgamlMath.Matrix3D *)
+  val matrix3D_r : string -> OgamlMath.Matrix3D.t -> t -> t
+
+  (** See vector3f. Type : mat3. @see:OgamlMath.Matrix2D *)
   val matrix2D : string -> OgamlMath.Matrix2D.t -> t -> (t, [> `Duplicate_uniform of string]) result
+
+  (** See vector3f_r. Type : mat3. @see:OgamlMath.Matrix2D *)
+  val matrix2D_r : string -> OgamlMath.Matrix2D.t -> t -> t
 
   (** See vector3f. Type : vec4. @see:OgamlGraphics.Color *)
   val color : string -> Color.t -> t -> (t, [> `Duplicate_uniform of string]) result
+
+  (** See vector3f_r. Type : vec4. @see:OgamlGraphics.Color *)
+  val color_r : string -> Color.t -> t -> t
 
   (** See vector3f. Type : sampler2D.
    *
@@ -1571,11 +1599,20 @@ module Uniform : sig
   val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t ->
     (t, [> `Duplicate_uniform of string]) result
 
+  (** Same as texture2D except any previously existing uniform with the same name
+    * is replaced. Type: sampler2D. *)
+  val texture2D_r : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
+
   (** See texture2D. Type : sampler2D.
     *
     * @see:OgamlGraphics.Texture.Texture3D *)
   val depthtexture2D : string -> ?tex_unit:int -> Texture.DepthTexture2D.t -> t ->
     (t, [> `Duplicate_uniform of string]) result
+
+  (** See texture2D_r. Type : sampler2D.
+    *
+    * @see:OgamlGraphics.Texture.Texture3D *)
+  val depthtexture2D_r : string -> ?tex_unit:int -> Texture.DepthTexture2D.t -> t -> t
 
   (** See texture2D. Type : sampler3D.
     *
@@ -1583,17 +1620,32 @@ module Uniform : sig
   val texture3D : string -> ?tex_unit:int -> Texture.Texture3D.t -> t ->
     (t, [> `Duplicate_uniform of string]) result
 
+  (** See texture2D_r. Type : sampler3D.
+    *
+    * @see:OgamlGraphics.Texture.Texture3D *)
+  val texture3D_r : string -> ?tex_unit:int -> Texture.Texture3D.t -> t -> t
+
   (** See texture2D. Type : sampler2Darray.
     *
     * @see:OgamlGraphics.Texture.Texture2DArray *)
   val texture2Darray : string -> ?tex_unit:int -> Texture.Texture2DArray.t -> t ->
     (t, [> `Duplicate_uniform of string]) result
 
+  (** See texture2D_r. Type : sampler2Darray.
+    *
+    * @see:OgamlGraphics.Texture.Texture2DArray *)
+  val texture2Darray_r : string -> ?tex_unit:int -> Texture.Texture2DArray.t -> t -> t
+
   (** See texture2D. Type : samplerCube.
     *
     * @see:OgamlGraphics.Texture.Cubemap *)
   val cubemap : string -> ?tex_unit:int -> Texture.Cubemap.t -> t ->
     (t, [> `Duplicate_uniform of string]) result
+
+  (** See texture2D_r. Type : samplerCube.
+    *
+    * @see:OgamlGraphics.Texture.Cubemap *)
+  val cubemap_r : string -> ?tex_unit:int -> Texture.Cubemap.t -> t -> t
 
 end
 
