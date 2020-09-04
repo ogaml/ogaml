@@ -88,6 +88,14 @@ let bind_depth_writing context parameters =
     GL.Pervasives.depth_mask depth_writing;
   end
 
+let bind_color_writing context parameters =
+  let color_writing = DrawParameter.color_write parameters in
+  if Context.LL.color_writing context <> color_writing then begin
+    Context.LL.set_color_writing context color_writing;
+    let r,g,b,a = color_writing in
+    GL.Pervasives.color_mask r g b a;
+  end
+
 let bind_antialiasing context level parameters = 
   let antialiasing = DrawParameter.antialiasing parameters in
   if level > 0
@@ -169,14 +177,25 @@ let bind_blend_mode context parameters =
     end
   )
 
+let begin_queries parameters =
+  Option.iter DrawParameter.Query.LL.begin_ (DrawParameter.samples_query parameters);
+  Option.iter DrawParameter.Query.LL.begin_ (DrawParameter.any_samples_query parameters);
+  Option.iter DrawParameter.Query.LL.begin_ (DrawParameter.primitives_query parameters);
+  Option.iter DrawParameter.Query.LL.begin_ (DrawParameter.time_query parameters)
+
+let end_queries parameters =
+  Option.iter DrawParameter.Query.LL.end_ (DrawParameter.samples_query parameters);
+  Option.iter DrawParameter.Query.LL.end_ (DrawParameter.any_samples_query parameters);
+  Option.iter DrawParameter.Query.LL.end_ (DrawParameter.primitives_query parameters);
+  Option.iter DrawParameter.Query.LL.end_ (DrawParameter.time_query parameters)
+
 let bind_draw_parameters context size aa parameters =
   let context = context in
   bind_culling_mode context parameters;
   bind_polygon_mode context parameters;
   bind_depth_testing context parameters;
   bind_depth_writing context parameters;
+  bind_color_writing context parameters;
   bind_antialiasing context aa parameters;
   bind_viewport context size parameters;
   bind_blend_mode context parameters
-
-

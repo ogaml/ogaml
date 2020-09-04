@@ -98,14 +98,74 @@ module DepthTest : sig
 end
 
 
+module Query : sig
+
+  module LL : sig
+
+    type t
+
+    val begin_ : t -> unit
+
+    val end_ : t -> unit
+
+  end
+
+  module SamplesPassed : sig
+
+    type t = LL.t
+
+    val create : unit -> t
+
+    val get : ?wait:bool -> t -> int
+
+  end
+
+  module AnySamplesPassed : sig
+
+    type t = LL.t
+
+    val create : unit -> t
+
+    val get : ?wait:bool -> t -> bool
+
+  end
+
+  module PrimitivesGenerated : sig
+
+    type t = LL.t
+
+    val create : unit -> t
+
+    val get : ?wait:bool -> t -> int
+
+  end
+
+  module TimeElapsed : sig
+
+    type t = LL.t
+
+    val create : unit -> t
+
+    val get : ?wait:bool -> t -> float
+
+  end
+
+end
+
+
 (** Creates a set *)
 val make : ?culling:CullingMode.t -> 
            ?polygon:PolygonMode.t ->
            ?depth_test:DepthTest.t ->
            ?depth_write:bool ->
+           ?color_write:(bool * bool * bool * bool) ->
            ?blend_mode:BlendMode.t -> 
            ?viewport:Viewport.t ->
            ?antialiasing:bool ->
+           ?samples_query:Query.SamplesPassed.t ->
+           ?any_samples_query:Query.AnySamplesPassed.t ->
+           ?primitives_query:Query.PrimitivesGenerated.t ->
+           ?time_query:Query.TimeElapsed.t ->
            unit -> t
 
 (** Returns the value of the culling parameter *)
@@ -120,8 +180,18 @@ val depth_test : t -> DepthTest.t
 (** Returns true iff depth writing is enabled *)
 val depth_write : t -> bool
 
+val color_write : t -> (bool * bool * bool * bool)
+
 val blend_mode : t -> BlendMode.t
 
 val viewport : t -> Viewport.t
 
 val antialiasing : t -> bool
+
+val samples_query : t -> Query.SamplesPassed.t option
+
+val any_samples_query : t -> Query.AnySamplesPassed.t option
+
+val primitives_query : t -> Query.PrimitivesGenerated.t option
+
+val time_query : t -> Query.TimeElapsed.t option

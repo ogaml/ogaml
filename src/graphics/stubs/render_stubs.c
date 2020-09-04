@@ -167,6 +167,19 @@ caml_depth_mask(value b)
 }
 
 
+// INPUT   a boolean for every color component
+// OUTPUT  nothing, sets the current value of color writing
+CAMLprim value
+caml_color_mask(value r, value g, value b, value a)
+{
+  CAMLparam4(r,g,b,a);
+
+  glColorMask(Bool_val(r), Bool_val(g), Bool_val(b), Bool_val(a));
+
+  CAMLreturn(Val_unit);
+}
+
+
 // INPUT   a depth function
 // OUTPUT  nothing, sets the current value of the depth function
 CAMLprim value

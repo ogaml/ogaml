@@ -106,25 +106,132 @@ module DepthTest = struct
 end
 
 
+module Query = struct
+
+  module LL = struct
+
+    type gl_query
+
+    (* Query creation is delayed to ensure the context is initialized before
+     * generating query objects *)
+    type t = {
+      mutable query : gl_query option;
+      target : GLTypes.Query.t
+    }
+
+    external create : unit -> gl_query = "caml_create_query"
+
+    external begin_query : GLTypes.Query.t -> gl_query -> unit = "caml_begin_query"
+
+    external end_query : GLTypes.Query.t -> unit = "caml_end_query"
+
+    external get_query_result : gl_query -> int = "caml_get_query_result"
+
+    external get_query_result_no_wait : gl_query -> int = "caml_get_query_result_no_wait"
+
+    let begin_ t =
+      let query =
+        match t.query with
+        | Some q -> q
+        | None ->
+          let q = create () in
+          t.query <- Some q;
+          q
+      in
+      begin_query t.target query
+
+    let end_ t =
+      end_query t.target
+
+    let get ~wait t =
+      match t.query with
+      | Some query ->
+        if wait then
+          get_query_result query
+        else
+          get_query_result_no_wait query
+      | None -> 0
+
+  end
+
+  module SamplesPassed = struct
+    
+    type t = LL.t
+
+    let create () = {LL.query = None; target = GLTypes.Query.SamplesPassed}
+
+    let get ?(wait=true) t =
+      LL.get ~wait t
+
+  end
+
+  module AnySamplesPassed = struct
+    
+    type t = LL.t
+
+    let create () = {LL.query = None; target = GLTypes.Query.AnySamplesPassed}
+
+    let get ?(wait=true) t =
+      LL.get ~wait t = 1
+
+  end
+
+  module PrimitivesGenerated = struct
+    
+    type t = LL.t
+
+    let create () = {LL.query = None; target = GLTypes.Query.PrimitivesGenerated}
+
+    let get ?(wait=true) t =
+      LL.get ~wait t
+
+  end
+
+  module TimeElapsed = struct
+    
+    type t = LL.t
+
+    let create () = {LL.query = None; target = GLTypes.Query.TimeElapsed}
+
+    let get ?(wait=true) t =
+      float (LL.get ~wait t) /. 1000000000.
+
+  end
+
+end
+
+
 type t = {
   culling : CullingMode.t;
   polygon : PolygonMode.t;
   depth   : DepthTest.t;
   depth_write : bool;
+  color_write : bool * bool * bool * bool;
   blend   : BlendMode.t;
   viewport: Viewport.t;
-  aa      : bool
+  aa      : bool;
+  samples : Query.SamplesPassed.t option;
+  any_samples : Query.AnySamplesPassed.t option;
+  primitives : Query.PrimitivesGenerated.t option;
+  time : Query.TimeElapsed.t option;
 }
 
 let make ?culling:(culling = CullingMode.CullNone)
          ?polygon:(polygon = PolygonMode.DrawFill) 
          ?depth_test:(depth_test = DepthTest.Less)
          ?depth_write:(depth_write = true)
+         ?color_write:(color_write = (true, true, true, true))
          ?blend_mode:(blend_mode = BlendMode.default)
          ?viewport:(viewport = Viewport.Full)
          ?antialiasing:(antialiasing = true)
+         ?samples_query:samples
+         ?any_samples_query:any_samples
+         ?primitives_query:primitives
+         ?time_query:time
          () = 
-  { culling; polygon; depth = depth_test; depth_write; blend = blend_mode; viewport; aa = antialiasing}
+  { culling; polygon; depth = depth_test; depth_write; color_write;
+  blend = blend_mode; viewport; aa = antialiasing;
+  samples; any_samples; primitives; time}
 
 let culling t = t.culling
 
@@ -134,8 +241,18 @@ let depth_test t = t.depth
 
 let depth_write t = t.depth_write
 
+let color_write t = t.color_write
+
 let blend_mode t = t.blend
 
 let viewport t = t.viewport
 
 let antialiasing t = t.aa
+
+let samples_query t = t.samples
+
+let any_samples_query t = t.any_samples
+
+let primitives_query t = t.primitives
+
+let time_query t = t.time

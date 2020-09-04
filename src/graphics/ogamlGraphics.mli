@@ -290,6 +290,91 @@ module DrawParameter : sig
 
   end
 
+  (** Query objects *)
+  module Query : sig
+
+    (** This module contains submodules for all query objects.
+      *
+      * Query objects allow the user to obtain information about the rendering process. *)
+ 
+    (** Query for samples passed *)
+    module SamplesPassed : sig
+ 
+      (** This query returns the number of samples passing a depth test *)
+
+      (** Type of a query *)
+      type t
+ 
+      (** Creates a query *)
+      val create : unit -> t
+ 
+      (** Returns the number of samples that passed the depth test.
+        *
+        * Blocks until the GPU is done drawing if $wait$ is set to $true$ (defaults to $true$)
+        *)
+      val get : ?wait:bool -> t -> int
+  
+    end
+  
+    (** Query checking if any samples passed *)
+    module AnySamplesPassed : sig
+  
+      (** This query returns whether a sample passed a depth test *)
+
+      (** Type of a query *)
+      type t
+  
+      (** Creates a query *)
+      val create : unit -> t
+  
+      (** Returns whether at least one sample passed the depth test.
+        *
+        * Blocks until the GPU is done drawing if $wait$ is set to $true$ (defaults to $true$)
+        *)
+      val get : ?wait:bool -> t -> bool
+  
+    end
+  
+    (** Query returning the number of generated primitives *)
+    module PrimitivesGenerated : sig
+  
+      (** This query returns the number of generated primitives during a draw call *)
+
+      (** Type of a query *)
+      type t
+  
+      (** Creates a query *)
+      val create : unit -> t
+
+      (** Returns the number of primitives generated during the draw call.
+       *
+       * Blocks until the GPU is done drawing if $wait$ is set to $true$ (defaults to $true$)
+       *)
+      val get : ?wait:bool -> t -> int
+  
+    end
+  
+    (** Query returning the duration of a draw call *)
+    module TimeElapsed : sig
+  
+      (** This query returns the duration of a draw call *)
+
+      (** Type of a query *)
+      type t
+  
+      (** Creates a query *)
+      val create : unit -> t
+
+      (** Returns the duration of a draw call in seconds.
+       *
+       * Blocks until the GPU is done drawing if $wait$ is set to $true$ (defaults to $true$)
+       *)
+      val get : ?wait:bool -> t -> float
+  
+    end
+  
+  end
+
   (** Creates a set of draw parameters with the following options :
     *
     * $culling$ specifies which face should be culled (defaults to $CullNone$)
@@ -300,23 +385,33 @@ module DrawParameter : sig
     *
     * $depth_write$ specifies whether depth should be written to the depth buffer (defaults to $true$)
     *
+    * $color_write$ specifies which color components should be written to the color buffer (defaults to $true$ for all components)
+    *
     * $blend_mode$ specifies the blending equation (defaults to $BlendingMode.default$)
     *
     * $viewport$ specifies the viewport (defaults to $Full$)
     *
     * $antialiasing$ specifies whether to activate AA or not (ignored if AA is not supported by the context, defaults to $true$)
     *
+    * $*_query$ specify optional queries
+    *
     * @see:OgamlGraphics.DrawParameter.CullingMode
     * @see:OgamlGraphics.DrawParameter.PolygonMode
     * @see:OgamlGraphics.DrawParameter.Viewport
+    * @see:OgamlGraphics.DrawParameter.Query
     * @see:OgamlGraphics.DrawParameter.BlendMode *)
   val make : ?culling:CullingMode.t ->
              ?polygon:PolygonMode.t ->
              ?depth_test:DepthTest.t ->
              ?depth_write:bool ->
+             ?color_write:bool * bool * bool * bool ->
              ?blend_mode:BlendMode.t ->
              ?viewport:Viewport.t ->
              ?antialiasing:bool ->
+             ?samples_query:Query.SamplesPassed.t ->
+             ?any_samples_query:Query.AnySamplesPassed.t ->
+             ?primitives_query:Query.PrimitivesGenerated.t ->
+             ?time_query:Query.TimeElapsed.t ->
              unit -> t
 
 end

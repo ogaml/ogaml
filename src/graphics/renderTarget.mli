@@ -1,4 +1,3 @@
-
 (* Type of renderable module *)
 module type T = sig
 
@@ -36,6 +35,9 @@ val bind_fbo :
 val clear : 
   ?color:Color.t -> depth:bool -> stencil:bool -> Context.t -> unit
 
+val begin_queries : DrawParameter.t -> unit
+
+val end_queries : DrawParameter.t -> unit
+
 val bind_draw_parameters : 
   Context.t -> OgamlMath.Vector2i.t -> int -> DrawParameter.t -> unit
-

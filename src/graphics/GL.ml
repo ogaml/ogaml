@@ -176,6 +176,8 @@ module Pervasives = struct
   
   external depth_mask : bool -> unit = "caml_depth_mask"
 
+  external color_mask : bool -> bool -> bool -> bool -> unit = "caml_color_mask"
+
   external depthfunction : DrawParameter.DepthTest.t -> unit = "caml_depth_fun"
 
   external glsl_version : unit -> string = "caml_glsl_version"
@@ -507,6 +509,3 @@ module Uniform = struct
   let mat43 i m = abst_mat43 i m.Data.data
 
 end
-
-
-

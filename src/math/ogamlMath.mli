@@ -1016,8 +1016,13 @@ module Matrix3D : sig
     * If $perspective$ is true, then the 4th column of the matrix is
     * added to the resulting vector. $perspective$ defaults to $true$. 
     *
+    * If $normalize$ is true, then the resulting vector is normalized w.r.t.
+    * the 4th column of the matrix, similarly to what happens between a
+    * vertex and a fragment shader. $normalize$ defaults to $true$ and
+    * is ignored if $perspective$ is not set to $true$.
+    *
     * @see:OgamlMath.Vector3f *)
-  val times : t -> ?perspective:bool -> Vector3f.t -> Vector3f.t
+  val times : t -> ?normalize:bool -> ?perspective:bool -> Vector3f.t -> Vector3f.t
 
   (** Returns a pretty-printed string (not for serialization) *)
   val to_string : t -> string

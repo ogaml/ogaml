@@ -110,9 +110,16 @@ let scale v m = product (scaling v) m
 let rotate v t m = 
   rotation v t >>>= fun m' -> product m' m
 
-let times m ?perspective:(p = true) v = 
+let times m ?normalize:(n = true) ?perspective:(p = true) v = 
   let open Vector3f in
-  if p then 
+  if p && n then
+    let fact_n = v.x *. m.{3} +. v.y *. m.{7} +. v.z *. m.{11} +. m.{15} in
+    {
+      x = (v.x *. m.{0} +. v.y *. m.{4} +. v.z *. m.{8}  +. m.{12}) /. fact_n;
+      y = (v.x *. m.{1} +. v.y *. m.{5} +. v.z *. m.{9}  +. m.{13}) /. fact_n;
+      z = (v.x *. m.{2} +. v.y *. m.{6} +. v.z *. m.{10} +. m.{14}) /. fact_n
+    }
+  else if p then
     {
       x = v.x *. m.{0} +. v.y *. m.{4} +. v.z *. m.{8}  +. m.{12};
       y = v.x *. m.{1} +. v.y *. m.{5} +. v.z *. m.{9}  +. m.{13};

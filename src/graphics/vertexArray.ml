@@ -828,6 +828,7 @@ let draw (type s) (type buf) (type err)
     Program.LL.use context (Some program);
     Uniform.LL.bind context uniform (Program.LL.uniforms program) >>= fun () ->
     bind context vertices program >>= fun () ->
+    RenderTarget.begin_queries parameters;
     begin match indices with
     |None -> 
       if start < 0 || start + length > v_length || length < 0 then
@@ -870,6 +871,7 @@ let draw (type s) (type buf) (type err)
           IndexArray.LL.bind context ebo;
           GL.VAO.draw_instanced mode start length n_instances
       end
-    end
+    end >>>= fun () ->
+    RenderTarget.end_queries parameters
   end else
     Ok ()

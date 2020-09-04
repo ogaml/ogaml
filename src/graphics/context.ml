@@ -57,6 +57,7 @@ type t = {
   mutable polygon_mode     : DrawParameter.PolygonMode.t;
   mutable depth_test       : bool;
   mutable depth_writing    : bool;
+  mutable color_writing    : bool * bool * bool * bool;
   mutable depth_function   : DrawParameter.DepthTest.t;
   mutable texture_pool     : ID_Pool.t;
   mutable texture_unit     : int;
@@ -183,6 +184,7 @@ module LL = struct
       depth_test       = false;
       depth_writing    = true;
       depth_function   = DrawParameter.DepthTest.Less;
+      color_writing    = true, true, true, true;
       texture_pool     = ID_Pool.create 0;
       texture_unit     = 0;
       pooled_tex_array = Array.make capabilities.max_texture_image_units true;
@@ -224,6 +226,9 @@ module LL = struct
   let depth_writing s = 
     s.depth_writing
 
+  let color_writing s = 
+    s.color_writing
+
   let depth_function s = 
     s.depth_function
 
@@ -241,6 +246,9 @@ module LL = struct
 
   let set_depth_writing s v = 
     s.depth_writing <- v
+
+  let set_color_writing s v = 
+    s.color_writing <- v
 
   let set_depth_function s f = 
     s.depth_function <- f
