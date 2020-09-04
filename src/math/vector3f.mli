@@ -1,7 +1,5 @@
 (* Operations on immutable 3 floats vectors *)
 
-exception Vector3f_exception of string
-
 type t = {x : float; y : float; z : float}
 
 val make : float -> float -> float -> t
@@ -20,7 +18,7 @@ val sub : t -> t -> t
 
 val prop : float -> t -> t
 
-val div : float -> t -> t
+val div : float -> t -> (t, [> `Division_by_zero]) result
 
 val pointwise_product : t -> t -> t
 
@@ -60,13 +58,13 @@ val max : t -> float
 
 val min : t -> float
 
-val normalize : t -> t
+val normalize : t -> (t, [> `Division_by_zero]) result
 
 val to_string : t -> string
 
 (* Returns the normalized direction vector from point1 to point 2 
  * Equivalent to normalize @ sub *)
-val direction : t -> t -> t
+val direction : t -> t -> (t, [> `Division_by_zero]) result
 
 (* Returns the point u + tv *)
 val endpoint : t -> t -> float -> t

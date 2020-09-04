@@ -170,6 +170,7 @@ module NSOpenGLPixelFormat = struct
   type profile =
     | NSOpenGLProfileVersionLegacy
     | NSOpenGLProfileVersion3_2Core
+    | NSOpenGLProfileVersion4_1Core
 
   type attribute =
     | NSOpenGLPFAAllRenderers
@@ -219,6 +220,7 @@ module NSOpenGLPixelFormat = struct
     let profile_to_int = function
       | NSOpenGLProfileVersionLegacy  -> 0x1000
       | NSOpenGLProfileVersion3_2Core -> 0x3200
+      | NSOpenGLProfileVersion4_1Core -> 0x4100
     in
     let to_ints = function
       | NSOpenGLPFAAllRenderers          -> [1]
@@ -405,6 +407,12 @@ module OGWindowController = struct
 
   external set_proper_relative_mouse_location : t -> float -> float -> unit
     = "caml_cocoa_set_proper_relative_mouse_location"
+
+  external hide_cursor : t -> unit
+    = "caml_cocoa_hide_cursor"
+
+  external show_cursor : t -> unit
+    = "caml_cocoa_show_cursor"
 
   external has_focus : t -> bool = "caml_cocoa_controller_has_focus"
 

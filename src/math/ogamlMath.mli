@@ -42,9 +42,6 @@ module Vector2i : sig
 
   (** This module defines the vector2i type and various operations on it. *)
 
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Vector2i_exception of string
-
   (*** Vector operations *)
 
   (** Type of immutable vectors of 2 integers *)
@@ -71,8 +68,8 @@ module Vector2i : sig
   (** Multiplies a vector by a scalar *)
   val prop : int -> t -> t
 
-  (** Divides a vector by a scalar. Raises Vector2i_exception if the scalar is zero. *)
-  val div : int -> t -> t
+  (** Divides a vector by a scalar. Returns $Error$ if the scalar is zero. *)
+  val div : int -> t -> (t, [> `Division_by_zero]) result
 
   (** Computes the pointwise product of two vectors. *)
   val pointwise_product : t -> t -> t
@@ -134,9 +131,6 @@ module Vector2f : sig
 
   (** This module defines the vector2f type and various operations on it. *)
 
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Vector2f_exception of string
-
   (*** Vector operations *)
 
   (** Type of immutable vectors of 2 floats *)
@@ -163,8 +157,8 @@ module Vector2f : sig
   (** Multiplies a vector by a scalar *)
   val prop : float -> t -> t
 
-  (** Divides a vector by a scalar. Raises Vector2f_exception if the scalar is zero. *)
-  val div : float -> t -> t
+  (** Divides a vector by a scalar. Returns $Error$ if the scalar is zero. *)
+  val div : float -> t -> (t, [> `Division_by_zero]) result
 
   (** Computes the pointwise product of two vectors. *)
   val pointwise_product : t -> t -> t
@@ -199,8 +193,8 @@ module Vector2f : sig
   (** Computes the distance between two points *)
   val dist : t -> t -> float
 
-  (** Normalizes a vector. Raises Vector2f_exception if the vector is zero. *)
-  val normalize : t -> t
+  (** Normalizes a vector. Returns $Error$ if the vector is zero. *)
+  val normalize : t -> (t, [> `Division_by_zero]) result
 
   (** $clamp v a b$ returns the vector whose coordinates are the coordinates of $v$
     * clamped between the coordinates of $a$ and $b$ *)
@@ -222,8 +216,8 @@ module Vector2f : sig
   val to_string : t -> string
 
   (** $direction u v$ returns the normalized direction vector from $u$ to $v$.
-    * Raises Vector2f_exception if $u = v$. *)
-  val direction : t -> t -> t
+    * Returns $Error$ if $u = v$. *)
+  val direction : t -> t -> (t, [> `Division_by_zero]) result
 
   (** $endpoint a v t$ returns the point $a + tv$ *)
   val endpoint : t -> t -> float -> t
@@ -252,9 +246,6 @@ end
 module Vector3i : sig
 
   (** This module defines the vector3i type and various operations on it. *)
-
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Vector3i_exception of string
 
   (*** Vector operations *)
 
@@ -285,8 +276,8 @@ module Vector3i : sig
   (** Multiplies a vector by a scalar *)
   val prop : int -> t -> t
 
-  (** Divides a vector by a scalar. Raises Vector3i_exception if the scalar is zero. *)
-  val div : int -> t -> t
+  (** Divides a vector by a scalar. Returns $Error$ if the scalar is zero. *)
+  val div : int -> t -> (t, [> `Division_by_zero]) result
 
   (** Computes the pointwise product of two vectors. *)
   val pointwise_product : t -> t -> t
@@ -354,9 +345,6 @@ module Vector3f : sig
 
   (** This module defines the vector3f type and various operations on it. *)
 
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Vector3f_exception of string
-
   (*** Vector operations *)
 
   (** Type of immutable vectors of 3 floats *)
@@ -386,8 +374,8 @@ module Vector3f : sig
   (** Multiplies a vector by a scalar *)
   val prop : float -> t -> t
 
-  (** Divides a vector by a scalar. Raises Vector3f_exception if the scalar is zero. *)
-  val div : float -> t -> t
+  (** Divides a vector by a scalar. Returns $Error$ if the scalar is zero. *)
+  val div : float -> t -> (t, [> `Division_by_zero]) result
 
   (** Computes the pointwise product of two vectors. *)
   val pointwise_product : t -> t -> t
@@ -428,8 +416,8 @@ module Vector3f : sig
   (** Computes the distance between two points *)
   val dist : t -> t -> float
 
-  (** Normalizes a vector. Raises Vector3f_exception if the vector is zero. *)
-  val normalize : t -> t
+  (** Normalizes a vector. Returns $Error$ if the vector is zero. *)
+  val normalize : t -> (t, [> `Division_by_zero]) result
 
   (** $clamp v a b$ returns the vector whose coordinates are the coordinates of $v$
     * clamped between the coordinates of $a$ and $b$ *)
@@ -451,8 +439,8 @@ module Vector3f : sig
   val to_string : t -> string
 
   (** $direction u v$ returns the normalized direction vector from $u$ to $v$.
-    * Raises Vector3f_exception if $u = v$. *)
-  val direction : t -> t -> t
+    * Returns $Error$ if $u = v$. *)
+  val direction : t -> t -> (t, [> `Division_by_zero]) result
 
   (** $endpoint a v t$ returns the point $a + tv$ *)
   val endpoint : t -> t -> float -> t
@@ -483,9 +471,6 @@ module Vector2fs : sig
 
   (** This module defines the vector2fs type and various operations on it. *)
 
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Vector2fs_exception of string
-
   (*** Vector operations *)
 
   (** Type of immutable vectors of 2 floats represented in polar coordinates *)
@@ -505,8 +490,8 @@ module Vector2fs : sig
   (** Multiplies a vector by a scalar *)
   val prop : float -> t -> t
 
-  (** Divides a vector by a scalar. Raises Vector2fs_exception if the scalar is zero. *)
-  val div : float -> t -> t
+  (** Divides a vector by a scalar. Returns $Error$ if the scalar is zero. *)
+  val div : float -> t -> (t, [> `Division_by_zero]) result
 
   (** Converts a vector represented in polar coordinates to a vector represented in cartesian coordinates 
     * @see:OgamlMath.Vector2f *)
@@ -519,8 +504,8 @@ module Vector2fs : sig
   (** Computes the norm of a vector *)
   val norm : t -> float
 
-  (** Normalizes a vector. Raises Vector2fs_exception if the vector is zero. *)
-  val normalize : t -> t
+  (** Normalizes a vector. Returns $Error$ if the vector is zero. *)
+  val normalize : t -> (t, [> `Division_by_zero]) result
 
   (** Returns a pretty-printed string (not for serialization) *)
   val to_string : t -> string
@@ -532,9 +517,6 @@ end
 module Vector3fs : sig
 
   (** This module defines the vector3fs type and various operations on it. *)
-
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Vector3fs_exception of string
 
   (*** Vector operations *)
 
@@ -559,8 +541,8 @@ module Vector3fs : sig
   (** Multiplies a vector by a scalar *)
   val prop : float -> t -> t
 
-  (** Divides a vector by a scalar. Raises Vector3fs_exception if the scalar is zero. *)
-  val div : float -> t -> t
+  (** Divides a vector by a scalar. Returns $Error$ if the scalar is zero. *)
+  val div : float -> t -> (t, [> `Division_by_zero]) result
 
   (** Converts a vector represented in spherical coordinates to a vector represented in cartesian coordinates 
     * @see:OgamlMath.Vector3f *)
@@ -573,8 +555,8 @@ module Vector3fs : sig
   (** Computes the norm of a vector *)
   val norm : t -> float
 
-  (** Normalizes a vector. Raises Vector3fs_exception if the vector is zero. *)
-  val normalize : t -> t
+  (** Normalizes a vector. Returns $Error$ if the vector is zero. *)
+  val normalize : t -> (t, [> `Division_by_zero]) result
 
   (** Returns a pretty-printed string (not for serialization) *)
   val to_string : t -> string
@@ -931,9 +913,6 @@ module Quaternion : sig
 
   (** This module defines the quaternion type and various operations on it *)
 
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Quaternion_exception of string
-
   (** Type of quaternions *)
   type t = {r : float; i : float; j : float; k : float}
 
@@ -965,8 +944,8 @@ module Quaternion : sig
   (** Returns the conjugate of a quaternion *)
   val conj : t -> t
 
-  (** Returns the inverse of a quaternion. Raises Quaternion_exception if the quaternion is zero *)
-  val inverse : t -> t
+  (** Returns the inverse of a quaternion. Returns $Error$ if the quaternion is zero *)
+  val inverse : t -> (t, [> `Division_by_zero]) result
 
   (** Returns the squared norm of a quaternion *)
   val squared_norm : t -> float
@@ -974,8 +953,8 @@ module Quaternion : sig
   (** Returns the norm of a quaternion *)
   val norm : t -> float
 
-  (** Normalizes a quaternion. Raises Quaternion_exception if the quaternion is zero *)
-  val normalize : t -> t 
+  (** Normalizes a quaternion. Returns $Error$ if the quaternion is zero *)
+  val normalize : t -> (t, [> `Division_by_zero]) result
 
 end
 
@@ -984,10 +963,6 @@ end
 module Matrix3D : sig
 
   (** Optimized operations on 3D (4x4) float matrices *)
-
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Matrix3D_exception of string
-
 
   (*** Simple Matrices *)
 
@@ -1006,8 +981,10 @@ module Matrix3D : sig
   (** Builds a scaling matrix from a vector @see:OgamlMath.Vector3f *)
   val scaling : Vector3f.t -> t
 
-  (** Builds a rotation matrix from an axis and an angle @see:OgamlMath.Vector3f *)
-  val rotation : Vector3f.t -> float -> t
+  (** Builds a rotation matrix from an axis and an angle.
+    * Returns $Error$ if the axis is zero.
+    * @see:OgamlMath.Vector3f *)
+  val rotation : Vector3f.t -> float -> (t, [> `Invalid_axis]) result
 
   (** Builds a rotation matrix from a quaternion @see:OgamlMath.Quaternion *)
   val from_quaternion : Quaternion.t -> t
@@ -1030,16 +1007,22 @@ module Matrix3D : sig
   val scale : Vector3f.t -> t -> t
 
   (** Rotates a matrix by an angle around a given axis. The original matrix is not modified. 
+    * Returns $Error$ if the axis is zero.
     * @see:OgamlMath.Vector3f *)
-  val rotate : Vector3f.t -> float -> t -> t
+  val rotate : Vector3f.t -> float -> t -> (t, [> `Invalid_axis]) result
 
   (** Computes the (right-)product of a matrix with a column vector.
     * 
     * If $perspective$ is true, then the 4th column of the matrix is
     * added to the resulting vector. $perspective$ defaults to $true$. 
     *
+    * If $normalize$ is true, then the resulting vector is normalized w.r.t.
+    * the 4th column of the matrix, similarly to what happens between a
+    * vertex and a fragment shader. $normalize$ defaults to $true$ and
+    * is ignored if $perspective$ is not set to $true$.
+    *
     * @see:OgamlMath.Vector3f *)
-  val times : t -> ?perspective:bool -> Vector3f.t -> Vector3f.t
+  val times : t -> ?normalize:bool -> ?perspective:bool -> Vector3f.t -> Vector3f.t
 
   (** Returns a pretty-printed string (not for serialization) *)
   val to_string : t -> string
@@ -1048,14 +1031,17 @@ module Matrix3D : sig
   (*** Rendering Matrices Creation *)
 
   (** Builds a "look-at" view matrix.
-    * Raises Matrix3D_exception if $up = zero$.
+    * Returns $Error$ if $up = zero$ or if $at - from$ and $up$ are colinear.
     * @see:OgamlMath.Vector3f *)
-  val look_at : from:Vector3f.t -> at:Vector3f.t -> up:Vector3f.t -> t
+  val look_at : from:Vector3f.t -> at:Vector3f.t -> up:Vector3f.t -> 
+    (t, [> `From_equals_at | `Invalid_up_direction | `Invalid_at_direction]) result
 
   (** Builds the inverse of a "look-at" view matrix.
-    * Raises Matrix3D_exception if $up = zero$.
+    * Returns $Error$ if $up = zero$ or if $at - from$ and $up$ are colinear.
     * @see:OgamlMath.Vector3f *)
-  val ilook_at : from:Vector3f.t -> at:Vector3f.t -> up:Vector3f.t -> t
+  val ilook_at : from:Vector3f.t -> at:Vector3f.t -> up:Vector3f.t ->
+    (t, [> `From_equals_at | `Invalid_up_direction | `Invalid_at_direction]) result
+
 
   (** Builds a "look-at" view matrix from eulerian angles. 
     * Theta should be in [0;2pi] and phi in [-pi/2;pi/2]. 
@@ -1070,13 +1056,14 @@ module Matrix3D : sig
   val ilook_at_eulerian : from:Vector3f.t -> theta:float -> phi:float -> t
 
   (** Builds an orthographic projection matrix englobing a volume defined by six planes. 
-    * Raises Matrix3D_exception if $right = left$ or $near = far$ or $top = bottom$ *)
+    * Returns $Error$ if $right = left$ or $near = far$ or $top = bottom$. *)
   val orthographic : right:float -> left:float -> near:float -> far:float ->
-      top:float -> bottom:float -> t
+      top:float -> bottom:float -> (t, [> `Invalid_planes of string]) result
 
-  (** Builds the inverse of an orthographic projection matrix *)
+  (** Builds the inverse of an orthographic projection matrix
+    * Returns $Error$ if $right = left$ or $near = far$ or $top = bottom$. *)
   val iorthographic : right:float -> left:float -> near:float -> far:float ->
-      top:float -> bottom:float -> t
+      top:float -> bottom:float -> (t, [> `Invalid_planes of string]) result
 
   (** Builds a perspective projection matrix. Near and far are the positions
     * of the clipping planes relatively to the camera position (nothing will
@@ -1084,13 +1071,14 @@ module Matrix3D : sig
     * the dimensions of the screen in pixels. Fov corresponds to the view 
     * angle, and is given in radians.
     *
-    * Raises Matrix3D_exception if $near = far$. *)
+    * Returns $Error$ if $near = far$. *)
   val perspective : near:float -> far:float -> width:float -> height:float ->
-      fov:float -> t
+      fov:float -> (t, [> `Invalid_planes of string]) result
 
-  (** Builds the inverse of a perspective projection matrix *)
+  (** Builds the inverse of a perspective projection matrix
+    * Returns $Error$ if $near = far$. *)
   val iperspective : near:float -> far:float -> width:float -> height:float ->
-      fov:float -> t
+      fov:float -> (t, [> `Invalid_planes of string]) result
 
   (*** Other functions *)
 
@@ -1106,10 +1094,6 @@ end
 module Matrix2D : sig
 
   (** Optimized operations on 2D (3x3) float matrices *)
-
-  (** Raised when an error occurs (usually a division by zero) *)
-  exception Matrix2D_exception of string
-
 
   (*** Simple Matrices *)
 
@@ -1166,11 +1150,13 @@ module Matrix2D : sig
 
   (*** Rendering Matrices Creation *)
 
-  (** Builds an orthographic projection matrix englobing a screen *)
-  val projection : size:Vector2f.t -> t
+  (** Builds an orthographic projection matrix englobing a screen.
+    * Returns $Error$ if one of the coordinates of $size$ is zero. *)
+  val projection : size:Vector2f.t -> (t, [> `Invalid_projection]) result
 
-  (** Builds the inverse of an orthographic projection matrix *)
-  val iprojection : size:Vector2f.t -> t
+  (** Builds the inverse of an orthographic projection matrix.
+    * Returns $Error$ if one of the coordinates of $size$ is zero. *)
+  val iprojection : size:Vector2f.t -> (t, [> `Invalid_projection]) result
 
   (*** Other functions *)
 

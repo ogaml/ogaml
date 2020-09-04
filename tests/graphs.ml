@@ -1,7 +1,7 @@
 open OgamlUtils
 
 let () = 
-  Printf.printf "Beginning graph tests...\n%!"
+  Log.info Log.stdout "Beginning graph tests..."
 
 module G = Graph.Make (struct
 
@@ -150,16 +150,16 @@ let testgraph6 () =
 
 let () = 
   testgraph1 ();
-  Printf.printf "\tTest 1 passed\n%!";
+  Log.info Log.stdout "Test 1 passed";
   testgraph2 ();
-  Printf.printf "\tTest 2 passed\n%!";
+  Log.info Log.stdout "Test 2 passed";
   testgraph3 ();
-  Printf.printf "\tTest 3 passed\n%!";
+  Log.info Log.stdout "Test 3 passed";
   testgraph4 ();
-  Printf.printf "\tTest 4 passed\n%!";
+  Log.info Log.stdout "Test 4 passed";
   testgraph5 ();
-  Printf.printf "\tTest 5 passed\n%!";
+  Log.info Log.stdout "Test 5 passed";
   testgraph6 ();
-  Printf.printf "\tTest 6 passed\n%!";
+  Log.info Log.stdout "Test 6 passed";
 
 

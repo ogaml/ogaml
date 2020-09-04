@@ -8,10 +8,6 @@
 (** Type of an interpolator returning type 'a *)
 type 'a t
 
-(** Raised when an error occurs during the creation of an interpolator *)
-exception Invalid_interpolator of string
-
-
 (*** Accessors and modifiers *)
 
 (** Those functions provide a way to modify the behaviour

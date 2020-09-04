@@ -163,17 +163,19 @@ and process_module = function
   | [] -> []
 
 and process_expr = function
+  | NoType ->
+    PP_NoType
   | ModuleType (s, te) -> 
     PP_ModType (s, process_expr te)
   | AtomType s -> 
     PP_AtomType s
   | Record l -> 
     PP_Record (List.map (fun (mut,_,a,b) -> (mut, a, process_expr b)) l)
-  | PolyVariant (v, sl) -> 
+  | PolyVariant (v, sl, opt) -> 
     PP_PolyVariant (v, List.map (fun (a,b) -> 
                                  match b with
                                  | None   -> (a, None)
-                                 | Some v -> (a, Some (process_expr v))) sl)
+                                 | Some v -> (a, Some (process_expr v))) sl, opt)
   | PolyType s -> 
     PP_PolyType s
   | Arrow (te, te') -> 
@@ -192,7 +194,7 @@ and process_expr = function
   | ParamType (l, e) ->
     PP_ParamType (List.map process_expr l, process_expr e)
   | FCModule (t, e) ->
-    PP_FCModule (process_expr t, List.map (fun (s,e) -> (s,process_expr e)) e)
+    PP_FCModule (process_expr t, List.map (fun (s,e) -> (process_expr s,process_expr e)) e)
 
 and get_members = function
   | Record l ->
@@ -222,7 +224,7 @@ and process_functor {name; args; sign; constr} =
     fname = name;
     fargs = args;
     fsign = sign;
-    fcons = List.map (fun (s,e) -> (s,process_expr e)) constr
+    fcons = List.map (fun (s,e) -> (process_expr s,process_expr e)) constr
   }
 
 and pp hierarchy modulename ast : ASTpp.module_data = 
@@ -269,7 +271,7 @@ let preprocess_file file =
     let dot = String.rindex file '.' in
     let sls = String.rindex file '/' in
     String.sub file (sls+1) (dot-sls-1)
-    |> String.capitalize
+    |> String.capitalize_ascii
   in
   let ast = parse_from_file file in
   preprocess modulename ast
@@ -288,7 +290,7 @@ let rec comment_to_html root ppf comment =
     Format.fprintf ppf "%a" (comment_to_html root) t
   | (PP_Related s)::t -> 
     let link = 
-      String.lowercase s 
+      String.lowercase_ascii s 
       |> Str.split (Str.regexp "\\.")
       |> String.concat "/"
     in
@@ -427,7 +429,7 @@ and module_to_html root ppf mdl =
       |> String.concat " "
     in
     let constraints = 
-      List.map (fun (s,e) -> Printf.sprintf "%s = %s" s (type_expr_to_string e)) 
+      List.map (fun (s,e) -> Printf.sprintf "%s = %s" (type_expr_to_string s) (type_expr_to_string e)) 
         fdata.fcons
       |> String.concat " and "
     in
@@ -454,6 +456,7 @@ and type_params_to_string = function
     "'" ^ s
 
 and type_expr_to_string = function
+  | PP_NoType -> "_"
   | PP_ModType (s,e) -> 
     Printf.sprintf "%s.%s" s (type_expr_to_string e)
   | PP_AtomType s ->
@@ -465,12 +468,19 @@ and type_expr_to_string = function
         s (type_expr_to_string e)) l
     |> String.concat "; "
     |> Printf.sprintf "{%s}"
-  | PP_PolyVariant (v, l) ->
-    List.map (function
-              | (s,Some e) -> Printf.sprintf "`%s of %s" s (type_expr_to_string e)
-              | (s,None)   -> Printf.sprintf "`%s" s) l
-    |> String.concat " | "
-    |> Printf.sprintf "[%s %s]" (variance_to_string v)
+  | PP_PolyVariant (v, l, opt) ->
+    let res = 
+      List.map (function
+                | (s,Some e) -> Printf.sprintf "`%s of %s" s (type_expr_to_string e)
+                | (s,None)   -> Printf.sprintf "`%s" s) l
+      |> String.concat " | "
+    in
+    let as_type = 
+      match opt with
+      | Some t -> Printf.sprintf " as '%s" t
+      | None -> ""
+    in
+    Printf.sprintf "[%s %s]%s" (variance_to_string v) res as_type
   | PP_PolyType s -> 
     Printf.sprintf "'%s" s
   | PP_Arrow (te1, te2) ->
@@ -499,7 +509,7 @@ and type_expr_to_string = function
     Printf.sprintf "(module %s)" (type_expr_to_string t)
   | PP_FCModule (t, l) ->
     let constraints = 
-      List.map (fun (s,e) -> Printf.sprintf "%s = %s" s (type_expr_to_string e)) l
+      List.map (fun (s,e) -> Printf.sprintf "%s = %s" (type_expr_to_string s) (type_expr_to_string e)) l
       |> String.concat " and "
     in
     Printf.sprintf "(module %s with type %s)" (type_expr_to_string t) constraints
@@ -557,7 +567,7 @@ let gen_main_pp ppf modl root =
   let rec print_submodules_aux ppf = function
     | []   -> ()
     | h::t -> 
-      let link = h.hierarchy @ [h.modulename] |> String.concat "/" |> String.lowercase in
+      let link = h.hierarchy @ [h.modulename] |> String.concat "/" |> String.lowercase_ascii in
       Format.fprintf ppf "<tr><td><a href=\"%sdoc/%s.html\">%s</a></td><td>%a</td></tr>@\n%a"
         root link h.modulename (comment_to_html root) h.description print_submodules_aux t
   in
@@ -591,7 +601,7 @@ let gen_main root modl =
   Format.flush_str_formatter ()
 
 let gen_index_entry root modl = 
-  let link = modl.ASTpp.modulename |> String.lowercase in
+  let link = modl.ASTpp.modulename |> String.lowercase_ascii in
   let comm = comment_to_string root modl.ASTpp.description in
   Printf.sprintf "<li>\n\t<p>\n\t\t<a href=\"%s.html\">%s</a>\n\t%s\n\t</p>\n</li>"
     link modl.ASTpp.modulename comm
@@ -635,7 +645,7 @@ let rec tree_mem cur mdl =
 let rec gen_aside_module root curr mdl = 
   let link = mdl.hierarchy @ [mdl.modulename] 
              |> String.concat "/" 
-             |> String.lowercase in
+             |> String.lowercase_ascii in
   Printf.sprintf 
   "<li>
     <span class=\"arrow-right arrow shownav\"></span>

@@ -16,6 +16,25 @@ Cocoa specific:
   ☐ Implement LL.show_cursor
   ☐ Fix all pixel/point related issues
 
+Audio (see NOTES for more info):
+  ✔ Low-level binding module: @done(2016-10-26 23:48) @project(Audio (see NOTES for more info))
+    ✔ Device @done(2016-10-26 20:33) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
+    ✔ Context @done(2016-10-26 21:16) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
+    ✔ Listener @done(2016-10-26 21:32) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
+    ✔ Pervasives @done(2016-10-26 22:29) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
+    ✔ Buffers @done(2016-10-26 22:21) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
+    ✔ Sources @done(2016-10-26 23:48) @project(Audio (see NOTES for more info) / ☐ Low-level binding module)
+  ✔ AudioContext module @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
+  ✔ SoundBuffer module: @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
+    ✔ load (from .ogg file) @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
+    ✔ create : data -> sampleCount -> channelCount -> sampleRate -> t @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
+    ✔ duration : t -> int @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
+  ✔ AudioStream module @done(2017-11-15 00:46) @project(Audio (see NOTES for more info))
+  ✔ AudioSource module: @done(2017-08-21 20:07) @project(Audio (see NOTES for more info))
+    ✔ create (with context) @done(2017-08-21 20:07) @project(Audio (see NOTES for more info) / ☐ SoundBuffer module)
+    ✔ play : t -> [`Stream of AudioStream.t | `Sound of SoundBuffer.t] -> ... sound parameters ... -> unit @done(2017-08-21 20:07) @project(Audio (see NOTES for more info) / ☐ SoundBuffer module)
+    ✔ stop/pause/resume @done(2017-08-21 20:07) @project(Audio (see NOTES for more info) / ☐ SoundBuffer module)
+
 Windows specific:
   ☐ Implement canonical_path
 
@@ -37,11 +56,13 @@ Interface changes:
       ☐ Filtered transformations
       ☐ Better specification of foreachword (color for blank spaces useless, but we could add punctuation)
   Sprite & Text:
-    ☐ Local relative-space conversion (rather than uniforms)
+    ✘ Local relative-space conversion (rather than uniforms) @cancelled(2017-08-21 20:07) @project(Interface changes / Sprite & Text)
     ☐ Same for texture coordinates for fonts
     ☐ (+Shape) Centralize transformations
   RenderTextures/Framebuffers:
     ☐ Test all attachments
+  ☐ Unify exceptions
+  ☐ More tests! (especially for vertex arrays)
 
 New modules:
   Bounding module:
@@ -55,14 +76,16 @@ New modules:
     ☐ Octree
 
 Advanced features:
+  ☐ Vertex buffer slices
+  ☐ Index buffer slices
   More Image and Texture types:
-    ☐ Single-channeled images
+    ☐ Single-channeled images (unified images for 8,16,24,32 bits)
     ☐ Image slices
-    ☐ Texture3D
+    ✔ Texture3D @done(2017-08-21 20:07) @project(Advanced features / More Image and Texture types)
     ☐ Parameterize renderbuffers/textures by a texture format
-    ☐ Depth textures
+    ✔ Depth textures @done(2017-08-21 22:01) @project(Advanced features / More Image and Texture types)
     ☐ Stencil textures
-    ☐ TextureCube
+    ✔ TextureCube @done(2017-08-21 20:07) @project(Advanced features / More Image and Texture types)
 
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿

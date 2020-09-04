@@ -1,3 +1,4 @@
+# Build files
 *.annot
 *.cmo
 *.cma
@@ -15,30 +16,56 @@
 # MVC++ files
 .vscode/
 
+# Depend files
 *.depend
 .depend
 
-# ocamlbuild working directory
+# Build directory
 _build/
 
-# doc directory
+# Doc directory
 html/*
 
-# ocamlbuild targets
+# Ocamlbuild targets
 *.byte
 *.native
+*.exe
 
-# oasis generated files
+# Oasis generated files
 setup.data
 setup.log
 
-# vim
+# Vim
 *.swp
+tags
 
 # OS X files
 .DS_Store
 
-# parser and lexer files
+# Parser and lexer files
 src/graphics/objLexer.ml
 src/graphics/objParser.ml
 src/graphics/objParser.mli
+
+# Jbuilder
+ogaml.install
+
+# Configuration files
+src/core/dune
+c_flags.os
+c_libs.os
+flags.os   # For retrocompatibility
+w_flags.os
+
+# Generated .merlin
+examples/.merlin
+src/audio/.merlin
+src/core/.merlin
+src/graphics/.merlin
+src/math/.merlin
+src/utils/.merlin
+tests/.merlin
+
+# ide-reason
+*.log
+glew32.dll

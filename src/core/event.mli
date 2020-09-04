@@ -19,3 +19,4 @@ type t =
   | ButtonReleased  of ButtonEvent.t
   | MouseMoved      of OgamlMath.Vector2i.t
   | MouseWheelMoved of float
+  | TextEntered     of char

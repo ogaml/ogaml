@@ -380,13 +380,55 @@ GLenum TextureFormat_val(value fmt)
       return GL_RGBA8;
 
     case 4:
-      return GL_DEPTH_COMPONENT24;
+      return GL_DEPTH_COMPONENT16;
 
     case 5:
-      return GL_DEPTH24_STENCIL8;
+      return GL_DEPTH_COMPONENT24;
 
     case 6:
+      return GL_DEPTH_COMPONENT32;
+
+    case 7:
+      return GL_DEPTH24_STENCIL8;
+
+    case 8:
       return GL_STENCIL_INDEX8;
+
+    case 9:
+      return GL_R16;
+
+    case 10:
+      return GL_RG16;
+
+    case 11:
+      return GL_RGB16;
+
+    case 12:
+      return GL_RGBA16;
+
+    case 13:
+      return GL_R16F;
+
+    case 14:
+      return GL_RG16F;
+
+    case 15:
+      return GL_RGB16F;
+
+    case 16:
+      return GL_RGBA16F;
+
+    case 17:
+      return GL_R32F;
+
+    case 18:
+      return GL_RG32F;
+
+    case 19:
+      return GL_RGB32F;
+
+    case 20:
+      return GL_RGBA32F;
 
     default:
       caml_failwith("Caml variant error in TextureFormat_val(1)");
@@ -601,7 +643,74 @@ GLenum Parameter_val(value par)
     case 12:
       return GL_MAX_COLOR_ATTACHMENTS;
 
+    case 13:
+      return GL_MAX_DRAW_BUFFERS;
+
     default:
       caml_failwith("Caml variant error in Parameter_val (1)");
+  }
+}
+
+
+GLenum FBOOutputBuffer_val(value out)
+{
+  if(Int_val(out) == 0) 
+  {
+    return GL_NONE;
+  }
+  else if(Tag_val(out) == 0)
+  {
+    return (GL_COLOR_ATTACHMENT0 + Int_val(Field(out,0)));
+  }
+  else
+  {
+    caml_failwith("Caml variant error in FBOOutputBuffer_val");
+  }
+}
+
+
+GLenum WindowOutputBuffer_val(value out)
+{
+  switch(Int_val(out))
+  {
+    case 0:
+      return GL_FRONT_LEFT;
+
+    case 1:
+      return GL_FRONT_RIGHT;
+
+    case 2:
+      return GL_BACK_LEFT;
+
+    case 3:
+      return GL_BACK_RIGHT;
+
+    case 4:
+      return GL_NONE;
+
+    default:
+      caml_failwith("Caml variant error in WindowOutputBuffer_val");
+  }
+}
+
+
+GLenum Query_val(value query)
+{
+  switch(Int_val(query))
+  {
+    case 0:
+      return GL_SAMPLES_PASSED;
+
+    case 1:
+      return GL_ANY_SAMPLES_PASSED;
+
+    case 2:
+      return GL_PRIMITIVES_GENERATED;
+
+    case 3:
+      return GL_TIME_ELAPSED;
+
+    default:
+      caml_failwith("Caml variant error in Query_val");
   }
 }

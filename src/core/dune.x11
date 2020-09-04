@@ -1,0 +1,15 @@
+(copy_files x11/*)
+(copy_files x11/stubs/*)
+
+(rule (copy impl/LL_impl_x11.ml LL.ml))
+(rule (copy impl/OS_impl_linux.ml OS.ml))
+
+(library
+  (name        OgamlCore)
+  (public_name ogaml.core)
+  (libraries   OgamlMath)
+  (c_names     utils atoms_stubs display_stubs event_stubs
+               glx_stubs mouse_stubs keyboard_stubs window_stubs 
+               utils_stubs)
+  (c_flags     (:standard (:include ../../c_flags.os)))
+  (c_library_flags (:include ../../c_libs.os)))

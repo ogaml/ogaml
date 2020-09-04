@@ -1,0 +1,1 @@
+(-framework Foundation -framework Cocoa -framework Carbon -lobjc -framework openGL -framework openAL)

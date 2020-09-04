@@ -30,7 +30,7 @@ and functor_data =
     fname : string;
     fargs : (string * string) list;
     fsign : string;
-    fcons : (string * type_expr) list
+    fcons : (type_expr * type_expr) list
   }
 
 and variance = AST.variance
@@ -38,10 +38,11 @@ and variance = AST.variance
 and type_param = AST.type_param
 
 and type_expr = 
+  | PP_NoType 
   | PP_ModType of string * type_expr
   | PP_AtomType of string
   | PP_Record of (bool * string * type_expr) list
-  | PP_PolyVariant of variance * ((string * type_expr option) list)
+  | PP_PolyVariant of variance * ((string * type_expr option) list) * string option
   | PP_PolyType of string
   | PP_Arrow of type_expr * type_expr
   | PP_TypeTuple of type_expr list
@@ -49,7 +50,7 @@ and type_expr =
   | PP_OptionalParam of string * type_expr
   | PP_Variant of (string * type_expr option) list
   | PP_ParamType of (type_expr list * type_expr)
-  | PP_FCModule of type_expr * (string * type_expr) list 
+  | PP_FCModule of type_expr * (type_expr * type_expr) list 
 
 and module_data = 
   {

@@ -5,8 +5,6 @@ type 'a t = {
   duration : float
 }
 
-exception Invalid_interpolator of string
-
 let mod_neg t =
   let vt = mod_float t 1. in
   if vt < 0. then vt +. 1.
@@ -19,7 +17,7 @@ let mod_neg2 t =
   else if vt > 1. then 2. -. vt
   else vt
 
-let clamp t = min (max t 0.) 1.
+let clamp (t : float) = if t <= 0. then 0. else if t >= 1. then 1. else t
 
 let get ip t = ip.func t
 
@@ -88,7 +86,7 @@ let rec append_tangents pb tb l pe =
     let mk = (pos2 -. pos1)/.(2.*.(t2 -. t1)) -. (pos1 -. pb)/.(2.*.(t1 -. tb)) in
     (t1,(pos1,mk))::(append_tangents pos1 t1 ((t2,pos2)::tail) pe)
 
-let points b l e t =
+let points b l e (t : float) =
   let rec points_aux b l =
     match l with
     |[] -> (b, (1.,e))
@@ -106,7 +104,7 @@ let h01 t = -. 2. *. t *. t *. t +. 3. *. t *. t
 let h11 t = t *. t *. t -. t *. t
 
 let linear b l e =
-  let func = fun t ->
+  let func = fun (t : float) ->
     let (t1, p1), (t2, p2) = points b l e t in
     let fact =
       if t2 = t1 then 1.

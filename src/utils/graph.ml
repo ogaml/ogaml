@@ -148,7 +148,11 @@ module Make (V : Vertex) : G with type vertex = V.t = struct
     let rec bfs_aux visited queue = 
       if Dequeue.is_empty queue then ()
       else begin
-        let (v,queue) = Dequeue.pop queue in
+        let (v,queue) = 
+          match Dequeue.pop queue with
+          | Error _ -> assert false
+          | Ok elt -> elt
+        in
         if is_visited v visited then bfs_aux visited queue
         else begin 
           f v;
@@ -167,7 +171,11 @@ module Make (V : Vertex) : G with type vertex = V.t = struct
     let rec d_aux (path,dists,queue) =
       if FQueue.is_empty queue then None
       else begin
-        let (v,queue) = FQueue.extract queue in
+        let (v,queue) = 
+          match FQueue.extract queue with
+          | Error _ -> assert false
+          | Ok elt -> elt
+        in
         if V.compare v v2 = 0 then Some (distance v dists, extract_path v2 path [])
         else begin
           let edges = if VMap.mem v g then VMap.find v g else [] in

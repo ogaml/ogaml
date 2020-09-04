@@ -1,44 +1,30 @@
-include ../../../common_defs.mk
+OCAMLC_DIR = $(shell ocamlc -where)
 
-# ML constants
+OBJC_FLAGS = -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT -fPIC -I '$(OCAMLC_DIR)'\
+             -Wno-unused-function -Wno-unused-variable -Wno-deprecated-declarations\
+             -fconstant-string-class=NSConstantString
 
-ML_SOURCES = cocoa.ml
+C_FLAGS = -Wno-unused-function -Wno-unused-variable -Wno-gnu-designator
 
-ML_OBJS = $(ML_SOURCES:.ml=.cmo)
+OBJC_FILES = application_delegate_stubs.m event_stubs.m window_stubs.m\
+             application_stubs.m glcontext_stubs.m utils_stubs.m opengl_stubs.m\
+             window_controller_stubs.m
 
-ML_NATS = $(ML_SOURCES:.ml=.cmx)
+C_FILES = utils.c
 
-ML_INTERFACES = $(ML_SOURCES:.ml=.mli)
+OBJC_OBJECTS = $(OBJC_FILES:.m=.o)
 
-ML_CMIS = $(ML_INTERFACES:.mli=.cmi)
+C_OBJECTS = $(C_FILES:.c=.o)
 
+default: cocoa_lib_stubs
 
-# Compilation
+cocoa_lib_stubs: $(OBJC_OBJECTS) $(C_OBJECTS)
+	ocamlmklib -o OgamlCore_stubs $(OBJC_OBJECTS) $(C_OBJECTS)
 
-default: $(ML_CMIS) $(ML_OBJS) $(ML_NATS)
+%.o:%.m
+	clang -c -o $@ $(OBJC_FLAGS) $<
 
-%.cmi:%.mli
-	$(OCAMLC_CMD) -c -o $@ $<
+%.o:%.c
+	ocamlc -c -o $@ -cclib "$(C_FLAGS)" $<
 
-%.cmx:%.ml $(wildcard %.cmi)
-	$(OCAMLOPT_CMD) -c -o $@ -for-pack $(CORE_PACK) $<
-
-%.cmo:%.ml $(wildcard %.cmi)
-	$(OCAMLC_CMD) -c -o $@ -for-pack $(CORE_PACK) $<
-
-
-# Cleaning
-
-clean:
-	rm -f $(CLEAN_EXTENSIONS)
-
-
-# Dependencies
-
-depend:.depend
-
-.depend:
-	$(DEPCOMMAND) *.ml *.mli > .depend
-
-.PHONY: .depend
-
+.PHONY: cocoa_lib_stubs

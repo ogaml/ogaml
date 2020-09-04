@@ -37,6 +37,12 @@ Windows, OSX and Linux (X11 only). It provides the following modules:
 
   * OgamlUtils (WIP) - provides several useful functions and data structures for 
     game development, such as interpolators, graphs or UTF8-encoded strings.
+
+  * OgamlAudio (WIP) - provides high-level wrappers around OpenAL for sounds
+    and music. This module lets you safely control audio sources and contexts,
+    play short sounds or long musics. It follows the same philosophy as 
+    OgamlGraphics, that is, there should be no undefined behaviour or 
+    non-catched error.
     
 You can find some examples in the corresponding directory as well as on the 
 documentation http://ogaml.github.io.
@@ -47,7 +53,7 @@ Upcoming features:
 
   * More image and textures types
     
-Our ultimate goal is to add access to music, network, and to implement more 
+Our ultimate goal is to add networking wrappers, and to implement more 
 helpers to make games (like physics, lighting, etc...).
 
 ## Why use OGaml (rather than raw OpenGL for example)?
@@ -84,9 +90,9 @@ OGaml is safe and easy to use:
 OGaml provides advanced functionalities:
 
   * The module VertexArray provides a high-level and easy to use wrapper around
-  OpenGL's vertex arrays. Unfortunately, this comes at a cost: those arrays 
-  cannot contain custom data. But you can use the module VertexMap that provides
-  the same functionnality for custom data.
+  OpenGL's vertex arrays. You can easily create a vertex array that contains
+  common data such as positions, colors or UV coordinates; or you can define
+  a new custom type of vertices to store any kind of data in a vertex array.
 
   * The module Shape provides easy manipulation of 2D shapes such as rectangles,
   circles or regular polygons. The module Sprite provides functions to render
@@ -103,44 +109,28 @@ OGaml provides advanced functionalities:
   polymorphism. This allows you to easily switch between rendering to a window
   or to a framebuffer. 
 
-## Building and installing OGaml (OSX/Linux only): 
-  
-You will need the following dependancies: 
+## Building and installing OGaml:
 
-  * cppo (preprocessor, available on Opam)
+Thanks to Jbuilder, it is now easier than ever to compile and install OGaml.
+You will need the following dependencies, depending on your OS:
 
-  * x11 (Linux)
+  * Jbuilder (available via opam)
 
   * OpenGL libraries (3.0 minimum)
 
-Then `make install` should do the trick. You can test it on some examples 
-`make examples` or on Travis' tests `make tests`.
+  * x11 (Linux)
 
-## Building and installing OGaml (Windows, MSVC): 
+  * OpenGL headers and libraries - opengl32.dll (Windows)
 
-You will need the following dependencies :
+  * GLEW headers and libraries - glew32.dll (Windows)
 
-  * GNU Make for Windows
+  * gdi32.dll and user32.dll (Windows, whould be available by default)
 
-  * OpenGL headers and libraries - opengl32.dll (3.0 minimum)
+  * Microsoft Windows SDK (Windows)
 
-  * GLEW headers and libraries - glew32.dll
-
-  * gdi32.dll and user32.dll, although these should be available by default
-
-  * Microsoft Windows SDK
-
-You will also need to install and configure OCaml to work with MSVC.
-
-Finally, you will need to compile cppo (from the sources) and place the
-resulting .exe in your PATH, so that the compiler can access it.
-
-Executing `make install` will then compile OGaml and install the library
-in OCaml's path. `make examples` will compile the examples, and
-`make tests` will run Travis's tests.
-
-Unfortunately, `make uninstall` is not working on Windows (yet), so uninstalling
-the library should be done manually.
+Moreover, having GNUMake and CoreUtils installed on Windows will definitely help.
+Then the usual spell, `make && make install` will take care of the rest.
+You can test it on some examples `make examples` or on Travis's tests `make tests`.
 
 ## Redistributing OGaml executables
 

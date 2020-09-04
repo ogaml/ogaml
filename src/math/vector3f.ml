@@ -1,6 +1,4 @@
 
-exception Vector3f_exception of string
-
 type t = {x : float; y : float; z : float}
 
 let make x y z = {x; y; z}
@@ -33,9 +31,9 @@ let prop f v = {
 
 let div f v = 
   if f = 0. then
-    raise (Vector3f_exception "Division by zero")
+    Error `Division_by_zero
   else
-    {
+    Ok {
       x = v.x /. f;
       y = v.y /. f;
       z = v.z /. f
@@ -99,10 +97,7 @@ let dist v1 v2 = norm (sub v2 v1)
 
 let normalize v = 
   let n = norm v in
-  if n = 0. then
-    raise (Vector3f_exception "Cannot normalize zero vector")
-  else 
-    div n v
+  div n v
 
 let clamp u a b = {
   x = min b.x (max u.x a.x);
@@ -131,10 +126,7 @@ let to_string u =
 let direction u v = 
   let dir = sub v u in
   let n = norm dir in
-  if n = 0. then
-    raise (Vector3f_exception "Cannot get normalized direction from identical points")
-  else
-    div n dir
+  div n dir
 
 let endpoint u v t =
   prop t v
@@ -156,8 +148,8 @@ let triangle_normal a b c =
 let raytrace_points p1 p2 = 
   let intersects a b mark = 
     let s   = if a < b then 1. else -1. in
-    let fst = if a < b then ceil a  else Pervasives.floor a in
-    let lst = if a < b then Pervasives.floor b else ceil  b in
+    let fst = if a < b then ceil a  else Stdlib.floor a in
+    let lst = if a < b then Stdlib.floor b else ceil  b in
     let idx = 1. /. (b -. a) in
     let rec aux v = 
       if (a  < b && v > lst +. 0.00001) 
@@ -170,9 +162,9 @@ let raytrace_points p1 p2 =
     aux fst
   in
   let rebuild l = 
-    let fst = {x = Pervasives.floor p1.x; 
-               y = Pervasives.floor p1.y; 
-               z = Pervasives.floor p1.z} 
+    let fst = {x = Stdlib.floor p1.x; 
+               y = Stdlib.floor p1.y; 
+               z = Stdlib.floor p1.z} 
     in
     let fstface = 
       if abs_float (p2.x -. p1.x) >= abs_float (p2.y -. p1.y)
@@ -194,8 +186,15 @@ let raytrace_points p1 p2 =
     let rec aux p = function
       |[] -> []
       |(t,face)::tail -> 
+        (* Ignore the first result if the ray starts on integer coordinates 
+         * and if we cross a face with negative normal (that is, we are
+         * entering a cube, not leaving one) *)
+        if t = 0. && face.x +. face.y +. face.z < 0. then 
+          (aux p tail)
+        else begin
           let v = sub p face in 
           (t,v,face)::(aux v tail)
+        end
     in
     (0., fst, fstface)::(aux fst l)
   in

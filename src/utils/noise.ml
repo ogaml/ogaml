@@ -48,17 +48,17 @@ module Perlin2D = struct
     perlin_array rng
 
   let grad (hash, x, y) =
-    let h = hash land 3 in
-    if h = 0 then (x +. y)
-    else if h = 1 then (x -. y)
-    else if h = 2 then (y -. x)
-    else 0. -. (x +. y)
+    let u1 = if hash land 0b1000 <> 0 then x else -.x in
+    let u2 = if hash land 0b0100 <> 0 then y else -.y in
+    let u3 = if hash land 0b0010 <> 0 then 2. else 1. in
+    let u4 = if hash land 0b0001 <> 0 then 2. else 1. in
+    (u1 /. u3) +. (u2 /. u4)
 
   let get p vec = 
     let open Vector2f in
     let vec = Vector2f.map vec abs_float in
-    let x1 = (int_of_float vec.x) land 255 and
-        y1 = (int_of_float vec.y) land 255 and
+    let x1 = (int_of_float (floor vec.x)) land 255 and
+        y1 = (int_of_float (floor vec.y)) land 255 and
         xi = vec.x -. (float (int_of_float vec.x)) and
         yi = vec.y -. (float (int_of_float vec.y)) in
     let u = fade xi and

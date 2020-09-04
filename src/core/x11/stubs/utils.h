@@ -16,11 +16,11 @@
 
 #define Some_val(v) Field(v,0)
 
-static struct custom_operations XVisualInfo_custom_ops;
+static struct custom_operations GLXFBConfig_custom_ops;
 
-#define XVisualInfo_val(v) ((XVisualInfo*) Data_custom_val(v))
-#define XVisualInfo_alloc(a) (a = caml_alloc_custom(&XVisualInfo_custom_ops, sizeof(XVisualInfo), 0, 1))
-#define XVisualInfo_copy(a,b) (memcpy(Data_custom_val(a), b, sizeof(XVisualInfo)))
+#define GLXFBConfig_val(v) (*(GLXFBConfig*) Data_custom_val(v))
+#define GLXFBConfig_alloc(a) (a = caml_alloc_custom(&GLXFBConfig_custom_ops, sizeof(GLXFBConfig), 0, 1))
+#define GLXFBConfig_copy(a,b) (memcpy(Data_custom_val(a), b, sizeof(GLXFBConfig)))
 
 static struct custom_operations XEvent_custom_ops;
 

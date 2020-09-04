@@ -1,9 +1,6 @@
 (** Window creation and manipulation *)
 module Window : sig
 
-  (** Raised if an error occurs during window creation *)
-  exception Error of string
-
   type t
 
   (** Creates a window of size width x height *)
@@ -29,7 +26,7 @@ module Window : sig
   val resize : t -> OgamlMath.Vector2i.t -> unit
 
   (** Toggle FullScreen mode *)
-  val toggle_fullscreen : t -> unit
+  val toggle_fullscreen : t -> bool
 
   (** Return true iff the window is open *)
   val is_open : t -> bool

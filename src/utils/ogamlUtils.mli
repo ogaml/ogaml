@@ -1,12 +1,104 @@
 (** High-level helper functions and data structures *)
 
+(** Result utilities *)
+module Result : sig
+
+  (** This module provides some common utility functions to work on result types.
+    * Its aim is not to replace a fully-featured library. It is mostly there to
+    * make the examples and tests self-contained. *)
+
+  (** Module containing operators. *)
+  module Operators : sig
+
+    (** Operators are contained in this submodule so that $Result.Operators$
+      * can be opened without polluting the namespace. *)
+
+    (** Infix operator corresponding to $bind$ but where the second argument
+      * doesn't depend on the first.
+      * Be careful as $a >> b$ will first evaluate $b$ before $a$. *)
+    val (>>) : ('a, 'b) result -> ('c, 'b) result -> ('c, 'b) result
+
+    (** Infix operator corresponding to $bind$. *)
+    val (>>=) : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
+
+    (** Infix operator corresponding to $apply$. *)
+    val (>>>=) : ('a, 'b) result -> ('a -> 'c) -> ('c, 'b) result
+
+  end
+
+  (** Module containing functions on lists. *)
+  module List : sig
+
+    (** $iter f l$ applies $f$ to every element of $l$ but stops as soon as
+      * $f$ returns an error. *)
+    val iter : ('a -> (unit, 'b) result) -> 'a list -> (unit, 'b) result
+
+    (** Same as $List.map$ but stops as soon as the function returns an error. *)
+    val map : ('a -> ('b, 'c) result) -> 'a list -> ('b list, 'c) result
+
+    (** Same as $List.fold_left$ but stops as soon as the function returns an error. *)
+    val fold_left : ('a -> 'b -> ('a, 'c) result) -> 'a -> 'b list -> ('a, 'c) result
+
+    (** Same as $List.fold_right$ but stops as soon as the function returns an error. *)
+    val fold_right : ('a -> 'b -> ('b, 'c) result) -> 'a list -> 'b -> ('b, 'c) result
+
+  end
+
+  (** Makes a result from an option and an error value. *)
+  val make : ?result:'a -> 'b -> ('a, 'b) result
+
+  (** Bind function on results. *)
+  val bind : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
+
+  (** Returns $true$ iff the result is $Ok$ *)
+  val is_ok : ('a, 'b) result -> bool
+
+  (** Returns $true$ iff the result is $Error$ *)
+  val is_error : ('a, 'b) result -> bool
+
+  (** Applies a function to a result. *)
+  val apply : ('a, 'b) result -> ('a -> 'c) -> ('c, 'b) result
+
+  (** Returns the value of a result if $Ok$ and raises $Assertion_failure$ otherwise. *)
+  val assert_ok : ('a, 'b) result -> 'a
+
+  (** Returns the value of a result if $Ok$ and raises the exception contained in
+    * $Error$ otherwise. *)
+  val throw : ('a, exn) result -> 'a
+
+  (** $catch f v$ applies $f$ to $v$ and catches any exception it may produce. *)
+  val catch : ('a -> 'b) -> 'a -> ('b, exn) result
+
+  (** Applies an error handler to a result. *)
+  val handle : ('b -> 'a) -> ('a, 'b) result -> 'a
+
+  (** Maps the $Ok$ part of a result. *)
+  val map : ('a -> 'c) -> ('a, 'b) result -> ('c, 'b) result
+
+  (** Maps the $Error$ part of a result. *)
+  val map_error : ('b -> 'c) -> ('a, 'b) result -> ('a, 'c) result
+
+  (** Returns an option from a result by mapping $Error$ to $None$. *)
+  val opt : ('a, 'b) result -> 'a option
+
+  (** Returns a result from an option by mapping $None$ to $Error ()$. *)
+  val from_opt : 'a option -> ('a, unit) result
+
+  (** $iteri first last f$ applies $f$ to every integer between $first$ and
+    * $last$ (both included) in increasing order but stops as soon as $f$ 
+    * returns an error. *)
+  val iteri : int -> int -> (int -> (unit, 'a) result) -> (unit, 'a) result
+
+end
+
+
 (** Log system *)
 module Log : sig
 
   (** This module provides a very simple log system to use with Ogaml *)
 
-  (** Enumeration of log message levels *)
-  type level = Debug | Warn | Error | Info | Fatal
+  (** Enumeration of log message levels by priority *)
+  type level = Trace | Debug | Info | Warn | Error | Fatal
 
   (** Type of a log *)
   type t
@@ -15,12 +107,12 @@ module Log : sig
     *
     * - output : output channel of log messages (defaults to stderr)
     *
-    * - debug : if false, debug messages will be ignored (defaults to true)
+    * - level : messages below this level will be ignored (defaults to Trace)
     *
     * - color : if false, messages will not be colored (defaults to true)
     *
     * - short : if true, timestamps will be shortened (defaults to false) *)
-  val create : ?output:out_channel -> ?debug:bool -> ?color:bool -> ?short:bool -> unit -> t
+  val create : ?output:out_channel -> ?level:level -> ?color:bool -> ?short:bool -> unit -> t
 
   (** Log to the standard output, that would be obtained by calling $create ~output:stdout ()$ *)
   val stdout : t
@@ -28,20 +120,26 @@ module Log : sig
   (** Log to the standard error, that would be obtained by calling $create ()$ *)
   val stderr : t
 
+  (** Sets the level threshold *)
+  val set_level : t -> level -> unit
+
   (** Logs a message *)
   val log : t -> level -> ('a, out_channel, unit) format -> 'a
 
+  (** Logs a trace message *)
+  val trace : t -> ('a, out_channel, unit) format -> 'a
+
   (** Logs a debug message *)
   val debug : t -> ('a, out_channel, unit) format -> 'a
+
+  (** Logs an info message *)
+  val info  : t -> ('a, out_channel, unit) format -> 'a
 
   (** Logs a warn message *)
   val warn  : t -> ('a, out_channel, unit) format -> 'a
 
   (** Logs an error message *)
   val error : t -> ('a, out_channel, unit) format -> 'a
-
-  (** Logs an info message *)
-  val info  : t -> ('a, out_channel, unit) format -> 'a
 
   (** Logs a fatal error message *)
   val fatal : t -> ('a, out_channel, unit) format -> 'a
@@ -90,27 +188,24 @@ module UTF8String : sig
   (** Type of a UTF-8 encoded string *)
   type t
 
-  (** Raised when a string is not correctly encoded *)
-  exception UTF8_error of string
-
-  (** Raised when an operation violates the bounds of the string *)
-  exception Out_of_bounds of string
-
   (** Empty UTF-8 string *)
   val empty : unit -> t
 
   (** Makes a UTF-8 string filled with one character
-    * 
-    * Raises UTF8_error if the code is not a valid UTF-8 character code *)
-  val make : int -> code -> t
+    *
+    * Returns $Error$ if the code is not a valid UTF-8 character code *)
+  val make : int -> code -> (t, [> `Invalid_UTF8_code]) result
 
-  (** Returns the ith character of a UTF-8 string *)
-  val get : t -> int -> code
+  (** Returns the ith character of a UTF-8 string.
+    *
+    * Returns $Error$ if $i$ is not a valid index *)
+  val get : t -> int -> (code, [> `Out_of_bounds]) result
 
   (** Sets the ith character of a UTF-8 string.
     *
-    * Raises UTF8_error if the code is not a valid UTF-8 character code *)
-  val set : t -> int -> code -> unit
+    * Returns $Error$ if $i$ is not a valid index or if the code is
+    * not a valid UTF-8 code *)
+  val set : t -> int -> code -> (unit, [> `Out_of_bounds | `Invalid_UTF8_code]) result
 
   (** Returns the length of a UTF-8 string *)
   val length : t -> int
@@ -120,9 +215,9 @@ module UTF8String : sig
   val byte_length : t -> int
 
   (** Returns a UTF-8 encoded string from a string.
-    * 
-    * Raises UTF8_error if the string is not a valid UTF-8 encoding *)
-  val from_string : string -> t
+    *
+    * Returns $Error$ if the string is not a valid UTF-8 encoding *)
+  val from_string : string -> (t, [> `Invalid_UTF8_bytes | `Invalid_UTF8_leader]) result
 
   (** Returns a string from a UTF-8 encoded string *)
   val to_string : t -> string
@@ -135,14 +230,14 @@ module UTF8String : sig
 
   (** Maps a UTF-8 string
     *
-    * Raises UTF8_error if the function returns an invalid UTF-8 code *)
-  val map : t -> (code -> code) -> t
+    * Returns $Error$ if the mapping function returns an invalid UTF-8 code *)
+  val map : t -> (code -> code) -> (t, [> `Invalid_UTF8_code]) result
 
 end
 
 
 (** Interpolation between multiple values *)
-module Interpolator : sig 
+module Interpolator : sig
 
   (** This module defines interpolators between two values.
     *
@@ -154,22 +249,18 @@ module Interpolator : sig
   (** Type of an interpolator returning type 'a *)
   type 'a t
 
-  (** Raised when an error occurs during the creation of an interpolator *)
-  exception Invalid_interpolator of string
-
-
   (*** Accessors and modifiers *)
 
   (** Those functions provide a way to modify the behaviour
     * of interpolators.
     *
-    * Unless otherwise specified, the modifiers applied to 
-    * an interpolator are kept by all subsequent operations. 
-    * This means that, for example, passing a time-based 
-    * interpolator to $map$ will return a new time-based 
+    * Unless otherwise specified, the modifiers applied to
+    * an interpolator are kept by all subsequent operations.
+    * This means that, for example, passing a time-based
+    * interpolator to $map$ will return a new time-based
     * interpolator. *)
 
-  (** $get ip t$ returns the value of the interpolator $ip$ 
+  (** $get ip t$ returns the value of the interpolator $ip$
     * at time $t$ in [0;1] *)
   val get : 'a t -> float -> 'a
 
@@ -179,14 +270,14 @@ module Interpolator : sig
     * If $ip$ is not time-based then the result is $ip(0)$. *)
   val current : 'a t -> 'a
 
-  (** $start ip t dt$ returns a new time-based interpolator 
+  (** $start ip t dt$ returns a new time-based interpolator
     * $tip$ such that :
     *
     * $current tip$ = $ip(0)$ at time $t$
     *
     * $current tip$ = $ip(1)$ at time $t + dt$
     *
-    * $t$ and $dt$ are given in seconds. 
+    * $t$ and $dt$ are given in seconds.
     * $t = Unix.gettimeofday()$ means that $tip$ starts immediately.
     *
     * If $dt = 0$ then $current$ will always return $ip(0)$
@@ -200,7 +291,7 @@ module Interpolator : sig
 
   (** $loop ip$ returns a repeating interpolator $lip$ from $ip$ such that :
     *
-    * $lip(x)$ = $ip(x)$ for $x$ in [0;1] 
+    * $lip(x)$ = $ip(x)$ for $x$ in [0;1]
     *
     * $lip(x)$ = $ip(2-x)$ for $x$ in [1;2]
     *
@@ -215,20 +306,20 @@ module Interpolator : sig
     *
     * Unless otherwise specified, parameters are clamped to
     * [0;1], that is ip(x) for x < 0 equals ip(0) and ip(x) for
-    * x > 1 equals ip(1) 
+    * x > 1 equals ip(1)
     *
     * Most constructors require a list of points of the form $(dt, v)$
     * such that the created interpolator will take the value $v$
     * at time $dt$.
     *
-    * The $cst_*$ variants create constant-speed interpolators 
+    * The $cst_*$ variants create constant-speed interpolators
     * so the $dt$ parameter is not required. *)
 
-  (** $custom f start stop$ returns a custom interpolator $ip$ that coincides with  
+  (** $custom f start stop$ returns a custom interpolator $ip$ that coincides with
     * the function $f$ such that $ip(0) = f(start)$, $ip(1) = f(stop)$. *)
   val custom : (float -> 'a) -> float -> float -> 'a t
 
-  (** $copy f$ returns a custom interpolator that coincides with  
+  (** $copy f$ returns a custom interpolator that coincides with
     * the function $f$ everywhere *)
   val copy : (float -> 'a) -> 'a t
 
@@ -240,8 +331,8 @@ module Interpolator : sig
     * $(dt, pos)$ of $steps$ at time $dt < 1.0$ *)
   val linear : float -> (float * float) list -> float -> float t
 
-  (** $cst_linear start steps endt$ creates a linear interpolator 
-    * going from $start$ to $endt$ passing through each point 
+  (** $cst_linear start steps endt$ creates a linear interpolator
+    * going from $start$ to $endt$ passing through each point
     * of $steps$ at constant speed *)
   val cst_linear : float -> float list -> float -> float t
 
@@ -271,12 +362,12 @@ module Interpolator : sig
   (** $map_right$ is an alias for $map$ *)
   val map_right : 'a t -> ('a -> 'b) -> 'b t
 
-  (** $map_left f ip$ returns a function $g$ such that 
+  (** $map_left f ip$ returns a function $g$ such that
     * $g(x) = ip(f(x))$ *)
   val map_left : ('a -> float) -> 'b t -> ('a -> 'b)
 
   (** Returns a pair-interpolator from a pair of interpolators.
-    * 
+    *
     * The new interpolator will not have any modifiers. *)
   val pair : 'a t -> 'b t -> ('a * 'b) t
 
@@ -285,12 +376,12 @@ module Interpolator : sig
     * The new interpolator will not have any modifiers. *)
   val collapse : ('a t) list -> ('a list) t
 
-  (** Returns a vector3f interpolator from three float interpolators. 
+  (** Returns a vector3f interpolator from three float interpolators.
     *
     * The new interpolator will not have any modifiers. *)
   val vector3f : float t -> float t -> float t -> OgamlMath.Vector3f.t t
 
-  (** Returns a vector2f interpolator from two float interpolators. 
+  (** Returns a vector2f interpolator from two float interpolators.
     *
     * The new interpolator will not have any modifiers. *)
   val vector2f : float t -> float t -> OgamlMath.Vector2f.t t
@@ -299,7 +390,7 @@ end
 
 
 (** Various noises *)
-module Noise : sig 
+module Noise : sig
 
   (** This module provides various 2D and 3D noises *)
 
@@ -365,9 +456,6 @@ module PriorityQueue : sig
 
     (** This module provides a basic implementation of priority queues *)
 
-    (** Raised when a queue is empty *)
-    exception Empty
-
     (** Priorities used by the queue *)
     type priority
 
@@ -389,21 +477,15 @@ module PriorityQueue : sig
     (** Inserts an element with a given priority *)
     val insert : 'a t -> priority -> 'a -> 'a t
 
-    (** Returns the top element of a queue
-      *
-      * Raises $Empty$ if the queue is empty *)
-    val top : 'a t -> 'a
+    (** Returns the top element of a queue *)
+    val top : 'a t -> ('a, unit) result
 
-    (** Removes the top element of a queue
-      *
-      * Raises $Empty$ if the queue is empty *)
-    val pop : 'a t -> 'a t
+    (** Removes the top element of a queue *)
+    val pop : 'a t -> ('a t, unit) result
 
     (** Returns the top element of a queue and the queue without its
-      * first element
-      *
-      * Raises $Empty$ if the queue is empty *)
-    val extract : 'a t -> ('a * 'a t)
+      * first element *)
+    val extract : 'a t -> ('a * 'a t, unit) result
 
   end
 
@@ -484,11 +566,11 @@ module Graph : sig
     (** Merges two graphs *)
     val merge : t -> t -> t
 
-    (** $dfs g s f$ iterates $f$ through all the accessible vertices of $g$, 
+    (** $dfs g s f$ iterates $f$ through all the accessible vertices of $g$,
       * starting from $s$ using a dfs *)
     val dfs : t -> vertex -> (vertex -> unit) -> unit
 
-    (** $bfs g s f$ iterates $f$ through all the accessible vertices of $g$, 
+    (** $bfs g s f$ iterates $f$ through all the accessible vertices of $g$,
       * starting from $s$ using a bfs *)
     val bfs : t -> vertex -> (vertex -> unit) -> unit
 
@@ -498,7 +580,7 @@ module Graph : sig
     val dijkstra : t -> vertex -> vertex -> (float * vertex list) option
 
     (** $astar g v1 v2 f$ runs the A* algorithm on $g$ from $v1$ to $v2$
-      * with the heuristic $f$ and returns the minimal path as well as the 
+      * with the heuristic $f$ and returns the minimal path as well as the
       * distance between $v1$ and $v2$, or $None$ if $v1$ and $v2$ are not connected *)
     val astar : t -> vertex -> vertex -> (vertex -> float) -> (float * vertex list) option
 

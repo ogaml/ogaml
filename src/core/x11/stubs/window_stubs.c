@@ -4,8 +4,7 @@
 #include "utils.h"
 
 
-// INPUT   display, parent window, origin, size, border width, 
-//         border value, bg value
+// INPUT   display, parent window, origin, size, glxfb config
 // OUTPUT  new window 
 CAMLprim value
 caml_xcreate_simple_window(
@@ -17,7 +16,7 @@ caml_xcreate_simple_window(
 
   Display* dpy = Display_val(disp);
   Window p = Window_val(parent);
-  XVisualInfo* xvi = XVisualInfo_val(visual);
+  XVisualInfo* xvi = glXGetVisualFromFBConfig(dpy, GLXFBConfig_val(visual));
 
   int depth = xvi->depth;
 

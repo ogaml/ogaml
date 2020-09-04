@@ -10,8 +10,6 @@ end
 
 module type Q = sig
 
-  exception Empty
-
   type priority
 
   type 'a t
@@ -26,18 +24,16 @@ module type Q = sig
 
   val insert : 'a t -> priority -> 'a -> 'a t
 
-  val top : 'a t -> 'a
+  val top : 'a t -> ('a, unit) result
 
-  val pop : 'a t -> 'a t
+  val pop : 'a t -> ('a t, unit) result
 
-  val extract : 'a t -> ('a * 'a t)
+  val extract : 'a t -> ('a * 'a t, unit) result
 
 end
 
 
 module Make (P : Priority) : Q with type priority = P.t = struct
-
-  exception Empty
 
   type priority = P.t
 
@@ -66,15 +62,17 @@ module Make (P : Priority) : Q with type priority = P.t = struct
   let rec insert queue prio elt = merge (singleton prio elt) queue
 
   let top = function
-    |Emp -> raise Empty
-    |Node(_,_,x,_,_) -> x
+    |Emp -> Error ()
+    |Node(_,_,x,_,_) -> Ok x
 
   let pop = function
-    |Emp -> raise Empty
-    |Node(_,_,_,l,r) -> merge l r
+    |Emp -> Error ()
+    |Node(_,_,_,l,r) -> Ok (merge l r)
 
   let extract q = 
-    top q, pop q
+    match top q, pop q with
+    | Ok x, Ok q -> Ok (x,q)
+    | _, _ -> Error ()
 
 end
 

@@ -14,6 +14,7 @@
     |> h_add "sig"      SIG
     |> h_add "exception"EXN
     |> h_add "of"       OF
+    |> h_add "as"       AS
     |> h_add "with"     WITH
     |> h_add "functor"  FUNCTOR
     |> h_add "and"      AND
@@ -52,6 +53,7 @@ rule token = parse
   | "(***" {TITLECOMMENT (read_comment (Buffer.create 13) lexbuf)}
   | "(**"  {DOCCOMMENT (read_comment (Buffer.create 13) lexbuf)}
   | "(*"   {COMMENT (read_comment (Buffer.create 13) lexbuf)}
+  | "_"  {UNDERSCORE}
   | "'"  {APOSTROPHE}
   | "`"  {QUOTE}
   | "?"  {QMARK}

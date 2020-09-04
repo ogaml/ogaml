@@ -1,0 +1,1 @@
+(-LC:/OCaml64/usr/local/lib -lopengl32 -lglew32 -luser32 -lgdi32 -lopenal32)

@@ -16,15 +16,15 @@ let gen_relative directory modules =
     if not (Sys.file_exists directory) then 
       Unix.mkdir directory 0o777;
     Unix.chdir directory;
-    let output = open_out (String.lowercase modl.modulename ^ ".html") in
+    let output = open_out (String.lowercase_ascii modl.modulename ^ ".html") in
     Printf.fprintf output "<!DOCTYPE html>\n<html>\n%s\n<body>%s\n%s</body>\n</html>"
       (Docgen.gen_header (relative_root (List.length modl.hierarchy + 1)) modl.modulename)
       (Docgen.gen_aside (relative_root (List.length modl.hierarchy + 1)) (Some modl) modules)
       (Docgen.gen_main (relative_root (List.length modl.hierarchy + 1)) modl);
     close_out output;
-    List.iter (fun modl' -> gen_aux (String.lowercase modl.modulename) modl')
+    List.iter (fun modl' -> gen_aux (String.lowercase_ascii modl.modulename) modl')
       modl.submodules;
-    List.iter (fun modl' -> gen_aux (String.lowercase modl.modulename) modl')
+    List.iter (fun modl' -> gen_aux (String.lowercase_ascii modl.modulename) modl')
       modl.signatures;
     Unix.chdir dir
   in
