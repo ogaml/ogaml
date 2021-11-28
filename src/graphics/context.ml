@@ -268,15 +268,13 @@ module LL = struct
   let texture_pool s = 
     s.texture_pool
 
-  let bound_texture s i = 
-    match s.bound_texture.(i) with
-    | None       -> None
-    | Some (_,t,_) -> Some t
+  let bound_texture s i =
+    s.bound_texture.(i)
 
-  let bound_target s i = 
+  let bound_texture_id s i =
     match s.bound_texture.(i) with
     | None       -> None
-    | Some (_,_,t) -> Some t
+    | Some (_,i,_) -> Some i
 
   let set_bound_texture s i t = 
     s.bound_texture.(i) <- t

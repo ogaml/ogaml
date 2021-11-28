@@ -139,11 +139,11 @@ module LL : sig
   (** Sets the currently bound texture ID to a texture unit and a target *)
   val set_bound_texture : t -> int -> (GL.Texture.t * int * GLTypes.TextureTarget.t) option -> unit
 
-  (** Returns the texture ID currently bound to a texture unit *)
-  val bound_texture : t -> int -> int option
+  (** Returns the texture currently bound to a texture unit *)
+  val bound_texture : t -> int -> (GL.Texture.t * int * GLTypes.TextureTarget.t) option
 
-  (** Returns the target currently bound to a texture unit *)
-  val bound_target : t -> int -> GLTypes.TextureTarget.t option
+  (** Returns the texture id currently bound to a texture unit *)
+  val bound_texture_id : t -> int -> int option
 
   (** Returns a reusable array of booleans of length max_texture_image_units *)
   val pooled_texture_array : t -> bool array

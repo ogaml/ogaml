@@ -120,33 +120,32 @@ module Common = struct
       GL.Texture.activate uid
     end
 
-  let bind tex uid = 
-    set_unit tex.context uid;
-    let bound_tex = Context.LL.bound_texture tex.context uid in
-    let bound_target = Context.LL.bound_target tex.context uid in
-    if bound_tex <> Some tex.id || bound_target <> Some tex.target then begin
-      begin match bound_target with
-      | None -> ()
-      | Some target -> GL.Texture.bind target None
-      end;
-      Context.LL.set_bound_texture tex.context uid (Some (tex.internal, tex.id, tex.target));
-      GL.Texture.bind tex.target (Some tex.internal)
-    end
-
-  let unbind context target uid = 
+  let bind_internal context uid internal id target =
     set_unit context uid;
-    let bound_tex = 
-      Context.LL.bound_texture context uid
-    in
-    let bound_target = 
-      Context.LL.bound_target context uid
-    in
-    if bound_tex <> None && bound_target = Some target then begin
-      Context.LL.set_bound_texture
-        context uid
-        None;
-      GL.Texture.bind target None
-    end
+    let bound_tex = Context.LL.bound_texture context uid in
+    match bound_tex with
+    | None ->
+      Context.LL.set_bound_texture context uid (Some (internal, id, target));
+      GL.Texture.bind target (Some internal)
+    | Some (btex, bid, btarget) ->
+      if btarget <> target then
+        GL.Texture.bind btarget None;
+      if bid <> id || btarget <> target then begin
+        Context.LL.set_bound_texture context uid (Some (internal, id, target));
+        GL.Texture.bind target (Some internal)
+      end
+
+  let bind tex uid =
+    bind_internal tex.context uid tex.internal tex.id tex.target
+
+  let bind_set_unbind tex uid setter =
+    let bound_tex = Context.LL.bound_texture tex.context uid in
+    bind tex uid;
+    setter ();
+    match bound_tex with
+    | None -> ()
+    | Some (btex, bid, btarget) ->
+      bind_internal tex.context uid btex bid btarget
 
   let create context mipmaps target =
     (* Create the texture *)
@@ -156,7 +155,7 @@ module Common = struct
     let finalize _ = 
       Context.ID_Pool.free idpool id;
       for i = 0 to (Context.capabilities context).Context.max_texture_image_units - 1 do
-        if Context.LL.bound_texture context i = Some id then
+        if Context.LL.bound_texture_id context i = Some id then
           Context.LL.set_bound_texture context i None
       done
     in
@@ -170,36 +169,40 @@ module Common = struct
                minify = Some GLTypes.MinifyFilter.LinearMipmapLinear} in
     Gc.finalise finalize tex;
     (* Bind it *)
-    bind tex 0;
-    (* Set reasonable parameters *)
-    GL.Texture.parameter target (`Minify GLTypes.MinifyFilter.LinearMipmapLinear);
-    GL.Texture.parameter target (`Magnify GLTypes.MagnifyFilter.Linear);
-    GL.Texture.parameter target (`Wrap GLTypes.WrapFunction.ClampEdge);
+    bind_set_unbind tex 0 (fun () ->
+      (* Set reasonable parameters *)
+      GL.Texture.parameter target (`Minify GLTypes.MinifyFilter.LinearMipmapLinear);
+      GL.Texture.parameter target (`Magnify GLTypes.MagnifyFilter.Linear);
+      GL.Texture.parameter target (`Wrap GLTypes.WrapFunction.ClampEdge)
+    );
     tex
 
   let minify tex filter = 
-    bind tex 0;
+    bind_set_unbind tex 0 (fun () ->
     match tex.minify with
     | Some f when f = filter -> ()
     | _ ->
       GL.Texture.parameter tex.target (`Minify filter);
       tex.minify <- Some filter
+    )
 
   let magnify tex filter = 
-    bind tex 0;
+    bind_set_unbind tex 0 (fun () ->
     match tex.magnify with
     | Some f when f = filter -> ()
     | _ ->
       GL.Texture.parameter tex.target (`Magnify filter);
       tex.magnify <- Some filter
+    )
 
   let wrap tex func = 
-    bind tex 0;
+    bind_set_unbind tex 0 (fun () ->
     match tex.wrap with
     | Some f when f = func -> ()
     | _ ->
       GL.Texture.parameter tex.target (`Wrap func);
       tex.wrap <- Some func
+    )
 
 end
 
@@ -289,34 +292,35 @@ module Texture2D = struct
     let common = Common.create context levels GLTypes.TextureTarget.Texture2D in
     let tex = {common; size; format} in
     (* Bind the texture *)
-    Common.bind tex.common 0;
-    (* Allocate the texture *)
-    let glformat = TextureFormat.to_texture_format format in
-    GL.Texture.storage2D
-      GLTypes.TextureTarget.Texture2D 
-      levels glformat
-      (size.Vector2i.x, size.Vector2i.y);
-    (* Load the corresponding image in each mipmap if requested *)
-    let load_level lvl = 
-      match img with
-      | Some img -> 
-        let data = (Image.data (Image.mipmap img lvl)) in
-        GL.Texture.subimage2D
-          GLTypes.TextureTarget.Texture2D 
-          lvl (0,0)
-          (size.Vector2i.x lsr lvl, size.Vector2i.y lsr lvl)
-          GLTypes.PixelFormat.RGBA
-          data
-      | None -> ()
-    in
-    begin match mipmaps with
-    | `AllGenerated | `Generated _ ->
-      for lvl = 0 to levels -1 do
-        load_level lvl
-      done
-    | `None | `AllEmpty | `Empty _ -> 
-      load_level 0
-    end;
+    Common.bind_set_unbind tex.common 0 (fun () ->
+      (* Allocate the texture *)
+      let glformat = TextureFormat.to_texture_format format in
+      GL.Texture.storage2D
+        GLTypes.TextureTarget.Texture2D 
+        levels glformat
+        (size.Vector2i.x, size.Vector2i.y);
+      (* Load the corresponding image in each mipmap if requested *)
+      let load_level lvl = 
+        match img with
+        | Some img -> 
+          let data = (Image.data (Image.mipmap img lvl)) in
+          GL.Texture.subimage2D
+            GLTypes.TextureTarget.Texture2D 
+            lvl (0,0)
+            (size.Vector2i.x lsr lvl, size.Vector2i.y lsr lvl)
+            GLTypes.PixelFormat.RGBA
+            data
+        | None -> ()
+      in
+      begin match mipmaps with
+      | `AllGenerated | `Generated _ ->
+        for lvl = 0 to levels -1 do
+          load_level lvl
+        done
+      | `None | `AllEmpty | `Empty _ -> 
+        load_level 0
+      end
+    );
     (* Return the texture *)
     tex
 
@@ -431,44 +435,45 @@ module DepthTexture2D = struct
     let common = Common.create context levels GLTypes.TextureTarget.Texture2D in
     let tex = {common; size; format; compare = None} in
     (* Bind the texture *)
-    Common.bind tex.common 0;
-    (* Allocate the texture *)
-    let glformat = DepthFormat.to_texture_format format in
-    GL.Texture.storage2D
-      GLTypes.TextureTarget.Texture2D
-      levels glformat
-      (size.Vector2i.x, size.Vector2i.y);
-    (* Load the corresponding image in each mipmap if requested *)
-    let load_level lvl = 
-      match data with
-      | Some data -> 
-        let mipmap_x, mipmap_y = 
-          (size.Vector2i.x lsr lvl, size.Vector2i.y lsr lvl) 
-        in
-        let mipmap_data = Bytes.create (mipmap_x * mipmap_y) in 
-        for i = 0 to mipmap_x - 1 do
-          for j = 0 to mipmap_y - 1 do
-            let offset = mipmap_x * (j lsl lvl) + (i lsl lvl) in
-            let mipmap_offset = mipmap_x * j + i in
-            Bytes.set mipmap_data mipmap_offset (Bytes.get data offset)
+    Common.bind_set_unbind tex.common 0 (fun () ->
+      (* Allocate the texture *)
+      let glformat = DepthFormat.to_texture_format format in
+      GL.Texture.storage2D
+        GLTypes.TextureTarget.Texture2D
+        levels glformat
+        (size.Vector2i.x, size.Vector2i.y);
+      (* Load the corresponding image in each mipmap if requested *)
+      let load_level lvl = 
+        match data with
+        | Some data -> 
+          let mipmap_x, mipmap_y = 
+            (size.Vector2i.x lsr lvl, size.Vector2i.y lsr lvl) 
+          in
+          let mipmap_data = Bytes.create (mipmap_x * mipmap_y) in 
+          for i = 0 to mipmap_x - 1 do
+            for j = 0 to mipmap_y - 1 do
+              let offset = mipmap_x * (j lsl lvl) + (i lsl lvl) in
+              let mipmap_offset = mipmap_x * j + i in
+              Bytes.set mipmap_data mipmap_offset (Bytes.get data offset)
+            done;
           done;
-        done;
-        GL.Texture.subimage2D
-          GLTypes.TextureTarget.Texture2D 
-          lvl (0,0)
-          (size.Vector2i.x lsr lvl, size.Vector2i.y lsr lvl)
-          GLTypes.PixelFormat.Depth
-          data
-      | None -> ()
-    in
-    begin match mipmaps with
-    | `AllGenerated | `Generated _ ->
-      for lvl = 0 to levels -1 do
-        load_level lvl
-      done
-    | `None | `AllEmpty | `Empty _ -> 
-      load_level 0
-    end;
+          GL.Texture.subimage2D
+            GLTypes.TextureTarget.Texture2D 
+            lvl (0,0)
+            (size.Vector2i.x lsr lvl, size.Vector2i.y lsr lvl)
+            GLTypes.PixelFormat.Depth
+            data
+        | None -> ()
+      in
+      begin match mipmaps with
+      | `AllGenerated | `Generated _ ->
+        for lvl = 0 to levels -1 do
+          load_level lvl
+        done
+      | `None | `AllEmpty | `Empty _ -> 
+        load_level 0
+      end
+    );
     (* Return the texture *)
     tex
 
@@ -482,9 +487,9 @@ module DepthTexture2D = struct
 
   let compare_function tex comp =
     if tex.compare <> comp then begin
-      Common.bind tex.common 0;
-      GL.Texture.parameter tex.common.Common.target (`Compare comp);
-      tex.compare <- comp
+      Common.bind_set_unbind tex.common 0 (fun () ->
+        GL.Texture.parameter tex.common.Common.target (`Compare comp);
+        tex.compare <- comp)
     end
 
   let mipmap_levels tex = tex.common.Common.mipmaps
@@ -664,36 +669,37 @@ module Texture2DArray = struct
     let common = Common.create context levels GLTypes.TextureTarget.Texture2DArray in
     let tex = {common; size; depth; format} in
     (* Bind the texture *)
-    Common.bind tex.common 0;
-    (* Allocate the texture *)
-    let glformat = TextureFormat.to_texture_format format in
-    GL.Texture.storage3D
-      GLTypes.TextureTarget.Texture2DArray
-      levels glformat
-      (size.Vector2i.x, size.Vector2i.y, depth);
-    (* Load the corresponding image in each mipmap if requested *)
-    let load_level lvl = 
-      List.iteri (fun layer img -> 
-        match img with
-        | Some img -> 
-          let data = Image.data (Image.mipmap img lvl) in
-          GL.Texture.subimage3D
-            GLTypes.TextureTarget.Texture2DArray
-            lvl (0,0,layer)
-            (size.Vector2i.x lsr lvl, size.Vector2i.y lsr lvl, 1)
-            GLTypes.PixelFormat.RGBA
-            data
-        | None     -> ()
-      ) imgs;
-    in
-    begin match mipmaps with
-    | `AllGenerated | `Generated _ ->
-      for lvl = 0 to levels -1 do
-        load_level lvl
-      done
-    | `None | `AllEmpty | `Empty _ -> 
-      load_level 0
-    end;
+    Common.bind_set_unbind tex.common 0 (fun () ->
+      (* Allocate the texture *)
+      let glformat = TextureFormat.to_texture_format format in
+      GL.Texture.storage3D
+        GLTypes.TextureTarget.Texture2DArray
+        levels glformat
+        (size.Vector2i.x, size.Vector2i.y, depth);
+      (* Load the corresponding image in each mipmap if requested *)
+      let load_level lvl = 
+        List.iteri (fun layer img -> 
+          match img with
+          | Some img -> 
+            let data = Image.data (Image.mipmap img lvl) in
+            GL.Texture.subimage3D
+              GLTypes.TextureTarget.Texture2DArray
+              lvl (0,0,layer)
+              (size.Vector2i.x lsr lvl, size.Vector2i.y lsr lvl, 1)
+              GLTypes.PixelFormat.RGBA
+              data
+          | None     -> ()
+        ) imgs;
+      in
+      begin match mipmaps with
+      | `AllGenerated | `Generated _ ->
+        for lvl = 0 to levels -1 do
+          load_level lvl
+        done
+      | `None | `AllEmpty | `Empty _ -> 
+        load_level 0
+      end
+    );
     (* Return the texture *)
     tex
 
@@ -904,40 +910,41 @@ module Cubemap = struct
     let common = Common.create context levels GLTypes.TextureTarget.CubemapTexture in
     let tex = {common; size = spx; format} in
     (* Bind the texture *)
-    Common.bind tex.common 0;
-    (* Allocate the texture *)
-    let glformat = TextureFormat.to_texture_format format in
-    GL.Texture.storage2D
-      GLTypes.TextureTarget.CubemapTexture
-      levels glformat
-      (spx.Vector2i.x, spx.Vector2i.y);
-    (* Load the corresponding image in each mipmap if requested *)
-    let load_img target lvl img = 
-      match img with
-      | Some img -> 
-        GL.Texture.subimage2D
-          target lvl (0,0)
-          (spx.Vector2i.x lsr lvl, spx.Vector2i.y lsr lvl)
-          GLTypes.PixelFormat.RGBA
-          (Image.data (Image.mipmap img lvl))
-      | None -> ()
-    in
-    let load_level lvl = 
-      load_img GLTypes.TextureTarget.CubemapPositiveX lvl ipx;
-      load_img GLTypes.TextureTarget.CubemapPositiveY lvl ipy;
-      load_img GLTypes.TextureTarget.CubemapPositiveZ lvl ipz;
-      load_img GLTypes.TextureTarget.CubemapNegativeX lvl inx;
-      load_img GLTypes.TextureTarget.CubemapNegativeY lvl iny;
-      load_img GLTypes.TextureTarget.CubemapNegativeZ lvl inz;
-    in
-    begin match mipmaps with
-    | `AllGenerated | `Generated _ ->
-      for lvl = 0 to levels -1 do
-        load_level lvl
-      done
-    | `None | `AllEmpty | `Empty _ -> 
-      load_level 0
-    end;
+    Common.bind_set_unbind tex.common 0 (fun () ->
+      (* Allocate the texture *)
+      let glformat = TextureFormat.to_texture_format format in
+      GL.Texture.storage2D
+        GLTypes.TextureTarget.CubemapTexture
+        levels glformat
+        (spx.Vector2i.x, spx.Vector2i.y);
+      (* Load the corresponding image in each mipmap if requested *)
+      let load_img target lvl img = 
+        match img with
+        | Some img -> 
+          GL.Texture.subimage2D
+            target lvl (0,0)
+            (spx.Vector2i.x lsr lvl, spx.Vector2i.y lsr lvl)
+            GLTypes.PixelFormat.RGBA
+            (Image.data (Image.mipmap img lvl))
+        | None -> ()
+      in
+      let load_level lvl = 
+        load_img GLTypes.TextureTarget.CubemapPositiveX lvl ipx;
+        load_img GLTypes.TextureTarget.CubemapPositiveY lvl ipy;
+        load_img GLTypes.TextureTarget.CubemapPositiveZ lvl ipz;
+        load_img GLTypes.TextureTarget.CubemapNegativeX lvl inx;
+        load_img GLTypes.TextureTarget.CubemapNegativeY lvl iny;
+        load_img GLTypes.TextureTarget.CubemapNegativeZ lvl inz;
+      in
+      begin match mipmaps with
+      | `AllGenerated | `Generated _ ->
+        for lvl = 0 to levels -1 do
+          load_level lvl
+        done
+      | `None | `AllEmpty | `Empty _ -> 
+        load_level 0
+      end;
+    );
     (* Return the texture *)
     tex
 
@@ -1072,36 +1079,37 @@ module Texture3D = struct
     let common = Common.create context levels GLTypes.TextureTarget.Texture3D in
     let tex = {common; size; format} in
     (* Bind the texture *)
-    Common.bind tex.common 0;
-    (* Allocate the texture *)
-    let glformat = TextureFormat.to_texture_format format in
-    GL.Texture.storage3D
-      GLTypes.TextureTarget.Texture3D
-      levels glformat
-      (size.Vector3i.x, size.Vector3i.y, size.Vector3i.z);
-    (* Load the corresponding image in each mipmap if requested *)
-    let load_level lvl = 
-      List.iteri (fun layer img -> 
-        match img with
-        | Some img -> 
-          let data = Image.data (Image.mipmap img lvl) in
-          GL.Texture.subimage3D
-            GLTypes.TextureTarget.Texture3D
-            lvl (0,0,layer)
-            (size.Vector3i.x lsr lvl, size.Vector3i.y lsr lvl, 1)
-            GLTypes.PixelFormat.RGBA
-            data
-        | None     -> ()
-      ) imgs;
-    in
-    begin match mipmaps with
-    | `AllGenerated | `Generated _ ->
-      for lvl = 0 to levels -1 do
-        load_level lvl
-      done
-    | `None | `AllEmpty | `Empty _ -> 
-      load_level 0
-    end;
+    Common.bind_set_unbind tex.common 0 (fun () ->
+      (* Allocate the texture *)
+      let glformat = TextureFormat.to_texture_format format in
+      GL.Texture.storage3D
+        GLTypes.TextureTarget.Texture3D
+        levels glformat
+        (size.Vector3i.x, size.Vector3i.y, size.Vector3i.z);
+      (* Load the corresponding image in each mipmap if requested *)
+      let load_level lvl = 
+        List.iteri (fun layer img -> 
+          match img with
+          | Some img -> 
+            let data = Image.data (Image.mipmap img lvl) in
+            GL.Texture.subimage3D
+              GLTypes.TextureTarget.Texture3D
+              lvl (0,0,layer)
+              (size.Vector3i.x lsr lvl, size.Vector3i.y lsr lvl, 1)
+              GLTypes.PixelFormat.RGBA
+              data
+          | None     -> ()
+        ) imgs;
+      in
+      begin match mipmaps with
+      | `AllGenerated | `Generated _ ->
+        for lvl = 0 to levels -1 do
+          load_level lvl
+        done
+      | `None | `AllEmpty | `Empty _ -> 
+        load_level 0
+      end
+    );
     (* Return the texture *)
     tex
 
