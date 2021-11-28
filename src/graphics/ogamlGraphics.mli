@@ -395,6 +395,8 @@ module DrawParameter : sig
     *
     * $*_query$ specify optional queries
     *
+    * $polygon_offset$ specifies a scale factor and a constant offset that are used to create a variable depth offset for each polygon
+    *
     * @see:OgamlGraphics.DrawParameter.CullingMode
     * @see:OgamlGraphics.DrawParameter.PolygonMode
     * @see:OgamlGraphics.DrawParameter.Viewport
@@ -412,6 +414,7 @@ module DrawParameter : sig
              ?any_samples_query:Query.AnySamplesPassed.t ->
              ?primitives_query:Query.PrimitivesGenerated.t ->
              ?time_query:Query.TimeElapsed.t ->
+             ?polygon_offset:float * float ->
              unit -> t
 
 end
@@ -914,6 +917,22 @@ module Texture : sig
 
   end
 
+  (** Module containing an enumeration of the depth comparison functions *)
+  module CompareFunction : sig
+
+    (** Enumeration of the depth comparison functions *)
+    type t =
+      | LEqual
+      | GEqual
+      | Less
+      | Greater
+      | Equal
+      | NotEqual
+      | Always
+      | Never
+
+  end
+
 
   (** Module containing an enumeration of the color texture formats *)
   module TextureFormat : sig
@@ -1101,6 +1120,10 @@ module Texture : sig
 
     (** Sets the wrapping function of a texture. Defaults as ClampEdge.  *)
     val wrap : t -> WrapFunction.t -> unit
+
+    (** Sets the depth comparison function of a texture. Defaults as None,
+      * in which case comparison is disabled.  *)
+    val compare_function : t -> CompareFunction.t option -> unit
 
     (** Returns the number of mipmap levels of a texture *)
     val mipmap_levels : t -> int
@@ -1700,14 +1723,24 @@ module Uniform : sig
 
   (** See texture2D. Type : sampler2D.
     *
-    * @see:OgamlGraphics.Texture.Texture3D *)
+    * @see:OgamlGraphics.Texture.DepthTexture2D *)
   val depthtexture2D : string -> ?tex_unit:int -> Texture.DepthTexture2D.t -> t ->
     (t, [> `Duplicate_uniform of string]) result
 
   (** See texture2D_r. Type : sampler2D.
     *
-    * @see:OgamlGraphics.Texture.Texture3D *)
+    * @see:OgamlGraphics.Texture.DepthTexture2D *)
   val depthtexture2D_r : string -> ?tex_unit:int -> Texture.DepthTexture2D.t -> t -> t
+
+  (** See texture2D. Type : sampler2DShadow.
+    *
+    * @see:OgamlGraphics.Texture.DepthTexture2D *)
+  val shadow2D : string -> ?tex_unit:int -> ?comparison:Texture.CompareFunction.t -> Texture.DepthTexture2D.t -> t -> (t, [> `Duplicate_uniform of string]) result
+
+  (** See texture2D_r. Type : sampler2DShadow.
+    *
+    * @see:OgamlGraphics.Texture.DepthTexture2D *)
+  val shadow2D_r : string -> ?tex_unit:int -> ?comparison:Texture.CompareFunction.t -> Texture.DepthTexture2D.t -> t -> t
 
   (** See texture2D. Type : sampler3D.
     *

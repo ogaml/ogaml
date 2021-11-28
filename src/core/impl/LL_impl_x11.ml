@@ -27,8 +27,8 @@ module Window = struct
     in
     let ctx_attribs = 
       let l = ref [] in
-      if ContextSettings.forward_compatible settings then
-        l := (X11.GLContext.(Flags {fwd_compat = true; debug = false})) :: !l;
+      if ContextSettings.forward_compatible settings || ContextSettings.debug settings then
+        l := (X11.GLContext.(Flags {fwd_compat = ContextSettings.forward_compatible settings; debug = ContextSettings.debug settings})) :: !l;
       if ContextSettings.compatibility_profile settings
       || ContextSettings.core_profile settings then 
         l := (X11.GLContext.(ProfileMask 

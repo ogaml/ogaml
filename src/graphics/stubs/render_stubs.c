@@ -268,3 +268,34 @@ caml_read_pixels(value topl, value size, value pfmt)
 
   CAMLreturn(res);
 }
+
+// INPUT   a boolean
+// OUTPUT  nothing, enables or disables polygon depth offset
+CAMLprim value
+caml_polygon_offset(value enable)
+{
+  CAMLparam1(enable);
+  if(!Bool_val(enable)) {
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    glDisable(GL_POLYGON_OFFSET_LINE);
+    glDisable(GL_POLYGON_OFFSET_POINT);
+  }
+  else {
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glEnable(GL_POLYGON_OFFSET_LINE);
+    glEnable(GL_POLYGON_OFFSET_POINT);
+  }
+  CAMLreturn(Val_unit);
+}
+
+// INPUT   the variable depth factor and the constant depth factor
+// OUTPUT  nothing, sets the values of the polygon depth offset
+CAMLprim value
+caml_set_polygon_offset(value factor, value units)
+{
+  CAMLparam2(factor, units);
+
+  glPolygonOffset(Double_val(factor), Double_val(units));
+
+  CAMLreturn(Val_unit);
+}

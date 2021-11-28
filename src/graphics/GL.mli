@@ -135,6 +135,12 @@ module Pervasives : sig
   (** Sets the MSAA *)
   val msaa : bool -> unit
 
+  (** Toggles the polygon offset *)
+  val polygon_offset : bool -> unit
+
+  (** Sets the polygon offset *)
+  val set_polygon_offset : float -> float -> unit
+
   (** Reads pixels in the current fb *)
   val read_pixels : (int * int) -> (int * int) -> GLTypes.PixelFormat.t -> Bytes.t
 
@@ -205,7 +211,8 @@ module Texture : sig
   val parameter : GLTypes.TextureTarget.t ->
                   [`Magnify of GLTypes.MagnifyFilter.t 
                   |`Minify  of GLTypes.MinifyFilter.t
-                  |`Wrap    of GLTypes.WrapFunction.t] -> unit
+                  |`Wrap    of GLTypes.WrapFunction.t
+                  |`Compare of GLTypes.CompareFunction.t option] -> unit
 
   (** Deletes a texture from the memory *)
   val destroy : t -> unit

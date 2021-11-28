@@ -214,6 +214,7 @@ type t = {
   any_samples : Query.AnySamplesPassed.t option;
   primitives : Query.PrimitivesGenerated.t option;
   time : Query.TimeElapsed.t option;
+  polygon_offset : (float * float) option
 }
 
 let make ?culling:(culling = CullingMode.CullNone)
@@ -228,10 +229,11 @@ let make ?culling:(culling = CullingMode.CullNone)
          ?any_samples_query:any_samples
          ?primitives_query:primitives
          ?time_query:time
+         ?polygon_offset
          () = 
   { culling; polygon; depth = depth_test; depth_write; color_write;
   blend = blend_mode; viewport; aa = antialiasing;
-  samples; any_samples; primitives; time}
+  samples; any_samples; primitives; time; polygon_offset}
 
 let culling t = t.culling
 
@@ -256,3 +258,5 @@ let any_samples_query t = t.any_samples
 let primitives_query t = t.primitives
 
 let time_query t = t.time
+
+let polygon_offset t = t.polygon_offset

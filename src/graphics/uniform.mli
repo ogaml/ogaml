@@ -75,6 +75,14 @@ val depthtexture2D : string -> ?tex_unit:int -> Texture.DepthTexture2D.t -> t ->
 (** Adds a 2D depth texture to a uniform structure, replacing any previously existing uniform with the same name *)
 val depthtexture2D_r : string -> ?tex_unit:int -> Texture.DepthTexture2D.t -> t -> t
 
+(** Adds a 2D depth texture to a uniform structure as a shadow sampler.
+  * $comparison$ defaults to $Texture.CompareFunction.LEqual$ *)
+val shadow2D : string -> ?tex_unit:int -> ?comparison:Texture.CompareFunction.t -> Texture.DepthTexture2D.t -> t -> (t, [> `Duplicate_uniform of string]) result
+
+(** Adds a 2D depth texture to a uniform structure as a shadow sampler, replacing any previously existing uniform with the same name.
+  * $comparison$ defaults to $Texture.CompareFunction.LEqual$ *)
+val shadow2D_r : string -> ?tex_unit:int -> ?comparison:Texture.CompareFunction.t -> Texture.DepthTexture2D.t -> t -> t
+
 (** Adds a 3D texture to a uniform structure *)
 val texture3D : string -> ?tex_unit:int -> Texture.Texture3D.t -> t -> (t, [> `Duplicate_uniform of string]) result
 

@@ -13,6 +13,7 @@ type uniform =
   | Texture3D of (int option * Texture.Texture3D.t)
   | Texture2DArray of (int option * Texture.Texture2DArray.t)
   | DepthTexture2D of (int option * Texture.DepthTexture2D.t)
+  | Shadow2D  of (int option * Texture.CompareFunction.t * Texture.DepthTexture2D.t)
   | Cubemap   of (int option * Texture.Cubemap.t)
   | Float     of float
   | Int       of int
@@ -111,6 +112,13 @@ let depthtexture2D s ?tex_unit t m =
 
 let depthtexture2D_r s ?tex_unit t m = 
   UniformMap.add s (DepthTexture2D (tex_unit,t)) m
+
+let shadow2D s ?tex_unit ?(comparison=Texture.CompareFunction.LEqual) t m = 
+  assert_free m s >>>= fun () ->
+  UniformMap.add s (Shadow2D (tex_unit, comparison, t)) m
+
+let shadow2D_r s ?tex_unit ?(comparison=Texture.CompareFunction.LEqual) t m = 
+  UniformMap.add s (Shadow2D (tex_unit, comparison, t)) m
 
 let int s i m = 
   assert_free m s >>>= fun () ->
@@ -213,6 +221,17 @@ module LL = struct
           next_unit 0 >>= fun u ->
           add_unit u >>>= fun () ->
           Texture.DepthTexture2D.bind t u;
+          GL.Uniform.int1 location (Context.LL.texture_unit context)
+      | Shadow2D (Some u, cmp, t), GLTypes.GlslType.Sampler2DShadow ->
+          add_unit u >>>= fun () ->
+          Texture.DepthTexture2D.bind t u;
+          Texture.DepthTexture2D.compare_function t (Some cmp);
+          GL.Uniform.int1 location (Context.LL.texture_unit context)
+      | Shadow2D (None, cmp, t), GLTypes.GlslType.Sampler2DShadow ->
+          next_unit 0 >>= fun u ->
+          add_unit u >>>= fun () ->
+          Texture.DepthTexture2D.bind t u;
+          Texture.DepthTexture2D.compare_function t (Some cmp);
           GL.Uniform.int1 location (Context.LL.texture_unit context)
       | Texture3D (Some u,t), GLTypes.GlslType.Sampler3D ->
           add_unit u >>>= fun () ->

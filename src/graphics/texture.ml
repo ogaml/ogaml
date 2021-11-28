@@ -17,6 +17,8 @@ module MagnifyFilter = GLTypes.MagnifyFilter
 
 module WrapFunction = GLTypes.WrapFunction
 
+module CompareFunction = GLTypes.CompareFunction
+
 module DepthFormat = struct
 
   type t = 
@@ -121,7 +123,12 @@ module Common = struct
   let bind tex uid = 
     set_unit tex.context uid;
     let bound_tex = Context.LL.bound_texture tex.context uid in
-    if bound_tex <> Some tex.id then begin
+    let bound_target = Context.LL.bound_target tex.context uid in
+    if bound_tex <> Some tex.id || bound_target <> Some tex.target then begin
+      begin match bound_target with
+      | None -> ()
+      | Some target -> GL.Texture.bind target None
+      end;
       Context.LL.set_bound_texture tex.context uid (Some (tex.internal, tex.id, tex.target));
       GL.Texture.bind tex.target (Some tex.internal)
     end
@@ -388,7 +395,8 @@ module DepthTexture2D = struct
   type t = {
     common  : Common.t;
     size    : Vector2i.t;
-    format  : DepthFormat.t
+    format  : DepthFormat.t;
+    mutable compare : CompareFunction.t option;
   }
 
   let create (type s) (module M : RenderTarget.T with type t = s) target 
@@ -421,7 +429,7 @@ module DepthTexture2D = struct
     end >>>= fun () ->
     (* Create the internal texture *)
     let common = Common.create context levels GLTypes.TextureTarget.Texture2D in
-    let tex = {common; size; format} in
+    let tex = {common; size; format; compare = None} in
     (* Bind the texture *)
     Common.bind tex.common 0;
     (* Allocate the texture *)
@@ -471,6 +479,13 @@ module DepthTexture2D = struct
   let magnify tex filter = Common.magnify tex.common filter
 
   let wrap tex func = Common.wrap tex.common func
+
+  let compare_function tex comp =
+    if tex.compare <> comp then begin
+      Common.bind tex.common 0;
+      GL.Texture.parameter tex.common.Common.target (`Compare comp);
+      tex.compare <- comp
+    end
 
   let mipmap_levels tex = tex.common.Common.mipmaps
 

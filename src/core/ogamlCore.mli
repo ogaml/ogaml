@@ -217,6 +217,7 @@ module ContextSettings : sig
                ?major_version:int ->
                ?minor_version:int ->
                ?forward_compatible:bool ->
+               ?debug:bool ->
                ?core_profile:bool ->
                ?compatibility_profile:bool ->
                unit -> t
@@ -247,6 +248,9 @@ module ContextSettings : sig
   
   (** Returns $true$ if a forward compatible context is requested (defaults to false) *)
   val forward_compatible : t -> bool
+
+  (** Returns $true$ if a debug context is requested (defaults to false) *)
+  val debug : t -> bool
    
   (** Returns $true$ if a core profile context is requested (defaults to false) *)
   val core_profile : t -> bool

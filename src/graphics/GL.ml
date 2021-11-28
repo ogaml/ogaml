@@ -193,6 +193,10 @@ module Pervasives = struct
   external read_pixels : (int * int) -> (int * int) -> GLTypes.PixelFormat.t -> Bytes.t
     = "caml_read_pixels"
 
+  external polygon_offset : bool -> unit = "caml_polygon_offset"
+
+  external set_polygon_offset : float -> float -> unit = "caml_set_polygon_offset"
+
   let get_integer_opt param = 
     let v = get_integerv param in
     if v < 0 then None
@@ -261,7 +265,8 @@ module Texture = struct
     GLTypes.TextureTarget.t ->
     [`Magnify of GLTypes.MagnifyFilter.t 
     |`Minify  of GLTypes.MinifyFilter.t
-    |`Wrap    of GLTypes.WrapFunction.t]
+    |`Wrap    of GLTypes.WrapFunction.t
+    |`Compare of GLTypes.CompareFunction.t option]
     -> unit = "caml_tex_parameter"
 
   external destroy : t -> unit = "caml_destroy_texture"

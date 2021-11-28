@@ -77,7 +77,8 @@ type t = {
   mutable color            : Color.t;
   mutable blending         : bool;
   mutable blend_equation   : DrawParameter.BlendMode.t;
-  mutable viewport         : OgamlMath.IntRect.t
+  mutable viewport         : OgamlMath.IntRect.t;
+  mutable polygon_offset   : (float * float) option
 }
 
 let capabilities t = t.capabilities
@@ -202,6 +203,7 @@ module LL = struct
       rbo_pool         = ID_Pool.create 0;
       color            = `RGB (Color.RGB.transparent);
       blending         = false;
+      polygon_offset   = None;
       blend_equation   = DrawParameter.BlendMode.(
         {color = Equation.Add (Factor.One, Factor.Zero);
          alpha = Equation.Add (Factor.One, Factor.Zero)});
@@ -354,5 +356,9 @@ module LL = struct
   let viewport s = s.viewport
 
   let set_viewport s v = s.viewport <- v
+
+  let polygon_offset s = s.polygon_offset
+
+  let set_polygon_offset s o = s.polygon_offset <- o
 
 end

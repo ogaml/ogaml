@@ -130,9 +130,10 @@ int Val_attrib_type(GLenum type)
     case GL_FLOAT_MAT4   : return 17;
     case GL_SAMPLER_1D   : return 18;
     case GL_SAMPLER_2D   : return 19;
-    case GL_SAMPLER_2D_ARRAY : return 20;
-    case GL_SAMPLER_3D   : return 21;
-    case GL_SAMPLER_CUBE : return 22;
+    case GL_SAMPLER_2D_SHADOW : return 20;
+    case GL_SAMPLER_2D_ARRAY : return 21;
+    case GL_SAMPLER_3D   : return 22;
+    case GL_SAMPLER_CUBE : return 23;
     default: return 0;
   }
 }
@@ -359,6 +360,32 @@ GLenum Wrap_val(value wrp)
 
     default:
       caml_failwith("Caml variant error in Wrap_val(1)");
+  }
+}
+
+
+GLenum TexCompare_val(value cmp)
+{
+  switch(Int_val(cmp))
+  {
+    case 0: return GL_LEQUAL;
+
+    case 1: return GL_GEQUAL;
+
+    case 2: return GL_LESS;
+
+    case 3: return GL_GREATER;
+
+    case 4: return GL_EQUAL;
+
+    case 5: return GL_NOTEQUAL;
+
+    case 6: return GL_ALWAYS;
+
+    case 7: return GL_NEVER;
+
+    default:
+      caml_failwith("Caml variant error in TexCompare_val(1)");
   }
 }
 

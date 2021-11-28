@@ -18,6 +18,9 @@ module MagnifyFilter = GLTypes.MagnifyFilter
 module WrapFunction = GLTypes.WrapFunction
 
 
+module CompareFunction = GLTypes.CompareFunction
+
+
 module DepthFormat : sig
 
   type t = 
@@ -136,6 +139,8 @@ module DepthTexture2D : sig
   val magnify : t -> MagnifyFilter.t -> unit
 
   val wrap : t -> WrapFunction.t -> unit
+
+  val compare_function : t -> CompareFunction.t option -> unit
 
   val mipmap_levels : t -> int
 

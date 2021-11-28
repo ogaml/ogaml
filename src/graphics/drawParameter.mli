@@ -166,6 +166,7 @@ val make : ?culling:CullingMode.t ->
            ?any_samples_query:Query.AnySamplesPassed.t ->
            ?primitives_query:Query.PrimitivesGenerated.t ->
            ?time_query:Query.TimeElapsed.t ->
+           ?polygon_offset:(float * float) ->
            unit -> t
 
 (** Returns the value of the culling parameter *)
@@ -195,3 +196,5 @@ val any_samples_query : t -> Query.AnySamplesPassed.t option
 val primitives_query : t -> Query.PrimitivesGenerated.t option
 
 val time_query : t -> Query.TimeElapsed.t option
+
+val polygon_offset : t -> (float * float) option

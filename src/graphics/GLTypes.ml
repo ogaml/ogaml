@@ -31,6 +31,7 @@ module GlslType = struct
     | Float4x4
     | Sampler1D
     | Sampler2D
+    | Sampler2DShadow
     | Sampler2DArray
     | Sampler3D
     | SamplerCube
@@ -129,6 +130,21 @@ module WrapFunction = struct
     | MirrorRepeat
     | Repeat
     | MirrorClamp
+
+end
+
+(** Texture depth comparison function *)
+module CompareFunction = struct
+
+  type t =
+    | LEqual
+    | GEqual
+    | Less
+    | Greater
+    | Equal
+    | NotEqual
+    | Always
+    | Never
 
 end
 

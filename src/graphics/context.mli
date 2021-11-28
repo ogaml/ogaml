@@ -217,6 +217,12 @@ module LL : sig
   (** Sets the current viewport *)
   val set_viewport : t -> OgamlMath.IntRect.t -> unit
 
+  (** Returns the current polygon offset *)
+  val polygon_offset : t -> (float * float) option
+
+  (** Sets the current polygon offset *)
+  val set_polygon_offset : t -> (float * float) option -> unit
+
 end
 
 

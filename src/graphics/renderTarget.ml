@@ -177,6 +177,21 @@ let bind_blend_mode context parameters =
     end
   )
 
+let bind_polygon_offset context parameters =
+  let polygon_offset = DrawParameter.polygon_offset parameters in
+  let context_offset = Context.LL.polygon_offset context in
+  Context.LL.set_polygon_offset context polygon_offset;
+  match polygon_offset, context_offset with
+  | None, None -> ()
+  | Some (f1, f2), None ->
+    GL.Pervasives.polygon_offset true;
+    GL.Pervasives.set_polygon_offset f1 f2
+  | None, Some _ ->
+    GL.Pervasives.polygon_offset false
+  | Some (f1, f2), Some (f1', f2') ->
+    if (f1 <> f1') || (f2 <> f2') then
+      GL.Pervasives.set_polygon_offset f1 f2
+
 let begin_queries parameters =
   Option.iter DrawParameter.Query.LL.begin_ (DrawParameter.samples_query parameters);
   Option.iter DrawParameter.Query.LL.begin_ (DrawParameter.any_samples_query parameters);
@@ -198,4 +213,5 @@ let bind_draw_parameters context size aa parameters =
   bind_color_writing context parameters;
   bind_antialiasing context aa parameters;
   bind_viewport context size parameters;
-  bind_blend_mode context parameters
+  bind_blend_mode context parameters;
+  bind_polygon_offset context parameters
