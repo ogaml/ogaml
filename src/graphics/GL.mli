@@ -295,6 +295,9 @@ module Program : sig
   (** Returns the type of an attribute from its index *)
   val atype : t -> int -> GLTypes.GlslType.t
 
+  (** Returns the size of a uniform from its index *)
+  val usize : t -> int -> int
+
   (** Returns the number of uniforms *)
   val ucount : t -> int
 

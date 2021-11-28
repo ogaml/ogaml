@@ -333,6 +333,8 @@ module Program = struct
 
   external atype : t -> int -> GLTypes.GlslType.t = "caml_attribute_type"
 
+  external usize : t -> int -> int = "caml_uniform_size"
+
   external log : t -> string = "caml_program_log"
 
   external delete : t -> unit = "caml_delete_program"

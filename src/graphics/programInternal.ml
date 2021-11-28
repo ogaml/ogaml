@@ -70,24 +70,44 @@ let create ~vertex ~fragment ~id =
   else
     Ok () 
   >>= fun () ->
+  let rec uniform_array name kind = function
+    |0 -> []
+    |n ->
+      let uname = Printf.sprintf "%s[%i]" name (n - 1) in
+      let location = GL.Program.uloc program uname in
+      let uniform = 
+        {
+          Uniform.name = uname; 
+          Uniform.kind = kind; 
+          Uniform.location = location
+        }
+      in
+      let lst = uniform_array name kind (n-1) in
+      uniform :: lst
+  in
   let rec uniforms = function
     |0 -> Ok []
     |n -> begin
       let name = GL.Program.uname program (n - 1) in
       let kind = GL.Program.utype program (n - 1) in
-      let location = GL.Program.uloc program name in
-      let uniform = 
-        {
-          Uniform.name = name; 
-          Uniform.kind = kind; 
-          Uniform.location = location
-        } 
-      in
-      uniforms (n-1) >>= fun lst ->
+      let size = GL.Program.usize program (n - 1) in
       if kind = GLTypes.GlslType.Unknown then
         Error `Unsupported_GLSL_type
-      else
-        Ok (uniform :: lst)
+      else if size = 1 then begin
+        let location = GL.Program.uloc program name in
+        let uniform = 
+          {
+            Uniform.name = name; 
+            Uniform.kind = kind; 
+            Uniform.location = location
+          }
+        in
+        uniforms (n-1) >>= fun lst -> Ok (uniform :: lst)
+      end else begin
+        let name = String.sub name 0 (String.length name - 3) in
+        let uarray = uniform_array name kind size in
+        uniforms (n-1) >>= fun lst -> Ok (uarray @ lst)
+      end
     end
   in
   let rec attributes = function
