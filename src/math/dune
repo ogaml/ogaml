@@ -1,4 +1,9 @@
+(copy_files stubs/*)
+
 (library
   (name OgamlMath)
   (libraries bigarray)
-  (public_name ogaml.math))
+  (public_name ogaml.math)
+  (c_names     math)
+  (c_flags     (:standard (:include ../../c_flags.os)))
+  (c_library_flags (:standard (:include ../../c_libs.os))))
