@@ -1,6 +1,4 @@
 
-exception Vector3i_exception of string
-
 type t = {x : int; y : int; z : int}
 
 let make x y z = {x; y; z}
@@ -33,9 +31,9 @@ let prop k u = {
 
 let div k u = 
   if k = 0 then 
-    raise (Vector3i_exception "Division by zero")
+    Error `Division_by_zero
   else
-    {
+    Ok {
       x = u.x / k;
       y = u.y / k;
       z = u.z / k
@@ -158,9 +156,9 @@ let raster v1 v2 =
       {x;y;z}::(aux_z x' y' z' xd'' yd'')
     end
   in
-  if a.x >= Pervasives.max a.y a.z then
+  if a.x >= Stdlib.max a.y a.z then
     aux_x v1.x v1.y v1.z (a.y - a.x/2) (a.z - a.x/2)
-  else if a.y >= Pervasives.max a.x a.z then
+  else if a.y >= Stdlib.max a.x a.z then
     aux_y v1.x v1.y v1.z (a.x - a.y/2) (a.z - a.y/2)
   else 
     aux_z v1.x v1.y v1.z (a.x - a.z/2) (a.y - a.z/2)

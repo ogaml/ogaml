@@ -328,3 +328,22 @@ caml_attribute_type(value id, value index)
 
   CAMLreturn(Val_int(Val_attrib_type(tmp_type)));
 }
+
+
+// INPUT   : a program id, a uniform index
+// OUTPUT  : the size of the uniform
+CAMLprim value
+caml_uniform_size(value id, value index)
+{
+  CAMLparam2(id,index);
+  CAMLlocal1(res);
+
+  GLsizei tmp_len;
+  GLint   tmp_size;
+  GLenum  tmp_type;
+  GLchar  tmp_name;
+
+  glGetActiveUniform(PROGRAM(id), Int_val(index), 0, &tmp_len, &tmp_size, &tmp_type, &tmp_name);
+
+  CAMLreturn(Val_int(tmp_size));
+}

@@ -167,6 +167,19 @@ caml_depth_mask(value b)
 }
 
 
+// INPUT   a boolean for every color component
+// OUTPUT  nothing, sets the current value of color writing
+CAMLprim value
+caml_color_mask(value r, value g, value b, value a)
+{
+  CAMLparam4(r,g,b,a);
+
+  glColorMask(Bool_val(r), Bool_val(g), Bool_val(b), Bool_val(a));
+
+  CAMLreturn(Val_unit);
+}
+
+
 // INPUT   a depth function
 // OUTPUT  nothing, sets the current value of the depth function
 CAMLprim value
@@ -254,4 +267,35 @@ caml_read_pixels(value topl, value size, value pfmt)
   glReadPixels(x,y,w,h,PixelFormat_val(pfmt),GL_UNSIGNED_BYTE,String_val(res));
 
   CAMLreturn(res);
+}
+
+// INPUT   a boolean
+// OUTPUT  nothing, enables or disables polygon depth offset
+CAMLprim value
+caml_polygon_offset(value enable)
+{
+  CAMLparam1(enable);
+  if(!Bool_val(enable)) {
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    glDisable(GL_POLYGON_OFFSET_LINE);
+    glDisable(GL_POLYGON_OFFSET_POINT);
+  }
+  else {
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glEnable(GL_POLYGON_OFFSET_LINE);
+    glEnable(GL_POLYGON_OFFSET_POINT);
+  }
+  CAMLreturn(Val_unit);
+}
+
+// INPUT   the variable depth factor and the constant depth factor
+// OUTPUT  nothing, sets the values of the polygon depth offset
+CAMLprim value
+caml_set_polygon_offset(value factor, value units)
+{
+  CAMLparam2(factor, units);
+
+  glPolygonOffset(Double_val(factor), Double_val(units));
+
+  CAMLreturn(Val_unit);
 }

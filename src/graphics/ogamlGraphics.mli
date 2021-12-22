@@ -266,6 +266,9 @@ module DrawParameter : sig
     (** Soft additive blending mode *)
     val soft_additive : t
 
+    (** Premutliplied alpha blending mode *)
+    val premultiplied_alpha : t
+
   end
 
   (** Depth testing functions enumeration *)
@@ -274,7 +277,7 @@ module DrawParameter : sig
     (** This module consists of one enumeration of openGL depth functions *)
 
     (** Depth testing functions *)
-    type t = 
+    type t =
       | None (* Disables depth testing *)
       | Always (* Test always passes *)
       | Never (* Test never passes *)
@@ -287,6 +290,91 @@ module DrawParameter : sig
 
   end
 
+  (** Query objects *)
+  module Query : sig
+
+    (** This module contains submodules for all query objects.
+      *
+      * Query objects allow the user to obtain information about the rendering process. *)
+ 
+    (** Query for samples passed *)
+    module SamplesPassed : sig
+ 
+      (** This query returns the number of samples passing a depth test *)
+
+      (** Type of a query *)
+      type t
+ 
+      (** Creates a query *)
+      val create : unit -> t
+ 
+      (** Returns the number of samples that passed the depth test.
+        *
+        * Blocks until the GPU is done drawing if $wait$ is set to $true$ (defaults to $true$)
+        *)
+      val get : ?wait:bool -> t -> int
+  
+    end
+  
+    (** Query checking if any samples passed *)
+    module AnySamplesPassed : sig
+  
+      (** This query returns whether a sample passed a depth test *)
+
+      (** Type of a query *)
+      type t
+  
+      (** Creates a query *)
+      val create : unit -> t
+  
+      (** Returns whether at least one sample passed the depth test.
+        *
+        * Blocks until the GPU is done drawing if $wait$ is set to $true$ (defaults to $true$)
+        *)
+      val get : ?wait:bool -> t -> bool
+  
+    end
+  
+    (** Query returning the number of generated primitives *)
+    module PrimitivesGenerated : sig
+  
+      (** This query returns the number of generated primitives during a draw call *)
+
+      (** Type of a query *)
+      type t
+  
+      (** Creates a query *)
+      val create : unit -> t
+
+      (** Returns the number of primitives generated during the draw call.
+       *
+       * Blocks until the GPU is done drawing if $wait$ is set to $true$ (defaults to $true$)
+       *)
+      val get : ?wait:bool -> t -> int
+  
+    end
+  
+    (** Query returning the duration of a draw call *)
+    module TimeElapsed : sig
+  
+      (** This query returns the duration of a draw call *)
+
+      (** Type of a query *)
+      type t
+  
+      (** Creates a query *)
+      val create : unit -> t
+
+      (** Returns the duration of a draw call in seconds.
+       *
+       * Blocks until the GPU is done drawing if $wait$ is set to $true$ (defaults to $true$)
+       *)
+      val get : ?wait:bool -> t -> float
+  
+    end
+  
+  end
+
   (** Creates a set of draw parameters with the following options :
     *
     * $culling$ specifies which face should be culled (defaults to $CullNone$)
@@ -297,23 +385,36 @@ module DrawParameter : sig
     *
     * $depth_write$ specifies whether depth should be written to the depth buffer (defaults to $true$)
     *
+    * $color_write$ specifies which color components should be written to the color buffer (defaults to $true$ for all components)
+    *
     * $blend_mode$ specifies the blending equation (defaults to $BlendingMode.default$)
     *
     * $viewport$ specifies the viewport (defaults to $Full$)
     *
     * $antialiasing$ specifies whether to activate AA or not (ignored if AA is not supported by the context, defaults to $true$)
     *
+    * $*_query$ specify optional queries
+    *
+    * $polygon_offset$ specifies a scale factor and a constant offset that are used to create a variable depth offset for each polygon
+    *
     * @see:OgamlGraphics.DrawParameter.CullingMode
     * @see:OgamlGraphics.DrawParameter.PolygonMode
     * @see:OgamlGraphics.DrawParameter.Viewport
+    * @see:OgamlGraphics.DrawParameter.Query
     * @see:OgamlGraphics.DrawParameter.BlendMode *)
   val make : ?culling:CullingMode.t ->
              ?polygon:PolygonMode.t ->
              ?depth_test:DepthTest.t ->
              ?depth_write:bool ->
+             ?color_write:bool * bool * bool * bool ->
              ?blend_mode:BlendMode.t ->
              ?viewport:Viewport.t ->
              ?antialiasing:bool ->
+             ?samples_query:Query.SamplesPassed.t ->
+             ?any_samples_query:Query.AnySamplesPassed.t ->
+             ?primitives_query:Query.PrimitivesGenerated.t ->
+             ?time_query:Query.TimeElapsed.t ->
+             ?polygon_offset:float * float ->
              unit -> t
 
 end
@@ -327,10 +428,6 @@ module Context : sig
     *
     * To get an instance of a Context.t, create a GL context (via a window) and
     * use Window.context *)
-
-  (** Raised when trying to perform an invalid state change 
-    * (for example, binding a texture to an invalid texture unit) *)
-  exception Invalid_context of string
 
   (** Rendering capabilities of a context *)
   type capabilities = {
@@ -347,6 +444,7 @@ module Context : sig
     max_texture_image_units   : int; (* Number of available texture units *)
     max_texture_size          : int; (* Maximal size of a texture *)
     max_color_attachments     : int; (* Maximal number of color attachments in a framebuffer *)
+    max_draw_buffers          : int; (* Maximal number of draw buffers *)
   }
 
   (** Type of a GL context *)
@@ -368,8 +466,10 @@ module Context : sig
   (** Returns true iff the given GLSL version is supported by this context *)
   val is_glsl_version_supported : t -> int -> bool
 
-  (** Asserts that no openGL error occured internally. Used for debugging and testing. *)
-  val assert_no_error : t -> unit
+  (** Checks that no openGL error occurred internally. Used for debugging and testing. *)
+  val check_errors : t ->
+    (unit, [> `Invalid_value | `Invalid_enum | `Invalid_op | `Invalid_fbop
+            | `Out_of_memory | `Stack_overflow | `Stack_underflow]) result
 
   (** Flushes the GL buffer *)
   val flush : t -> unit
@@ -389,6 +489,15 @@ module RenderTarget : sig
   (** Signature of a valid render target module *)
   module type T = sig
 
+    (** Module encapsulating the enumeration of the output buffers
+      * of a render target *)
+    module OutputBuffer : sig
+
+      (** Enumeration of the output buffers of a render target *)
+      type t
+
+    end
+
     (** Type of a render target *)
     type t
 
@@ -399,11 +508,13 @@ module RenderTarget : sig
     val context : t -> Context.t
 
     (** Clears a render target *)
-    val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+    val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t ->
+                (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer | `Invalid_color_buffer]) result
 
     (** Binds a render target for drawing. System-only function, usually done
       * automatically. *)
-    val bind : t -> DrawParameter.t -> unit
+    val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t ->
+               (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer | `Invalid_color_buffer]) result
 
   end
 
@@ -413,7 +524,7 @@ end
 (** Framebuffer attachments *)
 module Attachment : sig
 
-  (** This module contains the common interfaces 
+  (** This module contains the common interfaces
     * shared by textures or renderbuffers that can be attached
     * to a certain attachment of an FBO *)
 
@@ -423,7 +534,7 @@ module Attachment : sig
     (** Contains only the abstract type of a color attachment *)
 
     (** Abstract type of a color attachment *)
-    type t 
+    type t
 
   end
 
@@ -471,7 +582,7 @@ module Attachment : sig
   (** Interface of a depth-attachable texture or RBO *)
   module type DepthAttachable = sig
 
-    type t 
+    type t
 
     val to_depth_attachment : t -> DepthAttachment.t
 
@@ -510,19 +621,17 @@ module Renderbuffer : sig
   (** This module provides several implementations of Renderbuffer Objects (RBO)
     * that can be attached to framebuffer objects. *)
 
-  (** Raised if an error occurs while manipulating a renderbuffer. *)
-  exception RBO_Error of string
-
   (** Color Renderbuffer *)
   module ColorBuffer : sig
 
     (** Type of a color renderbuffer *)
     type t
 
-    (** Creates a color renderbuffer from a context and a size 
-      * Raises $RBO_Error$ if the requested size exceeds the maximum size
+    (** Creates a color renderbuffer from a context and a size
+      * Returns $Error$ if the requested size exceeds the maximum size
       * allowed by the context. *)
-    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t ->
+      (t, [> `RBO_too_large]) result
 
     (** ColorBuffer implements the interface ColorAttachable *)
     val to_color_attachment : t -> Attachment.ColorAttachment.t
@@ -540,9 +649,10 @@ module Renderbuffer : sig
     type t
 
     (** Creates a depth renderbuffer from a context and a size
-      * Raises $RBO_Error$ if the requested size exceeds the maximum size
+      * Returns $Error$ if the requested size exceeds the maximum size
       * allowed by the context. *)
-    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t ->
+      (t, [> `RBO_too_large]) result
 
     (** DepthBuffer implements the interface DepthAttachable *)
     val to_depth_attachment : t -> Attachment.DepthAttachment.t
@@ -559,10 +669,11 @@ module Renderbuffer : sig
     (** Type of a stencil renderbuffer *)
     type t
 
-    (** Creates a stencil renderbuffer from a context and a size 
-      * Raises $RBO_Error$ if the requested size exceeds the maximum size
+    (** Creates a stencil renderbuffer from a context and a size
+      * Returns $Error$ if the requested size exceeds the maximum size
       * allowed by the context. *)
-    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t ->
+      (t, [> `RBO_too_large]) result
 
     (** StencilBuffer implements the interface StencilAttachable *)
     val to_stencil_attachment : t -> Attachment.StencilAttachment.t
@@ -579,10 +690,11 @@ module Renderbuffer : sig
     (** Type of a depth stencil renderbuffer *)
     type t
 
-    (** Creates a depth stencil renderbuffer from a context and a size 
-      * Raises $RBO_Error$ if the requested size exceeds the maximum size
+    (** Creates a depth stencil renderbuffer from a context and a size
+      * Returns $Error$ if the requested size exceeds the maximum size
       * allowed by the context. *)
-    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t -> t
+    val create : (module RenderTarget.T with type t = 'a) -> 'a -> OgamlMath.Vector2i.t ->
+      (t, [> `RBO_too_large]) result
 
     (** DepthStencilBuffer implements the interface DepthStencilAttachable *)
     val to_depth_stencil_attachment : t -> Attachment.DepthStencilAttachment.t
@@ -598,54 +710,62 @@ end
 (** Framebuffer creation and manipulation *)
 module Framebuffer : sig
 
-  (** This module provides a safe way to create framebuffer objects (FBO) and 
+  (** This module provides a safe way to create framebuffer objects (FBO) and
     * attach textures to them. *)
-
-  (** Raised if an error occurs at creation or during an attachment *)
-  exception FBO_Error of string
 
   (** Type of a framebuffer object *)
   type t
+
+  (** Module encapsulating an enumeration of the output buffers of a framebuffer *)
+  module OutputBuffer : sig
+
+    (** Enumeration of the output buffers of a framebuffer *)
+    type t =
+      | Color of int
+      | None
+
+  end
 
   (** Creates a framebuffer from a valid context *)
   val create : (module RenderTarget.T with type t = 'a) -> 'a -> t
 
   (** Attaches a valid color attachment to a framebuffer at a given index.
-    * Raises $Error$ if the index is greater than the maximum number of color
+    * Returns an error if the index is greater than the maximum number of color
     * attachments allowed by the context, or if the attachment is larger
     * than the maximum size allowed by the context.
     *
     * @see:OgamlGraphics.Attachment.ColorAttachable
     * @see:OgamlGraphics.Context *)
-  val attach_color : (module Attachment.ColorAttachable with type t = 'a) 
-                      -> t -> int -> 'a -> unit
+  val attach_color : (module Attachment.ColorAttachable with type t = 'a)
+                      -> t -> int -> 'a ->
+                      (unit, [> `Attachment_too_large | `Too_many_color_attachments]) result
 
   (** Attaches a valid depth attachment to a framebuffer.
-    * Raises $Error$ if the attachment is larger than the maximum size 
+    * Returns an error if the attachment is larger than the maximum size
     * allowed by the context.
     *
     * @see:OgamlGraphics.Attachment.DepthAttachable
     * @see:OgamlGraphics.Context *)
   val attach_depth : (module Attachment.DepthAttachable with type t = 'a)
-                      -> t -> 'a -> unit
+                      -> t -> 'a -> (unit, [> `Attachment_too_large]) result
 
   (** Attaches a valid stencil attachment to a framebuffer.
-    * Raises $Error$ if the attachment is larger than the maximum size 
+    * Returns an error if the attachment is larger than the maximum size
     * allowed by the context.
     *
     * @see:OgamlGraphics.Attachment.StencilAttachable
     * @see:OgamlGraphics.Context *)
   val attach_stencil : (module Attachment.StencilAttachable with type t = 'a)
-                      -> t -> 'a -> unit
+                      -> t -> 'a -> (unit, [> `Attachment_too_large]) result
 
   (** Attaches a valid depth and stencil attachment to a framebuffer.
-    * Raises $Error$ if the attachment is larger than the maximum size 
+    * Returns an error if the attachment is larger than the maximum size
     * allowed by the context.
     *
     * @see:OgamlGraphics.Attachment.DepthStencilAttachable
     * @see:OgamlGraphics.Context *)
   val attach_depthstencil : (module Attachment.DepthStencilAttachable with type t = 'a)
-                      -> t -> 'a -> unit
+                            -> t -> 'a -> (unit, [> `Attachment_too_large]) result
 
   (** Returns true iff the FBO has a color attachment *)
   val has_color : t -> bool
@@ -656,19 +776,24 @@ module Framebuffer : sig
   (** Returns true iff the FBO has a stencil attachment *)
   val has_stencil : t -> bool
 
-  (** Returns the size of an FBO, that is the intersection of the sizes of 
+  (** Returns the size of an FBO, that is the intersection of the sizes of
     * its attachments.
     * Returns the maximal allowed size if nothing has been attached to this FBO *)
   val size : t -> OgamlMath.Vector2i.t
 
-  (** Returns the GL context associated to the FBO *) 
+  (** Returns the GL context associated to the FBO *)
   val context : t -> Context.t
 
-  (** Clears the FBO *)
-  val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+  (** Clears the FBO
+    *
+    * $buffers$ defaults to $[Color 0]$ *)
+  val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option ->
+              ?depth:bool -> ?stencil:bool -> t ->
+              (unit, [> `Duplicate_draw_buffer | `Invalid_color_buffer | `Too_many_draw_buffers]) result
 
   (** Binds the FBO for drawing. Internal use only. *)
-  val bind : t -> DrawParameter.t -> unit
+  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t ->
+             (unit, [> `Duplicate_draw_buffer | `Invalid_color_buffer | `Too_many_draw_buffers]) result
 
 end
 
@@ -681,18 +806,25 @@ module Image : sig
     * Images stored this way are uncompressed arrays of bytes and are therefore
     * not meant to be stored in large quantities. *)
 
-  (** Raised when an error occur in this module *)
-  exception Image_error of string
-
   (** Type of an image stored in the RAM *)
   type t
+
+  (** Creates an empty image filled with a default color *)
+  val empty : OgamlMath.Vector2i.t -> Color.t -> t
+
+  (** Loads an image from a file *)
+  val load : string -> (t, [> `File_not_found of string | `Loading_error of string]) result
 
   (** Creates an image from a file, some RGBA-formatted data, or an empty one
     * filled with a default color
     *
-    * Raises $Image_error$ if the loading fails 
     * @see:OgamlGraphics.Color *)
-  val create : [`File of string | `Empty of OgamlMath.Vector2i.t * Color.t | `Data of OgamlMath.Vector2i.t * Bytes.t] -> t
+  val create : [`File of string
+               | `Empty of OgamlMath.Vector2i.t * Color.t
+               | `Data of OgamlMath.Vector2i.t * Bytes.t] ->
+               (t, [> `File_not_found of string
+                    | `Loading_error of string
+                    | `Wrong_data_length]) result
 
   (** Saves an image to a file.
     *
@@ -704,28 +836,30 @@ module Image : sig
 
   (** Sets a pixel of an image
     * @see:OgamlGraphics.Color *)
-  val set : t -> OgamlMath.Vector2i.t -> Color.t -> unit
+  val set : t -> OgamlMath.Vector2i.t -> Color.t -> (unit, [> `Out_of_bounds]) result
 
   (** Gets the color of a pixel of an image
     * @see:OgamlGraphics.Color.RGB *)
-  val get : t -> OgamlMath.Vector2i.t -> Color.RGB.t
+  val get : t -> OgamlMath.Vector2i.t -> (Color.RGB.t, [> `Out_of_bounds]) result
 
   (** $blit src ~rect dest offset$ blits the subimage of $src$ defined by $rect$
     * on the image $dest$ at position $offset$ (relative to the top-left pixel).
     *
     * If $rect$ is not provided then the whole image $src$ is used.
     * @see:OgamlMath.IntRect @see:OgamlMath.Vector2i *)
-  val blit : t -> ?rect:OgamlMath.IntRect.t -> t -> OgamlMath.Vector2i.t -> unit
+  val blit : t -> ?rect:OgamlMath.IntRect.t -> t -> OgamlMath.Vector2i.t ->
+             (unit, [> `Out_of_bounds]) result
 
-  (** $mipmap img lvl$ returns a new, fresh image that is the $lvl$-th reduction 
+  (** $mipmap img lvl$ returns a new, fresh image that is the $lvl$-th reduction
     * of the image $img$ *)
   val mipmap : t -> int -> t
 
-  (** $pad img offset color size$ returns a new image of size $size$, which 
+  (** $pad img offset color size$ returns a new image of size $size$, which
     * contains $img$ placed at position $offset$, and where the empty pixels
     * are filled with $color$ *)
-  val pad : t -> ?offset:OgamlMath.Vector2i.t -> ?color:Color.t -> 
+  val pad : t -> ?offset:OgamlMath.Vector2i.t -> ?color:Color.t ->
                  OgamlMath.Vector2i.t -> t
+
 end
 
 
@@ -734,11 +868,6 @@ module Texture : sig
 
   (** This module provides wrappers around different kinds
     * of OpenGL textures *)
-
-
-  (** Raised if an error occurs while manipulating a texture *)
-  exception Texture_error of string
-
 
   (** Common signature for all texture types *)
   module type T = sig
@@ -755,7 +884,7 @@ module Texture : sig
   module MinifyFilter : sig
 
     (** Enumeration of the minifying filters *)
-    type t = 
+    type t =
       | Nearest
       | Linear
       | NearestMipmapNearest
@@ -769,7 +898,7 @@ module Texture : sig
   module MagnifyFilter : sig
 
     (** Enumeration of the magnifying filters *)
-    type t = 
+    type t =
       | Nearest
       | Linear
 
@@ -779,12 +908,65 @@ module Texture : sig
   module WrapFunction : sig
 
     (** Enumeration of the wrapping functions *)
-    type t = 
+    type t =
       | ClampEdge
       | ClampBorder
       | MirrorRepeat
       | Repeat
       | MirrorClamp
+
+  end
+
+  (** Module containing an enumeration of the depth comparison functions *)
+  module CompareFunction : sig
+
+    (** Enumeration of the depth comparison functions *)
+    type t =
+      | LEqual
+      | GEqual
+      | Less
+      | Greater
+      | Equal
+      | NotEqual
+      | Always
+      | Never
+
+  end
+
+
+  (** Module containing an enumeration of the color texture formats *)
+  module TextureFormat : sig
+
+    (** Enumeration of the color texture formats *)
+    type t =
+      | R8
+      | RG8
+      | RGB8
+      | RGBA8
+      | R16
+      | RG16
+      | RGB16
+      | RGBA16
+      | R16F
+      | RG16F
+      | RGB16F
+      | RGBA16F
+      | R32F
+      | RG32F
+      | RGB32F
+      | RGBA32F
+
+  end
+
+
+  (** Module containing an enumeration of the depth texture formats *)
+  module DepthFormat : sig
+
+    (** Enumeration of the depth texture formats *)
+    type t =
+      | Int16
+      | Int24
+      | Int32
 
   end
 
@@ -799,16 +981,16 @@ module Texture : sig
     val size : t -> OgamlMath.Vector2i.t
 
     (** Writes an image to a sub-rectangle of a mipmap level.
-      * Writes to the full mipmap level by default. 
+      * Writes to the full mipmap level by default.
       * @see:OgamlMath.IntRect
       * @see:OgamlGraphics.Image *)
     val write : t -> ?rect:OgamlMath.IntRect.t -> Image.t -> unit
 
     (** Returns the level of a Texture2DMipmap.t *)
     val level : t -> int
- 
+
     (** System only function, binds the original texture of the mipmap *)
-    val bind : t -> int -> unit 
+    val bind : t -> int -> unit
 
     (** Texture2DMipmap implements the interface ColorAttachable and
       * can be attached to an FBO.
@@ -829,18 +1011,20 @@ module Texture : sig
     type t
 
     (** Creates a texture from a source (a file or an image), or an empty texture.
-      * Generates all mipmaps by default.
+      * Generates all mipmaps by default. The default format is RGBA8.
       *
-      * Raises $Texture_error$ if the requested size exceeds the maximal texture size
-      * allowed by the context.
-      * @see:OgamlGraphics.RenderTarget.T 
-      * @see:OgamlMath.Vector2i 
+      * @see:OgamlGraphics.RenderTarget.T
+      * @see:OgamlMath.Vector2i
       * @see:OgamlGraphics.Context *)
-    val create : (module RenderTarget.T with type t = 'a) -> 'a -> 
+    val create : (module RenderTarget.T with type t = 'a) -> 'a ->
                  ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None] ->
-                 [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] -> t
+                 ?format:TextureFormat.t ->
+                 [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] ->
+                 (t, [> `Texture_too_large
+                      | `File_not_found of string
+                      | `Loading_error of string]) result
 
-    (** Returns the size of a texture 
+    (** Returns the size of a texture
       * @see:OgamlMath.Vector2i *)
     val size : t -> OgamlMath.Vector2i.t
 
@@ -852,13 +1036,12 @@ module Texture : sig
 
     (** Sets the wrapping function of a texture. Defaults as ClampEdge.  *)
     val wrap : t -> WrapFunction.t -> unit
-    
+
     (** Returns the number of mipmap levels of a texture *)
     val mipmap_levels : t -> int
 
-    (** Returns a mipmap level of a texture.
-      * Raises $Invalid_argument$ if the requested level is out of bounds *)
-    val mipmap : t -> int -> Texture2DMipmap.t
+    (** Returns a mipmap level of a texture. *)
+    val mipmap : t -> int -> (Texture2DMipmap.t, [> `Invalid_mipmap]) result
 
     (** System only function, binds a texture to a texture unit for drawing *)
     val bind : t -> int -> unit
@@ -870,9 +1053,96 @@ module Texture : sig
   end
 
 
+  (** Represents a mipmap level of a 2D depth texture *)
+  module DepthTexture2DMipmap : sig
+
+    (** Type of a 2D mipmap level *)
+    type t
+
+    (** Size of the mipmap level @see:OgamlMath.Vector2i *)
+    val size : t -> OgamlMath.Vector2i.t
+
+    (** Writes an image to a sub-rectangle of a mipmap level.
+      * Writes to the full mipmap level by default.
+      * @see:OgamlMath.IntRect
+      * @see:OgamlGraphics.Image *)
+    val write : t -> ?rect:OgamlMath.IntRect.t -> Image.t -> unit
+
+    (** Returns the level of a DepthTexture2DMipmap.t *)
+    val level : t -> int
+
+    (** System only function, binds the original texture of the mipmap *)
+    val bind : t -> int -> unit
+
+    (** DepthTexture2DMipmap implements the interface DepthAttachable and
+      * can be attached to an FBO.
+      * @see:OgamlGraphics.Attachment.DepthAttachment *)
+    val to_depth_attachment : t -> Attachment.DepthAttachment.t
+
+  end
+
+
+  (** Represents a 2D depth texture *)
+  module DepthTexture2D : sig
+
+    (** This module provides an abstraction of OpenGL 2D depth textures
+      * that can be used for 2D rendering (with sprites) or
+      * 3D rendering when passed to a GLSL program. *)
+
+    (** Type of a 2D depth texture *)
+    type t
+
+    (** Creates a texture from some data (in row-major order, starting from the
+      * bottom left corner), or an empty texture.
+      * Generates all mipmaps by default.
+      *
+      * @see:OgamlGraphics.RenderTarget.T
+      * @see:OgamlMath.Vector2i
+      * @see:OgamlGraphics.Context *)
+    val create : (module RenderTarget.T with type t = 'a) -> 'a ->
+                 ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None] ->
+                 DepthFormat.t ->
+                 [< `Data of (OgamlMath.Vector2i.t * Bytes.t) | `Empty of OgamlMath.Vector2i.t] ->
+                 (t, [> `Insufficient_data
+                      | `Texture_too_large
+                      | `File_not_found of string
+                      | `Loading_error of string]) result
+
+    (** Returns the size of a texture
+      * @see:OgamlMath.Vector2i *)
+    val size : t -> OgamlMath.Vector2i.t
+
+    (** Sets the minifying filter of a texture. Defaults as LinearMipmapLinear. *)
+    val minify : t -> MinifyFilter.t -> unit
+
+    (** Sets the magnifying filter of a texture. Defaults as Linear *)
+    val magnify : t -> MagnifyFilter.t -> unit
+
+    (** Sets the wrapping function of a texture. Defaults as ClampEdge.  *)
+    val wrap : t -> WrapFunction.t -> unit
+
+    (** Sets the depth comparison function of a texture. Defaults as None,
+      * in which case comparison is disabled.  *)
+    val compare_function : t -> CompareFunction.t option -> unit
+
+    (** Returns the number of mipmap levels of a texture *)
+    val mipmap_levels : t -> int
+
+    (** Returns a mipmap level of a texture. *)
+    val mipmap : t -> int -> (DepthTexture2DMipmap.t, [> `Invalid_mipmap]) result
+
+    (** System only function, binds a texture to a texture unit for drawing *)
+    val bind : t -> int -> unit
+
+    (** DepthTexture2D implements the interface DepthAttachable and can be
+      * attached to an FBO. Binds the mipmap level 0. *)
+    val to_depth_attachment : t -> Attachment.DepthAttachment.t
+
+  end
+
   (** Represents a layer's mipmap of a 2D texture array *)
   module Texture2DArrayLayerMipmap : sig
-  
+
     (** This module gives an abstract representation of a mipmap level
       * of a particular layer of a texture array *)
 
@@ -893,14 +1163,14 @@ module Texture : sig
 
     (** System only : binds the original texture array for drawing *)
     val bind : t -> int -> unit
-    
+
     (** Texture2DArrayLayerMipmap implements the interface ColorAttachable
       * and can be attached to an FBO *)
     val to_color_attachment : t -> Attachment.ColorAttachment.t
 
   end
 
-  
+
   (** Represents a mipmap level of a 2D texture array *)
   module Texture2DArrayMipmap : sig
 
@@ -919,9 +1189,8 @@ module Texture : sig
     (** Returns the mipmap's level *)
     val level : t -> int
 
-    (** Returns the mipmap of a particular layer 
-      * Raises $Invalid_argument$ if the layer does not exist. *)
-    val layer : t -> int -> Texture2DArrayLayerMipmap.t
+    (** Returns the mipmap of a particular layer *)
+    val layer : t -> int -> (Texture2DArrayLayerMipmap.t, [> `Invalid_layer]) result
 
   end
 
@@ -944,16 +1213,15 @@ module Texture : sig
     (** Returns the number of mipmap levels of a layer *)
     val mipmap_levels : t -> int
 
-    (** Returns a particular mipmap level of a layer
-      * Raises $Invalid_argument$ if the mipmap level does not exist. *)
-    val mipmap : t -> int -> Texture2DArrayLayerMipmap.t
+    (** Returns a particular mipmap level of a layer *)
+    val mipmap : t -> int -> (Texture2DArrayLayerMipmap.t, [> `Invalid_mipmap]) result
 
     (** System only : binds the original texture array for drawing *)
     val bind : t -> int -> unit
 
     (** Texture2DArrayLayerMipmap implements the interface ColorAttachable
       * and can be attached to an FBO. Binds the mipmap level 0. *)
-    val to_color_attachment : t -> Attachment.ColorAttachment.t 
+    val to_color_attachment : t -> Attachment.ColorAttachment.t
 
   end
 
@@ -964,20 +1232,23 @@ module Texture : sig
     (** This module provides an abstraction of OpenGL 2D texture arrays *)
 
     (** Type of a 2D texture array *)
-    type t 
+    type t
 
     (** Creates a texture array from a list of files, images, or empty
       * layers of given dimensions.
       * Generates all mipmaps by default for every layer by default.
-      *
-      * Raises $Texture_error$ if the requested size exceeds the maximal texture 
-      * size allowed by the context.
-      *
-      * Also raises $Texture_error$ if the list of layers is empty, or
-      * if all the layers do not have the same dimensions. *)
+      * The default format is RGBA8 *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a
                  -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
-                 -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list -> t
+                 -> ?format:TextureFormat.t
+                 -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list ->
+                 (t, [> `No_input_files
+                      | `Non_equal_input_sizes
+                      | `Texture_too_large
+                      | `Texture_too_deep
+                      | `File_not_found of string
+                      | `Loading_error of string]) result
+
 
     (** Returns the size of a texture array *)
     val size : t -> OgamlMath.Vector3i.t
@@ -997,13 +1268,11 @@ module Texture : sig
     (** Returns the number of mipmap levels of a texture. *)
     val mipmap_levels : t -> int
 
-    (** Returns a particular layer of a texture array.
-      * Raises $Invalid_argument$ if the layer does not exist. *)
-    val layer : t -> int -> Texture2DArrayLayer.t
+    (** Returns a particular layer of a texture array. *)
+    val layer : t -> int -> (Texture2DArrayLayer.t, [> `Invalid_layer]) result
 
-    (** Returns a particular mipmap of a texture array. 
-      * Raises $Invalid_argument$ if the mipmap level does not exist. *)
-    val mipmap : t -> int -> Texture2DArrayMipmap.t
+    (** Returns a particular mipmap of a texture array. *)
+    val mipmap : t -> int -> (Texture2DArrayMipmap.t, [> `Invalid_mipmap]) result
 
   end
 
@@ -1026,7 +1295,7 @@ module Texture : sig
     val level : t -> int
 
     (** Returns the face corresponding to this face's mipmap *)
-    val face : t -> [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ] 
+    val face : t -> [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ]
 
     (** System only : binds the original cubemap texture *)
     val bind : t -> int -> unit
@@ -1052,10 +1321,10 @@ module Texture : sig
     val mipmap_levels : t -> int
 
     (** Returns a particular mipmap level of this face *)
-    val mipmap : t -> int -> CubemapMipmapFace.t
+    val mipmap : t -> int -> (CubemapMipmapFace.t, [> `Invalid_mipmap]) result
 
     (** Returns the face corresponding to this texture *)
-    val face : t -> [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ] 
+    val face : t -> [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ]
 
     (** System only : binds the original texture for drawing *)
     val bind : t -> int -> unit
@@ -1065,10 +1334,10 @@ module Texture : sig
 
   end
 
-  
+
   (** Mipmap level of a cubemap texture *)
   module CubemapMipmap : sig
-    
+
     (** Represents a single mipmap level of a cubemap texture *)
 
     (** Type of a mipmap level *)
@@ -1081,7 +1350,7 @@ module Texture : sig
     val level : t -> int
 
     (** Returns a particular face of this mipmap *)
-    val face : t -> [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ] 
+    val face : t -> [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ]
                  -> CubemapMipmapFace.t
 
     (** System only : binds the original texture for drawing *)
@@ -1092,7 +1361,7 @@ module Texture : sig
 
   (** Cubemap textures *)
   module Cubemap : sig
-    
+
     (** This module provides an abstraction of OpenGL's cubemap textures *)
 
     (** Cubemap texture *)
@@ -1101,21 +1370,21 @@ module Texture : sig
     (** Creates a cubemap texture from 6 textures, images or empty layers of
       * a given dimension.
       * Generates all mipmaps by default.
-      *
-      * Raises $Texture_error$ if the requested size exceeds the maximal texture 
-      * size allowed by the context.
-      *
-      * Also raises $Texture_error$ if the 6 textures, images or empty layers
-      * do not have the same dimensions. *)
+      * The default format is RGBA8. *)
     val create : (module RenderTarget.T with type t = 'a) -> 'a
                  -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+                 -> ?format:TextureFormat.t
                  -> positive_x:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                  -> positive_y:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                  -> positive_z:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                  -> negative_x:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                  -> negative_y:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
                  -> negative_z:[< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t]
-                 -> unit -> t
+                 -> unit ->
+                 (t, [> `Texture_too_large
+                      | `Non_equal_input_sizes
+                      | `File_not_found of string
+                      | `Loading_error of string]) result
 
     (** Size of a face of a cubemap texture *)
     val size : t -> OgamlMath.Vector2i.t
@@ -1133,14 +1402,92 @@ module Texture : sig
     val mipmap_levels : t -> int
 
     (** Returns a particular mipmap level of a texture *)
-    val mipmap : t -> int -> CubemapMipmap.t
+    val mipmap : t -> int -> (CubemapMipmap.t, [> `Invalid_mipmap]) result
 
     (** Returns a particular face of a texture *)
-    val face : t -> [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ] 
+    val face : t -> [`PositiveX | `PositiveY | `PositiveZ | `NegativeX | `NegativeY | `NegativeZ]
                  -> CubemapFace.t
 
     (** System only : binds the texture for drawing *)
     val bind : t -> int -> unit
+
+  end
+
+
+  (** Represents a mipmap level of a 3D texture *)
+  module Texture3DMipmap : sig
+
+    (** This module gives an abstract representation of a mipmap level
+      * of a 3D texture *)
+
+    (** Type of a 3D texture's mipmap *)
+    type t
+
+    (** Size of a mipmap *)
+    val size : t -> OgamlMath.Vector3i.t
+
+    (** Returns the mipmap level *)
+    val level : t -> int
+
+    (** Focuses a particular layer of the 3D texture's mipmap *)
+    val layer : t -> int -> (t, [> `Invalid_layer]) result
+
+    (** Returns the currently focused layer of the 3D texture's mipmap *)
+    val current_layer : t -> int
+
+    (** Writes to the currently focused layer of the mipmap *)
+    val write : t -> OgamlMath.IntRect.t -> Image.t -> unit
+
+    (** System only : binds the original 3D texture for drawing *)
+    val bind : t -> int -> unit
+
+    (** Texture3DMipmap implements the interface ColorAttachable
+      * and the focused layer can be attached to an FBO *)
+    val to_color_attachment : t -> Attachment.ColorAttachment.t
+
+  end
+
+
+  (** Represents 3D textures *)
+  module Texture3D : sig
+
+    (** This module provides an abstraction of OpenGL 3D textures *)
+
+    (** Type of a 3D texture *)
+    type t
+
+    (** Creates a 3D texture from a list of files, images, or empty
+      * layers of given dimensions.
+      * Generates all mipmaps by default.
+      * The default format is RGBA8. *)
+    val create : (module RenderTarget.T with type t = 'a) -> 'a
+                 -> ?mipmaps:[`AllEmpty | `Empty of int | `AllGenerated | `Generated of int | `None]
+                 -> ?format:TextureFormat.t
+                 -> [< `File of string | `Image of Image.t | `Empty of OgamlMath.Vector2i.t] list ->
+                 (t, [> `Texture_too_large
+                      | `Non_equal_input_sizes
+                      | `No_input_files
+                      | `File_not_found of string
+                      | `Loading_error of string]) result
+
+
+    (** Returns the size of a 3D texture *)
+    val size : t -> OgamlMath.Vector3i.t
+
+    (** Sets the minifying filter of a texture. Defaults as LinearMipmapLinear. *)
+    val minify : t -> MinifyFilter.t -> unit
+
+    (** Sets the magnifying filter of a texture. Defaults as Linear. *)
+    val magnify : t -> MagnifyFilter.t -> unit
+
+    (** Sets the wrapping function of a texture. Defaults as ClampEdge. *)
+    val wrap : t -> WrapFunction.t -> unit
+
+    (** Returns the number of mipmap levels of a texture. *)
+    val mipmap_levels : t -> int
+
+    (** Returns a particular mipmap of a 3D texture. *)
+    val mipmap : t -> int -> (Texture3DMipmap.t, [> `Invalid_mipmap]) result
 
   end
 
@@ -1177,9 +1524,6 @@ module Font : sig
   (** This module stores a font and dynamically
     * loads sizes and glyphs as requested by the user *)
 
-  (** Raised when an error occur in this module *)
-  exception Font_error of string
-
   (** Type of a font *)
   type t
 
@@ -1187,7 +1531,7 @@ module Font : sig
   type code = [`Char of char | `Code of int]
 
   (** Loads a font from a file *)
-  val load : string -> t
+  val load : string -> (t, [> `File_not_found of string | `Invalid_font_file]) result
 
   (** $glyph font code size bold$ returns the glyph
     * representing the character $code$ in $font$
@@ -1217,14 +1561,16 @@ module Font : sig
 
   (** Returns the texture associated to a font.
     * In this texture, every layer correspond to a font size (in loading order).
-    * Use $Font.size_index$ to get the layer associated to a font size. 
+    * Use $Font.size_index$ to get the layer associated to a font size.
     * This texture is not mipmapped. *)
-  val texture : (module RenderTarget.T with type t = 'a) -> 'a -> 
-                t -> Texture.Texture2DArray.t
+  val texture : (module RenderTarget.T with type t = 'a) -> 'a ->
+                t ->
+                (Texture.Texture2DArray.t,
+                  [> `Font_texture_size_overflow
+                   | `Font_texture_depth_overflow]) result
 
-  (** Returns the index associated to a font size in the font's texture.
-    * Raises Font_error if the font size has not been loaded yet. *)
-  val size_index : t -> int -> int
+  (** Returns the index associated to a font size in the font's texture. *)
+  val size_index : t -> int -> (int, [> `Invalid_font_size]) result
 
 end
 
@@ -1235,24 +1581,24 @@ module Program : sig
   (** This module provides a high-level wrapper around GL shader programs
     * and can be used to compile shaders. *)
 
-  (** Raised when an error occurs during the manipulation of a program *)
-  exception Program_error of string
-
   (** Type of a program *)
   type t
 
   (** Type of a source, from a file or from a string *)
   type src = [`File of string | `String of string]
 
-  (** Compiles a program from a rendering context, a vertex source 
+  (** Compiles a program from a rendering context, a vertex source
     * and a fragment source.
     * Compilation errors will be reported on the provided log.
-    * The source must begin with a version assigment $#version xxx$ 
+    * The source must begin with a version assigment $#version xxx$
     * @see:OgamlUtils.Log *)
-  val from_source : (module RenderTarget.T with type t = 'a) -> 
-                    ?log:OgamlUtils.Log.t ->
-                    context:'a -> 
-                    vertex_source:src -> fragment_source:src -> unit -> t
+  val from_source : (module RenderTarget.T with type t = 'a) ->
+    context:'a -> vertex_source:src -> fragment_source:src ->
+    (t, [> `Context_failure
+         | `Vertex_compilation_error of string
+         | `Fragment_compilation_error of string
+         | `Linking_failure
+         | `Unsupported_GLSL_type]) result
 
   (** Compiles a program from a rendering context and
     * a list of sources paired with their required GLSL version.
@@ -1261,23 +1607,28 @@ module Program : sig
     * @see:OgamlGraphics.Context
     * @see:OgamlUtils.Log *)
   val from_source_list : (module RenderTarget.T with type t = 'a) ->
-                         ?log:OgamlUtils.Log.t ->
-                         context:'a  ->
-                         vertex_source:(int * src) list ->
-                         fragment_source:(int * src) list -> unit -> t
+    context:'a  -> vertex_source:(int * src) list -> fragment_source:(int * src) list ->
+    (t, [> `Context_failure
+         | `Vertex_compilation_error of string
+         | `Fragment_compilation_error of string
+         | `Linking_failure
+         | `Unsupported_GLSL_version
+         | `Unsupported_GLSL_type]) result
 
   (** Compiles a program from a rendering context and a source.
     * The source should not begin with a $#version xxx$ assignment,
     * as the function will preprocess the sources and prepend the
     * best version declaration.
     * Compilation errors will be reported on the provided log.
-    * @see:OgamlGraphics.Context 
+    * @see:OgamlGraphics.Context
     * @see:OgamlUtils.Log *)
   val from_source_pp : (module RenderTarget.T with type t = 'a) ->
-                       ?log:OgamlUtils.Log.t ->
-                       context:'a ->
-                       vertex_source:src ->
-                       fragment_source:src -> unit -> t
+    context:'a -> vertex_source:src -> fragment_source:src ->
+    (t, [> `Context_failure
+         | `Vertex_compilation_error of string
+         | `Fragment_compilation_error of string
+         | `Linking_failure
+         | `Unsupported_GLSL_type]) result
 
 end
 
@@ -1288,11 +1639,6 @@ module Uniform : sig
   (** This module encapsulates a set of uniforms that
     * can be passed to GLSL programs. *)
 
-  (** Raised when an error occurs while creating or when drawing using
-    * a uniform. *)
-  exception Invalid_uniform of string
-
-
   (** Type of a set of uniforms *)
   type t
 
@@ -1301,34 +1647,61 @@ module Uniform : sig
 
   (** $vector3f name vec set$ adds the uniform $vec$ to $set$.
     * the uniform should be refered to as $name$ in a glsl program.
-    * Raises $Invalid_uniform$ if $name$ is already bound in $set$.
     * Type : vec3.
     * @see:OgamlMath.Vector3f *)
-  val vector3f : string -> OgamlMath.Vector3f.t -> t -> t
+  val vector3f : string -> OgamlMath.Vector3f.t -> t -> (t, [> `Duplicate_uniform of string]) result
+
+  (** Same as vector3f except any previously existing uniform with the same name
+    * is replaced. *)
+  val vector3f_r : string -> OgamlMath.Vector3f.t -> t -> t
 
   (** See vector3f. Type : vec2. @see:OgamlMath.Vector2f *)
-  val vector2f : string -> OgamlMath.Vector2f.t -> t -> t
+  val vector2f : string -> OgamlMath.Vector2f.t -> t -> (t, [> `Duplicate_uniform of string]) result
+
+  (** See vector3f_r. Type : vec2. @see:OgamlMath.Vector2f *)
+  val vector2f_r : string -> OgamlMath.Vector2f.t -> t -> t
 
   (** See vector3f. Type : vec3i. @see:OgamlMath.Vector3i *)
-  val vector3i : string -> OgamlMath.Vector3i.t -> t -> t
+  val vector3i : string -> OgamlMath.Vector3i.t -> t -> (t, [> `Duplicate_uniform of string]) result
+
+  (** See vector3f_r. Type : vec3i. @see:OgamlMath.Vector3i *)
+  val vector3i_r : string -> OgamlMath.Vector3i.t -> t -> t
 
   (** See vector3f. Type : vec2i. @see:OgamlMath.Vector2i *)
-  val vector2i : string -> OgamlMath.Vector2i.t -> t -> t
+  val vector2i : string -> OgamlMath.Vector2i.t -> t -> (t, [> `Duplicate_uniform of string]) result
+
+  (** See vector3f_r. Type : vec2i. @see:OgamlMath.Vector2i *)
+  val vector2i_r : string -> OgamlMath.Vector2i.t -> t -> t
 
   (** See vector3f. Type : int. *)
-  val int : string -> int -> t -> t
+  val int : string -> int -> t -> (t, [> `Duplicate_uniform of string]) result
+
+  (** See vector3f_r. Type : int. *)
+  val int_r : string -> int -> t -> t
 
   (** See vector3f. Type : float. *)
-  val float : string -> float -> t -> t
+  val float : string -> float -> t -> (t, [> `Duplicate_uniform of string]) result
 
-  (** See vector3f. Type : mat3. @see:OgamlMath.Matrix3D *)
-  val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> t
+  (** See vector3f_r. Type : float. *)
+  val float_r : string -> float -> t -> t
 
-  (** See vector3f. Type : mat2. @see:OgamlMath.Matrix2D *)
-  val matrix2D : string -> OgamlMath.Matrix2D.t -> t -> t
+  (** See vector3f. Type : mat4. @see:OgamlMath.Matrix3D *)
+  val matrix3D : string -> OgamlMath.Matrix3D.t -> t -> (t, [> `Duplicate_uniform of string]) result
+
+  (** See vector3f_r. Type : mat4. @see:OgamlMath.Matrix3D *)
+  val matrix3D_r : string -> OgamlMath.Matrix3D.t -> t -> t
+
+  (** See vector3f. Type : mat3. @see:OgamlMath.Matrix2D *)
+  val matrix2D : string -> OgamlMath.Matrix2D.t -> t -> (t, [> `Duplicate_uniform of string]) result
+
+  (** See vector3f_r. Type : mat3. @see:OgamlMath.Matrix2D *)
+  val matrix2D_r : string -> OgamlMath.Matrix2D.t -> t -> t
 
   (** See vector3f. Type : vec4. @see:OgamlGraphics.Color *)
-  val color : string -> Color.t -> t -> t
+  val color : string -> Color.t -> t -> (t, [> `Duplicate_uniform of string]) result
+
+  (** See vector3f_r. Type : vec4. @see:OgamlGraphics.Color *)
+  val color_r : string -> Color.t -> t -> t
 
   (** See vector3f. Type : sampler2D.
    *
@@ -1336,22 +1709,71 @@ module Uniform : sig
     * unit that is used to bind this texture. If not provided, it
     * defaults to the next available unit. If no additional units
     * are available, or if a unit is explicitly bound twice, drawing
-    * with the uniform will raise $Invalid_uniform$.
+    * with the uniform will return $Error$.
     *
     * See $Context.capabilities$ for the number of available units.
     * @see:OgamlGraphics.Texture.Texture2D
     * @see:OgamlGraphics.Context *)
-  val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
+  val texture2D : string -> ?tex_unit:int -> Texture.Texture2D.t -> t ->
+    (t, [> `Duplicate_uniform of string]) result
+
+  (** Same as texture2D except any previously existing uniform with the same name
+    * is replaced. Type: sampler2D. *)
+  val texture2D_r : string -> ?tex_unit:int -> Texture.Texture2D.t -> t -> t
+
+  (** See texture2D. Type : sampler2D.
+    *
+    * @see:OgamlGraphics.Texture.DepthTexture2D *)
+  val depthtexture2D : string -> ?tex_unit:int -> Texture.DepthTexture2D.t -> t ->
+    (t, [> `Duplicate_uniform of string]) result
+
+  (** See texture2D_r. Type : sampler2D.
+    *
+    * @see:OgamlGraphics.Texture.DepthTexture2D *)
+  val depthtexture2D_r : string -> ?tex_unit:int -> Texture.DepthTexture2D.t -> t -> t
+
+  (** See texture2D. Type : sampler2DShadow.
+    *
+    * @see:OgamlGraphics.Texture.DepthTexture2D *)
+  val shadow2D : string -> ?tex_unit:int -> ?comparison:Texture.CompareFunction.t -> Texture.DepthTexture2D.t -> t -> (t, [> `Duplicate_uniform of string]) result
+
+  (** See texture2D_r. Type : sampler2DShadow.
+    *
+    * @see:OgamlGraphics.Texture.DepthTexture2D *)
+  val shadow2D_r : string -> ?tex_unit:int -> ?comparison:Texture.CompareFunction.t -> Texture.DepthTexture2D.t -> t -> t
+
+  (** See texture2D. Type : sampler3D.
+    *
+    * @see:OgamlGraphics.Texture.Texture3D *)
+  val texture3D : string -> ?tex_unit:int -> Texture.Texture3D.t -> t ->
+    (t, [> `Duplicate_uniform of string]) result
+
+  (** See texture2D_r. Type : sampler3D.
+    *
+    * @see:OgamlGraphics.Texture.Texture3D *)
+  val texture3D_r : string -> ?tex_unit:int -> Texture.Texture3D.t -> t -> t
 
   (** See texture2D. Type : sampler2Darray.
     *
     * @see:OgamlGraphics.Texture.Texture2DArray *)
-  val texture2Darray : string -> ?tex_unit:int -> Texture.Texture2DArray.t -> t -> t
+  val texture2Darray : string -> ?tex_unit:int -> Texture.Texture2DArray.t -> t ->
+    (t, [> `Duplicate_uniform of string]) result
 
-  (** See texture2D. Type : samplerCube. 
+  (** See texture2D_r. Type : sampler2Darray.
+    *
+    * @see:OgamlGraphics.Texture.Texture2DArray *)
+  val texture2Darray_r : string -> ?tex_unit:int -> Texture.Texture2DArray.t -> t -> t
+
+  (** See texture2D. Type : samplerCube.
     *
     * @see:OgamlGraphics.Texture.Cubemap *)
-  val cubemap : string -> ?tex_unit:int -> Texture.Cubemap.t -> t -> t
+  val cubemap : string -> ?tex_unit:int -> Texture.Cubemap.t -> t ->
+    (t, [> `Duplicate_uniform of string]) result
+
+  (** See texture2D_r. Type : samplerCube.
+    *
+    * @see:OgamlGraphics.Texture.Cubemap *)
+  val cubemap_r : string -> ?tex_unit:int -> Texture.Cubemap.t -> t -> t
 
 end
 
@@ -1366,8 +1788,22 @@ module Window : sig
     * to obtain information about the GL context. *)
 
   (*** Window creation *)
+
   (** The type of a window *)
   type t
+
+  (** Module encapsulating an enumeration of the output buffers of a window *)
+  module OutputBuffer : sig
+
+    (** Enumeration of the output buffers of a window *)
+    type t =
+      | FrontLeft
+      | FrontRight
+      | BackLeft
+      | BackRight
+      | None
+
+  end
 
   (** Creates a window of size $width$ x $height$.
     * This window will create its openGL context following the specified settings.
@@ -1385,7 +1821,9 @@ module Window : sig
     ?width:int ->
     ?height:int ->
     ?title:string ->
-    ?settings:OgamlCore.ContextSettings.t -> unit -> t
+    ?settings:OgamlCore.ContextSettings.t -> unit ->
+    (t, [> `Window_creation_error of string
+         | `Context_initialization_error of string]) result
 
   (** Returns the settings used at the creation of the window *)
   val settings : t -> OgamlCore.ContextSettings.t
@@ -1411,8 +1849,8 @@ module Window : sig
     * @see:OgamlMath.Vector2i *)
   val resize : t -> OgamlMath.Vector2i.t -> unit
 
-  (** Toggles the full screen mode of a window. *)
-  val toggle_fullscreen : t -> unit
+  (** Toggles the full screen mode of a window. Returns $true$ if successful. *)
+  val toggle_fullscreen : t -> bool
 
   (** Returns the rectangle associated to a window, in screen coordinates
     * @see:OgamlMath.IntRect *)
@@ -1440,18 +1878,22 @@ module Window : sig
   val display : t -> unit
 
   (** Clears the window.
-    * Clears the color buffer with opaque black by default. 
-    * Clears the depth buffer and the stencil buffer by default. *)
-  val clear : ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t -> unit
+    * Clears the color buffer with opaque black by default.
+    * Clears the depth buffer and the stencil buffer by default.
+    *
+    * $buffers$ defaults to $[BackLeft]$ *)
+  val clear : ?buffers:OutputBuffer.t list -> ?color:Color.t option -> ?depth:bool -> ?stencil:bool -> t ->
+              (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer]) result
 
   (** Show or hide the cursor *)
   val show_cursor : t -> bool -> unit
 
   (** Binds the window for drawing. This function is for internal use only. *)
-  val bind : t -> DrawParameter.t -> unit
+  val bind : t -> ?buffers:OutputBuffer.t list -> DrawParameter.t ->
+             (unit, [> `Too_many_draw_buffers | `Duplicate_draw_buffer]) result
 
   (** Takes a screenshot of the window *)
-  val screenshot : t -> Image.t 
+  val screenshot : t -> Image.t
 
 end
 
@@ -1492,8 +1934,7 @@ module IndexArray : sig
     val length : t -> int
 
     (** $append s1 s2$ appends the source $s2$ at the end of the source $s1$ (in place),
-      * and returns $s1$.
-      * Raises Invalid_source if types are incompatible. *)
+      * and returns $s1$. *)
     val append : t -> t -> t
 
   end
@@ -1515,12 +1956,12 @@ module IndexArray : sig
     * @see:OgamlGraphics.IndexArray.Source *)
   val dynamic : (module RenderTarget.T with type t = 'a) -> 'a -> Source.t -> dynamic t
 
-  (** $rebuild array src offset$ rebuilds $array$ starting from
+  (** $rebuild (module M) context array src offset$ rebuilds $array$ starting from
     * the index at position $offset$ using $src$.
     *
     * The index array is modified in-place and is resized as needed.
     * @see:OgamlGraphics.IndexArray.Source *)
-  val rebuild : dynamic t -> Source.t -> int -> unit
+  val rebuild : (module RenderTarget.T with type t = 'a) -> 'a -> dynamic t -> Source.t -> int -> unit
 
   (** Returns the length of an index array *)
   val length : 'a t -> int
@@ -1533,39 +1974,54 @@ module VertexArray : sig
 
   (** This modules provides a high-level and safe access to
     * openGL vertex arrays. Vertex arrays are used to store
-    * vertices on the GPU and can be used to render 3D models. 
+    * vertices on the GPU and can be used to render 3D models.
     *
     *
-    * The idea behind this module is to provide a safe way to
-    * create vertex arrays in 3 steps:
+    * This module aims at providing a safe way to
+    * create vertex arrays in 4 steps:
     *
     *
-    *   - First, you will need to create a vertex structure. This 
+    *   - First, you will need to create a vertex structure. This
     * is done using the function Vertex.make. You can add attributes
     * to your structure V by calling V.attribute and giving them a
-    * name and type. 
+    * name and type. You can also provide a divisor that will be used
+    * for instanced rendering.
     *
     * The attributes will be passed to GLSL programs
     * under the provided name. Once you have added some attributes
-    * to your structure, you need to seal it using V.seal. 
+    * to your structure, you need to seal it using V.seal.
     *
-    * Be careful as once a structure is sealed, you cannot add 
+    * Be careful as once a structure is sealed, you cannot add
     * attributes to it anymore. You can then create vertices that will
     * contain the attributes of your structure using V.create.
     *
     * Alternatively, you can use the module SimpleVertex which
-    * is a predefined vertex structure containing a position, 
+    * is a predefined non-instanced vertex structure containing a position,
     * texture coordinates, a color, and a normal.
     *
     *
     *   - Secondly, you will need to create a source which contains
-    * vertices. This is done using VertexSource.empty. The module
-    * VertexSource provides several useful functions to manipulate
+    * vertices. This is done using Source.empty. The module
+    * Source provides several useful functions to manipulate
     * sources of vertices.
     *
     *
-    *   - Finally, you can create a vertex array using one of the 
-    * two functions $static$ or $dynamic$.
+    *   - Thirdly, you need to upload the source to the GPU by using the module
+    * Buffer, using one of the two functions $Buffer.static$ or $Buffer.dynamic$.
+    * Once sent to the GPU, you can use Buffer.unpack to un-protect the type
+    * by removing phantom types, which leads us to the fourth and last step:
+    *
+    *
+    *   - Finally, you can create a vertex array from a collection of (unpacked)
+    * vertex buffers. This vertex array can be drawn to a target using the
+    * function $draw$. Every attribute required by the GLSL program will be
+    * automatically bound to the buffer of the vertex array that contains an
+    * attribute with the same name. As such, when calling $VertexArray.create$
+    * on a collection of buffers, every attribute name must appear only once.
+    *
+    * Moreover, if any of the buffers contains an instanced attribute (that is,
+    * an attribute with a non-zero divisor), the vertex array will be flaged as
+    * "instanced", and all the draw calls will automatically use instanced rendering.
     *)
 
 
@@ -1575,17 +2031,8 @@ module VertexArray : sig
     (** This module provides a way to create and manipulate vertex structures
       * and vertices.
       *
-      * A vertex is a collection attributes, and a vertex structure 
+      * A vertex is a collection attributes, and a vertex structure
       * creates vertices that have the same attributes. *)
-
-    (** Raised when trying to add an attribute to a sealed structure *)
-    exception Sealed_vertex of string
-
-    (** Raised when trying to create a vertex from an unsealed structure *)
-    exception Unsealed_vertex of string
-
-    (** Raised when trying to get the value of an unset attribute *)
-    exception Unbound_attribute of string
 
     (** Type of a vertex *)
     type 'a t
@@ -1636,8 +2083,11 @@ module VertexArray : sig
       val set : 'b t -> ('a, 'b) s -> 'a -> unit
 
       (** Gets the value of a vertex's attribute.
-        * Raises $Unbound_attribute$ if the attribute is not initialized. *)
-      val get : 'b t -> ('a, 'b) s -> 'a
+        * Returns $Error$ if the attribute is not initialized. *)
+      val get : 'b t -> ('a, 'b) s -> ('a, [> `Unbound_attribute of string]) result
+
+      (** Returns the divisor of the attribute used during instanced rendering. *)
+      val divisor : ('a, 'b) s -> int
 
       (** Returns the name of an attribute, that is, the name
         * that will refer to this attribute in a GLSL program. *)
@@ -1656,17 +2106,20 @@ module VertexArray : sig
       type s
 
       (** Adds an attribute to this structure.
-        * Raises $Sealed_vertex$ if the structure is sealed. *)
-      val attribute : string -> 'a AttributeType.s -> ('a, s) Attribute.s
+        *
+        * $divisor$ corresponds to the attribute's divisor for instanced rendering,
+        * and defaults to $0$ (non-instanced) *)
+      val attribute : string -> ?divisor:int -> 'a AttributeType.s ->
+        (('a, s) Attribute.s, [> `Sealed_vertex | `Duplicate_attribute]) result
 
       (** Seals this structure. Once sealed, the structure can be used to
         * create vertices but cannot receive new attributes.
-        * Raises $Sealed_vertex$ if the structure is already sealed. *)
-      val seal : unit -> unit
+        * Returns $Error$ if the structure is already sealed. *)
+      val seal : unit -> (unit, [> `Sealed_vertex]) result
 
       (** Creates a vertex following this structure.
-        * Raises $Unsealed_vertex$ if the structure is not sealed. *)
-      val create : unit -> s t
+        * Returns $Error$ if the structure is not sealed. *)
+      val create : unit -> (s t, [>`Unsealed_vertex]) result
 
       (** Creates a copy of a vertex *)
       val copy : s t -> s t
@@ -1706,7 +2159,7 @@ module VertexArray : sig
     module T : Vertex.VERTEX
 
     (** Creates a vertex with predefined attributes *)
-    val create : 
+    val create :
       ?position:OgamlMath.Vector3f.t ->
       ?color:Color.t ->
       ?uv:OgamlMath.Vector2f.t ->
@@ -1728,10 +2181,10 @@ module VertexArray : sig
 
 
   (** Vertex source *)
-  module VertexSource : sig
+  module Source : sig
 
     (** This module represents vertex sources, which are collections of
-      * vertices. 
+      * vertices.
       *
       *
       * This module ensures that everything goes well. In particular, it
@@ -1740,20 +2193,13 @@ module VertexArray : sig
       *
       *
       * An empty source can receive any vertex. The type of the source
-      * is then fixed by the first vertex added to it. Any vertex 
+      * is then fixed by the first vertex added to it. Any vertex
       * added to the source after the first one must have at least the
-      * same initialized attributes as the first vertex. 
+      * same initialized attributes as the first vertex.
       *
       *
       * Note that the type of a source is reinitialized if the source is
       * cleared. *)
-
-    (** Raised if a vertex is missing some of the attributes required by
-      * the source. *)
-    exception Uninitialized_field of string
-
-    (** Raised when trying to concatenate incompatible sources. *)
-    exception Incompatible_sources 
 
     (** Type of a vertex source *)
     type 'a t
@@ -1762,104 +2208,200 @@ module VertexArray : sig
       * an initial size can be specified with $size$. *)
     val empty : ?size:int -> unit -> 'a t
 
-    (** Adds a vertex to a source. If the source is not empty, the vertex must 
+    (** Adds a vertex to a source. If the source is not empty, the vertex must
       * have at least the same initialized fields as the first vertex put into
       * the source. *)
-    val add : 'a t -> 'a Vertex.t -> unit
+    val add : 'a t -> 'a Vertex.t -> (unit, [> `Missing_attribute of string]) result
 
     (** Convenient operator to add vertices to a source. *)
-    val (<<) : 'a t -> 'a Vertex.t -> 'a t
+    val (<<) : 'a t -> 'a Vertex.t -> ('a t, [> `Missing_attribute of string]) result
+
+    (** Convenient operator to add vertices to a source that can easily
+      * be chained. *)
+    val (<<<) : ('a t, [> `Missing_attribute of string] as 'b) result -> 'a Vertex.t ->
+      ('a t, 'b) result
 
     (** Returns the length (in vertices) of a source. *)
     val length : 'a t -> int
 
     (** Clears the source. Any source that has been converted into a vertex array
-      * can be safely cleared and reused. 
+      * can be safely cleared and reused.
       * This avoids reallocation and garbage collection. *)
     val clear : 'a t -> unit
 
-    (** $append s1 s2$ appends the source $s2$ to $s1$. $s2$ is not modified. *) 
-    val append : 'a t -> 'a t -> unit
+    (** $append s1 s2$ appends the source $s2$ to $s1$. $s2$ is not modified.
+      *
+      * Returns $Error$ if both sources do not contain the same fields. *)
+    val append : 'a t -> 'a t -> (unit, [> `Incompatible_fields]) result
 
     (** Iterates through all the vertices of a source. *)
     val iter : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> unit) -> unit
 
     (** Maps all the vertices of a source to a new source. *)
-    val map : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t
+    val map : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) ->
+      ('b t, [> `Missing_attribute of string]) result
 
     (** Maps all the vertices of a source to an existing source. *)
-    val map_to : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t -> unit
+    val map_to : 'a t -> ?start:int -> ?length:int -> ('a Vertex.t -> 'b Vertex.t) -> 'b t ->
+      (unit, [> `Missing_attribute of string]) result
 
   end
 
-  (** Raised when trying to draw with a program that requires an attribute
-    * not provided by the vertex array. *)
-  exception Missing_attribute of string
 
-  (** Raised when trying to draw with a program that requires an attribute
-    * of a different type than the one provided by the vertex array. *)
-  exception Invalid_attribute of string
+  (** Vertex buffer *)
+  module Buffer : sig
 
-  (** Raised when trying to draw an invalid slice of a vertex array. *)
-  exception Out_of_bounds of string
+    (** This module represents vertex buffers, which are vertex sources that
+      * have been uploaded to the GPU.
+      *
+      * A buffer can be either static or dynamic. The data of a dynamic
+      * buffer can be changed using $blit$, whereas the data of a static buffer
+      * cannot. However, a static buffer provides faster accesses, and
+      * should therefore be used whenever possible.
+      *
+      * Buffers can also be unpacked using $unpack$ which unprotects the type
+      * but allows the user to build lists of buffers. *)
 
-  (** Phantom type for static arrays *)
-  type static
+    (** Phantom type for static buffers *)
+    type static
 
-  (** Phantom type for dynamic arrays *)
-  type dynamic
+    (** Phantom type for dynamic buffers *)
+    type dynamic
 
-  (** Type of a vertex array (static or dynamic) *)
-  type ('a, 'b) t 
+    (** Type of a buffer with vertices of type $'b$ *)
+    type ('a, 'b) t
 
-  (** Creates a static array from a source. A static array is faster
-    * but cannot be modified later. @see:OgamlGraphics.VertexArray.Source *)
-  val static : (module RenderTarget.T with type t = 'a) 
-                -> 'a -> 'b VertexSource.t -> (static, 'b) t
+    (** Type of an unprotected buffer *)
+    type unpacked
 
-  (** Creates a dynamic vertex array that can be modified later.
-    * @see:OgamlGraphics.VertexArray.Source *)
-  val dynamic : (module RenderTarget.T with type t = 'a) 
-                 -> 'a -> 'b VertexSource.t -> (dynamic, 'b) t
+    (** Creates a static buffer from a source. A static buffer is faster
+      * but cannot be modified later. @see:OgamlGraphics.VertexArray.Source *)
+    val static : (module RenderTarget.T with type t = 'a)
+                  -> 'a -> 'b Source.t -> (static, 'b) t
 
-  (** $rebuild array src offset$ rebuilds $array$ starting from
-    * the vertex at position $offset$ using $src$.
+    (** Creates a dynamic buffer from a source. A dynamic buffer can be
+      * modified later. @see:OgamlGraphics.VertexArray.Source *)
+    val dynamic : (module RenderTarget.T with type t = 'a)
+                   -> 'a -> 'b Source.t -> (dynamic, 'b) t
+
+    (** Returns the length (in vertices) of a vertex buffer. *)
+    val length : (_, _) t -> int
+
+    (** $blit (module M) context buffer ~first ~length source$ copies
+      * $length$ vertices from $source$ to $buffer$, starting from the
+      * $first$-th element of $buffer$. $buffer$ is modified in place and is
+      * resized as needed.
+      *
+      * $first$ defaults to $0$
+      *
+      * $length$ defaults to the length of $source$ *)
+    val blit    : (module RenderTarget.T with type t = 'a) ->
+                   'a -> (dynamic, 'b) t ->
+                   ?first:int -> ?length:int ->
+                   'b Source.t ->
+                   (unit, [> `Invalid_start | `Invalid_length | `Incompatible_sources]) result
+
+    (** Unprotect a buffer so that it is possible to build lists of buffers. *)
+    val unpack : (_, _) t -> unpacked
+
+  end
+
+  (** Type of a vertex array *)
+  type t
+
+  (** Creates a vertex array from a list of vertex buffers. *)
+  val create : (module RenderTarget.T with type t = 'a) -> 'a -> Buffer.unpacked list -> t
+
+  (** Returns the maximal number of vertices that can be drawn with the array. *)
+  val length : t -> int
+
+  (** Returns the maximal number of instanced that can be drawn with the array.
+    * Returns $None$ if none of the buffers are instanced. *)
+  val max_instances : t -> int option
+
+  (** Draws $length$ vertices starting from $start$ of the vertex array $vertices$
+    * on $target$ using the given parameters. Is the vertex array is instanced,
+    * it draws $instances$ instances. Otherwise, the parameter $instances$
+    * is ignored.
     *
-    * The vertex array is modified in-place and is resized as needed.
-    * @see:OgamlGraphics.VertexArray.Source *)
-  val rebuild : (dynamic, 'b) t -> 'b VertexSource.t -> int -> unit
-
-  (** Returns the length of a vertex array *)
-  val length : ('a, 'b) t -> int
-
-  (** Draws the slice starting at $start$ of length $length$ of a vertex array on a
-    * window using the given parameters.
+    * $start$ defaults to 0.
     *
-    * $start$ defaults to 0
+    * If $length$ is not provided, then the whole vertex array (starting from $start$) is drawn.
     *
-    * if $length$ is not provided, then the whole vertex array (starting from $start$) is drawn
+    * If $instances$ is not provided and if the data is instanced, then
+    * $max_instances vertices$ instances are drawn.
     *
     * $uniform$ should provide the uniforms required by $program$ (defaults to empty)
     *
     * $parameters$ defaults to $DrawParameter.make ()$
     *
+    * $buffers$ defaults to $[Color 0]$ for custom framebuffers, and to
+    * $[BackLeft]$ for the default framebuffer (Window).
+    *
     * $mode$ defaults to $DrawMode.Triangles$
+    *
+    * Quite a lot of errors can occur here. Here is a summary of all of them:
+    *
+    *   - $`Wrong_attribute_type str$ occurs when the attribute $str$ in $vertices$ does
+    * not have the type required by $program$.
+    *
+    *   - $`Missing_attribute str$ occurs when the attribute $str$ is required by
+    * $program$ but is not present in $vertices$.
+    *
+    *   - $`Invalid_slice$ occurs when $start$ and $length$ do not define a valid
+    * slice of $vertices$.
+    *
+    *   - $`Invalid_instance_count$ occurs when $instances$ does not define a
+    * valid number of instances for $indices$.
+    *
+    *   - $`Invalid_uniform_type str$ occurs when the uniform $str$ does not have
+    * the type required by $program$.
+    *
+    *   - $`Invalid_texture_unit i$ occurs if $uniform$ binds a texture with
+    * an invalid unit $i$.
+    *
+    *   - $`Missing_uniform str$ occurs if $program$ requires a uniform $str$ that
+    * is not available in $uniform$.
+    *
+    *   - $`Too_many_textures$ occurs if $uniform$ tries to bind more textures
+    * than the number of available units.
+    *
+    *   - $`Duplicate_draw_buffer$ occurs if the same draw buffer is bound twice
+    * in $parameters$.
+    *
+    *   - $`Too_many_draw_buffers$ occurs if $parameters$ tries to bind more
+    * draw buffers than supported by the context.
+    *
+    *   - $`Invalid_color_buffer$ occurs if $parameters$ tries to bind an
+    * invalid color buffer unit.
     *
     * @see:OgamlGraphics.IndexArray @see:OgamlGraphics.Window
     * @see:OgamlGraphics.Program @see:OgamlGraphics.Uniform
     * @see:OgamlGraphics.DrawParameter @see:OgamlGraphics.DrawMode *)
   val draw :
-    (module RenderTarget.T with type t = 'a) ->
-    vertices   : ('b, 'c) t ->
+    (module RenderTarget.T with type t = 'a and type OutputBuffer.t = 'b) ->
+    vertices   : t ->
     target     : 'a ->
-    ?indices   : 'd IndexArray.t ->
+    ?instances : int ->
+    ?indices   : _ IndexArray.t ->
     program    : Program.t ->
     ?uniform    : Uniform.t ->
     ?parameters : DrawParameter.t ->
+    ?buffers   : 'b list ->
     ?start     : int ->
     ?length    : int ->
     ?mode      : DrawMode.t ->
-    unit -> unit
+    unit -> (unit, [> `Wrong_attribute_type of string
+                   | `Missing_attribute of string
+                   | `Invalid_slice
+                   | `Invalid_instance_count
+                   | `Invalid_uniform_type of string
+                   | `Invalid_texture_unit of int
+                   | `Missing_uniform of string
+                   | `Too_many_textures
+                   | `Duplicate_draw_buffer
+                   | `Too_many_draw_buffers
+                   | `Invalid_color_buffer]) result
 
 end
 
@@ -1870,134 +2412,75 @@ module Model : sig
   (** This module provides helpers to manipulate and load
     * immutable 3D models in the RAM.
     *
-    * Moreover, the operations provided in this module are generally costly
-    * and should not be used in performance-sensitive code.
-    *
-    * Models stored in that form are not RAM-friendly, and
-    * should not be stored in large numbers. Use vertex arrays
-    * instead. *)
+    * All faces are assumed to be triangles.
+    * Square faces are stored as two triangles. *)
 
-  (** Represents a particular vertex of a model *)
-  module Vertex : sig
+  open OgamlMath
 
-    (** Type of a model vertex *)
+  (** Represents the location of a parsing error *)
+  module Location : sig
+
+    (** Modules that stores a representation of the location of a parsing
+      * error for OBJ files *)
+
+    (** Location type *)
     type t
 
-    (** Creates a model vertex *)
-    val create : position:OgamlMath.Vector3f.t ->
-                ?normal:OgamlMath.Vector3f.t   ->
-                ?uv:OgamlMath.Vector2f.t       ->
-                ?color:Color.t -> unit -> t
+    (** First line of the error *)
+    val first_line : t -> int
 
-    (** Returns the position of a model vertex *)
-    val position : t -> OgamlMath.Vector3f.t
+    (** Last line of the error *)
+    val last_line : t -> int
 
-    (** Returns the normal of a model vertex *)
-    val normal : t -> OgamlMath.Vector3f.t option
+    (** First char of the error *)
+    val first_char : t -> int
 
-    (** Returns the UV coordinates associated to a model vertex *)
-    val uv : t -> OgamlMath.Vector2f.t option
+    (** Last char of the error *)
+    val last_char : t -> int
 
-    (** Returns the color of a model vertex *)
-    val color : t -> Color.t option
+    (** Returns a pretty-printed string of the location *)
+    val to_string : t -> string
 
   end
-
-
-  (** Represents a face of a model *)
-  module Face : sig
-
-    (** Type of a face *)
-    type t
-
-    (** Creates a face from 3 vertices *)
-    val create : Vertex.t -> Vertex.t -> Vertex.t -> t
-
-    (** Returns the two triangles associated to 4 vertices *)
-    val quad : Vertex.t -> Vertex.t -> Vertex.t -> Vertex.t -> (t * t)
-
-    (** Returns the 3 vertices of a face *)
-    val vertices : t -> (Vertex.t * Vertex.t * Vertex.t)
-
-    (** Returns a new face painted with a given color *)
-    val paint : t -> Color.t -> t
-
-    (** Returns the normal of a face *)
-    val normal : t -> OgamlMath.Vector3f.t
-
-  end
-
-
-  (** Raised if an OBJ file is ill-formed or if a model has a wrong type *)
-  exception Error of string
 
   (** Type of a model *)
   type t
 
+  (*** Operations on models *)
+
+  (** Premultiply every point a model to yield a new one *)
+  val transform : Matrix3D.t -> t -> t
+
+  (** Scale a model *)
+  val scale : Vector3f.t -> t -> t
+
+  (** Tranlation of a model *)
+  val translate : Vector3f.t -> t -> t
+
+  (** Rotation of a model *)
+  val rotate : Quaternion.t -> t -> t
+
+  (** Create a copy of the object with computed normals (where missing) *)
+  val compute_normals : t -> t
+
   (*** Model creation *)
 
-  (** Empty model *)
-  val empty : t
+  (** Read a file in Wavefront (.obj) format to create a model *)
+  val from_obj :
+    ?compute_normals: bool ->
+    string ->
+    (t, [> `Syntax_error of (Location.t * string)
+         | `Parsing_error of Location.t]) result
 
-  (** Returns the model associated to an OBJ file *)
-  val from_obj : string -> t
+  (*** Usage *)
 
-  (** Creates a cube from two endpoints *)
-  val cube : OgamlMath.Vector3f.t -> OgamlMath.Vector3f.t -> t
-
-
-  (*** Transformations *)
-
-  (** Applies a transformation to a 3D model *)
-  val transform : t -> OgamlMath.Matrix3D.t -> t
-
-  (** Scales a 3D model *)
-  val scale : t -> OgamlMath.Vector3f.t -> t
-
-  (** Translates a 3D model *)
-  val translate : t -> OgamlMath.Vector3f.t -> t
-
-  (** Rotates a 3D model *)
-  val rotate : t -> OgamlMath.Quaternion.t -> t
-
-
-  (*** Model modification *)
-
-  (** Adds a face to a model *)
-  val add_face : t -> Face.t -> t
-
-  (** Paints the whole model with a given color *)
-  val paint : t -> Color.t -> t
-
-  (** Merges two models *)
-  val merge : t -> t -> t
-
-  (** (Re-)computes the normals of a model. If $smooth$ is $true$,
-    * then the normals are computed per-vertex instead of per-face *)
-  val compute_normals : ?smooth:bool -> t -> t
-
-  (** Simpifies a model (removes all redundant faces) *)
-  val simplify : t -> t
-
-  (** Appends a model to a vertex source. Uses indexing if an index source is provided.
-    * Use Triangles as DrawMode with this source.
-    * @see:OgamlGraphics.IndexArray.Source
-    * @see:OgamlGraphics.VertexArray.Source *)
-  val source : t -> ?index_source:IndexArray.Source.t 
-                 -> vertex_source:VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t 
-                 -> unit -> unit
-
-
-  (*** Iterators *)
-
-  (** Iterates through all faces of a model *)
-  val iter : t -> (Face.t -> unit) -> unit
-
-  (** Folds through all faces of a model *)
-  val fold : t -> ('a -> Face.t -> 'a) -> 'a -> 'a
-
-  (** Maps a model face by face *)
-  val map : t -> (Face.t -> Face.t) -> t
+  (** Add the model vertices to a VertexArray *)
+  val add_to_source :
+    VertexArray.SimpleVertex.T.s VertexArray.Source.t ->
+    t ->
+    (VertexArray.SimpleVertex.T.s VertexArray.Source.t,
+     [> `Missing_attribute of string ]
+    ) result
 
 end
 
@@ -2121,19 +2604,21 @@ module Shape : sig
   (*** Vertex array access *)
 
   (** Outputs a shape to a vertex array source.
-    * 
+    *
     * This outputs triangles with position
     * and color attributes.
     *
     * Use DrawMode.Triangles with this source. *)
-  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t -> unit
+  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t ->
+    (unit, [> `Missing_attribute of string]) result
 
   (** Outputs a shape to a vertex array source by mapping its vertices.
     *
     * See $to_source$ for more information. *)
-  val map_to_source : t -> 
-                      (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
-                      'b VertexArray.VertexSource.t -> unit
+  val map_to_source : t ->
+    (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) ->
+    'b VertexArray.Source.t ->
+    (unit, [> `Missing_attribute of string]) result
 
 end
 
@@ -2154,7 +2639,7 @@ module Sprite : sig
     ?color    : Color.t ->
     ?size     : OgamlMath.Vector2f.t ->
     ?rotation : float ->
-    unit -> t
+    unit -> (t, [> `Invalid_subrect]) result
 
   (** Draws a sprite on a window using the given parameters.
     *
@@ -2162,7 +2647,7 @@ module Sprite : sig
     *
     * @see:OgamlGraphics.DrawParameter
     * @see:OgamlGraphics.Window *)
-  val draw : (module RenderTarget.T with type t = 'a) -> 
+  val draw : (module RenderTarget.T with type t = 'a) ->
              ?parameters:DrawParameter.t -> target:'a -> sprite:t -> unit -> unit
 
   (** Sets the position of the origin of the sprite in the window. *)
@@ -2215,19 +2700,21 @@ module Sprite : sig
   (*** Vertex array access *)
 
   (** Outputs a sprite to a vertex array source.
-    * 
+    *
     * This outputs two triangles with UV coordinates
     * and position attributes.
     *
     * Use DrawMode.Triangles with this source. *)
-  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t -> unit
+  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t ->
+    (unit, [> `Missing_attribute of string]) result
 
   (** Outputs a sprite to a vertex array source by mapping its vertices.
     *
     * See $to_source$ for more information. *)
-  val map_to_source : t -> 
-                      (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
-                      'b VertexArray.VertexSource.t -> unit
+  val map_to_source : t ->
+                      (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) ->
+                      'b VertexArray.Source.t ->
+                      (unit, [> `Missing_attribute of string]) result
 
 end
 
@@ -2291,7 +2778,7 @@ module Text : sig
       font : Font.t ->
       colors : (Font.code,'b,Color.t list) full_it ->
       size : int ->
-      unit -> t
+      unit -> (t, [> `Invalid_UTF8_bytes | `Invalid_UTF8_leader]) result
 
     (** Draws a Fx.t. *)
     val draw :
@@ -2299,7 +2786,8 @@ module Text : sig
       ?parameters : DrawParameter.t ->
       text : t ->
       target : 'a ->
-      unit -> unit
+      unit ->
+      (unit, [> `Font_texture_size_overflow | `Font_texture_depth_overflow]) result
 
     (** The global advance of the text.
       * Basically it is a vector such that if you add it to the position of
@@ -2323,7 +2811,7 @@ module Text : sig
     ?color : Color.t ->
     size : int ->
     ?bold : bool ->
-    unit -> t
+    unit -> (t, [> `Invalid_UTF8_bytes | `Invalid_UTF8_leader]) result
 
   (** Draws text on the screen. *)
   val draw :
@@ -2331,7 +2819,8 @@ module Text : sig
     ?parameters : DrawParameter.t ->
     text : t ->
     target : 'a ->
-    unit -> unit
+    unit ->
+    (unit, [> `Font_texture_size_overflow | `Font_texture_depth_overflow]) result
 
   (** The global advance of the text.
     * Basically it is a vector such that if you add it to the position of
@@ -2344,20 +2833,22 @@ module Text : sig
   (*** Vertex array access *)
 
   (** Outputs text vertices to a vertex array source.
-    * 
+    *
     * This outputs triangles with UV coordinates, color
     * and position attributes.
     *
     * Use DrawMode.Triangles with this source and bind the
     * correct font before use. *)
-  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.VertexSource.t -> unit
+  val to_source : t -> VertexArray.SimpleVertex.T.s VertexArray.Source.t ->
+    (unit, [> `Missing_attribute of string]) result
 
   (** Outputs text vertices to a vertex array source by mapping its vertices.
     *
     * See $to_source$ for more information. *)
-  val map_to_source : t -> 
-                      (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) -> 
-                      'b VertexArray.VertexSource.t -> unit
+  val map_to_source : t ->
+                      (VertexArray.SimpleVertex.T.s VertexArray.Vertex.t -> 'b VertexArray.Vertex.t) ->
+                      'b VertexArray.Source.t ->
+                      (unit, [> `Missing_attribute of string]) result
 end
 
 
@@ -2417,5 +2908,3 @@ module Keyboard : sig
   val is_alt_down : unit -> bool
 
 end
-
-

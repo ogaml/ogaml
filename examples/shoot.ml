@@ -1,7 +1,16 @@
 open OgamlGraphics
 open OgamlCore
-open OgamlUtils
 open OgamlMath
+open OgamlUtils
+open Result.Operators
+
+let fail ?msg err = 
+  Log.fatal Log.stdout "%s" err;
+  begin match msg with
+  | None -> ()
+  | Some e -> Log.fatal Log.stderr "%s" e
+  end;
+  exit 2
 
 module GameState = struct
 
@@ -80,22 +89,29 @@ module GameState = struct
       true
     end
 
+  let text_handler txt = 
+    Result.handle (function
+      | `Invalid_UTF8_bytes -> fail "Invalid UTF8 sequence"
+      | `Invalid_UTF8_leader -> fail "Invalid UTF8") txt
+
   let display win s font = 
     let rule_text1 = 
-      Text.create 
+      OgamlGraphics.Text.create 
         ~font 
         ~text:" : right click" 
         ~size:15 
         ~bold:false 
         ~position:Vector2f.({x = 35.; y = 25.}) ()
+        |> text_handler
     in
     let rule_text2 = 
-      Text.create 
+      OgamlGraphics.Text.create 
         ~font 
         ~text:" : left click" 
         ~size:15 
         ~bold:false 
         ~position:Vector2f.({x = 35.; y = 55.}) ()
+        |> text_handler
     in
     let rule_square1 = 
       Shape.create_rectangle 
@@ -110,36 +126,40 @@ module GameState = struct
         ~color:(`RGB Color.RGB.green) ()
     in
     let score_text1 = 
-      Text.create
+      OgamlGraphics.Text.create
         ~font
         ~text:(Printf.sprintf "Clicked rectangles : %i" s.count)
         ~size:15
         ~bold:false
         ~position:Vector2f.({x = 500.; y = 25.}) ()
+        |> text_handler
     in
     let score_text2 = 
-      Text.create
+      OgamlGraphics.Text.create
         ~font
         ~text:(Printf.sprintf "Missed clicks : %i" s.missed)
         ~size:15
         ~bold:false
         ~position:Vector2f.({x = 500.; y = 55.}) ()
+        |> text_handler
     in
     let score_text3 = 
-      Text.create
+      OgamlGraphics.Text.create
         ~font
         ~text:(Printf.sprintf "Avg time per rectangle : %f" ((Unix.gettimeofday () -. s.starting_time) /. (float_of_int s.count)))
         ~size:15
         ~bold:false
         ~position:Vector2f.({x = 500.; y = 85.}) ()
+        |> text_handler
     in
     let score_text4 = 
-      Text.create
+      OgamlGraphics.Text.create
         ~font
         ~text:(Printf.sprintf "Hit ratio : %f" ((float_of_int s.count)/.(float_of_int (s.count + s.missed))))
         ~size:15
         ~bold:false
         ~position:Vector2f.({x = 500.; y = 115.}) ()
+        |> text_handler
     in
     let click_square = 
       Shape.create_rectangle
@@ -149,23 +169,34 @@ module GameState = struct
         ()
     in
     Shape.draw (module Window) ~target:win ~shape:rule_square1 ();
-    Text.draw  (module Window) ~target:win ~text:rule_text1 ();
+    OgamlGraphics.Text.draw  (module Window) ~target:win ~text:rule_text1 () |> Result.assert_ok;
     Shape.draw (module Window) ~target:win ~shape:rule_square2 ();
-    Text.draw  (module Window) ~target:win ~text:rule_text2 ();
+    OgamlGraphics.Text.draw  (module Window) ~target:win ~text:rule_text2 () |> Result.assert_ok;
     Shape.draw (module Window) ~target:win ~shape:click_square ();
-    Text.draw (module Window) ~target:win ~text:score_text1 ();
-    Text.draw (module Window) ~target:win ~text:score_text2 ();
-    Text.draw (module Window) ~target:win ~text:score_text3 ();
-    Text.draw (module Window) ~target:win ~text:score_text4 ();
+    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text1 () |> Result.assert_ok;
+    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text2 () |> Result.assert_ok;
+    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text3 () |> Result.assert_ok;
+    OgamlGraphics.Text.draw (module Window) ~target:win ~text:score_text4 () |> Result.assert_ok;
     s.last_hits <- List.filter (display_hit win) s.last_hits
     
 end
 
-let window = Window.create ~width:800 ~height:600 ~title:"Shoot !" ()
+let window = 
+  match Window.create ~width:800 ~height:600 ~title:"Shoot !" () with
+  | Ok win -> win
+  | Error (`Context_initialization_error msg) -> 
+    fail ~msg "Failed to create context"
+  | Error (`Window_creation_error msg) -> 
+    fail ~msg "Failed to create window"
+
 
 let state = GameState.create ()
 
-let font = Font.load "examples/font1.ttf"
+let font = 
+  match Font.load "examples/font1.ttf" with
+  | Ok font -> font
+  | Error (`File_not_found f) -> fail ("Cannot open font file " ^ f)
+  | Error `Invalid_font_file -> fail "Invalid font file"
 
 let rec event_loop () =
   match Window.poll_event window with
@@ -181,7 +212,7 @@ let rec event_loop () =
 
 let rec main_loop () =
   if Window.is_open window then begin
-    Window.clear ~color:(Some (`RGB Color.RGB.white)) window ;
+    Window.clear ~color:(Some (`RGB Color.RGB.white)) window |> Result.assert_ok;
     GameState.display window state font;
     Window.display window;
     event_loop ();

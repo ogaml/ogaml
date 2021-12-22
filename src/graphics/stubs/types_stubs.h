@@ -36,6 +36,8 @@ GLenum Minify_val(value min);
 
 GLenum Wrap_val(value wrp);
 
+GLenum TexCompare_val(value cmp);
+
 GLenum TextureFormat_val(value fmt);
 
 GLenum PixelFormat_val(value fmt);
@@ -51,5 +53,11 @@ GLenum VBOKind_val(value kind);
 GLenum Attachment_val(value att);
 
 GLenum Parameter_val(value par);
+
+GLenum WindowOutputBuffer_val(value par);
+
+GLenum FBOOutputBuffer_val(value par);
+
+GLenum Query_val(value query);
 
 #endif

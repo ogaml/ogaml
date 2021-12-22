@@ -152,6 +152,7 @@ module Event : sig
     | ButtonReleased  of ButtonEvent.t (* A mouse button has been released *)
     | MouseMoved      of OgamlMath.Vector2i.t (* The mouse has been moved *)
     | MouseWheelMoved of float (* The mouse wheel has been moved of $delta$ *)
+    | TextEntered     of char (* A character has been entered *)
 
 end
 
@@ -213,6 +214,12 @@ module ContextSettings : sig
                ?resizable:bool ->
                ?fullscreen:bool ->
                ?framerate_limit:int ->
+               ?major_version:int ->
+               ?minor_version:int ->
+               ?forward_compatible:bool ->
+               ?debug:bool ->
+               ?core_profile:bool ->
+               ?compatibility_profile:bool ->
                unit -> t
 
   (** Returns the requested AA level *)
@@ -224,14 +231,32 @@ module ContextSettings : sig
   (** Returns the requested number of stencil buffer bits *)
   val stencil_bits : t -> int
 
-  (** Returns true iff the settings require a resizable window *)
+  (** Returns $true$ iff the settings require a resizable window *)
   val resizable : t -> bool
 
-  (** Returns true iff the settings require fullscreen mode *)
+  (** Returns $true$ iff the settings require fullscreen mode *)
   val fullscreen : t -> bool
 
   (** Returns the requested framerate limit, if any *)
   val framerate_limit : t -> int option
+
+  (** Returns the requested major version, if any *)
+  val major_version : t -> int option
+
+  (** Returns the requested minor version, if any *)
+  val minor_version : t -> int option
+  
+  (** Returns $true$ if a forward compatible context is requested (defaults to false) *)
+  val forward_compatible : t -> bool
+
+  (** Returns $true$ if a debug context is requested (defaults to false) *)
+  val debug : t -> bool
+   
+  (** Returns $true$ if a core profile context is requested (defaults to false) *)
+  val core_profile : t -> bool
+   
+  (** Returns $true$ if a compatibility profile context is requested (defaults to false) *)
+  val compatibility_profile : t -> bool
 
 end
 
@@ -253,7 +278,8 @@ module LL : sig
     (** Type of a window *)
     type t
 
-    (** Creates a window of a given size *)
+    (** Creates a window of a given size. Might raise Failure if something
+      * goes wrong. *)
     val create : width:int -> height:int -> title:string -> settings:ContextSettings.t -> t
 
     (** Sets the tite of the window. *)
@@ -278,8 +304,8 @@ module LL : sig
       * @see:OgamlMath.Vector2i *)
     val resize : t -> OgamlMath.Vector2i.t -> unit
 
-    (** Toggle the full screen mode of a window *)
-    val toggle_fullscreen : t -> unit
+    (** Toggle the full screen mode of a window. Returns $true$ if successful. *)
+    val toggle_fullscreen : t -> bool
 
     (** Returns $true$ iff the window is open *)
     val is_open : t -> bool

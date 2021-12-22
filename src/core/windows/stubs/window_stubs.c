@@ -6,6 +6,10 @@
 value* callback_get_window_from_id;
 value* callback_push_event_to_window;
 
+#ifndef WN_MOUSEHWHEEL
+#define WM_MOUSEHWHEEL                  0x020E
+#endif
+
 value getModifiers()
 {
     CAMLparam0();

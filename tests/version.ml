@@ -1,15 +1,20 @@
 open OgamlGraphics
+open OgamlUtils
 
 let () =
-  Printf.printf "Beginning version test...\n%!"
+  Log.info Log.stdout "Beginning version test..."
 
-let settings = OgamlCore.ContextSettings.create ()
+let settings = OgamlCore.ContextSettings.create ~core_profile:true ()
 
-let window = Window.create ~width:100 ~height:100 ~settings ~title:"" ()
+let window = 
+  match Window.create ~width:100 ~height:100 ~settings ~title:"" () with
+  | Ok win -> win
+  | Error (`Context_initialization_error s) -> failwith ("Failed to create context: " ^ s)
+  | Error (`Window_creation_error s) -> failwith ("Failed to create window: " ^ s)
 
 let context = Window.context window
 
 let () = 
-  Printf.printf "GLSL Version : %i\n%!" (Context.glsl_version context);
+  Log.info Log.stdout "GLSL Version : %i" (Context.glsl_version context);
   let (maj, min) = (Context.version context) in
-  Printf.printf "OpenGL Version : %i.%i\n%!" maj min
+  Log.info Log.stdout "OpenGL Version : %i.%i" maj min

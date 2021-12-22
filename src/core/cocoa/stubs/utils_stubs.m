@@ -106,6 +106,9 @@ void warpCursor(NSPoint loc)
                                              0);
   CGEventPost(kCGHIDEventTap, event);
   CFRelease(event);
+
+  // Other solution (too strict!)
+  // CGWarpMouseCursorPosition(newCursorPosition);
 }
 
 CAMLprim value
@@ -263,11 +266,11 @@ caml_cocoa_create_nsrect(value x, value y, value w, value h)
   CAMLparam4(x,y,w,h);
 
   CAMLlocal1(mlrect);
-  mlrect = caml_alloc_custom(&empty_custom_opts, sizeof(NSRect), 0, 1);
+  NSRect_alloc(mlrect);
 
   NSRect rect = NSMakeRect(Double_val(x), Double_val(y), Double_val(w), Double_val(h));
 
-  memcpy(Data_custom_val(mlrect), &rect, sizeof(NSRect));
+  NSRect_copy(mlrect, &rect);
 
   CAMLreturn(mlrect);
 }
@@ -278,7 +281,7 @@ caml_cocoa_get_nsrect(value mlrect)
   CAMLparam1(mlrect);
   CAMLlocal1(tuple);
 
-  NSRect* rect = (NSRect*) Data_custom_val(mlrect);
+  NSRect* rect = NSRect_val(mlrect);
 
   tuple = caml_alloc(4,0);
   Store_field(tuple,0,caml_copy_double(rect->origin.x));

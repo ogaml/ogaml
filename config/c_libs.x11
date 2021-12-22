@@ -1,0 +1,1 @@
+(-lX11 -lGL -lX11-xcb -lxcb -lopenal)

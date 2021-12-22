@@ -25,11 +25,13 @@
 
 #define TEX(_a) (*(GLuint*) Data_custom_val(_a))
 
-#define MLvar_Minify  (254173077)
+#define MLvar_Minify hash_variant("Minify")
 
-#define MLvar_Magnify (-1011094397)
+#define MLvar_Magnify hash_variant("Magnify")
 
-#define MLvar_Wrap (1940966357)
+#define MLvar_Wrap hash_variant("Wrap")
+
+#define MLvar_TexCompare hash_variant("Compare")
 
 void finalise_tex(value v)
 {
@@ -276,6 +278,15 @@ caml_tex_parameter(value typ, value loc)
     glTexParameteri(Target_val(typ), GL_TEXTURE_WRAP_S, Wrap_val(Field(loc, 1)));
     glTexParameteri(Target_val(typ), GL_TEXTURE_WRAP_R, Wrap_val(Field(loc, 1)));
     glTexParameteri(Target_val(typ), GL_TEXTURE_WRAP_T, Wrap_val(Field(loc, 1)));
+  }
+  else if(Field(loc, 0) == MLvar_TexCompare) {
+    if(Field(loc, 1) == Val_none) {
+      glTexParameteri(Target_val(typ), GL_TEXTURE_COMPARE_MODE, GL_NONE);
+    }
+    else {
+      glTexParameteri(Target_val(typ), GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+      glTexParameteri(Target_val(typ), GL_TEXTURE_COMPARE_FUNC, TexCompare_val(Some_val(Field(loc, 1))));
+    }
   }
   else {
     caml_failwith("Caml polymorphic variant error in tex_parameter_2D(1)");

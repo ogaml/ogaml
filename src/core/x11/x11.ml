@@ -41,8 +41,8 @@ module Display = struct
 end
 
 
-(* VisualInfo module *)
-module VisualInfo = struct
+(* GLXFBConfig module *)
+module GLXFBConfig = struct
 
   type t
 
@@ -93,13 +93,28 @@ module GLContext = struct
 
   type t
 
-  (* Exposed functions *)
-  external create : Display.t -> VisualInfo.t -> t = "caml_glx_create_context"
+  type flags = {debug : bool; fwd_compat : bool}
 
+  type profile = {compat : bool; core : bool}
+
+  type attribute = 
+    | MajorVersion of int
+    | MinorVersion of int
+    | Flags        of flags
+    | ProfileMask  of profile
+
+  (* Abstract functions *)
+  external abstract_create : Display.t -> GLXFBConfig.t -> attribute list -> int -> t = "caml_glx_create_context"
+
+  (* Exposed functions *)
   external destroy : Display.t -> t -> unit = "caml_glx_destroy_context"
 
   external debug : unit -> unit = "caml_glcontext_debug"
 
+  (* Implementations *)
+  let create display vi attributes = 
+    let length = List.length attributes * 2 in
+    abstract_create display vi attributes length
 end
 
 
@@ -114,7 +129,7 @@ module Window = struct
   external abstract_root_window : Display.t -> int -> t = "caml_xroot_window"
 
   external abstract_create_simple_window : 
-    Display.t -> t -> (int * int) -> (int * int) -> VisualInfo.t -> t
+    Display.t -> t -> (int * int) -> (int * int) -> GLXFBConfig.t -> t
     = "caml_xcreate_simple_window"
 
 
@@ -226,7 +241,7 @@ module Event = struct
   (* Event enum *)
   type enum = 
     | Unknown
-    | KeyPress      of key * modifiers
+    | KeyPress      of key * int * modifiers
     | KeyRelease    of key * modifiers
     | ButtonPress   of int * position * modifiers
     | ButtonRelease of int * position * modifiers

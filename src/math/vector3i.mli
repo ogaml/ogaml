@@ -1,7 +1,5 @@
 (* Operation on immutable 3 ints vectors *)
 
-exception Vector3i_exception of string
-
 type t = {x : int; y : int; z : int}
 
 val make : int -> int -> int -> t
@@ -20,7 +18,7 @@ val sub : t -> t -> t
 
 val prop : int -> t -> t
 
-val div : int -> t -> t
+val div : int -> t -> (t, [> `Division_by_zero]) result
 
 val pointwise_product : t -> t -> t
 

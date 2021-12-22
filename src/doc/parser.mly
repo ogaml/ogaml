@@ -5,11 +5,11 @@
 %token <string> DOCCOMMENT
 %token <string> TITLECOMMENT
 %token <string> OPERATOR
-%token APOSTROPHE QUOTE QMARK LPAREN RPAREN
+%token APOSTROPHE QUOTE QMARK LPAREN RPAREN UNDERSCORE
 %token STAR COLON SEMICOLON EQUALS
 %token LBRACE RBRACE LBRACK RBRACK
 %token PIPE DOT ARROW COMMA
-%token MODULE VAL TYPE END SIG EXN OF FUNCTOR WITH AND
+%token MODULE VAL TYPE END SIG EXN OF FUNCTOR WITH AND AS
 %token LOWER GREATER
 %token MUTABLE
 
@@ -70,6 +70,7 @@ type_params:
 atomic_type:
   | m = UIDENT; DOT; a = atomic_type {AST.ModuleType(m,a)}
   | a = LIDENT {AST.AtomType(a)}
+  | UNDERSCORE {AST.NoType}
   ;
 
 module_type:
@@ -81,9 +82,8 @@ value_type:
   | t = atomic_type {t}
   | APOSTROPHE; v = LIDENT {AST.PolyType v}
   | LBRACE; r = record_content; RBRACE {AST.Record r}
-  | LBRACK; LOWER; r = vp_content; RBRACK {AST.PolyVariant (AST.Lower, r)}
-  | LBRACK; GREATER; r = vp_content; RBRACK {AST.PolyVariant (AST.Greater, r)}
-  | LBRACK; r = vp_content; RBRACK {AST.PolyVariant (AST.Equals, r)}
+  | pv = poly_variant {let v,p = pv in AST.PolyVariant (v,p,None)}
+  | pv = poly_variant; AS; APOSTROPHE; t = LIDENT {let v,p = pv in AST.PolyVariant (v,p,Some t)}
   | LPAREN; t = delim_value_type; RPAREN {t}
   | LPAREN; MODULE; t = module_type; cons = type_constraints; RPAREN {AST.FCModule (t,cons)}
   | r = value_type_param; t = atomic_type {AST.ParamType (r,t)}
@@ -106,12 +106,12 @@ functor_params:
 
 opt_constraints:
   | {[]}
-  | AND; TYPE; l = LIDENT; EQUALS; t = value_type; o = opt_constraints {(l,t)::o}
+  | AND; TYPE; l = atomic_type; EQUALS; t = value_type; o = opt_constraints {(l,t)::o}
   ;
 
 type_constraints:
   | {[]}
-  | WITH; TYPE; l = LIDENT; EQUALS; t = value_type; o = opt_constraints {(l,t)::o}
+  | WITH; TYPE; l = atomic_type; EQUALS; t = value_type; o = opt_constraints {(l,t)::o}
   ;
 
 delim_value_type:
@@ -164,3 +164,8 @@ vp_content:
   | QUOTE; u = UIDENT; OF; t = delim_value_type; PIPE; v = vp_content {(u,Some t) :: v}
   ;
 
+poly_variant:
+  | LBRACK; LOWER; r = vp_content; RBRACK {(AST.Lower, r)}
+  | LBRACK; GREATER; r = vp_content; RBRACK {(AST.Greater, r)}
+  | LBRACK; r = vp_content; RBRACK {(AST.Equals, r)}
+  ;
